@@ -1,0 +1,50 @@
+<html>
+<head>
+   <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+
+   <center> <h1> Making Movies<br> </h1> </center><p></p>
+ 
+   <p> Some of the animations in IQmol can be recorded to make movie files that
+   can be displayed using video software.  On OS X IQmol can use the built-in
+   system support for QuickTime to generate a .mov file.  For Linux and
+   Windows IQmol will simply save the individual image files and these will
+   need to be compiled into a movie file using third party software.
+
+   The animations that can be recorded are:
+   <ul>
+      <li> Vibrational frequencies
+      <li> Pathways (optmization and IRC)
+      <li> Symmetrization of structures
+      <li> Adding hydrogens
+      <li> Translation to center
+   </ul>
+
+   <p> To record an animation, click the Record Animation Tool Bar button,
+   <img width=28 src="images/buttons/Movie.png"> Tool Bar button.  You will be
+   prompted for a either the name of the movie file (OS X) or the base name for
+   the image files (Linux and Windows - individual image files will be numbered
+   sequentially).  The Tool Bar button will begin to flash showing that the
+   images are being recorded and you may notice a slow down in the animation
+   speed as the files are written to disk.  All animations will continue to be
+   recorded until the Record Animation Tool Bar button is pressed again to end
+   the recording.  On OS X the image files will then be compiled into a .mov 
+   file and you may notice a slight delay while this is happening, depending on
+   the length of the movie.
+
+   <p> When recording, only the auto-update frames are recorded.  If you
+   manually rotate or otherwise manipulate the molecule while recording you may
+   not get what you expected.  If no animation is active, then no frames are
+   recorded even if the Tool Bar button is flashing.  So a pause between
+   animating two frequencies, for example, will not give rise to a pause in the
+   final movie.
+
+   <p> For recordings of vibrational frequencies and pathways it is recommended
+   that the Loop checkbox that appears in the configurators is unchecked to
+   prevent multiple cycles from being recorded.
+
+</body>
+
+</html>

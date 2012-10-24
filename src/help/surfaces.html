@@ -1,0 +1,112 @@
+<html>
+<head>
+   <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+
+   <center> <h1> Plotting Surfaces <br> </h1> </center><p></p>
+ 
+
+   <h3><a name="modelDensities"></a>Model Densities</h3>
+
+   <p> Plotting the true density from molecular orbital coefficients is
+   expensive and the high accuracy is ofen not required for a visual
+   representation.  IQmol can generate the following model surfaces without
+   having to calculate a wavefunction:
+      
+   <ul>
+      <li> van der Waals surface<br>
+	  <li> Promolecule density based on HF/6-311G Atomic Shell Approximation
+           densities (for atoms up to Kr).<br>
+	  <li> Superposition of Ionic Densities based on HF/6-311++G densities (for
+           atoms up to Ar).  SID uses the current atomic charges to determine 
+           the atomic density as a linear combination of the neutral and either
+           the cation or anion density.
+   </ul>
+
+   <p> To plot any of these surfaces, bring up the molecule configurator dialog
+   by double clicking the molecule name in the Model View.  Near the bottom of
+   this dialog are the options for adding a surface.  Added surfaces appear
+   under the 'Surfaces' sub-item under the molecule in the Model View.
+
+
+
+   <br>
+   <h3><a name="wavefunctionSurfaces"></a>Wavefuction-Based Surfaces</h3>
+
+   <p> If a formmated checkpoint file is available (extension .fchk) then the
+   following additional surfaces are available.
+
+   <ul>
+      <li> Molecular orbitals (alpha and beta)<br>
+      <li> Total density<br>
+      <li> Spin density<br>
+      <li> Alpha (and beta) density<br>
+   </ul>
+
+   <p> To plot any of these surfaces the following steps are required:
+
+   <ol>
+      <li> Open a checkpoint file either from the menu or by clicking the 
+           open button on the Toolbar. <br>
+	  <li> Once the file has loaded the molecule will appear in the Viewer and
+		   the 'Moleculear Orbitals' sub-item will appear in the Model View
+		   under the name of the molecule.  Double click the 'Molecular
+           Orbitals' item to bring up the add surface dialog.<br>
+      <li> Select the required surface and make any necessary changes to the
+           parameters.  Several surfaces can be queued before calculating them,
+           and this is computationally more efficient than calculating them one 
+           at a time.<br>
+      <li> Once the calculation of the surfaces has finished, they will appear
+           as sub-items of the 'Molecular Orbitals' item.  The visibility of a
+           surface can be controlled by the checkbox that appears next to it in 
+           the Model View.<br> 
+      <li> Double clicking a surface in the Model View opens a configuration
+           dialog that allows you to change the appearance of the surface.  Each
+           surface can be configured separately.
+   </ol>
+
+   <p> Note that the formatted checkpoint file only contains the cannonical
+   orbitals.  In order to visualize orbitals of other types (e.g. localized
+   orbitals), a cube file needs to be generated.
+
+
+   <br>
+   <h3><a name="surfaceProperties"></a>Displaying Properties on a Surface</h3>
+
+   <p> A surface can be colored based on some property that can be evaluated at
+   each point of the surface.  Distance from the origin and the electrostatic
+   potential (ESP) based on the atomic charges are properties that are always
+   available.  Additionally, if a cube file has been loaded with some other
+   property, then this can be used to color the surface also.
+ 
+   <p> To display a surface property, double click the surface in the Model
+   View to bring up the surface configurator dialog.  Select the desired
+   property from the combo box, the surface should update automatically.  A
+   small delay may occur if the property is expensive to compute for each point
+   on the surface.
+
+   <p> The colors used can be configured by clicking on the gradient displayed 
+   in the surface configurator dialog.
+
+
+   <br>
+   <h3>Notes</h3>
+
+   <ol>
+	  <li> Surface layers can appear under either the 'Surfaces' or the
+          'Moleculear Orbitals' sub-items in the Model View, depending on how the 
+           surface is generated. <br>
+      <li> The value selected for the quality of the surface will determine
+           how long it takes to evaulate the grid data.  Each step on the slider
+           calculates about four times as much data as the previous one, and thus 
+           the calculation will take about four times as long.  <br>
+      <li> Once the grid data has been generated for a particular property
+           (MO or density), additional surfaces (for example changing the
+           iso-value) can be computed relatively cheaply.<br>
+   </ol>
+
+</body>
+
+</html>

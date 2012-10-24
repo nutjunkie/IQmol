@@ -1,0 +1,98 @@
+<html>
+<head>
+   <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+
+   <center> <h1> Overview <br> </h1> </center><p></p>
+      
+   
+   <h3><a name="mainwindow"></a>Main Window</h3>
+
+   <p> The main window of IQmol is partitioned into four main parts:
+
+   <center><img src="images/MainWindow.png" /></center>
+  
+   <ul>
+      <li> The <a href="toolbar.html">Tool Bar</a> provides access to common
+           functions.<br>
+      <li> The <a href="modelview.html">Model View</a> provides a
+           hierarchical view of the data structures that make up the system.<br>
+      <li> The History view displays the actions that can be undone.  Clicking
+           on the item in the list will take the system back to that state.
+           The Edit&rarr;Undo and Edit&rarr;Redo menu options can also be
+           used to navigate the history stack.  The number of undo operations
+           can be configured in the preferences.<br>
+      <li> The Viewer forms the main part of the window and is where the molecule is
+           is displayed.
+   </ul>
+       
+
+   <br>
+   <h3><a name="open"></a>Opening Files</h3>
+
+   <p> IQmol's file IO is handled by the OpenBabel libraray which can handle
+   many common chemical file formats including the following:
+     
+   <table cellpadding=4 cellspacing=1>
+   <tr><td> <b>Type</b> </td>                <td> <b>File Extension</b> </td>  </tr>
+   <tr><td> XYZ coordinates</td>             <td> .xyz </td> </tr>
+   <tr><td> Q-Chem input/output</td>         <td> .inp/.out </td> </tr>
+   <tr><td> MDL Molfile </td>                <td> .mol </td> </tr>
+   <tr><td> Protein data back </td>          <td> .pdb </td> </tr>
+   <tr><td> Chemical markup language</td>    <td> .cml</td> </tr>
+   <tr><td> Formatted checkpoint files</td>  <td> .fchk </td> </tr>
+   </table>
+
+   <p> Check the OpenBabel documentation for other supported file types.
+      
+   <p> Files can be opened using the menu File&rarr;Open or the 
+   <img src="images/buttons/Open.png"> Tool Bar button.  Additionally, 
+   multiple files can be opened using the command line or, on systems that 
+   support drag and drop, by dragging the file icons from the system file 
+   manager into the Viewer window. 
+
+   <p> Note that when opening multiple files, only the last one is displayed.  Use
+   the checkbox associated with each molecule to toggle its visibility.
+
+
+   <br>
+   <h3><a name="build"></a>Building Molecules</h3>
+
+   <p> By default, IQmol opens in build mode.  This is indicated by a red border
+   around the <img src="images/buttons/Equipment.png"> icon in the Tool Bar.  Clicking
+   in the empty Viewer window will create an atom of the type indicated by the
+   Build Element button next to the Build button in the Tool Bar.  Clicking the
+   Build Element button causes a pop-up periodic table to appear, from which a new
+   build element can be selected.  
+
+   <p> Additional atoms can be added by clicking on an existing atom and
+   dragging the mouse.  This creates a new atom bonded to the first.  To create a
+   separate fragment, hold down the <i>alt</i> modifier key when clicking in the
+   Viewer window.
+
+   <p> Bond orders can be increased by clicking and dragging between two
+   existing atoms.  If no bond exists between the two atoms,  one is created.
+   Otherwise the bond order is increased.  To decrease the bond order, the bond
+   must first be deleted and a new bond created.
+
+   <p>Entire frgaments can be loaded from an existing file by using the 
+   <img src="images/buttons/AddFragment.png"> Tool Bar button.
+
+   <p> IQmol operates in free-form mode, which means standardized bond lengths
+   and angles are not used.  It is recommended that after drawing a moleule an
+   energy minimization is performed using the <img src="images/buttons/Minimize.png"> 
+   Tool Bar button.  Note that if your initial structure is very poor, the
+   minimizer will start off with too much energy and may not converge to the
+   desired structure.  Performing an additional minimization should fix this.
+
+   <p> If your molecule is symmetric, the optimizer is unlikely to find a
+   structure with the desired symmetry.  If this is the case, a nearly symmetric
+   structure can be symmetrized using the Build&rarr;Symmetrize Molecule menu
+   option.  Finding very high symmetry may require relaxing the tolerance using
+   the Build&rarr;Set Symmetry Tolerance menu option.
+
+</body>
+
+</html>

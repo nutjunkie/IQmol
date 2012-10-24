@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FrequenciesConfigurator</class>
+ <widget class="QDialog" name="FrequenciesConfigurator">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>354</width>
+    <height>435</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Vibrational Frequencies</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QToolButton {
+   color: #333;
+   background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, 
+          stop: 0 #fff,
+          stop: 0.5 #eee, 
+          stop: 1 #999);
+   border-width: 2px;
+   border-color: #333;
+   border-style: solid;
+   border-radius: 5;
+   padding: 0px;
+   font-size: 24px;
+   min-width: 34px;
+   max-width: 34px;
+   min-height: 34px;
+   max-height: 34px;
+}
+
+QToolButton:disabled {
+  background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, 
+          stop: 0 #fff,
+          stop: 0.5 #eee, 
+          stop: 1 #bbb);
+   border-color: #aaa;
+   color: #aaa;
+}
+
+QToolButton:pressed {
+   background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, 
+          stop: 0 #999,
+          stop: 0.5 #eee, 
+          stop: 1 #fff);
+}
+
+QToolButton:checked {
+   border-color: #b00;
+}
+
+QToolTip {
+   border: 2px solid darkkhaki;
+   padding: 2px;
+   border-radius: 3px;
+   opacity: 500;
+   font-size: 10px;
+}</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QTableWidget" name="frequencyTable">
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <attribute name="horizontalHeaderMinimumSectionSize">
+      <number>30</number>
+     </attribute>
+     <attribute name="verticalHeaderCascadingSectionResizes">
+      <bool>true</bool>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>Frequency (cm⁻¹)</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Intensity (km/mol)</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QToolButton" name="backButton">
+       <property name="toolTip">
+        <string>Move to previous frequency</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="IQmol.qrc">
+         <normaloff>:/resources/icons/GoBack.png</normaloff>:/resources/icons/GoBack.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="playButton">
+       <property name="toolTip">
+        <string>Start and stop animation</string>
+       </property>
+       <property name="styleSheet">
+        <string>QToolButton:checked {
+   border-color: #333;
+}</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="IQmol.qrc">
+         <normaloff>:/resources/icons/Play.png</normaloff>
+         <normalon>:/resources/icons/Stop.png</normalon>:/resources/icons/Play.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="forwardButton">
+       <property name="toolTip">
+        <string>Move to next frequency</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="IQmol.qrc">
+         <normaloff>:/resources/icons/GoForward.png</normaloff>:/resources/icons/GoForward.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Color</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="colorButton">
+       <property name="toolTip">
+        <string>Select the displacement vector color</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="loopButton">
+       <property name="text">
+        <string>Loop</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>10</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Amplitude</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QSlider" name="amplitudeSlider">
+       <property name="toolTip">
+        <string>This slider controls the magnitude of both the displacement vectors and animation.</string>
+       </property>
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="value">
+        <number>25</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Speed</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QSlider" name="speedSlider">
+       <property name="toolTip">
+        <string>Controls the speed of animation</string>
+       </property>
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="value">
+        <number>25</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="closeButton">
+       <property name="text">
+        <string>Close</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="IQmol.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>closeButton</sender>
+   <signal>clicked()</signal>
+   <receiver>FrequenciesConfigurator</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>229</x>
+     <y>448</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>139</x>
+     <y>238</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

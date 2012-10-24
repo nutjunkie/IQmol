@@ -1,0 +1,120 @@
+<html>
+<head>
+   <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+
+   <center> <h1> Viewer Modes <br> </h1> </center><p></p>
+ 
+
+   <p> IQmol operates in one of four modes that change the behavior of the mouse
+   actions.  Modes are selected by clicking on the appropriate tool from the
+   Tool Bar.  In addition, some modes can be activated whilst in the manipulate
+   mode using hot keys.
+
+
+
+   <br>
+   <h3><a name="manipulate"></a>Manipulate Mode</h3>
+       <img src="images/buttons/Manipulate.png">
+         
+   <p> Activating this mode changes the cursor to 
+   <img src="images/cursors/open_hand.png">.  This is the default mode for the
+   viewer and allows the molecule to be rotated and zoomed.
+
+   <p>The manipulate mode implements the following mouse functions:
+    
+   <ul>
+      <li> <B>Left click and drag:</B> Rotate the view of the molecule.  Cursor changes 
+           to <img src="images/cursors/closed_hand.png"> <br>
+      <li> <B>Middle click and drag:</B> Zoom in and out.  Cursor changes 
+           to <img src="images/cursors/zoom.png"> <br>
+      <li> <B>Right click and drag:</B> Translate the view of the molecule. Cursor
+           changes to <img src="images/cursors/translate.png"> <br>
+   </ul>
+
+
+
+   <br>
+   <h3><a name="build"></a>Build Mode</h3>
+       <img src="images/buttons/Equipment.png"> 
+
+   <p> Activating this mode changes the cursor to 
+   <img src="images/cursors/build.png">.  This mode can also be
+   activated using the <i>alt</i> modifier when in manipulate mode.
+
+   <p>The build mode implements the following mouse functions:
+    
+   <ul>
+	  <li> <B>Left click:</B> If no atoms exist, creates an atom. Clicking on
+		   an existing atom will convert it to the current build element shown
+           in the Toolbar.<br>
+      <li> <B>Click and drag:</B> If the click originates on an atom, this
+		   will create a bond and  a new atom.  If the drag occurs between two
+		   existing atoms, then a bond is created (if a bond already exists
+		   then the bond order is incresed). If the click does not originate on
+		   an atom, then this action rotates the molecule as in manipulate
+           mode. <br> 
+       <li> <B>Right click:</B> Deletes any atom or bond under the cursor.
+   </ul>
+
+
+
+   <br>
+   <h3><a name="select"></a>Select Mode</h3>
+       <img src="images/buttons/MagicWand.png">
+
+   <p> Activating this mode changes the cursor to 
+   <img src="images/cursors/select.png">.  This mode can also be activated
+   using the <i>shift key</i> when in manipulate mode.
+
+   <p>The select mode implements the following mouse functions:
+    
+   <ul>
+      <li> <B>Left click:</B> Adds atom or bond to selection. <br>
+      <li> <B>Click and drag:</B> Creates a selection rectangle, all atoms and bonds
+           within the selection rectangle are added to the selection. <br>
+      <li> <B>Right click:</B> Removes atom or bond from selection.
+   </ul>
+
+   <p>If the following items are selected, appropriate geometric infomation is
+   displayed in the bottom left of the viewer window:
+
+   <ul>
+      <li> <B>Atom:</B> Element type <br>
+      <li> <B>Bond:</B> Bond length <br>
+      <li> <B>Two atoms:</B> Inter-atomic distance<br>
+      <li> <B>Three atoms:</B> Bond angle<br>
+      <li> <B>Four atoms:</B> Torsion angle<br>
+   </ul>
+
+   <p>The selected geometric parameter can be constrained using the menu option
+   Build&rarr;Fix Constraint.  This will fix the value of this parameter when
+   the <img src="images/buttons/Minimize.png"> button is pressed.
+      
+
+
+   <br>
+   <h3><a name="manipulateSelection"></a>Manipulate Selection Mode</h3>
+
+   <p> Activating this mode changes the cursor to 
+   <img src="images/cursors/open_hand_select.png">.  This mode
+   manipulates only the selected atoms, and can only be activaed using the
+   <i>ctrl</i> modifier (&#8984; key on Mac).  This mode is useful for moving
+   and orienting separate fragments in the molecule.
+
+   <p>The manipulate selection mode implements the following mouse functions:
+
+   <ul>
+	  <li> <B>Left click and drag:</B> Rotate the selected atoms about their
+           center. Cursor changes to
+           <img src="images/cursors/closed_hand_select.png"> <br>
+      <li> <B>Right click and drag:</B> Translate the selected atoms.  Cursor changes
+           to <img src="images/cursors/translate_selection.png"> <br>
+   </ul>
+
+
+</body>
+
+</html>

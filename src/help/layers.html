@@ -1,0 +1,139 @@
+<html>
+<head>
+   <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+
+   <center> <h1> Layers <br> </h1> </center><p></p>
+ 
+
+   <h3><a name="layers"></a>Introduction</h3>
+
+   <p> IQmol uses the concept of Layers for overlays that are displayed on the
+   molecule model and also for representing data associated with a molecule.
+   Layers appear in the Model View section of the main window and form a tree
+   structure.  A checkbox besides a layer item indicates that the user has
+   control over the visibility of the layer.  Unchecking this causes the layer and
+   all its children to become invisible.
+
+   <p> Many layers can be configured by double clicking the layer item in the
+   Model View.  If there are any options for the layer, a dialog will appear
+   displaying them.  For example, double clicking on the molecule name causes
+   the molecule configurator dialog to appear which contains options for changing
+   the way the molecule appears (CPK, tubes etc.) and also allows model density
+   surfaces to be added.
+
+   <p> Note that each layer is configured separately, which gives maximum
+   control over the appearance of elements that make up the system.
+
+
+   <br>
+   <h3><a name="global"></a>Global Layers</h3>
+
+   <p> These layers are always present and can be accessed by opening the
+   Global layer item at the top of the Model View.  They represent items
+   that are not associated with a particular molecule.
+
+   <p> <b>Background:</b> This layer allows the user to change the color of the
+   Viewer background.  The checkbox can be used to disable the current color
+   and turns the background white.  This is useful when taking snapshots that
+   should have a white background.  The configurator allows the color to be
+   changed.
+
+   <p> <b>Axes:</b> This layer provides a visual aid to identify the cartesian
+   axes in the Viewer.  The axes are colored red (<i>x</i>), green (<i>y</i>),
+   blue (<i>z</i>).
+
+   <p> <b>Mesh:</b> This layer provides a visual aid to identify the cartesian
+   planes in the view.  A regular grid is drawn in either the <i>xy</i> (default), 
+   <i>xz</i> or <i>yz</i> planes.  The density of the mesh and its type (either
+   (cartesian or radial) can be configured.
+
+
+
+   <br>
+   <h3><a name="molecule"></a>Molecule Layers</h3>
+
+   <p> IQmol supports the display of multiple molecules and each molecule is
+   represented by its own layer in the Model View.  Data elements associated with
+   the molecule are appended as children.  A non-empty molecule always has the 
+   following layers:
+
+   <ul>
+	  <li> <b>Info:</b> The Info configurator provides a container for
+		   information about the molecule such as the number of atoms,
+           molecular mass and point group.  The dipole direction vector
+           is appended as a child to the Info layer.<br>
+
+      <li> <b>Atoms:</b> a list of the atoms in the system.  Atoms can be
+           selected using the Model View.  Multiple atoms can be selected by
+           holding down the <i>shift</i> key or the <i>ctrl</i> modifier
+           (&#8984; key on Mac).<br>
+
+      <li> <b>Bonds:</b> a list of the bonds in the system.  Like atoms, bonds
+           can also be selected using the Model View.<br>
+   </ul>
+
+
+   <br>
+   <h3><a name="other"></a>Other Layers</h3>
+
+   <p> In addition to the above layers, there are several other layers that
+   form part of the molecule data structure.  These layers only appear when
+   certain actions are taken by the user, for example opening a file.
+
+   <ul>
+      <li> <b>Files:</b> A list of files associated with the molecule that
+		   contain data that can be visualized using IQmol.  These include:
+		   output files (.out), formatted checkpointg files (.fchk) and cube
+		   files (.cube).  Double clicking a data file brings up a file viewer
+           that allows the user to view and search the contents of the file. <br>
+
+	  <li> <b>Molecular Orbitals:</b> Contains a list of the molecular orbitals
+		   that have been generated for the molecule.  This layer appears when
+           a formatted checkpoint file has been loaded into IQmol.
+		   See the <a href="surfaces.html">Plotting Surfaces</a> section on how
+		   to generate different types of surfaces.  Configuring a surface
+		   layer allows the user to customise the colors, surface property,
+		   rendering and some of the OpenGL display vairables (e.g.
+           transparency).<br>
+
+	  <li> <b>Frequencies:</b> This layer appears when an output file containing
+		   a frequency job is loaded.  See the 
+           <a href="vibrations.html">Vibrational Frequecies</a> section for more
+           details.<br>
+
+	  <li> <b>Geometries:</b> This layer appears when an output file containing
+           an optimization or intrinsic reaction coordinate (IRC) job is loaded.
+		   See the <a href="paths.html">Visualizing Pathways</a> section for more
+           details.<br>
+
+	  <li> <b>Surfaces:</b> Contains a list of the surfaces generated via the
+		   molecule configurator dialog.  These include items such as the van
+           der Waals (vdW) and promolecule density surfaces.  Note that a 
+           formatted checkpoint file is not required to generate these surfaces.
+           Individual surfaces can be configured by double clicking on them in 
+           the model view. <br>
+
+	  <li> <b>Constraints:</b> A list of constraints that have been applied to
+		   the molecule.  Constraints can be added by selecting the appropriate
+           atoms and using the Build&rarr;Set Constraint menu option.  The type of
+           constraint is determined by the number of selected atoms:
+           <ol>
+              <li> Fixed atom
+              <li> Inter-atomic distance
+              <li> Bond angle
+              <li> Torsion angle<br>
+           </ol>
+		   The constraint is displayed in the Viewer and can be disabled by
+		   clicking the checkbox in the Model View.  Only visible constraints
+		   are active when minimizing the energy and when generating a Q-Chem
+           input file.  
+
+   </ul>
+
+
+</body>
+
+</html>

@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DipoleConfigurator</class>
+ <widget class="QDialog" name="DipoleConfigurator">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>311</width>
+    <height>140</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Dipole Options</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QToolButton {
+   color: #333;
+   background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, 
+          stop: 0 #fff,
+          stop: 0.5 #eee, 
+          stop: 1 #999);
+   border-width: 2px;
+   border-color: #333;
+   border-style: solid;
+   border-radius: 5;
+   padding: 0px;
+   font-size: 24px;
+   min-width: 34px;
+   max-width: 34px;
+   min-height: 34px;
+   max-height: 34px;
+}
+
+QToolButton:disabled {
+  background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, 
+          stop: 0 #fff,
+          stop: 0.5 #eee, 
+          stop: 1 #bbb);
+   border-color: #aaa;
+   color: #aaa;
+}
+
+QToolButton:pressed {
+   background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, 
+          stop: 0 #999,
+          stop: 0.5 #eee, 
+          stop: 1 #fff);
+}
+
+QToolButton:checked {
+   border-color: #b00;
+}
+
+QToolTip {
+   border: 2px solid darkkhaki;
+   padding: 2px;
+   border-radius: 3px;
+   opacity: 500;
+   font-size: 10px;
+}</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Dipole:  </string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="dipoleLabel">
+       <property name="text">
+        <string>value</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Color</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="colorButton">
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Scale</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSlider" name="scaleSlider">
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="value">
+        <number>25</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="closeButton">
+       <property name="text">
+        <string>Close</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="IQmol.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>closeButton</sender>
+   <signal>clicked()</signal>
+   <receiver>DipoleConfigurator</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>229</x>
+     <y>448</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>139</x>
+     <y>238</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

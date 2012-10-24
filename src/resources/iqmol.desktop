@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=IQmol
+Comment=Molecular Visualization Package
+TryExec=IQmol
+Exec=IQmol %F
+Icon=resources/IQmol.png
+MimeType=text/plain

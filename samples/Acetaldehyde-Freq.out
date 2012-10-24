@@ -1,0 +1,863 @@
+/usr/local/qchem/22Jul11/exe/qcprog.exe .Acetaldehyde-Freq.inp.930.qcin.1 /scratch/atg/local/qchem930/
+
+                  Welcome to Q-Chem
+     A Quantum Leap Into The Future Of Chemistry
+
+ Y. Shao, L. Fusti-Molnar, Y. Jung, J. Kussmann, C. Ochsenfeld,
+ S. T. Brown, A. T. B. Gilbert, L. V. Slipchenko,S. V. Levchenko,
+ D. P. O'Neill, R. A. DiStasio Jr., R. C. Lochan, T. Wang,
+ G. J. O. Beran, N. A. Besley, J. M. Herbert, C. Y. Lin,
+ T. Van Voorhis, S. H. Chien, A. Sodt, R. P. Steele, 
+ V. A. Rassolov, P. E. Maslen, P. P. Korambath, R. D. Adamson,
+ B. Austin, J. Baker, E. F. C. Byrd, H. Dachsel, R. J. Doerksen,
+ A. Dreuw, B. D. Dunietz, A. D. Dutoi, T. R. Furlani,
+ S. R. Gwaltney, A. Heyden, S. Hirata, C.-P. Hsu, G. Kedziora,
+ R. Z. Khaliullin, P. Klunzinger, A. M. Lee, M. S. Lee, W. Liang,
+ I. Lotan, N. Nair, B. Peters, E. I. Proynov, P. A. Pieniazek, 
+ Y. M. Rhee, J. Ritchie, E. Rosta, C. D. Sherrill, 
+ A. C. Simmonett, J. E. Subotnik, H. L. Woodcock III,
+ W. Zhang, A. T. Bell, A. K. Chakraborty, D. M. Chipman,
+ F. J. Keil, A. Warshel, W. J. Hehre, H. F. Schaefer III,
+ J. Kong, A. I. Krylov, P. M. W. Gill, M. Head-Gordon,
+
+ Additional authors for Version 3.1: 
+ Z. Gan, Y. Zhao, N. E. Schultz, D. Truhlar, E. Epifanovsky and M. Oana.
+
+ Additional authors for Version 3.2: 
+ R. Baer, B. R. Brooks, D. Casanova, J.-D. Chai, C.-L. Cheng, 
+ C. Cramer, D. Crittenden, A. Ghysels, G. Hawkins, E. G. Hohenstein, 
+ C. Kelley, W. Kurlancheek, D. Liotard, E. Livshits, P. Manohar, 
+ A. Marenich, D. Neuhauser, R. Olson, M. A. Rohrdanz, K. S. Thanthiriwatte, 
+ A. J. W. Thom, V. Vanovschi, C. F. Williams, Q. Wu and Z.-Q. You. 
+ Additional authors for Version 4.0: 
+ E. Sundstrom, J. Parkhill, K. Lawler, D. Lambrecht, M. Goldey, R. Olivares-Amaya,
+ Y. Bernard, L. Vogt, M. Watson, J. Liu, S. Yeganeh, B. Kaduk, O. Vydrov, X. Xu, 
+ I. Kaliman, C. Zhang, N. Russ, I.Y. Zhang, W.A. Goddard III, F. Liu, R. King ,
+ A. Landau, M. Wormit, A. Dreuw, M. Diedenhofen, A. Klamt, A.W. Lange, D. Ghosh,
+ D. Kosenkov, A. Landau, D. Zuev, J. Deng, S.P. Mao, Y.C. Su, D. Small
+ 
+ Q-Chem, Version 4.0, Q-Chem, Inc., Pittsburgh, PA (2007).
+
+
+ MAC (Intel) OSX Version
+
+ Q-chem begins on Mon Feb  6 11:28:34 2012  
+
+aitkin.anu.edu.au
+Host: 0
+ Using version located at /usr/local/qchem/22Jul11/bin/qchem
+
+
+theFileMan(): MAXOPENFILES=2510 MAX_SUB_FILE_NUM=16
+Maximum size of a physical file is 2.0 GB, maximum size of a tmp-file is 32.0 GB
+
+
+Total Memory Limit in MB = 2000
+Mega-Array Size in MB = 62
+Finally everything over in PARseQInput
+
+--------------------------------------------------------------
+User input:
+--------------------------------------------------------------
+$molecule
+0 1
+  H   -1.707068    0.203401    0.880805
+  C   -1.161006   -0.159478    0.000000
+  H   -1.135363   -1.251590    0.000000
+  H   -1.707068    0.203401   -0.880805
+  C    0.238998    0.401892    0.000000
+  H    0.296098    1.514745    0.000000
+  O    1.249192   -0.265033    0.000000
+$end
+
+$rem
+   BASIS  =  6-31G*
+   EXCHANGE  =  B3LYP
+   GUI  =  2
+   JOB_TYPE  =  Frequency
+$end
+
+--------------------------------------------------------------
+ ----------------------------------------------------
+       Standard Nuclear Orientation (Angstroms)
+    I     Atom         X            Y            Z
+ ----------------------------------------------------
+    1      H      -1.713730     0.219516     0.880805
+    2      C      -1.171140    -0.148534     0.000000
+    3      H      -1.155873    -1.240840    -0.000000
+    4      H      -1.713730     0.219516    -0.880805
+    5      C       0.234133     0.399512     0.000000
+    6      H       0.301802     1.511772     0.000000
+    7      O       1.237946    -0.276979    -0.000000
+ ----------------------------------------------------
+ Molecular Point Group                 Cs    NOp =  2
+ Largest Abelian Subgroup              Cs    NOp =  2
+ Nuclear Repulsion Energy =    69.4744823140 hartrees
+ There are       12 alpha and       12 beta electrons
+ Requested basis set is 6-31G(d)
+ There are 20 shells and 53 basis functions
+
+Total QAlloc Memory Limit   2000 MB
+Mega-Array Size        77 MB
+MEM_STATIC part        62 MB
+
+finished with qalloc call
+
+                       Distance Matrix (Angstroms)
+             H (  1)   C (  2)   H (  3)   H (  4)   C (  5)   H (  6)
+   C (  2)  1.098036
+   H (  3)  1.794342  1.092413
+   H (  4)  1.761610  1.098036  1.794342
+   C (  5)  2.145318  1.508359  2.150086  2.145318
+   H (  6)  2.551101  2.219499  3.114754  2.551101  1.114317
+   O (  7)  3.120051  2.412508  2.580581  3.120051  1.210488  2.018910
+
+
+ Job number = 2, Threshold = 1.00E-11
+Integral type ranges set in mkLRange.C for JobNum: 2  <1-21|1-21>
+Symmetry turned off temporarily
+ Using the largest function pair in Schwarz integrals
+Total number of integrals generated =           25829
+Symmetry turned back on
+ A cutoff of  1.0D-11 yielded    209 shell pairs
+ There are      1511 function pairs
+ Job number = 11, Threshold = 1.00E-11
+Integral type ranges set in mkLRange.C for JobNum: 11  <1-21|22-22>
+Total number of integrals generated =            9863
+ Smallest overlap matrix eigenvalue = 5.69E-03
+ Multipole matrices computed through 2nd order
+ Guess from superposition of atomic densities
+ Warning:  Energy on first SCF cycle will be non-variational
+scfman initvdwdat 
+ A restricted hybrid HF-DFT SCF calculation will be
+ performed using Pulay DIIS extrapolation
+ Exchange:     0.2000 Hartree-Fock + 0.0800 Slater + 0.7200 Becke88
+ Correlation:  0.8100 LYP + 0.1900 VWN1RPA
+ Using SG-1 standard quadrature grid
+ SCF converges when DIIS error is below 1.0E-08
+Finding J and K together
+ Job number = 22, Threshold = 1.00E-11
+Integral type ranges set in mkLRange.C for JobNum: 22  <1-21|1-21>
+Approximate symmetry reduction factor = 1.039216
+Storing 165.41% of integrals
+Total number of integrals generated =         1126389
+Target Grid is being used
+ CPU 0.00 s  wall 0.00 s
+NTotSigB2 = 95565
+Total Number of Grid Points = 19662
+ CPU 0.72 s  wall 0.74 s
+
+ Total DFTman time = 0.72 CPUs 0.74 Wall
+Fock build time:  1.04 s (CPU) 1.08 s (wall)
+DIIS Errors:  Max 8.00E-01 RMS 1.04E-01
+
+Current DIIS subspace size = 1
+REM_GRID_RESTART_DIIS = 0
+
+ ---------------------------------------
+  Cycle       Energy         DIIS Error
+ ---------------------------------------
+    1    -154.1760424512      1.04E-01  00000
+Finding J and K together
+ Job number = 22, Threshold = 1.00E-11
+Integral type ranges set in mkLRange.C for JobNum: 22  <1-21|1-21>
+Approximate symmetry reduction factor = 1.039216
+Storing 165.41% of integrals
+Reusing in-core integrals buffer for job 22
+Target Grid is being used
+ CPU 0.00 s  wall 0.00 s
+NTotSigB2 = 95565
+Total Number of Grid Points = 19662
+ CPU 0.71 s  wall 0.71 s
+
+ Total DFTman time = 0.71 CPUs 0.71 Wall
+Fock build time:  0.84 s (CPU) 0.85 s (wall)
+DIIS Errors:  Max 1.99E-01 RMS 1.72E-02
+
+Current DIIS subspace size = 2
+REM_GRID_RESTART_DIIS = 0
+
+    2    -153.7386758227      1.72E-02  00000
+Finding J and K together
+ Job number = 22, Threshold = 1.00E-11
+Integral type ranges set in mkLRange.C for JobNum: 22  <1-21|1-21>
+Approximate symmetry reduction factor = 1.039216
+Storing 165.41% of integrals
+Reusing in-core integrals buffer for job 22
+Target Grid is being used
+ CPU 0.00 s  wall 0.00 s
+NTotSigB2 = 95565
+Total Number of Grid Points = 19662
+ CPU 0.75 s  wall 0.75 s
+
+ Total DFTman time = 0.75 CPUs 0.75 Wall
+Fock build time:  0.88 s (CPU) 0.89 s (wall)
+DIIS Errors:  Max 4.00E-01 RMS 3.15E-02
+
+Current DIIS subspace size = 3
+REM_GRID_RESTART_DIIS = 0
+
+    3    -153.5509119967      3.15E-02  00000
+Finding J and K together
+ Job number = 22, Threshold = 1.00E-11
+Integral type ranges set in mkLRange.C for JobNum: 22  <1-21|1-21>
+Approximate symmetry reduction factor = 1.039216
+Storing 165.41% of integrals
+Reusing in-core integrals buffer for job 22
+Target Grid is being used
+ CPU 0.00 s  wall 0.00 s
+NTotSigB2 = 95565
+Total Number of Grid Points = 19662
+ CPU 0.74 s  wall 0.74 s
+
+ Total DFTman time = 0.74 CPUs 0.74 Wall
+Fock build time:  0.87 s (CPU) 0.88 s (wall)
+DIIS Errors:  Max 5.60E-02 RMS 5.32E-03
+
+Current DIIS subspace size = 4
+REM_GRID_RESTART_DIIS = 0
+
+    4    -153.8207632692      5.32E-03  00000
+Finding J and K together
+ Job number = 22, Threshold = 1.00E-11
+Integral type ranges set in mkLRange.C for JobNum: 22  <1-21|1-21>
+Approximate symmetry reduction factor = 1.039216
+Storing 165.41% of integrals
+Reusing in-core integrals buffer for job 22
+Target Grid is being used
+ CPU 0.00 s  wall 0.00 s
+NTotSigB2 = 95565
+Total Number of Grid Points = 19662
+ CPU 0.74 s  wall 0.74 s
+
+ Total DFTman time = 0.74 CPUs 0.74 Wall
+Fock build time:  0.87 s (CPU) 0.88 s (wall)
+DIIS Errors:  Max 8.77E-03 RMS 9.27E-04
+
+Current DIIS subspace size = 5
+REM_GRID_RESTART_DIIS = 0
+
+    5    -153.8298540767      9.27E-04  00000
+Finding J and K together
+ Job number = 22, Threshold = 1.00E-11
+Integral type ranges set in mkLRange.C for JobNum: 22  <1-21|1-21>
+Approximate symmetry reduction factor = 1.039216
+Storing 165.41% of integrals
+Reusing in-core integrals buffer for job 22
+Target Grid is being used
+ CPU 0.00 s  wall 0.00 s
+NTotSigB2 = 95565
+Total Number of Grid Points = 19662
+ CPU 0.74 s  wall 0.77 s
+
+ Total DFTman time = 0.74 CPUs 0.77 Wall
+Fock build time:  0.87 s (CPU) 0.90 s (wall)
+DIIS Errors:  Max 1.91E-03 RMS 2.02E-04
+
+Current DIIS subspace size = 6
+REM_GRID_RESTART_DIIS = 0
+
+    6    -153.8300976663      2.02E-04  00000
+Finding J and K together
+ Job number = 22, Threshold = 1.00E-11
+Integral type ranges set in mkLRange.C for JobNum: 22  <1-21|1-21>
+Approximate symmetry reduction factor = 1.039216
+Storing 165.41% of integrals
+Reusing in-core integrals buffer for job 22
+Target Grid is being used
+ CPU 0.00 s  wall 0.00 s
+NTotSigB2 = 95565
+Total Number of Grid Points = 19662
+ CPU 0.74 s  wall 0.74 s
+
+ Total DFTman time = 0.74 CPUs 0.74 Wall
+Fock build time:  0.88 s (CPU) 0.89 s (wall)
+DIIS Errors:  Max 7.45E-04 RMS 5.77E-05
+
+Current DIIS subspace size = 7
+REM_GRID_RESTART_DIIS = 0
+
+    7    -153.8301100177      5.77E-05  00000
+Finding J and K together
+ Job number = 22, Threshold = 1.00E-11
+Integral type ranges set in mkLRange.C for JobNum: 22  <1-21|1-21>
+Approximate symmetry reduction factor = 1.039216
+Storing 165.41% of integrals
+Reusing in-core integrals buffer for job 22
+Target Grid is being used
+ CPU 0.00 s  wall 0.00 s
+NTotSigB2 = 95565
+Total Number of Grid Points = 19662
+ CPU 0.73 s  wall 0.73 s
+
+ Total DFTman time = 0.73 CPUs 0.73 Wall
+Fock build time:  0.86 s (CPU) 0.87 s (wall)
+DIIS Errors:  Max 1.13E-04 RMS 1.08E-05
+
+Current DIIS subspace size = 8
+REM_GRID_RESTART_DIIS = 0
+
+    8    -153.8301110585      1.08E-05  00000
+Finding J and K together
+ Job number = 22, Threshold = 1.00E-11
+Integral type ranges set in mkLRange.C for JobNum: 22  <1-21|1-21>
+Approximate symmetry reduction factor = 1.039216
+Storing 165.41% of integrals
+Reusing in-core integrals buffer for job 22
+Target Grid is being used
+ CPU 0.00 s  wall 0.00 s
+NTotSigB2 = 95565
+Total Number of Grid Points = 19662
+ CPU 0.72 s  wall 0.74 s
+
+ Total DFTman time = 0.72 CPUs 0.74 Wall
+Fock build time:  0.85 s (CPU) 0.87 s (wall)
+DIIS Errors:  Max 1.66E-05 RMS 1.69E-06
+
+Current DIIS subspace size = 9
+REM_GRID_RESTART_DIIS = 0
+
+    9    -153.8301110917      1.69E-06  00000
+Finding J and K together
+ Job number = 22, Threshold = 1.00E-11
+Integral type ranges set in mkLRange.C for JobNum: 22  <1-21|1-21>
+Approximate symmetry reduction factor = 1.039216
+Storing 165.41% of integrals
+Reusing in-core integrals buffer for job 22
+Target Grid is being used
+ CPU 0.00 s  wall 0.00 s
+NTotSigB2 = 95565
+Total Number of Grid Points = 19662
+ CPU 0.70 s  wall 0.70 s
+
+ Total DFTman time = 0.70 CPUs 0.70 Wall
+Fock build time:  0.83 s (CPU) 0.84 s (wall)
+DIIS Errors:  Max 1.15E-06 RMS 1.05E-07
+
+Current DIIS subspace size = 10
+REM_GRID_RESTART_DIIS = 0
+
+   10    -153.8301110893      1.05E-07  00000
+Finding J and K together
+ Job number = 22, Threshold = 1.00E-11
+Integral type ranges set in mkLRange.C for JobNum: 22  <1-21|1-21>
+Approximate symmetry reduction factor = 1.039216
+Storing 165.41% of integrals
+Reusing in-core integrals buffer for job 22
+Target Grid is being used
+ CPU 0.00 s  wall 0.00 s
+NTotSigB2 = 95565
+Total Number of Grid Points = 19662
+ CPU 0.64 s  wall 0.64 s
+
+ Total DFTman time = 0.64 CPUs 0.64 Wall
+Fock build time:  0.77 s (CPU) 0.78 s (wall)
+DIIS Errors:  Max 3.82E-07 RMS 3.34E-08
+
+Current DIIS subspace size = 11
+REM_GRID_RESTART_DIIS = 0
+
+   11    -153.8301110925      3.34E-08  00000
+Finding J and K together
+ Job number = 22, Threshold = 1.00E-11
+Integral type ranges set in mkLRange.C for JobNum: 22  <1-21|1-21>
+Approximate symmetry reduction factor = 1.039216
+Storing 165.41% of integrals
+Reusing in-core integrals buffer for job 22
+Target Grid is being used
+ CPU 0.00 s  wall 0.00 s
+NTotSigB2 = 95565
+Total Number of Grid Points = 19662
+ CPU 0.56 s  wall 0.56 s
+
+ Total DFTman time = 0.56 CPUs 0.56 Wall
+Fock build time:  0.69 s (CPU) 0.70 s (wall)
+DIIS Errors:  Max 4.53E-08 RMS 3.76E-09
+
+Current DIIS subspace size = 12
+REM_GRID_RESTART_DIIS = 0
+
+   12    -153.8301110890      3.76E-09  00000 Convergence criterion met
+ ---------------------------------------
+ SCF time:  CPU 10.32 s  wall 10.52 s
+ SCF   energy in the final basis set = -153.8301110890
+ Total energy in the final basis set = -153.8301110890
+Symmetry turned off temporarily
+ Analysis of SCF Wavefunction
+
+ --------------------------------------------------------------
+             Orbital Energies (a.u.) and Symmetries
+ --------------------------------------------------------------
+
+ Alpha MOs, Restricted
+ -- Occupied --                  
+-19.151 -10.282 -10.198  -1.046  -0.754  -0.581  -0.477  -0.445
+  1 A'    2 A'    3 A'    4 A'    5 A'    6 A'    7 A'    1 A"                 
+ -0.434  -0.399  -0.364  -0.255
+  8 A'    9 A'    2 A"   10 A'                                                 
+ -- Virtual --                   
+ -0.022   0.107   0.131   0.152   0.154   0.255   0.280   0.525
+  3 A"   11 A'   12 A'   13 A'    4 A"   14 A'   15 A'    5 A"                 
+  0.537   0.586   0.597   0.668   0.706   0.749   0.844   0.846
+ 16 A'   17 A'    6 A"   18 A'   19 A'   20 A'    7 A"   21 A'                 
+  0.877   0.920   0.934   0.990   1.080   1.250   1.399   1.476
+ 22 A'   23 A'   24 A'    8 A"   25 A'   26 A'    9 A"   27 A'                 
+  1.530   1.692   1.799   1.808   1.845   2.058   2.060   2.148
+ 10 A"   28 A'   29 A'   11 A"   30 A'   31 A'   12 A"   32 A'                 
+  2.293   2.355   2.535   2.581   2.849   2.941   3.809   4.067
+ 13 A"   33 A'   34 A'   14 A"   35 A'   36 A'   37 A'   38 A'                 
+  4.331
+ 39 A'                                                                         
+
+ Beta MOs, Restricted
+ -- Occupied --                  
+-19.151 -10.282 -10.198  -1.046  -0.754  -0.581  -0.477  -0.445
+  1 A'    2 A'    3 A'    4 A'    5 A'    6 A'    7 A'    1 A"                 
+ -0.434  -0.399  -0.364  -0.255
+  8 A'    9 A'    2 A"   10 A'                                                 
+ -- Virtual --                   
+ -0.022   0.107   0.131   0.152   0.154   0.255   0.280   0.525
+  3 A"   11 A'   12 A'   13 A'    4 A"   14 A'   15 A'    5 A"                 
+  0.537   0.586   0.597   0.668   0.706   0.749   0.844   0.846
+ 16 A'   17 A'    6 A"   18 A'   19 A'   20 A'    7 A"   21 A'                 
+  0.877   0.920   0.934   0.990   1.080   1.250   1.399   1.476
+ 22 A'   23 A'   24 A'    8 A"   25 A'   26 A'    9 A"   27 A'                 
+  1.530   1.692   1.799   1.808   1.845   2.058   2.060   2.148
+ 10 A"   28 A'   29 A'   11 A"   30 A'   31 A'   12 A"   32 A'                 
+  2.293   2.355   2.535   2.581   2.849   2.941   3.809   4.067
+ 13 A"   33 A'   34 A'   14 A"   35 A'   36 A'   37 A'   38 A'                 
+  4.331
+ 39 A'                                                                         
+ --------------------------------------------------------------
+
+          Ground-State Mulliken Net Atomic Charges
+
+     Atom                 Charge (a.u.)
+  ----------------------------------------
+      1 H                     0.173360
+      2 C                    -0.517295
+      3 H                     0.182131
+      4 H                     0.173360
+      5 C                     0.260958
+      6 H                     0.101768
+      7 O                    -0.374281
+  ----------------------------------------
+  Sum of atomic charges =    -0.000000
+
+ -----------------------------------------------------------------
+                    Cartesian Multipole Moments
+ -----------------------------------------------------------------
+    Charge (ESU x 10^10)
+                -0.0000
+    Dipole Moment (Debye)
+         X      -2.4196      Y       1.0575      Z       0.0000
+       Tot       2.6406
+    Quadrupole Moments (Debye-Ang)
+        XX     -20.5096     XY       0.8223     YY     -17.8006
+        XZ       0.0000     YZ      -0.0000     ZZ     -17.6010
+    Octapole Moments (Debye-Ang^2)
+       XXX      -0.3926    XXY       0.7454    XYY       1.0400
+       YYY      -1.2286    XXZ       0.0000    XYZ       0.0000
+       YYZ       0.0000    XZZ       0.8569    YZZ       0.0305
+       ZZZ       0.0000
+    Hexadecapole Moments (Debye-Ang^3)
+      XXXX    -147.9162   XXXY      -2.0399   XXYY     -31.0542
+      XYYY       0.3820   YYYY     -41.0110   XXXZ       0.0000
+      XXYZ      -0.0000   XYYZ      -0.0000   YYYZ      -0.0000
+      XXZZ     -25.4303   XYZZ      -1.2362   YYZZ     -11.1743
+      XZZZ       0.0000   YZZZ      -0.0000   ZZZZ     -22.0829
+ -----------------------------------------------------------------
+ Calculating MO derivatives via CPSCF
+use symmetric Px in CPSCF
+Wx will be set to be (0.5PFCCt+0.5CCtFP)x rather than (PFP)x
+ Job number = 111, Threshold = 1.00E-11
+Integral type ranges set in mkLRange.C for JobNum: 11  <1-21|22-22>
+Total number of integrals generated =           10577
+ Job number = 31, Threshold = 1.00E-11
+Integral type ranges set in mkLRange.C for JobNum: 31  <1-21|1-21>
+Storing 159.17% of integrals
+Total number of integrals generated =         1154057
+ CPU 0.00 s  wall 0.00 s
+NTotSigB2 = 95565
+Total Number of Grid Points = 19662
+ CPU 20.38 s  wall 20.58 s
+
+ Total DFTman time = 20.38 CPUs 20.58 Wall
+ Job number = 130, Threshold = 1.00E-11
+Integral type ranges set in mkLRange.C for JobNum: 30  <1-21|1-21>
+ CPU 0.00 s  wall 0.00 s
+NTotSigB2 = 95565
+Total Number of Grid Points = 19662
+ CPU 19.21 s  wall 19.51 s
+
+ Total DFTman time = 19.21 CPUs 19.51 Wall
+ using symmetry in setfoz
+ Job number = 31, Threshold = 1.00E-11
+Integral type ranges set in mkLRange.C for JobNum: 31  <1-21|1-21>
+Storing 159.17% of integrals
+ CPU 0.00 s  wall 0.00 s
+NTotSigB2 = 95565
+Total Number of Grid Points = 19662
+ CPU 20.72 s  wall 21.21 s
+
+ Total DFTman time = 20.72 CPUs 21.21 Wall
+ using symmetry in makeab
+   1         3          21      0.204508    0.066146
+ using symmetry in setfoz
+ Job number = 31, Threshold = 1.00E-11
+Integral type ranges set in mkLRange.C for JobNum: 31  <1-21|1-21>
+Storing 159.17% of integrals
+ CPU 0.00 s  wall 0.00 s
+NTotSigB2 = 95565
+Total Number of Grid Points = 19662
+ CPU 20.73 s  wall 21.02 s
+
+ Total DFTman time = 20.73 CPUs 21.02 Wall
+ using symmetry in makeab
+   2         3          21      0.013188    0.004520
+ using symmetry in setfoz
+ Job number = 31, Threshold = 1.00E-11
+Integral type ranges set in mkLRange.C for JobNum: 31  <1-21|1-21>
+Storing 159.17% of integrals
+ CPU 0.00 s  wall 0.00 s
+NTotSigB2 = 95565
+Total Number of Grid Points = 19662
+ CPU 20.77 s  wall 21.17 s
+
+ Total DFTman time = 20.77 CPUs 21.17 Wall
+ using symmetry in makeab
+   3         3          21      0.000528    0.000180
+ using symmetry in setfoz
+ Job number = 31, Threshold = 1.00E-11
+Integral type ranges set in mkLRange.C for JobNum: 31  <1-21|1-21>
+Storing 159.17% of integrals
+ CPU 0.00 s  wall 0.00 s
+NTotSigB2 = 95565
+Total Number of Grid Points = 19662
+ CPU 20.84 s  wall 21.46 s
+
+ Total DFTman time = 20.84 CPUs 21.46 Wall
+ using symmetry in makeab
+   4        18           6      0.000015    0.000007
+ using symmetry in setfoz
+ Job number = 31, Threshold = 1.00E-11
+Integral type ranges set in mkLRange.C for JobNum: 31  <1-21|1-21>
+Storing 159.17% of integrals
+ CPU 0.00 s  wall 0.00 s
+NTotSigB2 = 95565
+Total Number of Grid Points = 19662
+ CPU 11.03 s  wall 11.11 s
+
+ Total DFTman time = 11.03 CPUs 11.11 Wall
+ using symmetry in makeab
+   5        24           0      0.000000    0.000000    Roots Converged
+ Job number = 31, Threshold = 1.00E-11
+Integral type ranges set in mkLRange.C for JobNum: 31  <1-21|1-21>
+Storing 159.17% of integrals
+ CPU 0.00 s  wall 0.00 s
+NTotSigB2 = 95565
+Total Number of Grid Points = 19662
+ CPU 22.11 s  wall 22.15 s
+
+ Total DFTman time = 22.11 CPUs 22.15 Wall
+ CPSCF time:  CPU 164.36 s  wall 166.97 s
+ Calculating analytic Hessian of the SCF energy
+ Polarizability Matrix (a.u.)
+            1           2           3
+    1 -28.8952157   1.7994671  -0.0000000
+    2   1.7994671 -25.1297929   0.0000000
+    3  -0.0000000   0.0000000 -17.3090095
+ Job number = 211, Threshold = 1.00E-11
+Integral type ranges set in mkLRange.C for JobNum: 11  <1-21|22-22>
+Total number of integrals generated =           10577
+Finding J and K together
+ Job number = 222, Threshold = 1.00E-11
+Integral type ranges set in mkLRange.C for JobNum: 22  <1-21|1-21>
+Total number of integrals generated =         1154057
+ CPU 0.00 s  wall 0.00 s
+NTotSigB2 = 276259
+Total Number of Grid Points = 19662
+ CPU 32.36 s  wall 32.47 s
+
+ Total DFTman time = 32.36 CPUs 32.47 Wall
+
+ Direct stationary perturbation theory relativistic correction:
+
+ rels  =       0.047379396902
+ relv  =      -0.195013518358
+ rel2e =       0.068998072282
+ E_rel =      -0.078636049173
+
+ Hessian of the SCF Energy
+            1           2           3           4           5           6
+    1   0.1171991  -0.0468522  -0.1155456  -0.1073278   0.0411961   0.1105996
+    2  -0.0468522   0.0780646   0.0784937   0.0393966  -0.0793005  -0.0705182
+    3  -0.1155456   0.0784937   0.2330004   0.1058272  -0.0717574  -0.2136992
+    4  -0.1073278   0.0393966   0.1058272   0.4807358  -0.0350561  -0.0000000
+    5   0.0411961  -0.0793005  -0.0717574  -0.0350561   0.6002759  -0.0000000
+    6   0.1105996  -0.0705182  -0.2136992  -0.0000000  -0.0000000   0.5231736
+    7  -0.0003236   0.0159449  -0.0021457  -0.0498053   0.0084928  -0.0000000
+    8  -0.0002291  -0.0071173   0.0007198   0.0047228  -0.3253123   0.0000000
+    9  -0.0014072  -0.0266883   0.0017009  -0.0000000   0.0000000  -0.0508608
+   10   0.0096230  -0.0058427   0.0141198  -0.1073278   0.0411961  -0.1105996
+   11  -0.0058427   0.0030732  -0.0090399   0.0393966  -0.0793005   0.0705182
+   12  -0.0141198   0.0090399  -0.0220492  -0.1058272   0.0717574  -0.2136992
+   13  -0.0152269  -0.0023363  -0.0019683  -0.1636019  -0.0538696   0.0000000
+   14   0.0167365   0.0050533   0.0003414  -0.0543900  -0.1289742   0.0000000
+   15   0.0277274   0.0128365   0.0021143  -0.0000000   0.0000000  -0.0877877
+   16   0.0010602   0.0010731   0.0006164   0.0015234  -0.0293395   0.0000000
+   17  -0.0012480  -0.0003909   0.0006130  -0.0001325  -0.0095255   0.0000000
+   18  -0.0033851  -0.0015096   0.0000837  -0.0000000  -0.0000000   0.0172486
+   19  -0.0050040  -0.0013834  -0.0009038  -0.0541964   0.0273802  -0.0000000
+   20  -0.0037606   0.0006176   0.0006294   0.0060627   0.0221370  -0.0000000
+   21  -0.0038693  -0.0016540  -0.0011509   0.0000000   0.0000000   0.0256248
+            7           8           9          10          11          12
+    1  -0.0003236  -0.0002291  -0.0014072   0.0096230  -0.0058427  -0.0141198
+    2   0.0159449  -0.0071173  -0.0266883  -0.0058427   0.0030732   0.0090399
+    3  -0.0021457   0.0007198   0.0017009   0.0141198  -0.0090399  -0.0220492
+    4  -0.0498053   0.0047228  -0.0000000  -0.1073278   0.0393966  -0.1058272
+    5   0.0084928  -0.3253123   0.0000000   0.0411961  -0.0793005   0.0717574
+    6  -0.0000000   0.0000000  -0.0508608  -0.1105996   0.0705182  -0.2136992
+    7   0.0494566  -0.0046549   0.0000000  -0.0003236   0.0159449   0.0021457
+    8  -0.0046549   0.3503726  -0.0000000  -0.0002291  -0.0071173  -0.0007198
+    9   0.0000000  -0.0000000   0.0475801   0.0014072   0.0266883   0.0017009
+   10  -0.0003236  -0.0002291   0.0014072   0.1171991  -0.0468522   0.1155456
+   11   0.0159449  -0.0071173   0.0266883  -0.0468522   0.0780646  -0.0784937
+   12   0.0021457  -0.0007198   0.0017009   0.1155456  -0.0784937   0.2330004
+   13   0.0028640   0.0017738  -0.0000000  -0.0152269  -0.0023363   0.0019683
+   14  -0.0380483  -0.0151497  -0.0000000   0.0167365   0.0050533  -0.0003414
+   15   0.0000000  -0.0000000  -0.0011110  -0.0277274  -0.0128365   0.0021143
+   16  -0.0060882  -0.0023761  -0.0000000   0.0010602   0.0010731  -0.0006164
+   17  -0.0019758   0.0002131  -0.0000000  -0.0012480  -0.0003909  -0.0006130
+   18  -0.0000000   0.0000000   0.0024616   0.0033851   0.0015096   0.0000837
+   19   0.0042201   0.0009927   0.0000000  -0.0050040  -0.0013834   0.0009038
+   20   0.0042965   0.0041108  -0.0000000  -0.0037606   0.0006176  -0.0006294
+   21  -0.0000000  -0.0000000  -0.0014718   0.0038693   0.0016540  -0.0011509
+           13          14          15          16          17          18
+    1  -0.0152269   0.0167365   0.0277274   0.0010602  -0.0012480  -0.0033851
+    2  -0.0023363   0.0050533   0.0128365   0.0010731  -0.0003909  -0.0015096
+    3  -0.0019683   0.0003414   0.0021143   0.0006164   0.0006130   0.0000837
+    4  -0.1636019  -0.0543900  -0.0000000   0.0015234  -0.0001325  -0.0000000
+    5  -0.0538696  -0.1289742   0.0000000  -0.0293395  -0.0095255  -0.0000000
+    6   0.0000000   0.0000000  -0.0877877   0.0000000   0.0000000   0.0172486
+    7   0.0028640  -0.0380483   0.0000000  -0.0060882  -0.0019758  -0.0000000
+    8   0.0017738  -0.0151497  -0.0000000  -0.0023761   0.0002131   0.0000000
+    9  -0.0000000  -0.0000000  -0.0011110  -0.0000000  -0.0000000   0.0024616
+   10  -0.0152269   0.0167365  -0.0277274   0.0010602  -0.0012480   0.0033851
+   11  -0.0023363   0.0050533  -0.0128365   0.0010731  -0.0003909   0.0015096
+   12   0.0019683  -0.0003414   0.0021143  -0.0006164  -0.0006130   0.0000837
+   13   0.8319137  -0.2199535  -0.0000000  -0.0692656  -0.0430436  -0.0000000
+   14  -0.2199535   0.7210067   0.0000000  -0.0358147  -0.2571435  -0.0000000
+   15  -0.0000000   0.0000000   0.2105328   0.0000000  -0.0000000  -0.0624075
+   16  -0.0692656  -0.0358147   0.0000000   0.0719623   0.0186509  -0.0000000
+   17  -0.0430436  -0.2571435  -0.0000000   0.0186509   0.2972550  -0.0000000
+   18  -0.0000000  -0.0000000  -0.0624075  -0.0000000  -0.0000000   0.0221831
+   19  -0.5714563   0.3147335   0.0000000  -0.0002523   0.0289971   0.0000000
+   20   0.3197653  -0.3298459  -0.0000000   0.0467333  -0.0300173   0.0000000
+   21   0.0000000  -0.0000000  -0.0634553  -0.0000000   0.0000000   0.0203468
+           19          20          21
+    1  -0.0050040  -0.0037606  -0.0038693
+    2  -0.0013834   0.0006176  -0.0016540
+    3  -0.0009038   0.0006294  -0.0011509
+    4  -0.0541964   0.0060627   0.0000000
+    5   0.0273802   0.0221370   0.0000000
+    6  -0.0000000  -0.0000000   0.0256248
+    7   0.0042201   0.0042965  -0.0000000
+    8   0.0009927   0.0041108  -0.0000000
+    9   0.0000000  -0.0000000  -0.0014718
+   10  -0.0050040  -0.0037606   0.0038693
+   11  -0.0013834   0.0006176   0.0016540
+   12   0.0009038  -0.0006294  -0.0011509
+   13  -0.5714563   0.3197653   0.0000000
+   14   0.3147335  -0.3298459  -0.0000000
+   15   0.0000000  -0.0000000  -0.0634553
+   16  -0.0002523   0.0467333  -0.0000000
+   17   0.0289971  -0.0300173   0.0000000
+   18   0.0000000   0.0000000   0.0203468
+   19   0.6316929  -0.3693367  -0.0000000
+   20  -0.3693367   0.3323802   0.0000000
+   21  -0.0000000   0.0000000   0.0212573
+ Gradient time:  CPU 202.30 s  wall 207.03 s
+ ------------------------------------------------------------------------------
+                     drvman        : Timing summary (seconds)
+ ------------------------------------------------------------------------------
+     job step          cpu (% of tot)      sys (% of tot)     wall (% of tot)
+ ------------------------------------------------------------------------------
+  cpscf_lag         0.4293E+02 (21.2)   0.2560E-03 (23.3)   0.4361E+02 (21.1)
+  iterzp            0.9837E+02 (48.6)   0.5450E-03 (49.5)   0.1003E+03 (48.4)
+  make_fx           0.2305E+02 (11.4)   0.1260E-03 (11.4)   0.2309E+02 (11.2)
+  scf_hess          0.3794E+02 (18.8)   0.1730E-03 (15.7)   0.4006E+02 (19.3)
+ ------------------------------------------------------------------------------
+   Grand Totals     0.2023E+03          0.1101E-02          0.2070E+03
+ ------------------------------------------------------------------------------
+ JobOver = TRUE
+ **********************************************************************
+ **                                                                  **
+ **                       VIBRATIONAL ANALYSIS                       **
+ **                       --------------------                       **
+ **                                                                  **
+ **        VIBRATIONAL FREQUENCIES (CM**-1) AND NORMAL MODES         **
+ **     FORCE CONSTANTS (mDYN/ANGSTROM) AND REDUCED MASSES (AMU)     **
+ **                  INFRARED INTENSITIES (KM/MOL)                   **
+ **                                                                  **
+ **********************************************************************
+
+
+ Mode:                 1                      2                      3
+ Frequency:       151.64                 505.89                 778.03
+ Force Cnst:      0.0168                 0.3835                 0.4013
+ Red. Mass:       1.2403                 2.5435                 1.1251
+ IR Active:          YES                    YES                    YES
+ IR Intens:        0.278                 12.882                  0.658
+ Raman Active:       YES                    YES                    YES
+               X      Y      Z        X      Y      Z        X      Y      Z
+ H         -0.279  0.388 -0.343    0.013  0.333 -0.015    0.453  0.202  0.137
+ C          0.000  0.000 -0.004   -0.166  0.024  0.000   -0.000  0.000 -0.070
+ H          0.000  0.000  0.431   -0.754  0.017 -0.000   -0.000  0.000  0.262
+ H          0.279 -0.388 -0.343    0.013  0.333  0.015   -0.453 -0.202  0.137
+ C          0.000  0.000  0.109   -0.017 -0.207  0.000    0.000  0.000 -0.067
+ H          0.000  0.000  0.319   -0.230 -0.185 -0.000    0.000 -0.000  0.627
+ O         -0.000 -0.000 -0.083    0.198  0.105 -0.000    0.000  0.000  0.030
+ TransDip  -0.000  0.000  0.017   -0.088 -0.074  0.000    0.000  0.000  0.026
+
+ Mode:                 4                      5                      6
+ Frequency:       892.35                1136.34                1144.58
+ Force Cnst:      1.0189                 1.5838                 1.3601
+ Red. Mass:       2.1718                 2.0817                 1.7621
+ IR Active:          YES                    YES                    YES
+ IR Intens:        8.139                 24.853                  1.486
+ Raman Active:       YES                    YES                    YES
+               X      Y      Z        X      Y      Z        X      Y      Z
+ H          0.440  0.379 -0.045   -0.064 -0.240  0.112    0.415  0.070  0.106
+ C          0.253 -0.014 -0.000    0.023  0.193  0.000    0.000  0.000 -0.139
+ H         -0.234 -0.010  0.000    0.814  0.198 -0.000    0.000  0.000  0.289
+ H          0.440  0.379  0.045   -0.064 -0.240 -0.112   -0.415 -0.070  0.106
+ C         -0.134 -0.086 -0.000   -0.135 -0.194 -0.000   -0.000 -0.000  0.216
+ H         -0.401 -0.058  0.000   -0.101 -0.207  0.000   -0.000 -0.000 -0.687
+ O         -0.105  0.031  0.000    0.047  0.032  0.000    0.000  0.000 -0.046
+ TransDip  -0.084 -0.036  0.000   -0.120 -0.105 -0.000   -0.000 -0.000  0.039
+
+ Mode:                 7                      8                      9
+ Frequency:      1401.08                1448.10                1489.97
+ Force Cnst:      1.4536                 1.4892                 1.3792
+ Red. Mass:       1.2568                 1.2053                 1.0544
+ IR Active:          YES                    YES                    YES
+ IR Intens:       19.078                 11.677                 17.042
+ Raman Active:       YES                    YES                    YES
+               X      Y      Z        X      Y      Z        X      Y      Z
+ H          0.477  0.264  0.225   -0.097  0.031 -0.112   -0.292  0.425 -0.363
+ C         -0.135 -0.064 -0.000    0.048 -0.021 -0.000   -0.001 -0.054 -0.000
+ H          0.465 -0.049 -0.000   -0.131 -0.022  0.000    0.437 -0.034  0.000
+ H          0.477  0.264 -0.225   -0.097  0.031  0.112   -0.292  0.425  0.363
+ C          0.006  0.006  0.000   -0.053 -0.063 -0.000   -0.011  0.006 -0.000
+ H          0.250 -0.003 -0.000    0.947 -0.154  0.000   -0.094  0.010  0.000
+ O         -0.008  0.013 -0.000   -0.036  0.070  0.000    0.025 -0.016  0.000
+ TransDip   0.138  0.022 -0.000   -0.083 -0.071  0.000   -0.085  0.101  0.000
+
+ Mode:                10                     11                     12
+ Frequency:      1499.59                1842.67                2899.78
+ Force Cnst:      1.3882                17.9985                 5.3688
+ Red. Mass:       1.0478                 8.9969                 1.0837
+ IR Active:          YES                    YES                    YES
+ IR Intens:        9.339                156.812                138.480
+ Raman Active:       YES                    YES                    YES
+               X      Y      Z        X      Y      Z        X      Y      Z
+ H         -0.153 -0.452  0.055   -0.170  0.020 -0.085    0.014 -0.018 -0.037
+ C         -0.000  0.000 -0.054   -0.047  0.020  0.000   -0.002  0.003 -0.000
+ H         -0.000  0.000  0.726    0.254  0.002 -0.000    0.001 -0.009 -0.000
+ H          0.153  0.452  0.055   -0.170  0.020  0.085    0.014 -0.018  0.037
+ C          0.000 -0.000 -0.026    0.584 -0.334 -0.000   -0.011 -0.082  0.000
+ H         -0.000  0.000  0.078   -0.406 -0.207  0.000    0.088  0.991 -0.000
+ O         -0.000  0.000  0.003   -0.372  0.246  0.000    0.002 -0.001  0.000
+ TransDip   0.000 -0.000  0.098    0.368 -0.160 -0.000   -0.085 -0.367 -0.000
+
+ Mode:                13                     14                     15
+ Frequency:      3043.48                3100.08                3163.28
+ Force Cnst:      5.6631                 6.2237                 6.4988
+ Red. Mass:       1.0377                 1.0991                 1.1023
+ IR Active:          YES                    YES                    YES
+ IR Intens:        2.576                  9.291                 10.507
+ Raman Active:       YES                    YES                    YES
+               X      Y      Z        X      Y      Z        X      Y      Z
+ H         -0.311  0.214  0.527   -0.356  0.241  0.557   -0.129  0.078  0.221
+ C          0.052 -0.002 -0.000   -0.000 -0.000 -0.091    0.022 -0.090  0.000
+ H          0.013 -0.395  0.000   -0.000  0.000 -0.017   -0.013  0.920 -0.000
+ H         -0.311  0.214 -0.527    0.356 -0.241  0.557   -0.129  0.078 -0.221
+ C         -0.001 -0.005  0.000    0.000  0.000 -0.001    0.001 -0.004 -0.000
+ H          0.009  0.047 -0.000   -0.000 -0.000  0.001    0.005  0.031 -0.000
+ O         -0.000  0.000 -0.000   -0.000  0.000 -0.000   -0.001  0.001  0.000
+ TransDip   0.042 -0.030  0.000   -0.000  0.000 -0.098    0.002 -0.104  0.000
+
+ STANDARD THERMODYNAMIC QUANTITIES AT   298.18 K  AND     1.00 ATM
+
+   This Molecule has  0 Imaginary Frequencies
+   Zero point vibrational energy:       35.020 kcal/mol
+
+   Atom    1 Element H  Has Mass    1.00783
+   Atom    2 Element C  Has Mass   12.00000
+   Atom    3 Element H  Has Mass    1.00783
+   Atom    4 Element H  Has Mass    1.00783
+   Atom    5 Element C  Has Mass   12.00000
+   Atom    6 Element H  Has Mass    1.00783
+   Atom    7 Element O  Has Mass   15.99491
+   Molecular Mass:    44.026230 amu
+   Principal axes and moments of inertia in atomic units:
+                             1           2           3
+    Eigenvalues --       31.72788   179.15820   199.71733
+          X               0.99967     0.02568     0.00000
+          Y              -0.02568     0.99967    -0.00000
+          Z              -0.00000     0.00000     1.00000
+   Rotational Symmetry Number is   1
+   The Molecule is an Asymmetric Top
+   Translational Enthalpy:        0.889 kcal/mol
+   Rotational Enthalpy:           0.889 kcal/mol
+   Vibrational Enthalpy:         35.690 kcal/mol
+   gas constant (RT):             0.593 kcal/mol
+   Translational Entropy:        37.273  cal/mol.K
+   Rotational Entropy:           21.656  cal/mol.K
+   Vibrational Entropy:           3.831  cal/mol.K
+
+   Total Enthalpy:               38.061 kcal/mol
+   Total Entropy:                62.760  cal/mol.K
+
+ ======================================================================
+
+ STANDARD THERMODYNAMIC QUANTITIES FOR ANHARMONIC VIBRATION -- TOSH
+
+   Zero point vibrational energy: ************ kcal/mol
+
+   Vibrational Enthalpy:            NaN kcal/mol
+   Vibrational Entropy:             NaN  cal/mol.K
+
+   Total Enthalpy:                  NaN kcal/mol
+   Total Entropy:                   NaN  cal/mol.K
+
+ ======================================================================
+
+ STANDARD THERMODYNAMIC QUANTITIES FOR ANHARMONIC VIBRATION -- VPT2
+
+   Zero point vibrational energy: ************ kcal/mol
+
+   Vibrational Enthalpy:            NaN kcal/mol
+   Vibrational Entropy:             NaN  cal/mol.K
+
+   Total Enthalpy:                  NaN kcal/mol
+   Total Entropy:                   NaN  cal/mol.K
+
+ ======================================================================
+
+Archival summary:
+1\1\aitkin.anu.edu.au\FREQ\ProcedureUnspecified\6-31G*\124\MonFeb611:32:122012MonFeb611:32:122012\0\\#,FREQ,ProcedureUnspecified,6-31G*,\\0,1\C\H,1,1.11432\O,1,1.21049,2,120.495\C,1,1.50836,2,114.787,3,-180,0\H,4,1.09241,1,110.505,2,180,0\H,4,1.09804,1,109.791,2,-58.4866,0\H,4,1.09804,1,109.791,2,58.4866,0\\\@
+
+ Total job time:  217.88s(wall), 212.79s(cpu) 
+ Mon Feb  6 11:32:12 2012
+
+        *************************************************************
+        *                                                           *
+        *  Thank you very much for using Q-Chem.  Have a nice day.  *
+        *                                                           *
+        *************************************************************
+
+
+*** MISSION COMPLETED -- STARFLEET OUT ***
+

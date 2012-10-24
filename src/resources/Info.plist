@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleVersion</key>
+	<string>1.0.0</string>
+	<key>CFBundleDisplayName</key>
+	<string>IQmol</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleIconFile</key>
+	<string>IQmol.icns</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>xyz</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleTypeIconFile</key>
+			<string>IQmolDocument.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>XYZ molecule file</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>text/plain</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>mdl</string>
+				<string>mol</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleTypeIconFile</key>
+			<string>IQmolDocument.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>MDL Molfile</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>chemical/x-mdl-molfile</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>cdx</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleTypeIconFile</key>
+			<string>IQmolDocument.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>CS ChemDraw Drawing</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>chemical/x-cdx</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>pdb</string>
+				<string>ent</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleTypeIconFile</key>
+			<string>IQmolDocument.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Protein Databank file</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>mol2</string>
+				<string>ml2</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleTypeIconFile</key>
+			<string>IQmolDocument.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Sybyl Mol2 file</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>chemical/x-mdl-molfile	</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>inp</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleTypeIconFile</key>
+			<string>IQmolDocument.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>QChem input file</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>text/plain</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>out</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleTypeIconFile</key>
+			<string>IQmolDocument.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>QChem output file</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>text/plain</string>
+			</array>
+		</dict>
+
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>cube</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleTypeIconFile</key>
+			<string>IQmolDocument.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Cube data file</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>chemical/x-gaussian-cube</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>fchk</string>
+				<string>fch</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleTypeIconFile</key>
+			<string>IQmolDocument.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Gaussian formatted checkpoint</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>chemical/x-gaussian-checkpoint</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>cml</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleTypeIconFile</key>
+			<string>IQmolDocument.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Chemical Markup Language file</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>chemical/x-cml</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleGetInfoString</key>
+	<string>IQmol - version 1.0.0</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>(C) 2011 Andrew Gilbert</string>
+	<key>CFBundleExecutable</key>
+	<string>IQmol</string>
+	<key>CFBundleIdentifier</key>
+	<string>org.iqmol</string>
+</dict>
+</plist>
