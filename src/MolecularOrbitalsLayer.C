@@ -42,7 +42,7 @@ MolecularOrbitals::MolecularOrbitals(unsigned int const nAlpha, unsigned int nBe
    unsigned int nBasis,
    QList<double>& alphaCoefficients, QList<double> const& alphaEnergies,
    QList<double>&  betaCoefficients, QList<double> const&  betaEnergies,
-   ShellList const& shells) : Data("Molecular Orbitals"),
+   ShellList const& shells) : Data("Surfaces"),
    m_nAlpha(nAlpha), m_nBeta(nBeta), m_nBasis(nBasis), m_configurator(this),
    m_alphaEnergies(alphaEnergies), m_betaEnergies(betaEnergies), m_shells(shells)
 {

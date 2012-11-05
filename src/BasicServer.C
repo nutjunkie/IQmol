@@ -31,12 +31,12 @@
 namespace IQmol {
 
 BasicServer::BasicServer::BasicServer(Server* server, QVariantMap const& defaults)
- : ServerDelegate(server), m_jobLimit(LONG_MAX) 
+ : ServerDelegate(server), m_jobLimit(INT_MAX) 
 { 
    if (defaults.contains("JobLimit")) {
       bool ok;
       int limit(defaults.value("JobLimit").toInt(&ok));
-      if (ok) m_jobLimit = (limit == 0 ? LONG_MAX : limit);
+      if (ok) m_jobLimit = (limit == 0 ? INT_MAX : limit);
    }
 }
 
@@ -44,7 +44,7 @@ BasicServer::BasicServer::BasicServer(Server* server, QVariantMap const& default
 QVariantMap BasicServer::delegateDefaults() const
 {
    QVariantMap map;
-   int limit(m_jobLimit == LONG_MAX ? 0 : m_jobLimit);
+   int limit(m_jobLimit == INT_MAX ? 0 : m_jobLimit);
    map.insert("JobLimit", limit);
    return map;
 }

@@ -126,7 +126,8 @@ void Browser::on_browseLogFileButton_clicked(bool)
 
 void Browser::on_browseQChemDatabaseFileButton_clicked(bool) 
 {
-   setFilePath(m_preferencesBrowser.qchemDatabaseFileLineEdit);
+   bool mustExist(true);
+   setFilePath(m_preferencesBrowser.qchemDatabaseFileLineEdit, mustExist);
 }
 
 

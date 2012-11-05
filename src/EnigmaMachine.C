@@ -24,7 +24,7 @@
 #include <iostream>
 #include <ctime>
 #include <climits>
-#include <stdio.h>
+#include <cstring>
 
 
 namespace IQmol {

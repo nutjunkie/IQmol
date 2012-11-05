@@ -40,22 +40,23 @@ IQmolApplication::IQmolApplication(int &argc, char **argv )
    setApplicationName("IQmol");
 
    QDir dir(QApplication::applicationDirPath());
+   dir.cdUp();  
+   QString path(dir.absolutePath());
+
 #ifdef Q_WS_MAC
-   dir.cdUp();  dir.cd("Frameworks");
-   QApplication::setLibraryPaths(QStringList(dir.absolutePath()));
-   dir.cdUp();  dir.cd("PlugIns");
-   QApplication::addLibraryPath(dir.absolutePath());
-
-   dir.cdUp(); dir.cd("lib/openbabel");
-   qputenv("BABEL_LIBDIR", dir.absolutePath().toAscii());
-   dir.cdUp(); dir.cdUp(); dir.cd("share/openbabel");
-   qputenv("BABEL_DATADIR", dir.absolutePath().toAscii());
-
+   // IQmol.app/Contents/MacOS/IQmol
+   QApplication::addLibraryPath(path + "/Frameworks");
+   QApplication::addLibraryPath(path + "/PlugIns");
 #else
-   QApplication::addLibraryPath(dir.absolutePath() + "/plugins");
+   // IQmol/bin/IQmol
+   QApplication::addLibraryPath(path + "/lib");
+   QApplication::addLibraryPath(path + "/lib/plugins");
 #endif
 
-   
+   QString env(path + "/lib/openbabel");
+   qputenv("BABEL_LIBDIR", env.toAscii());
+   env = path + "/share/openbabel";
+   qputenv("BABEL_DATADIR", env.toAscii());
 }
 
 

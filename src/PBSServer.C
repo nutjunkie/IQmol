@@ -67,13 +67,9 @@ qDebug() << "Testing PBSServer configuration";
    file  = m_server->qchemEnvironment() + "/exe/" + m_server->executableName();
    test->addFileTest(file, flags);
 
-   // These may not be required if we just assume the remote server is *nix based
-   // also use: test  at  ps  rm  mkdir  grep  cd  sleep  awk  tail
-   if (m_server->host() == Server::Remote) {
-      flags = HostDelegate::Executable;
-      file  = "qstat";
-      test->addFileTest(file, flags);
-   }
+   // The following are not tested as each test requires a separate test which
+   // takes time.  We just assume the server is *nix based and they exist:
+   // qstat  test  at  ps  rm  mkdir  grep  cd  sleep  awk  tail
 
    return test;
 }

@@ -22,42 +22,29 @@
 
 #include "SecureConnection.h"
 #include "SecureConnectionException.h"
-#include "SecureConnectionThread.h"
-
+//#include "SecureConnectionThread.h"
 #include "PasswordVault.h"
 #include "Preferences.h"
 #include "QsLog.h"
 #include <QFileInfo>
 #include <QMutexLocker>
-
-#ifdef HAVE_WINSOCK2_H
-# include <winsock2.h>
-#endif
-#ifdef HAVE_SYS_SOCKET_H
-# include <sys/socket.h>
-#endif
-#ifdef HAVE_NETINET_IN_H
-# include <netinet/in.h>
-#endif
-#ifdef HAVE_SYS_SELECT_H
-# include <sys/select.h>
-#endif
-# ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
-#ifdef HAVE_ARPA_INET_H
-# include <arpa/inet.h>
-#endif
-
-#include <netdb.h>
-#include <fcntl.h>  // for fileInfo
-#include <errno.h> 
-//#include <sys/types.h>
-//#include <stdlib.h>
-//#include <ctype.h>
-//#include <sstream>
-
 #include <QInputDialog>
+
+#ifdef WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <windows.h>
+#define in_addr_t u_long
+#else
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <sys/select.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <fcntl.h>
+#include <errno.h> 
+#endif
 
 
 namespace IQmol {
@@ -97,6 +84,15 @@ Connection::Connection(QString const& hostname, QString const& username, int con
    m_connected(false)
 {
    if (NumberOfConnections == 0) {
+#ifdef WIN32
+      WSADATA wsadata;
+      int res = WSAStartup(MAKEWORD(2,0), &wsadata);
+      if (res != NO_ERROR) {
+         QString msg("WSAStartup failed to initialize: error ");
+         msg += QString::number(res);
+         throw Exception(msg);
+      }
+#endif
       int code(libssh2_init(0));
       if (code != 0) throw Exception("Failed to initialize secure connection");
    }else {
@@ -109,7 +105,12 @@ Connection::~Connection()
 {
    disconnect();
    --NumberOfConnections;
-   if (NumberOfConnections == 0) libssh2_exit();
+   if (NumberOfConnections == 0) {
+      libssh2_exit();
+#ifdef WIN32
+      WSACleanup();
+#endif
+   }
 }
 
 
@@ -122,26 +123,30 @@ QString Connection::lastError()
 }
 
 
-// converts a hostname or IPv4 address into an address in network byte order
 in_addr_t lookupHost2(QString const& hostname)
 {
    // This is the validator for an IPv4 address only
-   QString octet = "(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])";
+   QString octet("(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])");
    QRegExpValidator ipv4Validator(0);
-   ipv4Validator.setRegExp(QRegExp("^" +octet+ "\\." +octet+ "\\." +octet+ "\\." +octet+ "$"));
+   ipv4Validator.setRegExp(QRegExp(
+      "^" + octet + "\\." + octet + "\\." + octet + "\\." + octet + "$"));
 
    in_addr_t address;
    int pos;
 
    QString tmp(hostname);
-   if (ipv4Validator.validate(tmp, pos) == QValidator::Acceptable) {
+   if (ipv4Validator.validate(tmp,pos) == QValidator::Acceptable) {
       address = inet_addr(hostname.toAscii().data());
-      if (address == INADDR_NONE || address == INADDR_ANY) throw Exception("Invalid IP address");
+      if (address == INADDR_NONE || address == INADDR_ANY) {
+         throw Exception("Invalid IP address");
+      }
    }else {
       struct hostent* host;
       host = gethostbyname(hostname.toAscii().data());
-      if (!host) throw Exception("Invalid host name");
-      if (host->h_addrtype == AF_INET6) throw Exception("IPv6 addresses not supported");
+      if (!host) throw Exception("Invalid hostname");
+      if (host->h_addrtype == AF_INET6) {
+         throw Exception("IPv6 addresses not supported");
+      }
       address = *(in_addr_t*)host->h_addr;
    }
 
@@ -154,9 +159,8 @@ QString Connection::lookupHost(QString const& hostname)
 
   QLOG_DEBUG() << "Looking up hostname" << hostname;
   struct addrinfo hints, *res;
-  const int maxLength(100);
-  char addrstr[maxLength];
   int errcode;
+  char addrstr[100];
   void *ptr;
 
   memset (&hints, 0, sizeof (hints));
@@ -164,13 +168,12 @@ QString Connection::lookupHost(QString const& hostname)
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_flags |= AI_CANONNAME;
 
-  errcode = getaddrinfo(hostname.toAscii().data(), NULL, &hints, &res);
-
+  errcode = getaddrinfo (hostname.toAscii().data(), NULL, &hints, &res);
   if (errcode != 0) throw Exception("Host not found");
 
-  while (res) {
-
-      inet_ntop (res->ai_family, res->ai_addr->sa_data, addrstr, maxLength);
+  while (res)
+    {
+      inet_ntop (res->ai_family, res->ai_addr->sa_data, addrstr, 100);
 
       switch (res->ai_family) {
          case AF_INET:
@@ -180,7 +183,7 @@ QString Connection::lookupHost(QString const& hostname)
             ptr = &((struct sockaddr_in6 *) res->ai_addr)->sin6_addr;
             break;
       }
-      inet_ntop (res->ai_family, ptr, addrstr, maxLength);
+      inet_ntop (res->ai_family, ptr, addrstr, 100);
       printf ("IPv%d address: %s (%s)\n", res->ai_family == PF_INET6 ? 6 : 4,
               addrstr, res->ai_canonname);
       return QString(addrstr);
@@ -192,12 +195,96 @@ QString Connection::lookupHost(QString const& hostname)
 }
 
 
+#ifdef WIN32
 void Connection::connectSocket()
 {
    // Create the socket
    m_socket = socket(AF_INET, SOCK_STREAM, 0);
    if (m_socket < 0) {
-      QString msg("Failed to create socket:\n");
+      QString msg("Failed to create socket.\n");
+      msg += "Error code: " + QString::number(WSAGetLastError());
+      throw Exception(msg);
+   }
+
+   // Set non-blocking
+   unsigned long arg(0);
+   int ret;
+   if ( (ret = ioctlsocket(m_socket, FIONBIO, &arg)) == SOCKET_ERROR) { 
+      QString msg("Failed to set non-blocking on socket.\n");
+      msg += "error code: " + QString::number(WSAGetLastError());
+      throw Exception(msg);
+   } 
+
+   // Now try and connect with timout
+   struct sockaddr_in sin;
+   sin.sin_family = AF_INET;
+   sin.sin_port = htons(m_port);
+   //sin.sin_addr.s_addr = inet_addr(lookupHost(m_hostname).toAscii().data());
+   sin.sin_addr.s_addr = lookupHost2(m_hostname);
+
+   int res(::connect(m_socket, (struct sockaddr*)&sin, sizeof(struct sockaddr_in))); 
+
+   if (res == SOCKET_ERROR) { 
+
+      int err(WSAGetLastError());
+
+      if (err != WSAEWOULDBLOCK) { 
+         QString msg("Failed to connect:\n");
+         msg += "Error code: " + QString::number(err);
+         throw Exception(msg);
+      }
+
+      do { 
+         struct timeval tv; 
+         tv.tv_sec = 6; 
+         tv.tv_usec = 0; 
+
+         fd_set myset; 
+         FD_ZERO(&myset); 
+         FD_SET(m_socket, &myset); 
+
+         res = select(m_socket+1, NULL, &myset, NULL, &tv); 
+         err = WSAGetLastError();
+         if (res < 0 && err != EINTR) { 
+            QString msg("Connection error:\n");
+            msg += "Error code: " + QString::number(err);
+            throw Exception(msg);
+         }else if (res > 0) { 
+            // Socket selected for write 
+            socklen_t lon(sizeof(int));
+            int errorStatus; 
+
+            if (getsockopt(m_socket, SOL_SOCKET, SO_ERROR, (char*)(&errorStatus), &lon) < 0) { 
+               QString msg("Error checking socket option:\n");
+               msg += "error code: " + QString::number(WSAGetLastError());
+               throw Exception(msg);
+            } 
+
+            break; 
+         }else {
+            throw Exception("Connection to server timed out");
+         } 
+
+      } while (1); 
+   }
+ 
+   // Set to blocking mode again... 
+   arg = 1;
+   if ( (ret = ioctlsocket(m_socket, FIONBIO, &arg)) == SOCKET_ERROR) { 
+      QString msg("Failed to set blocking on socket.\n");
+      msg += "error code: " + QString::number(WSAGetLastError());
+      throw Exception(msg);
+   } 
+}
+
+#else
+
+void Connection::connectSocket()
+{
+   // Create the socket
+   m_socket = socket(AF_INET, SOCK_STREAM, 0);
+   if (m_socket < 0) {
+      QString msg("Failed to create socket.\n");
       msg += QString(strerror(errno));
       throw Exception(msg);
    }
@@ -216,22 +303,15 @@ void Connection::connectSocket()
       throw Exception(msg);
    } 
 
-
    // Now try and connect with timout
    struct sockaddr_in sin;
    sin.sin_family = AF_INET;
    sin.sin_port = htons(m_port);
    sin.sin_addr.s_addr = inet_addr(lookupHost(m_hostname).toAscii().data());
-qDebug() << "lookupHost  returning" << sin.sin_addr.s_addr;
-qDebug() << "lookupHost2 returning" << lookupHost2(m_hostname);
-// -----
-   sin.sin_addr.s_addr = lookupHost2(m_hostname);
-// -----
 
    int res(::connect(m_socket, (struct sockaddr*)&sin, sizeof(struct sockaddr_in))); 
 
    if (res < 0) { 
-
       if (errno != EINPROGRESS) { 
          QString msg("Connection error:\n");
          msg += QString(strerror(errno));
@@ -290,6 +370,9 @@ qDebug() << "lookupHost2 returning" << lookupHost2(m_hostname);
       throw Exception(msg);
    } 
 }
+
+#endif // WIN32
+
 
 
 bool Connection::connect(Authentication const authentication, QString const& password)
@@ -451,7 +534,9 @@ bool Connection::connectPassword(QString const& password)
    int rc;
    while ((rc = libssh2_userauth_password(m_session, m_username.toAscii().data(), 
       password.toAscii().data())) == LIBSSH2_ERROR_EAGAIN);
-   if (rc != 0) QLOG_DEBUG() << "Connect with Password authentication failed: " << lastError();
+   if (rc != 0) {
+      QLOG_DEBUG() << "Connect with Password authentication failed: " << lastError();
+   }
    return (rc == 0);
 }
 

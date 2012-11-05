@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
        fileDestination = QsLogging::DestinationFactory::MakeFileDestination(logFile);
        logger.addDestination(fileDestination.get());
 #ifdef Q_WS_WIN
-       if (Preferences::LogFileHidden()) {
+       if (IQmol::Preferences::LogFileHidden()) {
           int fileHidden(0x2);  // Where is FILE_ATTRIBUTE_HIDDEN defined?
           WCHAR* fnam = (WCHAR*)logFile.constData();
           SetFileAttributes(fnam, fileHidden); 

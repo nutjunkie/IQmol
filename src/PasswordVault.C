@@ -39,9 +39,12 @@ void OverwriteString(std::string& string)
    string.replace(0, string.size(), string.size(), '0');
    string.clear();
 }
+
+
 void OverwriteString(QString& string)
 {
-   QString zero(QString('0').repeated(string.length()));
+   QString zero;
+   for (int i = 0; i < string.length(); ++i) zero += '0';
    string.replace(0, string.size(), zero);
    string.clear();
 }

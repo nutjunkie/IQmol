@@ -22,9 +22,7 @@
    
 ********************************************************************************/
 
-#include "libssh2_config.h"
 #include <libssh2.h>
-
 #include <QMutex>
 #include <QObject>
 

@@ -133,9 +133,6 @@ QString Base::grep(QString const& string, QString const& filePath)
 }
 
 
-
-
-
 void Base::runThread(Threaded* thread)
 {
    QMutexLocker locker(&m_workerLock);
@@ -144,18 +141,53 @@ void Base::runThread(Threaded* thread)
    thread->wait();
 }
 
+
+/// Writes contents to a temporary file and returns the temporary file name.
+/// This is done in a cack-arsed way as it seems that on Windows the buffer 
+/// is not properly flushed to disk when the file is closed, so we end copying
+/// an emtpy file.  We use QTemoporaryFile simply to get a unique file name.
+QString Base::writeToTemporaryFile(QString const& contents)
+{
+   QDir tmpDir(QDir::temp());
+   if (!tmpDir.exists()) tmpDir = QDir::home();
+   QFileInfo tmpFileInfo(tmpDir, "iqmol_temp.XXXXXX");
+
+   QString tmpFilePath;
+   { 
+      QTemporaryFile file(tmpFileInfo.filePath());
+      if (file.open()) {
+         tmpFilePath = file.fileName();
+         file.close();
+      }
+   }
+
+   if (tmpFilePath.isEmpty()) return QString();
+   QFile file(tmpFilePath);
+   if (file.exists()) file.remove();
+   if (!file.open(QIODevice::WriteOnly)) return QString();
+
+   QByteArray buffer;
+   buffer.append(contents);
+   file.write(buffer);
+   file.flush();
+   file.close();
+
+   return tmpFilePath;
+}
  
+
 // --------------------------------
+
 
 void TestConfiguration::run()
 {
    QString file;
    HostDelegate::FileFlags flags;
 
-   for (int i = 0; i < m_filesForTesting.length(); ++i) {
+   for (int i = 0; i < m_filesForTesting.size(); ++i) {
        file  = m_filesForTesting[i];
        flags = m_fileFlags[i];
-qDebug() << "TestConfiguration::run() checking file" << file << "with flags" << flags;
+       QLOG_DEBUG() << "TestConfiguration::run() checking file" << file << "with flags" << flags;
 
        if (m_terminate) {
           m_errorMessage += "Terminated";
@@ -219,26 +251,22 @@ void Setup::run()
       }
    }
 
-   // Create input file
-   QTemporaryFile input("iqmol_temp.XXXXXX");
-   if (!input.open()) {
+   QString contents(jobInfo->get(JobInfo::InputString));
+   QString tmpFilePath(writeToTemporaryFile(contents));
+
+   if (tmpFilePath.isEmpty()) {
       m_errorMessage = "Failed to create temporary input file";
       return;
    }
 
-   QString tmpFileName(input.fileName());
-   QByteArray buffer;
-   buffer.append(jobInfo->get(JobInfo::InputString));
-   input.write(buffer);
-   input.flush();
-   input.close();
-
    QFileInfo fileName(dir, jobInfo->get(JobInfo::InputFileName));
 
-   if (!push(tmpFileName, fileName.filePath())) {
-      m_errorMessage = "Failed to copy input file to server";
-      return;
+   if (!push(tmpFilePath, fileName.filePath())) {
+       m_errorMessage = "Failed to copy input file to server";
    }
+      
+   QFile tmp(tmpFilePath);
+   tmp.remove();
 }
 
 
@@ -246,34 +274,29 @@ void Setup::run()
 
 bool Submit::createSubmissionScript(Process* process)
 {
-   QTemporaryFile runFile("iqmol_temp.XXXXXX");
-   if (!runFile.open()) {
+   QString contents(m_server->runFileTemplate());
+   contents += "\n";
+   contents = m_server->replaceMacros(contents, process);
+   QString tmpFilePath(writeToTemporaryFile(contents));
+
+   if (tmpFilePath.isEmpty()) {
       m_errorMessage = "Failed to create temporary run file";
       return false;
    }
 
-   QString contents(m_server->runFileTemplate());
-   contents += "\n";
-   contents = m_server->replaceMacros(contents, process);
-
    JobInfo* jobInfo(process->jobInfo());
    QString dir(workingDirectory(jobInfo));
-   QString tmpFileName(runFile.fileName());
-   QByteArray buffer;
-
-   buffer.append(contents);
-   runFile.write(buffer);
-   runFile.flush();
-   runFile.close();
-
    QFileInfo fileName(dir, jobInfo->get(JobInfo::RunFileName));
 
-   if (!push(tmpFileName, fileName.filePath())) {
+   bool ok(true);
+   if (!push(tmpFilePath, fileName.filePath())) {
       m_errorMessage = "Failed to copy run file to server";
-      return false;
+      ok = false;
    }
 
-   return true;
+   QFile tmp(tmpFilePath);
+   tmp.remove();
+   return ok;
 }
 
 
@@ -376,7 +399,7 @@ void BasicSubmit::runLocal()
    // give the exe a chance to fire up.
    unsigned int pid(0);
    for (int i = 0; i < 5; ++i) {
-       sleep(1);
+       wait(1000);  // wait 1000 msec for the job to start
        pid = System::ExecutablePid(m_server->executableName(), *qprocess);
        if (pid > 0) break;
    }
@@ -461,7 +484,7 @@ qDebug() << "Time updated from output file";
           if (!tokens.isEmpty()) {
              bool ok;
              double s(tokens.first().remove("s(wall),").toDouble(&ok));
-             if (ok) m_time += s;
+             if (ok) m_time += (int)s;
 qDebug() << "  time += " << s;
           }
       }

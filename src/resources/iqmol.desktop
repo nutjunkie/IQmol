@@ -1,9 +1,11 @@
 [Desktop Entry]
-Version=1.0
-Type=Application
+Comment=Molecular editor and visualization package
+Version=2.1
+Exec=/tmp/IQmol-2.1/iqmol.sh
+Icon=/tmp/IQmol-2.1/IQmol.png
 Name=IQmol
-Comment=Molecular Visualization Package
-TryExec=IQmol
-Exec=IQmol %F
-Icon=resources/IQmol.png
-MimeType=text/plain
+NoDisplay=false
+StartupNotify=false
+Terminal=0
+TerminalOptions=
+Type=Application

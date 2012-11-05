@@ -7,37 +7,40 @@
 #     Linux:    qmake -unix -o Makefile IQmol.pro
 #     Windows:  qmake.exe -win32 -o Makefile IQmol.pro
 #
-#  Note that the FORTRAN object files must be generated manually, for
-#  example with the command:
-#
-#     gfortran -c symmol.f90
-#
 ######################################################################
 
 TEMPLATE     =  app
 DEPENDPATH  +=  .
-CONFIG      +=  no_keywords qt opengl qchem_ui
+CONFIG      +=  no_keywords qt opengl
 RESOURCES   +=  IQmol.qrc
 ICON         =  resources/IQmol.icns
 QT          +=  sql xml opengl
-OBJECTS_DIR  = ../../build
-MOC_DIR      = ../../build/moc
-UI_DIR       = ../../build/ui
-DESTDIR      = ../../build
+OBJECTS_DIR  = ../build
+DESTDIR      = ../
+MOC_DIR      = ../build/moc
+UI_DIR       = ../build/ui
 
 QMAKE_CXXFLAGS += -O2
-#QMAKE_CXXFLAGS += -O0 
+#QMAKE_CXXFLAGS += -O0 -g
 
-
+######################################################################
+#
+#  More recent versions of qmake/gcc can handle fortran source files.
+#  If yours cannot, generate symmol.o via:
+#
+#   gfortran -c symmol.f90
+#
+#  and swap the comments in the following SOURCES and OBJECTS
+#
+######################################################################
+#SOURCES += symmol.f90
 OBJECTS += symmol.o
+
 
 include(QsLog/QsLog.pri)
 include(GL2PS/GL2PS.pri)
 include(QMsgBox/QMsgBox.pri)
-
-qchem_ui {
-   include(QUI/QUI.pri)
-}
+include(QUI/QUI.pri)
 
 
 #################################
@@ -64,13 +67,12 @@ macx {
 }
 
 win32 {
-   INCLUDEPATH += "C:\Program Files\boost\boost_1_36_0"
-   INCLUDEPATH += C:\Users\atg\Development
-   INCLUDEPATH += C:\Users\atg\Development\OpenBabel\include\openbabel-2.0
-   INCLUDEPATH += C:\Users\atg\Development\MinGW\include\libxml2
+   INCLUDEPATH += "C:\Program Files\boost\old versions\boost_1_36_0"
+   INCLUDEPATH += "C:\Users\qchem\Documents\extlib\include"
 
-   LIBS += -LC:\Users\atg\Development\OpenBabel-shared\bin -lopenbabel
-   LIBS += -LC:\Users\atg\Development\QGLViewer\debug -lQGLViewerd2
+   LIBS += -LC:\Users\qchem\Documents\extlib\lib
+   LIBS += -lQGLViewerd2 -lssh2 -lz -lssl -lcrypto -lgdi32
+   LIBS += -lws2_32 -lopenbabel
    LIBS += -L"C:\Program Files\gfortran\bin" -lgfortran-3 -lgcc_s_dw2-1
 
    SOURCES += QUI/getpids.C
@@ -82,14 +84,17 @@ win32 {
 }
 
 unix:!macx {
-   INCLUDEPATH += /home/agilbert/development/libQGLViewer/include
-   INCLUDEPATH += /home/agilbert/development/openbabel/include/openbabel-2.0
-   LIBS += -L/home/agilbert/development/libQGLViewer/lib -lQGLViewer
-   LIBS += -L~/development/libQGLViewer/lib -L/usr/lib -lopenbabel -L../build
+   INCLUDEPATH += $(DEV)/extlib/include
+   INCLUDEPATH += $(DEV)/openbabel/include/openbabel-2.0
+   LIBS += -L/usr/lib64
+   LIBS += -L/usr/lib -lopenbabel
    LIBS += -L/usr/local/gfortran/lib -lgfortran
+   LIBS += -L$(DEV)/extlib/lib -lssh2 -lcrypto -lz -lssl
+   LIBS += $(DEV)/extlib/lib/libQGLViewer.a
    CONFIG += release
    FORMS += PeriodicTable.ui
 }
+
 
 
 ###############
@@ -114,7 +119,7 @@ HEADERS += \
    MolecularOrbitalsConfigurator.h  ConformerListConfigurator.h \
    CubeDataConfigurator.h  FileLayer.h FileConfigurator.h  DipoleLayer.h \
    DipoleConfigurator.h  Gradient.h  ColorGrid.h  SpatialProperty.h \
-   AtomicDensity.h  Sanderson.h  FragmentLayer.h  ReindexAtomsHandler.h \
+   AtomicDensity.h  FragmentLayer.h  ReindexAtomsHandler.h \
    ConstraintLayer.h  ConstraintConfigurator.h  GLShape.h  LogMessageDialog.h \
    Snapshot.h  EnigmaMachine.h  PasswordVault.h  Server.h  ServerListDialog.h \
    JobInfo.h  ProcessMonitor.h \
@@ -131,6 +136,7 @@ HEADERS += \
    PBSServer.h \
    FragmentTable.h \
    ServerDialog.h  ServerOptionsDialog.h \
+#  Sanderson.h  \
    LocalConnectionThread.h
            
 
@@ -149,7 +155,7 @@ SOURCES += \
    ConformerListLayer.C  FormattedCheckpointParser.C   MolecularOrbitalsLayer.C \
    MolecularOrbitalsConfigurator.C  DipoleLayer.C  ConformerListConfigurator.C \
    CubeDataConfigurator.C  FileConfigurator.C  DipoleConfigurator.C  Gradient.C \
-   ColorGrid.C  SpatialProperty.C  AtomicDensity.C  Sanderson.C  IQmol.C  \
+   ColorGrid.C  SpatialProperty.C  AtomicDensity.C  IQmol.C  \
    FragmentLayer.C  ReindexAtomsHandler.C  ConstraintLayer.C \
    ConstraintConfigurator.C  GLShape.C LogMessageDialog.C  Snapshot.C  \
    EnigmaMachine.C  PasswordVault.C  Server.C  ServerListDialog.C \
@@ -165,6 +171,7 @@ SOURCES += \
    BasicServer.C \
    PBSServer.C \
    FragmentTable.C \
+#  Sanderson.C  \
    LocalConnectionThread.C
    
 
@@ -182,3 +189,5 @@ FORMS += \
    FragmentTable.ui   \
    ProcessMonitor.ui  SSHFileConfigurator.ui   PBSConfigurator.ui \
    ServerDialog.ui  ServerOptionsDialog.ui
+
+   

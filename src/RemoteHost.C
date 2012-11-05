@@ -69,7 +69,7 @@ bool RemoteHost::connectServer()
 
    m_connection = new SecureConnection::Connection(hostAddress(), userName(), port());
 
-   bool connected;
+   bool connected(false);
    switch (authentication()) {
 
       case Server::None:

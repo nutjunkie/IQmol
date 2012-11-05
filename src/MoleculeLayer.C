@@ -28,7 +28,7 @@
 #include "AtomLayer.h"
 #include "BondLayer.h"
 #include "DataLayer.h"
-#include "Sanderson.h"
+//#include "Sanderson.h"
 #include "BaseParser.h"
 #include "Preferences.h"
 #include "ChargeLayer.h"
@@ -1525,7 +1525,12 @@ void Molecule::setSandersonCharges()
        coordinates.append( (*iter)->getPosition() );
        atomicNumbers.append( (*iter)->getAtomicNumber());
    }
-
+   // TMP
+   for (int i = 0; i < atoms.size(); ++i) {
+       atoms[i]->setCharge(0.0);
+   }
+   
+/* No Sanderson at the moment
    qDebug() << "Total charge set to" << totalCharge();
    Sanderson eem(atomicNumbers, coordinates, totalCharge());
    QList<double> charges = eem.solve();
@@ -1533,6 +1538,7 @@ void Molecule::setSandersonCharges()
    for (int i = 0; i < atoms.size(); ++i) {
        atoms[i]->setCharge(charges[i]);
    }
+*/
 }
 
 
@@ -1766,9 +1772,7 @@ void Molecule::appendSurface(Surface* surface)
          break;
    }
 
-   if (!m_surfaceList.hasChildren()) {
-      appendRow(&m_surfaceList);
-   }
+   if (!m_surfaceList.hasChildren()) appendRow(&m_surfaceList);
 
    connect(surface, SIGNAL(updated()), this, SIGNAL(softUpdate()));
    surface->setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
@@ -1866,11 +1870,13 @@ void Molecule::calculateSID(Surface* surface)
        atomicNumbers.append( (*iter)->getAtomicNumber());
    }
 
+   QList<double> charges;
+/* No Sanderson at the moment
    qDebug() << "Total charge set to" << totalCharge();
    Sanderson eem(atomicNumbers, coordinates, totalCharge());
-   QList<double> charges;
+   charges = eem.solve();
+*/
 
-   //charges = eem.solve();
    for (int i = 0; i < atoms.size(); ++i) {
        charges.append(atoms[i]->getCharge());
    }

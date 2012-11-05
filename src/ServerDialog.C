@@ -54,6 +54,7 @@ ServerDialog::~ServerDialog()
    if (m_server != m_tmpServer || !m_accepted) {
       ServerRegistry::instance().remove(m_tmpServer);  
    }
+   OverwriteString(m_password);
 }
 
 
@@ -167,8 +168,11 @@ bool ServerDialog::copyToServer(Server* server)
       (Server::Authentication)(m_dialog.authentication->currentIndex()+1);
 
    if (host == Server::Remote && authentication == Server::Vault && m_password.isEmpty()) {
-      QMsgBox::warning(this, "IQmol", "Password must be set for Vault authentication");
-      return false;
+      m_password  = PasswordVault::instance().getServerPassword(server->m_name);
+      if (m_password.isEmpty()) {
+         QMsgBox::warning(this, "IQmol", "Password must be set for Vault authentication");
+         return false;
+      }
    }
 
    server->m_name             = m_dialog.name->text().trimmed();
@@ -192,7 +196,6 @@ bool ServerDialog::copyToServer(Server* server)
 
    if (!m_password.isEmpty() && server->m_authentication == Server::Vault) {
       PasswordVault::instance().storeServerPassword(server->m_name, m_password);
-      OverwriteString(m_password);
    }
    return true;
 }

@@ -34,7 +34,7 @@
 
 
 namespace GetPIDs {
-   std::vector<unsigned int> getpids(unsigned int);
+   std::list<unsigned int> getpids(unsigned int);
 }
 
 namespace IQmol {

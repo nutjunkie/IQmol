@@ -98,6 +98,8 @@ void ToolBar::on_elementSelect_clicked(bool)
 
 void ToolBar::on_addFragment_clicked(bool) 
 {
+   addFragment();
+   return;
    QPoint pos(QCursor::pos());
    pos -= QPoint(m_fragmentTable.width()/2, 25);
    m_fragmentTable.move(x()+pos.x(), y()+pos.y()); 

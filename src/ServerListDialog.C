@@ -25,6 +25,7 @@
 #include "ServerDialog.h"
 #include "Server.h"
 #include "QMsgBox.h"
+#include <QHeaderView>
 
 
 namespace IQmol {

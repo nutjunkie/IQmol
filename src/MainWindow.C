@@ -612,6 +612,7 @@ void MainWindow::createMenus()
          if (Preferences::DefaultForceField() == ff) action->setChecked(true);
 
 
+/*
       menu->addSeparator();
 
       name = "Group Selection";
@@ -623,6 +624,7 @@ void MainWindow::createMenus()
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), &m_viewerModel, SLOT(ungroupSelection()));
       action->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_G );
+*/
 
 
       menu->addSeparator();

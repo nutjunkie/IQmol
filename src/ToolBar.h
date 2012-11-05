@@ -75,7 +75,6 @@ namespace IQmol {
          void on_elementSelect_clicked(bool);
          void on_addHydrogens_clicked(bool)       { addHydrogens(); }
          void on_addFragment_clicked(bool);
-         //void on_addFragment_clicked(bool)     { addFragment(); }
          void on_minimizeEnergy_clicked(bool)     { minimizeEnergy(); }
          void on_selectMode_clicked(bool);
          void on_deleteSelection_clicked(bool)    { deleteSelection(); }

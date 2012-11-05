@@ -62,7 +62,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <iostream>
-#include <vector>
+#include <list>
 #include <windows.h>
 
 #include <QtDebug>
@@ -94,8 +94,8 @@ int queryprocess( ULONG pid, ULONG *ppid, LONGLONG *createtime );
 
 
 
-std::vector<unsigned int> getpids( unsigned int ulQueryPid ) {
-   std::vector<unsigned int> familyTree;
+std::list<unsigned int> getpids( unsigned int ulQueryPid ) {
+   std::list<unsigned int> familyTree;
 
    // Presettings
    ULONG     ulProcessPpid;

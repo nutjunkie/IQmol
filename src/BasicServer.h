@@ -40,7 +40,7 @@ namespace IQmol {
       Q_OBJECT
 
       public:
-         BasicServer::BasicServer(Server* server, QVariantMap const& defaults);
+         BasicServer(Server* server, QVariantMap const& defaults);
          void runQueue(); 
    
          void addToWatchList(Process*);

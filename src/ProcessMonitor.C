@@ -30,6 +30,7 @@
 #include "QMsgBox.h"
 #include <QCloseEvent>
 #include <QShowEvent>
+#include <QHeaderView>
 #include <QSet>
 
 #include <QtDebug>

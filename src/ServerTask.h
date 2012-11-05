@@ -66,6 +66,9 @@ namespace ServerTask {
             return m_hostDelegate->workingDirectory(jobInfo); 
          }
 
+         // Writes contents to a temporary file and returns the temporary file name
+         QString writeToTemporaryFile(QString const& contents);
+
       protected:
          Server* m_server;
          ServerDelegate* m_serverDelegate;

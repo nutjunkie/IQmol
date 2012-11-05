@@ -240,7 +240,7 @@ bool Process::getLocalSaveDirectory()
       dir.setPath(list.first());
       if (dir.path().isEmpty()) return false;
 
-      if (dir.path().contains(" ")) {
+      if (dir.dirName().contains(" ")) {
          QMsgBox::warning(0, "IQmol", "Directory name cannot contain spaces");
       }else {
          if (dir.count() == 0) break;
