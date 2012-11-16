@@ -22,8 +22,10 @@
 
 #include "PBSServer.h"
 #include "ServerTask.h"
+#include "ServerRegistry.h"
 #include "Server.h"
 #include "QsLog.h"
+#include "QMsgBox.h"
 #include "PBSConfigurator.h"
 
 #include <QDebug>
@@ -117,7 +119,7 @@ Process::Status PBSServer::parseQueryString(QString const& query, Process* proce
    for (iter = lines.begin(); iter != lines.end(); ++iter) {
        //job_state = R
        if ((*iter).contains("job_state =")) {
-          tokens = (*iter).split(" ", QString::SkipEmptyParts);
+          tokens = (*iter).split(QRegExp("\\s+"), QString::SkipEmptyParts);
           if (tokens.size() >= 3) {
              if (tokens[2] == "R" || tokens[2] == "E") {
                 status = Process::Running;
@@ -130,7 +132,7 @@ Process::Status PBSServer::parseQueryString(QString const& query, Process* proce
        }
 
        if ((*iter).contains("resources_used.walltime =")) {
-          QString time((*iter).split(" ", QString::SkipEmptyParts).last());
+          QString time((*iter).split(QRegExp("\\s+"), QString::SkipEmptyParts).last());
           process->resetTimer(Timer::toSeconds(time));
        }else if ((*iter).contains("comment =")) {
           process->setComment((*iter).remove("comment = ").trimmed());
@@ -143,6 +145,12 @@ Process::Status PBSServer::parseQueryString(QString const& query, Process* proce
 
 bool PBSServer::configureJob(Process* process)
 {
+
+   if (m_queues.isEmpty()) {
+      QMsgBox::warning(0, "IQmol", "No PBS queues found");
+      return false;
+   }
+
    if (!m_configurator) {
        m_configurator = new PBSConfigurator(m_queues, m_defaults);
    }
@@ -163,6 +171,7 @@ bool PBSServer::configureJob(Process* process)
          m_defaults.insert("Memory", m_configurator->memory());
          m_defaults.insert("Jobfs", m_configurator->jobfs());
          m_defaults.insert("Ncpus", m_configurator->ncpus());
+         ServerRegistry::instance().saveToPreferences();
       }
       accepted = true;
    }

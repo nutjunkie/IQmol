@@ -751,7 +751,7 @@ qDebug() << "=====================================";
    QStringList tokens;
    QStringList::iterator line;
    for (line = lines.begin(); line != lines.end(); ++line) {
-       tokens = (*line).split(" ", QString::SkipEmptyParts);
+       tokens = (*line).split(QRegExp("\\s+"), QString::SkipEmptyParts);
        if (tokens.size() < 4) return;  // invalid format
        x = tokens[1].toDouble(&xOK);
        y = tokens[2].toDouble(&yOK);

@@ -41,7 +41,7 @@ FragmentTable::FragmentTable(QWidget* parent) : QFrame(parent)
  <<"Toluene"
  <<"Water";
 
-    m_fragmentTable.fragmentList->addItems(solvents);
+    //m_fragmentTable.fragmentList->addItems(solvents);
 
 
 /*

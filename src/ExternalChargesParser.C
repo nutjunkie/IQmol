@@ -44,7 +44,7 @@ DataList ExternalCharges::parse(QTextStream& textStream)
       }else if (line.contains("$end", Qt::CaseInsensitive)) {
          break;
       }else {
-         tokens = line.split(" ", QString::SkipEmptyParts);
+         tokens = line.split(QRegExp("\\s+"), QString::SkipEmptyParts);
          if (tokens.count() == 1) {
             tokens[0].toUInt(&parseOkay);
          }else if (tokens.count() == 4) {

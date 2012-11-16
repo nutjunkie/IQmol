@@ -22,7 +22,6 @@
 
 #include "SecureConnection.h"
 #include "SecureConnectionException.h"
-//#include "SecureConnectionThread.h"
 #include "PasswordVault.h"
 #include "Preferences.h"
 #include "QsLog.h"
@@ -156,7 +155,7 @@ in_addr_t lookupHost2(QString const& hostname)
 
 QString Connection::lookupHost(QString const& hostname)
 {
-
+#ifndef WIN32
   QLOG_DEBUG() << "Looking up hostname" << hostname;
   struct addrinfo hints, *res;
   int errcode;
@@ -189,6 +188,7 @@ QString Connection::lookupHost(QString const& hostname)
       return QString(addrstr);
       res = res->ai_next;
     }
+#endif
 
   throw Exception("Host not found");
   return QString();

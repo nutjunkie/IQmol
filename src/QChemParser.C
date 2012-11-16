@@ -113,12 +113,12 @@ void QChem::processLine(QTextStream& textStream)
          if (!m_prependConformer) m_defaultConformer = m_conformers.first();
          m_prependConformer = true;
       }else if (line.contains("Convergence criterion met")) {
-         QStringList tokens(line.split(" ", QString::SkipEmptyParts));
+         QStringList tokens(line.split(QRegExp("\\s+"), QString::SkipEmptyParts));
          energy = tokens[1].toDouble(&eOK);
          if (!eOK) throw FormatError();
          m_currentConformer->setEnergy(energy);
       }else if (line.contains("MP2         total energy =")) {
-         QStringList tokens(line.split(" ", QString::SkipEmptyParts));
+         QStringList tokens(line.split(QRegExp("\\s+"), QString::SkipEmptyParts));
          energy = tokens[4].toDouble(&eOK);
          if (!eOK) throw FormatError();
          m_currentConformer->setEnergy(energy);
@@ -151,7 +151,7 @@ void QChem::readCoordinates(QTextStream& textStream)
    while (!textStream.atEnd()) {
       line = textStream.readLine();
       if (line.contains("----------")) break;
-      tokens = line.split(" ", QString::SkipEmptyParts);
+      tokens = line.split(QRegExp("\\s+"), QString::SkipEmptyParts);
       x = tokens[2].toDouble(&xOK); 
       y = tokens[3].toDouble(&yOK); 
       z = tokens[4].toDouble(&zOK); 
@@ -181,7 +181,7 @@ qDebug() << "Parser::QChem with spin = " << withSpin;
    while (!textStream.atEnd()) {
       line = textStream.readLine();
       if (line.contains("----------")) return;
-      tokens = line.split(" ", QString::SkipEmptyParts);
+      tokens = line.split(QRegExp("\\s+"), QString::SkipEmptyParts);
       q = tokens[2].toDouble(&qOK);
       s = withSpin ? tokens[3].toDouble(&sOK) : 0.0;
 
@@ -206,7 +206,7 @@ void QChem::readMultipoles(QTextStream& textStream)
 
    // charge
    QString line(textStream.readLine());
-   tokens = line.split(" ", QString::SkipEmptyParts);
+   tokens = line.split(QRegExp("\\s+"), QString::SkipEmptyParts);
    q = tokens[0].toDouble(&allOK);
    if (!allOK) throw FormatError();
    m_multipoles.append(q);
@@ -216,7 +216,7 @@ void QChem::readMultipoles(QTextStream& textStream)
 
    // dipole
    line = textStream.readLine();
-   tokens = line.split(" ", QString::SkipEmptyParts);
+   tokens = line.split(QRegExp("\\s+"), QString::SkipEmptyParts);
    x = tokens[1].toDouble(&ok); allOK = allOK && ok;
    y = tokens[3].toDouble(&ok); allOK = allOK && ok;
    z = tokens[5].toDouble(&ok); allOK = allOK && ok;
@@ -231,13 +231,13 @@ void QChem::readMultipoles(QTextStream& textStream)
 
    // quadrupole
    line = textStream.readLine();
-   tokens = line.split(" ", QString::SkipEmptyParts);
+   tokens = line.split(QRegExp("\\s+"), QString::SkipEmptyParts);
    xx = tokens[1].toDouble(&ok); allOK = allOK && ok;
    xy = tokens[3].toDouble(&ok); allOK = allOK && ok;
    yy = tokens[5].toDouble(&ok); allOK = allOK && ok;
 
    line = textStream.readLine();
-   tokens = line.split(" ", QString::SkipEmptyParts);
+   tokens = line.split(QRegExp("\\s+"), QString::SkipEmptyParts);
    xz = tokens[1].toDouble(&ok); allOK = allOK && ok;
    yz = tokens[3].toDouble(&ok); allOK = allOK && ok;
    zz = tokens[5].toDouble(&ok); allOK = allOK && ok;

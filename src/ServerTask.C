@@ -207,7 +207,8 @@ void TestConfiguration::run()
    PBSServer* server = qobject_cast<PBSServer*>(m_serverDelegate);
    if (server) {
       QLOG_DEBUG() << "Obtaining queues from PBS server";
-      QString cmd("qstat -fQ");
+
+      QString cmd(m_server->queueInfo());
       cmd = exec(cmd);
 
       if (cmd.contains("Command not found")) {
@@ -274,6 +275,11 @@ void Setup::run()
 
 bool Submit::createSubmissionScript(Process* process)
 {
+   // We don't create a submission file for Windows
+#ifdef Q_WS_WIN
+   if (m_server->host() == Server::Local) return true;
+#endif
+
    QString contents(m_server->runFileTemplate());
    contents += "\n";
    contents = m_server->replaceMacros(contents, process);
@@ -293,6 +299,10 @@ bool Submit::createSubmissionScript(Process* process)
       m_errorMessage = "Failed to copy run file to server";
       ok = false;
    }
+
+   // make sure the submission script is executable (this covers both local and
+   // remote.
+   exec("/bin/chmod +x " + fileName.filePath());
 
    QFile tmp(tmpFilePath);
    tmp.remove();
@@ -320,11 +330,10 @@ void BasicSubmit::runRemote()
 {
    QString dir(m_process->jobInfo()->get(JobInfo::RemoteWorkingDirectory));
    QString script(m_process->jobInfo()->get(JobInfo::RunFileName));
+   QString exeName(m_server->executableName());
    QString query(m_server->queryCommand());
    query = m_server->replaceMacros(query, m_process);
 
-   // make sure the submission script is executable
-   exec("cd " + dir + " && chmod +x " + script);
 
    QString submitCommand("cd " + dir + " && ");
    submitCommand += m_server->replaceMacros(m_server->submitCommand(), m_process);  
@@ -340,13 +349,15 @@ void BasicSubmit::runRemote()
    // executable name and was submitted sufficiently recently.
    int tmin(5);
    for (iter = progs.begin(); iter != progs.end(); ++iter) {
-       QStringList tokens((*iter).split(" ", QString::SkipEmptyParts));
-       if (tokens.size() == 3) {
-          int t(Timer::toSeconds(tokens[2]));
-          if (t >= 0 && t < tmin) {
-             tmin = t;
-             found = true;
-             m_process->setId(tokens[1]); // assume second token is the pid
+       if ((*iter).contains(exeName)) {
+          QStringList tokens((*iter).split(QRegExp("\\s+"), QString::SkipEmptyParts));
+          if (tokens.size() == 3) {
+             int t(Timer::toSeconds(tokens[2]));
+             if (t >= 0 && t < tmin) {
+                tmin = t;
+                found = true;
+                m_process->setId(tokens[1]); // assume second token is the pid
+             }
           }
        }
    }
@@ -364,45 +375,55 @@ void BasicSubmit::runRemote()
       m_errorMessage = "Process not found";
    }
 
-qDebug() << msg;
-      QLOG_DEBUG() << msg;
+   QLOG_DEBUG() << msg;
 }
 
 
 void BasicSubmit::runLocal()
 {
+   QString submitCommand( m_server->replaceMacros(m_server->submitCommand(), m_process) );  
+   QStringList args(submitCommand.split(QRegExp("\\s+"), QString::SkipEmptyParts));
+   if (args.isEmpty()) {
+      m_errorMessage = "Command not found";
+   }else {
+      submitCommand = args.takeFirst();
+   }
+
    JobInfo* jobInfo(m_process->jobInfo());
    QDir dir(jobInfo->get(JobInfo::LocalWorkingDirectory));
-   QFileInfo  input(dir, jobInfo->get(JobInfo::InputFileName));
-   QFileInfo output(dir, jobInfo->get(JobInfo::OutputFileName));
-
    QProcess* qprocess = new QProcess();
    qprocess->setWorkingDirectory(dir.path());
+
+   QFileInfo output(dir, jobInfo->get(JobInfo::ErrorFileName));
    qprocess->setStandardOutputFile(output.filePath());
    qprocess->setStandardErrorFile(output.filePath(), QIODevice::Append);
 
-   QStringList args;
-   args << input.fileName();
-#ifndef Q_WS_WIN
-   args << output.fileName();
-#endif
-
-   QString cmd(m_server->replaceMacros("${QC}/bin/qchem", m_process));
+   QLOG_DEBUG() << "QProcess executing command" << submitCommand << "\n"
+                << "  in directory " << dir.path() << "\n"
+                << "  with arguments " << args;
 
    jobInfo->localFilesExist(true);
-
    m_process->setQProcess(qprocess);
    m_process->setStatus(Process::Running);
-   qprocess->start(cmd, args);
+   qprocess->start(submitCommand, args);
 
+qDebug() << "Parent QProcess has PID =" << qprocess->pid() << System::ProcessID(*qprocess);
    // attempt to get the actual PID of the qchem.exe process, but we need to
    // give the exe a chance to fire up.
    unsigned int pid(0);
    for (int i = 0; i < 5; ++i) {
-       wait(1000);  // wait 1000 msec for the job to start
+       // wait a second for the job to start
+#ifdef Q_WS_WIN
+       Sleep(1000); 
+#else
+       sleep(1); 
+#endif
        pid = System::ExecutablePid(m_server->executableName(), *qprocess);
+       qDebug() << "PID search returned" << pid;
        if (pid > 0) break;
    }
+
+   
    // Note that if the job has alread finsished (crashed) then the pid will be
    // set to 0.  The server will pick this up the next time it updates the
    // processes, won't find the pid=0 process and so will attempt a clean up.
@@ -444,7 +465,7 @@ void Query::run()
    query = m_server->replaceMacros(query, m_process);
 qDebug() << "Query command" << query;
    m_outputMessage = exec(query);
-//qDebug() << "Query return" << m_outputMessage;
+qDebug() << "Query return" << m_outputMessage;
    m_status = m_serverDelegate->parseQueryString(m_outputMessage, m_process);
 qDebug() << "Status set to" << m_status;
 }
@@ -467,7 +488,7 @@ void CleanUp::run()
    // Get an updated time, first we check for PBS output
    QString pbs(grep("elapsed time", errFile.filePath()));
    if (!pbs.isEmpty()) {
-      QStringList tokens(pbs.split(" ", QString::SkipEmptyParts));
+      QStringList tokens(pbs.split(QRegExp("\\s+"), QString::SkipEmptyParts));
       m_time = Timer::toSeconds(tokens.last());
 qDebug() << "Time updated from PBS file" << m_time;
    }
@@ -479,7 +500,7 @@ qDebug() << "Time updated from PBS file" << m_time;
       QStringList::iterator iter;
 qDebug() << "Time updated from output file";
       for (iter = lines.begin(); iter != lines.end(); ++iter) {
-          QStringList tokens((*iter).split(" ", QString::SkipEmptyParts));
+          QStringList tokens((*iter).split(QRegExp("\\s+"), QString::SkipEmptyParts));
           tokens = tokens.filter("(wall)");
           if (!tokens.isEmpty()) {
              bool ok;
@@ -515,7 +536,7 @@ void KillProcess::run()
 {
    QString cmd(m_server->killCommand());
    cmd = m_server->replaceMacros(cmd, m_process);
-qDebug() << "Kill command" << cmd;
+   QLOG_DEBUG() << "Kill command" << cmd;
    exec(cmd);
 }
 
@@ -529,96 +550,64 @@ void CopyResults::run()
    m_process->setCopyActive(true);
    JobInfo* jobInfo(m_process->jobInfo());
 
+   QFileInfo source;
+   QFileInfo destination;
    QDir  localDir(jobInfo->get(JobInfo::LocalWorkingDirectory));
    QDir remoteDir(jobInfo->get(JobInfo::RemoteWorkingDirectory));
 
-   QFileInfo source;
-   QFileInfo destination;
-   QString file;
-   QString cmd;
-   int  kb(0);
+   int  kbToCopy(0);
    bool ok(true);
+   QString cmd;
+
+   QStringList copyList;
+   QStringList fileList;
+   fileList.append(jobInfo->get(JobInfo::InputFileName));
+   fileList.append(jobInfo->get(JobInfo::OutputFileName));
+   fileList.append(jobInfo->get(JobInfo::AuxFileName));
+   fileList.append(jobInfo->get(JobInfo::ErrorFileName));
+
+   // First check the files exist and, if so, their sizes
+   QStringList::iterator iter;
+   for (iter = fileList.begin(); iter != fileList.end(); ++iter) {
+       source.setFile(remoteDir, *iter);
+
+       cmd = "test -f " + source.filePath() + " && du -k " + source.filePath();
+       cmd = exec(cmd);
+qDebug() << "cmd returned" << cmd;
+       if (!cmd.isEmpty()) {
+          cmd = cmd.split(QRegExp("\\s+"), QString::SkipEmptyParts).first();
+qDebug() << "  first token" << cmd;
+          int n = cmd.toInt(&ok);
+          if (ok) {
+             kbToCopy += n;
+             copyList.append(*iter);
+          }
+       }
+   }
+
+   if (copyList.isEmpty() || kbToCopy == 0) {
+      m_errorMessage += "No files found to copy";
+      m_process->setCopyActive(false);
+      return;
+   }
+
+   m_process->setCopyTarget(kbToCopy);
+
+   // Now copy each of the files.
    bool allOk(true);
-
-   file = jobInfo->get(JobInfo::InputFileName);
-   source.setFile(remoteDir, file);
-   cmd = "du -k " + source.filePath() + " | awk \'{print $1}\'";
-   cmd = exec(cmd);
-   kb = cmd.toInt(&ok);
-   allOk = allOk && ok;
-   file = jobInfo->get(JobInfo::OutputFileName);
-   source.setFile(remoteDir, file);
-   cmd = "du -k " + source.filePath() + " | awk \'{print $1}\'";
-   cmd = exec(cmd);
-   kb += cmd.toInt(&ok);
-   allOk = allOk && ok;
-   file = jobInfo->get(JobInfo::AuxFileName);
-   source.setFile(remoteDir, file);
-qDebug() << "need to copy all fchk files";
-   cmd = "du -k " + source.filePath() + " | awk \'{print $1}\'";
-   cmd = exec(cmd);
-   kb += cmd.toInt(&ok);
-   allOk = allOk && ok;
-
-   if (allOk) m_process->setCopyTarget(kb);
-
-   allOk = true;
-
-   // Input
-   file = jobInfo->get(JobInfo::InputFileName);
-   source.setFile(remoteDir, file);
-   destination.setFile(localDir, file);
-   Threaded* thread = m_hostDelegate->pull(source.filePath(), destination.filePath());
-   connect(thread, SIGNAL(copyProgress()), m_process, SLOT(copyProgress()));
-   runThread(thread);
-   ok = thread->errorMessage().isEmpty();
-   if (ok) {
-      qDebug() << "File copy successful" << source.filePath();
-   }else {
-      qDebug() << "File copy failed" << source.filePath();
+   for (iter = copyList.begin(); iter != copyList.end(); ++iter) {
+       source.setFile(remoteDir, *iter);
+       destination.setFile(localDir, *iter);
+       Threaded* thread = m_hostDelegate->pull(source.filePath(), destination.filePath());
+       connect(thread, SIGNAL(copyProgress()), m_process, SLOT(copyProgress()));
+       runThread(thread);
+       ok = thread->errorMessage().isEmpty();
+       allOk = allOk && ok;
+       if (!ok) m_errorMessage += "Failed to copy file " + source.filePath() + "\n";
+       thread->deleteLater();
    }
-   thread->deleteLater();
-   if (!ok) m_errorMessage += "Failed to copy file from server\n" + file + "\n";
-   allOk = allOk && ok;
-
-   // Output
-   file = jobInfo->get(JobInfo::OutputFileName);
-   source.setFile(remoteDir, file);
-   destination.setFile(localDir, file);
-   thread = m_hostDelegate->pull(source.filePath(), destination.filePath());
-   connect(thread, SIGNAL(copyProgress()), m_process, SLOT(copyProgress()));
-   runThread(thread);
-   ok = thread->errorMessage().isEmpty();
-   if (ok) {
-      qDebug() << "File copy successful" << source.filePath();
-   }else {
-      qDebug() << "File copy failed" << source.filePath();
-   }
- 
-   thread->deleteLater();
-   if (!ok) m_errorMessage += "Failed to copy file from server\n" + file + "\n";
-   allOk = allOk && ok;
-
-   // Fchk
-   file = jobInfo->get(JobInfo::AuxFileName);
-   source.setFile(remoteDir, file);
-   destination.setFile(localDir, file);
-   thread = m_hostDelegate->pull(source.filePath(), destination.filePath());
-   connect(thread, SIGNAL(copyProgress()), m_process, SLOT(copyProgress()));
-   runThread(thread);
-   ok = thread->errorMessage().isEmpty();
-   if (ok) {
-      qDebug() << "File copy successful" << source.filePath();
-   }else {
-      qDebug() << "File copy failed" << source.filePath();
-   }
- 
-   thread->deleteLater();
-   if (!ok) m_errorMessage += "Failed to copy file from server\n" + file + "\n";
-   allOk = allOk && ok;
 
    jobInfo->localFilesExist(allOk);
-qDebug() << "ServerTask::CopyResults finished with ok=" << allOk;
    m_process->setCopyActive(false);
 }
 

@@ -35,7 +35,7 @@ namespace LocalConnection {
 
 void Exec::run()
 {
-   QStringList arguments(m_command.split(" ", QString::QString::SkipEmptyParts));
+   QStringList arguments(m_command.split(QRegExp("\\s+"), QString::QString::SkipEmptyParts));
 
    if (arguments.isEmpty()) {
       m_errorMessage = "Cannot execute null command";

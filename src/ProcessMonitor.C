@@ -271,6 +271,10 @@ void ProcessMonitor::submitJob2()
       task = server->submit(m_pendingProcess);
       connect(task, SIGNAL(finished()), this, SLOT(jobSubmitted()));
       task->start();
+   }else {
+      delete m_pendingProcess;
+      m_pendingProcess = 0;
+      return;
    }
 }
 
@@ -288,6 +292,7 @@ void ProcessMonitor::jobSubmitted()
    ServerTask::Base* task = qobject_cast<ServerTask::Base*>(sender());
    if (!task) {
       delete m_pendingProcess;
+      m_pendingProcess = 0;
       return;
    }
 
@@ -333,8 +338,6 @@ void ProcessMonitor::addToTable(Process* process)
    connect(process, SIGNAL(finished()), this, SLOT(processFinished()));
    updateRow(row, process->monitorItems());
 }
-
-
 
 
 

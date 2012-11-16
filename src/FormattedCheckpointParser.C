@@ -62,7 +62,7 @@ void FormattedCheckpoint::processLine(QTextStream& textStream)
    key.resize(42);
    key = key.trimmed();
    QString tmp = line.mid(43, 37);
-   QStringList list = tmp.split(" ", QString::SkipEmptyParts);
+   QStringList list = tmp.split(QRegExp("\\s+"), QString::SkipEmptyParts);
 
    if (key == "Number of alpha electrons") {
       m_nAlpha = list.at(1).toInt();
@@ -120,7 +120,7 @@ QList<int> FormattedCheckpoint::readIntegerArray(QTextStream& textStream, int n)
    QList<int> tmp;
    while (tmp.size() < n && m_parseOkay) {
       QString line = textStream.readLine();
-      QStringList list = line.split(" ", QString::SkipEmptyParts);
+      QStringList list = line.split(QRegExp("\\s+"), QString::SkipEmptyParts);
       for (int i = 0; i < list.size(); ++i) {
           tmp.append(list.at(i).toInt(&m_parseOkay));
       }

@@ -116,6 +116,7 @@ namespace IQmol {
          QString executableName()        const { return m_executableName; }
          QString submitCommand()         const { return m_submitCommand; }
          QString queryCommand()          const { return m_queryCommand; }
+         QString queueInfo()             const { return m_queueInfo; }
          QString killCommand()           const { return m_killCommand; }
          QString runFileTemplate()       const { return m_runFileTemplate; }
          int updateInterval()            const { return m_updateInterval; }
@@ -194,6 +195,7 @@ namespace IQmol {
          QString m_executableName;
          QString m_submitCommand;
          QString m_queryCommand;
+         QString m_queueInfo;
          QString m_killCommand;
          QString m_runFileTemplate;
          int m_updateInterval;

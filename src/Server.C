@@ -173,22 +173,26 @@ void Server::setRemoteDefaults()
 
 void Server::setBasicDefaults(Host const host)
 {
-   m_type = Basic;
-   m_runFileTemplate = "#! /bin/csh\nsource ~/.cshrc\nqchem ${JOB_NAME}.inp ${JOB_NAME}.out &";
-   m_delegateDefaults.insert("JobLimit", 0);
+   m_type            = Basic;
+   m_queueInfo       = "(not used)";
+   m_killCommand     = System::KillCommand();
+   m_queryCommand    = System::QueryCommand();
+   m_runFileTemplate = "#! /bin/csh\nsource ~/.cshrc\nqchem ${JOB_NAME}.inp ${JOB_NAME}.out";
 
    if (host == Local) {
-      m_submitCommand   = "(QProcess)";
-      m_queryCommand    = System::QueryCommand();
-      m_killCommand     = System::KillCommand();
 #ifdef Q_WS_WIN
-      m_runFileTemplate = "${QC}/qcenv_s.bat ${JOB_NAME}.inp ${JOB_NAME}.out";
+      m_submitCommand   = "${QC}/qcenv_s.bat ${JOB_NAME}.inp ${JOB_NAME}.out";
+     // note we make the textedit read-only in ServerOptionsDialog
+      m_runFileTemplate = "(not used)";  
+#else
+      m_submitCommand   = "./${JOB_NAME}.run";
 #endif
    }else {
       m_submitCommand   = "nohup ./${JOB_NAME}.run < /dev/null >& ${JOB_NAME}.err";
-      m_queryCommand    = "ps xc -o command,pid,time ${JOB_ID} | grep ${EXE_NAME}"; 
-      m_killCommand     = "kill -TERM ${JOB_ID}";
+      m_runFileTemplate += " &";
    }
+
+   m_delegateDefaults.insert("JobLimit", 0);
 }
 
 
@@ -197,6 +201,7 @@ void Server::setPBSDefaults(Host const)
    m_type = PBS;
    m_submitCommand = "qsub ${JOB_NAME}.run";
    m_queryCommand  = "qstat -f ${JOB_ID}";
+   m_queueInfo     = "qstat -fQ";
    m_killCommand   = "qdel ${JOB_ID}";
 
    QStringList runFile;
@@ -257,6 +262,7 @@ QVariant Server::toQVariant()
    map.insert("ExecutableName", m_executableName);
    map.insert("SubmitCommand", m_submitCommand);
    map.insert("QueryCommand", m_queryCommand);
+   map.insert("QueueInfo", m_queueInfo);
    map.insert("KillCommand", m_killCommand);
    map.insert("RunFileTemplate", m_runFileTemplate);
    map.insert("UpdateInterval", m_updateInterval);
@@ -350,22 +356,28 @@ void Server::fromQVariant(QVariant const& qvar)
 	  m_workingDirectory = map.value("WorkingDirectory").toString();
    }
 
-   // $EXE_NAME
+   // ${EXE_NAME}
    if (map.contains("ExecutableName")) {
 	  m_executableName = map.value("ExecutableName").toString();
    }
 
-   // $SUBMIT_CMD
+   // ${SUBMIT_CMD}
    if (map.contains("SubmitCommand")) {
 	  m_submitCommand = map.value("SubmitCommand").toString();
    }
 
-   // $QUERY_CMD
+   // ${QUERY_CMD}
    if (map.contains("QueryCommand")) {
 	  m_queryCommand = map.value("QueryCommand").toString();
    }
 
-   // $KILL_CMD
+   // ${QUEUE_INFO}
+   if (map.contains("QueueInfo")) {
+	  m_queueInfo = map.value("QueueInfo").toString();
+   }
+
+
+   // ${KILL_CMD}
    if (map.contains("KillCommand")) {
 	  m_killCommand = map.value("KillCommand").toString();
    }
@@ -442,8 +454,8 @@ qDebug() << output;
       QLOG_WARN() << "Unmatched macros found in string:";
       QLOG_WARN() << input;
    }
-qDebug() << "Substituted output";
-qDebug() << output;
+
+   QLOG_DEBUG() << "Substituted output: " << output;
 
    return output;
 }

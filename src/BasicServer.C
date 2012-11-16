@@ -68,11 +68,13 @@ qDebug() << "Testing BasicServer configuration";
 
    flags = HostDelegate::Directory | HostDelegate::Writable;
    file  = m_server->workingDirectory();
-   test->addFileTest(file, flags);
+   if (!file.isEmpty()) test->addFileTest(file, flags);
    
+#ifndef Q_WS_WIN
    flags = HostDelegate::Executable;
    file  = m_server->qchemEnvironment() + "/exe/" + m_server->executableName();
    test->addFileTest(file, flags);
+#endif
 
    // These may not be required if we just assume the remote server is *nix based
    // also use: test  at  ps  rm  mkdir  grep  cd  sleep  awk  tail
@@ -188,7 +190,7 @@ Process::Status BasicServer::parseQueryString(QString const& query, Process* pro
    QStringList::iterator line;
    for (line = lines.begin(); line != lines.end(); ++line) {
        if ((*line).contains(m_server->executableName()) && (*line).contains(id)) {
-          QString time((*line).split(" ", QString::SkipEmptyParts).last());
+          QString time((*line).split(QRegExp("\\s+"), QString::SkipEmptyParts).last());
           process->resetTimer(Timer::toSeconds(time));
           status = Process::Running;
        }

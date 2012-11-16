@@ -55,8 +55,10 @@ IQmolApplication::IQmolApplication(int &argc, char **argv )
 
    QString env(path + "/lib/openbabel");
    qputenv("BABEL_LIBDIR", env.toAscii());
+   QLOG_INFO() << "Setting BABEL_LIBDIR = " << env;
    env = path + "/share/openbabel";
    qputenv("BABEL_DATADIR", env.toAscii());
+   QLOG_INFO() << "Setting BABEL_DATADIR = " << env;
 }
 
 

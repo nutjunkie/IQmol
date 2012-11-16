@@ -71,6 +71,7 @@ QStringList RunCommand(QString const& command, QStringList const& arguments,
 }
 
 
+/*
 QString StatProcess(QString const& name, unsigned int const pid)
 {
    QString time("0:00:00");
@@ -106,6 +107,7 @@ QString StatProcess(QString const& name, unsigned int const pid)
 
    return time;
 }
+*/
 
 
 QString QueryCommand()
@@ -121,7 +123,7 @@ QString QueryCommand()
    args << "/v" << "/fo list" << "/fi " + spid << "/fi " + sname;
    cmd = tasklist.filePath() + " " + args.join(" ");
 #else
-   cmd = "/bin/ps xc -o command,pid,time ${JOB_ID}";
+   cmd = "/bin/ps xc -o command=,pid=,time= ${JOB_ID}";
 #endif
    return cmd;
 }
@@ -142,10 +144,12 @@ QString KillCommand()
       cmd = "Error: taskkill.exe or tskill.exe not found";
    }
 #else
-   cmd = "/bin/kill -HUP ${JOB_ID}";
+   cmd = "/bin/kill -TERM ${JOB_ID}";
 #endif
    return cmd;
 }
+
+
 
 /*
 
@@ -183,16 +187,24 @@ unsigned int ExecutablePid(QString const& processName, QProcess const& parent)
    QList<unsigned int> pids(System::GetMatchingProcessIds(processName));
    QList<unsigned int>::iterator iter, jter;
 
-qDebug() << "ExecutablePid found :" << pids.size();
+   qDebug() << "Parent QProcess id:" << qpid;
+
    for (iter = pids.begin(); iter != pids.end(); ++iter) {
        qDebug() << processName << "process found on pid:" << *iter;
        ancestry = System::GetParentProcessChain(*iter);
 
-       for (jter = ancestry.begin(); jter != ancestry.end(); ++jter) {
-           qDebug() << " ->" << *jter;
+       if (ancestry.contains(qpid)) {
+          qDebug() << "Found child process" << processName << "on PID" << *iter;
+          for (jter = ancestry.begin(); jter != ancestry.end(); ++jter) {
+              if (*jter == qpid) {
+                 qDebug() << "  ->" << *jter <<"*";
+              }else {
+                 qDebug() << "  ->" << *jter;
+              }
+          }
+          
+          return *iter;
        }
-
-       if (ancestry.contains(qpid)) return *iter;
    }
 
    return 0;
@@ -232,9 +244,6 @@ QList<unsigned int> GetMatchingProcessIds(QString const& pattern)
 
    QStringList processes(RunCommand(cmd, args));
    QStringList tokens;
-
-qDebug() << "Looking or processes with the pattern" << pattern;
-//qDebug() << "process list: " << processes;
 
    for (int i = 0; i < processes.count(); ++i) {
        if (processes[i].contains(pattern, Qt::CaseInsensitive)) {
@@ -279,8 +288,8 @@ QList<unsigned int> GetParentProcessChain(unsigned int const pid)
                        << tokens[0] << tokens[1];
           }
        }else {
-          qDebug() << "Incorrect number of tokens from ps"
-                   << "command in GetParentProcessChain:" << lines[i];
+          //qDebug() << "Incorrect number of tokens from ps"
+          //         << "command in GetParentProcessChain:" << lines[i];
        }
    }
 

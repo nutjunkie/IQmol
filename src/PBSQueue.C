@@ -40,7 +40,7 @@ QueueList PBSQueue::fromQstat(QString const& qstat)
    QStringList::iterator iter;
    for (iter = lines.begin(); iter != lines.end(); ++iter) {
        line = *iter; 
-       tokens = line.split(" ", QString::SkipEmptyParts);
+       tokens = line.split(QRegExp("\\s+"), QString::SkipEmptyParts);
 
        if (line.contains("Queue: ")) {
           queue = new PBSQueue(tokens[1]);

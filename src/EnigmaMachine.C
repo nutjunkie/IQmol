@@ -207,8 +207,8 @@ std::string EnigmaMachine::decrypt(std::string const& cipherString)
    length = pLength + fLength;
    std::string ret((char*)plainText);
 
-   std::cout << "Decoded string length: " << length << std::endl;
-   std::cout << "Decoded string: " << ret << std::endl;
+   //std::cout << "Decoded string length: " << length << std::endl;
+   //std::cout << "Decoded string: " << ret << std::endl;
 
    delete[] cipherText;
    delete[] plainText;

@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>384</width>
-    <height>312</height>
+    <width>412</width>
+    <height>306</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>FragmentTable</string>
+   <string>Frame</string>
   </property>
   <property name="frameShape">
    <enum>QFrame::StyledPanel</enum>
@@ -19,13 +19,13 @@
   <property name="frameShadow">
    <enum>QFrame::Raised</enum>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
-      <widget class="QRadioButton" name="radioButton_2">
+      <widget class="QRadioButton" name="efpButton">
        <property name="text">
-        <string>Library</string>
+        <string>EFP</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -33,39 +33,21 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="categoryCombo">
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>16777215</height>
-        </size>
+      <widget class="QRadioButton" name="moleculesButton">
+       <property name="text">
+        <string>Molecules</string>
        </property>
-       <item>
-        <property name="text">
-         <string>Solvents</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Bases</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Gases</string>
-        </property>
-       </item>
       </widget>
      </item>
      <item>
-      <widget class="QRadioButton" name="radioButton">
+      <widget class="QRadioButton" name="customButton">
        <property name="text">
         <string>Custom</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="openButton">
        <property name="enabled">
         <bool>false</bool>
        </property>
@@ -75,7 +57,7 @@
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer">
+      <spacer name="horizontalSpacer_4">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -90,25 +72,105 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
-      <widget class="QListWidget" name="fragmentList">
-       <property name="frameShape">
-        <enum>QFrame::Panel</enum>
+      <widget class="QTreeWidget" name="fragmentList">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
-       <property name="frameShadow">
-        <enum>QFrame::Sunken</enum>
+       <property name="minimumSize">
+        <size>
+         <width>180</width>
+         <height>180</height>
+        </size>
        </property>
-       <property name="lineWidth">
-        <number>2</number>
+       <property name="maximumSize">
+        <size>
+         <width>180</width>
+         <height>500</height>
+        </size>
        </property>
-       <property name="midLineWidth">
-        <number>2</number>
+       <property name="font">
+        <font>
+         <kerning>true</kerning>
+        </font>
        </property>
+       <property name="indentation">
+        <number>12</number>
+       </property>
+       <property name="rootIsDecorated">
+        <bool>true</bool>
+       </property>
+       <attribute name="headerVisible">
+        <bool>false</bool>
+       </attribute>
+       <column>
+        <property name="text">
+         <string notr="true">1</string>
+        </property>
+       </column>
+       <item>
+        <property name="text">
+         <string>Solvents</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>Acetone</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Acetonitrile</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Benzene</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Carbon Tetracholoride</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Water</string>
+         </property>
+        </item>
+       </item>
+       <item>
+        <property name="text">
+         <string>Gases</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>Ammonia</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Methane</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Oxygen (O2)</string>
+         </property>
+        </item>
+       </item>
+       <item>
+        <property name="text">
+         <string>Bases</string>
+        </property>
+       </item>
       </widget>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <layout class="QVBoxLayout" name="verticalLayout">
        <item>
         <widget class="QFrame" name="viewWidget">
          <property name="sizePolicy">
@@ -138,20 +200,7 @@
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
           <spacer name="horizontalSpacer_2">
            <property name="orientation">
@@ -159,8 +208,8 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>40</width>
-             <height>20</height>
+             <width>48</width>
+             <height>17</height>
             </size>
            </property>
           </spacer>
@@ -174,14 +223,55 @@
          </item>
         </layout>
        </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>58</width>
+           <height>38</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
       </layout>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="IQmol.qrc"/>
- </resources>
- <connections/>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>efpButton</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>openButton</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>36</x>
+     <y>28</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>287</x>
+     <y>29</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

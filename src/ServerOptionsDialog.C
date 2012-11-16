@@ -35,6 +35,7 @@ ServerOptionsDialog::ServerOptionsDialog(QWidget* parent, Server* server) : QDia
    m_dialog.exeName->setText(m_server->m_executableName);
    m_dialog.submitCommand->setText(m_server->m_submitCommand);
    m_dialog.queryCommand->setText(m_server->m_queryCommand);
+   m_dialog.queueInfo->setText(m_server->m_queueInfo);
    m_dialog.killCommand->setText(m_server->m_killCommand);
    m_dialog.runFileTemplate->setText(m_server->m_runFileTemplate);
    m_dialog.updateInterval->setValue(m_server->m_updateInterval);
@@ -48,6 +49,13 @@ ServerOptionsDialog::ServerOptionsDialog(QWidget* parent, Server* server) : QDia
    m_dialog.queryCommand->setReadOnly(readOnly);
    m_dialog.killCommand->setReadOnly(readOnly);
 
+   if (m_server->type() == Server::Basic) {
+      m_dialog.queueInfo->setEnabled(false);
+#ifdef Q_WS_WIN
+      if (m_server->host() == Server::Local) m_dialog.runFileTemplate->setEnabled(false);
+#endif
+   }
+
    connect(m_dialog.buttonBox, SIGNAL(accepted()), this, SLOT(copyToServer()));
 }
 
@@ -57,6 +65,7 @@ void ServerOptionsDialog::copyToServer()
    m_server->m_executableName  = m_dialog.exeName->text();
    m_server->m_submitCommand   = m_dialog.submitCommand->text();
    m_server->m_queryCommand    = m_dialog.queryCommand->text();
+   m_server->m_queueInfo       = m_dialog.queueInfo->text();
    m_server->m_killCommand     = m_dialog.killCommand->text();
    m_server->m_runFileTemplate = m_dialog.runFileTemplate->toPlainText();
    m_server->m_updateInterval  = m_dialog.updateInterval->value();
