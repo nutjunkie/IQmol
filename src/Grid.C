@@ -22,6 +22,7 @@
 
 #include "IQmol.h"
 #include "Grid.h"
+#include "GridData.h"
 #include "QsLog.h"
 #include <cmath>
 #include <QApplication>
@@ -281,8 +282,13 @@ Grid::Grid(OpenBabel::OBGridData const& gridData) : m_dataType(Grid::DataType::C
         QLOG_WARN() << "Warning: Non-regular grid found in Grid constructor";
    }
 
-   dx     *=  BohrToAngstrom;
-   boxMin *=  BohrToAngstrom;
+   if (gridData.GetUnit() == OpenBabel::OBGridData::BOHR) {
+      QLOG_TRACE() << "Scaling grid Bohr -> Angstrom";
+      dx     *=  BohrToAngstrom;
+      boxMin *=  BohrToAngstrom;
+   }else if (gridData.GetUnit() == OpenBabel::OBGridData::ANGSTROM) {
+      QLOG_TRACE() << "Grid spacings are already in Angstroms";
+   }
 
    QLOG_TRACE() << "Size" << dx << nx << ny << nz;
    QLOG_TRACE() << "Total points" <<  nx * ny * nz;
@@ -299,6 +305,48 @@ Grid::Grid(OpenBabel::OBGridData const& gridData) : m_dataType(Grid::DataType::C
        }
    }
 
+}
+
+
+// ----- Grid -----
+Grid::Grid(Data::Grid const& gridData) : m_dataType(Grid::DataType::CubeData)
+{
+   QLOG_DEBUG() << "Grid constructor called for CubeData";
+   Vec boxMin(gridData.getMin());
+   Vec boxMax(gridData.getMax());
+   Vec delta(boxMax-boxMin);
+
+   int nx, ny, nz;
+   gridData.getNumberOfPoints(nx, ny, nz);
+
+   double dx(delta.x/(nx-1));
+   double dy(delta.y/(ny-1));
+   double dz(delta.z/(nz-1));
+   double thresh(1.0e-6);
+
+   if (std::abs(dx-dy) > thresh ||std::abs(dx-dz) > thresh || std::abs(dy-dz) > thresh) {
+      QLOG_WARN() << "Warning: Non-regular grid found in Grid constructor";
+   }
+
+   dx     *= BohrToAngstrom;
+   boxMin *= BohrToAngstrom;
+
+   QLOG_TRACE() << "Size" << dx << nx << ny << nz;
+   QLOG_TRACE() << "Total points" <<  nx * ny * nz;
+
+   Size size(boxMin, dx, nx, ny, nz);
+   m_size = size;
+   init();
+
+   int cnt(0);
+   for (int i = 0; i < nx; ++i) {
+       for (int j = 0; j < ny; ++j) {
+            for (int k = 0; k < nz; ++k) {
+                (*m_data)[i][j][k] = gridData.getValue(cnt);
+                ++cnt;
+            }
+       }
+   }
 }
 
 

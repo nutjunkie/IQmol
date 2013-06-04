@@ -34,6 +34,8 @@ namespace qglviewer {
 }
 
 namespace IQmol {
+   class AmbientOcclusionEngine;
+
 namespace Layer {
 
    /// Representation of a OpenGL surface.  Note that a surface layer is 
@@ -51,6 +53,7 @@ namespace Layer {
          typedef QList<GLfloat> Data;
 
 
+/*
       public: class Facet {
 
          public:
@@ -63,6 +66,7 @@ namespace Layer {
             qglviewer::Vec m_b, m_nb;
             qglviewer::Vec m_c, m_nc;
       };
+*/
 
 
       public: // Surface
@@ -73,20 +77,22 @@ namespace Layer {
             QColor const& positive, QColor const& negative = QColor(), bool upsample = false);
          ~Surface();
 
-         void draw(qglviewer::Vec const& cameraPosition);
-         void drawFast(qglviewer::Vec const& cameraPosition);
-         void drawSelected(qglviewer::Vec const& cameraPosition);
+         void draw();
+         void drawFast();
+         void drawSelected();
 
          void setSurfaceData(Data const&, Sign sign = Positive);
-         void computePropertyData(Function3D);
-         void clearPropertyData();
-         void setAlpha(double alpha);
+
          int  quality() const { return m_quality; }
          double isovalue() const { return m_isovalue; }
          bool upsample() const { return m_upsample; }
          void createToolTip(QString const& label = QString());
-   
+         double minPropertyValue() const { return m_min; }
+         double maxPropertyValue() const { return m_max; }
+         
          Grid::DataType gridDataType() const { return m_type; }
+         bool cubeIsSigned() const { return m_cubeIsSigned; }
+         void setCubeIsSigned(bool tf) { m_cubeIsSigned = tf; }
 
          bool operator==(Surface const& that);
          bool operator!=(Surface const& that) { return !(*this == that); }
@@ -94,16 +100,21 @@ namespace Layer {
       protected:
          void setGradient(Gradient::ColorList const& colors) { m_colors = colors; }
          void setColor(QColor const& color, Sign sign = Positive);
+         void computePropertyData(Function3D);
+         void clearPropertyData();
+         void setAlpha(double alpha);
+         void addAmbientOcclusion(bool);
          QColor color(Sign sign = Positive) const;
 
          Grid::DataType m_type;
          int      m_quality;
          double   m_isovalue;
-         GLfloat  m_shininess;
-         GLfloat  m_specular;
          DrawMode m_drawMode;
          bool     m_upsample;
          Configurator::Surface m_configurator;
+
+      private Q_SLOTS:
+         void ambientOcclusionDataAvailable();
 
       private:
          void recompile();
@@ -124,6 +135,12 @@ namespace Layer {
          double m_max;
          double m_areaPositive;
          double m_areaNegative;
+         bool m_cubeIsSigned;
+
+         void computeAmbientOcclusion();
+         AmbientOcclusionEngine* m_aoEngine;
+         Data m_occlusionData;
+         bool  m_includeAmbientOcclusion;
    };
 
 } // end namespace Layer

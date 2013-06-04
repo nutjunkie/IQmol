@@ -61,11 +61,11 @@ DataList OpenBabel::parse(QTextStream& stream)
 DataList OpenBabel::parseFile(QString const& fileName)
 {
    OBConversion conv;
-   OBFormat *inFormat = conv.FormatFromExt(fileName.toAscii().data());
+   OBFormat *inFormat = conv.FormatFromExt(QFile::encodeName(fileName).data());
    if (!inFormat || !conv.SetInFormat(inFormat)) throw ExtensionError();
 
    std::ifstream ifs;
-   ifs.open(fileName.toAscii().data());
+   ifs.open(QFile::encodeName(fileName).data());
    if (!ifs) throw ReadError();
 
    ::OpenBabel::OBMol mol;
@@ -89,7 +89,7 @@ DataList OpenBabel::extractData(::OpenBabel::OBMol& obMol)
       atom = new Layer::Atom(obAtom->GetAtomicNum());  // Need to set parent !!!
       atom->setCharge(obAtom->GetPartialCharge());     // display options (Molecule::createAtom())
       atom->setPosition(pos);
-      atoms->appendRow(atom);
+      atoms->appendLayer(atom);
       atomMap.insert(&*obAtom, atom);
    }
 
@@ -111,7 +111,7 @@ DataList OpenBabel::extractData(::OpenBabel::OBMol& obMol)
       if (begin && end) {
          bond = new Layer::Bond(begin, end);
          bond->setOrder(obBond->GetBondOrder());
-         bonds->appendRow(bond);
+         bonds->appendLayer(bond);
       }
    }
 

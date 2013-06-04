@@ -96,7 +96,14 @@ namespace Parser {
 		 /// it does not correspond to a distinct file type.
 		 class MoleculeSection {
             public:
-               MoleculeSection() { }
+               DataList parse(QTextStream&);
+         };
+
+		 /// Subparser used to read the contents of a $efp_fragments section in a
+		 /// QChem input/output file.  This is not derived from Parser::Base as
+		 /// it does not correspond to a distinct file type.
+		 class EfpFragmentsSection {
+            public:
                DataList parse(QTextStream&);
          };
 
@@ -105,7 +112,6 @@ namespace Parser {
 		 /// does not correspond to a distinct file type.
          class RemSection {
             public:
-               RemSection() { }
                DataList parse(QTextStream&);
          };
 

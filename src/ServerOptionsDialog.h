@@ -38,6 +38,7 @@ namespace IQmol {
 
       private Q_SLOTS:
          void copyToServer();
+         void on_clearCookieButton_clicked(bool);
 
       private:
          Ui::ServerOptionsDialog m_dialog;

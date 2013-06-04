@@ -44,9 +44,9 @@ namespace Layer {
          Bond(Atom* begin, Atom* end);
          ~Bond() { }
 
-         // Note the default cameraPosition will only work for single bonds
-         void draw(qglviewer::Vec const& cameraPosition);
-         void drawSelected(qglviewer::Vec const& cameraPosition);
+         void draw();
+         void drawFast() { }
+         void drawSelected();
          void setOrder(int const order) { m_order = order; }
          void setIndex(int const index);
 
@@ -55,17 +55,12 @@ namespace Layer {
          Atom* endAtom() { return m_end; }
          double length();
 
-      protected:
-         Atom* m_begin;
-         Atom* m_end;
-         int m_order;
-
       private:
          void updateOrientation();
-         void drawPrivate(qglviewer::Vec const& cameraPosition, bool selected);
-         void drawBallsAndSticks(qglviewer::Vec const& cameraPosition, bool selected);
-         void drawTubes(qglviewer::Vec const& cameraPosition, bool selected);
-         void drawWireFrame(qglviewer::Vec const& cameraPosition, bool selected);
+         void drawPrivate(bool selected);
+         void drawBallsAndSticks(bool selected);
+         void drawTubes(bool selected);
+         void drawWireFrame(bool selected);
 
          // Static Data
          static GLfloat s_defaultColor[];        // Gray bonds for BallsAndSticks
@@ -73,6 +68,10 @@ namespace Layer {
          static GLfloat s_radiusTubes;           // Default tube radius in angstroms
          static GLfloat s_radiusWireFrame;       // Default wire frame radius in pixels
          static qglviewer::Vec s_zAxis;
+
+         Atom* m_begin;
+         Atom* m_end;
+         int m_order;
    };
 
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>331</width>
-    <height>147</height>
+    <height>152</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -69,6 +69,21 @@ QToolButton:pressed {
       </widget>
      </item>
      <item>
+      <widget class="QCheckBox" name="signedButton">
+       <property name="toolTip">
+        <string>A signed surface will disply both the 
+positive and negative isosurfaces.  
+Uncheck if only one surface is desired.</string>
+       </property>
+       <property name="text">
+        <string>Signed</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer_4">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -93,9 +108,27 @@ QToolButton:pressed {
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label_9">
+      <widget class="QToolButton" name="negativeColorButton">
+       <property name="styleSheet">
+        <string notr="true">QToolButton {
+   background-color: rgb(255, 0, 0);
+}</string>
+       </property>
        <property name="text">
-        <string>Positive</string>
+        <string/>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>16</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="negativeLabel">
+       <property name="text">
+        <string>Negative</string>
        </property>
       </widget>
      </item>
@@ -118,27 +151,9 @@ QToolButton:pressed {
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="negativeLabel">
+      <widget class="QLabel" name="positiveLabel">
        <property name="text">
-        <string>Negative</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="negativeColorButton">
-       <property name="styleSheet">
-        <string notr="true">QToolButton {
-   background-color: rgb(255, 0, 0);
-}</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>32</width>
-         <height>16</height>
-        </size>
+        <string>Positive</string>
        </property>
       </widget>
      </item>

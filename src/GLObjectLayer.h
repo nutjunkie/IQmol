@@ -54,62 +54,106 @@ namespace Layer {
          /// Note the constructor does not allow a QObject parent.  This
          /// means the destruction of GLObjects must be taken care of 
          /// explicitly and not through the Qt mechanism.
-         explicit GLObject(QString const& text = QString()) : Base(text), 
-            m_selected(false), m_alpha(1.0) { 
+         explicit GLObject(QString const& text = QString()) : Base(text), m_alpha(1.0) 
+         { 
             setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
           }
 
          virtual ~GLObject() {  }
 
 		 /// This is the key function for GLObjects and must be implemented
-		 /// for the object to be able to be drawn on the GL canvas.  The
-         /// cameraPosition can be just a dummy argument, but it allows for 
-         /// drawing of objects that need to face the camera.
-         virtual void draw(qglviewer::Vec const& cameraPosition) = 0;
+		 /// for the object to be able to be drawn on the GL canvas. 
+         virtual void draw() 
+         {
+            glPushMatrix();
+            glMultMatrixd(m_frame.matrix());
+            glCallList(m_callList);
+            glPopMatrix();
+         }
 
 		 /// Reimplement this for complex objects that require simplified
 		 /// drawing when moving to maintain interactive frame rates.
-         virtual void drawFast(qglviewer::Vec const& cameraPosition) {
-            draw(cameraPosition);
+         virtual void drawFast() 
+         {
+            glPushMatrix();
+            glMultMatrixd(m_frame.matrix());
+            glCallList(m_fastCallList);
+            glPopMatrix();
          } 
 
          /// Reimplement this for objects that should appear different when 
          /// selected.  This is called after the object has been drawn and
          /// in most cases this function just needs to draw a transparent 
          /// 'halo' around the object.
-         virtual void drawSelected(qglviewer::Vec const& cameraPosition) {
-            draw(cameraPosition);
+         virtual void drawSelected() {
+            glPushMatrix();
+            glMultMatrixd(m_frame.matrix());
+            glCallList(m_selectedCallList);
+            glPopMatrix();
          }
 
-         virtual void select() { m_selected = true; }
-         virtual void deselect() { m_selected = false; }
-         bool isSelected() const { return m_selected; }
+         virtual void select()   { setProperty(Selected);   }
+         virtual void deselect() { unsetProperty(Selected); }
+         bool isSelected() const { return hasProperty(Selected); }
 
          virtual void setAlpha(double alpha) { m_alpha = alpha; }
          virtual double getAlpha() const { return m_alpha; }
 
+         qglviewer::Frame getFrame() { return m_frame; }
+
          qglviewer::Vec getPosition() { return m_frame.position(); }
          qglviewer::Quaternion getOrientation() { return m_frame.orientation(); }
+         qglviewer::Vec getTranslation() { return m_frame.translation(); }
+         qglviewer::Quaternion getRotation() { return m_frame.rotation(); }
+
 
 		 /// Basic implmentation of an alpha sort so transparent objects can be
 		 /// drawn last so that they are not eclipsed.
-         static bool AlphaSort(GLObject* a, GLObject* b) { 
+         static bool AlphaSort(GLObject* a, GLObject* b) 
+         { 
             return (a->getAlpha() > b->getAlpha()); 
          }
 
-      public Q_SLOTS:
-         virtual void setPosition(qglviewer::Vec const& pos) { 
-            m_frame.setPosition(pos); 
+         /// This should be called just before a draw of the whole scene.
+         static void SetCameraPosition(qglviewer::Vec const& position) 
+         { 
+            s_cameraPosition = position; 
          }
 
-         virtual void setOrientation(qglviewer::Quaternion const& orient) { 
+      public Q_SLOTS:
+         virtual void setReferenceFrame(qglviewer::Frame* frame) { 
+            m_frame.setReferenceFrame(frame); 
+         }
+
+         virtual void setFrame(qglviewer::Frame const& frame) {
+            m_frame = frame;
+         }
+
+         virtual void setPosition(qglviewer::Vec const& position) {
+            m_frame.setPosition(position); 
+         }
+
+         virtual void setOrientation(qglviewer::Quaternion const& orient) {
             m_frame.setOrientation(orient); 
          }
 
+         virtual void setTranslation(qglviewer::Vec const& translation) {
+            m_frame.setTranslation(translation); 
+         }
+
+         virtual void setRotation(qglviewer::Quaternion const& rotation) {
+            m_frame.setRotation(rotation); 
+         }
+
+
+
       protected:
+         static qglviewer::Vec s_cameraPosition;
          qglviewer::Frame m_frame;
-         bool   m_selected;
          double m_alpha;   
+         GLuint m_callList;
+         GLuint m_fastCallList;
+         GLuint m_selectedCallList;
    };
 
 } // end namespace Layer

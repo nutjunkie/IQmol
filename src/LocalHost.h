@@ -52,7 +52,6 @@ namespace IQmol {
          Threaded* grep(QString const& string, QString const& filePath);
          Threaded* checkOutputForErrors(QString const& filePath);
     
-
          QString workingDirectory(JobInfo* jobInfo) {
             return jobInfo->get(JobInfo::LocalWorkingDirectory);
          }

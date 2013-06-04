@@ -21,9 +21,11 @@
 ********************************************************************************/
 
 #include "Grid.h"
+#include "IQmol.h"
 #include "QsLog.h"
 #include "SpatialProperty.h"
 #include "AtomicDensity.h"
+#include "MoleculeLayer.h"
 #include <openbabel/mol.h>  // for OpenBabel::etab
 
 
@@ -111,14 +113,15 @@ void PromoleculeDensity::boundingBox(Vec& min, Vec& max)
 
 
 // --------------- PointChargePotential ---------------
-
-void PointChargePotential::update(QList<double> charges, QList<qglviewer::Vec> coordinates) {
-   if (charges.size() == coordinates.size()) {
-      m_charges = charges;
-      m_coordinates = coordinates;
-   }else {
+Function3D PointChargePotential::evaluator() 
+{
+   // update the data first
+   m_coordinates = m_molecule->coordinates();
+   m_charges = m_molecule->atomicCharges();
+   if (m_charges.size() != m_coordinates.size()) {
       QLOG_ERROR() << "Unequal atom list lengths passed";
    }
+   return boost::bind(&PointChargePotential::potential, this, _1, _2, _3);
 }
 
 
@@ -133,6 +136,106 @@ double PointChargePotential::potential(double const x, double const y, double co
        esp += m_charges[i]/d;
    }
    return esp;
+}
+
+
+// --------------- MultipolePotential ---------------
+
+MultipolePotential::~MultipolePotential() 
+{ 
+   delete m_siteList; 
+}
+
+
+double MultipolePotential::potential(double const x, double const y, double const z)
+{
+   double esp(0.0);
+   double tmp, R2, s, ir1, ir2, ir3, ir5, ir7;
+   Vec pos(x, y, z);
+   Vec R;
+
+   Data::MultipoleExpansionList::const_iterator site;
+
+   for (site = m_siteList->begin(); site != m_siteList->end(); ++site) {
+       R   = pos-(*site)->position();
+       R  *= AngstromToBohr;
+       R2  = R.squaredNorm();
+       ir1 = 1.0/R.norm();
+       ir2 = ir1*ir1;
+       ir3 = ir1*ir2;
+       ir5 = ir3*ir2;
+       ir7 = ir5*ir2;
+       
+       if (m_order >= 0) { // charge
+          esp += (*site)->moment(Data::MultipoleExpansion::Q) * ir1;
+       }
+       if (m_order >= 1) { // dipole
+          tmp  = (*site)->moment(Data::MultipoleExpansion::X) * R.x;
+          tmp += (*site)->moment(Data::MultipoleExpansion::Y) * R.y;
+          tmp += (*site)->moment(Data::MultipoleExpansion::Z) * R.z;
+          esp += tmp * ir3;
+       }
+       if (m_order >= 2) { // quadrupole
+          tmp  = (*site)->moment(Data::MultipoleExpansion::XX) * (3.0*R.x*R.x - R2);
+          tmp += (*site)->moment(Data::MultipoleExpansion::YY) * (3.0*R.y*R.y - R2);
+          tmp += (*site)->moment(Data::MultipoleExpansion::ZZ) * (3.0*R.z*R.z - R2);
+          tmp += (*site)->moment(Data::MultipoleExpansion::XY) * (3.0*R.x*R.y);
+          tmp += (*site)->moment(Data::MultipoleExpansion::XZ) * (3.0*R.x*R.z);
+          tmp += (*site)->moment(Data::MultipoleExpansion::YZ) * (3.0*R.y*R.z);
+          esp += 0.5*tmp*ir5;
+       } 
+       if (m_order >= 3) { // octopole
+          tmp  = (*site)->moment(Data::MultipoleExpansion::XYZ) * (30.0*R.x*R.y*R.z);
+          s    = 5.0*R.x*R.x;
+          tmp += (*site)->moment(Data::MultipoleExpansion::XXX) *     R.x*(s - 3.0*R2);
+          tmp += (*site)->moment(Data::MultipoleExpansion::XXY) * 3.0*R.y*(s -     R2);
+          tmp += (*site)->moment(Data::MultipoleExpansion::XXZ) * 3.0*R.z*(s -     R2);
+          s    = 5.0*R.y*R.y;
+          tmp += (*site)->moment(Data::MultipoleExpansion::XYY) * 3.0*R.x*(s -     R2);
+          tmp += (*site)->moment(Data::MultipoleExpansion::YYY) *     R.y*(s - 3.0*R2);
+          tmp += (*site)->moment(Data::MultipoleExpansion::YYZ) * 3.0*R.z*(s -     R2);
+          s    = 5.0*R.z*R.z;
+          tmp += (*site)->moment(Data::MultipoleExpansion::XZZ) * 3.0*R.x*(s -     R2);
+          tmp += (*site)->moment(Data::MultipoleExpansion::YZZ) * 3.0*R.y*(s -     R2);
+          tmp += (*site)->moment(Data::MultipoleExpansion::ZZZ) *     R.z*(s - 3.0*R2);
+          esp += 0.5*tmp*ir7;
+       }
+   }
+       
+   return esp;
+}
+
+
+// --------------- NearestNuclearCharge ---------------
+
+void NearestNuclearCharge::update(QList<int> nuclearCharges, QList<qglviewer::Vec> coordinates) {
+   if (nuclearCharges.size() == coordinates.size()) {
+      m_nuclearCharges = nuclearCharges;
+      m_coordinates = coordinates;
+   }else {
+      QLOG_ERROR() << "Unequal atom list lengths passed";
+   }
+}
+
+
+double NearestNuclearCharge::nucleus(double const x, double const y, double const z)
+{
+   if (m_nuclearCharges.isEmpty())  return 1.0;  // set to hydrogen
+
+   Vec pos(x, y, z);
+   double dmin((m_coordinates[0]-pos).norm());
+   double Z(m_nuclearCharges[0]);
+   double d;
+
+   for (int i = 1; i < m_nuclearCharges.size(); ++i) {
+       d = (m_coordinates[i] - pos).norm();
+       if (d < dmin) {
+          Z = m_nuclearCharges[i];
+          dmin = d;
+       }
+   }
+
+   return Z;
 }
 
 

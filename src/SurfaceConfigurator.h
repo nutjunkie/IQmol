@@ -57,9 +57,8 @@ namespace Configurator{
          void on_fillButton_clicked(bool);
          void on_linesButton_clicked(bool);
          void on_dotsButton_clicked(bool);
+         void on_ambientOcclusionCheckBox_clicked(bool);
          void on_transparencySlider_valueChanged(int);
-         void on_shininessSlider_valueChanged(int);
-         void on_specularSlider_valueChanged(int);
          void editGradientColors(bool);
 
 
@@ -75,6 +74,9 @@ namespace Configurator{
          QColor m_colorNegative;
          Gradient::ColorList m_colors;
          bool m_initialized;
+
+         static Gradient::ColorList s_atomColors;
+         Gradient::ColorList const& atomColorGradient();
    };
 
 } } // end namespace IQmol::Configurator

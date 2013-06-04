@@ -36,18 +36,22 @@ namespace Layer {
 
    /// Custom Layer property flags.  Do not confuse these with the flags for
    /// QStandardItem.
-   enum PropertyFlags { 
-      RemoveWhenChildless = 0x1 
+   enum PropertyFlag { 
+      RemoveWhenChildless = 0x001,
+      Selected            = 0x002 
    };
 
+
    /// Flags that control the behavior of the findLayers() member function.
-   enum FindFlags { 
-      Visible     = 0x001, 
-      Nested      = 0x002, 
-      Children    = 0x004, 
-      Parents     = 0x008, 
-      IncludeSelf = 0x010 
+   enum FindFlag { 
+      Visible      = 0x001, 
+      Nested       = 0x002, 
+      Children     = 0x004, 
+      Parents      = 0x008, 
+      IncludeSelf  = 0x010,
+      SelectedOnly = 0x020
    };
+
       
 
    /// Model item for the ViewerModel class.  
@@ -68,12 +72,12 @@ namespace Layer {
       public:
 
          explicit Base(QString const& text = QString(), QObject* parent = 0)
-          : QObject(parent), QStandardItem(text), m_configurator(0), m_persistentParent(0)
+          : QObject(parent), QStandardItem(text), m_configurator(0), m_persistentParent(0),
+            m_propertyFlags(0)
          { 
             setFlags(Qt::ItemIsEnabled);
             setData(QVariantPointer<Base>::toQVariant(this));
          }
-
 
          virtual ~Base() 
          { 
@@ -83,61 +87,70 @@ namespace Layer {
                 delete *iter;
             } 
          }
-   
 
-		 /// Allows custom property flags to be set for the Layer.  Multiple
-		 /// flags can be set by flag1 | flag2 ... 
-         void setPropertyFlags(unsigned int const flags) 
-         { 
-            m_propertyFlags = flags; 
-         }
+		 /// Allows custom property flags to be set for the Layer.
+         void setProperty(PropertyFlag const flag)   { m_propertyFlags |= flag; }
+         void unsetProperty(PropertyFlag const flag) { m_propertyFlags &= ~flag; }
+         bool hasProperty(PropertyFlag const flag) const { return m_propertyFlags & flag; }
 
 
 		 /// Appends a child Layer to the current Layer.  If the current Layer
 		 /// is childless and the RemoveWhenChildless flag is set, then it will
 		 /// be reparented automatically.  This function should be used in
 		 /// preference to QStandardItem::appendRow()
-         void appendLayer(Base* child)
+         virtual void appendLayer(Base* child)
          {
             child->setPersistentParent(this);
             if (!hasChildren() && (m_propertyFlags & RemoveWhenChildless)) adopt();
             appendRow(child);
          }
 
-
 		 /// Removes a child Layer from this, if it exists.  Note that deletion
 		 /// of the Layer must be handled explicitly.
-         void removeLayer(Base* child)
+         virtual void removeLayer(Base* child)
          {
             child->orphan();
             if (!hasChildren() && (m_propertyFlags & RemoveWhenChildless)) orphan();
          }
 
-
-		 /// Generic search function that finds related Layers of a
-		 /// particular type.
-         template <class T>
-         QList<T*> findLayers(unsigned int flags = (Nested | Children)) 
+         virtual void orphanLayer()
          {
-            QList<T*> hits;    
+            if (m_persistentParent) {
+               m_persistentParent->removeLayer(this);
+               m_persistentParent = 0;
+            }
+         }
 
-            if (flags & IncludeSelf) {
-               T* t;
-               if ( (t = dynamic_cast<T*>(this)) ) {
-                  if (flags & Visible) {
-                     if (isCheckable() && checkState() == Qt::Checked) {
-                        hits.append(t);
-                     }
-                  }else {
-                     hits.append(t);
-                  }
-               }
+
+         template <class T>
+         QList<T*> findLayers(unsigned int flags = (Nested | Children))
+         {
+            bool appendSelf(flags & IncludeSelf);
+            
+            if (flags & SelectedOnly) {
+               appendSelf = appendSelf && hasProperty(Selected);
+            }
+            if (flags & Visible && isCheckable()) {
+               appendSelf = appendSelf && (checkState() == Qt::Checked);
             }
 
-            if (flags & Parents)  findParents<T>(hits, flags);
-            if (flags & Children) findChildren<T>(hits, flags);
+            T* t;
+            QList<T*> hits;    
+            if ( appendSelf && (t = dynamic_cast<T*>(this)) ) { 
+               hits.append(t);
+               if (!(flags & Nested)) return hits;
+            }
+
+			// We can't go both ways else we'd end up with the whole family around
+            if (flags & Children) {
+               findChildren<T>(hits, flags);
+            }else if (flags & Parents)  {
+               findParents<T>(hits, flags);
+            }
+            
             return hits;
          }
+
 
 
 		 /// Returns a list of actions that should appear in the context menu.
@@ -257,17 +270,20 @@ namespace Layer {
          template <class T>
          void findChildren(QList<T*>& children, unsigned int flags)
          {
-            bool visibleOnly(flags & Visible);
-            if (visibleOnly && isCheckable() && checkState() == Qt::Unchecked) return;
+            if (flags & Visible && isCheckable() && checkState() == Qt::Unchecked) return;
 
-            T* t;
             for (int i = 0; i < rowCount(); ++i) {
                 Base* ptr(QVariantPointer<Base>::toPointer(child(i)->data()));
 
-                if (visibleOnly && ptr->isCheckable() && ptr->checkState() == Qt::Unchecked) {
-                   // do nothing
-                }else {
-                   if ( (t = dynamic_cast<T*>(ptr)) ) {
+                bool append(true);
+                if (flags & Visible && ptr->isCheckable()) {
+                   append = append && (ptr->checkState() == Qt::Checked);
+                }
+ 
+                if (append) {
+                   if (flags & SelectedOnly) append = append && ptr->hasProperty(Selected);
+                   T* t;
+                   if (append && (t = dynamic_cast<T*>(ptr)) ) {
                       children.append(t);
                       if (flags & Nested) ptr->findChildren<T>(children, flags);
                    }else {
@@ -283,25 +299,25 @@ namespace Layer {
          void findParents(QList<T*>& parents, unsigned int flags) 
          {
             QStandardItem* p(QStandardItem::parent());
+            if (!p) return;
 
-            if (p) {
-               Base* ptr(QVariantPointer<Base>::toPointer(p->data()));
-               if (ptr) {
-                  T* t;
-                  if ( (t = dynamic_cast<T*>(ptr)) ) {
-                     bool visibleOnly(flags & Visible);
-                     if (visibleOnly && ptr->isCheckable() && 
-                         ptr->checkState() == Qt::Unchecked) {
-                         // do nothing
-                     }else {
-                        parents.append(t);
-                        if (flags & Nested) ptr->findParents<T>(parents, flags);
-                     }
-                  }else {
-                     ptr->findParents<T>(parents, flags);
-                  }
-               }
+            Base* ptr(QVariantPointer<Base>::toPointer(p->data()));
+            if (!ptr) return;
+
+            bool append(true);
+            if (flags & SelectedOnly) {
+               append = append && ptr->hasProperty(Selected);
             }
+            if (flags & Visible && ptr->isCheckable()) {
+               append = append && (ptr->checkState() == Qt::Checked);
+            }
+            T* t;
+            if (append && (t = dynamic_cast<T*>(ptr))) {
+               parents.append(t);
+               if (!(flags & Nested)) return;
+            }
+
+            ptr->findParents<T>(parents, flags);
          }
 
          // Data members
@@ -310,6 +326,7 @@ namespace Layer {
          Base* m_persistentParent;
          unsigned int m_propertyFlags;
    };
+
 
 } } // end namespace IQmol::Layer
 

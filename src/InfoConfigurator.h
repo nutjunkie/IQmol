@@ -47,6 +47,7 @@ namespace Configurator {
          void sync();
          void on_chargeSpin_valueChanged(int);
          void on_multiplicitySpin_valueChanged(int);
+         void on_detectSymmetryButton_clicked(bool);
 
       private:
          Ui::InfoConfigurator m_infoConfigurator;

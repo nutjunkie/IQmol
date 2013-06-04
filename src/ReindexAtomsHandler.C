@@ -22,7 +22,6 @@
 
 #include "ReindexAtomsHandler.h"
 #include "MoleculeLayer.h"
-#include "FragmentLayer.h"
 #include "Viewer.h"
 
 
@@ -38,20 +37,20 @@ void ReindexAtoms::reset(Layer::Molecule* molecule)
 
 void ReindexAtoms::mousePressEvent(QMouseEvent* e) 
 {
-   m_viewer->m_selectionHighlighting = false;
+   m_viewer->setSelectionHighlighting(false);
 
    if (e->button() == Qt::LeftButton) {
-      m_viewer->setSelectionMode(Viewer::AddClick);
+      m_selectionMode = AddClick;
    }else if (e->button() == Qt::RightButton) {
-      m_viewer->setSelectionMode(Viewer::RemoveClick);
+      m_selectionMode = RemoveClick;
    }else {
-      m_viewer->setSelectionMode(Viewer::ToggleClick);
+      m_selectionMode = ToggleClick;
    }
 
    m_viewer->QGLViewer::select(e);
 
    // Manipulate if we don't select anything
-   if (m_viewer->m_selectionHits == 0) {
+   if (m_viewer->selectionHits() == 0) {
       e->ignore();
       return;
    }
@@ -60,12 +59,9 @@ void ReindexAtoms::mousePressEvent(QMouseEvent* e)
    GLObjectList::iterator iter;
    int index(1);
    Layer::Atom* atom;
-   Layer::Fragment* frag;
 
    for (iter = selection.begin(); iter != selection.end(); ++iter) {
-       if ( (frag = qobject_cast<Layer::Fragment*>(*iter)) ) {
-          frag->renumberAtomsFrom(index);
-       }else if ( (atom = qobject_cast<Layer::Atom*>(*iter)) ) {
+       if ( (atom = qobject_cast<Layer::Atom*>(*iter)) ) {
           atom->setReorderIndex(index++);
        }
    }
@@ -82,7 +78,6 @@ void ReindexAtoms::keyReleaseEvent(QKeyEvent* e)
       GLObjectList objects(m_viewer->m_objects);
       GLObjectList::iterator iter;
       Layer::Atom* atom;
-      Layer::Fragment* frag;
 
 	  // Zero out the unselected indices so updateAtomOrder() knows which ones
 	  // have not been reorderd.
@@ -90,12 +85,8 @@ void ReindexAtoms::keyReleaseEvent(QKeyEvent* e)
       for (iter = objects.begin(); iter != objects.end(); ++iter) {
           if ((*iter)->isSelected()) { 
              (*iter)->deselect();
-          }else {
-             if ( (frag = qobject_cast<Layer::Fragment*>(*iter)) ) {
-                frag->renumberAtomsFrom(zero);
-             }else if ( (atom = qobject_cast<Layer::Atom*>(*iter)) ) {
-                atom->setReorderIndex(zero);
-             }
+          }else if ( (atom = qobject_cast<Layer::Atom*>(*iter)) ) {
+             atom->setReorderIndex(zero);
           }
       }
 
@@ -107,8 +98,8 @@ void ReindexAtoms::keyReleaseEvent(QKeyEvent* e)
       m_viewer->clearSelection();
    }
 
-   m_viewer->setActiveViewerMode(IQmol::Manipulate);
-   m_viewer->m_selectionHighlighting = true;
+   m_viewer->setActiveViewerMode(Viewer::Manipulate);
+   m_viewer->setSelectionHighlighting(true);
    m_viewer->setLabelType(Layer::Atom::Index);
    m_viewer->displayMessage("");
    e->accept();

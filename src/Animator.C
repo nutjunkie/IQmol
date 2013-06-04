@@ -33,8 +33,8 @@ namespace Animator {
 
 // if cycles < 0.0 then it animates until manually stopped
 Base::Base(Layer::GLObject* object, double const cycles, double const speed, 
-   Waveform const waveform) : m_object(object), m_cycles(cycles), m_speed(speed),
-   m_time(0.0), m_active(true)
+   Waveform const waveform) : m_object(object), m_time(0.0), m_active(true),
+   m_cycles(cycles), m_speed(speed)
 {
    m_originalPosition = m_object->getPosition();
    setWavefunction(waveform);
@@ -157,6 +157,32 @@ void Move::update(double const time, double const amp)
 {
    Q_UNUSED(time);
    m_object->setPosition( (1.0-amp)*m_originalPosition + amp*m_endPoint);
+}
+
+
+// --------------- Transform ---------------
+Transform::Transform(Layer::GLObject* object, qglviewer::Frame const& endPoint, 
+   double const speed) : Base(object, 1.0, speed, Sigmoidal)
+{ 
+  m_startPoint = m_object->getFrame();
+  m_endPoint   = endPoint;
+}
+
+
+void Transform::reset()
+{
+   m_time = 0;
+   m_active = true;
+   m_object->setFrame(m_startPoint);
+}
+
+
+void Transform::update(double const time, double const amp)
+{
+   Q_UNUSED(time);
+   m_object->setPosition( (1.0-amp)*m_startPoint.position() + amp*m_endPoint.position());
+   m_object->setOrientation( Quaternion::slerp(m_startPoint.orientation(),
+       m_endPoint.orientation(),amp) );
 }
 
 } } // end namespace IQmol::Animator

@@ -29,6 +29,9 @@
 #include <QMessageBox>
 #include <QFileOpenEvent>
 
+#include <QThread>
+#include <QThreadPool>
+
 
 
 namespace IQmol {
@@ -115,6 +118,8 @@ void IQmolApplication::open(QString const& file)
       connect(this, SIGNAL(lastWindowClosed()), this, SLOT(maybeQuit()));
       connected = true;
    }
+//   QLOG_INFO() << "Number of threads:" << QThread::idealThreadCount();
+//   QLOG_INFO() << "Active    threads:" << QThreadPool::globalInstance()->activeThreadCount();
 }
 
 

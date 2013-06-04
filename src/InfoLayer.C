@@ -268,4 +268,10 @@ void Info::setPointGroup(QString const& pointGroup)
 }
 
 
+void Info::detectSymmetry()
+{
+   if (m_molecule) m_molecule->detectSymmetry();
+}
+
+
 } } // end namespace IQmol::Layer

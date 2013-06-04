@@ -57,11 +57,18 @@ void Info::sync()
    s = QString::number(m_info->m_mass, 'f', 3) + " g/mol";
    m_infoConfigurator.massLabel->setText(s);
 
-   if (m_info->m_energyUnit == Layer::Info::Hartree) {
-      s = QString::number(m_info->m_energy, 'f', 6) + " E" + subscript("h");
-   }else {
-      s = QString::number(m_info->m_energy, 'f', 3) + " kJ/mol";
+   switch (m_info->m_energyUnit) {
+      case Layer::Info::Hartree:
+         s = QString::number(m_info->m_energy, 'f', 6) + " E" + subscript("h");
+      break;
+      case Layer::Info::KJMol:
+         s = QString::number(m_info->m_energy, 'f', 3) + " kJ/mol";
+      break;
+      case Layer::Info::KCalMol:
+         s = QString::number(m_info->m_energy, 'f', 3) + " kcal/mol";
+      break;
    }
+
    m_infoConfigurator.energyLabel->setText(s);
 
    s = QString::number(m_info->dipole(), 'f', 3) + " D";
@@ -83,5 +90,12 @@ void Info::on_multiplicitySpin_valueChanged(int value)
 {
    m_info->setMultiplicity(value); 
 }
+
+
+void Info::on_detectSymmetryButton_clicked(bool) 
+{
+   m_info->detectSymmetry();
+}
+
 
 } } // end namespace IQmol::Configurator

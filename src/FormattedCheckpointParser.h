@@ -46,6 +46,7 @@ namespace Parser {
          QList<int> readIntegerArray(QTextStream&, int nTokens);
          QList<double> readDoubleArray(QTextStream&, int nTokens);
          void generateShells();
+         void makeAtomList();
 
          bool m_parseOkay;
          double m_energy;

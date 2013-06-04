@@ -44,7 +44,7 @@ Frequencies::Frequencies(OpenBabel::OBVibrationData const& vibrationData)
        intensity = m_haveIntensities ? intensities[i] : 0.0;
        Mode* mode = new Mode(frequencies[i], vibrationData.GetLx()[i], intensity);
        connect(mode, SIGNAL(playMode(Mode const&)), this, SLOT(playMode(Mode const&)));
-       appendRow(mode);
+       appendLayer(mode);
    }
 
    m_configurator.load();

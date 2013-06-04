@@ -25,6 +25,7 @@
 #include "Server.h"
 #include "QMsgBox.h"
 #include <exception>
+#include <cstdlib>
 
 
 namespace IQmol {
@@ -39,11 +40,7 @@ ServerRegistry& ServerRegistry::instance()
    if (s_instance == 0) {
       s_instance = new ServerRegistry();
       loadFromPreferences();
-#ifdef Q_WS_X11
       atexit(ServerRegistry::destroy);
-#else
-      ::std::atexit(ServerRegistry::destroy);
-#endif
    }
    return *s_instance;
 }

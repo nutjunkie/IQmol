@@ -26,7 +26,7 @@
 #include "Server.h"
 #include "QsLog.h"
 #include "QMsgBox.h"
-#include "PBSConfigurator.h"
+#include "ServerQueueDialog.h"
 
 #include <QDebug>
 
@@ -34,14 +34,14 @@
 namespace IQmol {
 
 PBSServer::PBSServer(Server* server, QVariantMap const& defaults) : ServerDelegate(server), 
-   m_configurator(0), m_defaults(defaults)
+   m_dialog(0), m_defaults(defaults)
 { 
 }
 
 
 PBSServer::~PBSServer()
 {
-   if (m_configurator) delete m_configurator;
+   if (m_dialog) delete m_dialog;
 }
 
 
@@ -52,7 +52,7 @@ qDebug() << "Testing PBSServer configuration";
       throw Server::Exception("Test Configuration called on disconnected server");
    }
 
-   ServerTask::TestConfiguration* test = new ServerTask::TestConfiguration(m_server);
+   ServerTask::TestConfiguration* test = new ServerTask::TestPBSConfiguration(m_server);
 
    HostDelegate::FileFlags flags;
    QString file;
@@ -80,30 +80,6 @@ qDebug() << "Testing PBSServer configuration";
 ServerTask::Base* PBSServer::submit(Process* process)
 {
    return new ServerTask::PBSSubmit(m_server, process);
-}
-
-   
-ServerTask::Base* PBSServer::kill(Process* process)
-{
-   return new ServerTask::KillProcess(m_server, process);
-}
-
-
-ServerTask::Base* PBSServer::query(Process* process)
-{
-   return new ServerTask::Query(m_server, process);
-}
-
-
-ServerTask::Base* PBSServer::cleanUp(Process* process)
-{
-   return new ServerTask::CleanUp(m_server, process);
-}
-
-
-ServerTask::CopyResults* PBSServer::copyResults(Process* process)
-{
-   return new ServerTask::CopyResults(m_server, process);
 }
 
 
@@ -145,32 +121,31 @@ Process::Status PBSServer::parseQueryString(QString const& query, Process* proce
 
 bool PBSServer::configureJob(Process* process)
 {
-
    if (m_queues.isEmpty()) {
       QMsgBox::warning(0, "IQmol", "No PBS queues found");
       return false;
    }
 
-   if (!m_configurator) {
-       m_configurator = new PBSConfigurator(m_queues, m_defaults);
+   if (!m_dialog) {
+       m_dialog = new ServerQueueDialog(m_queues, m_defaults);
    }
 
    bool accepted(false);
 
-   if (m_configurator->exec() == QDialog::Accepted) {
+   if (m_dialog->exec() == QDialog::Accepted) {
       JobInfo* jobInfo(process->jobInfo());
-      jobInfo->set(JobInfo::Queue, m_configurator->queue()); 
-      jobInfo->set(JobInfo::Walltime, m_configurator->walltime()); 
-      jobInfo->set(JobInfo::Memory, m_configurator->memory()); 
-      jobInfo->set(JobInfo::Jobfs, m_configurator->jobfs()); 
-      jobInfo->set(JobInfo::Ncpus, m_configurator->ncpus()); 
+      jobInfo->set(JobInfo::Queue, m_dialog->queue()); 
+      jobInfo->set(JobInfo::Walltime, m_dialog->walltime()); 
+      jobInfo->set(JobInfo::Memory, m_dialog->memory()); 
+      jobInfo->set(JobInfo::Scratch, m_dialog->scratch()); 
+      jobInfo->set(JobInfo::Ncpus, m_dialog->ncpus()); 
 
-      if (m_configurator->saveAsDefaults()) {
-         m_defaults.insert("Queue", m_configurator->queue());
-         m_defaults.insert("Walltime", m_configurator->walltime());
-         m_defaults.insert("Memory", m_configurator->memory());
-         m_defaults.insert("Jobfs", m_configurator->jobfs());
-         m_defaults.insert("Ncpus", m_configurator->ncpus());
+      if (m_dialog->saveAsDefaults()) {
+         m_defaults.insert("Queue", m_dialog->queue());
+         m_defaults.insert("Walltime", m_dialog->walltime());
+         m_defaults.insert("Memory", m_dialog->memory());
+         m_defaults.insert("Scratch", m_dialog->scratch());
+         m_defaults.insert("Ncpus", m_dialog->ncpus());
          ServerRegistry::instance().saveToPreferences();
       }
       accepted = true;
@@ -179,5 +154,57 @@ bool PBSServer::configureJob(Process* process)
    return accepted;
 }
 
+
+int PBSServer::setQueuesFromQueueInfo(QString const& queueInfo)
+{
+   ServerQueue* queue(0);
+   QStringList lines(queueInfo.split(QRegExp("\\n"), QString::SkipEmptyParts));
+   QStringList tokens;
+   QString line;
+   bool ok; 
+   int n;
+
+   QStringList::iterator iter;
+   for (iter = lines.begin(); iter != lines.end(); ++iter) {
+       line = *iter; 
+       tokens = line.split(QRegExp("\\s+"), QString::SkipEmptyParts);
+
+       if (line.contains("Queue: ")) {
+          queue = new ServerQueue(tokens[1]);
+          m_queues.append(queue);
+       }   
+
+       if (!queue) break;
+
+       if (line.contains("resources_max.walltime")) {
+           queue->m_maxWallTime = tokens[2];
+       }else if (line.contains("resources_default.walltime")) {
+           queue->m_defaultWallTime = tokens[2];
+       }else if (line.contains("resources_max.vmem")) {
+           queue->m_maxMemory = ServerQueue::parseResource(tokens[2]);
+       }else if (line.contains("resources_min.vmem")) {
+           queue->m_minMemory = ServerQueue::parseResource(tokens[2]);
+       }else if (line.contains("resources_default.vmem")) {
+           queue->m_defaultMemory = ServerQueue::parseResource(tokens[2]);
+       }else if (line.contains("resources_max.jobfs")) {
+           queue->m_maxScratch = ServerQueue::parseResource(tokens[2]);
+       }else if (line.contains("resources_min.jobfs")) {
+           queue->m_minScratch = ServerQueue::parseResource(tokens[2]);
+       }else if (line.contains("resources_default.jobfs")) {
+           queue->m_defaultScratch = ServerQueue::parseResource(tokens[2]);
+       }else if (line.contains("resources_max.ncpus")) {
+          n = tokens[2].toInt(&ok);
+          if (ok) queue->m_maxCpus = n;
+       }else if (line.contains("resources_min.ncpus")) {
+          n = tokens[2].toInt(&ok);
+          if (ok) queue->m_minCpus = n;
+       }else if (line.contains("resources_default.ncpus")) {
+          n = tokens[2].toInt(&ok);
+          if (ok) queue->m_defaultCpus = n;
+       }   
+   }   
+
+   return m_queues.size();
+}
 
 } // end namespace IQmol

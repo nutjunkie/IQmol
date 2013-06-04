@@ -22,7 +22,7 @@
 
 ********************************************************************************/
 
-#include "IQmol.h"
+#include "Viewer.h"
 #include "MeshLayer.h"
 #include "AxesLayer.h"
 #include "DataLayer.h"
@@ -41,6 +41,7 @@ class QUndoCommand;
 
 namespace IQmol {
 
+
    class JobInfo;
 
    /// Model for the hierarchical data structures contained within the
@@ -57,7 +58,7 @@ namespace IQmol {
          GLObjectList getSelectedObjects() { return m_selectedObjects; }
          void displayGlobals();
          bool open(QString const& fileName);
-         void addFragment(QString const& fileName);
+//void addFragment(QString const& fileName);
          void setForceField(QString const& forceField) { m_forceField = forceField; }
          void setPartialChargeType(QString const& type);
          double sceneRadius(bool all = false);  // default includes only visible mols
@@ -87,6 +88,7 @@ namespace IQmol {
          void symmetrize(double const);
          void determineSymmetry();
          void adjustSymmetryTolerance();
+         void toggleAutoDetectSymmetry();
 
          void setConstraint();
          void translateToCenter();
@@ -123,7 +125,7 @@ namespace IQmol {
          void selectionChanged(QItemSelection const& items, QItemSelectionModel::SelectionFlags);
          void select(QModelIndex const& item, QItemSelectionModel::SelectionFlags);
          void clearSelection();
-         void changeActiveViewerMode(ViewerMode const);
+         void changeActiveViewerMode(Viewer::Mode const);
          void pushAnimators(AnimatorList const&);
          void popAnimators(AnimatorList const&);
          void foregroundColorChanged(QColor const&);

@@ -23,14 +23,14 @@
 ********************************************************************************/
 
 #include "ServerDelegate.h"
-#include "PBSQueue.h"
+#include "ServerQueue.h"
 #include "Process.h"
 
 
 namespace IQmol {
 
    class Server;
-   class PBSConfigurator;
+   class ServerQueueDialog;
    namespace ServerTask {
       class Base;
    }
@@ -48,16 +48,16 @@ namespace IQmol {
          void setQueues(QueueList const& queues) { m_queues = queues; }
          QVariantMap delegateDefaults() const { return m_defaults; }
          
+         /// Sets the queue list from the output of the command given by the
+         /// ${QUEUE_INFO} command.  Returns the number of queues found.
+         int setQueuesFromQueueInfo(QString const& info);
+
          ServerTask::Base* testConfiguration();
          ServerTask::Base* submit(Process*);
-         ServerTask::Base* kill(Process*);
-         ServerTask::Base* query(Process*);
-         ServerTask::Base* cleanUp(Process*);
-         ServerTask::CopyResults* copyResults(Process*);
 
       private:
          QueueList m_queues;
-         PBSConfigurator* m_configurator;
+         ServerQueueDialog* m_dialog;
          QVariantMap m_defaults;
    };
 

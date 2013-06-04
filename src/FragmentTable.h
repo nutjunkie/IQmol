@@ -23,6 +23,8 @@
 ********************************************************************************/
 
 #include "ui_FragmentTable.h"
+#include "Viewer.h"
+#include <QDir>
 
 
 namespace IQmol {
@@ -34,12 +36,34 @@ namespace IQmol {
 
       public: 
          FragmentTable(QWidget* parent = 0);
+         ~FragmentTable();
+
+      Q_SIGNALS:
+         void fragmentSelected(QString const&, Viewer::Mode const);
 
       private Q_SLOTS:
+         void on_selectButton_clicked(bool);
+         void on_efpButton_clicked(bool);
+         void on_moleculesButton_clicked(bool);
+         void on_functionalGroupsButton_clicked(bool);
+
+         void selectionChanged(QTreeWidgetItem*, QTreeWidgetItem*);
+         void itemDoubleClicked(QTreeWidgetItem*, int);
 
       private:
+         static int s_fileRole;
+         static int s_imageRole;
+         static QString s_invalidFile;
+
          void setFragmentImage(QString const& fileName);
+         void loadFragments();
+         QList<QTreeWidgetItem*> loadFragments(QDir const& dir, QTreeWidgetItem* parent = 0);
          Ui::FragmentTable m_fragmentTable;
+         QString m_fileName;
+         QList<QTreeWidgetItem*> m_efp;
+         QList<QTreeWidgetItem*> m_molecules;
+         QList<QTreeWidgetItem*> m_functionalGroups;
+         Viewer::Mode m_buildMode;
    };
 
 } // end namespace IQmol

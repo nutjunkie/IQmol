@@ -38,7 +38,8 @@ namespace Parser {
 
    /// This is also a primary interface function which parses several files
    /// which are assumed to relate to the same molecule (e.g. output and
-   /// checkpoint files).
+   /// checkpoint files).  Note: no checking is performed to check that the
+   /// files correspond to the same system.
    DataList ParseFiles(QStringList const& fileNames);
 
    /// Abstract base class for file parsers.  Each derived class should handle
@@ -64,8 +65,7 @@ namespace Parser {
 
 	     /// Controls whether or not any errors should be displayed to the user.
 	     /// Call with false if the exceptions are to be handled internally.
-         void displayErrors(bool tf) { s_displayErrors = tf; }
-
+         static void displayErrors(bool tf) { s_displayErrors = tf; }
 
       protected:
          static bool s_displayErrors;

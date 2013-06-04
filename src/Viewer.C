@@ -21,9 +21,12 @@
 ********************************************************************************/
 
 #include "Viewer.h"
+#include "ViewerModel.h"
 #include "IQmol.h"
 #include "QsLog.h"
 #include "MoleculeLayer.h"
+#include "ShaderLibrary.h"
+#include "EFPFragmentLayer.h"
 #include "Preferences.h"
 #include "ManipulatedFrameSetConstraint.h"
 #include <QStandardItem>
@@ -38,6 +41,8 @@ using namespace qglviewer;
 
 namespace IQmol {
 
+Vec Layer::GLObject::s_cameraPosition = Vec(0.0, 0.0, 0.0);
+
 const Qt::Key Viewer::s_buildKey(Qt::Key_Alt);
 const Qt::Key Viewer::s_selectKey(Qt::Key_Shift);
 const Qt::Key Viewer::s_manipulateSelectionKey(Qt::Key_Control);
@@ -51,13 +56,15 @@ QFontMetrics Viewer::s_labelFontMetrics(Viewer::s_labelFont);
 
 //! Window set up is done here
 Viewer::Viewer(ViewerModel& model, QWidget* parent) : QGLViewer(parent), 
-   m_buildElement(6), 
    m_viewerModel(model), 
    m_selectionHighlighting(true),
    m_labelType(Layer::Atom::None),
-   m_manipulateHandler(this),
    m_selectHandler(this),
-   m_buildHandler(this),
+   m_manipulateHandler(this),
+   m_buildEFPFragmentHandler(this),
+   m_buildAtomHandler(this),
+   m_buildFunctionalGroupHandler(this),
+   m_buildMoleculeHandler(this),
    m_reindexAtomsHandler(this),
    m_manipulateSelectionHandler(this),
    m_snapper(0)
@@ -81,7 +88,9 @@ Viewer::Viewer(ViewerModel& model, QWidget* parent) : QGLViewer(parent),
    // Disable zoom selection, which makes no sense in our context
    setWheelBinding(Qt::MetaModifier, CAMERA, NO_MOUSE_ACTION);
 
-   setActiveViewerMode(Build);  // this should get overwritten by the MainWindow class
+   // The following two lines must be in this order
+   setDefaultBuildElement(6);
+   setActiveViewerMode(BuildAtom);  // this should get overwritten by the MainWindow class
    setSceneRadius(DefaultSceneRadius);
    resetView();
 }
@@ -93,34 +102,110 @@ Viewer::Viewer(ViewerModel& model, QWidget* parent) : QGLViewer(parent),
 void Viewer::init()
 {
    makeCurrent();
-   // A ManipulatedFrameSetConstraint will apply displacements to the selection
-   setManipulatedFrame(new ManipulatedFrame());
-   //setMouseTracking(true);
 
+   setManipulatedFrame(new ManipulatedFrame());
    manipulatedFrame()->setConstraint(new ManipulatedFrameSetConstraint());
+
    s_labelFont.setStyleStrategy(QFont::OpenGLCompatible);
    s_labelFont.setPointSize(Preferences::LabelFontSize());
+
    setForegroundColor(Preferences::ForegroundColor());
+   setBackgroundColor(Preferences::BackgroundColor());
 
-   // SpotLight
-/* !!!
-	glEnable(GL_LIGHT1);
+   if (0) {
+      glDisable(GL_LIGHT0);
+      glEnable(GL_LIGHT1);
+   }else {
+      glEnable(GL_LIGHT0);
+      glDisable(GL_LIGHT1);
+   }
 
-	// Light default parameters
-	const GLfloat light_ambient[4]  = {1.0, 1.0, 1.0, 1.0};
-	const GLfloat light_specular[4] = {1.0, 1.0, 1.0, 1.0};
-	const GLfloat light_diffuse[4]  = {1.0, 1.0, 1.0, 1.0};
+   //setFPSIsDisplayed(true);
 
-	glLightf( GL_LIGHT1, GL_SPOT_EXPONENT, 3.0);
-	glLightf( GL_LIGHT1, GL_SPOT_CUTOFF,   10.0);
-	glLightf( GL_LIGHT1, GL_CONSTANT_ATTENUATION,  0.1f);
-	glLightf( GL_LIGHT1, GL_LINEAR_ATTENUATION,    0.3f);
-	glLightf( GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.3f);
-	glLightfv(GL_LIGHT1, GL_AMBIENT,  light_ambient);
-	glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE,  light_diffuse);
+   // E
+   const GLfloat light_ambient[4]  = {0.3, 0.3, 0.3, 1.0};
+   const GLfloat light_diffuse[4]  = {0.75, 0.75, 0.75, 0.5};
+   const GLfloat light_specular[4] = {1.0, 1.0, 1.0, 1.0};
+
+   glLightfv(GL_LIGHT1, GL_AMBIENT,  light_ambient);
+   glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular);
+   glLightfv(GL_LIGHT1, GL_DIFFUSE,  light_diffuse);
+
+   //glLightf( GL_LIGHT1, GL_SPOT_EXPONENT, 2.0);
+   //glLightf( GL_LIGHT1, GL_SPOT_CUTOFF,   95.0);
+   //glLightf( GL_LIGHT1, GL_CONSTANT_ATTENUATION,  0.1f);
+   //glLightf( GL_LIGHT1, GL_LINEAR_ATTENUATION,    0.3f);
+   //glLightf( GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.3f);
+}
+
+
+
+void Viewer::draw()
+{
+   makeCurrent();
+   ShaderLibrary& library( ShaderLibrary::instance());
+
+
+   // Position the light(s)
+#if 0
+   Vec cameraPosition(camera()->position());
+   Vec cameraDirection(camera()->viewDirection());
+   Vec cameraRight(camera()->rightVector());
+   Vec cameraUp(camera()->upVector());
+
+   double cameraDistance(camera()->sceneRadius());
+   Vec lightPosition(0.0, 5.0, 0.0);
+   Vec lightDirection(lightPosition.unit());
+   lightDirection = cameraDirection;
+
+   GLfloat pos[] = {lightPosition[0],  lightPosition[1],  lightPosition[2], 0.0};
+   GLfloat dir[] = {lightDirection[0], lightDirection[1], lightDirection[2], 0.0};
+
+   glLightfv(GL_LIGHT1, GL_POSITION, pos);
+   glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, dir);
+#endif
+
+
+/*
+   // Default material
+   GLfloat mat_specular[] = { 0.9, 0.9, 0.9, 1.0 };
+   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+   GLfloat mat_ambient[] = { 0.2, 0.2, 0.2, 1.0 };
+   glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
+   GLfloat mat_diffuse[] = { 0.8, 0.8, 0.8, 1.0 };
+   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
+   GLfloat mat_shininess = 50.0;
+   glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
 */
-    
+
+   library.resumeShader();
+
+   glShadeModel(GL_SMOOTH);
+   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  
+
+
+   // create the master object lists, do the surfaces neeed to be filtered out?
+   m_objects = m_viewerModel.getVisibleObjects();
+   m_selectedObjects = m_viewerModel.getSelectedObjects();
+
+   Layer::GLObject::SetCameraPosition(camera()->position());
+
+   drawGlobals();
+
+   drawObjects(m_objects);
+
+   drawSelected(m_selectedObjects);
+   drawObjects(m_currentBuildHandler->buildObjects());
+  
+   library.suspendShader();
+
+   if (m_labelType != Layer::Atom::None) drawLabels(m_objects);
+   if (m_currentHandler->selectionMode() != Handler::None) {
+      drawSelectionRectangle(m_selectHandler.region());
+   }
+   displayGeometricParameter(m_selectedObjects);
+   
+   //drawLight(GL_LIGHT1);
 }
 
 
@@ -178,12 +263,12 @@ void Viewer::resetView()
       camera()->setPosition( Vec(0.0f, 0.0, 3.0*radius) );
       camera()->setOrientation(0.0f, 0.0f);
       camera()->lookAt( Vec(0.0f, 0.0f, 0.0f) );
-      updateGL();
    }else {
       camera()->interpolateTo(Frame(Vec(0.0, 0.0, 3.0*radius), Quaternion()), 1.0);
-      m_viewerModel.sceneRadiusChanged(radius);
    }
 
+   m_viewerModel.sceneRadiusChanged(radius);
+   updateGL();
 
 }
 
@@ -214,64 +299,49 @@ void Viewer::setLabelType(int const type)
 }
 
 
-void Viewer::draw()
+void Viewer::setDefaultBuildElement(unsigned int element)
 {
-   makeCurrent();
-/*
-  Vec cameraPos(camera()->position());
-  static const GLfloat pos[4] = {1.5, 0.0, 0.0, 1.0};
-  glLightfv(GL_LIGHT0, GL_POSITION, );
-  static const GLfloat spotDir[3] = {-1.0, 0.0, 0.0};
-  glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, spotDir);
-
-   bool spotLight = true;
-   if (spotLight) {
-      const Vec cameraPos = camera()->position();
-      const GLfloat pos[4] = {cameraPos[0], cameraPos[1], cameraPos[2], 1.0};
-      glLightfv(GL_LIGHT1, GL_POSITION, pos);
-
-      // Orientate light along view direction
-      glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, camera()->viewDirection());
-   }
-*/
-
-   // Default material
-   GLfloat mat_specular[] = { 0.9, 0.9, 0.9, 1.0 };
-   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
-   GLfloat mat_shininess = 50.0;
-   glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
-   glShadeModel(GL_SMOOTH);
-   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  
-
-   // create the master object lists, do the surfaces neeed to be filtered out?
-   m_objects = m_viewerModel.getVisibleObjects();
-   m_selectedObjects = m_viewerModel.getSelectedObjects();
-
-   Vec cameraPosition(camera()->position());
-
-   drawGlobals();
-   drawObjects(m_objects, cameraPosition);
-   drawSelected(m_selectedObjects, cameraPosition);
-   drawObjects(m_buildObjects, cameraPosition);
-  
-   if (m_labelType != Layer::Atom::None) drawLabels(m_objects);
-   if (m_selectionMode != None) drawSelectionRectangle(m_selectHandler.region());
-   displayGeometricParameter(m_selectedObjects);
-
-   // drawLight(GL_LIGHT0);
+   m_buildAtomHandler.setBuildElement(element);
+   m_currentBuildHandler = &m_buildAtomHandler;
 }
 
 
-void Viewer::drawObjects(GLObjectList const& objects, Vec const& cameraPosition)
+void Viewer::setDefaultBuildFragment(QString const& filePath, Viewer::Mode const mode)
+{
+   switch (mode) {
+      case BuildFunctionalGroup:
+         m_currentBuildHandler = &m_buildFunctionalGroupHandler;
+         break;
+      case BuildEFP:
+         m_currentBuildHandler = &m_buildEFPFragmentHandler;
+         break;
+      case BuildMolecule:
+         m_currentBuildHandler = &m_buildMoleculeHandler;
+         break;
+      default:
+         qDebug() << "Invalid Viewer::Mode in setDefaultBuildFragment";
+         return;
+   }
+
+   m_currentBuildHandler->setBuildFile(filePath);
+}
+
+
+void Viewer::drawGlobals() 
+{ 
+   m_viewerModel.displayGlobals(); 
+}
+
+void Viewer::drawObjects(GLObjectList const& objects)
 {
    GLObjectList::const_iterator object;
    for (object = objects.begin(); object != objects.end(); ++object) {
-       (*object)->draw(cameraPosition);
+       (*object)->draw();
    }
 }
 
 
-void Viewer::drawSelected(GLObjectList const& objects, Vec const& cameraPosition)
+void Viewer::drawSelected(GLObjectList const& objects)
 {
    if (!m_selectionHighlighting || objects.isEmpty()) return;
 
@@ -286,7 +356,7 @@ void Viewer::drawSelected(GLObjectList const& objects, Vec const& cameraPosition
 
    GLObjectList::const_iterator object;
    for (object = objects.begin(); object != objects.end(); ++object) {
-       (*object)->draw(cameraPosition);
+       (*object)->draw();
    }
 
    glStencilFunc(GL_EQUAL, 0x4, 0x4);
@@ -295,7 +365,7 @@ void Viewer::drawSelected(GLObjectList const& objects, Vec const& cameraPosition
    for (object = objects.begin(); object != objects.end(); ++object) {
        glEnable(GL_BLEND);
        glBlendFunc(GL_ONE, GL_ONE);
-       (*object)->drawSelected(cameraPosition);
+       (*object)->drawSelected();
    }
 
    glDisable(GL_STENCIL_TEST);
@@ -357,7 +427,9 @@ void Viewer::displayGeometricParameter(GLObjectList const& selection)
 {
    QString msg;
    Layer::Atom *a, *b, *c, *d;
+   Layer::Primitive*A, *B;
    Layer::Bond *bond;
+   Layer::EFPFragment *efp;
 
    switch (selection.size()) {
       case 0:
@@ -369,6 +441,8 @@ void Viewer::displayGeometricParameter(GLObjectList const& selection)
              msg = "Bond length: " + QString::number(bond->length(), 'f', 5) + " " + ch;
          }else if ( (a = qobject_cast<Layer::Atom*>(selection[0])) ) {
              msg = a->getAtomicSymbol() + " atom";
+         }else if ( (efp = qobject_cast<Layer::EFPFragment*>(selection[0])) ) {
+             msg = efp->text() + " EFP";
          }
          break;
 
@@ -376,7 +450,13 @@ void Viewer::displayGeometricParameter(GLObjectList const& selection)
          if ( (a = qobject_cast<Layer::Atom*>(selection[0])) &&
               (b = qobject_cast<Layer::Atom*>(selection[1])) ) {
             QChar ch(0x00c5);
-            msg = "Distance: " + QString::number(Layer::Atom::distance(a,b), 'f', 5) + " " + ch;
+            msg = "Distance: " + 
+                  QString::number(Layer::Primitive::distance(a,b), 'f', 5) + " " + ch;
+         }else if ( (A = qobject_cast<Layer::Primitive*>(selection[0])) &&
+                    (B = qobject_cast<Layer::Primitive*>(selection[1])) ) {
+            QChar ch(0x00c5);
+            msg = "C.O.M. Distance: " + 
+                  QString::number(Layer::Primitive::distance(A,B),'f',5) + " " + ch;
          }
          break;
 
@@ -385,7 +465,8 @@ void Viewer::displayGeometricParameter(GLObjectList const& selection)
               (b = qobject_cast<Layer::Atom*>(selection[1])) &&
               (c = qobject_cast<Layer::Atom*>(selection[2])) ) {
             QChar ch(0x00b0);
-            msg = "Angle: " + QString::number(Layer::Atom::angle(a,b,c), 'f', 5) + " " + ch;
+            msg = "Angle: " + 
+                  QString::number(Layer::Primitive::angle(a,b,c), 'f', 5) + " " + ch;
          }
          break;
 
@@ -395,7 +476,8 @@ void Viewer::displayGeometricParameter(GLObjectList const& selection)
               (c = qobject_cast<Layer::Atom*>(selection[2])) &&
               (d = qobject_cast<Layer::Atom*>(selection[3])) ) {
             QChar ch(0x00b0);
-            msg = "Torsion: " + QString::number(Layer::Atom::torsion(a,b,c,d), 'f', 3) + " " + ch;
+            msg = "Torsion: " + 
+                  QString::number(Layer::Primitive::torsion(a,b,c,d), 'f', 3) + " " + ch;
          }
          break;
 
@@ -499,25 +581,19 @@ void Viewer::setRecordingActive(bool activate)
 
 // ---------------- Selection functions ---------------
 
-void Viewer::setSelectionMode(SelectionMode const mode)
-{
-   m_selectionMode = mode;
-}
-
 void Viewer::drawWithNames() 
 {
-   Vec cameraPosition(camera()->position());
-
    int i;
    for (i = 0; i < int(m_objects.size()); ++i) {
        glPushName(i);
-       m_objects.at(i)->draw(cameraPosition);
+       m_objects.at(i)->draw();
        glPopName();
    }
 
-   for (int j = 0; j < int(m_buildObjects.size()); ++j) {
+   GLObjectList buildObjects(m_currentBuildHandler->buildObjects());
+   for (int j = 0; j < int(buildObjects.size()); ++j) {
        glPushName(i);
-       m_buildObjects.at(j)->draw(cameraPosition);
+       buildObjects.at(j)->draw();
        glPopName();
        ++i;
    }
@@ -538,8 +614,9 @@ void Viewer::endSelection(const QPoint&)
    if (m_selectionHits == 0) return;
 
    // If the user clicks, then we only select the front object
-   if ( (m_selectionMode == AddClick) || (m_selectionMode == RemoveClick) ||
-        (m_selectionMode == ToggleClick) ) {
+   Handler::SelectionMode selectionMode(m_currentHandler->selectionMode());
+   if ( (selectionMode == Handler::AddClick) || (selectionMode == Handler::RemoveClick) ||
+        (selectionMode == Handler::ToggleClick) ) {
       GLuint zMin = (selectBuffer())[1];
       int iMin = 0;
       for (int i = 1; i < m_selectionHits; ++i) {
@@ -549,9 +626,9 @@ void Viewer::endSelection(const QPoint&)
           }
       }
 
-      if (m_selectionMode == AddClick) {
+      if (selectionMode == Handler::AddClick) {
          addToSelection((selectBuffer())[4*iMin+3]);
-      }else if (m_selectionMode == RemoveClick) {
+      }else if (selectionMode == Handler::RemoveClick) {
          removeFromSelection((selectBuffer())[4*iMin+3]);
       }else {
          toggleSelection((selectBuffer())[4*iMin+3]);
@@ -568,14 +645,14 @@ void Viewer::endSelection(const QPoint&)
 	  // trigger an update which makes the slected item appear incrementally.
       enableUpdate(false);
       for (int i = 0; i < m_selectionHits; ++i) {
-          switch (m_selectionMode) {
-             case Add: 
+          switch (m_currentHandler->selectionMode()) {
+             case Handler::Add: 
                 addToSelection((selectBuffer())[4*i+3]); 
                 break;
-             case Remove: 
+             case Handler::Remove: 
                 removeFromSelection((selectBuffer())[4*i+3]);  
                 break;
-             case Toggle: 
+             case Handler::Toggle: 
                 toggleSelection((selectBuffer())[4*i+3]);  
                 break;
              default: 
@@ -624,11 +701,15 @@ void Viewer::postSelection(QPoint const&) {
 }
 
 
+void Viewer::addToSelection(Layer::GLObject* object) 
+{
+   select(object->index(), QItemSelectionModel::Select);
+}
+
+
 void Viewer::addToSelection(int id) 
 {
-   if (id < m_objects.size()) {
-      select(m_objects[id]->index(), QItemSelectionModel::Select);
-   }
+   if (id < m_objects.size()) select(m_objects[id]->index(), QItemSelectionModel::Select);
 }
 
 
@@ -697,15 +778,16 @@ void Viewer::keyPressEvent(QKeyEvent *e)
    // if we are using a global QKeyEvent
    switch (e->key()) {
       case s_selectKey:
-         setTemporaryViewerMode(Select);
+         setHandler(Select);
          e->accept();
          break;
       case s_manipulateSelectionKey:
-         setTemporaryViewerMode(ManipulateSelection);
+         setHandler(ManipulateSelection);
          e->accept();
          break;
       case s_buildKey:
-         setTemporaryViewerMode(Build);
+         m_currentHandler = m_currentBuildHandler;
+         setCursor(m_currentHandler->cursorType());
          e->accept();
          break;
    }
@@ -723,7 +805,7 @@ void Viewer::keyReleaseEvent(QKeyEvent *e)
         (e->key() == s_buildKey) ||
         (e->key() == s_manipulateSelectionKey) ) {
       e->accept();
-      setTemporaryViewerMode(m_activeMode);
+      setHandler(m_activeMode);
    } else if (e->key() == Qt::Key_Escape && isFullScreen()) {
       escapeFullScreen();
    }else {
@@ -767,37 +849,56 @@ void Viewer::dropEvent(QDropEvent* event)
 
 
 // --------------- Handler Modes ---------------
-void Viewer::setActiveViewerMode(ViewerMode const mode)
+void Viewer::setActiveViewerMode(Viewer::Mode const mode)
 {
    m_previousMode = m_activeMode;
    m_activeMode = mode;
-   m_selectionHighlighting = true;
-   m_selectionMode = None;
-   setTemporaryViewerMode(m_activeMode);
+   setHandler(m_activeMode);
    activeViewerModeChanged(m_activeMode);
 }
 
 
-void Viewer::setTemporaryViewerMode(ViewerMode const mode)
-{  
+void Viewer::setHandler(Viewer::Mode const mode)
+{
    switch (mode) {
       case Manipulate:
          m_currentHandler = &m_manipulateHandler; 
          break;
+
       case Select:
          m_currentHandler = &m_selectHandler; 
          break;
-      case Build:
-         m_currentHandler = &m_buildHandler; 
-         break;
+
       case ManipulateSelection:
          m_currentHandler = &m_manipulateSelectionHandler; 
          break;
+
       case ReindexAtoms:
          m_currentHandler = &m_reindexAtomsHandler; 
          break;
+
+      case BuildAtom:
+         m_currentHandler      = &m_buildAtomHandler;
+         m_currentBuildHandler = &m_buildAtomHandler;
+         break;
+
+      case BuildFunctionalGroup:
+         m_currentHandler      = &m_buildFunctionalGroupHandler;
+         m_currentBuildHandler = &m_buildFunctionalGroupHandler;
+         break;
+
+      case BuildEFP:
+         m_currentHandler      = &m_buildEFPFragmentHandler;
+         m_currentBuildHandler = &m_buildEFPFragmentHandler;
+         break;
+
+      case BuildMolecule:
+         m_currentHandler      = &m_buildMoleculeHandler;
+         m_currentBuildHandler = &m_buildMoleculeHandler;
+         break;
    }
 
+   m_selectionHighlighting = true;
    setCursor(m_currentHandler->cursorType());
 }
 
@@ -805,7 +906,6 @@ void Viewer::setTemporaryViewerMode(ViewerMode const mode)
 // This is the only entry point for the ReindexAtom mode
 void Viewer::reindexAtoms(Layer::Molecule* molecule)
 {
-   QLOG_INFO() << "Reindexing Atoms 0";
    setActiveViewerMode(ReindexAtoms);
    m_reindexAtomsHandler.reset(molecule);
    setLabelType(Layer::Atom::Reindex);
@@ -816,18 +916,15 @@ void Viewer::reindexAtoms(Layer::Molecule* molecule)
 
 GLObjectList Viewer::startManipulation(QMouseEvent* event) 
 {
-   ManipulatedFrameSetConstraint* mfsc =
-      (ManipulatedFrameSetConstraint*)(manipulatedFrame()->constraint());
+   ManipulatedFrame* frame(manipulatedFrame());
+   /// The value of 100 effectively turns off auto rotation for the selection
+   frame->setSpinningSensitivity(100.0);
+   ManipulatedFrameSetConstraint* mfsc = (ManipulatedFrameSetConstraint*)(frame->constraint());
    mfsc->clearSet();
 
    GLObjectList selection;
    GLObjectList::iterator iter;
-
-   for (iter = m_objects.begin(); iter != m_objects.end(); ++iter) {
-/// !!! if cast to fragment, 
-       if ( (*iter)->isSelected()) selection.append(*iter); 
-   }
-   
+   selection = m_selectedObjects;
    Layer::Bond* bond;
 
    if ((selection.size() == 1) &&

@@ -11,6 +11,7 @@
     <file>resources/icons/Configure.png</file>
     <file>resources/icons/Display.png</file>
     <file>resources/icons/Equipment.png</file>
+    <file>resources/icons/Equipment_sm.png</file>
     <file>resources/icons/Minimize.png</file>
     <file>resources/icons/Favourites.png</file>
     <file>resources/icons/Film.png</file>
@@ -47,9 +48,7 @@
     <file>resources/cursors/translate.png</file>
     <file>resources/cursors/translate_selection.png</file>
     <file>resources/cursors/zoom.png</file>
-    <file>resources/fragments/CH3.png</file>
-    <file>resources/fragments/methanol.jpg</file>
-    <file>resources/fragments/water.png</file>
+    <file>resources/unhappy.png</file>
   </qresource>
 
   <qresource prefix="/" >
@@ -77,6 +76,7 @@
     <file>help/images/ServerDialog.png</file>
     <file>help/images/ServerOptions.png</file>
     <file>help/images/ProcessMonitor.png</file>
+    <file>help/images/SurfaceConfigurator.png</file>
 
     <file>help/images/buttons/Manipulate.png</file>
     <file>help/images/buttons/Equipment.png</file>

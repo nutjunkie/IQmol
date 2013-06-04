@@ -24,6 +24,8 @@
 #include "MoleculeLayer.h"
 #include "AtomLayer.h"
 #include "BondLayer.h"
+#include "GroupLayer.h"
+#include "ConstraintLayer.h"
 #include "QVariantPointer.h"
 
 
@@ -117,6 +119,20 @@ EditPrimitives::~EditPrimitives()
 }
 
 
+EditPrimitives& EditPrimitives::add(PrimitiveList const& added) 
+{
+   m_added.append(added);
+   return *this;
+}
+
+
+EditPrimitives& EditPrimitives::remove(PrimitiveList const& remove) 
+{
+   m_removed.append(remove);
+   return *this;
+}
+
+
 void EditPrimitives::redo()
 {
    m_deleteRemoved = true;
@@ -135,75 +151,31 @@ void EditPrimitives::undo()
 
 
 
-
-// --------------- AddPrimitives ---------------
-AddPrimitives::~AddPrimitives()
-{
-   if (m_deletePrimitives) {
-      PrimitiveList::iterator iter;
-      for (iter = m_primitiveList.begin(); iter != m_primitiveList.end(); ++iter) {
-          delete *iter;
-      }
-   }
-}
-
-void AddPrimitives::redo()
-{
-   m_deletePrimitives = false;
-   m_molecule->appendPrimitives(m_primitiveList);
-}
-
-void AddPrimitives::undo()
-{
-   m_deletePrimitives = true;
-   m_molecule->takePrimitives(m_primitiveList);
-   m_molecule->updated();
-}
-
-
-
-// --------------- RemovePrimitives ---------------
-RemovePrimitives::~RemovePrimitives()
-{
-   if (m_deletePrimitives) {
-      PrimitiveList::iterator iter;
-      for (iter = m_primitiveList.begin(); iter != m_primitiveList.end(); ++iter) {
-          delete *iter;
-      }
-   }
-}
-
-void RemovePrimitives::redo()
-{
-   m_deletePrimitives = true;
-   m_molecule->takePrimitives(m_primitiveList);
-   m_molecule->updated();
-}
-
-void RemovePrimitives::undo()
-{
-   m_deletePrimitives = false;
-   m_molecule->appendPrimitives(m_primitiveList);
-}
-
-
-
 // --------------- MoveObjects ---------------
 MoveObjects::MoveObjects(Layer::Molecule* molecule, QString const& text, bool const animate) 
    : QUndoCommand(text), m_molecule(molecule), m_finalStateSaved(false), m_animate(animate)
 { 
+/*
    AtomList atomList(m_molecule->findLayers<Layer::Atom>(Layer::Children));
-   AtomList::iterator iter;
-   for (iter = atomList.begin(); iter != atomList.end(); ++iter) {
-       m_objectList.append(*iter);
+   AtomList::iterator atom;
+   for (atom = atomList.begin(); atom != atomList.end(); ++atom) {
+       m_objectList.append(*atom);
    }
-   saveCoordinates(m_initialCoordinates);
+
+   GroupList groupList(m_molecule->findLayers<Layer::Group>(Layer::Children));
+   GroupList::iterator group;
+   for (group = groupList.begin(); group != groupList.end(); ++group) {
+       m_objectList.append(*group);
+   }
+*/
+   m_objectList = m_molecule->findLayers<Layer::GLObject>(Layer::Children);
+   saveFrames(m_initialFrames);
 }
 
 
-MoveObjects::MoveObjects(GLObjectList const& objectList, QString const& text, bool const animate) 
-   : QUndoCommand(text), m_molecule(0), m_objectList(objectList), m_finalStateSaved(false),
-   m_animate(animate)
+MoveObjects::MoveObjects(GLObjectList const& objectList, QString const& text, 
+   bool const animate) : QUndoCommand(text), m_molecule(0), m_objectList(objectList), 
+   m_finalStateSaved(false), m_animate(animate)
 { 
    // Need a Molecule handle for the Viewer update (yugh)
    MoleculeList parents;
@@ -216,7 +188,7 @@ MoveObjects::MoveObjects(GLObjectList const& objectList, QString const& text, bo
    }
 
    if (!m_molecule) { QLOG_ERROR() << "MoveObjects constructor called with no molecule"; }
-   saveCoordinates(m_initialCoordinates);
+   saveFrames(m_initialFrames);
 }
 
 
@@ -229,17 +201,17 @@ MoveObjects::~MoveObjects()
    }
 }
 
-            
 
 void MoveObjects::redo() 
 {
    if (!m_finalStateSaved) {
-      saveCoordinates(m_finalCoordinates);
+      saveFrames(m_finalFrames);
       m_finalStateSaved = true;
       if (m_animate) {   
          for (int i = 0; i < m_objectList.size(); ++i) {
-             m_objectList[i]->setPosition(m_initialCoordinates[i]);
-             m_animatorList.append(new Animator::Move(m_objectList[i], m_finalCoordinates[i]));
+             m_objectList[i]->setFrame(m_initialFrames[i]);
+             m_animatorList.append(new Animator::Transform(m_objectList[i],
+                 m_finalFrames[i]));
          }
       }
    }
@@ -250,42 +222,68 @@ void MoveObjects::redo()
           (*iter)->reset();
       }
       m_molecule->pushAnimators(m_animatorList); 
-      
+      m_molecule->setReferenceFrame(m_finalFrames.last());
    }else {
-      loadCoordinates(m_finalCoordinates);
+      loadFrames(m_finalFrames);
    }
 
-   if (m_molecule) {
-      m_molecule->postMessage(m_msg);
-   }
+   if (m_molecule) m_molecule->postMessage(m_msg);
 }
 
 
 void MoveObjects::undo() 
 {
-   loadCoordinates(m_initialCoordinates);
-   if (m_molecule) {
-      m_molecule->postMessage("");
-   }
+   loadFrames(m_initialFrames);
+   if (m_molecule) m_molecule->postMessage("");
 }
 
 
-void MoveObjects::saveCoordinates(QList<Vec>& coordinates)
+void MoveObjects::saveFrames(QList<Frame>& frames)
 {
-   coordinates.clear();
+   frames.clear();
    for (int i = 0; i < m_objectList.size(); ++i) {
-       coordinates.push_back(m_objectList[i]->getPosition());
+       frames.append(m_objectList[i]->getFrame());
    }
+   frames.append(m_molecule->getReferenceFrame());
 }
 
 
-void MoveObjects::loadCoordinates(QList<Vec> const& coordinates)
+void MoveObjects::loadFrames(QList<Frame> const& frames)
 {
    for (int i = 0; i < m_objectList.size(); ++i) {
-       m_objectList[i]->setPosition(coordinates[i]);
+       m_objectList[i]->setFrame(frames[i]);
    }
+   m_molecule->setReferenceFrame(frames.last());
 }
 
+
+
+// --------------- ApplyConstraint ---------------
+ApplyConstraint::ApplyConstraint(Layer::Molecule* molecule, Layer::Constraint* constraint)
+   : MoveObjects(molecule, "Apply constraint", true), m_deleteConstraint(false), 
+     m_constraint(constraint) 
+{ 
+}
+
+
+ApplyConstraint::~ApplyConstraint()
+{
+   if (m_deleteConstraint) delete m_constraint;
+}
+
+
+void ApplyConstraint::undo()
+{
+   m_deleteConstraint = true;
+   MoveObjects::undo();
+}
+
+
+void ApplyConstraint::redo()
+{
+   m_deleteConstraint = false;
+   MoveObjects::redo();
+}
 
 
 

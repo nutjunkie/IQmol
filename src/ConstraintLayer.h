@@ -62,8 +62,9 @@ namespace Layer {
          ~Constraint();
 
          Type constraintType() const { return m_type; }
-         void draw(qglviewer::Vec const& cameraPosition);
-         void drawSelected(qglviewer::Vec const&) { }
+         void draw();
+         void drawFast() { }
+         void drawSelected() { }
 
          bool isValid() const { return m_type != Invalid; }
          AtomList atomList() const { return m_atoms; }

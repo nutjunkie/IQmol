@@ -23,6 +23,9 @@
 #include "QChemParser.h"
 #include "ExternalChargesParser.h"
 #include "OpenBabelParser.h"
+#include "EFPFragmentLayer.h"
+#include "EFPFragmentListLayer.h"
+#include "QMsgBox.h"
 #include "openbabel/mol.h"
 #include "openbabel/format.h"
 #include "openbabel/obconversion.h"
@@ -65,11 +68,21 @@ DataList QChem::parse(QTextStream& textStream)
       processLine(textStream);
    }
 
-   m_dataList = m_inputDataList;
 
-   if (!m_conformers.isEmpty()) {
+   if (m_conformers.isEmpty()) {
+      // This is only true for input files
+      m_dataList = m_inputDataList;
+   }else {
+      // Hack to remove extraneous geometries put in by the EFP code
+      QList<Layer::Conformer*> conformers;
+      for (int i = 0; i < m_conformers.size(); ++i) {
+          if (m_conformers[i]->getEnergy() < -0.00001) {
+             conformers.append(m_conformers[i]);
+          }
+      }
       if (!m_defaultConformer) m_defaultConformer = m_currentConformer;
-      m_dataList.append(new Layer::ConformerList(m_conformers, m_defaultConformer));
+      if (!conformers.contains(m_defaultConformer)) conformers.prepend(m_defaultConformer);
+      m_dataList.append(new Layer::ConformerList(conformers, m_defaultConformer));
    }
 
    m_dataList += m_chargesList;
@@ -102,6 +115,10 @@ void QChem::processLine(QTextStream& textStream)
       ExternalCharges externalCharges;
       m_chargesList += externalCharges.parse(textStream);
 
+   }else if (line.contains("$efp_fragments", Qt::CaseInsensitive)) {
+      EfpFragmentsSection efpFragments;
+      m_inputDataList += efpFragments.parse(textStream);
+
    }else if (line.contains("Q-Chem fatal error")) {
      
 
@@ -117,11 +134,37 @@ void QChem::processLine(QTextStream& textStream)
          energy = tokens[1].toDouble(&eOK);
          if (!eOK) throw FormatError();
          m_currentConformer->setEnergy(energy);
+
       }else if (line.contains("MP2         total energy =")) {
          QStringList tokens(line.split(QRegExp("\\s+"), QString::SkipEmptyParts));
          energy = tokens[4].toDouble(&eOK);
          if (!eOK) throw FormatError();
          m_currentConformer->setEnergy(energy);
+
+      }else if (line.contains("RIMP2         total energy")) {
+         QStringList tokens(line.split(QRegExp("\\s+"), QString::SkipEmptyParts));
+         energy = tokens[4].toDouble(&eOK);
+         if (!eOK) throw FormatError();
+         m_currentConformer->setEnergy(energy);
+
+      }else if (line.contains("CCSD total energy", Qt::CaseInsensitive)) {
+         QStringList tokens(line.split(QRegExp("\\s+"), QString::SkipEmptyParts));
+         energy = tokens[4].toDouble(&eOK);
+         if (!eOK) throw FormatError();
+         m_currentConformer->setEnergy(energy);
+
+      }else if (line.contains("CCD total energy           =")) {
+         QStringList tokens(line.split(QRegExp("\\s+"), QString::SkipEmptyParts));
+         energy = tokens[4].toDouble(&eOK);
+         if (!eOK) throw FormatError();
+         m_currentConformer->setEnergy(energy);
+
+      }else if (line.contains("EMP4                   =")) {
+         QStringList tokens(line.split(QRegExp("\\s+"), QString::SkipEmptyParts));
+         energy = tokens[2].toDouble(&eOK);
+         if (!eOK) throw FormatError();
+         m_currentConformer->setEnergy(energy);
+
       }else if (line.contains("Mulliken Net Atomic Charges")) {
          readMullikenCharges(textStream);
          m_currentConformer->setCharges(m_partialCharges, m_spinDensities);
@@ -131,8 +174,8 @@ void QChem::processLine(QTextStream& textStream)
       }
 
    }
-
 }
+
 
 
 // Note that this only reads the coordinates for a Conformer.  
@@ -315,12 +358,62 @@ DataList QChem::MoleculeSection::parse(QTextStream& textStream)
 }
 
 
-
 DataList QChem::RemSection::parse(QTextStream&)
 {
    // NYI  where should this go? we don't really want it visible
    // until the user fires up the QUI
    return DataList();
+}
+
+
+DataList QChem::EfpFragmentsSection::parse(QTextStream& textStream)
+{
+   QStringList lines;
+   QString line;
+
+   while (!textStream.atEnd()) {
+      line = textStream.readLine().trimmed();
+      if (line.contains("$end", Qt::CaseInsensitive)) break;
+      lines << line;
+   }
+
+   // For the time being we are only supporting the mixed efp/molecule format
+   Layer::EFPFragments* efpFragments = new Layer::EFPFragments();
+
+   bool fragmentsNotFound(false);
+   QStringList::iterator iter;
+   QStringList tokens;
+   for (iter = lines.begin(); iter != lines.end(); ++iter) {
+       tokens = (*iter).split(QRegExp("\\s+"), QString::SkipEmptyParts);
+       bool ok(tokens.size() == 7);
+       if (!ok) throw FormatError();
+       QString name(tokens[0]);
+       double x(tokens[1].toDouble(&ok));  if (!ok) throw FormatError();
+       double y(tokens[2].toDouble(&ok));  if (!ok) throw FormatError();
+       double z(tokens[3].toDouble(&ok));  if (!ok) throw FormatError();
+       double a(tokens[4].toDouble(&ok));  if (!ok) throw FormatError();
+       double b(tokens[5].toDouble(&ok));  if (!ok) throw FormatError();
+       double c(tokens[6].toDouble(&ok));  if (!ok) throw FormatError();
+     
+       QString filePath(Layer::EFPFragment::getFilePath(name));
+       if (filePath.isEmpty()) {
+          fragmentsNotFound = true;
+       }else {
+          Layer::EFPFragment* efp = new Layer::EFPFragment(filePath);
+          efp->setPosition(Vec(x,y,z));
+          efp->setOrientation(FromEulerAngles(a,b,c));
+          efpFragments->appendLayer(efp);
+       }
+   }
+
+   if (fragmentsNotFound) {
+      QString msg("Parameter files for some EFP fragments were not found");
+      QMsgBox::warning(0, "IQmol", msg);
+   }
+
+   DataList dataList;
+   dataList.append(efpFragments);
+   return dataList;
 }
 
 

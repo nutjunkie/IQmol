@@ -21,67 +21,189 @@
 ********************************************************************************/
 
 #include "FragmentTable.h"
+#include "Preferences.h"
 
 
 namespace IQmol {
 
-FragmentTable::FragmentTable(QWidget* parent) : QFrame(parent) 
+int FragmentTable::s_fileRole  = Qt::UserRole+1;
+int FragmentTable::s_imageRole = Qt::UserRole+2;
+
+QString FragmentTable::s_invalidFile = "invalidFile";
+
+FragmentTable::FragmentTable(QWidget* parent) : QFrame(parent), m_fileName(s_invalidFile)
 {
    m_fragmentTable.setupUi(this);
    setWindowTitle(tr("Fragment Table"));
-   setFragmentImage(":/resources/fragments/water.png"); 
-   QStringList solvents;
-   solvents << "Acetonitrile"
- <<"Benzene"
- <<"Carbon tetrachloride"
- <<"Dichloromethane"
- <<"Dimethyl sulfoxide"
- <<"Methanol"
- <<"Phenol"
- <<"Toluene"
- <<"Water";
-
-    //m_fragmentTable.fragmentList->addItems(solvents);
+   connect(m_fragmentTable.fragmentList, 
+      SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this,
+      SLOT(selectionChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
+   connect(m_fragmentTable.fragmentList, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), 
+      this, SLOT(itemDoubleClicked(QTreeWidgetItem*, int)));
+       
+   loadFragments();
+   on_functionalGroupsButton_clicked(true);
+}
 
 
-/*
-Acetone_L.efp        
-Cytosine_C2A_L.efp   
-GuanINE_EN9RN7_L.efp 
-CYTOSINE_C2B_L.efp   
-GUANINE_EN9_L.efp    
-THYMINE_L.efp
-ADENINE_L.efp        
-CYTOSINE_C3A_L.efp   
-GUANINE_KN7_L.efp    
-AMMONIA_L.efp        
-CYTOSINE_C3B_L.efp   
-GUANINE_KN9_L.efp    
-METHANE_L.efp
-CYTOSINE_C1_L.efp    
-GUANINE_EN7_L.efp    
-O2_L.efp
-*/
+FragmentTable::~FragmentTable()
+{
+   QTreeWidget* tree = m_fragmentTable.fragmentList;
+   while (tree->topLevelItemCount() > 0) { tree->takeTopLevelItem(0);}
+   m_efp += m_molecules;
+   QList<QTreeWidgetItem*>::iterator iter;
+   for (iter = m_efp.begin(); iter != m_efp.end(); ++iter) {
+       delete (*iter);
+   }
+}
 
 
+void FragmentTable::loadFragments()
+{
+   QDir dir(Preferences::FragmentDirectory());
+   if (!dir.exists() || !dir.exists("EFP") || !dir.exists("Molecules") || 
+       !dir.exists("Functional_Groups") ) {
+      setFragmentImage(":resources/unhappy.png");
+      m_fragmentTable.selectButton->setEnabled(false);
+      return;
+   }
+
+   dir.cd("EFP");
+   m_efp = loadFragments(dir);
+   dir.cdUp(); 
+   dir.cd("Molecules"); 
+   m_molecules = loadFragments(dir);
+   dir.cdUp(); 
+   dir.cd("Functional_Groups"); 
+   m_functionalGroups = loadFragments(dir);
+}
+
+
+QList<QTreeWidgetItem*> FragmentTable::loadFragments(QDir const& dir, QTreeWidgetItem* parent)
+{
+   QList<QTreeWidgetItem*> items;
+   QTreeWidgetItem* item;
+   QDir::Filters filters(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot | QDir::Readable);
+   QStringList contents(dir.entryList(filters, QDir::DirsLast));
+
+   QStringList::iterator iter;
+   for (iter = contents.begin(); iter != contents.end(); ++iter) {
+       QFileInfo info(dir, *iter);
+       QString name(*iter);
+       name = name.replace(".efp", " ", Qt::CaseInsensitive);
+       name = name.replace(".xyz", " ", Qt::CaseInsensitive);
+       name = name.replace("_L", " (L)");
+       name = name.replace("_", " ");
+ 
+       if (info.isDir()) {
+          if (parent == 0) {
+             item = new QTreeWidgetItem(QStringList(name));
+             loadFragments(QDir(info.filePath()), item);
+             items.append(item);
+          }else {
+             item = new QTreeWidgetItem(parent, QStringList(name));
+          }
+          item->setData(0, s_fileRole, s_invalidFile);
+          item->setData(0, s_imageRole, s_invalidFile);
+
+       }else if (info.suffix().contains("efp", Qt::CaseInsensitive) ||
+                 info.suffix().contains("xyz", Qt::CaseInsensitive) ) {
+
+          if (parent == 0) {
+             item = new QTreeWidgetItem(QStringList(name));
+             items.append(item);
+          }else {
+             item = new QTreeWidgetItem(parent, QStringList(name));
+          }
+
+          item->setData(0, s_fileRole, info.filePath());
+          item->setData(0, s_imageRole, s_invalidFile);
+          info.setFile(dir, info.completeBaseName() + ".png");
+
+          if (info.exists()) {
+              item->setData(0, s_imageRole, info.filePath());
+          }else {
+              qDebug() << "Image file not found:" << info.filePath();
+          }
+       }
+   }
+   return items;
+}
+
+
+
+void FragmentTable::selectionChanged(QTreeWidgetItem* current, QTreeWidgetItem*)
+{
+   if (current) {
+      m_fileName = current->data(0, s_fileRole).toString();
+      setFragmentImage(current->data(0, s_imageRole).toString());
+   }
+}
+
+
+void FragmentTable::itemDoubleClicked(QTreeWidgetItem* item, int)
+{
+   m_fileName = item->data(0, s_fileRole).toString();
+   on_selectButton_clicked(true);
+}
+
+
+void FragmentTable::on_selectButton_clicked(bool)
+{
+   if (m_fileName == s_invalidFile) return;
+   fragmentSelected(m_fileName, m_buildMode);
+   close();
 }
 
 
 void FragmentTable::setFragmentImage(QString const& fileName)
 {
-   QPixmap pixmap(fileName);
-   QPixmap resized(pixmap.scaled(QSize(150,150)));
    QWidget* view(m_fragmentTable.viewWidget);
-   QString style("background-image: url(");
-   style += fileName + ");";
+   QString style;
+
+   if (fileName == s_invalidFile) {
+      style = "background: white";
+   }else {
+      style = "background-image: url(";
+      style += fileName + ");";
+   }
    view->setStyleSheet(style);
-/*
-   QPalette palette(view->palette());
-   view->setPixmap(resized);
-   //palette.setBrush(QPalette::Background, resized);
-   //view->setPalette(palette);
-*/
 }
 
 
+
+
+void FragmentTable::on_efpButton_clicked(bool)
+{
+   m_buildMode = Viewer::BuildEFP;
+   QTreeWidget* tree = m_fragmentTable.fragmentList;
+   while (tree->topLevelItemCount() > 0) { tree->takeTopLevelItem(0);}
+   tree->setColumnCount(1);
+   tree->insertTopLevelItems(0, m_efp);
+}
+
+
+void FragmentTable::on_moleculesButton_clicked(bool)
+{
+   m_buildMode = Viewer::BuildMolecule;
+   QTreeWidget* tree = m_fragmentTable.fragmentList;
+   while (tree->topLevelItemCount() > 0) tree->takeTopLevelItem(0);
+   tree->setColumnCount(1);
+   tree->insertTopLevelItems(0, m_molecules);
+}
+
+
+void FragmentTable::on_functionalGroupsButton_clicked(bool)
+{
+   m_buildMode = Viewer::BuildFunctionalGroup;
+   QTreeWidget* tree = m_fragmentTable.fragmentList;
+   while (tree->topLevelItemCount() > 0) tree->takeTopLevelItem(0);
+   tree->setColumnCount(1);
+   tree->insertTopLevelItems(0, m_functionalGroups);
+}
+ 
+
+
 } // end namespace IQmol
+
+

@@ -27,6 +27,7 @@
 #include "QsLog.h"
 #include <QDebug>
 #include <QInputDialog>
+#include <cstdlib>
 
 
 namespace IQmol {
@@ -55,11 +56,7 @@ PasswordVault* PasswordVault::s_instance = 0;
 PasswordVault& PasswordVault::instance() {
    if (s_instance == 0) {
       s_instance = new PasswordVault();
-#ifdef Q_WS_X11
       atexit(PasswordVault::destroy);
-#else
-      ::std::atexit(PasswordVault::destroy);
-#endif
    }
    return *s_instance;
 }

@@ -89,12 +89,14 @@ void JobInfo::set(Field const field, QString const& value)
       case InputString:
       case Coordinates:
       case Constraints:
+      case EfpFragments:
+      case EfpParameters:
       case Queue:
       case Walltime:
          m_data[field] = value;
          break;
       default:
-         qDebug() << "Atempt to set invalid field in JobInfo::set()";
+         qDebug() << "Attempt to set invalid field in JobInfo::set()";
       break;
    }
    updated();
@@ -132,12 +134,22 @@ QString JobInfo::get(Field const field) const
       case AuxFileName:
          value = m_data[BaseName] + ".FChk";
          break;
+      case EspFileName:
+         value = m_data[BaseName] + ".esp";
+         break;
+      case MoFileName:
+         value = m_data[BaseName] + ".mo";
+         break;
+      case DensityFileName:
+         value = m_data[BaseName] + ".hf";
+         break;
       case RunFileName:
          value = m_data[BaseName] + ".run";
          break;
       case ErrorFileName:
          value = m_data[BaseName] + ".err";
          break;
+
       default:
          value = m_data[field];
          break;

@@ -22,6 +22,8 @@
 
 #include "FormattedCheckpointParser.h"
 #include "MolecularOrbitalsLayer.h"
+#include "AtomLayer.h"
+#include "InfoLayer.h"
 #include "IQmol.h"
 #include "QsLog.h"
 #include <QTextStream>
@@ -40,6 +42,7 @@ DataList FormattedCheckpoint::parse(QTextStream& textStream)
    }
 
    if (m_parseOkay) {
+      makeAtomList();
       generateShells();
       // Note that this eats the coefficient arrays
       Layer::MolecularOrbitals* mos = new Layer::MolecularOrbitals(
@@ -51,6 +54,31 @@ DataList FormattedCheckpoint::parse(QTextStream& textStream)
    }
 
    return m_dataList;
+}
+
+
+void FormattedCheckpoint::makeAtomList()
+{
+   int nAtoms(m_atomicNumbers.size());
+   if (nAtoms == 0 || m_coordinates.size() != 3*nAtoms) return;
+
+   Layer::Atoms* atoms = new Layer::Atoms;
+   Layer::Atom* atom;
+   double x, y, z;
+
+   for (int i = 0; i < m_atomicNumbers.size(); ++i) {
+       atom = new Layer::Atom(m_atomicNumbers[i]);    
+       x = m_coordinates[3*i+0];
+       y = m_coordinates[3*i+1];
+       z = m_coordinates[3*i+2];
+       atom->setPosition(BohrToAngstrom*qglviewer::Vec(x,y,z));
+       atoms->appendLayer(atom);
+   }
+
+   Layer::Info* info = new Layer::Info();
+   info->addAtoms(atoms->getAtoms());
+   m_dataList.append(info);
+   m_dataList.append(atoms);
 }
 
 
@@ -155,6 +183,8 @@ void FormattedCheckpoint::generateShells()
    // Conversion factor for the exponents
    double conv(1.0/(BohrToAngstrom*BohrToAngstrom));
 
+   unsigned nBasis(0);
+
    for (int shell = 0; shell < m_shellTypes.size(); ++shell) {
        expts.clear();
        coefs.clear();
@@ -179,31 +209,46 @@ void FormattedCheckpoint::generateShells()
        switch (m_shellTypes.at(shell)) {
           case 0:
              m_shells.append( new Shell(Shell::S, position, expts, coefs) );
+             nBasis += 1;
              break;
           case 1:
              m_shells.append( new Shell(Shell::P, position, expts, coefs) );
+             nBasis += 3;
              break;
           case -1:
              m_shells.append( new Shell(Shell::S, position, expts, coefs)   );
              m_shells.append( new Shell(Shell::P, position, expts, coefsSP) );
+             nBasis += 4;
              break;
           case 2:
              m_shells.append( new Shell(Shell::D6, position, expts, coefs) );
+             nBasis += 6;
              break;
           case -2:
              m_shells.append( new Shell(Shell::D5, position, expts, coefs) );
+             nBasis += 5;
              break;
           case 3:
              m_shells.append( new Shell(Shell::F10, position, expts, coefs) );
+             nBasis += 10;
              break;
           case -3:
              m_shells.append( new Shell(Shell::F7, position, expts, coefs) );
+             nBasis += 7;
              break;
 
           default:
              QLOG_ERROR() << "Unknown Shell type found";
              break;
        }
+   }
+
+   if (nBasis != m_nBasis) { 
+      QLOG_ERROR() << "Formatted Checkpoint File: nBasis read: " << m_nBasis 
+                                                  << "tallied: " << nBasis;
+      qDebug() << "Number of basis functions read  " << m_nBasis;
+      qDebug() << "Number of basis functions tally " << nBasis;
+      throw FormatError();
    }
 }
 

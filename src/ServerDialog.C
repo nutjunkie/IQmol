@@ -61,6 +61,11 @@ ServerDialog::~ServerDialog()
 void ServerDialog::on_localRadioButton_toggled(bool)
 {
    if (m_dialog.localRadioButton->isChecked()) {
+      m_dialog.typeCombo->clear();
+      m_dialog.typeCombo->addItem("Basic");
+      m_dialog.typeCombo->addItem("PBS");
+      m_dialog.typeCombo->addItem("SGE");
+
       m_dialog.remoteLoginGroupBox->setEnabled(false);
       if (m_blockSignals) return;
       setCurrentDefaults(m_tmpServer);
@@ -72,6 +77,11 @@ void ServerDialog::on_localRadioButton_toggled(bool)
 void ServerDialog::on_remoteRadioButton_toggled(bool)
 {
    if (m_dialog.remoteRadioButton->isChecked()) {
+      m_dialog.typeCombo->clear();
+      m_dialog.typeCombo->addItem("Basic");
+      m_dialog.typeCombo->addItem("PBS");
+      m_dialog.typeCombo->addItem("SGE");
+      //m_dialog.typeCombo->addItem("Web");
       m_dialog.remoteLoginGroupBox->setEnabled(true);
       if (m_blockSignals) return;
       setCurrentDefaults(m_tmpServer);
@@ -82,9 +92,16 @@ void ServerDialog::on_remoteRadioButton_toggled(bool)
 
 void ServerDialog::on_typeCombo_currentIndexChanged(int index)
 {
-   bool showJobLimit(index != Server::PBS);
-   m_dialog.jobLimit->setEnabled(showJobLimit);
-   m_dialog.jobLimitLabel->setEnabled(showJobLimit);
+   Server::Type type = (Server::Type)index;
+   bool web(type == Server::HTTP);
+   m_dialog.qcLabel->setEnabled(!web);
+   m_dialog.qcEnvironment->setEnabled(!web);
+   m_dialog.workingDirectory->setEnabled(!web);
+   m_dialog.workingDirectoryLabel->setEnabled(!web);
+   m_dialog.authentication->setEnabled(!web);
+   m_dialog.authenticationLabel->setEnabled(!web);
+   m_dialog.configureSsh->setEnabled(!web);
+
    if (m_blockSignals) return;
    setCurrentDefaults(m_tmpServer);
    copyFromServer(m_tmpServer);
@@ -100,8 +117,14 @@ void ServerDialog::on_configureTypeButton_clicked(bool)
 
 void ServerDialog::setCurrentDefaults(Server* server)
 {
-   Server::Host host = m_dialog.localRadioButton->isChecked() ? Server::Local : Server::Remote;
    Server::Type type = (Server::Type)m_dialog.typeCombo->currentIndex();
+   Server::Host host;
+   if (type == Server::HTTP) {
+      host = Server::Web;
+   }else {
+      host = m_dialog.localRadioButton->isChecked() ? Server::Local : Server::Remote;
+   }
+qDebug() << "Setting defaults for server:" << server << "host:" << host << " type: " << type;
    server->setDefaults(host, type);
 }
 
@@ -109,7 +132,7 @@ void ServerDialog::setCurrentDefaults(Server* server)
 void ServerDialog::copyFromServer(Server* server)
 {
    // We use this flag to block the signals triggered by the Host
-   // radio buttons and Type combo box to avoids recursion.
+   // radio buttons and Type combo box to avoid recursion.
    m_blockSignals = true;
 
    if (server->m_host == Server::Local) {
@@ -121,7 +144,6 @@ void ServerDialog::copyFromServer(Server* server)
    }
 
    m_dialog.typeCombo->setCurrentIndex(server->m_type);
-   m_dialog.jobLimit->setValue(server->jobLimit());
    m_dialog.qcEnvironment->setText(server->m_qchemEnvironment);
    m_dialog.hostAddress->setText(server->m_hostAddress);
    m_dialog.userName->setText(server->m_userName);
@@ -151,9 +173,20 @@ bool ServerDialog::copyToServer(Server* server)
       return false;
    }
 
-   Server::Host host = m_dialog.localRadioButton->isChecked() ? Server::Local : Server::Remote;
+   switch (m_dialog.typeCombo->currentIndex()) {
+      case Server::HTTP:
+         server->m_type = Server::HTTP;
+         server->m_host = Server::Web;
+         break;
+     
+      default:
+         server->m_type = (Server::Type)m_dialog.typeCombo->currentIndex();
+         server->m_host = 
+            m_dialog.localRadioButton->isChecked() ? Server::Local : Server::Remote;
+         break;
+   }
 
-   if (host == Server::Remote) {
+   if (server->m_host == Server::Remote) {
       if (m_dialog.hostAddress->text().trimmed().isEmpty()) {
          QMsgBox::warning(this, "IQmol", "Host address must be set");
          return false;
@@ -164,22 +197,22 @@ bool ServerDialog::copyToServer(Server* server)
       }
    }
 
+   server->m_name             = m_dialog.name->text().trimmed();
+   server->m_qchemEnvironment = m_dialog.qcEnvironment->text().trimmed();
+
+   if (server->m_host == Server::Local) return true;
+
    Server::Authentication authentication = 
       (Server::Authentication)(m_dialog.authentication->currentIndex()+1);
 
-   if (host == Server::Remote && authentication == Server::Vault && m_password.isEmpty()) {
-      m_password  = PasswordVault::instance().getServerPassword(server->m_name);
+   if (server->m_host == Server::Remote && 
+       authentication == Server::Vault && m_password.isEmpty()) {
+      m_password = PasswordVault::instance().getServerPassword(server->m_name);
       if (m_password.isEmpty()) {
          QMsgBox::warning(this, "IQmol", "Password must be set for Vault authentication");
          return false;
       }
    }
-
-   server->m_name             = m_dialog.name->text().trimmed();
-   server->m_qchemEnvironment = m_dialog.qcEnvironment->text().trimmed();
-   server->setJobLimit(m_dialog.jobLimit->value());
-
-   if (host == Server::Local) return true;
 
    // If any of these options change we should make sure the server is
    // disconnected before over-writing them.
@@ -244,7 +277,7 @@ void ServerDialog::testConfiguration()
    copyToServer(m_server);
 
    try {
-      qDebug() << "Is server connected?" << m_server->isConnected();
+      //qDebug() << "Is server connected?" << m_server->isConnected();
       if (m_server->connectServer()) {
          m_task = m_server->testConfiguration();
          connect(m_task, SIGNAL(finished()), this, SLOT(configurationTested()));

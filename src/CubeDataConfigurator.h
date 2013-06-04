@@ -51,6 +51,7 @@ namespace Configurator {
          void on_cancelButton_clicked(bool);
          void on_positiveColorButton_clicked(bool);
          void on_negativeColorButton_clicked(bool);
+         void on_signedButton_clicked(bool);
 
       private:
          void setPositiveColor(QColor const& color);

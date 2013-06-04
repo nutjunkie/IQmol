@@ -25,6 +25,7 @@
 #include "SurfaceConfigurator.h"
 #include "SurfaceLayer.h"
 #include "MoleculeLayer.h"
+#include <openbabel/mol.h>
 #include <QColorDialog>
 
 
@@ -33,10 +34,13 @@ using namespace qglviewer;
 namespace IQmol {
 namespace Configurator {
 
+Gradient::ColorList Surface::s_atomColors;
+
 Surface::Surface(Layer::Surface* surface) : m_surface(surface), 
    m_colors(Preferences::DefaultGradientColors()), m_initialized(false)
 {        
    m_surfaceConfigurator.setupUi(this);
+   m_surfaceConfigurator.ambientOcclusionCheckBox->setVisible(false);
 }
 
 
@@ -88,6 +92,7 @@ void Surface::on_propertyCombo_currentIndexChanged(int)
 
    if (type == "None") {
       m_surfaceConfigurator.positiveColorButton->setProperty("gradient",false);
+      m_surfaceConfigurator.negativeLabel->setVisible(false);
       m_surfaceConfigurator.positiveLabel->setText("Positive");
       setPositiveColor(m_colorPositive);
       connect(m_surfaceConfigurator.positiveColorButton, SIGNAL(clicked(bool)),
@@ -95,13 +100,23 @@ void Surface::on_propertyCombo_currentIndexChanged(int)
 
       if (m_surface->gridDataType().isSigned()) {
          m_surfaceConfigurator.negativeColorButton->setVisible(true);
-         m_surfaceConfigurator.negativeLabel->setVisible(true);
-         m_surfaceConfigurator.positiveLabel->setVisible(true);
+         m_surfaceConfigurator.negativeLabel->setText("Negative");
          m_surfaceConfigurator.swapColorsButton->setEnabled(true);
       }
  
       m_surface->clearPropertyData();
       m_surface->updated();
+
+   }else if (type == "Nearest nucleus") {
+
+      QList<Layer::Molecule*> parents = m_surface->findLayers<Layer::Molecule>(Layer::Parents);
+      if (parents.isEmpty()) {
+         QLOG_ERROR() << "No Molecule found";
+      }else {
+         m_surface->setGradient(atomColorGradient());
+         m_surface->computePropertyData(parents.first()->getPropertyEvaluator(type));
+         m_surface->updated();
+      }
 
    }else {
       m_surfaceConfigurator.positiveColorButton->setProperty("gradient",true);
@@ -109,9 +124,8 @@ void Surface::on_propertyCombo_currentIndexChanged(int)
       connect(m_surfaceConfigurator.positiveColorButton, SIGNAL(clicked(bool)),
          this, SLOT(editGradientColors(bool)));
 
+      m_surfaceConfigurator.negativeLabel->setVisible(true);
       m_surfaceConfigurator.negativeColorButton->setVisible(false);
-      m_surfaceConfigurator.negativeLabel->setVisible(false);
-      m_surfaceConfigurator.positiveLabel->setVisible(false);
       m_surfaceConfigurator.swapColorsButton->setEnabled(false);
 
       QList<Layer::Molecule*> parents = m_surface->findLayers<Layer::Molecule>(Layer::Parents);
@@ -122,8 +136,26 @@ void Surface::on_propertyCombo_currentIndexChanged(int)
          m_surface->computePropertyData(parents.first()->getPropertyEvaluator(type));
          m_surface->updated();
       }
-
+      QString v1(QString::number(m_surface->minPropertyValue(), 'f', 4));
+      QString v2(QString::number(m_surface->maxPropertyValue(), 'f', 4));
+      m_surfaceConfigurator.negativeLabel->setText(v1);
+      m_surfaceConfigurator.positiveLabel->setText(v2);
    }
+}
+
+
+Gradient::ColorList const& Surface::atomColorGradient()
+{
+   if (s_atomColors.isEmpty()) {
+      QColor color;
+      for (unsigned int Z = 1; Z <= 9; ++Z) {
+          std::vector<double> rgb(OpenBabel::etab.GetRGB(Z));
+          color.setRgbF(rgb[0],rgb[1],rgb[2],1.0);
+          s_atomColors.append(color);
+      }
+   }
+
+   return s_atomColors;
 }
 
    
@@ -193,20 +225,6 @@ void Surface::setNegativeColor(QColor const& color)
 }
 
 
-void Surface::on_shininessSlider_valueChanged(int value)
-{
-   m_surface->m_shininess = value;
-   m_surface->updated();
-}
-
-
-void Surface::on_specularSlider_valueChanged(int value)
-{
-   m_surface->m_specular = value/100.0;
-   m_surface->updated();
-}
-
-
 void Surface::on_transparencySlider_valueChanged(int value)
 {
    m_surface->setAlpha(value/100.0);
@@ -233,6 +251,13 @@ void Surface::on_dotsButton_clicked(bool)
    m_surface->m_drawMode = Layer::Surface::Dots;
    m_surface->updated();
 }
+
+
+void Surface::on_ambientOcclusionCheckBox_clicked(bool tf)
+{
+   m_surface->addAmbientOcclusion(tf);
+}
+
 
 void Surface::setArea(double const area)
 {

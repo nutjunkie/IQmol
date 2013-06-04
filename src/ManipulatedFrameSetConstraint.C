@@ -32,13 +32,13 @@ namespace IQmol {
 
 void ManipulatedFrameSetConstraint::clearSet() 
 {
-   m_primitives.clear();
+   m_objects.clear();
 }
 
 
 void ManipulatedFrameSetConstraint::addObjectToSet(GLObject* object) 
 {
-   m_primitives.append(object);
+   m_objects.append(object);
 }
 
 
@@ -65,7 +65,7 @@ void ManipulatedFrameSetConstraint::constrainTranslation(Vec& translation, Frame
    }
 
    QList<GLObject*>::iterator iter, end;
-   for (iter = m_primitives.begin(), end = m_primitives.end(); iter != end; ++iter) {
+   for (iter = m_objects.begin(), end = m_objects.end(); iter != end; ++iter) {
        (*iter)->m_frame.translate(translation);
    }
 }
@@ -90,7 +90,7 @@ void ManipulatedFrameSetConstraint::constrainRotation(Quaternion &rotation, Fram
    }
 
    QList<GLObject*>::iterator iter, end;
-   for (iter = m_primitives.begin(), end = m_primitives.end(); iter != end; ++iter) {
+   for (iter = m_objects.begin(), end = m_objects.end(); iter != end; ++iter) {
        // Rotation has to be expressed in the object local coordinates system.
         Quaternion qObject((*iter)->m_frame.transformOf(worldAxis), angle);
         (*iter)->m_frame.rotate(qObject);

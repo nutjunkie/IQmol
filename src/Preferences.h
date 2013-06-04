@@ -101,6 +101,15 @@ namespace Preferences {
    QString FragmentDirectory();
    void    FragmentDirectory(QString const&);
 
+   QString ShaderDirectory();
+   void    ShaderDirectory(QString const&);
+
+   QString DefaultShader();
+   void    DefaultShader(QString const&);
+    
+   QVariantMap DefaultShaderParameters();
+   void        DefaultShaderParameters(QVariantMap const&);
+
    QString QChemDatabaseFilePath();
    void    QChemDatabaseFilePath(QString const&);
 
@@ -186,19 +195,6 @@ namespace Preferences {
    QString TemplateDirectory();
    void    TemplateDirectory(QString const&);
    
-
-   // These functions are generic and should only be used within the Preferences
-   // module and not in the general code.
-   QVariant Get(QString const& name);
-   void     Set(QString const& name, QVariant const& value);
-
-   QList<QVariant> GetQVariantList(QString const& name);
-   template <class T> QList<T> GetList(QString const& name);
-   template <class T> void     SetList(QString const& name, QList<T> const& list);
-
-   template <class T> QMap<QString,T> GetMap(QString const& name);
-   template <class T> void            SetMap(QString const& name, QMap<QString,T> const& map);
-
 } } // end namespace IQmol::Preferences
 
 #endif

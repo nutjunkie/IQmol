@@ -24,8 +24,8 @@
 
 #include "Animator.h"
 #include "DataLayer.h"
-#include "FragmentLayer.h"
 #include "QGLViewer/vec.h"
+#include "PrimitiveLayer.h"
 #include <QUndoCommand>
 #include <QString>
 #include <QList>
@@ -43,6 +43,7 @@ namespace Layer {
    class Atom;
    class Bond;
    class Molecule;
+   class Constraint;
 }
 
 namespace Command {
@@ -50,10 +51,11 @@ namespace Command {
    /// Allows Primitives to be added and/or removed from a Molecule in one Command
    class EditPrimitives : public QUndoCommand {
       public:
-         EditPrimitives(QString const& text, Layer::Molecule* molecule, 
-            PrimitiveList const& removed, PrimitiveList const& added)
-          : QUndoCommand(text), m_molecule(molecule), m_removed(removed),
-            m_added(added), m_deleteRemoved(true) { }
+         EditPrimitives(QString const& text, Layer::Molecule* molecule)
+          : QUndoCommand(text), m_molecule(molecule), m_deleteRemoved(true) { }
+
+         EditPrimitives& add(PrimitiveList const& added);
+         EditPrimitives& remove(PrimitiveList const& removed);
             
          ~EditPrimitives();
             
@@ -73,49 +75,6 @@ namespace Command {
    };
 
 
-   // !!! DEPRECATE
-   /// Adds a list of primitves to a Molecule.  If the last call was to undo
-   /// when the Command goes out of scope then the primtives are deleted.
-   class AddPrimitives : public QUndoCommand {
-      public:
-         AddPrimitives(Layer::Molecule* molecule, PrimitiveList const& primitiveList, 
-            QString const& text = "Add atoms/bonds") : QUndoCommand(text), 
-            m_molecule(molecule), m_primitiveList(primitiveList), m_deletePrimitives(false) { }
-         ~AddPrimitives();
-            
-         virtual void redo();
-         virtual void undo();
-
-      private:
-         Layer::Molecule* m_molecule;
-         PrimitiveList m_primitiveList;
-         bool m_deletePrimitives;
-   };
-
-
-   // !!! DEPRECATE
-   /// Removes a list of primitives from a single Molecule.  The destruction of
-   /// the Primitives is delayed until the Command is destroyed.
-   class RemovePrimitives : public QUndoCommand {
-      public:
-         RemovePrimitives(Layer::Molecule* molecule, PrimitiveList const& primitiveList,
-            QString const& text = "Remove atoms/bonds") : QUndoCommand(text), 
-            m_molecule(molecule), m_primitiveList(primitiveList), m_deletePrimitives(false) { }
-            
-         ~RemovePrimitives();
-         virtual void redo();
-         virtual void undo();
-
-      private:
-         Layer::Molecule* m_molecule;
-         PrimitiveList m_primitiveList;
-         bool m_deletePrimitives;
-   };
-
-
-   // Note that in the following class the Molecule object is simply a handle
-   // for updating the Viewer.  The GLObjectList can contain objects from other
-   // Molecules as well.
    class MoveObjects : public QUndoCommand {
       public:
          MoveObjects(Layer::Molecule*, QString const& text = "Move items", 
@@ -128,18 +87,22 @@ namespace Command {
          virtual void undo();
          void setMessage(QString const& msg) { m_msg = msg; }
 
-      private:
-         void loadCoordinates(QList<qglviewer::Vec> const& coordinates);
-         void saveCoordinates(QList<qglviewer::Vec>& coordinates);
-         QList<qglviewer::Vec> m_initialCoordinates;
-         QList<qglviewer::Vec> m_finalCoordinates;
+      protected:
          Layer::Molecule* m_molecule;
+
+      private:
+         void loadFrames(QList<qglviewer::Frame> const& frames);
+         void saveFrames(QList<qglviewer::Frame>& frames);
+         QList<qglviewer::Frame> m_initialFrames;
+         QList<qglviewer::Frame> m_finalFrames;
+
          GLObjectList m_objectList;
          bool m_finalStateSaved;
          bool m_animate;
          QString m_msg;
          AnimatorList m_animatorList;
    };
+
 
 
    class AddHydrogens : public QUndoCommand {
@@ -159,10 +122,12 @@ namespace Command {
 
    // Specialized cases of the above
 
-   class AddCharges: public AddPrimitives {
+   class AddCharges: public EditPrimitives {
       public:
          AddCharges(Layer::Molecule* molecule, PrimitiveList const& chargeList)
-            : AddPrimitives(molecule, chargeList, "Add charges") { }
+            : EditPrimitives("Add Charges", molecule) {
+            add(chargeList);
+         }
    };
 
 
@@ -182,8 +147,17 @@ namespace Command {
 
    class ApplyConstraint : public MoveObjects {
       public:
-         ApplyConstraint(Layer::Molecule* molecule)
-            : MoveObjects(molecule, "Apply constraint", true) { }
+         ApplyConstraint(Layer::Molecule*, Layer::Constraint*);
+         ~ApplyConstraint();
+
+         void redo();
+         void undo();
+
+      private:
+		 // Determines if the Constraint needs to be deleted when the command
+         // goes out of scope.
+         bool m_deleteConstraint;
+         Layer::Constraint* m_constraint;
    };
 
 

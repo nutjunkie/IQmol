@@ -77,17 +77,17 @@ void Charge::setCharge(double const charge)
 }
 
 
-void Charge::draw(Vec const& cameraPosition)
+void Charge::draw()
 {
-   Q_UNUSED(cameraPosition);
-   drawPrivate(false);
+   bool selectedOnly(false);
+   drawPrivate(selectedOnly);
 }
 
 
-void Charge::drawSelected(Vec const& cameraPosition)
+void Charge::drawSelected()
 {
-   Q_UNUSED(cameraPosition);
-   drawPrivate(true);
+   bool selectedOnly(true);
+   drawPrivate(selectedOnly);
 }
 
 

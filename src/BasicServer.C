@@ -103,7 +103,7 @@ ServerTask::Base* BasicServer::submit(Process* process)
    process->setStatus(Process::Queued);
    runQueue();
    
-   return doNothing(msg);
+   return new ServerTask::DoNothing(m_server, msg);
 }
 
 
@@ -120,8 +120,8 @@ void BasicServer::addToWatchList(Process* process)
 void BasicServer::runQueue()
 {  
    if (!isConnected()) {
-qDebug() << "BasicServer::runQueue returning because we ain't connected, yo";
-       return;
+      QLOG_DEBUG() << "BasicServer::runQueue server not connected";
+      return;
    }
    int running(m_server->watchedWithStatus(Process::Running));
 
@@ -154,12 +154,6 @@ ServerTask::Base* BasicServer::submitToHost(Process* process)
 }
 
 
-ServerTask::Base* BasicServer::kill(Process* process)
-{
-   return new ServerTask::KillProcess(m_server, process);
-}
-
-
 ServerTask::Base* BasicServer::query(Process* process)
 {
    ServerTask::Base* task(0);
@@ -168,7 +162,7 @@ ServerTask::Base* BasicServer::query(Process* process)
       if (process->status() == Process::Queued) {
          QString msg("Process " + QString::number(m_queue.indexOf(process)+1)
                     + " of " + QString::number(m_queue.size()) + " in queue");
-        task = doNothing(msg);
+        task = new ServerTask::DoNothing(m_server, msg);
       }else {
          QLOG_WARN() << "Unqueued process found in queue";
       }
@@ -200,19 +194,5 @@ Process::Status BasicServer::parseQueryString(QString const& query, Process* pro
 
    return status;
 }
-
-
-ServerTask::Base* BasicServer::cleanUp(Process* process)
-{
-   return new ServerTask::CleanUp(m_server, process);
-}
-
-
-ServerTask::CopyResults* BasicServer::copyResults(Process* process)
-{
-qDebug() <<"fake servertask returned from BasicServer::copyResults()";
-   return new ServerTask::CopyResults(m_server, process);
-}
-
 
 } // end namespace IQmol

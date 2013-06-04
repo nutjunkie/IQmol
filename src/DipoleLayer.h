@@ -25,6 +25,7 @@
 #include "GLObjectLayer.h"
 #include "DipoleConfigurator.h"
 #include <QColor>
+//2.541746230211
 
 
 namespace IQmol {
@@ -45,9 +46,9 @@ namespace Layer {
          void setValue(qglviewer::Vec const& value);
          double value() const { return m_value; }
 
-         void draw(qglviewer::Vec const& cameraPosition = qglviewer::Vec(0.0, 0.0, 0.0));
-         void drawFast(qglviewer::Vec const& cameraPosition = qglviewer::Vec(0.0, 0.0, 0.0));
-         void drawSelected(qglviewer::Vec const& cameraPosition = qglviewer::Vec(0.0, 0.0, 0.0));
+         void draw();
+         void drawFast();
+         void drawSelected() { }
 
       public Q_SLOTS:
          void setRadius(double const radius); 

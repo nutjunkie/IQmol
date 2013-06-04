@@ -53,7 +53,7 @@ bool Molecule::loadFromFile(QFileInfo const& info) {
    //qDebug() << "-----------------------";
 
    OBConversion conv;
-   OBFormat *inFormat = conv.FormatFromExt( name.toAscii().data() );
+   OBFormat *inFormat = conv.FormatFromExt(QFile::encodeName(name).data() );
 
    if ((!inFormat) || (!conv.SetInFormat(inFormat))) {
       QString msg("Could not determine the format of file \n");

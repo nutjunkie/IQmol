@@ -24,8 +24,12 @@
 
 #include "BaseLayer.h"
 
-
 namespace IQmol {
+
+namespace Data {
+   class Base;
+}
+
 namespace Layer {
 
    class Molecule;
@@ -38,7 +42,7 @@ namespace Layer {
 
       public:
          Data(QString const& text = QString(), QObject* parent = 0) 
-            : Base(text, parent), m_molecule(0) 
+            : Base(text, parent), m_molecule(0), m_data(0)
          { 
             setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
          }
@@ -47,30 +51,20 @@ namespace Layer {
       protected:
          QString m_fileName;   // where the data came from
          Molecule* m_molecule; // what Molecule the data is associated with
+
+
+         // Temporary hack for merging with the Data namespace
+     public:
+         void setData(IQmol::Data::Base* data) { m_data = data; }
+         IQmol::Data::Base* getData() const { return m_data; }
+
+      private:
+         IQmol::Data::Base* m_data;
    };
 
 } // end namespace Layer
 
 typedef QList<Layer::Data*> DataList;
-
-/*
-  class DataList : public  QList<Layer::Data*> {   
-         /// Convenience function that returns a pointer to the first data layer 
-         /// of the specfied type that the file contains. 
-         template <class T> T* getData(); 
-      template <class T>
-      T* Base::getData() 
-      {         
-         T* t(0);
-         DataList::iterator iter;
-         for (iter =  m_dataList.begin(); iter != m_dataList.end(); ++iter) {
-             if (t = dynamic_cast<T*>(*iter)) break;
-         }   
-         return t;
-      } 
-   };
-
-*/
 
 } // end namespace IQmol::Layer
 

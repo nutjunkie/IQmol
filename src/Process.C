@@ -57,7 +57,6 @@ QString Process::toString(Status const& state)
 Process::~Process()
 {
   // Let the server know we don't exist any more.
-   if (m_qprocess) delete m_qprocess;
    Server* server = ServerRegistry::instance().get(serverName());
    if (server) server->removeFromWatchList(this);
 }
@@ -203,7 +202,7 @@ void Process::setStatus(Status const status)
          finished();
          break;
       case Copying:
-         QLOG_ERROR() << "Process::setStatus called with Copying";
+         QLOG_ERROR() << "Process::setStatus called while Copying";
          break;
       case Unknown:
          m_timer.stop();
@@ -314,93 +313,5 @@ void Process::copyProgress()
    ++m_copyProgress;
    if (m_copyProgress > m_copyTarget) m_copyProgress = m_copyTarget;
 }
-
-
-// ------------ These are only applicable to local processes ------------
-
-void Process::setQProcess(QProcess*)
-{
-qDebug() << "setting qprocess for process";
-// these signals do not seem to get picked up.
-/*
-   m_qprocess = qprocess;
-   connect(qprocess, SIGNAL(finished(int, QProcess::ExitStatus)),
-      this, SLOT(qprocessFinished(int, QProcess::ExitStatus)));
-   connect(qprocess, SIGNAL(error(QProcess::ProcessError)),
-      this, SLOT(qprocessError(QProcess::ProcessError)));
-*/
-}
-
-/*
-void Process::qprocessFinished(int, QProcess::ExitStatus exitStatus)
-{
-qDebug() << "**************** Local Process finished **************** " << name();
-   if (exitStatus == QProcess::NormalExit) {
-      setStatus(Process::Finished);
-      //cleanUp(this, exitStatus == QProcess::CrashExit);
-   }else {
-      setStatus(Process::Error);
-       // need to determine error
-      //cleanUp(this, exitStatus == QProcess::CrashExit);
-   }
-}
-
-
-void Process::qprocessError(QProcess::ProcessError error)
-{
-qDebug() << "**************** Local Process error **************** " << name();
-   switch (error) {
-      case QProcess::FailedToStart: {
-         setComment("Process failed to start");
-      } break;
-      case QProcess::Crashed: {
-         setComment("Process crashed");
-      } break;
-      case QProcess::Timedout: {
-         setComment("Process timed out");
-      } break;
-      case QProcess::WriteError: {
-         setComment("Could not write to process");
-      } break;
-      case QProcess::ReadError: {
-         setComment("Could not read from process");
-      } break;
-      default: {
-         setComment("Unknown error occured");
-      } break;
-   }
-
-   setStatus(Process::Error);
-}
-*/
-
-/*
-void LocalServer::cleanUp(Process* process, bool qError)
-{
-   QString err(checkForErrors(process->m_jobInfo));
-   renameFchkFile(process->m_jobInfo);
-
-   if (!qError && err.isEmpty()) {
-      process->setStatus(Process::Finished);
-   }else {
-      if (err.isEmpty()) {
-         setComment("Process Error");
-      }else {
-         setComment(err);
-      }
-      process->setStatus(Process::Error);
-   }
-
-   m_activeProcesses.remove(process);
-   runQueue();
-}
-
-
-
-
-
-*/
-
-
 
 } // end namespaces IQmol

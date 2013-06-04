@@ -37,12 +37,11 @@
 #include <QDir>
 #include "QsLog.h"
 #include "QsLogDest.h"
+#include "Lebedev.h"
 
 #ifdef Q_WS_WIN
 #include <windows.h>
 #endif
-
-#include <QDebug>
 
 int main(int argc, char *argv[]) {
     IQmol::IQmolApplication iqmol(argc, argv);
@@ -69,6 +68,7 @@ int main(int argc, char *argv[]) {
 
     QLOG_INFO() << "---------- Session Started ----------";
     QLOG_INFO() << "IQmol Version: " << IQMOL_VERSION;
+
 
     QStringList args(QCoreApplication::arguments());
     args.removeFirst();

@@ -62,6 +62,7 @@
 #include <QFont>
 #include <QPixmap>
 
+#include <QDebug>
 
 
 namespace Qui {
@@ -130,22 +131,51 @@ void InputDialog::setJobInfo(IQmol::JobInfo* jobInfo)
    m_jobInfo = jobInfo; 
    m_fileIn.setFile(m_jobInfo->get(IQmol::JobInfo::BaseName) + ".inp");
 
-   if (m_currentJob) {
-      m_currentJob->setCoordinates(m_jobInfo->get(IQmol::JobInfo::Coordinates));
-      m_currentJob->setConstraints(m_jobInfo->get(IQmol::JobInfo::Constraints));
-
-      // We need the temporaries as setting the charge will overwrite the
-      // jobInfo->multiplicity
-      int charge(m_jobInfo->getCharge());
-      int multiplicity(m_jobInfo->getMultiplicity());
-      m_ui.qui_charge->setValue(charge);
-      m_ui.qui_multiplicity->setValue(multiplicity);
-
-      on_jobList_currentIndexChanged(0);
-      m_taint = false;
-      m_reg.get("JOB_TYPE").applyRules();
-      updatePreviewText();
+   m_ui.jobList->setCurrentIndex(0);
+   if (!m_currentJob) {
+      qDebug() << "Attempt to set JobInfo with no current Job";
+      return;
    }
+
+   m_currentJob->setCoordinates(m_jobInfo->get(IQmol::JobInfo::Coordinates));
+   m_currentJob->setEfpFragments(m_jobInfo->get(IQmol::JobInfo::EfpFragments));
+   m_currentJob->setConstraints(m_jobInfo->get(IQmol::JobInfo::Constraints));
+   m_currentJob->setEfpParameters(m_jobInfo->get(IQmol::JobInfo::EfpParameters));
+
+
+   if (m_jobInfo->efpOnlyJob()) {
+      m_ui.basis->setEnabled(false);
+      m_currentJob->setOption("SYMMETRY_IGNORE", "true");
+      m_ui.efp_input->setEnabled(true);
+      m_currentJob->setOption("EFP_INPUT", "true");
+      m_currentJob->setOption("EFP_FRAGMENTS_ONLY", "true");
+      m_currentJob->setOption("GUI",  "0");
+   }else {
+      m_ui.basis->setEnabled(true);
+      m_ui.efp_input->setEnabled(false);
+      m_currentJob->setOption("GUI",  "2");
+      m_currentJob->setOption("EFP_FRAGMENTS_ONLY", "false");
+
+      QString frag(m_jobInfo->get(IQmol::JobInfo::EfpFragments));
+      m_ui.efp_fragments_only->setEnabled(!frag.isEmpty());
+   }
+
+   // We need the temporaries as setting the charge will overwrite the
+   // jobInfo->multiplicity
+   int charge(m_jobInfo->getCharge());
+   int multiplicity(m_jobInfo->getMultiplicity());
+   m_ui.qui_charge->setValue(charge);
+   m_ui.qui_multiplicity->setValue(multiplicity);
+
+   on_jobList_currentIndexChanged(0);
+   m_taint = false;
+   m_reg.get("JOB_TYPE").applyRules();
+
+   if (m_currentJob && m_jobInfo->efpOnlyJob()) {
+       m_currentJob->printOption("BASIS", false);
+   }
+
+   updatePreviewText();
 }
 
 

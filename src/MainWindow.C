@@ -23,11 +23,12 @@
 #include "MainWindow.h"
 #include "ServerListDialog.h"
 #include "QMsgBox.h"
-#include "IQmol.h"
 #include "Animator.h"
 #include "PasswordVault.h"
 #include "JobInfo.h"
 #include "ServerRegistry.h"
+#include "ShaderDialog.h"
+#include "ShaderLibrary.h"
 #include "QUI/InputDialog.h"
 #include <QResizeEvent>
 #include <QDropEvent>
@@ -35,6 +36,16 @@
 #include <QMenuBar>
 #include <QFileDialog>
 #include <QtDebug>
+
+#include "ParseFile.h"
+#include "Bank.h"
+#include "Geometry.h"
+#include "AtomicProperty.h"
+#include "Atom.h"
+#include "QGLViewer/vec.h"
+#include <fstream>
+#include "IQmolParser.h"
+
 
 
 namespace IQmol {
@@ -51,11 +62,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent),
    m_viewerSelectionModel(&m_viewerModel, this),
    m_logMessageDialog(0),
    m_preferencesBrowser(this),
-   m_processMonitor(this),
-   m_quiInputDialog(0)
+   m_quiInputDialog(0),
+   m_shaderDialog(0)
 {
    setStatusBar(0);
-   //setWindowTitle(DefaultMoleculeName + "[*]");
    setWindowTitle("IQmol");
    setWindowModified(false);
    setAcceptDrops(false);
@@ -69,9 +79,14 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent),
    m_undoStackView.setEmptyLabel("History:");
    m_viewerView.setModel(&m_viewerModel);
    m_viewerView.setSelectionModel(&m_viewerSelectionModel);
-   m_viewer.setActiveViewerMode(Build);
+   m_viewer.setActiveViewerMode(Viewer::BuildAtom);
 }
 
+MainWindow::~MainWindow()
+{
+   delete m_quiInputDialog;
+   delete m_shaderDialog;
+}
 
 void MainWindow::createLayout()
 {
@@ -88,6 +103,15 @@ void MainWindow::createLayout()
    // sideSplitter (ha ha) is a data member as we need to control its visibility
    m_sideSplitter = new QSplitter(Qt::Vertical, this);
    m_sideSplitter->addWidget(&m_viewerView);
+
+/*
+   QWidget* progress = new QWidget(this);
+   progress->setLayoutDirection(
+   progress->addWidget();
+   progress->addWidget(&m_status);
+   progress->addWidget(&m_progressBar);
+*/
+   
    m_sideSplitter->addWidget(&m_undoStackView);
    m_sideSplitter->setCollapsible(0, true);
    m_sideSplitter->setCollapsible(1, true);
@@ -130,9 +154,6 @@ void MainWindow::createConnections()
    connect(&m_toolBar, SIGNAL(addHydrogens()), 
       &m_viewerModel, SLOT(addHydrogens()));
 
-   connect(&m_toolBar, SIGNAL(addFragment()), 
-      this, SLOT(addFragment()));
-
    connect(&m_toolBar, SIGNAL(minimizeEnergy()), 
       &m_viewerModel, SLOT(minimizeEnergy()));
 
@@ -142,7 +163,7 @@ void MainWindow::createConnections()
    connect(&m_toolBar, SIGNAL(takeSnapshot()), 
       &m_viewer, SLOT(saveSnapshot()));
 
-   connect(&m_toolBar, SIGNAL(recordingActive(bool)), 
+   connect(&m_toolBar, SIGNAL(record(bool)), 
       this, SLOT(setRecordingActive(bool)));
          
    connect(this, SIGNAL(recordingActive(bool)), 
@@ -160,11 +181,16 @@ void MainWindow::createConnections()
    connect(&m_toolBar, SIGNAL(showHelp()), 
       this, SLOT(showHelp()));
          
-   connect(&m_toolBar, SIGNAL(changeActiveViewerMode(ViewerMode const)), 
-      &m_viewer, SLOT(setActiveViewerMode(ViewerMode const)));
+   connect(&m_toolBar, SIGNAL(viewerModeChanged(Viewer::Mode const)), 
+      &m_viewer, SLOT(setActiveViewerMode(Viewer::Mode const)));
 
-   connect(&m_toolBar, SIGNAL(buildElementChanged(unsigned int)), 
+   connect(&m_toolBar, SIGNAL(buildElementSelected(unsigned int)), 
       &m_viewer, SLOT(setDefaultBuildElement(unsigned int)));
+
+   connect(&m_toolBar, 
+      SIGNAL(buildFragmentSelected(QString const&, Viewer::Mode const)), 
+      &m_viewer,
+      SLOT(setDefaultBuildFragment(QString const&, Viewer::Mode const)));
 
    // ViewerModel 
    connect(&m_viewerModel, SIGNAL(updated()), 
@@ -179,8 +205,8 @@ void MainWindow::createConnections()
    connect(&m_viewerModel, SIGNAL(sceneRadiusChanged(double const)), 
       &m_viewer, SLOT(setSceneRadius(double const)));
 
-   connect(&m_viewerModel, SIGNAL(changeActiveViewerMode(ViewerMode const)), 
-      &m_viewer, SLOT(setActiveViewerMode(ViewerMode const)));
+   connect(&m_viewerModel, SIGNAL(changeActiveViewerMode(Viewer::Mode const)), 
+      &m_viewer, SLOT(setActiveViewerMode(Viewer::Mode const)));
 
    connect(&m_viewerModel, SIGNAL(displayMessage(QString const&)),
        &m_viewer, SLOT(displayMessage(QString const&)));
@@ -191,7 +217,7 @@ void MainWindow::createConnections()
    connect(&m_viewerModel, SIGNAL(foregroundColorChanged(QColor const&)),
        &m_viewer, SLOT(setForegroundColor(QColor const&)));
 
-   connect(&m_processMonitor, SIGNAL(resultsAvailable(JobInfo*)),
+   connect(&(ProcessMonitor::instance()), SIGNAL(resultsAvailable(JobInfo*)),
        &m_viewerModel, SLOT(openCalculationResults(JobInfo*)));
 
    // Viewer
@@ -210,8 +236,8 @@ void MainWindow::createConnections()
    connect(&m_viewer, SIGNAL(openFileFromDrop(QString const&)),
       this, SLOT(openFile(QString const&)));
 
-   connect(&m_viewer, SIGNAL(activeViewerModeChanged(ViewerMode const)),
-      &m_toolBar, SLOT(setActiveViewerMode(ViewerMode const)));
+   connect(&m_viewer, SIGNAL(activeViewerModeChanged(Viewer::Mode const)),
+      &m_toolBar, SLOT(setToolBarMode(Viewer::Mode const)));
 
    connect(&m_viewer, SIGNAL(escapeFullScreen()), 
       this, SLOT(fullScreen()));
@@ -311,8 +337,6 @@ void MainWindow::createMenus()
    QMenu*   menu;
    QMenu*   subMenu;
 
-   // bcde
-
    // ----- File Menu -----
    menu = menuBar()->addMenu("File");
 
@@ -339,6 +363,14 @@ void MainWindow::createMenus()
       updateRecentFilesMenu();
 
       menu->addSeparator();
+
+/*
+      name = "Parse Test File";
+      action = menu->addAction(name);
+      connect(action, SIGNAL(triggered()), this, SLOT(parseFile()));
+
+      menu->addSeparator();
+*/
 
       name = "Close Viewer";
       action = menu->addAction(name);
@@ -413,7 +445,6 @@ void MainWindow::createMenus()
       connect(action, SIGNAL(triggered()), &m_viewerModel, SLOT(pasteSelectionFromClipboard()));
       action->setShortcut(Qt::CTRL + Qt::Key_V);
 
-
       menu->addSeparator();
 
       name = "Select All";
@@ -431,10 +462,11 @@ void MainWindow::createMenus()
       connect(action, SIGNAL(triggered()), &m_viewerModel, SLOT(invertSelection()));
       action->setShortcut(Qt::CTRL + Qt::Key_I);
 
-      //name = "Delete Selection";
-      //action = menu->addAction(name);
-      //connect(action, SIGNAL(triggered()), &m_viewerModel, SLOT(deleteSelection()));
-      //action->setShortcut(Qt::CTRL + Qt::Key_Backspace);
+      menu->addSeparator();
+
+      name = "Reindex Atoms";
+      action = menu->addAction(name);
+      connect(action, SIGNAL(triggered()), this, SLOT(reindexAtoms()));
 
 
       menu->addSeparator();
@@ -471,51 +503,65 @@ void MainWindow::createMenus()
 
       menu->addSeparator();
 
-      name = "Element";
-      action = menu->addAction(name);
-      connect(action, SIGNAL(triggered()), this, SLOT(setLabel()));
-      action->setData(Layer::Atom::Element);
-      action->setShortcut(Qt::Key_E);
-      action->setCheckable(true);
-      m_labelActions << action;
+      name = "Atom Labels";
+      subMenu = menu->addMenu(name);
 
-      name = "Index";
-      action = menu->addAction(name);
-      connect(action, SIGNAL(triggered()), this, SLOT(setLabel()));
-      action->setData(Layer::Atom::Index);
-      action->setShortcut(Qt::Key_I);
-      action->setCheckable(true);
-      m_labelActions << action;
+         name = "Element";
+         action = subMenu->addAction(name);
+         connect(action, SIGNAL(triggered()), this, SLOT(setLabel()));
+         action->setData(Layer::Atom::Element);
+         action->setShortcut(Qt::Key_E);
+         action->setCheckable(true);
+         m_labelActions << action;
 
-      name = "Mass";
-      action = menu->addAction(name);
-      connect(action, SIGNAL(triggered()), this, SLOT(setLabel()));
-      action->setData(Layer::Atom::Mass);
-      action->setShortcut(Qt::Key_M);
-      action->setCheckable(true);
-      m_labelActions << action;
+         name = "Index";
+         action = subMenu->addAction(name);
+         connect(action, SIGNAL(triggered()), this, SLOT(setLabel()));
+         action->setData(Layer::Atom::Index);
+         action->setShortcut(Qt::Key_I);
+         action->setCheckable(true);
+         m_labelActions << action;
+   
+         name = "Mass";
+         action = subMenu->addAction(name);
+         connect(action, SIGNAL(triggered()), this, SLOT(setLabel()));
+         action->setData(Layer::Atom::Mass);
+         action->setShortcut(Qt::Key_M);
+         action->setCheckable(true);
+         m_labelActions << action;
 
-      name = "Partial Charge";
-      action = menu->addAction(name);
-      connect(action, SIGNAL(triggered()), this, SLOT(setLabel()));
-      action->setData(Layer::Atom::Charge);
-      action->setShortcut(Qt::Key_Q);
-      action->setCheckable(true);
-      m_labelActions << action;
+/*
+         name = "NMR Shifts";
+         action = subMenu->addAction(name);
+         connect(action, SIGNAL(triggered()), this, SLOT(setLabel()));
+         action->setData(Layer::Atom::NmrShifts);
+         action->setShortcut(Qt::Key_N);
+         action->setCheckable(true);
+         m_labelActions << action;
+*/
 
-      name = "Spin Densities";
-      action = menu->addAction(name);
-      connect(action, SIGNAL(triggered()), this, SLOT(setLabel()));
-      action->setData(Layer::Atom::Spin);
-      action->setShortcut(Qt::Key_S);
-      action->setCheckable(true);
-      m_labelActions << action;
+         name = "Partial Charge";
+         action = subMenu->addAction(name);
+         connect(action, SIGNAL(triggered()), this, SLOT(setLabel()));
+         action->setData(Layer::Atom::Charge);
+         action->setShortcut(Qt::Key_Q);
+         action->setCheckable(true);
+         m_labelActions << action;
 
-      menu->addSeparator();
+         name = "Spin Densities";
+         action = subMenu->addAction(name);
+         connect(action, SIGNAL(triggered()), this, SLOT(setLabel()));
+         action->setData(Layer::Atom::Spin);
+         action->setShortcut(Qt::Key_S);
+         action->setCheckable(true);
+         m_labelActions << action;
 
-      name = "Reindex Atoms";
+   menu->addSeparator();
+
+   name = "Configure Appearance";
       action = menu->addAction(name);
-      connect(action, SIGNAL(triggered()), this, SLOT(reindexAtoms()));
+      connect(action, SIGNAL(triggered()), this, SLOT(configureAppearance()));
+
 
       // These are not working correctly at the moment.
 /*
@@ -611,22 +657,6 @@ void MainWindow::createMenus()
          connect(action, SIGNAL(triggered()), this, SLOT(setForceField()));
          if (Preferences::DefaultForceField() == ff) action->setChecked(true);
 
-
-/*
-      menu->addSeparator();
-
-      name = "Group Selection";
-      action = menu->addAction(name);
-      connect(action, SIGNAL(triggered()), &m_viewerModel, SLOT(groupSelection()));
-      action->setShortcut(Qt::CTRL + Qt::Key_G );
-
-      name = "Ungroup Selection";
-      action = menu->addAction(name);
-      connect(action, SIGNAL(triggered()), &m_viewerModel, SLOT(ungroupSelection()));
-      action->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_G );
-*/
-
-
       menu->addSeparator();
 
       name = "Translate To Center";
@@ -642,6 +672,13 @@ void MainWindow::createMenus()
       name = "Set Symmetry Tolerance";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), &m_viewerModel, SLOT(adjustSymmetryTolerance()));
+
+      name = "Auto-detect Symmetry";
+      action = menu->addAction(name);
+      action->setCheckable(true);
+      action->setChecked(false);
+      connect(action, SIGNAL(triggered()), &m_viewerModel, SLOT(toggleAutoDetectSymmetry()));
+
 
 
    // ----- Calculation Menu -----
@@ -666,7 +703,8 @@ void MainWindow::createMenus()
 
       name = "Remove All Processes";
       action = menu->addAction(name);
-      connect(action, SIGNAL(triggered()), &m_processMonitor, SLOT(clearProcessList()));
+      connect(action, SIGNAL(triggered()), 
+         &(ProcessMonitor::instance()), SLOT(clearProcessList()));
 
       name = "Reset Password Vault Key";
       action = menu->addAction(name);
@@ -714,39 +752,67 @@ void MainWindow::newViewer()
 }
 
 
-void MainWindow::addFragment()
+void MainWindow::parseFile()
 {
-   QString name(QFileDialog::getOpenFileName(this, tr("Open File"), 
-      Preferences::FragmentDirectory()));
-   if (!name.isEmpty()) {
-      m_viewerModel.addFragment(name);
+   Parser2::ParseFile* parser = new Parser2::ParseFile("efp.out");
+   connect(parser, SIGNAL(finished()), this, SLOT(fileParsed()));
+   parser->start();
+}
+
+
+void MainWindow::fileParsed()
+{
+   Parser2::ParseFile* parser(qobject_cast<Parser2::ParseFile*>(sender()));
+   QStringList errors(parser->errors());
+   if (!errors.isEmpty()) {
+      QMsgBox::warning(0, "IQmol", errors.join("\n"));
    }
+
+   Data::Bank* bank(parser->takeData());
+   qDebug() << "-------- Dumping read data ------------";
+   bank->dump();
+
+   qDebug() << "-------- Serialization Test ------------";
+
+{
+   qDebug() << "Saving data to test.iqmol";
+   Parser2::IQmol iqmol;
+   iqmol.saveData("test.iqmol", *bank); 
+   qDebug() << "Finished with .iqmol archive write";
+}
+
+// Regular text archive
+{
+   std::ofstream ofs("SerializationTest");
+   IQmol::Data::OutputArchive oar(ofs);
+   bank->serialize(oar, 0);
+   qDebug() << "Finished with archive write";
+   qDebug();
+   qDebug();
+}
+
+   delete bank;
+   qDebug() << "Finished deleting Bank";
+
+{
+   IQmol::Data::Factory& factory = IQmol::Data::Factory::instance();
+   IQmol::Data::Base* base = factory.create(IQmol::Data::Type::Bank);
+
+   std::ifstream ifs("SerializationTest");
+   IQmol::Data::InputArchive iar(ifs);
+   qDebug() << "Bank archive read from file:";
+   base->serialize(iar);
+   base->dump();
+   delete base;
+}
+
+   parser->deleteLater();
+
 }
 
 
 void MainWindow::openFile()
 {
-/*
-   QFileDialog dialog(this, "Open File", Preferences::LastFileAccessed());
-   dialog.setFileMode(QFileDialog::AnyFile);
-   dialog.setOption(QFileDialog::DontUseNativeDialog,true);
-
-   QListView* listView = dialog.findChild<QListView*>("listView");
-   if (listView) listView->setSelectionMode(QAbstractItemView::MultiSelection);
-
-   QTreeView* treeView = dialog.findChild<QTreeView*>();
-   if (treeView) treeView->setSelectionMode(QAbstractItemView::MultiSelection);
-
-   if (dialog.exec()) {
-      QStringList files(dialog.selectedFiles());
-      QStringList::iterator iter;
-      for (iter =  files.begin(); iter != files.end(); ++iter) {
-          openFile(*iter);
-      }
-   }
-*/
-
-
    QString name(QFileDialog::getOpenFileName(this, tr("Open File"), 
       Preferences::LastFileAccessed()));
    if (name.isEmpty()) return;
@@ -827,6 +893,44 @@ void MainWindow::setLabel()
 }
 
 
+void MainWindow::configureAppearance()
+{
+   
+   if (!m_shaderDialog) {
+      m_shaderDialog = new ShaderDialog(this);
+      connect(m_shaderDialog, SIGNAL(updated()), &m_viewer, SLOT(updateGL()));
+   }
+   m_shaderDialog->show();
+}
+
+
+void MainWindow::setShader()
+{
+   QAction* action(qobject_cast<QAction*>(sender()));
+
+   bool turnOn(action->isChecked());
+
+   ShaderLibrary& library(ShaderLibrary::instance());
+   if (turnOn) {
+      if (!library.install(action->data().toString())) {
+         QMsgBox::warning(0, "IQmol", "Failed to load shader");
+      }
+   }else {
+      if (!library.uninstall()) {
+         QMsgBox::warning(0, "IQmol", "Failed to unload shader");
+      }
+   }
+
+   QList<QAction*>::iterator iter;
+   for (iter = m_labelActions.begin(); iter != m_labelActions.end(); ++iter) {
+       (*iter)->setChecked(false);
+   }
+   if (turnOn) action->setChecked(true);
+
+   m_viewer.updateGL();
+}
+
+
 void MainWindow::setForceField()
 {
    QAction* action = qobject_cast<QAction*>(sender());
@@ -839,7 +943,6 @@ void MainWindow::setPartialChargeType()
    QAction* action = qobject_cast<QAction*>(sender());
    if (action) m_viewerModel.setPartialChargeType(action->data().toString());
 }
-
 
 
 void MainWindow::updateRecentFilesMenu()
@@ -875,14 +978,6 @@ void MainWindow::clearRecentFilesMenu()
 }
 
 
-
-/******************
- *
- *  Slots
- *
- ******************/
-
-
 void MainWindow::fullScreen()
 {
    QString msg;
@@ -900,16 +995,11 @@ void MainWindow::fullScreen()
       m_sideSplitter->hide();
       m_viewer.setFullScreen(true);
       m_fullScreenAction->setChecked(true);
-#ifdef Q_WS_MAC
-      msg = "Use " + QString(QChar(8984)) + "-0 to exit full screen mode";
-#else
-      msg = "Use Ctrl-0 to exit full screen mode";
-#endif
+      msg = "Use <esc> to exit full screen mode";
    }
 
    m_viewer.QGLViewer::displayMessage(msg, 5000);
 }
-
 
 
 void MainWindow::openQChemUI() 
@@ -924,12 +1014,12 @@ void MainWindow::openQChemUI()
       }
 
       connect(m_quiInputDialog, SIGNAL(submitJobRequest(IQmol::JobInfo*)),
-         &m_processMonitor, SLOT(submitJob(IQmol::JobInfo*)));
+         &(ProcessMonitor::instance()), SLOT(submitJob(IQmol::JobInfo*)));
 
-      connect(&m_processMonitor, SIGNAL(jobAccepted()),
+      connect(&(ProcessMonitor::instance()), SIGNAL(jobAccepted()),
          m_quiInputDialog, SLOT(close()));
 
-      connect(&m_processMonitor, SIGNAL(postStatusMessage(QString const&)),
+      connect(&(ProcessMonitor::instance()), SIGNAL(postStatusMessage(QString const&)),
          m_quiInputDialog, SLOT(showMessage(QString const&)));
    }
 
@@ -952,7 +1042,7 @@ void MainWindow::openQChemUI()
    m_quiInputDialog->setWindowModality(Qt::WindowModal);
    m_quiInputDialog->show();
 
-   m_viewer.setActiveViewerMode(Manipulate);
+   m_viewer.setActiveViewerMode(Viewer::Manipulate);
 }
 
 

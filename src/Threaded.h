@@ -98,11 +98,13 @@ namespace IQmol {
          int  m_timeout;
          QString m_errorMessage;
          QString m_outputMessage;
+         QThread m_thread;
+         QMutex* m_mutex;
 
 
-      private Q_SLOTS:
+      protected Q_SLOTS:
          /// We need to catch exceptions here as we are threaded
-         void process() {
+         virtual void process() {
             try {
 
                if (m_mutex) {
@@ -131,8 +133,6 @@ namespace IQmol {
       private:
          Threaded(Threaded const&);
          Threaded& operator=(Threaded const&);
-         QThread m_thread;
-         QMutex* m_mutex;
    };
 
 

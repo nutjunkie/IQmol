@@ -72,7 +72,6 @@ void ConformerList::setMolecule(Molecule* molecule)
 
    //connect(m_animatorList.last(), SIGNAL(finished()), &m_configurator, SLOT(reset()));
 
-
    setDefaultConformer();
 }
 

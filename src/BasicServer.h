@@ -50,10 +50,7 @@ namespace IQmol {
    
          ServerTask::Base* testConfiguration();
          ServerTask::Base* submit(Process*);
-         ServerTask::Base* kill(Process*);
          ServerTask::Base* query(Process*);
-         ServerTask::Base* cleanUp(Process*);
-         ServerTask::CopyResults* copyResults(Process*);
 
       private Q_SLOTS:
          void submitFinished();

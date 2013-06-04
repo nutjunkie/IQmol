@@ -23,49 +23,47 @@
 ********************************************************************************/
 
 #include "BaseHandler.h"
+#include "GLObjectLayer.h"
 
-
-namespace qglviewer {
-   class Vec;
-}
 
 namespace IQmol {
 
 namespace Layer {
    class Atom;
-   class Bond;
    class Molecule;
-   class GLObject;
 }
 
 namespace Handler {
 
-   /// The build handler controls how the mouse actions are interpreted when in
-   /// the Build ViewerMode.  
+   /// This is the base class for all the building handlers
    class Build : public Base {
 
       public: 
-         Build(Viewer* viewer) : Base(viewer) { }
-         Cursors::Type cursorType() const { return Cursors::Build; }
+         enum Mode { Atom, Group, EFP, Molecule };
+         Build(Viewer* viewer) : Base(viewer)  { }
+         Cursors::Type  cursorType() const { return Cursors::Build; }
+         GLObjectList buildObjects() const { return m_buildObjects; }
 
-         void mousePressEvent(QMouseEvent *);
-         void mouseMoveEvent(QMouseEvent *);
-         void mouseReleaseEvent(QMouseEvent *);
+         void setBuildFile(QString const& filePath) { m_filePath = filePath; } 
+         void mousePressEvent(QMouseEvent*);
+         void mouseMoveEvent(QMouseEvent*);
+         void mouseReleaseEvent(QMouseEvent*);
 
-      private:
-         void leftMousePressEvent(QMouseEvent *e);
-         void rightMousePressEvent(QMouseEvent *e);
-         void leftMouseMoveEvent(QMouseEvent *e);
-         void rightMouseMoveEvent(QMouseEvent *e);
-         void leftMouseReleaseEvent(QMouseEvent *e);
-         void rightMouseReleaseEvent(QMouseEvent *e);
+      protected:
+         virtual void leftMousePressEvent(QMouseEvent*)    = 0;
+         virtual void leftMouseMoveEvent(QMouseEvent*)     = 0;
+         virtual void leftMouseReleaseEvent(QMouseEvent*)  = 0;
+         virtual void rightMousePressEvent(QMouseEvent*)   = 0;
+         virtual void rightMouseMoveEvent(QMouseEvent*)    = 0;
+         virtual void rightMouseReleaseEvent(QMouseEvent*) = 0;
 
-         Qt::MouseButton m_button;
-         Layer::Bond* m_bond;
-         Layer::Atom *m_existingAtom, *m_beginAtom, *m_endAtom;
+         GLObjectList m_buildObjects;
+         QString m_filePath;
+         Layer::Atom* m_beginAtom;
          Layer::Molecule* m_molecule;
-         Layer::GLObject* m_deleteTarget;
-         bool m_buildIsActive;
+         Qt::MouseButton m_button;
+         // Only set this if we are manipulating (i.e. no build action);
+         bool m_manipulateOnly;
    };
 
 } } // end namespace IQmol::Handler

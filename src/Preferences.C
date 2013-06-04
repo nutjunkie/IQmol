@@ -21,6 +21,7 @@
 ********************************************************************************/
 
 #include "Preferences.h"
+#include "ShaderLibrary.h"
 #include <QApplication>
 #include <QFileDialog>
 #include <QColorDialog>
@@ -168,6 +169,19 @@ void Browser::setFilePath(QLineEdit* edit, bool const mustExist)
 // take care of the necessary conversion from the QVariant.
 
 
+// These functions are generic and should only be used within the Preferences
+// module and not in the general code.
+QVariant Get(QString const& name);
+void     Set(QString const& name, QVariant const& value);
+
+template <class T> QList<T> GetList(QString const& name);
+template <class T> void     SetList(QString const& name, QList<T> const& list);
+
+template <class T> QMap<QString,T> GetMap(QString const& name);
+template <class T> void            SetMap(QString const& name, QMap<QString,T> const& map);
+
+
+
 // Size of the InputDialog window
 QSize MainWindowSize() 
 {
@@ -230,7 +244,8 @@ void LabelFontSize(int const size)
 QString LastFileAccessed() 
 {
    QVariant value(Get("LastFileAccesed"));
-   return value.isNull() ? QString() : value.value<QString>();
+   QString home(QDir::homePath());
+   return value.isNull() ? home : value.value<QString>();
 }
 
 void LastFileAccessed(QString const& filePath) 
@@ -315,8 +330,68 @@ void QChemDatabaseFilePath(QString const& filePath)
    Set("QChemDatabaseFilePath", QVariant::fromValue(filePath));
 }
 
+// ---------
+
+QString ShaderDirectory() 
+{
+   QString shaderDir;
+   QVariant value(Get("ShaderDirectory"));
+
+   if (value.isNull()) {
+      QDir dir(QApplication::applicationDirPath());
+      dir.cdUp();
+#ifdef Q_WS_MAC
+      dir.cd("share/shaders");
+      shaderDir = dir.absolutePath();
+#else
+      shaderDir = dir.absolutePath() + "/shaders";
+#endif
+   }else {
+      shaderDir = value.value<QString>();
+   }
+   return shaderDir;
+}
+
+void ShaderDirectory(QString const& filePath) 
+{
+   Set("ShaderDirectory", QVariant::fromValue(filePath));
+}
+
 
 // ---------
+
+
+QString DefaultShader()
+{
+   QVariant value(Get("DefaultShader"));
+   return value.isNull() ? ShaderLibrary::NoShader : value.value<QString>();
+}
+
+void DefaultShader(QString const& shader)
+{
+   Set("DefaultShader", shader);
+}
+
+
+// ---------
+
+
+QVariantMap DefaultShaderParameters()
+{
+   QVariantMap map;
+   QVariant qvar(Get("DefaultShaderParameters"));
+   if (!qvar.isNull()) map = qvar.toMap();
+   return map;
+}
+
+void DefaultShaderParameters(QVariantMap const& map)
+{
+   Set("DefaultShaderParameters", QVariant(map));
+}
+
+
+// ---------
+
 
 QString FragmentDirectory() 
 {
@@ -325,8 +400,8 @@ QString FragmentDirectory()
 
    if (value.isNull()) {
       QDir dir(QApplication::applicationDirPath());
-#ifdef Q_WS_MAC
       dir.cdUp();
+#ifdef Q_WS_MAC
       dir.cd("share/fragments");
       fragDir = dir.absolutePath();
 #else
@@ -342,6 +417,7 @@ void FragmentDirectory(QString const& filePath)
 {
    Set("FragmentDirectory", QVariant::fromValue(filePath));
 }
+
 
 // ---------
 
@@ -631,7 +707,10 @@ void SSHPrivateIdentityFile(QString const& file)
 
 QVariantList ServerList()
 {
-   return GetQVariantList("ServerList");
+   QVariant value(Get("ServerList"));
+   QVariantList list;
+   if (!value.isNull()) list = value.toList();
+   return list;
 }
 
 void ServerList(QVariantList const& servers)
@@ -639,18 +718,23 @@ void ServerList(QVariantList const& servers)
    SetList("ServerList", servers);
 }
 
+
 // ---------
 
 
 QVariantList CurrentProcessList()
 {
-   return GetQVariantList("CurrentProcessList");
+   QVariant value(Get("CurrentProcessList"));
+   QVariantList list;
+   if (!value.isNull()) list = value.toList();
+   return list;
 }
 
 void CurrentProcessList(QVariantList const& processList)
 {
    SetList("CurrentProcessList", processList);
 }
+
 
 // ---------
 
@@ -727,15 +811,6 @@ QVariant Get(QString const& name)
 }
 
 
-QList<QVariant> GetQVariantList(QString const& name)
-{
-   QVariant value(Get(name));
-   QVariantList list;
-   if (!value.isNull()) list = value.toList();
-   return list;
-}
-
-
 template <class T>
 QList<T> GetList(QString const& name)
 {
@@ -752,6 +827,7 @@ QList<T> GetList(QString const& name)
 
    return list;
 }
+
 
 
 template <class T>
@@ -806,6 +882,5 @@ void SetMap(QString const& name, QMap<QString, T> const& map)
    }
    Set(name, QVariant(variantMap));
 }
-
 
 } } // end namespace IQmol::Preferences

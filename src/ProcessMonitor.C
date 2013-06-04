@@ -28,21 +28,35 @@
 #include "ServerTask.h"
 #include "Preferences.h"
 #include "QMsgBox.h"
+#include "QsLog.h"
 #include <QCloseEvent>
 #include <QShowEvent>
 #include <QHeaderView>
 #include <QSet>
-
 #include <QtDebug>
+#include <cstdlib>
 
 
 namespace IQmol {
 
 
+ProcessMonitor* ProcessMonitor::s_instance = 0;
+QMap<Process*, QTableWidgetItem*> ProcessMonitor::s_processMap = 
+   QMap<Process*, QTableWidgetItem*>();
+
+ProcessMonitor& ProcessMonitor::instance()
+{
+   if (s_instance == 0) {
+      s_instance = new ProcessMonitor(0);
+      atexit(ProcessMonitor::destroy);
+   }
+   return *s_instance;
+}
+
+
 ProcessMonitor::ProcessMonitor(QWidget* parent) : QMainWindow(parent), m_pendingProcess(0)
 {
    m_ui.setupUi(this);
-
    QTableWidget* table(m_ui.processTable);
    table->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
    table->horizontalHeader()->setStretchLastSection(true);
@@ -70,9 +84,9 @@ ProcessMonitor::ProcessMonitor(QWidget* parent) : QMainWindow(parent), m_pending
 }
 
 
-ProcessMonitor::~ProcessMonitor()
+void ProcessMonitor::destroy()
 {
-   ProcessList processes(m_processMap.keys());
+   ProcessList processes(s_processMap.keys());
    ProcessList::iterator iter;
    for (iter = processes.begin(); iter != processes.end(); ++iter) {
        delete (*iter);
@@ -80,7 +94,8 @@ ProcessMonitor::~ProcessMonitor()
 }
 
 
-void ProcessMonitor::initializeMenus() {
+void ProcessMonitor::initializeMenus() 
+{
    QMenuBar* menubar(menuBar());
    QAction*  action;
    QMenu*    menu;
@@ -90,7 +105,6 @@ void ProcessMonitor::initializeMenus() {
       action = menu->addAction(tr("Reconnect Servers"));
       connect(action, SIGNAL(triggered()), this, SLOT(reconnectServers()));
       action->setShortcut(Qt::CTRL + Qt::Key_R);
-
 
       action = menu->addAction(tr("Remove All Processes"));
       connect(action, SIGNAL(triggered()), this, SLOT(clearProcessList()));
@@ -138,15 +152,12 @@ void ProcessMonitor::submitJob(IQmol::JobInfo* jobInfo)
       return;
    }
 
-qDebug() << "Server is connected:" << server->isConnected();
-
    if (!server->isConnected()) {
       postStatusMessage("Connecting to server...");
       try {
-        qDebug() << "Attempting to connect to server";
+         QLOG_DEBUG() << "Attempting to connect to server " << server->name();
          if (!server->connectServer()) throw Server::Exception("Connection failed");
-         qDebug() << "Server is connected 2:" << server->isConnected();
-        
+         QLOG_DEBUG() << "Connection established: " << server->isConnected();
          postStatusMessage("Testing configuration...");
       } catch (std::exception& err) {
          QString msg("Failed to connect to server ");
@@ -158,7 +169,7 @@ qDebug() << "Server is connected:" << server->isConnected();
    }
 
    // This is a bit untidy, but we need to tell the next slot in the submission
-   // chain what job we are dealing with.
+   // thread chain what job we are dealing with.
    m_pendingProcess = new Process(jobInfo);
    ServerTask::Base* task = server->testConfiguration();
    if (task) {
@@ -199,17 +210,13 @@ void ProcessMonitor::submitJob1()
 
    postStatusMessage("Determining working directory...");
    Server* server = ServerRegistry::instance().get(m_pendingProcess->serverName());
-   if (server) {
-      if (server->getWorkingDirectoryFromUser(m_pendingProcess)) {
-         task = server->setup(m_pendingProcess);
-         connect(task, SIGNAL(finished()), this, SLOT(submitJob2()));
-         task->start();
-      }else {
-         delete m_pendingProcess;
-         m_pendingProcess = 0;
-      }
+   if (server->getWorkingDirectoryFromUser(m_pendingProcess)) {
+      task = server->setup(m_pendingProcess);
+      connect(task, SIGNAL(finished()), this, SLOT(submitJob2()));
+      task->start();
    }else {
-      qDebug() << "failed to find server" << m_pendingProcess->serverName();
+      delete m_pendingProcess;
+      m_pendingProcess = 0;
    }
 }
 
@@ -235,10 +242,6 @@ void ProcessMonitor::submitJob2()
    task->deleteLater();
 
    Server* server = ServerRegistry::instance().get(m_pendingProcess->serverName());
-   if (!server) {
-      QMsgBox::warning(this, "IQmol", "Failed to find server");
-      return;
-   }
 
    if (errorMessage.contains("Working directory exists")) {
       if (QMsgBox::question(0, "IQmol", "Directory exists, overwrite?") == QMessageBox::Ok) {
@@ -297,7 +300,7 @@ void ProcessMonitor::jobSubmitted()
    }
 
    QString errorMessage(task->errorMessage());
-qDebug() << "ProcessMonitor::jobSubmitted() error message" << errorMessage;
+   qDebug() << "ProcessMonitor::jobSubmitted() error message" << errorMessage;
    task->deleteLater();
 // if message = Process not found then we try a clean up
 
@@ -333,7 +336,7 @@ void ProcessMonitor::addToTable(Process* process)
    table->item(row, 2)->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
    table->item(row, 3)->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
 
-   m_processMap.insert(process, table->item(row,0));
+   s_processMap.insert(process, table->item(row,0));
    connect(process, SIGNAL(updated()),  this, SLOT(processUpdated()));
    connect(process, SIGNAL(finished()), this, SLOT(processFinished()));
    updateRow(row, process->monitorItems());
@@ -343,7 +346,7 @@ void ProcessMonitor::addToTable(Process* process)
 
 void ProcessMonitor::reconnectServers()
 {
-   ProcessList list(m_processMap.keys());
+   ProcessList list(s_processMap.keys());
    QSet<Server*> servers;
 
    ProcessList::iterator iter;
@@ -391,7 +394,7 @@ void ProcessMonitor::clearProcessList(bool const finishedOnly, bool const prompt
       if (QMsgBox::question(this, "IQmol", msg) == QMessageBox::Cancel) return;
    }
 
-   ProcessList list(m_processMap.keys());
+   ProcessList list(s_processMap.keys());
    ProcessList::iterator iter;
 
    for (iter = list.begin(); iter != list.end(); ++iter) {
@@ -402,9 +405,9 @@ void ProcessMonitor::clearProcessList(bool const finishedOnly, bool const prompt
            status == Process::Error    ||
            status == Process::Finished) 
        {
-           QTableWidgetItem* item(m_processMap[process]);
+           QTableWidgetItem* item(s_processMap[process]);
            m_ui.processTable->removeRow(item->row());
-           m_processMap.remove(process);
+           s_processMap.remove(process);
            Server* server = ServerRegistry::instance().get(process->serverName());
            if (server) server->removeFromWatchList(process);
        }
@@ -593,9 +596,9 @@ void ProcessMonitor::removeProcess()
    Process* process(getSelectedProcess());
 
    if (process) {
-      QTableWidgetItem* item(m_processMap[process]);
+      QTableWidgetItem* item(s_processMap[process]);
       m_ui.processTable->removeRow(item->row());
-      m_processMap.remove(process);
+      s_processMap.remove(process);
       Server* server = ServerRegistry::instance().get(process->serverName());
       server->removeFromWatchList(process);
       saveProcessList();
@@ -719,7 +722,7 @@ void ProcessMonitor::queryFinished()
 
 void ProcessMonitor::updateTable()
 {
-   ProcessList list(m_processMap.keys());
+   ProcessList list(s_processMap.keys());
    ProcessList::iterator iter;
    QTableWidget* table(m_ui.processTable);
    QTableWidgetItem* item;
@@ -727,10 +730,10 @@ void ProcessMonitor::updateTable()
    bool sortingEnabled(table->isSortingEnabled());
    table->setSortingEnabled(false);
    for (iter = list.begin(); iter != list.end(); ++iter) {
-       item = m_processMap[*iter];
+       item = s_processMap[*iter];
    }
    for (iter = list.begin(); iter != list.end(); ++iter) {
-       item = m_processMap[*iter];
+       item = s_processMap[*iter];
        updateRow(item->row(), (*iter)->monitorItems());
    }
    table->setSortingEnabled(sortingEnabled);
@@ -746,7 +749,7 @@ void ProcessMonitor::processUpdated()
 
 void ProcessMonitor::saveProcessList()
 {
-   ProcessList processes(m_processMap.keys());
+   ProcessList processes(s_processMap.keys());
    ProcessList::iterator iter;
    QVariantList list;
 
@@ -866,7 +869,7 @@ Process* ProcessMonitor::getSelectedProcess(QTableWidgetItem* item)
 
    int row(item->row());
    item = table->item(row,0);
-   ProcessList list(m_processMap.keys(item));
+   ProcessList list(s_processMap.keys(item));
 
    if (list.isEmpty()) {
       qDebug() << "Way not up with the where now??";

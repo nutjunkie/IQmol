@@ -21,8 +21,11 @@
 ********************************************************************************/
 
 #include "Server.h"
+#include "ServerRegistry.h"
 #include "BasicServer.h"
 #include "PBSServer.h"
+#include "SGEServer.h"
+#include "HttpServer.h"
 #include "System.h"
 #include "QsLog.h"
 #include "QMsgBox.h"
@@ -36,9 +39,10 @@ QString Server::toString(Server::Type const& type)
 {
    QString s;
    switch (type) {
-      case Server::Basic:   s = "Basic";   break;
-      case Server::PBS:     s = "PBS";     break;
-      case Server::Custom:  s = "Custom";  break;
+      case Server::Basic:  s = "Basic";  break;
+      case Server::PBS:    s = "PBS";    break;
+      case Server::SGE:    s = "SGE";    break;
+      case Server::HTTP:   s = "HTTP";   break;
    }
    return s;
 }
@@ -50,6 +54,7 @@ QString Server::toString(Server::Host const& host)
    switch (host) {
       case Server::Local:   s = "Local";   break;
       case Server::Remote:  s = "Remote";  break;
+      case Server::Web:     s = "Web";     break;
    }
    return s;
 }
@@ -94,8 +99,11 @@ void Server::setDelegate(Host const host, Type const type)
       case PBS:
          m_serverDelegate = new PBSServer(this, m_delegateDefaults);
          break;
-      case Custom:
-         m_serverDelegate = new BasicServer(this, m_delegateDefaults);
+      case SGE:
+         m_serverDelegate = new SGEServer(this, m_delegateDefaults);
+         break;
+      case HTTP:
+         m_serverDelegate = new HttpServer(this, m_delegateDefaults);
          break;
    }
 
@@ -115,29 +123,39 @@ QStringList Server::tableFields() const
 }
 
 
+int Server::updateInterval() const
+{
+   return m_updateTimer.interval()/1000;
+}
+
+
 void Server::setUpdateInterval(int const seconds)
 {
-   m_updateInterval = seconds;
-   m_updateTimer.setInterval(m_updateInterval*1000); 
+   m_updateTimer.setInterval(seconds*1000); 
 }
 
 
 void Server::setDefaults(Host const host, Type const type)
 {
-   if (host == Local) {
-      setLocalDefaults();
-   }else if (host == Remote) {
-      setRemoteDefaults();
+   switch (host) {
+      case Local:   setLocalDefaults();   break;
+      case Remote:  setRemoteDefaults();  break;
+      case Web:     setWebDefaults();     break;
    }
 
-   if (type == Basic) {
-      setBasicDefaults(host);
-   }else if (type == PBS) {
-      setPBSDefaults(host);
-   }else {
-      setCustomDefaults(host);
+   switch (type) {
+      case Basic:  setBasicDefaults(host);  break;
+      case PBS:    setPBSDefaults(host);    break;
+      case SGE:    setSGEDefaults(host);    break;
+      case HTTP:   /* nowt to do */         break;
    }
 }
+
+
+/// Ideally these defaults should be moved to their respectiv Host or Delegate,
+/// however, when creating new Servers, the Hosts and Delegates are not created
+/// until they are actually needed, but they still need to be configured in the 
+/// dialog.
 
 
 void Server::setLocalDefaults()
@@ -166,15 +184,37 @@ void Server::setRemoteDefaults()
    m_port             = 22;
    m_workingDirectory =  "~/";
    m_executableName   = "qcprog.exe";
-   m_updateInterval   = 20;
    setBasicDefaults(m_host);
+   setUpdateInterval(20);
+}
+
+
+void Server::setWebDefaults()
+{
+   m_host             = Web;
+   m_type             = HTTP;
+   m_qchemEnvironment = "(unused)";
+   m_hostAddress      = "www.iqmol.org";
+   m_userName         = "guest";
+   m_port             = 80;
+   m_workingDirectory = "(unused)";
+   m_authentication   = None;
+   setUpdateInterval(20);
+
+   m_executableName   = "/cgi/IQmol";
+   m_queueInfo        = "limits.cgi user=${USER}";
+   m_killCommand      = "kill.cgi jobID=${JOB_ID}";
+   m_queryCommand     = "query.cgi jobID=${JOB_ID}";
+   m_submitCommand    = "submit.cgi user=${USER} jobID=${JOB_ID}";
+   m_runFileTemplate  = "(unused)";
+   m_delegateDefaults.insert("JobLimit", 0);
 }
 
 
 void Server::setBasicDefaults(Host const host)
 {
    m_type            = Basic;
-   m_queueInfo       = "(not used)";
+   m_queueInfo       = "(unused)";
    m_killCommand     = System::KillCommand();
    m_queryCommand    = System::QueryCommand();
    m_runFileTemplate = "#! /bin/csh\nsource ~/.cshrc\nqchem ${JOB_NAME}.inp ${JOB_NAME}.out";
@@ -183,7 +223,7 @@ void Server::setBasicDefaults(Host const host)
 #ifdef Q_WS_WIN
       m_submitCommand   = "${QC}/qcenv_s.bat ${JOB_NAME}.inp ${JOB_NAME}.out";
      // note we make the textedit read-only in ServerOptionsDialog
-      m_runFileTemplate = "(not used)";  
+      m_runFileTemplate = "(unused)";  
 #else
       m_submitCommand   = "./${JOB_NAME}.run";
 #endif
@@ -209,7 +249,7 @@ void Server::setPBSDefaults(Host const)
            << "#PBS -q ${QUEUE}"
            << "#PBS -l walltime=${WALLTIME}"
            << "#PBS -l vmem=${MEMORY}Mb"
-           << "#PBS -l jobfs=${JOBFS}Mb"
+           << "#PBS -l jobfs=${SCRATCH}Mb"
            << "#PBS -l ncpus=${NCPUS}"
            << "#PBS -j oe"
            << "#PBS -o ${JOB_NAME}.err"
@@ -223,9 +263,30 @@ void Server::setPBSDefaults(Host const)
 }
 
 
-void Server::setCustomDefaults(Host const)
+void Server::setSGEDefaults(Host const)
 {
-   m_type = Custom;
+   m_type = SGE;
+   m_submitCommand = "qsub ${JOB_NAME}.run";
+   // This is annoying, but SGE qstat -j doesn't give us the status.
+   m_queryCommand  = "qstat && qstat -j ${JOB_ID}";
+   m_queueInfo     = "qstat -g c";
+   m_killCommand   = "qdel ${JOB_ID}";
+
+   // this assumes the $QC is set up in .bashrc
+   QStringList runFile;
+   runFile << "#!/bin/bash"
+           << "#$ -S /bin/bash"
+           << "#$ -pe mpi 1"
+           << "#$ -j yes"            //merge stderr stdout
+           << "#$ -l h_rt=${WALLTIME}"
+           << "#$ -l h_vmem=${MEMORY}"
+           << "#$ -l scr_free=${SCRATCH}"
+           << "#$ -cwd"     
+           << ""
+           << "export QCSCRATCH=/scratch"
+           << "qchem ${JOB_NAME}.inp ${JOB_NAME}.out";
+
+   m_runFileTemplate = runFile.join("\n");
 }
 
 
@@ -247,6 +308,13 @@ void Server::setJobLimit(int const limit)
 }
 
 
+void Server::setCookie(QString const& cookie)
+{
+   m_cookie = cookie;
+   ServerRegistry::saveToPreferences();
+}
+
+
 QVariant Server::toQVariant()
 {
    QVariantMap map;
@@ -265,7 +333,9 @@ QVariant Server::toQVariant()
    map.insert("QueueInfo", m_queueInfo);
    map.insert("KillCommand", m_killCommand);
    map.insert("RunFileTemplate", m_runFileTemplate);
-   map.insert("UpdateInterval", m_updateInterval);
+   map.insert("UpdateInterval", updateInterval());
+   map.insert("Cookie", m_cookie);
+   
    if (m_serverDelegate) m_delegateDefaults = m_serverDelegate->delegateDefaults();
    map.insert("DelegateDefaults", QVariant(m_delegateDefaults));
 
@@ -289,7 +359,12 @@ void Server::fromQVariant(QVariant const& qvar)
    // Host
    if (map.contains("Host")) {
       int host(map.value("Host").toInt(&ok));
-      if (ok && (host == Remote)) setRemoteDefaults();
+      if (ok) {
+         if (host == Remote) setRemoteDefaults();
+         if (host == Web) {
+            setWebDefaults();
+         }
+      }
    }else {
       throw Server::Exception(m_name, "Remote/Local type not set");
    }
@@ -299,8 +374,9 @@ void Server::fromQVariant(QVariant const& qvar)
       int type(map.value("Type").toInt(&ok));
       if (ok) {
          switch (type) {
-            case 1:   m_type = PBS;      break;
-            case 2:   m_type = Custom;   break;
+            case PBS:   m_type = PBS;    break;
+            case SGE:   m_type = SGE;    break;
+            case HTTP:  m_type = HTTP;   break;
             default:  m_type = Basic;    break;
          }
       }
@@ -312,6 +388,11 @@ void Server::fromQVariant(QVariant const& qvar)
    if (map.contains("JobLimit")) {
       int limit(map.value("JobLimit").toInt(&ok));
       if (ok) m_delegateDefaults.insert("JobLimit", limit);
+   }
+
+   // Cookie (this should be shifted to the delegate
+   if (map.contains("Cookie")) {
+      m_cookie = map.value("Cookie").toString();
    }
 
    // $QC
@@ -376,7 +457,6 @@ void Server::fromQVariant(QVariant const& qvar)
 	  m_queueInfo = map.value("QueueInfo").toString();
    }
 
-
    // ${KILL_CMD}
    if (map.contains("KillCommand")) {
 	  m_killCommand = map.value("KillCommand").toString();
@@ -390,7 +470,7 @@ void Server::fromQVariant(QVariant const& qvar)
    // UpdateInterval
    if (map.contains("UpdateInterval")) {
       int interval(map.value("UpdateInterval").toInt(&ok));
-	  if (ok) m_updateInterval = interval;
+	  if (ok) setUpdateInterval(interval);
    }
 
    if (map.contains("DelegateDefaults")) {
@@ -435,20 +515,28 @@ void Server::startTimer()
 
 QString Server::replaceMacros(QString const& input, Process* process)
 {
-   JobInfo* jobInfo(process->jobInfo());
    QString output(input);
-qDebug() << "Server::replaceMacros:";
-qDebug() << output;
+qDebug() << "Server::replaceMacros on string:" << output;
 
+   output.replace("${USER}",      m_userName);
    output.replace("${QC}",        m_qchemEnvironment);
    output.replace("${EXE_NAME}",  m_executableName);
-   output.replace("${JOB_ID}",    process->id());
-   output.replace("${JOB_NAME}",  jobInfo->get(JobInfo::BaseName));
-   output.replace("${QUEUE}",     jobInfo->get(JobInfo::Queue));
-   output.replace("${WALLTIME}",  jobInfo->get(JobInfo::Walltime));
-   output.replace("${MEMORY}",    jobInfo->get(JobInfo::Memory));
-   output.replace("${JOBFS}",     jobInfo->get(JobInfo::Jobfs));
-   output.replace("${NCPUS}",     jobInfo->get(JobInfo::Ncpus));
+   // bit of a hack, we don't need the executable name for an HTTP server, so
+   // we store the location of the cgi scripts instead.
+   output.replace("${CGI_ROOT}",  m_executableName);  
+   output.replace("${SERVER}",    m_name);  
+
+   if (process) {
+      JobInfo* jobInfo(process->jobInfo());
+      output.replace("${JOB_ID}",   process->id());
+      output.replace("${JOB_NAME}", jobInfo->get(JobInfo::BaseName));
+      output.replace("${QUEUE}",    jobInfo->get(JobInfo::Queue));
+      output.replace("${WALLTIME}", jobInfo->get(JobInfo::Walltime));
+      output.replace("${MEMORY}",   jobInfo->get(JobInfo::Memory));
+      output.replace("${JOBFS}",    jobInfo->get(JobInfo::Scratch));
+      output.replace("${SCRATCH}",  jobInfo->get(JobInfo::Scratch));
+      output.replace("${NCPUS}",    jobInfo->get(JobInfo::Ncpus));
+   }
 
    if (output.contains("${")) {
       QLOG_WARN() << "Unmatched macros found in string:";
@@ -561,10 +649,7 @@ ServerTask::Base* Server::query(Process* process)
 
 void Server::updateProcesses()
 {
-   if (!isConnected() || m_watchList.isEmpty()) {
-//qDebug() << "Server::updateProcesses returning because " << isConnected() << m_watchList.length();
-      return;
-   }
+   if (m_watchList.isEmpty()  || !isConnected() ) return;
 
    // query may trigger the process to be removed from m_watchList, so we make
    // a copy of the list so we don't iterate past the end.
@@ -589,6 +674,14 @@ void Server::queryFinished()
    Process::Status oldStatus(process->status());
    Process::Status newStatus(task->newStatus());
    task->deleteLater();
+
+   // Check for any error and bail cos, really, we don't know what's going on
+   QString msg(task->errorMessage());
+   if (!msg.isEmpty()) {
+      process->setComment(msg);
+      process->setStatus(Process::Unknown);
+      return;
+   }
 
    if (oldStatus == Process::Queued    || 
        oldStatus == Process::Running   || 

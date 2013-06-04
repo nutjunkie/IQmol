@@ -43,7 +43,7 @@ namespace IQmol {
 
       Q_SIGNALS:
          void elementSelected(unsigned int atomicNumber);
-         void elementSelected(QString atomicSymbol);
+         void elementSelected(QString const& atomicSymbol);
 
       private Q_SLOTS:
          void buttonPushed();

@@ -23,9 +23,9 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
-      <widget class="QRadioButton" name="efpButton">
+      <widget class="QRadioButton" name="functionalGroupsButton">
        <property name="text">
-        <string>EFP</string>
+        <string>Functional Group</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -33,26 +33,19 @@
       </widget>
      </item>
      <item>
+      <widget class="QRadioButton" name="efpButton">
+       <property name="text">
+        <string>EFP</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QRadioButton" name="moleculesButton">
        <property name="text">
         <string>Molecules</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="customButton">
-       <property name="text">
-        <string>Custom</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="openButton">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>Open</string>
        </property>
       </widget>
      </item>
@@ -185,6 +178,9 @@
            <height>180</height>
           </size>
          </property>
+         <property name="styleSheet">
+          <string>background: white</string>
+         </property>
          <property name="frameShape">
           <enum>QFrame::Panel</enum>
          </property>
@@ -215,7 +211,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButton_2">
+          <widget class="QPushButton" name="selectButton">
            <property name="text">
             <string>Select</string>
            </property>
@@ -256,22 +252,5 @@
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>efpButton</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>openButton</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>36</x>
-     <y>28</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>287</x>
-     <y>29</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

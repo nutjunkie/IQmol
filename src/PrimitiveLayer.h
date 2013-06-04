@@ -50,9 +50,15 @@ namespace Layer {
          virtual void setIndex(int const index) { m_index = index; }
          int  index() const { return m_index; }
          void setScale(double const scale) { m_scale = scale; }
-         void setDrawMode(DrawMode const drawMode) { m_drawMode = drawMode; }
-         bool isInGroup() const { return m_inGroup; }
-         void setInGroup(bool tf) { m_inGroup = tf; }
+         virtual void setDrawMode(DrawMode const drawMode) { m_drawMode = drawMode; }
+         
+         static double distance(Primitive* A, Primitive* B);
+         static double angle(Primitive* A, Primitive* B, Primitive* C);
+         static double torsion(Primitive* A, Primitive* B, Primitive* C, Primitive* D);
+
+
+bool isInGroup() const { return m_inGroup; }
+void setInGroup(bool tf) { m_inGroup = tf; }
 
       protected:
          static int s_resolution;
@@ -64,7 +70,8 @@ namespace Layer {
          QString m_label;
          int m_index;
          double m_scale;
-         bool m_inGroup;
+
+bool m_inGroup;
    };
 
 

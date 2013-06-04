@@ -83,8 +83,6 @@ void Job::copy(Job const& that) {
 
 
 
-
-
 //! Adds the given section to the Job object, deleting any existing section of
 //! the same name
 void Job::addSection(KeywordSection* section) {
@@ -155,6 +153,18 @@ void Job::setCoordinates(QString const& coords) {
 
 void Job::setConstraints(QString const& constraints) {
    addSection("opt", constraints);
+}
+
+
+void Job::setEfpFragments(QString const& efpFragments) {
+   KeywordSection* efp = addSection("efp_fragments", efpFragments);
+   efp->print(!efpFragments.isEmpty());
+}
+
+
+void Job::setEfpParameters(QString const& efpParameters) {
+   KeywordSection* efp = addSection("efp_parameters", efpParameters);
+   efp->print(!efpParameters.isEmpty());
 }
 
 

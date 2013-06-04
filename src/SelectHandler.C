@@ -29,7 +29,7 @@ namespace Handler {
 void Select::mousePressEvent(QMouseEvent* e) 
 {
    m_rectangle = QRect(e->pos(), e->pos());
-   m_viewer->setSelectionMode(Viewer::Add);
+   m_selectionMode = Add;
    e->accept();
 }
 
@@ -53,26 +53,26 @@ void Select::mouseReleaseEvent(QMouseEvent* e)
 
    if (e->button() == Qt::LeftButton) {
       if (click) {
-         m_viewer->setSelectionMode(Viewer::AddClick);
+         m_selectionMode = AddClick;
       }else {
-         m_viewer->setSelectionMode(Viewer::Add);
+         m_selectionMode = Add;
       }
    }else if (e->button() == Qt::RightButton) {
       if (click) {
-         m_viewer->setSelectionMode(Viewer::RemoveClick);
+         m_selectionMode = RemoveClick;
       }else {
-         m_viewer->setSelectionMode(Viewer::Remove);
+         m_selectionMode = Remove;
       }
    }else {
       if (click) {
-         m_viewer->setSelectionMode(Viewer::ToggleClick);
+         m_selectionMode = ToggleClick;
       }else {
-         m_viewer->setSelectionMode(Viewer::Toggle);
+         m_selectionMode = Toggle;
       }
    }
  
    m_viewer->QGLViewer::select(m_rectangle.center());
-   m_viewer->setSelectionMode(Viewer::None);
+   m_selectionMode = None;
    m_rectangle.setSize(QSize(1,1));
    m_viewer->updateGL();
    e->accept();

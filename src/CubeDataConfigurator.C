@@ -49,6 +49,22 @@ void CubeData::on_negativeColorButton_clicked(bool)
 }
 
 
+void CubeData::on_signedButton_clicked(bool)
+{
+   if (m_cubeDataConfigurator.signedButton->checkState() == Qt::Checked) {
+      m_cubeDataConfigurator.negativeLabel->setVisible(true);
+      m_cubeDataConfigurator.positiveLabel->setVisible(true);
+      m_cubeDataConfigurator.negativeColorButton->setVisible(true);
+      m_cubeDataConfigurator.isovalue->setRange(0.001, 99.9999);
+   }else {
+      m_cubeDataConfigurator.negativeLabel->setVisible(false);
+      m_cubeDataConfigurator.positiveLabel->setVisible(false);
+      m_cubeDataConfigurator.negativeColorButton->setVisible(false);
+      m_cubeDataConfigurator.isovalue->setRange(-99.999, 99.9999);
+   }
+}
+
+
 void CubeData::setPositiveColor(QColor const& color)
 {
    if (color.isValid()) {
@@ -83,8 +99,11 @@ void CubeData::on_calculateButton_clicked(bool)
    double isoValue(m_cubeDataConfigurator.isovalue->value());
    QColor positive(Preferences::PositiveSurfaceColor());
    QColor negative(Preferences::NegativeSurfaceColor());
+
    Grid::DataType data(Grid::DataType::CubeData);
-   calculateSurface(new Layer::Surface(data, -1, isoValue, positive, negative)); 
+   Layer::Surface* surface(new Layer::Surface(data, -1, isoValue, positive, negative)); 
+   surface->setCubeIsSigned(m_cubeDataConfigurator.signedButton->checkState() == Qt::Checked);
+   calculateSurface(surface);
 }
 
 } } // end namespace IQmol::Configurator

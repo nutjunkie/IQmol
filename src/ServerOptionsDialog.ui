@@ -21,7 +21,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="exeNameLabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -133,6 +133,34 @@ p, li { white-space: pre-wrap; }
       </widget>
      </item>
      <item>
+      <widget class="QLabel" name="jobLimitLabel">
+       <property name="text">
+        <string>Job Limit</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="jobLimit">
+       <property name="toolTip">
+        <string>Maximum number of concurrent jobs.
+Note this is ignored on PBS servers.</string>
+       </property>
+       <property name="minimum">
+        <number>0</number>
+       </property>
+       <property name="maximum">
+        <number>100</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="clearCookieButton">
+       <property name="text">
+        <string>Clear Cookie</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -164,9 +192,11 @@ p, li { white-space: pre-wrap; }
   <tabstop>exeName</tabstop>
   <tabstop>submitCommand</tabstop>
   <tabstop>queryCommand</tabstop>
+  <tabstop>queueInfo</tabstop>
   <tabstop>killCommand</tabstop>
   <tabstop>runFileTemplate</tabstop>
   <tabstop>updateInterval</tabstop>
+  <tabstop>jobLimit</tabstop>
  </tabstops>
  <resources/>
  <connections>

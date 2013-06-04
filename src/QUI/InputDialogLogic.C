@@ -60,12 +60,14 @@ void InputDialog::initializeQuiLogic() {
          Disable(m_ui.cd_algorithm) 
       )
    );
+
    node->addRule(
-      If(*node == S("RIMP2"),  
+      If(*node == S("RIMP2") || *node == S("SOSMP2") || *node == S("MOSMP2"),
          Enable(m_ui.auxiliary_basis), 
          Disable(m_ui.auxiliary_basis) 
       )
    );
+
    node = &reg.get("ECP");
    node->addRule(
       If(*node != S("None"), 

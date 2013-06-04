@@ -45,13 +45,16 @@ namespace IQmol {
          /// InputString    - the entire input file as a string 
          /// RunFileName    - the name of the PBS submission script
          /// Note that not all these are serialized
-         enum Field { BaseName, InputFileName, OutputFileName, AuxFileName, ErrorFileName,
+         enum Field { BaseName, InputFileName, OutputFileName, AuxFileName, 
+            EspFileName, MoFileName, DensityFileName, ErrorFileName,
             RunFileName, ServerName, LocalWorkingDirectory, RemoteWorkingDirectory, 
-            InputString, Charge, Multiplicity, Coordinates, Constraints, Queue, Walltime,
-            Memory, Jobfs, Ncpus };
+            InputString, Charge, Multiplicity, Coordinates, Constraints, EfpFragments,
+            EfpParameters,
+            Queue, Walltime, Memory, Scratch, Ncpus };
+            
             
          JobInfo() : m_charge(0), m_multiplicity(1), m_localFilesExist(false),
-           m_promptOnOverwrite(true) { }
+           m_promptOnOverwrite(true), m_efpOnlyJob(false) { }
 
          /// Serialization functions that are used to reconstruct the contents of the 
          /// ProcessMonitor on restarting IQmol.  Note that it is assumed that the
@@ -67,6 +70,9 @@ namespace IQmol {
          QStringList outputFiles() const;
          int getCharge() const { return m_charge; }
          int getMultiplicity() const { return m_multiplicity; }
+
+         bool efpOnlyJob() const { return m_efpOnlyJob; }
+         void setEfpOnlyJob(bool const tf) { m_efpOnlyJob = tf; }
 
          bool localFilesExist() const { return m_localFilesExist; }
          void localFilesExist(bool const tf) { m_localFilesExist = tf; }
@@ -85,6 +91,7 @@ namespace IQmol {
          int m_multiplicity;
          bool m_localFilesExist;
          bool m_promptOnOverwrite;
+         bool m_efpOnlyJob;
    };
 
 } // end namespace IQmol

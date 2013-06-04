@@ -37,7 +37,12 @@ namespace OpenBabel {
    class OBGridData;
 }
 
+
 namespace IQmol {
+
+namespace Data {
+   class Grid;
+}
 
    /// A three-dimensional cartesian grid containing scalar data.  Two 
    /// auxiliary classes, DataType and Size, hold information about the 
@@ -136,6 +141,7 @@ namespace IQmol {
       public:  // Grid
          Grid(DataType const& dataType, Size const& size);
          Grid(OpenBabel::OBGridData const& gridData);
+         Grid(Data::Grid const& gridData);
          Grid(Grid const& that);
          ~Grid();
          Grid* upsample() const;

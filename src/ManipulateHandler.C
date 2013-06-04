@@ -28,6 +28,10 @@ namespace Handler {
 
 void Manipulate::mousePressEvent(QMouseEvent* e) 
 {
+   m_viewer->setMouseBinding(Qt::LeftButton, QGLViewer::CAMERA, QGLViewer::ROTATE);
+   m_viewer->setMouseBinding(Qt::RightButton, QGLViewer::CAMERA, QGLViewer::TRANSLATE);
+
+   m_viewer->manipulatedFrame()->setSpinningSensitivity(100.0);
    if (e->button() == Qt::LeftButton) {
       m_viewer->setCursor(Cursors::ClosedHand);
    }else if (e->button() == Qt::RightButton) {

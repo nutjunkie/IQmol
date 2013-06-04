@@ -76,7 +76,7 @@ QToolTip {
     <number>6</number>
    </property>
    <item>
-    <widget class="QToolButton" name="newMolecule">
+    <widget class="QToolButton" name="newMoleculeButton">
      <property name="enabled">
       <bool>true</bool>
      </property>
@@ -105,7 +105,7 @@ QToolTip {
     </widget>
    </item>
    <item>
-    <widget class="QToolButton" name="open">
+    <widget class="QToolButton" name="openButton">
      <property name="toolTip">
       <string>Open File</string>
      </property>
@@ -125,7 +125,7 @@ QToolTip {
     </widget>
    </item>
    <item>
-    <widget class="QToolButton" name="save">
+    <widget class="QToolButton" name="saveButton">
      <property name="toolTip">
       <string>Save</string>
      </property>
@@ -155,7 +155,7 @@ QToolTip {
     </widget>
    </item>
    <item>
-    <widget class="QToolButton" name="manipulateMode">
+    <widget class="QToolButton" name="manipulateButton">
      <property name="toolTip">
       <string>Manipulate Mode</string>
      </property>
@@ -188,7 +188,7 @@ QToolTip {
     </widget>
    </item>
    <item>
-    <widget class="QToolButton" name="buildMode">
+    <widget class="QToolButton" name="buildButton">
      <property name="toolTip">
       <string>Build Mode (Alt)</string>
      </property>
@@ -217,7 +217,7 @@ QToolTip {
     </widget>
    </item>
    <item>
-    <widget class="QToolButton" name="elementSelect">
+    <widget class="QToolButton" name="elementSelectButton">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
        <horstretch>34</horstretch>
@@ -245,6 +245,7 @@ p, li { white-space: pre-wrap; }
      <property name="styleSheet">
       <string notr="true">font-size: 18px;
 
+
 QToolTip {
    border: 2px solid darkkhaki;
    padding: 2px;
@@ -256,10 +257,13 @@ QToolTip {
      <property name="text">
       <string>C</string>
      </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item>
-    <widget class="QToolButton" name="addFragment">
+    <widget class="QToolButton" name="fragmentSelectButton">
      <property name="toolTip">
       <string>Add Fragment</string>
      </property>
@@ -279,10 +283,13 @@ QToolTip {
        <height>24</height>
       </size>
      </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item>
-    <widget class="QToolButton" name="addHydrogens">
+    <widget class="QToolButton" name="addHydrogensButton">
      <property name="font">
       <font>
        <pointsize>-1</pointsize>
@@ -316,7 +323,7 @@ QToolTip {
     </widget>
    </item>
    <item>
-    <widget class="QToolButton" name="minimizeEnergy">
+    <widget class="QToolButton" name="minimizeEnergyButton">
      <property name="toolTip">
       <string>Minimize Energy</string>
      </property>
@@ -346,7 +353,7 @@ QToolTip {
     </widget>
    </item>
    <item>
-    <widget class="QToolButton" name="selectMode">
+    <widget class="QToolButton" name="selectButton">
      <property name="toolTip">
       <string>Select Mode (Shift)</string>
      </property>
@@ -372,7 +379,7 @@ QToolTip {
     </widget>
    </item>
    <item>
-    <widget class="QToolButton" name="deleteSelection">
+    <widget class="QToolButton" name="deleteSelectionButton">
      <property name="toolTip">
       <string>Delete Selection</string>
      </property>
@@ -402,7 +409,7 @@ QToolTip {
     </widget>
    </item>
    <item>
-    <widget class="QToolButton" name="takeSnapshot">
+    <widget class="QToolButton" name="takeSnapshotButton">
      <property name="toolTip">
       <string>Save picture</string>
      </property>
@@ -425,7 +432,7 @@ QToolTip {
     </widget>
    </item>
    <item>
-    <widget class="QToolButton" name="recordAnimation">
+    <widget class="QToolButton" name="recordButton">
      <property name="toolTip">
       <string>Record animation</string>
      </property>
@@ -451,7 +458,7 @@ QToolTip {
     </widget>
    </item>
    <item>
-    <widget class="QToolButton" name="fullScreen">
+    <widget class="QToolButton" name="fullScreenButton">
      <property name="toolTip">
       <string>Full Screen Mode</string>
      </property>
@@ -481,7 +488,7 @@ QToolTip {
     </widget>
    </item>
    <item>
-    <widget class="QToolButton" name="showHelp">
+    <widget class="QToolButton" name="showHelpButton">
      <property name="toolTip">
       <string>Show Help</string>
      </property>

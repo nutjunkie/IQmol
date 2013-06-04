@@ -784,6 +784,12 @@ void MolecularOrbitals::calculateSurface(Surface* surface)
       surface->setSurfaceData(mc.generateSurface(isovalue));
    }
 
+   // Get the frame from the parent molecule incase it has been reoriented.
+   MoleculeList parents(findLayers<Layer::Molecule>(Layer::Parents));
+   if (!parents.isEmpty()) {
+      surface->setFrame(parents.first()->getReferenceFrame());
+   }
+
    double t = time.elapsed() / 1000.0;
    QLOG_INFO() << "Time to compute" << dataType.info() << "surface at level" 
             << surface->quality() << ":" << t << "seconds";

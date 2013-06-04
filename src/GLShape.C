@@ -22,6 +22,7 @@
 
 #include "QGLViewer/qglviewer.h"
 #include "GLShape.h"
+#include <cmath>
 
 
 using namespace qglviewer;
@@ -31,6 +32,127 @@ namespace GLShape {
 
 double const TwoPi = 2.0*M_PI;
 
+GLUquadric* Base::s_quadric = 0;
+GLfloat Base::s_thresh = 0.000001;
+
+Base::Base(QColor const& color) : m_red(-1), m_green(-1), m_blue(-1)
+{
+   if (color.isValid()) {
+      m_red   = color.red();
+      m_green = color.green();
+      m_blue  = color.blue();
+   }
+
+   if (s_quadric == 0) s_quadric = gluNewQuadric();
+}
+
+
+bool Base::isoChromic(Base const& rhs) 
+{
+   return m_red == rhs.m_red  &&  m_green == rhs.m_green  &&  m_blue == rhs.m_blue;
+}
+
+
+GLfloat Base::LengthScale(GLint const resolution)
+{
+   return pow(2.0f, -0.5f*resolution);
+}
+
+
+// ---------- Sphere -----------
+
+GLSphere::GLSphere(GLfloat const radius, int const resolution, QColor const& color) :
+   Base(color), m_radius(radius) 
+{ 
+   m_segments = ceil(M_PI*m_radius / LengthScale(resolution));
+}
+
+
+bool GLSphere::operator==(GLSphere const& rhs)
+{
+   return ( (m_radius-rhs.m_radius) < s_thresh && 
+            (m_segments == rhs.m_segments)    &&
+            isoChromic(rhs));
+}
+
+
+void GLSphere::draw()
+{
+   if (m_red >= 0) glColor3i(m_red, m_blue, m_green);
+   gluQuadricOrientation(s_quadric, GLU_OUTSIDE);
+   gluSphere(s_quadric, m_radius, 2*m_segments, m_segments);
+}
+
+
+
+// ---------- Torus -----------
+
+GLTorus::GLTorus(GLfloat const majorRadius, GLfloat const minorRadius, int const resolution,
+   GLfloat const angle, QColor const& color) : Base(color), m_majorRadius(majorRadius),
+   m_minorRadius(minorRadius), m_angle(angle)
+{
+   GLfloat d(LengthScale(resolution));
+   m_majorSegments = ceil(fabs(m_angle)*(m_majorRadius+m_minorRadius)/d);
+   m_minorSegments = ceil(TwoPi*m_minorRadius/d);
+}
+
+
+bool GLTorus::operator==(GLTorus const& rhs)
+{
+   return ( (m_majorRadius-rhs.m_majorRadius) < s_thresh && 
+            (m_minorRadius-rhs.m_minorRadius) < s_thresh && 
+            (m_angle      -rhs.m_angle      ) < s_thresh && 
+            (m_majorSegments == rhs.m_majorSegments)     &&
+            (m_minorSegments == rhs.m_minorSegments)     &&
+            isoChromic(rhs));
+}
+
+
+void GLTorus::draw()
+{
+   GLfloat R(m_majorRadius);
+   GLfloat r(m_minorRadius);
+   GLfloat dA(m_angle/m_majorSegments);
+   GLfloat da(TwoPi/m_minorSegments);
+   GLfloat cosTheta[2], sinTheta[2], cosPhi, sinPhi;
+   Vec v, n;
+   
+   for (int i = 0; i < m_majorSegments; ++i) {
+       cosTheta[0] = cos( i   *dA);
+       cosTheta[1] = cos((i+1)*dA);
+       sinTheta[0] = sin( i   *dA);
+       sinTheta[1] = sin((i+1)*dA);
+
+       glBegin(GL_QUAD_STRIP);
+       for (int j = 0; j <= m_minorSegments; ++j) {
+           cosPhi = cos(j*da);
+           sinPhi = sin(j*da);
+
+           for (int k = 0; k <= 1; ++k) {
+               v.x = (R+r*cosPhi) * cosTheta[k];
+               v.y = (R+r*cosPhi) * sinTheta[k];
+               v.z = r*sinPhi;
+
+               n.x = R*cosTheta[k];
+               n.y = R*sinTheta[k];
+               n.z = 0;
+               n = (v-n).unit();
+
+               glNormal3f(n.x, n.y, n.z); 
+               glVertex3f(v.x, v.y, v.z);
+           }
+       }
+       glEnd();
+   }     
+}
+
+
+
+
+////-------------------------------------------------------
+////-------------------------------------------------------
+////-------------------------------------------------------
+////-------------------------------------------------------
 void Torus(double const majorRadius, double const minorRadius, double const resolution, 
    double const angle)
 {

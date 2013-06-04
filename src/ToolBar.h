@@ -25,8 +25,7 @@
 #include "ui_ToolBar.h"
 #include "PeriodicTable.h"
 #include "FragmentTable.h"
-#include "HelpBrowser.h"
-#include "IQmol.h"
+#include "Viewer.h"
 #include <QTimer>
 
 
@@ -45,44 +44,52 @@ namespace IQmol {
 
       public Q_SLOTS:
 		 /// This is used to update the appearance of the ToolBar
-		 /// programatically.  It does not relay any signals.
-         void setActiveViewerMode(ViewerMode const);
+		 /// programatically and does not emit any signals.
+         void setToolBarMode(Viewer::Mode const);
 
       Q_SIGNALS:
          void newMolecule();
          void open();
          void save();
-         void changeActiveViewerMode(ViewerMode const);
-         void buildElementChanged(unsigned int atomicNumber);
          void addHydrogens();
-         void addFragment();
          void minimizeEnergy();
          void deleteSelection();
          void takeSnapshot();
-         void recordingActive(bool);
+         void record(bool const);
          void fullScreen();
          void showHelp();
+
+		 // This signal is only emitted when the change in the Viewer::Mode
+		 // originates from the tool bar.
+         void viewerModeChanged(Viewer::Mode const);
+
+         void buildElementSelected(unsigned int const atomicNumber);
+
+         // The Viewer::Modes passed in this signal should only be build-related
+         void buildFragmentSelected(QString const& fileName, Viewer::Mode const);
 
       public Q_SLOTS:
          void setRecordAnimationButtonChecked(bool);
 
       private Q_SLOTS:
-         void on_newMolecule_clicked(bool)        { newMolecule(); }
-         void on_open_clicked(bool)               { open(); }
-         void on_save_clicked(bool)               { save(); }
-         void on_manipulateMode_clicked(bool);
-         void on_buildMode_clicked(bool);
-         void on_elementSelect_clicked(bool);
-         void on_addHydrogens_clicked(bool)       { addHydrogens(); }
-         void on_addFragment_clicked(bool);
-         void on_minimizeEnergy_clicked(bool)     { minimizeEnergy(); }
-         void on_selectMode_clicked(bool);
-         void on_deleteSelection_clicked(bool)    { deleteSelection(); }
-         void on_takeSnapshot_clicked(bool)       { takeSnapshot(); }
-         void on_recordAnimation_clicked(bool tf) { recordingActive(tf); }
-         void on_fullScreen_clicked(bool)         { fullScreen(); }
-         void on_showHelp_clicked(bool)           { showHelp(); }
-         void updateBuildElementButton(QString);
+         void on_newMoleculeButton_clicked(bool)      { newMolecule(); }
+         void on_openButton_clicked(bool)             { open(); }
+         void on_saveButton_clicked(bool)             { save(); }
+         void on_manipulateButton_clicked(bool);
+         void on_buildButton_clicked(bool);
+         void on_elementSelectButton_clicked(bool);
+         void on_fragmentSelectButton_clicked(bool);
+         void on_addHydrogensButton_clicked(bool)     { addHydrogens(); }
+         void on_minimizeEnergyButton_clicked(bool)   { minimizeEnergy(); }
+         void on_selectButton_clicked(bool);
+         void on_deleteSelectionButton_clicked(bool)  { deleteSelection(); }
+         void on_takeSnapshotButton_clicked(bool)     { takeSnapshot(); }
+         void on_recordButton_clicked(bool tf)        { record(tf); }
+         void on_fullScreenButton_clicked(bool)       { fullScreen(); }
+         void on_showHelpButton_clicked(bool)         { showHelp(); }
+
+         void updateBuildElement(QString const&);
+         void updateBuildFragment(QString const&, Viewer::Mode const);
          void toggleRecordButton();
 
       private:
@@ -92,6 +99,8 @@ namespace IQmol {
          PeriodicTable m_periodicTable;
          FragmentTable m_fragmentTable;
          QTimer m_recordTimer;
+         // We use this to keep track of the last build mode used
+         Viewer::Mode m_buildMode;
    };
 
 } // end namespace IQmol

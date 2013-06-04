@@ -152,7 +152,10 @@ void Mesh::drawPolar(double const stepSize, int const nSteps)
    }
    glEnd();
    glPopMatrix();
-} void Mesh::drawRadialLines(double const inner, double outer) 
+} 
+
+
+void Mesh::drawRadialLines(double const inner, double outer) 
 { 
    int   n(8);
    double theta(2.0f*M_PI / n);

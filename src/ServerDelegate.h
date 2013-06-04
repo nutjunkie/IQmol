@@ -25,6 +25,7 @@
 #include "Server.h"
 #include "LocalHost.h"
 #include "RemoteHost.h"
+#include "WebHost.h"
 #include "ServerTask.h"
 #include "Process.h"
 #include <QObject>
@@ -57,6 +58,9 @@ namespace IQmol {
                case Server::Remote:
                   m_hostDelegate = new RemoteHost(m_server);
                   break;
+               case Server::Web:
+                  m_hostDelegate = new WebHost(m_server);
+                  break;
             }
          }
 
@@ -86,32 +90,56 @@ namespace IQmol {
          virtual bool configureJob(Process*) = 0;
          virtual QVariantMap delegateDefaults() const = 0;
 
+/*
+         QVariantMap delegateSettings() const {
+            return m_delegateSettings; 
+         }
+
+         void delegateSettings(QVariantMap const& settings) {
+            m_delegateSettings = settings; 
+         }
+
+         QVariant delegateSetting(QString const& key) const {
+            return m_delegateSettings.value(key);
+         }
+
+         void delegateSetting(QString const& key, QVariant const& value) {
+            m_delegateSettings.insert(key, value);
+         }
+*/
+
          virtual ServerTask::Base* testConfiguration() = 0;
          virtual ServerTask::Base* submit(Process*) = 0;
-         virtual ServerTask::Base* kill(Process*) = 0;
-         virtual ServerTask::Base* query(Process*) = 0;
-         virtual ServerTask::Base* cleanUp(Process*) = 0;
-         virtual ServerTask::CopyResults* copyResults(Process*) = 0;
+
+         virtual ServerTask::Base* kill(Process* process) {
+            return new ServerTask::KillProcess(m_server, process);
+         }
+
+         virtual ServerTask::Base* query(Process* process) {
+            return new ServerTask::Query(m_server, process);
+         }
+
+         virtual ServerTask::Base* cleanUp(Process* process) {
+            return new ServerTask::CleanUp(m_server, process);
+         }
+
+         virtual ServerTask::CopyResults* copyResults(Process* process) {
+            return new ServerTask::CopyResults(m_server, process);
+         }
 
          virtual ServerTask::Base* setup(Process* process) {
             return new ServerTask::Setup(m_server, process);
          }
 
-		 // Convenience function that returns a threaded no-op with optional
-		 // message.
-         ServerTask::Base* doNothing(QString const& msg = QString()) 
-         {
-            ServerTask::Base* task(new ServerTask::Base(m_server));
-            task->setOutputMessage(msg);
-            return task;
-         }
 
       Q_SIGNALS:
          void delegateDefaultsUpdated();
 
+
       protected:
          Server* m_server;
          HostDelegate* m_hostDelegate;
+//         QVariantMap m_delegateSettings;
    };
 
 

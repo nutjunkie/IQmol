@@ -22,6 +22,8 @@
 
 #include "ServerTask.h"
 #include "PBSServer.h"
+#include "SGEServer.h"
+#include "HttpServer.h"
 #include "JobInfo.h"
 #include "QsLog.h"
 #include "System.h"
@@ -32,6 +34,7 @@
 
 #include <QDebug>
 
+#include "SecureConnectionException.h"
 
 namespace IQmol {
 namespace ServerTask {
@@ -178,8 +181,7 @@ QString Base::writeToTemporaryFile(QString const& contents)
 
 // --------------------------------
 
-
-void TestConfiguration::run()
+bool TestConfiguration::testFiles()
 {
    QString file;
    HostDelegate::FileFlags flags;
@@ -187,8 +189,8 @@ void TestConfiguration::run()
    for (int i = 0; i < m_filesForTesting.size(); ++i) {
        file  = m_filesForTesting[i];
        flags = m_fileFlags[i];
-       QLOG_DEBUG() << "TestConfiguration::run() checking file" << file << "with flags" << flags;
-
+       QLOG_DEBUG() << "TestConfiguration::testFiles() checking " << file 
+                    << "with flags" << flags;
        if (m_terminate) {
           m_errorMessage += "Terminated";
           break;
@@ -203,24 +205,81 @@ void TestConfiguration::run()
           }
        }
    }
+   return m_errorMessage.isEmpty();
+}
 
-   PBSServer* server = qobject_cast<PBSServer*>(m_serverDelegate);
-   if (server) {
-      QLOG_DEBUG() << "Obtaining queues from PBS server";
 
-      QString cmd(m_server->queueInfo());
-      cmd = exec(cmd);
+void TestPBSConfiguration::run()
+{
+   if (!testFiles()) return;
 
-      if (cmd.contains("Command not found")) {
-         m_errorMessage  = "Could not find qstat command on PBS server ";
-         m_errorMessage += m_server->name();
-      }else  {
-         QueueList queues(PBSQueue::fromQstat(cmd));
-         server->setQueues(queues);
-         QLOG_DEBUG() << "PBSQueue::fromQstat found" << queues.size() << "queues";
+   PBSServer* delegate = qobject_cast<PBSServer*>(m_serverDelegate);
+   if (!delegate) return;
+
+   QLOG_DEBUG() << "Obtaining queues from PBS server";
+
+   QString cmd(m_server->queueInfo());
+   QString output(exec(cmd));
+
+   if (output.contains("command not found", Qt::CaseInsensitive)) {
+      QStringList tokens(cmd.split(QRegExp("\\n"), QString::SkipEmptyParts));
+      if (tokens.isEmpty()) {
+         m_errorMessage  = "${QUEUE_INFO} command not set for server ";
+      }else {
+         m_errorMessage  = "Could not find " + tokens.first() +  " command on server ";
       }
+      m_errorMessage += m_server->name();
+   }else  {
+      int n(delegate->setQueuesFromQueueInfo(output));
+      QLOG_DEBUG() << n << " queues found on SGE server" << m_server->name();
    }
 }
+
+
+void TestSGEConfiguration::run()
+{
+   if (!testFiles()) return;
+
+   SGEServer* delegate = qobject_cast<SGEServer*>(m_serverDelegate);
+   if (!delegate) return;
+
+   QLOG_DEBUG() << "Obtaining queues from SGE server";
+
+   QString cmd(m_server->queueInfo());
+   QString output(exec(cmd));
+
+   if (output.contains("command not found", Qt::CaseInsensitive)) {
+      QStringList tokens(cmd.split(QRegExp("\\n"), QString::SkipEmptyParts));
+      if (tokens.isEmpty()) {
+         m_errorMessage  = "${QUEUE_INFO} command not set for server ";
+      }else {
+         m_errorMessage  = "Could not find " + tokens.first() +  " command on server ";
+      }
+      m_errorMessage += m_server->name();
+   }else  {
+      int n(delegate->setQueuesFromQueueInfo(output));
+      QLOG_DEBUG() << n << " queues found on SGE server" << m_server->name();
+   }
+}
+
+
+void TestHttpConfiguration::run()
+{
+   HttpServer* server = qobject_cast<HttpServer*>(m_serverDelegate);
+   if (!server) {
+      m_errorMessage = "Invalid ServerDelegate in TestHttpServer task";
+      return;
+   }
+
+   QString cmd(m_server->queueInfo());
+   cmd = m_server->replaceMacros(cmd);
+
+   QString limits(exec(cmd));
+   qDebug() << "WebServer returned limits:";
+   qDebug() << limits;
+   server->parseLimits(limits);
+}
+
 
 
 // --------------------------------
@@ -268,6 +327,46 @@ void Setup::run()
       
    QFile tmp(tmpFilePath);
    tmp.remove();
+}
+
+
+void SetupHttp::run()
+{
+   JobInfo* jobInfo(m_process->jobInfo());
+   QString contents(jobInfo->get(JobInfo::InputString));
+   // WebHosts deal with push commands a bit differently, the file contents are
+   // passed rather than the file name, which is determined by the server and
+   // returned in the output.
+
+   Threaded* thread = m_hostDelegate->push(contents, QString());    
+   runThread(thread);
+
+   m_errorMessage  = thread->errorMessage();
+   m_outputMessage = thread->outputMessage();
+
+   thread->deleteLater();
+
+   if (m_outputMessage.contains("jobID=")) {
+      m_outputMessage = m_outputMessage.remove("jobID=");
+      bool ok;
+      m_outputMessage.toInt(&ok);
+      if (ok) {
+         qDebug() << "Job setup returned with jobID =" << m_outputMessage;
+         m_process->setId(m_outputMessage);
+      }else {
+         m_errorMessage = "Invalid jobID";
+      }
+   }
+
+   if (m_outputMessage.contains("ERROR:")) {
+      m_errorMessage = m_outputMessage;
+      m_outputMessage.clear();
+   }
+
+   if (!m_errorMessage.isEmpty()) {
+      QLOG_DEBUG() << "ServerTask error:" << m_errorMessage;
+      m_errorMessage = "Failed to copy input to server:";
+   }
 }
 
 
@@ -321,8 +420,11 @@ void BasicSubmit::run()
       case Server::Remote:
          runRemote();
          break;
+      case Server::Web:
+         // shouldn't get here
+         qDebug() << "ERROR: Server::Web encountered in BasicSubmit";
+         break;
    }
-
 }
 
 
@@ -333,7 +435,6 @@ void BasicSubmit::runRemote()
    QString exeName(m_server->executableName());
    QString query(m_server->queryCommand());
    query = m_server->replaceMacros(query, m_process);
-
 
    QString submitCommand("cd " + dir + " && ");
    submitCommand += m_server->replaceMacros(m_server->submitCommand(), m_process);  
@@ -403,7 +504,6 @@ void BasicSubmit::runLocal()
                 << "  with arguments " << args;
 
    jobInfo->localFilesExist(true);
-   m_process->setQProcess(qprocess);
    m_process->setStatus(Process::Running);
    qprocess->start(submitCommand, args);
 
@@ -447,14 +547,57 @@ void PBSSubmit::run()
 
    QString output(exec(submitCommand));
 
-   if (output.isEmpty()) {
-      m_errorMessage = "Failed to submit job to PBS server";
-   }else {
+   // A successful submission returns a single token containing the job ID
+   QStringList tokens(output.split(QRegExp("\\s+"), QString::SkipEmptyParts));
+   if (tokens.size() == 1) {
       m_process->setId(output);
       m_process->setStatus(Process::Queued);
       m_server->addToWatchList(m_process);
       QLOG_DEBUG() << "PBS job submitted with id" << m_process->id();
+   }else {
+      m_errorMessage = "Failed to submit job to PBS server:\n" +  output;
    }
+}
+
+// --------------------------------
+
+void SGESubmit::run()
+{
+   if (!createSubmissionScript(m_process)) return;
+
+   QString dir(m_process->jobInfo()->get(JobInfo::RemoteWorkingDirectory));
+   QString script(m_process->jobInfo()->get(JobInfo::RunFileName));
+
+   QString submitCommand("cd " + dir + " && ");
+   submitCommand += m_server->replaceMacros(m_server->submitCommand(), m_process);  
+
+   QString output(exec(submitCommand));
+
+   // A successful submission returns a string like:
+   //   Your job 2834 ("test.sh") has been submitted
+   int id(0);
+   if (output.contains("has been submitted")) {
+      QStringList tokens(output.split(QRegExp("\\s+"), QString::SkipEmptyParts));
+      bool ok;
+      id = tokens[2].toInt(&ok);
+      if (ok) {
+         m_process->setId(output);
+         m_process->setStatus(Process::Queued);
+         m_server->addToWatchList(m_process);
+         QLOG_DEBUG() << "SGE job submitted with id" << m_process->id();
+      }else {
+         id = 0;
+      }
+   }
+
+   if (id == 0) {
+      m_errorMessage = "Failed to submit job to SGE server:\n" + output;
+   }
+}
+
+
+void HttpSubmit::run()
+{
 }
 
 // --------------------------------
@@ -463,11 +606,8 @@ void Query::run()
 {
    QString query(m_server->queryCommand());
    query = m_server->replaceMacros(query, m_process);
-qDebug() << "Query command" << query;
    m_outputMessage = exec(query);
-qDebug() << "Query return" << m_outputMessage;
    m_status = m_serverDelegate->parseQueryString(m_outputMessage, m_process);
-qDebug() << "Status set to" << m_status;
 }
 
 
@@ -480,9 +620,28 @@ void CleanUp::run()
    QFileInfo errFile(dir, jobInfo->get(JobInfo::ErrorFileName));
    QFileInfo outFile(dir, jobInfo->get(JobInfo::OutputFileName));
 
-   // Rename the checkpoint file, if required
+   // Rename the auxiliary output files
    QFileInfo oldFile(dir, "Test.FChk");
    QFileInfo newFile(dir, jobInfo->get(JobInfo::AuxFileName));
+   move(oldFile.filePath(), newFile.filePath());
+
+   {//  New fchk file name
+      QString fileName(jobInfo->get(JobInfo::InputFileName));
+      fileName += ".fchk";
+      oldFile.setFile(dir, fileName);
+      move(oldFile.filePath(), newFile.filePath());
+   }
+
+   oldFile.setFile(dir, "plot.esp");
+   newFile.setFile(dir, jobInfo->get(JobInfo::EspFileName));
+   move(oldFile.filePath(), newFile.filePath());
+
+   oldFile.setFile(dir, "plot.mo");
+   newFile.setFile(dir, jobInfo->get(JobInfo::MoFileName));
+   move(oldFile.filePath(), newFile.filePath());
+
+   oldFile.setFile(dir, "plot.hf");
+   newFile.setFile(dir, jobInfo->get(JobInfo::DensityFileName));
    move(oldFile.filePath(), newFile.filePath());
 
    // Get an updated time, first we check for PBS output
@@ -490,7 +649,7 @@ void CleanUp::run()
    if (!pbs.isEmpty()) {
       QStringList tokens(pbs.split(QRegExp("\\s+"), QString::SkipEmptyParts));
       m_time = Timer::toSeconds(tokens.last());
-qDebug() << "Time updated from PBS file" << m_time;
+      qDebug() << "Time updated from PBS file" << m_time;
    }
 
    // If nothing found, we tally the times in the output file
@@ -498,7 +657,7 @@ qDebug() << "Time updated from PBS file" << m_time;
       QString times(grep("Total job time:", outFile.filePath()));
       QStringList lines(times.split(QRegExp("\\n")));
       QStringList::iterator iter;
-qDebug() << "Time updated from output file";
+      qDebug() << "Time updated from output file";
       for (iter = lines.begin(); iter != lines.end(); ++iter) {
           QStringList tokens((*iter).split(QRegExp("\\s+"), QString::SkipEmptyParts));
           tokens = tokens.filter("(wall)");
@@ -506,26 +665,28 @@ qDebug() << "Time updated from output file";
              bool ok;
              double s(tokens.first().remove("s(wall),").toDouble(&ok));
              if (ok) m_time += (int)s;
-qDebug() << "  time += " << s;
+             qDebug() << "  time += " << s;
           }
       }
    }
 
-   // Check for PBS errors in the error file
-   m_runTimeError = grep("terminated", errFile.filePath());
-
-   // If none, check for any errors reported in the output
+   // Check for any errors reported in the output
    Threaded* thread = m_hostDelegate->checkOutputForErrors(outFile.filePath());
    runThread(thread);
    m_runTimeError = thread->outputMessage();
    thread->deleteLater();
+
+   // If none, check for PBS errors in the error file
+   if (m_runTimeError.isEmpty()) {
+      m_runTimeError = grep("terminate", errFile.filePath());
+      if (m_runTimeError.isEmpty()) m_runTimeError = grep("what()", errFile.filePath());
+   }
       
    // Finally check to see that at least one job has completed
    if (m_runTimeError.isEmpty()) {
       QString happyDays(grep("Have a nice day.", outFile.filePath()));
       if (happyDays.isEmpty()) m_runTimeError = "Job failed to finish";
    }
-
 }
 
 
@@ -565,6 +726,9 @@ void CopyResults::run()
    fileList.append(jobInfo->get(JobInfo::OutputFileName));
    fileList.append(jobInfo->get(JobInfo::AuxFileName));
    fileList.append(jobInfo->get(JobInfo::ErrorFileName));
+   fileList.append(jobInfo->get(JobInfo::EspFileName));
+   fileList.append(jobInfo->get(JobInfo::MoFileName));
+   fileList.append(jobInfo->get(JobInfo::DensityFileName));
 
    // First check the files exist and, if so, their sizes
    QStringList::iterator iter;

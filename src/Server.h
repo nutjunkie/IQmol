@@ -55,10 +55,11 @@ namespace IQmol {
       friend class ServerTask::Base;
 
       friend class BasicServer;
+      friend class HttpServer;
 
       public:
-         enum Type { Basic = 0, PBS, Custom };
-         enum Host { Local = 0, Remote };
+         enum Type { Basic = 0, PBS, SGE, HTTP};
+         enum Host { Local = 0, Remote, Web };
          enum Authentication { None = 0, Agent, PublicKey, HostBased, KeyboardInteractive,
            Vault, Prompt   };
            
@@ -81,7 +82,7 @@ namespace IQmol {
 		 /// Takes the input string and substitutes the macros with appropriate
 		 /// values based on the given process.  Note this should be the only
 		 /// place that the macro substitution occurs.
-         QString replaceMacros(QString const& input, Process*);
+         QString replaceMacros(QString const& input, Process* = 0);
 
          void startTimer();
 
@@ -101,6 +102,8 @@ namespace IQmol {
 
          int  jobLimit() const;
          void setJobLimit(int const);
+         QString cookie() const { return m_cookie; }
+         void setCookie(QString const& cookie);
 
          QString name()                  const { return m_name; }
          Host host()                     const { return m_host; }
@@ -119,7 +122,9 @@ namespace IQmol {
          QString queueInfo()             const { return m_queueInfo; }
          QString killCommand()           const { return m_killCommand; }
          QString runFileTemplate()       const { return m_runFileTemplate; }
-         int updateInterval()            const { return m_updateInterval; }
+
+         int updateInterval() const;
+         void setUpdateInterval(int const seconds);
 
 		 /// This function can be used to add a recreated process to the
 		 /// servers's watch list rather than submitting it.  This is useful 
@@ -198,8 +203,9 @@ namespace IQmol {
          QString m_queueInfo;
          QString m_killCommand;
          QString m_runFileTemplate;
-         int m_updateInterval;
          QVariantMap m_delegateDefaults;
+         
+         QString m_cookie;
 
 
       private Q_SLOTS:
@@ -212,12 +218,12 @@ namespace IQmol {
          static QString toString(Host const&);
          static QString toString(Authentication const&);
 
-         void setUpdateInterval(int const seconds);
          void setLocalDefaults();
          void setRemoteDefaults();
+         void setWebDefaults();
          void setBasicDefaults(Host const);
          void setPBSDefaults(Host const);
-         void setCustomDefaults(Host const);
+         void setSGEDefaults(Host const);
          
          QTimer m_updateTimer;  // Triggers update for active processes.
          bool m_testedAndValid;

@@ -45,8 +45,9 @@ namespace Layer {
             qglviewer::Vec(0.0, 0.0, 0.0));
          ~Charge() { }
 
-         void draw(qglviewer::Vec const& cameraPosition = qglviewer::Vec(0.0, 0.0, 0.0));
-         void drawSelected(qglviewer::Vec const& cameraPosition = qglviewer::Vec(0.0, 0.0, 0.0));
+         void draw();
+         void drawFast() { }
+         void drawSelected();
          void drawLabel(QGLViewer& viewer, QFontMetrics& fontMetrics);
          void setCharge(double const charge);
 

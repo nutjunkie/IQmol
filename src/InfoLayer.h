@@ -42,7 +42,7 @@ namespace Layer {
       friend class Configurator::Info;
 
       public:
-         enum EnergyUnit { Hartree, KJmol };
+         enum EnergyUnit { Hartree, KJMol, KCalMol };
          explicit Info(Molecule* molecule = 0);
 
          void setMolecule(Molecule*);
@@ -71,6 +71,7 @@ namespace Layer {
          void updated(); 
 
       protected:
+         void detectSymmetry();
          double dipole() const { return m_dipole.value(); }
          int m_charge;
          double m_energy;

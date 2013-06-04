@@ -108,10 +108,6 @@ namespace Layer {
    };
 
 
-} // end namespace Layer
-
-} // end namespace IQmol
-
-
+} } // end namespace IQmol::Layer
 
 #endif

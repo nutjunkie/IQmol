@@ -40,7 +40,6 @@ namespace ServerTask {
 
       public:
          Base(Server* server, int timeout = 5000);
-         void setOutputMessage(QString const& msg) { m_outputMessage = msg; }
 
       Q_SIGNALS:
          void terminateRequested();
@@ -81,6 +80,15 @@ namespace ServerTask {
 
    // --------------------------------
 
+   class DoNothing : public Base {
+      public:
+         DoNothing(Server* server, QString const& msg = QString()) : Base(server) {
+            m_outputMessage = msg;
+      }
+   };
+
+   // --------------------------------
+
    class TestConfiguration : public Base {
       Q_OBJECT
       public:
@@ -90,10 +98,41 @@ namespace ServerTask {
             m_fileFlags.append(flags);
          }
       protected:
-         void run();
+         virtual void run() { testFiles(); }
+         bool testFiles();
       private:
          QStringList m_filesForTesting;
          QList<HostDelegate::FileFlags> m_fileFlags;
+   };
+
+
+
+   class TestPBSConfiguration : public TestConfiguration {
+      Q_OBJECT
+      public:
+         TestPBSConfiguration(Server* server) : TestConfiguration(server) { }
+      protected:
+         virtual void run();
+   };
+
+
+
+   class TestSGEConfiguration : public TestConfiguration {
+      Q_OBJECT
+      public:
+         TestSGEConfiguration(Server* server) : TestConfiguration(server) { }
+      protected:
+         virtual void run();
+   };
+
+
+
+   class TestHttpConfiguration : public Base {
+      Q_OBJECT
+      public:
+         TestHttpConfiguration(Server* server) : Base(server) { }
+      protected:
+         void run();
    };
 
    // --------------------------------
@@ -116,6 +155,16 @@ namespace ServerTask {
       protected:
          void run();
    };
+
+
+   class SetupHttp : public ProcessTask {
+      Q_OBJECT
+      public:
+         SetupHttp(Server* server, Process* process) : ProcessTask(server, process) { }
+      protected:
+         void run();
+   };
+
 
    // --------------------------------
 
@@ -150,6 +199,29 @@ namespace ServerTask {
       protected:
          void run();
    };
+
+   // --------------------------------
+
+   class SGESubmit : public Submit {
+      Q_OBJECT
+      public:
+         SGESubmit(Server* server, Process* process) : Submit(server, process) { }
+      protected:
+         void run();
+   };
+
+
+   // --------------------------------
+
+   class HttpSubmit : public Submit {
+      Q_OBJECT
+      public:
+         HttpSubmit(Server* server, Process* process) : Submit(server, process) { }
+      protected:
+         void run();
+   };
+
+
 
    // --------------------------------
 

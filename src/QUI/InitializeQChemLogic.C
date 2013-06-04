@@ -45,11 +45,22 @@ void InitializeQChemLogic() {
 
 
   node = &reg.get("CORRELATION");
-   node->addRule(
-      If(isPostHF, 
-         reg.get("EXCHANGE").shouldBe("HF"))
+  node->addRule(
+     If(isPostHF, 
+        reg.get("EXCHANGE").shouldBe("HF"))
    );
 
+  node = &reg.get("JOB_TYPE");
+  node->addRule(
+     If(requiresDerivatives, 
+        reg.get("THRESH").shouldBe("12"),
+        reg.get("THRESH").shouldBe("8"))
+  );
+  node->addRule(
+     If(requiresDerivatives, 
+        reg.get("SCF_CONVERGENCE").shouldBe("8"),
+        reg.get("SCF_CONVERGENCE").shouldBe("5"))
+  );
 
 }
 

@@ -61,8 +61,14 @@ void CubeData::calculateSurface(Surface* surface)
 
    MarchingCubes mc(m_grid);
    GLfloat isovalue(surface->isovalue());
-   surface->setSurfaceData(mc.generateSurface( isovalue), Surface::Positive);
-   surface->setSurfaceData(mc.generateSurface(-isovalue), Surface::Negative);
+
+   if ( surface->cubeIsSigned() ) {
+      surface->setSurfaceData(mc.generateSurface( isovalue), Surface::Positive);
+      surface->setSurfaceData(mc.generateSurface(-isovalue), Surface::Negative);
+   }else {
+      surface->setSurfaceData(mc.generateSurface(isovalue));
+   }
+
    surface->setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable |
       Qt::ItemIsEnabled | Qt::ItemIsEditable);
    if (m_molecule) connect(surface, SIGNAL(updated()), m_molecule, SIGNAL(softUpdate()));

@@ -12,10 +12,7 @@
 #include "OptionDatabase.h"
 #include <QtDebug>
 #include <QMessageBox>
-
-
 #include <math.h>
-
 
 
 namespace Qui {
@@ -50,6 +47,7 @@ void RemSection::addAdHoc(QString const& rem, QString const& quiValue,
 
 //! Sets the neccessary default values required for a job to run successfully.
 void RemSection::init() {
+qDebug()  << "Printing basis again";
    m_options.clear();
    m_toPrint.clear();
 
@@ -65,6 +63,10 @@ void RemSection::init() {
 
    m_options["GUI"] = "1";
    m_toPrint.insert("GUI");
+
+   m_options["DMA"] = "1";
+   m_toPrint.insert("DMA");
+
 
    // These are necessary for obsure reasons.  Essentially this is a hack for
    // when we want to combine several controls into the one rem.  Only one of

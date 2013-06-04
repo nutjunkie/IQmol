@@ -61,6 +61,7 @@ QString GenericSection::rawData() {
 
 void GenericSection::read(QString const& data) {
     m_data = data.trimmed();
+    if (m_data.isEmpty()) m_print = false;
 }
 
 

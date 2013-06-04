@@ -34,8 +34,8 @@ class Viewer;
 
 namespace Handler {
 
-   /// Base class for interpreting input events from a QGLViewer widget.   To
-   /// use these handlers in a class derived from QGLViewer, events need to be
+   /// Base class for interpreting mouse input events from a QGLViewer widget.
+   //  To use these handlers in a class derived from QGLViewer, events need to be
    /// sent to the handler:
    /// 
    ///    Handler::Base* handler;
@@ -46,12 +46,20 @@ namespace Handler {
    /// The advantage of doing things this way is that the handlers can be swapped
    /// in and out to give rise to different behaviors depending on the mode.  It also
    /// factors out the handling code into the derived handlers.
+
+   /// Enumerates the possible selection behaviours when performing an
+   /// OpenGL select.  The Click modes are distinct from the others in that
+   /// they only select the front-most object.
+   enum SelectionMode { None, Add, Remove, Toggle, AddClick, RemoveClick, ToggleClick };
+
    class Base {
 
       public: 
+
          Base(Viewer* viewer) : m_viewer(viewer) { }
          virtual ~Base() { }
          virtual Cursors::Type cursorType() const { return Cursors::OpenHand; }
+         SelectionMode selectionMode() const { return m_selectionMode; }
 
          virtual void mousePressEvent(QMouseEvent* e) {
             e->ignore();
@@ -81,7 +89,9 @@ namespace Handler {
             e->ignore();
          }
 
+
       protected:
+         SelectionMode m_selectionMode;
          Viewer* m_viewer;
    };
 

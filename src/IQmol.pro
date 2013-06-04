@@ -14,14 +14,14 @@ DEPENDPATH  +=  .
 CONFIG      +=  no_keywords qt opengl
 RESOURCES   +=  IQmol.qrc
 ICON         =  resources/IQmol.icns
-QT          +=  sql xml opengl
+QT          +=  sql xml opengl network
 OBJECTS_DIR  = ../build
 DESTDIR      = ../
 MOC_DIR      = ../build/moc
 UI_DIR       = ../build/ui
 
-QMAKE_CXXFLAGS += -O2
-#QMAKE_CXXFLAGS += -O0 -g
+#QMAKE_CXXFLAGS += -O2
+QMAKE_CXXFLAGS += -O0 -g
 
 ######################################################################
 #
@@ -41,6 +41,10 @@ include(QsLog/QsLog.pri)
 include(GL2PS/GL2PS.pri)
 include(QMsgBox/QMsgBox.pri)
 include(QUI/QUI.pri)
+include(QCPRotation/QCPRotation.pri)
+
+include(Data/Data.pri)
+include(Parser/Parser.pri)
 
 
 #################################
@@ -59,6 +63,7 @@ macx {
    LIBS += -framework GLUT -framework QGLViewer 
    LIBS += -L/usr/local/lib -L/usr/local/gfortran/lib -L$(DEV)/extlib/lib
    LIBS += -lopenbabel -lgfortran -lssl -lssh2 -lcrypto -lz
+   LIBS += -L$(DEV)/Boost/lib -lboost_iostreams -lboost_serialization
 
    #CONFIG += debug
    CONFIG += release
@@ -107,8 +112,17 @@ HEADERS += \
    GLObjectLayer.h  BaseLayer.h  MeshLayer.h  AxesLayer.h BackgroundLayer.h \
    MoleculeLayer.h  ManipulatedFrameSetConstraint.h PrimitiveLayer.h  AtomLayer.h \
    BondLayer.h  ChargeLayer.h  UndoCommands.h SymmetryToleranceDialog.h \
-   ViewerModelView.h  Cursors.h  ManipulateHandler.h SelectHandler.h \
-   ManipulateSelectionHandler.h  BuildHandler.h  Shell.h  Grid.h MOCoefficients.h \
+   ViewerModelView.h  Cursors.h \
+   ManipulateHandler.h \
+   SelectHandler.h \
+   ManipulateSelectionHandler.h  \
+   BuildHandler.h  \
+   BuildAtomHandler.h  \
+   BuildFunctionalGroupHandler.h \
+   BuildEFPFragmentHandler.h \
+   EFPFragmentListConfigurator.h \
+   BuildMoleculeFragmentHandler.h \
+   Shell.h  Grid.h MOCoefficients.h \
    ProgressDialog.h  SurfaceLayer.h  MarchingCubes.h CubeDataLayer.h \
    QChemParser.h  GlobalLayer.h MeshConfigurator.h  InfoLayer.h \
    InfoConfigurator.h  BaseConfigurator.h BackgroundConfigurator.h \
@@ -119,24 +133,40 @@ HEADERS += \
    MolecularOrbitalsConfigurator.h  ConformerListConfigurator.h \
    CubeDataConfigurator.h  FileLayer.h FileConfigurator.h  DipoleLayer.h \
    DipoleConfigurator.h  Gradient.h  ColorGrid.h  SpatialProperty.h \
-   AtomicDensity.h  FragmentLayer.h  ReindexAtomsHandler.h \
+   AtomicDensity.h  ReindexAtomsHandler.h \
    ConstraintLayer.h  ConstraintConfigurator.h  GLShape.h  LogMessageDialog.h \
    Snapshot.h  EnigmaMachine.h  PasswordVault.h  Server.h  ServerListDialog.h \
    JobInfo.h  ProcessMonitor.h \
    Process.h  Timer.h  System.h \
    SecureConnection.h  SSHFileConfigurator.h \
-   PBSQueue.h  PBSConfigurator.h  ServerRegistry.h \
+   ServerRegistry.h \
+   ServerQueue.h  ServerQueueDialog.h  \
    Threaded.h  SecureConnectionThread.h \
    ServerDelegate.h \
    ServerTask.h \
    HostDelegate.h \
    LocalHost.h \
    RemoteHost.h \
+   HttpServer.h \
+   HttpThread.h \
+   WebHost.h \
    BasicServer.h \
    PBSServer.h \
+   SGEServer.h \
    FragmentTable.h \
    ServerDialog.h  ServerOptionsDialog.h \
 #  Sanderson.h  \
+   GLShapeLibrary.h \
+   ContainerLayer.h \
+   GroupLayer.h \
+   EFPFragmentLayer.h \
+   EFPFragmentListLayer.h \
+   EFPFragmentParser.h \
+   Task.h \
+   ShaderLibrary.h \
+   ShaderDialog.h \
+   Lebedev.h \
+   AmbientOcclusionEngine.h \
    LocalConnectionThread.h
            
 
@@ -147,7 +177,13 @@ SOURCES += \
    ManipulatedFrameSetConstraint.C  AtomLayer.C  BondLayer.C  ChargeLayer.C \
    UndoCommands.C  SymmetryToleranceDialog.C  ViewerModelView.C  Cursors.C \
    ManipulateHandler.C  SelectHandler.C  ManipulateSelectionHandler.C \
-   BuildHandler.C  Shell.C  Grid.C  MOCoefficients.C  ProgressDialog.C \
+   BuildHandler.C  PrimitiveLayer.C \
+   BuildAtomHandler.C  \
+   BuildFunctionalGroupHandler.C \
+   BuildEFPFragmentHandler.C \
+   EFPFragmentListConfigurator.C \
+   BuildMoleculeFragmentHandler.C \
+   Shell.C  Grid.C  MOCoefficients.C  ProgressDialog.C \
    SurfaceLayer.C  MarchingCubes.C  CubeDataLayer.C  QChemParser.C  InfoLayer.C \
    InfoConfigurator.C  BackgroundConfigurator.C  MoleculeConfigurator.C \
    SurfaceConfigurator.C  BaseParser.C  ExternalChargesParser.C \
@@ -156,22 +192,36 @@ SOURCES += \
    MolecularOrbitalsConfigurator.C  DipoleLayer.C  ConformerListConfigurator.C \
    CubeDataConfigurator.C  FileConfigurator.C  DipoleConfigurator.C  Gradient.C \
    ColorGrid.C  SpatialProperty.C  AtomicDensity.C  IQmol.C  \
-   FragmentLayer.C  ReindexAtomsHandler.C  ConstraintLayer.C \
+   ReindexAtomsHandler.C  ConstraintLayer.C \
    ConstraintConfigurator.C  GLShape.C LogMessageDialog.C  Snapshot.C  \
    EnigmaMachine.C  PasswordVault.C  Server.C  ServerListDialog.C \
    ProcessMonitor.C \
    JobInfo.C Process.C  Timer.C  System.C  \
    SecureConnection.C  SSHFileConfigurator.C  \
-   PBSQueue.C  PBSConfigurator.C  ServerRegistry.C \
+   ServerRegistry.C \
+   ServerQueue.C  ServerQueueDialog.C  \
    SecureConnectionThread.C \
    ServerDialog.C  ServerOptionsDialog.C \
    LocalHost.C \
    RemoteHost.C \
+   HttpServer.C \
+   WebHost.C \
+   HttpThread.C \
    ServerTask.C \
    BasicServer.C \
    PBSServer.C \
+   SGEServer.C \
    FragmentTable.C \
 #  Sanderson.C  \
+   GLShapeLibrary.C \
+   GroupLayer.C \
+   EFPFragmentLayer.C \
+   EFPFragmentListLayer.C \
+   EFPFragmentParser.C \
+   ShaderLibrary.C \
+   ShaderDialog.C \
+   Lebedev.C \
+   AmbientOcclusionEngine.C \
    LocalConnectionThread.C
    
 
@@ -187,7 +237,8 @@ FORMS += \
    LogMessageDialog.ui  SetPasswordDialog.ui  GetVaultKeyDialog.ui \
    ServerListDialog.ui   \
    FragmentTable.ui   \
-   ProcessMonitor.ui  SSHFileConfigurator.ui   PBSConfigurator.ui \
-   ServerDialog.ui  ServerOptionsDialog.ui
+   ProcessMonitor.ui  SSHFileConfigurator.ui   \
+   ServerDialog.ui  ServerOptionsDialog.ui  EFPFragmentListConfigurator.ui \
+   ServerQueueDialog.ui  ShaderDialog.ui
 
    

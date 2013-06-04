@@ -48,8 +48,10 @@ namespace IQmol {
                        Copying,  
                        Unknown };
 
+         static QString toString(Status const& status);
+
          Process(JobInfo* jobInfo) : m_jobInfo(jobInfo), m_status(NotRunning),
-           m_copyProgress(0), m_copyTarget(1), m_qprocess(0) { }
+           m_copyProgress(0), m_copyTarget(1) { }
 
 		 /// Note that deleting a Process will not result in the termination 
 		 /// of the process.  This allows jobs to continue running even after
@@ -92,7 +94,6 @@ namespace IQmol {
          QString serverName() const { return m_jobInfo->get(JobInfo::ServerName); }
 
          bool getLocalSaveDirectory();
-         void setQProcess(QProcess*);
 
       Q_SIGNALS:
          void updated();
@@ -109,7 +110,6 @@ namespace IQmol {
          QString m_id;       // PID or PBS job number
 
       private:
-         static QString toString(Status const& status);
 
          JobInfo* m_jobInfo;
          Status   m_status;
@@ -119,8 +119,6 @@ namespace IQmol {
          Status   m_preCopyStatus;
          int      m_copyProgress; // block count
          int      m_copyTarget;   // target block count (kb blocks)
-
-         QProcess* m_qprocess;
    };
 
    typedef QList<Process*> ProcessList;

@@ -28,6 +28,8 @@
 #include "AtomLayer.h"
 #include "BondLayer.h"
 #include "ChargeLayer.h"
+#include "ContainerLayer.h"
+#include "EFPFragmentListLayer.h"
 #include "MoleculeConfigurator.h"
 #include "Animator.h"
 #include <QFileInfo>
@@ -49,18 +51,11 @@ namespace OpenBabel {
 
 namespace IQmol {
 
-namespace Handler {
-   class Build;
-   class ReindexAtoms;
-}
-
 namespace Command {
    class AppendData;
    class RemoveData;
-   class AddPrimitives;
    class EditPrimitives;
    class AddHydrogens;
-   class RemovePrimitives;
    class MoveObjects;
    class AddMolecule;
    class RemoveMolecule;
@@ -71,6 +66,7 @@ namespace Command {
 
 class SpatialProperty;
 class PointChargePotential;
+class NearestNuclearCharge;
 class JobInfo;
 
 namespace Layer {
@@ -78,8 +74,10 @@ namespace Layer {
    class Conformer;
    class Constraint;
    class Surface;
-   typedef QMap<OpenBabel::OBAtom*, Atom*> AtomMap;
-   typedef QMap<OpenBabel::OBBond*, Bond*> BondMap;
+   class Group;
+   typedef QMap<OpenBabel::OBAtom*, Atom*>  AtomMap;
+   typedef QMap<OpenBabel::OBBond*, Bond*>  BondMap;
+   typedef QMap<OpenBabel::OBAtom*, Group*> GroupMap;
 
    /// Container Layer for all things related to a particular molecule.
    /// This is the main data structure for a molecule.  It contains the Primitve
@@ -97,17 +95,13 @@ namespace Layer {
       // !!! some of these are no longer required to be friends
       friend class Command::AppendData;
       friend class Command::RemoveData;
-      friend class Command::AddPrimitives;
       friend class Command::EditPrimitives;
       friend class Command::AddHydrogens;
-      friend class Command::RemovePrimitives;
       friend class Command::MoveObjects;
       friend class Command::AddMolecule;
       friend class Command::RemoveMolecule;
       friend class Command::ChangeBondOrder;
       friend class Command::ChangeAtomType;
-      friend class Handler::Build;
-      friend class Handler::ReindexAtoms;
 
       public:
          explicit Molecule(QObject* parent = 0);
@@ -132,14 +126,20 @@ namespace Layer {
 
 		 /// Creates a new JobInfo object and sends it out into the ether.
 		 /// This really needs to be a smart pointer because we don't delete
-		 /// as it may be being used by a Process or Server.
+		 /// as it may be being used by a Process or Server.  One day...
 		 JobInfo* jobInfo();
          bool jobInfoMatch(JobInfo* jobInfo) { return jobInfo == m_jobInfo; }
 
+		 /// Attempts to determine the best axis for the functional group when
+		 /// converting an atom to a functional group (click on atom event)
+         qglviewer::Vec getBuildAxis(Atom*);
          void addHydrogens();
          void symmetrize(double tolerance, bool updateCoordinates = true);
          void minimizeEnergy(QString const& forcefield);
          void translateToCenter(GLObjectList const& selection);
+         static void toggleAutoDetectSymmetry() { 
+            s_autoDetectSymmetry = !s_autoDetectSymmetry; 
+         }
 
 		 /// Obtains a list of selected Primitives in the Molecule and removes
 		 /// them from the lists.  The Primitives are not immediately deleted,
@@ -155,6 +155,7 @@ namespace Layer {
          /// Locates all atoms for which there exists a path to B without going through A.
          AtomList getContiguousFragment(Atom* A, Atom* B);
          Bond* getBond(Atom*, Atom*);
+         BondList getBonds(Atom*);
          bool isModified() const { return m_modified; }
 
          qglviewer::Vec centerOfNuclearCharge();
@@ -184,11 +185,27 @@ namespace Layer {
          /// Useful for, e.g., reperceiving bonds.
          QString coordinatesAsString(bool const selectedOnly = false);
 
+		 /// Assigns the atom indices based on the ordering selected by 
+		 /// the user via the reorderIndex variable in the Atom class.
+         void updateAtomOrder();
+
+         Atom* createAtom(unsigned int const Z, qglviewer::Vec const& position);
+         Bond* createBond(Atom* begin, Atom* end, int const order = 1);
+         Charge* createCharge(double const q, qglviewer::Vec const& position);
+
+         QList<qglviewer::Vec> coordinates();
+         QList<double> atomicCharges();
+
+		 // This is needed for fchk-file based surfaces and only covers ridgid
+		 // body motions of the molecule.
+         qglviewer::Frame const& getReferenceFrame() const { return m_frame; }
+         void setReferenceFrame(qglviewer::Frame const& frame) { m_frame = frame; }
+
+
       public Q_SLOTS:
          void appendDataFile(Data*);
          void appendSurface(Layer::Surface*);
-         void reperceiveBonds();
-         void determineSymmetry() { symmetrize(0.00001, false); }
+         void reperceiveBonds( );
          void setGasteigerCharges();
          void setSandersonCharges();
          void setMullikenCharges();
@@ -201,6 +218,9 @@ namespace Layer {
 
          /// Passes the remove signal on so that the ViewerModel can deal with it
          void removeMolecule() { removeMolecule(this); }
+
+         void detectSymmetry();
+         void autoDetectSymmetry();
 
       Q_SIGNALS:
          void softUpdate(); // issue if the number of primitives does not change
@@ -227,24 +247,19 @@ namespace Layer {
          void updateDrawMode(Primitive::DrawMode const);
          void updateInfo();
 
-         Atom* createAtom(unsigned int const Z, qglviewer::Vec const& position);
-         Bond* createBond(Atom* begin, Atom* end, int const order = 1);
-         Charge* createCharge(double const q, qglviewer::Vec const& position);
-
          /// Updates the atom and bond indicies after, for example, deletion.
          void reindexAtomsAndBonds();
-
-		 /// Assigns the atom indices based on the ordering selected by 
-		 /// the user via the reorderIndex variable in the Atom class.
-         void updateAtomOrder();
 
       private Q_SLOTS:
          void jobInfoChanged();
 
       private:
+         static bool s_autoDetectSymmetry;
          int totalCharge() const;
          int multiplicity() const;
          QString constraintsAsString();
+         QString efpFragmentsAsString();
+         QString efpParametersAsString();
 
          template <class T>
          void forall(boost::function<void(T&)> function, QList<T> list);
@@ -271,8 +286,7 @@ namespace Layer {
          void applyRingConstraint();
 
          /// Note that these create new OBMol objects which must be deleted
-         OpenBabel::OBMol* toOBMol(AtomMap&, BondMap&);
-         OpenBabel::OBMol* toOBMol();
+         OpenBabel::OBMol* toOBMol(AtomMap*, BondMap*, GroupMap* = 0);
 
 		 /// Loads the molecular information from an OBMol object.  If existing
 		 /// Atom and Bond Maps are specified, only the additional primitives
@@ -281,7 +295,8 @@ namespace Layer {
          /// used for UndoCommands.  Note that this does not load all the data
          /// in the OBMol (e.g. frequecny data), for that Parser::OpenBabel
          /// should be used.
-		 PrimitiveList fromOBMol(OpenBabel::OBMol*, AtomMap* = 0, BondMap* = 0);
+		 PrimitiveList fromOBMol(OpenBabel::OBMol*, AtomMap* = 0, BondMap* = 0, 
+            GroupMap* = 0);
 
          template <class T> void update(boost::function<void(T&)>);
          void translate(qglviewer::Vec const& displacement);
@@ -321,23 +336,26 @@ namespace Layer {
 		 /// Determines if the hydrogen atoms should be drawn smaller in the CPK
          /// model.
          bool m_smallerHydrogens;
+         bool m_modified;
 
          Configurator::Molecule m_configurator;
          
          // This is the last JobInfo we created
-         JobInfo*       m_jobInfo;
-         Layer::Atoms   m_atomList;
-         Layer::Bonds   m_bondList;
-         Layer::Charges m_chargeList;
-         Layer::Data    m_surfaceList;
-         Layer::Files   m_fileList;
-         Layer::Info    m_info;
-         Layer::Base    m_constraintList;
+         JobInfo*    m_jobInfo;
+         Layer::Info m_info;
 
-         bool m_modified;
+         Layer::Container m_atomList;
+         Layer::Container m_bondList;
+         Layer::Container m_chargesList;
+         Layer::Container m_fileList;
+         Layer::Container m_surfaceList;
+         Layer::Container m_constraintList;
+         Layer::Container m_groupList;
+
+         Layer::EFPFragmentList m_efpFragmentList;
 
          QList<SpatialProperty*> m_properties;
-         PointChargePotential* m_openBabelESP;
+         qglviewer::Frame m_frame;
    };
 
 } // end namespace Layer

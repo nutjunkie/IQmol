@@ -29,65 +29,118 @@
 namespace IQmol {
 
 ToolBar::ToolBar(QWidget* parent) : QWidget(parent),
-   m_periodicTable(this), m_recordTimer(this)
+   m_periodicTable(this), m_recordTimer(this), m_buildMode(Viewer::BuildAtom)
 {
    m_toolBar.setupUi(this);
    m_periodicTable.setWindowFlags(Qt::Popup);
    m_fragmentTable.setWindowFlags(Qt::Popup);
    m_recordTimer.setInterval(1000);
 
-   connect(&m_periodicTable, SIGNAL(elementSelected(QString)), 
-      this, SLOT(updateBuildElementButton(QString)));
    connect(&m_periodicTable, SIGNAL(elementSelected(unsigned int)), 
-      this, SIGNAL(buildElementChanged(unsigned int)));
+      this, SIGNAL(buildElementSelected(unsigned int)));
+
+   connect(&m_periodicTable, SIGNAL(elementSelected(QString const&)), 
+      this, SLOT(updateBuildElement(QString const&)));
+
+   connect(&m_fragmentTable, SIGNAL(fragmentSelected(QString const&, Viewer::Mode const)),
+      this, SLOT(updateBuildFragment(QString const&, Viewer::Mode const)));
+
    connect(&m_recordTimer, SIGNAL(timeout()), 
       this, SLOT(toggleRecordButton()));
 }
 
 
-void ToolBar::setActiveViewerMode(ViewerMode const mode)
+void ToolBar::setToolBarMode(Viewer::Mode const mode)
 {
-   m_toolBar.buildMode->setChecked(false);
-   m_toolBar.selectMode->setChecked(false);
-   m_toolBar.manipulateMode->setChecked(false);
+   // These are all the Mode-related buttons that can be toggled
+   m_toolBar.manipulateButton->setChecked(false);
+   m_toolBar.buildButton->setChecked(false);
+   m_toolBar.elementSelectButton->setChecked(false);      
+   m_toolBar.fragmentSelectButton->setChecked(false);      
+   m_toolBar.selectButton->setChecked(false);
 
    switch (mode) {
-      case Build:      m_toolBar.buildMode->setChecked(true);      break;
-      case Select:     m_toolBar.selectMode->setChecked(true);     break;
-      case Manipulate: m_toolBar.manipulateMode->setChecked(true); break;
-      default:  break;
+      case Viewer::Manipulate: 
+         m_toolBar.manipulateButton->setChecked(true); 
+         break;
+
+      case Viewer::Select:
+         m_toolBar.selectButton->setChecked(true);     
+         break;
+
+      case Viewer::ManipulateSelection:
+         m_toolBar.manipulateButton->setChecked(true); 
+         break;
+
+      case Viewer::ReindexAtoms:
+         m_toolBar.manipulateButton->setChecked(true); 
+         break;
+
+      case Viewer::BuildAtom:      
+         m_toolBar.buildButton->setChecked(true);      
+         m_toolBar.elementSelectButton->setChecked(true);      
+         m_buildMode = Viewer::BuildAtom;
+         break;
+
+      case Viewer::BuildFunctionalGroup:      
+         m_toolBar.buildButton->setChecked(true);      
+         m_toolBar.fragmentSelectButton->setChecked(true);      
+         m_buildMode = Viewer::BuildFunctionalGroup;
+         break;
+
+      case Viewer::BuildEFP:      
+         m_toolBar.buildButton->setChecked(true);      
+         m_toolBar.fragmentSelectButton->setChecked(true);      
+         m_buildMode = Viewer::BuildEFP;
+         break;
+
+      case Viewer::BuildMolecule:      
+         m_toolBar.buildButton->setChecked(true);      
+         m_toolBar.fragmentSelectButton->setChecked(true);      
+         m_buildMode = Viewer::BuildMolecule;
+         break;
    }
 }
 
 
-void ToolBar::updateBuildElementButton(QString symbol)
+void ToolBar::updateBuildElement(QString const& symbol)
 {
-   m_toolBar.elementSelect->setText(symbol);
+   m_buildMode = Viewer::BuildAtom;
+   on_buildButton_clicked(true);
+   m_toolBar.elementSelectButton->setText(symbol);
 }
 
 
-void ToolBar::on_buildMode_clicked(bool) 
+void ToolBar::updateBuildFragment(QString const& fileName, Viewer::Mode const mode)
 {
-   setActiveViewerMode(Build);
-   changeActiveViewerMode(Build);
+   m_buildMode = mode;
+   on_buildButton_clicked(true);
+   buildFragmentSelected(fileName, mode);
 }
 
 
-void ToolBar::on_selectMode_clicked(bool) 
+void ToolBar::on_buildButton_clicked(bool) 
 {
-   setActiveViewerMode(Select);
-   changeActiveViewerMode(Select);
+   setToolBarMode(m_buildMode);
+   viewerModeChanged(m_buildMode);
 }
 
 
-void ToolBar::on_manipulateMode_clicked(bool) 
+void ToolBar::on_selectButton_clicked(bool) 
 {
-   setActiveViewerMode(Manipulate);
-   changeActiveViewerMode(Manipulate);
+   setToolBarMode(Viewer::Select);
+   viewerModeChanged(Viewer::Select);
 }
 
 
-void ToolBar::on_elementSelect_clicked(bool) 
+void ToolBar::on_manipulateButton_clicked(bool) 
+{
+   setToolBarMode(Viewer::Manipulate);
+   viewerModeChanged(Viewer::Manipulate);
+}
+
+
+void ToolBar::on_elementSelectButton_clicked(bool) 
 {
    QPoint pos(QCursor::pos());
    pos -= QPoint(m_periodicTable.width()/2, 25);
@@ -96,10 +149,8 @@ void ToolBar::on_elementSelect_clicked(bool)
 }
 
 
-void ToolBar::on_addFragment_clicked(bool) 
+void ToolBar::on_fragmentSelectButton_clicked(bool) 
 {
-   addFragment();
-   return;
    QPoint pos(QCursor::pos());
    pos -= QPoint(m_fragmentTable.width()/2, 25);
    m_fragmentTable.move(x()+pos.x(), y()+pos.y()); 
@@ -109,7 +160,7 @@ void ToolBar::on_addFragment_clicked(bool)
 
 void ToolBar::setRecordAnimationButtonChecked(bool tf)
 {
-   m_toolBar.recordAnimation->setChecked(tf);
+   m_toolBar.recordButton->setChecked(tf);
    if (tf) {
       recordOn();
       m_recordTimer.start();
@@ -136,7 +187,7 @@ void ToolBar::toggleRecordButton()
 void ToolBar::recordOn()
 {
    const QString styleSheet("QToolButton { background-color: #e00; }") ;
-   m_toolBar.recordAnimation->setStyleSheet(styleSheet);
+   m_toolBar.recordButton->setStyleSheet(styleSheet);
 }
 
 
@@ -145,10 +196,8 @@ void ToolBar::recordOff()
    const QString styleSheet("QToolButton { "
      "background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, "
      "stop: 0 #fff, stop: 0.5 #eee, stop: 1 #999);}");
-   m_toolBar.recordAnimation->setStyleSheet(styleSheet);
+   m_toolBar.recordButton->setStyleSheet(styleSheet);
 }
-
-
 
 
 } // end namespace IQmol

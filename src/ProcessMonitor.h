@@ -35,19 +35,20 @@ namespace IQmol {
    class JobInfo;
    class Process;
 
-   //! The Process::Monitor handles the submission of external jobs, such as
-   //! Q-Chem jobs.  
+   /// The ProcessMonitor handles the submission of calculations such as Q-Chem
+   /// jobs.  Note that the ProcessMonitor takes ownership of the Processes it
+   /// creates and deletes them on destruction.
    class ProcessMonitor : public QMainWindow {
 
       Q_OBJECT
 
       public:
-         ProcessMonitor(QWidget* parent);
-         ~ProcessMonitor();
+         static ProcessMonitor& instance();
 
       Q_SIGNALS:
-		 /// This signals the job is valid has been submitted, and the input
-		 /// generator can be closed.
+		 /// This signals the most recent job is valid has been submitted.  Its
+		 /// primary use is to let the input generator dialog know that it can
+		 /// close.
          void jobAccepted();
 
          /// This signal is emitted only when a job has finished successfully.
@@ -58,9 +59,18 @@ namespace IQmol {
          void postStatusMessage(QString const&);
 
       public Q_SLOTS:
-         // scope required as we call this from the Qui namespace
+		 /// This is the main entry point for submitting a calculation.
+		 /// Because the submission requires communication to a (potentially
+         /// remote) Server, the process is carried out in a thread chain.
+         /// The scope required as we may be calling this from another namespace.
          void submitJob(IQmol::JobInfo*);
+
+		 /// Used to remove all jobs listed in the monitor.  This is triggered
+		 /// by a MainWindow menu action and may be useful there are rogue
+		 /// processes on the list which are causing problems and need to be
+		 /// removed.
          void clearProcessList() { clearProcessList(false, true); }
+
 
       protected:
          void closeEvent(QCloseEvent* event);
@@ -70,6 +80,7 @@ namespace IQmol {
       private Q_SLOTS:
          void on_clearListButton_clicked(bool);
          void on_processTable_cellDoubleClicked(int row, int col);
+
          // These form a thread chain
          void submitJob1();
          void submitJob2();
@@ -98,28 +109,40 @@ namespace IQmol {
 
 
       private:
+         /// Loads the list of processes from the users preferences file.
          void loadProcessList();
+         void saveProcessList();
+
 		 // Clears all the processes from the monitor and their servers.  If
 		 // finishedOnly then only the processes that have status Finished, 
-         // Killed or Error hare removed.
+         // Killed or Error are removed.
          void clearProcessList(bool const finishedOnly, bool const prompt);
+
          void copyResults(Process*);
          void queryProcess(Process*);
          void addToTable(Process*);
-         void saveProcessList();
          void updateRow(int const row, QStringList const& items);
 
-         // Performs a reverse lookup on m_processMap to find either the process that
+         // Performs a reverse lookup on s_processMap to find either the process that
          // corresponds to the item if non-zero or the selected process otherwise.
          Process* getSelectedProcess(QTableWidgetItem* item = 0);
          void initializeMenus();
 
          QTimer m_updateTimer;
          Ui::ProcessMonitor m_ui;
-         QMap<Process*, QTableWidgetItem*> m_processMap;
+         static QMap<Process*, QTableWidgetItem*> s_processMap;
 
-         /// This holds the Process that is in the process of being submitted.
+		 /// This holds the Process that is in the process of being submitted
+		 /// and is required for persistence across the submission thread chain.
          Process* m_pendingProcess;
+
+         // Singleton stuff
+         ProcessMonitor() { }
+         ProcessMonitor(QWidget* parent);
+         explicit ProcessMonitor(ProcessMonitor const&);
+         ~ProcessMonitor() { }
+         static ProcessMonitor* s_instance;
+         static void destroy();
    };
 
 

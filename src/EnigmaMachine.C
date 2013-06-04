@@ -25,6 +25,7 @@
 #include <ctime>
 #include <climits>
 #include <cstring>
+#include <cstdlib>
 
 
 namespace IQmol {
@@ -36,13 +37,8 @@ EnigmaMachine::EnigmaMachine(std::string const& password, unsigned int seed) : m
    // used to initialize any subsequent EnigmaMachine that is to be 
    // used to decrypt the data.
    if (m_seed == 0) m_seed = std::time(0);
-#ifdef Q_WS_X11
    srand(m_seed);
    unsigned int salt[] = { rand(), rand() };
-#else
-   std::srand(m_seed);
-   unsigned int salt[] = { std::rand(), std::rand() };
-#endif
    const char* cstr(password.c_str());
    m_initialized = init((BinaryData*)cstr, strlen(cstr), (BinaryData*)salt);
 }

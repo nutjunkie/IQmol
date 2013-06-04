@@ -50,7 +50,7 @@ namespace Layer {
       friend class Constraint;
 
       public:
-         enum LabelType { None, Index, Element, Charge, Mass, Spin, Reindex };
+         enum LabelType { None, Index, Element, Charge, Mass, Spin, Reindex, NmrShift };
          enum ChargeType { Unknown = -1, Gasteiger, Sanderson, Mulliken };
 
          Atom(int Z);
@@ -71,9 +71,9 @@ namespace Layer {
             s_vibrationDisplayVector= tf; 
          }
 
-         void draw(qglviewer::Vec const& cameraPosition);
-         void drawFast(qglviewer::Vec const& cameraPosition);
-         void drawSelected(qglviewer::Vec const& cameraPosition);
+         void draw();
+         void drawFast();
+         void drawSelected();
          void drawLabel(Viewer& viewer, LabelType const, QFontMetrics&);
 
          void setAtomicNumber(unsigned int const Z);
@@ -109,7 +109,7 @@ namespace Layer {
       private:
          QString getLabel(LabelType const type);
          void drawPrivate(bool selected);
-         void drawDisplacement(qglviewer::Vec const& cameraPosition); 
+         void drawDisplacement(); 
          void drawArrow(const qglviewer::Vec& from, const qglviewer::Vec& to);
          void drawArrow(float length);
 
@@ -128,6 +128,7 @@ namespace Layer {
          int     m_index;
          double  m_charge;
          double  m_spin;
+         double  m_nmrShift;
          GLfloat m_vdwRadius;
          QString m_symbol;
          bool    m_smallerHydrogens;

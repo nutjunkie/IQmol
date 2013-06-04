@@ -58,6 +58,8 @@ class Job {
       void setMultiplicity(int);
       void setCoordinates(QString const&);
       void setConstraints(QString const&);
+      void setEfpFragments(QString const&);
+      void setEfpParameters(QString const&);
       void setMolecule(Molecule*);
       QString  getCoordinates();
       int  getNumberOfAtoms();

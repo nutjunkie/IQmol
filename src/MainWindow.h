@@ -38,7 +38,9 @@
 #include <QUndoView>
 #include <QTreeView>
 #include <QSplitter>
+#include <QProgressBar>
 #include <QList>
+
 
 namespace Qui {
    class InputDialog;
@@ -54,6 +56,7 @@ class QMenu;
 namespace IQmol {
 
    class ModelView;
+   class ShaderDialog;
 
    /// MainWindow is the top level window in IQmol which contains the
    /// ToolBar, Viewer, ViewerModelView and History.
@@ -63,7 +66,7 @@ namespace IQmol {
 
       public: 
          MainWindow(QWidget* parent = 0);
-         ~MainWindow() { }
+         ~MainWindow();
 
       Q_SIGNALS:
          void recordingActive(bool);
@@ -72,7 +75,6 @@ namespace IQmol {
          void openFile();
          void openRecentFile();
          void openFile(QString const& fileName);
-         void addFragment();
          void addCommand(QUndoCommand* cmd) { m_undoStack.push(cmd); }
 
       private Q_SLOTS:
@@ -80,7 +82,6 @@ namespace IQmol {
          void showHelp() { m_helpBrowser.show(); }
          void showAbout() { m_aboutDialog.show(); }
          void showPreferences() { m_preferencesBrowser.show(); }
-         void showProcessMonitor() { m_processMonitor.show(); m_processMonitor.raise();}
          void showLogMessages();
          void closeEvent(QCloseEvent*);
          void newViewer();
@@ -90,6 +91,7 @@ namespace IQmol {
          void setForceField();
          void setPartialChargeType();
          void setLabel();
+         void setShader();
          void reindexAtoms();
          void windowModified() { setWindowModified(true); }
          void setRecordingActive(bool);
@@ -98,6 +100,15 @@ namespace IQmol {
          void editServers();
          void setVaultPassword();
          void recordingCancelled() { setRecordingActive(false); }
+/////////////////////////
+         void parseFile();
+         void fileParsed();
+         void configureAppearance();
+
+         void showProcessMonitor() { 
+            ProcessMonitor::instance().show(); 
+            ProcessMonitor::instance().raise();
+         }
 
       private:
          void createMenus();
@@ -113,12 +124,13 @@ namespace IQmol {
          ViewerModelView m_viewerView;
          QUndoStack      m_undoStack;
          QUndoView       m_undoStackView;
+         QProgressBar    m_progressBar;
+         QLabel          m_status;
          Viewer          m_viewer;
 
          QItemSelectionModel  m_viewerSelectionModel;
          LogMessageDialog     m_logMessageDialog;
          Preferences::Browser m_preferencesBrowser;
-         ProcessMonitor       m_processMonitor;
 
          QMenu*   m_recentFilesMenu;
          QAction* m_fullScreenAction;
@@ -128,6 +140,7 @@ namespace IQmol {
 
          QSplitter* m_sideSplitter;
          Qui::InputDialog* m_quiInputDialog;
+         ShaderDialog* m_shaderDialog;
    };
 
 } // end namespace IQmol

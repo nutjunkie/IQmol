@@ -23,11 +23,14 @@
 ********************************************************************************/
 
 /// \file  IQmol.h
-/// \brief Various function, typedef and constant definitions that are not
+/// \brief Grab-bag of function, typedef and constant definitions that are not
 ///        associated with a specific class.
 
-#include <QString>
 #include "boost/function.hpp"
+#include <QString>
+#include <QDir>
+#include "QGLViewer/vec.h"
+#include "QGLViewer/quaternion.h"
 #include <cmath>
 #include <limits>
 #define FOREVER ( std::numeric_limits<int>::max() )
@@ -46,9 +49,6 @@ namespace IQmol {
    double const DefaultSceneRadius = 4.0;
 
    typedef boost::function<double (double const, double const, double const)> Function3D;
-
-   /// Enumerates the possible Modes that the Viewer can operate in.
-   enum ViewerMode { Manipulate, Select, Build, ManipulateSelection, ReindexAtoms };
 
    enum Spin { Alpha, Beta };
 
@@ -79,6 +79,14 @@ namespace IQmol {
 
    /// Convenience function that sets the background color of a QToolButton.
    void SetButtonColor(QToolButton& button, QColor const& color);
+
+   /// Recursivly scans a directory strucutre for a named file and, if found,
+   /// returns the file path.
+   QString ScanDirectory(QDir const& dir, QString const& fileName,
+      Qt::CaseSensitivity caseSensitive = Qt::CaseInsensitive);
+
+   qglviewer::Vec ToEulerAngles(qglviewer::Quaternion const&);
+   qglviewer::Quaternion FromEulerAngles(double const, double const, double const);
 
 } // end namespace IQmol
 

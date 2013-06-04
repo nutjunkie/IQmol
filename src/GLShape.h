@@ -29,6 +29,56 @@
 namespace IQmol {
 namespace GLShape {
 
+   class Base {
+      public:
+         Base(QColor const& color = QColor());
+         virtual void draw() = 0;
+         virtual ~Base() { }
+         static GLfloat LengthScale(GLint const resolution);
+         
+      protected:
+         bool   isoChromic(Base const&);
+         static GLfloat s_thresh;
+         static GLUquadric* s_quadric;
+         GLint  m_red;
+         GLint  m_green;
+         GLint  m_blue;
+   };
+
+
+   class GLSphere : public Base {
+
+      public:
+         GLSphere(GLfloat const radius, int const resolution, QColor const& color = QColor());
+         bool operator==(GLSphere const&);
+         void draw();
+
+      private:
+         GLfloat m_radius;
+         GLint   m_segments;
+   };
+
+
+   class GLTorus : public Base {
+
+      public:
+         GLTorus(GLfloat const majorRadius, GLfloat const minorRadius, int const resolution,
+            GLfloat const angle = 2.0f*M_PI, QColor const& color = QColor());
+         bool operator==(GLTorus const&);
+         void draw();
+
+      private:
+        GLfloat m_majorRadius;
+        GLfloat m_minorRadius;
+        GLfloat m_angle;
+        GLint   m_majorSegments;
+        GLint   m_minorSegments;
+        GLboolean m_capEnds;
+   };
+   
+
+
+
    /// Draws a torus with the maximum length of a polygon set to resolution.
    /// The angle is in radians and if less than 2pi a partial torus is drawn.
    void Torus(double const majorRadius, double const minorRadius, double const resolution, 

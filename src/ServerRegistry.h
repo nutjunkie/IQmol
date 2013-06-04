@@ -1,5 +1,5 @@
-#ifndef IQMOL_REGISTRY_H
-#define IQMOL_REGISTRY_H
+#ifndef IQMOL_SERVERREGISTRY_H
+#define IQMOL_SERVERREGISTRY_H
 /*******************************************************************************
        
   Copyright (C) 2011 Andrew Gilbert
@@ -28,8 +28,6 @@
 namespace IQmol {
 
    class Server;
-   class LocalServer;
-   class RemoteServer;
 
    /// The ServerRegistry is a singleton that provides a global entry point 
    /// to the Server objects.  The ServerRegistry loads and saves Server 
@@ -82,7 +80,7 @@ namespace IQmol {
          // Hide these to prevent multiple instances
          ServerRegistry() { }
          explicit ServerRegistry(ServerRegistry const&) { }
-         virtual ~ServerRegistry() { }
+         ~ServerRegistry() { }
    };
 
 

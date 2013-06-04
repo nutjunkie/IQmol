@@ -21,18 +21,21 @@
 ********************************************************************************/
 
 #include "Lebedev.h"
+#include "QsLog.h"
 #include "QGLViewer/vec.h"
-#include <cmath>
+#include <QFile>
 
+#include <QDebug>
 
-using namespace std;
 
 namespace IQmol {
 
-const int s_maxRules = 66;  // zeroth rule is a dummy
+unsigned const Lebedev::s_maxRules = 66;  // zeroth rule is a dummy
 
-int const Lebedev::s_available[s_maxRules] = {  
-      0,
+
+int const Lebedev::s_available[Lebedev::s_maxRules] = 
+{  
+      0,    // dummy
       1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
       1,    1,    1,    1,    1,    0,    1,    0,    0,    1,
       0,    0,    1,    0,    0,    1,    0,    0,    1,    0,
@@ -42,7 +45,22 @@ int const Lebedev::s_available[s_maxRules] = {
       0,    1,    0,    0,    1 
 };
 
-int const Lebedev::s_numberOfPoints[s_maxRules] = { 
+
+Lebedev::Loader const Lebedev::s_loaders[Lebedev::s_maxRules] = 
+{  
+   na,
+   ld0006, ld0014, ld0026, ld0038, ld0050, ld0074, ld0086, ld0110, ld0146, ld0170,
+   ld0194, ld0230, ld0266, ld0302, ld0350, na,     ld0434, na,     na,     ld0590, 
+   na,     na,     ld0770, na,     na,     ld0974, na,     na,     ld1202, na,
+   na,     ld1454, na,     na,     ld1730, na,     na,     ld2030, na,     na,
+   ld2354, na,     na,     ld2702, na,     na,     ld3074, na,     na,     ld3470,
+   na,     na,     ld3890, na,     na,     ld4334, na,     na,     ld4802, na,
+   na,     ld5294, na,     na,     ld5810
+};
+
+
+int const Lebedev::s_numberOfPoints[Lebedev::s_maxRules] = 
+{ 
       0,
       6,   14,   26,   38,   50,   74,   86,  110,  146,  170,
     194,  230,  266,  302,  350,  386,  434,  482,  530,  590, 
@@ -54,24 +72,67 @@ int const Lebedev::s_numberOfPoints[s_maxRules] = {
 };
 
 
-Lebedev::Lebedev(unsigned int const rule) : m_rule(rule)
+Lebedev::Lebedev(unsigned int const rule) : m_rule(rule), m_numberOfPoints(0),
+   m_x(0), m_y(0), m_z(0), m_w(0)
 {
-   if (isAvailable(rule)) {
-      unsigned int n(numberOfPoints());
-      m_x = new double[n];
-      m_y = new double[n];
-      m_z = new double[n];
-      m_w = new double[n];
+   if (!isAvailable(m_rule) || m_rule == 0) {
+      qDebug() << "Request for invalid Lebedev grid" << m_rule;
+      QLOG_WARN() << "Request for invalid Lebedev grid" << m_rule;
+      return;
    }
+
+   m_numberOfPoints = s_numberOfPoints[m_rule];
+   m_x = new double[m_numberOfPoints];
+   m_y = new double[m_numberOfPoints];
+   m_z = new double[m_numberOfPoints];
+   m_w = new double[m_numberOfPoints];
+
+   s_loaders[m_rule](m_x, m_y, m_z, m_w);
 }
 
 
-:ebedev::~Lebedev()
+Lebedev::~Lebedev()
 {
-   delete [] m_x;
-   delete [] m_y;
-   delete [] m_z;
-   delete [] m_w;
+   if (m_x) delete [] m_x;
+   if (m_y) delete [] m_y;
+   if (m_z) delete [] m_z;
+   if (m_w) delete [] m_w;
+}
+
+
+qglviewer::Vec Lebedev::point(unsigned n)
+{
+   qglviewer::Vec v;
+   if (n < m_numberOfPoints) v.setValue(m_x[n], m_y[n], m_z[n]);
+   return v;
+}
+
+
+double Lebedev::weight(unsigned n)
+{
+   double w(0.0);
+   if (n < m_numberOfPoints) w = m_w[n];
+   return w;
+}
+
+
+void Lebedev::dump() const
+{
+   QFile file("lebedev_grid.m");
+   if (file.exists()) file.remove();
+   if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+      for (unsigned i = 0; i < m_numberOfPoints; ++i) {
+          file.write(QByteArray::number(m_x[i],'f',12));
+          file.write("\n");
+          file.write(QByteArray::number(m_y[i],'f',12));
+          file.write("\n");
+          file.write(QByteArray::number(m_z[i],'f',12));
+          file.write("\n");
+          file.write(QByteArray::number(m_w[i],'f',12));
+          file.write("\n");
+      }
+      file.close();
+   }
 }
  
 
@@ -105,6 +166,7 @@ int Lebedev::generateOh(int const code, double a, double b, double v, double *x,
          x[ 4] =  c;   y[ 4] =  c;   z[ 4] =  a;   w[ 4] = v;
          x[ 5] =  c;   y[ 5] =  c;   z[ 5] = -a;   w[ 5] = v;
          num  = 6;
+         break;
  
       case 2:
          a = sqrt(0.5);
@@ -121,6 +183,7 @@ int Lebedev::generateOh(int const code, double a, double b, double v, double *x,
          x[10] =  a;   y[10] = -a;   z[10] =  c;   w[10] = v;
          x[11] = -a;   y[11] = -a;   z[11] =  c;   w[11] = v;
          num = 12;
+         break;
 
       case 3:
          a = sqrt(1.0/3.0);
@@ -133,6 +196,7 @@ int Lebedev::generateOh(int const code, double a, double b, double v, double *x,
          x[ 6] =  a;   y[ 6] = -a;   z[ 6] = -a;   w[ 6] = v;
          x[ 7] = -a;   y[ 7] = -a;   z[ 7] = -a;   w[ 7] = v;
          num = 8;
+         break;
 
       case 4:
          b = sqrt(1.0 - 2.0*a*a);
@@ -161,6 +225,7 @@ int Lebedev::generateOh(int const code, double a, double b, double v, double *x,
          x[22] =  b;   y[22] = -a;   z[22] = -a;   w[22] = v;
          x[23] = -b;   y[23] = -a;   z[23] = -a;   w[23] = v;
          num = 24;
+         break;
 
       case 5:
          b = sqrt(1.0 - a*a);
@@ -189,6 +254,7 @@ int Lebedev::generateOh(int const code, double a, double b, double v, double *x,
          x[22] =  c;   y[22] =  b;   z[22] = -a;   w[22] = v;
          x[23] =  c;   y[23] = -b;   z[23] = -a;   w[23] = v;
          num = 24;
+         break;
 
       case 6:
          c = sqrt(1.0 - a*a - b*b);
@@ -241,6 +307,7 @@ int Lebedev::generateOh(int const code, double a, double b, double v, double *x,
          x[46] =  c;   y[46] = -b;   z[46] = -a;   w[46] = v;
          x[47] = -c;   y[47] = -b;   z[47] = -a;   w[47] = v;
          num = 48;
+         break;
 
      default:
          num = 0;

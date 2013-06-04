@@ -280,9 +280,8 @@ QString Constraint::formatQChem() const
 // ------------------------------------------------------------------------------
 
 
-void Constraint::draw(Vec const& cameraPosition)
+void Constraint::draw()
 {
-   Q_UNUSED(cameraPosition);
    if (checkState() != Qt::Checked) return;
 
    switch (m_type) {

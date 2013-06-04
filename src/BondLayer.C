@@ -33,7 +33,7 @@ namespace Layer {
 GLfloat Bond::s_defaultColor[]       = {0.3f, 0.3f, 0.3f, 1.0f};
 GLfloat Bond::s_radiusBallsAndSticks =  0.10;
 GLfloat Bond::s_radiusTubes          =  0.10;
-GLfloat Bond::s_radiusWireFrame      =  2.00;  // pixels
+GLfloat Bond::s_radiusWireFrame      =  3.00;  // pixels
 Vec     Bond::s_zAxis                = Vec(0.0, 0.0, 1.0);
 
 
@@ -58,30 +58,32 @@ double Bond::length()
 }
 
 
-void Bond::draw(Vec const& cameraPosition) 
+void Bond::draw() 
 {
-   drawPrivate(cameraPosition, false); 
+   bool selectedOnly(false);
+   drawPrivate(selectedOnly); 
 }
 
 
-void Bond::drawSelected(Vec const& cameraPosition) 
+void Bond::drawSelected() 
 {
-   drawPrivate(cameraPosition, true);
+   bool selectedOnly(true);
+   drawPrivate(selectedOnly);
 }
 
 
-void Bond::drawPrivate(Vec const& cameraPosition, bool selected) 
+void Bond::drawPrivate(bool selected) 
 {
    updateOrientation(); // This should only need calling if an atom is moving
    switch (m_drawMode) {
       case Primitive::BallsAndSticks:
-         drawBallsAndSticks(cameraPosition, selected);
+         drawBallsAndSticks(selected);
          break;
       case Primitive::Tubes:
-         drawTubes(cameraPosition, selected);
+         drawTubes(selected);
          break;
       case Primitive::WireFrame:
-         drawWireFrame(cameraPosition, selected);
+         drawWireFrame(selected);
          break;
       default:
          break;
@@ -89,7 +91,7 @@ void Bond::drawPrivate(Vec const& cameraPosition, bool selected)
 }
 
 
-void Bond::drawBallsAndSticks(Vec const& cameraPosition, bool selected)
+void Bond::drawBallsAndSticks(bool selected)
 {
    GLfloat radius(s_radiusBallsAndSticks*m_scale);
 
@@ -102,7 +104,7 @@ void Bond::drawBallsAndSticks(Vec const& cameraPosition, bool selected)
 
    Vec a(m_begin->displacedPosition());
    Vec b(m_end  ->displacedPosition());
-   Vec normal = cross(cameraPosition-a, cameraPosition-b);
+   Vec normal = cross(s_cameraPosition-a, s_cameraPosition-b);
    normal.normalize();
    GLfloat length((a-b).norm());
 
@@ -217,9 +219,8 @@ void Bond::drawBallsAndSticks(Vec const& cameraPosition, bool selected)
 }
 
 
-void Bond::drawTubes(Vec const& cameraPosition, bool selected) 
+void Bond::drawTubes(bool selected) 
 {
-   Q_UNUSED(cameraPosition);
    GLfloat radius(s_radiusTubes*m_scale);
 
    Vec a(m_begin->displacedPosition());
@@ -247,23 +248,32 @@ void Bond::drawTubes(Vec const& cameraPosition, bool selected)
 
 
 
-void Bond::drawWireFrame(Vec const& cameraPosition, bool selected) 
+void Bond::drawWireFrame(bool selected) 
 {
-   Q_UNUSED(cameraPosition);
    GLfloat radius(s_radiusWireFrame*m_scale);
 
    Vec a(m_begin->displacedPosition());
    Vec b(m_end  ->displacedPosition());
-   Vec m(0.5*(a+b)); // bond midpoint
+   GLfloat length((a-b).norm());
+
+   glPushMatrix();
+   glMultMatrixd(m_frame.matrix());
 
    GLboolean lightingEnabled(glIsEnabled(GL_LIGHTING));
-
    glDisable(GL_LIGHTING);
+
    if (!selected) {
       glEnable(GL_BLEND);
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       glEnable(GL_LINE_SMOOTH);
    }
+
+   Vec normal = cross(s_cameraPosition-a, s_cameraPosition-b);
+   normal.normalize();
+
+   a.setValue(0.0, 0.0, 0.0); 
+   b.setValue(0.0, 0.0, length); 
+   Vec m(0.5*(a+b)); // bond midpoint
 
    if (selected) {
 
@@ -278,8 +288,6 @@ void Bond::drawWireFrame(Vec const& cameraPosition, bool selected)
    }else {
 
       glLineWidth(radius);
-      Vec normal = cross(cameraPosition-a, cameraPosition-b);
-      normal.normalize();
    
       switch (m_order) {
          case 2: 
@@ -360,6 +368,8 @@ void Bond::drawWireFrame(Vec const& cameraPosition, bool selected)
       glDisable(GL_LINE_SMOOTH);
    }
    if (lightingEnabled) glEnable(GL_LIGHTING);
+
+   glPopMatrix();
 }
 
 

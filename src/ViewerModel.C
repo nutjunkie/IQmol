@@ -84,7 +84,7 @@ ViewerModel::ViewerModel(QWidget* parent) : QStandardItemModel(0, 1, parent),
 
    Layer::Molecule* mol(newMolecule());
    appendRow(mol);
-   changeActiveViewerMode(Build);
+   changeActiveViewerMode(Viewer::BuildAtom);
    sceneRadiusChanged(DefaultSceneRadius);
 }
 
@@ -201,7 +201,7 @@ bool ViewerModel::open(QString const& fileName)
    Command::AddMolecule* cmd = new Command::AddMolecule(molecule, root);
 
    postCommand(cmd);
-   changeActiveViewerMode(Manipulate);
+   changeActiveViewerMode(Viewer::Manipulate);
    sceneRadiusChanged(sceneRadius());
 
    return true;
@@ -254,7 +254,7 @@ qDebug() << "found existing molecule";
 qDebug() << "using default molecule";
       if (defaultMolecule->checkState() == Qt::Checked) {
          molecule->setCheckState(Qt::Checked);
-         changeActiveViewerMode(Manipulate);
+         changeActiveViewerMode(Viewer::Manipulate);
          sceneRadiusChanged(sceneRadius());
          
       }else {
@@ -284,50 +284,6 @@ void ViewerModel::setPartialChargeType(QString const& type)
       forAllMolecules(boost::bind(&Layer::Molecule::setMullikenCharges, _1));
    }
 }
-
-
-void ViewerModel::addFragment(QString const& fileName)
-{
-   Layer::Molecule* molecule(activeMolecule());
-   if (!molecule) return;
-
-   DataList dataList(Parser::ParseFile(fileName));
-
-   PrimitiveList primitiveList;
-   Layer::Atoms* atoms;
-   Layer::Bonds* bonds;
-
-   DataList::iterator iter;
-   for (iter = dataList.begin(); iter != dataList.end(); ++iter) {
-       if ( (atoms = qobject_cast<Layer::Atoms*>(*iter)) ) {
-          AtomList atomList(atoms->getAtoms());
-          AtomList::iterator atom;
-          for (atom = atomList.begin(); atom != atomList.end(); ++atom) {
-              primitiveList.append(*atom);
-          }
-          // these will be reparented later
-          while (atoms->hasChildren()) atoms->takeRow(0);
-       }
-
-       if ( (bonds = qobject_cast<Layer::Bonds*>(*iter)) ) {
-          BondList bondList(bonds->getBonds());
-          BondList::iterator bond;
-          for (bond = bondList.begin(); bond != bondList.end(); ++bond) {
-              primitiveList.append(*bond);
-          }
-          // these will be reparented later
-          while (bonds->hasChildren()) bonds->takeRow(0);
-       }
-   }
-
-   if (!primitiveList.isEmpty()) {
-      selectAll();
-      QUndoCommand* cmd(new Command::AddPrimitives(molecule, primitiveList, "Add Fragment"));
-      postCommand(cmd);
-      invertSelection();
-   }
-}
-
 
 
 void ViewerModel::saveAs()
@@ -367,7 +323,7 @@ void ViewerModel::newMoleculeMenu()
 {
    forAllMolecules(boost::bind(&Layer::Molecule::setCheckState, _1, Qt::Unchecked));
    Command::AddMolecule* cmd(new Command::AddMolecule(newMolecule(), invisibleRootItem()));
-   changeActiveViewerMode(Build);
+   changeActiveViewerMode(Viewer::BuildAtom);
    postCommand(cmd);
 }
 
@@ -687,9 +643,15 @@ void ViewerModel::symmetrize(double const tolerance)
 }
 
 
+void ViewerModel::toggleAutoDetectSymmetry()
+{
+   Layer::Molecule::toggleAutoDetectSymmetry();
+}
+
+
 void ViewerModel::determineSymmetry()
 {
-   forAllMolecules(boost::bind(&Layer::Molecule::determineSymmetry, _1));
+   forAllMolecules(boost::bind(&Layer::Molecule::autoDetectSymmetry, _1));
 }
 
 
@@ -779,7 +741,7 @@ qDebug() << "=====================================";
    DataList::iterator iter;
    for (iter = data.begin(); iter != data.end(); ++iter) {
        if ((atoms = qobject_cast<Layer::Atoms*>(*iter))) {
-          AtomList atomList(atoms->getAtoms());
+          AtomList atomList(atoms->findLayers<Layer::Atom>(Layer::Children));
           AtomList::iterator atom;
           for (atom = atomList.begin(); atom != atomList.end(); ++atom) {
               atoms->removeLayer(*atom);
@@ -787,12 +749,12 @@ qDebug() << "=====================================";
           }
 
        }else if ((bonds = qobject_cast<Layer::Bonds*>(*iter))) {
-             BondList bondList(bonds->getBonds());
-             BondList::iterator bond;
-             for (bond = bondList.begin(); bond != bondList.end(); ++bond) {
-                 bonds->removeLayer(*bond);
-                 primitives.append(*bond);
-             }
+          BondList bondList(bonds->findLayers<Layer::Bond>(Layer::Children));
+          BondList::iterator bond;
+          for (bond = bondList.begin(); bond != bondList.end(); ++bond) {
+              bonds->removeLayer(*bond);
+              primitives.append(*bond);
+          }
 
        }
    }

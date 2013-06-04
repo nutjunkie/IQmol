@@ -1527,6 +1527,11 @@ QToolButton:checked {
           </item>
           <item>
            <property name="text">
+            <string>EFP Options</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
             <string>QMMM</string>
            </property>
           </item>
@@ -1796,9 +1801,6 @@ QToolButton:checked {
               <item row="0" column="1">
                <widget class="QComboBox" name="purecart"/>
               </item>
-              <item row="1" column="1">
-               <widget class="QComboBox" name="basis_projection_type"/>
-              </item>
               <item row="1" column="0">
                <widget class="QLabel" name="label_203">
                 <property name="text">
@@ -1825,6 +1827,26 @@ QToolButton:checked {
                  </size>
                 </property>
                </spacer>
+              </item>
+              <item row="2" column="0" colspan="2">
+               <layout class="QHBoxLayout" name="horizontalLayout_3">
+                <item>
+                 <widget class="QComboBox" name="basis_projection_type"/>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_4">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
               </item>
              </layout>
             </item>
@@ -2475,8 +2497,25 @@ values</string>
                 </property>
                </widget>
               </item>
-              <item row="3" column="1" colspan="2">
-               <widget class="QComboBox" name="meteco"/>
+              <item row="4" column="0" colspan="2">
+               <layout class="QHBoxLayout" name="horizontalLayout_2">
+                <item>
+                 <widget class="QComboBox" name="meteco"/>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
               </item>
              </layout>
             </item>
@@ -3471,6 +3510,44 @@ values</string>
                <size>
                 <width>20</width>
                 <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="AdvancedEFPOptions">
+           <layout class="QVBoxLayout" name="verticalLayout_5">
+            <item>
+             <widget class="QCheckBox" name="efp">
+              <property name="text">
+               <string>EFP Calculation</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="efp_fragments_only">
+              <property name="text">
+               <string>EFP Only Calculation (No QM)</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="efp_input">
+              <property name="text">
+               <string>Use new EFP input format</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>460</height>
                </size>
               </property>
              </spacer>
@@ -6846,7 +6923,6 @@ values</string>
   <tabstop>scf_guess_mix</tabstop>
   <tabstop>rca_max_cycles</tabstop>
   <tabstop>purecart</tabstop>
-  <tabstop>basis_projection_type</tabstop>
   <tabstop>qui_radial_grid</tabstop>
   <tabstop>xc_smart_grid</tabstop>
   <tabstop>xc_grid</tabstop>
@@ -6881,7 +6957,6 @@ values</string>
   <tabstop>basis_linear_dependence_thresh</tabstop>
   <tabstop>thresh</tabstop>
   <tabstop>varthresh</tabstop>
-  <tabstop>meteco</tabstop>
   <tabstop>wavefunction_analysis</tabstop>
   <tabstop>stability_analysis</tabstop>
   <tabstop>nbo</tabstop>

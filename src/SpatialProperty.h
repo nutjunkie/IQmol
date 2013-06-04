@@ -24,6 +24,7 @@
 
 #include "IQmol.h"
 #include <QList>
+#include "MultipoleExpansion.h"
 #include "QGLViewer/vec.h"
 #include "boost/bind.hpp"
 #include "boost/function.hpp"
@@ -36,6 +37,11 @@ namespace IQmol {
    namespace AtomicDensity {
       class Base;
    }
+
+   namespace Layer {
+      class Molecule;
+   }
+
 
    /// Several classes that represent molecular properties than have a 
    /// spatially dependent value.
@@ -91,23 +97,70 @@ namespace IQmol {
   
    class PointChargePotential : public SpatialProperty {
       public:
-         PointChargePotential(QString type, QList<double> charges = QList<double>(), 
-            QList<qglviewer::Vec> coordinates = QList<qglviewer::Vec>()) : m_text(type) {
-            update(charges, coordinates);
-         }
+         PointChargePotential(QString const& type, Layer::Molecule* molecule) 
+          : m_text(type), m_molecule(molecule) { }
 
          QString text() const { return m_text; }
          bool isAvailable() const { return true; }
-         Function3D evaluator() {
-            return boost::bind(&PointChargePotential::potential, this, _1, _2, _3);
-         }
-         void update(QList<double> charges, QList<qglviewer::Vec> coordinates);
+         Function3D evaluator();
 
       private:
          QString m_text;
+         Layer::Molecule* m_molecule;
          QList<double> m_charges;
          QList<qglviewer::Vec> m_coordinates;
          double  potential(double const x, double const y, double const z);
+   };
+
+
+   // !!!! Note that the evaluator call should be updating the positions and
+   // orientations of the multipoles before returning.  The fact that it does
+   // not means that if a DMA is loaded and the molecule is rotated before
+   // evaluating the ESP, it will be incorrect.  I have left this class without
+   // the update to the coordinates so that it is 'more wrong' and the bug is
+   // not so subtle.
+   class MultipolePotential : public SpatialProperty {
+
+      public:
+         MultipolePotential(QString type, int const order, 
+            Data::MultipoleExpansionList* siteList) : m_text(type), m_order(order), 
+            m_siteList(siteList) { }
+
+         ~MultipolePotential();
+
+         QString text() const { return m_text; }
+         bool isAvailable() const { return true; }
+
+         Function3D evaluator() {
+            return boost::bind(&MultipolePotential::potential, this, _1, _2, _3);
+         }
+
+      private:
+         QString m_text;
+         int m_order;
+         Data::MultipoleExpansionList* m_siteList;
+         double  potential(double const x, double const y, double const z);
+   };
+
+
+   class NearestNuclearCharge : public SpatialProperty {
+      public:
+         NearestNuclearCharge(QList<int> nuclearCharges = QList<int>(), 
+            QList<qglviewer::Vec> coordinates = QList<qglviewer::Vec>()) {
+            update(nuclearCharges, coordinates);
+         }
+
+         QString text() const { return "Nearest nucleus"; }
+         bool isAvailable() const { return true; }
+         Function3D evaluator() {
+            return boost::bind(&NearestNuclearCharge::nucleus, this, _1, _2, _3);
+         }
+         void update(QList<int> charges, QList<qglviewer::Vec> coordinates);
+
+      private:
+         QList<int> m_nuclearCharges;
+         QList<qglviewer::Vec> m_coordinates;
+         double nucleus(double const x, double const y, double const z);
    };
 
 

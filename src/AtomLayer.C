@@ -129,22 +129,20 @@ void Atom::setIndex(int const index)
 }
 
 
-void Atom::draw(Vec const& cameraPosition)
+void Atom::draw()
 {
    drawPrivate(false);
-   if (s_vibrationDisplayVector) drawDisplacement(cameraPosition);
+   if (s_vibrationDisplayVector) drawDisplacement();
 }
 
-void Atom::drawFast(Vec const& cameraPosition)
+void Atom::drawFast()
 {
-   Q_UNUSED(cameraPosition);
    drawPrivate(false);
 }
 
 
-void Atom::drawSelected(Vec const& cameraPosition)
+void Atom::drawSelected()
 {
-   Q_UNUSED(cameraPosition);
    drawPrivate(true);
 }
 
@@ -230,29 +228,32 @@ QString Atom::getLabel(LabelType const type)
 {
    QString label;
    switch (type) {
-      case Index:   label = QString::number(m_index);
+      case None:      label = "";
          break;
-      case Element: label = m_symbol;
+      case Index:     label = QString::number(m_index);
          break;
-      case Charge:  label = QString::number(m_charge, 'f', 2);
+      case Element:   label = m_symbol;
          break;
-      case Mass:    label = QString::number(m_mass, 'f', 3);
+      case Charge:    label = QString::number(m_charge, 'f', 2);
          break;
-      case Spin:    label = QString::number(m_spin, 'f', 2);
+      case Mass:      label = QString::number(m_mass, 'f', 3);
          break;
-      case Reindex: label = isSelected() ? QString::number(m_reorderIndex) : "";
+      case NmrShift:  label = QString::number(m_nmrShift, 'f', 2);
          break;
-      default:      label = "";
+      case Spin:      label = QString::number(m_spin, 'f', 2);
+         break;
+      case Reindex:   label = isSelected() ? QString::number(m_reorderIndex) : "";
+         break;
    }
    return label;
 }
 
 
-void Atom::drawDisplacement(Vec const& cameraPosition) 
+void Atom::drawDisplacement() 
 {
    if (s_vibrationDisplayVector) {
       Vec from(getPosition());
-      Vec shift(cameraPosition - from);
+      Vec shift(s_cameraPosition - from);
       shift.normalize();
       from = from + 1.10 * shift * getRadius(true) - 
           0.5*m_displacement*s_vibrationVectorScale;

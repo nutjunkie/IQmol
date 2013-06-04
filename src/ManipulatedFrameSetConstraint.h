@@ -45,7 +45,7 @@ namespace IQmol {
             qglviewer::Frame *const frame);
 
       private:
-         QList<Layer::GLObject*> m_primitives;  // Objects in the frame set
+         QList<Layer::GLObject*> m_objects;  // Objects in the frame set
    };
 
 } // end namespace IQmol

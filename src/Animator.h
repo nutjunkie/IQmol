@@ -60,6 +60,8 @@ namespace Animator {
          Layer::GLObject* m_object;
          qglviewer::Vec m_originalPosition;
          virtual void update(double const time, double const amplitude) = 0;
+         double m_time;
+         bool   m_active;
 
       private:
          static double signum(double const t);
@@ -72,8 +74,6 @@ namespace Animator {
          double (*wavefunction)(double const);
          double m_cycles;  // < 0 => forever
          double m_speed;
-         double m_time;
-         bool   m_active;
    };
 
 
@@ -137,12 +137,29 @@ namespace Animator {
    };
 
 
-   // class Transform, based on KeyFrameInterpolator?
-           
+   // Similar to Move, but transforms by Frames rather than just positions.
+   // This is important for any object that has an orientation, such as Groups.
+   class Transform : public Base {
+
+      Q_OBJECT
+
+      public:
+         Transform(Layer::GLObject* object, qglviewer::Frame const& endPoint, 
+            double const speed = 0.05);
+         void update(double const time, double const amplitude);
+
+      public Q_SLOTS:
+         void reset();
+
+      private:
+         qglviewer::Frame m_startPoint;
+         qglviewer::Frame m_endPoint;
+   };
+
 }
 
 typedef QList<Animator::Base*> AnimatorList;
 
- } // end namespace IQmol::Animator
+} // end namespace IQmol::Animator
 
 #endif

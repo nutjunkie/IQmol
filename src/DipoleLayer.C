@@ -56,22 +56,14 @@ void Dipole::setValue(qglviewer::Vec const& value)
 }
 
 
-void Dipole::draw(Vec const& cameraPosition)
+void Dipole::draw()
 {
-   Q_UNUSED(cameraPosition);
-   drawPrivate();
-}
-
-void Dipole::drawFast(Vec const& cameraPosition)
-{
-   Q_UNUSED(cameraPosition);
    drawPrivate();
 }
 
 
-void Dipole::drawSelected(Vec const& cameraPosition)
+void Dipole::drawFast()
 {
-   Q_UNUSED(cameraPosition);
    drawPrivate();
 }
 
