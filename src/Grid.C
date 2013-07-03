@@ -1,6 +1,6 @@
 /*******************************************************************************
        
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
            
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -23,6 +23,7 @@
 #include "IQmol.h"
 #include "Grid.h"
 #include "GridData.h"
+#include "MoleculeLayer.h"
 #include "QsLog.h"
 #include <cmath>
 #include <QApplication>
@@ -60,6 +61,8 @@ Grid::DataType& Grid::DataType::operator+=(Grid::DataType const& that)
    } else if (isDensity() && that.isDensity()) {
       m_type = DensityCombo;
       m_index = (s_densityTypeCount++);
+   } else if (m_type == CubeData && that.m_type == CubeData) {
+      m_type = CubeData;
    }else {
       m_type = Undefined;
    }
@@ -75,6 +78,8 @@ Grid::DataType& Grid::DataType::operator-=(Grid::DataType const& that)
    } else if (isDensity() && that.isDensity()) {
       m_type = DensityCombo;
       m_index = (s_densityTypeCount++);
+   } else if (m_type == CubeData && that.m_type == CubeData) {
+      m_type = CubeData;
    }else {
       m_type = Undefined;
    }
@@ -187,6 +192,20 @@ Grid::Size::Size(Vec const& boxMin, double const stepSize,
 }
 
 
+Vec Grid::Size::bbMin() const
+{
+   double h(stepSize());
+   return Vec(h*m_xMin, h*m_yMin, h*m_zMin);
+}
+
+Vec Grid::Size::bbMax() const
+{
+   double h(stepSize());
+   return Vec(h*m_xMax, h*m_yMax, h*m_zMax);
+}
+
+
+
                
 Grid::Size& Grid::Size::operator=(Grid::Size const& that)
 {
@@ -254,6 +273,12 @@ void Grid::Size::debugInfo() const
             << "   -->   y" << stepSize()*m_yMin << "to" << stepSize()*m_yMax;
    QLOG_TRACE() << "                   k"  << m_zMin << "to" << m_zMax
             << "   -->   z" << stepSize()*m_zMin << "to" << stepSize()*m_zMax;
+}
+
+
+int Grid::Size::dataCount() const
+{
+   return (m_xMax-m_xMin) * (m_yMax-m_yMin) * (m_zMax-m_zMin);
 }
  
 
@@ -666,6 +691,12 @@ void Grid::copy(Grid const& that)
 }
 
 
+double Grid::dataSizeInKb() const
+{
+   return  (double)m_size.dataCount() * sizeof(double)/1024.0;
+}
+
+
 
 void Grid::generateData(Function3D function)
 {
@@ -846,7 +877,7 @@ double Grid::bicubicInterpolate (double p[4][4], double x, double y) const
 }
 
 
-double Grid::tricubicInterpolate (double p[4][4][4], double x, double y, double z) const
+double Grid::tricubicInterpolate(double p[4][4][4], double x, double y, double z) const
 {
 	double array[4];
 	array[0] = bicubicInterpolate(p[0], y, z);
@@ -854,6 +885,78 @@ double Grid::tricubicInterpolate (double p[4][4][4], double x, double y, double 
 	array[2] = bicubicInterpolate(p[2], y, z);
 	array[3] = bicubicInterpolate(p[3], y, z);
 	return cubicInterpolate(array, x);
+}
+
+
+bool Grid::saveToCubeFile(QString const& filePath, Layer::Molecule& molecule, 
+   bool const invertSign) const
+{
+   QFile file(filePath);
+   if (file.exists() || !file.open(QIODevice::WriteOnly)) return false;
+
+   QStringList header;
+   header << "Cube file for " + m_dataType.info();
+   header << "Generated using IQmol";
+   
+   QStringList coords(molecule.coordinatesForCubeFile());
+   double h(stepSize()*AngstromToBohr);
+
+   int nx(xMax()-xMin());
+   int ny(yMax()-yMin());
+   int nz(zMax()-zMin());
+
+   header << QString("%1 %2 %3 %4").arg(coords.size(), 5)
+                                   .arg(h*xMin(), 13, 'f', 6)
+                                   .arg(h*yMin(), 13, 'f', 6)
+                                   .arg(h*zMin(), 13, 'f', 6);
+   header << QString("%1 %2 %3 %4").arg(nx, 5)
+                                   .arg(h,   13, 'f', 6)
+                                   .arg(0.0, 13, 'f', 6)
+                                   .arg(0.0, 13, 'f', 6);
+   header << QString("%1 %2 %3 %4").arg(ny, 5)
+                                   .arg(0.0, 13, 'f', 6)
+                                   .arg(h,   13, 'f', 6)
+                                   .arg(0.0, 13, 'f', 6);
+   header << QString("%1 %2 %3 %4").arg(nz, 5)
+                                   .arg(0.0, 13, 'f', 6)
+                                   .arg(0.0, 13, 'f', 6)
+                                   .arg(h,   13, 'f', 6);
+   header << coords;
+
+   QByteArray buffer;
+   buffer.append(header.join("\n"));
+   buffer.append("\n");
+   file.write(buffer);
+   buffer.clear();
+
+   double w;
+   int col(0);
+
+   for (int i = 0; i < nx; ++i) {
+       for (int j = 0; j < ny; ++j) {
+           for (int k = 0; k < nz; ++k, ++col) {
+               w = (*m_data)[i][j][k];
+               if (invertSign) w = -w;
+               if (w >= 0.0) buffer += " ";
+               buffer += QString::number(w, 'E', 5);
+               if (col == 5) {
+                  col = -1;
+                  buffer += "\n";
+               }else {
+                  buffer += " ";
+               }
+           }
+           file.write(buffer); 
+           buffer.clear();
+       }
+   }
+
+   buffer += "\n";
+   file.write(buffer); 
+   file.flush();
+   file.close();
+
+   return true;
 }
 
 

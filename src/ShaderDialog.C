@@ -1,6 +1,6 @@
 /*******************************************************************************
          
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
       
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -41,8 +41,11 @@ ShaderDialog::ShaderDialog(QWidget* parent) : QDialog(parent)
    m_sliders[1] = m_dialog.slider1;
    m_sliders[2] = m_dialog.slider2;
    m_sliders[3] = m_dialog.slider3;
+
    m_checkBoxes[0] = m_dialog.checkBox0;
    m_checkBoxes[1] = m_dialog.checkBox1;
+   m_checkBoxes[2] = m_dialog.checkBox2;
+   m_checkBoxes[3] = m_dialog.checkBox3;
 
    for (int i = 0; i < s_maxSliders; ++i) {
        connect(m_sliders[i], SIGNAL(valueChanged(int)), 
@@ -63,6 +66,30 @@ ShaderDialog::ShaderDialog(QWidget* parent) : QDialog(parent)
       m_dialog.shaderCombo->setCurrentIndex(index);
       on_shaderCombo_currentIndexChanged(index);
    }
+
+   if (!library.filtersAvailable()) {
+      m_dialog.shaderFilterTabWidget->removeTab(1);
+      return;
+   }
+
+   connect(m_dialog.antialias, SIGNAL(clicked(bool)), 
+      this, SLOT(installFilterParameters(bool)));
+   connect(m_dialog.border, SIGNAL(clicked(bool)), 
+      this, SLOT(installFilterParameters(bool)));
+   connect(m_dialog.ambientOcclusion, SIGNAL(clicked(bool)), 
+      this, SLOT(installFilterParameters(bool)));
+
+   connect(m_dialog.aoRadius, SIGNAL(valueChanged(int)), 
+      this, SLOT(installFilterParameters(int)));
+   connect(m_dialog.aoStrength, SIGNAL(valueChanged(int)), 
+      this, SLOT(installFilterParameters(int)));
+   connect(m_dialog.aoStrength, SIGNAL(valueChanged(int)), 
+      this, SLOT(installFilterParameters(int)));
+
+   setFilterParameters(Preferences::DefaultFilterParameters());
+
+   // Hide the effects page for now
+   m_dialog.shaderFilterTabWidget->removeTab(1);
 }
 
 
@@ -71,12 +98,12 @@ void ShaderDialog::on_shaderCombo_currentIndexChanged(int)
    ShaderLibrary& library(ShaderLibrary::instance());
    QString name(m_dialog.shaderCombo->currentText());
 
-   if (!library.install(name)) {
+   if (!library.bindShader(name)) {
       QMsgBox::warning(this, "IQmol", "Shader not found");
       return;
    }
 
-   setParameters(library.uniformVariableList(name));
+   setParameters(library.uniformUserVariableList(name));
    updated();
 }
 
@@ -93,6 +120,42 @@ void ShaderDialog::hideOptionControls()
 }
 
 
+void ShaderDialog::on_ambientOcclusion_clicked(bool tf)
+{
+   m_dialog.aoOptionsGroupBox->setEnabled(tf);
+}
+
+
+void ShaderDialog::setFilterParameters(QVariantMap const& map)
+{
+
+   // Don't allow these to be enabled from the Preferences
+/*
+   bool tf;
+   tf = map.contains("Antialias") ? map.value("Antialias").toBool() : false;
+   m_dialog.antialias->setChecked(tf);
+
+   tf = map.contains("Border") ? map.value("Border").toBool() : false;
+   m_dialog.border->setChecked(tf);
+
+   tf = map.contains("AmbientOcclusion") ? map.value("AmbientOcclusion").toBool() : false;
+   m_dialog.ambientOcclusion->setChecked(tf);
+   m_dialog.aoOptionsGroupBox->setEnabled(tf);
+*/
+
+   double value;
+   
+   value = map.contains("AORadius") ? map.value("AORadius").toDouble() : 0.0;
+   m_dialog.aoRadius->setValue(int(100.0*value));
+
+   value = map.contains("AOStrength") ? map.value("AOStrength").toDouble() : 0.0;
+   m_dialog.aoStrength->setValue(int(100.0*value));
+
+   value = map.contains("AOTotal") ? map.value("AOTotal").toDouble() : 0.0;
+   m_dialog.aoTotal->setValue(int(100*value));
+}
+
+
 void ShaderDialog::setParameters(QVariantMap const& map)
 {
    QString name;
@@ -105,6 +168,7 @@ void ShaderDialog::setParameters(QVariantMap const& map)
 
    for (QVariantMap::const_iterator iter = map.begin(); iter != map.end(); ++iter) {
        name = iter.key();
+       name.replace("user_","");
        name.replace("_"," ");
    
        switch (iter.value().type()) {
@@ -138,12 +202,26 @@ void ShaderDialog::setParameters(QVariantMap const& map)
 }
 
 
+QVariantMap ShaderDialog::getFilterParameters()
+{
+   QVariantMap map;
+   map.insert("Antialias", QVariant(m_dialog.antialias->isChecked()));
+   map.insert("Border", QVariant(m_dialog.border->isChecked()));
+   map.insert("AmbientOcclusion", QVariant(m_dialog.ambientOcclusion->isChecked()));
+   map.insert("AORadius", QVariant(m_dialog.aoRadius->value()/100.0));
+   map.insert("AOStrength", QVariant(m_dialog.aoStrength->value()/100.0));
+   map.insert("AOTotal", QVariant(m_dialog.aoTotal->value()/100.0));
+   return map;
+}
+
+
 QVariantMap ShaderDialog::getParameters()
 {
    QVariantMap map;
    for (int i = 0; i < s_maxSliders; ++i) {
        if (m_sliders[i]->isVisible()) {
           QString name(m_labels[i]->text().replace(" ","_"));
+          name.prepend("user_");
           double value(m_sliders[i]->value()/100.0);
           map.insert(name, QVariant(value));
        }
@@ -152,12 +230,22 @@ QVariantMap ShaderDialog::getParameters()
    for (int i = 0; i < s_maxCheckBoxes; ++i) {
        if (m_checkBoxes[i]->isVisible()) {
           QString name(m_checkBoxes[i]->text().replace(" ","_"));
+          name.prepend("user_");
           bool value(m_checkBoxes[i]->isChecked());
           map.insert(name, QVariant(value));
        }
    }
  
    return map;
+}
+
+
+
+void ShaderDialog::installFilterParameters()
+{
+   ShaderLibrary& library(ShaderLibrary::instance());
+   library.setFilterVariables(getFilterParameters());
+   updated();
 }
 
 
@@ -170,16 +258,16 @@ void ShaderDialog::installShaderParameters(int)
 }
 
 
-void ShaderDialog::accept()
+void ShaderDialog::on_saveAsDefault_clicked(bool)
 {
-   if (m_dialog.saveAsDefaultCheckBox->checkState() == Qt::Checked) {
-      qDebug() << "Setting Default Shader";
-      qDebug() << getParameters();
-      Preferences::DefaultShader(m_dialog.shaderCombo->currentText());
-      Preferences::DefaultShaderParameters(getParameters());
-   }
-
-   QDialog::accept();
+   qDebug() << "Setting Default Shader" << m_dialog.shaderCombo->currentText();
+   qDebug() << getParameters();
+   qDebug() << "Setting Default Shader";
+   qDebug() << getFilterParameters();
+   Preferences::DefaultShader(m_dialog.shaderCombo->currentText());
+   Preferences::DefaultShaderParameters(getParameters());
+   Preferences::DefaultFilterParameters(getFilterParameters());
 }
+
 
 } // end namespace IQmol

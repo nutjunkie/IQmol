@@ -2,7 +2,7 @@
 #define IQMOL_CONFORMERLISTLAYER_H
 /*******************************************************************************
        
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
            
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -41,6 +41,7 @@ namespace Layer {
       public:
          ConformerList(QList<Conformer*> const& conformers, Conformer* defaultConformer = 0);
          void setMolecule(Molecule*);
+         ~ConformerList();
 
       Q_SIGNALS:
          void pushAnimators(AnimatorList const&);
@@ -57,9 +58,11 @@ namespace Layer {
          void setLoop(bool const loop);
          void setBounce(bool const bounce);
          void setSpeed(double const speed);
-         void reperceiveBonds(bool const tf) { m_reperceiveBonds = tf; }
+         void reperceiveBonds(bool const tf);
 
       private:
+         void makeAnimators();
+         void deleteAnimators();
          Configurator::ConformerList m_configurator;
          AnimatorList m_animatorList;
          Conformer* m_defaultConformer;
@@ -67,6 +70,7 @@ namespace Layer {
          bool m_reperceiveBonds;
          int  m_nConformers;
          bool m_bounce;
+         bool m_loop;
    };
 
 

@@ -1,6 +1,6 @@
 /*******************************************************************************
          
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
       
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -21,7 +21,7 @@
 ********************************************************************************/
 
 #include "Animator.h"
-#include "QsLog.h"
+#include "MoleculeLayer.h"
 #define _USE_MATH_DEFINES
 #include <cmath>
 
@@ -31,25 +31,18 @@ using namespace qglviewer;
 namespace IQmol {
 namespace Animator {
 
-// if cycles < 0.0 then it animates until manually stopped
-Base::Base(Layer::GLObject* object, double const cycles, double const speed, 
-   Waveform const waveform) : m_object(object), m_time(0.0), m_active(true),
-   m_cycles(cycles), m_speed(speed)
-{
-   m_originalPosition = m_object->getPosition();
-   setWavefunction(waveform);
-}
 
-
-void Base::setWavefunction(Waveform const waveform)
+double Base::amplitude(double const t)
 {
-   switch (waveform) {
-      case Square:      wavefunction = &square;      break;
-      case Ramp:        wavefunction = &ramp;        break;
-      case Sigmoidal:   wavefunction = &sigmoidal;   break;
-      case Triangle:    wavefunction = &triangle;    break;
-      case Sinusoidal:  wavefunction = &sinusoidal;  break;
+   double amp(0.0);
+   switch (m_waveform) {
+      case Square:      amp = (std::sin(2.0*M_PI*t)>0) ? 1.0 : -1.0;  break;
+      case Ramp:        amp = t - std::floor(t);                      break; 
+      case Sigmoidal:   amp = std::pow(std::sin(0.5*M_PI*t), 2);      break;
+      case Triangle:    amp = std::abs(2.0-std::fmod(t, 4.0)) - 1.0;  break;
+      case Sinusoidal:  amp = std::sin(2.0*M_PI*t);                   break;
    }
+   return amp;
 }
 
 
@@ -63,7 +56,7 @@ void Base::step()
       m_active = false;
    }
 
-   update(m_time, wavefunction(m_time));
+   update(m_time, amplitude(m_time));
 
    if (!m_active) {
        finished(this);
@@ -74,61 +67,61 @@ void Base::step()
 
 void Base::reset()
 {
-   QLOG_TRACE() << "Animator: Base::reset() called, setting to original position";
    m_time = 0;
    m_active = true;
-   m_object->setPosition(m_originalPosition);
-}
-
-
-double Base::signum(double const t)
-{
-   return (t > 0.0) ? 1.0 : -1.0; 
-}
-
-
-double Base::square(double const t)
-{
-   return signum(std::sin(2.0*M_PI*t));
-}
-
-
-double Base::ramp(double const t)
-{
-   return t - std::floor(t);
-}
-
-
-double Base::sigmoidal(double const t)
-{
-   double s(std::sin(0.5*M_PI*t));
-   return s*s;
-}
-
-
-
-double Base::triangle(double const t)
-{
-   return std::abs(2.0 - std::fmod(t, 4.0)) - 1.0;
-}
-
-
-double Base::sinusoidal(double const t)
-{
-   return std::sin(2.0*M_PI*t);
 }
 
 
 
 // --------------- Vibration ---------------
+
 void Vibration::update(double const time, double const amplitude)
 {
    Q_UNUSED(time);
-   m_object->setPosition(m_originalPosition + m_scale*amplitude*m_displacement);
+   m_object->setPosition(m_beginFrame.position() + m_scaleAmplitude*amplitude*m_displacement);
 }
 
 
+
+// --------------- Move ---------------
+
+Move::Move(Layer::GLObject* object, Frame const& endFrame, double const speed) :    
+   Movement(object, 1.0, speed, Sigmoidal), m_endFrame(endFrame) 
+{ 
+}
+            
+
+Move::Move(Layer::GLObject* object, Vec const& endPoint, double const speed) : 
+   Movement(object, 1.0, speed, Sigmoidal) 
+{
+   m_endFrame.setPosition(endPoint);
+}
+            
+
+void Move::update(double const time, double const amp)
+{
+   Q_UNUSED(time);
+   m_object->setPosition( (1.0-amp)*m_beginFrame.position() + amp*m_endFrame.position());
+   m_object->setOrientation( Quaternion::slerp(m_beginFrame.orientation(),
+       m_endFrame.orientation(),amp) );
+}
+
+
+
 // --------------- Path ---------------
+Path::Path(Layer::GLObject* object, QList<Vec> const& waypoints, double const speed, 
+   bool const bounce) : Movement(object, 1.0, speed, Ramp), m_waypoints(waypoints),  
+   m_bounce(bounce)
+{ 
+}
+           
+
+void Path::addWaypoint(Vec const& point)
+{
+   m_waypoints.append(point);
+}
+           
+
 void Path::update(double const time, double const amplitude)
 {
    int n(m_waypoints.size()-1);
@@ -145,44 +138,96 @@ void Path::update(double const time, double const amplitude)
 }
 
 
-// --------------- Move ---------------
-void Move::reset()
-{
-   QLOG_DEBUG() << "Animator: Move::reset() called";
-   //m_object->setPosition(m_endPoint);
-}
 
+// --------------- Combo ---------------
 
-void Move::update(double const time, double const amp)
-{
-   Q_UNUSED(time);
-   m_object->setPosition( (1.0-amp)*m_originalPosition + amp*m_endPoint);
-}
-
-
-// --------------- Transform ---------------
-Transform::Transform(Layer::GLObject* object, qglviewer::Frame const& endPoint, 
-   double const speed) : Base(object, 1.0, speed, Sigmoidal)
+Combo::Combo(Layer::Molecule* molecule, DataList const& frames, int const interpolationFrames, 
+   double const speed, bool const bounce) : Base(1.0, speed, Ramp), m_molecule(molecule),
+   m_frames(frames), m_bounce(bounce), m_interpolationFrames(interpolationFrames), 
+   m_currentIndex(-1)
 { 
-  m_startPoint = m_object->getFrame();
-  m_endPoint   = endPoint;
+   DataList::iterator iter;
+   for (iter = m_frames.begin(); iter != m_frames.end(); ++iter) {
+       (*iter)->m_surface->setCheckState(Qt::Unchecked);
+   }
+
+   setCurrentIndex(0);
 }
 
 
-void Transform::reset()
+Combo::~Combo()
 {
-   m_time = 0;
-   m_active = true;
-   m_object->setFrame(m_startPoint);
+   reset();
+   DataList::iterator iter;
+   for (iter = m_frames.begin(); iter != m_frames.end(); ++iter) {
+       delete (*iter);
+   }
 }
 
 
-void Transform::update(double const time, double const amp)
+void Combo::reset()
 {
-   Q_UNUSED(time);
-   m_object->setPosition( (1.0-amp)*m_startPoint.position() + amp*m_endPoint.position());
-   m_object->setOrientation( Quaternion::slerp(m_startPoint.orientation(),
-       m_endPoint.orientation(),amp) );
+   Base::reset();
+   //setCurrentIndex(0);
 }
+
+
+void Combo::setCurrentIndex(int const n)
+{
+   if (n < 0 || n >= m_frames.size() || n == m_currentIndex) return;
+   m_frames[n]->m_surface->setCheckState(Qt::Checked);
+   m_molecule->setGeometry(m_frames[n]->m_geometry);
+
+   if (m_currentIndex >= 0 && m_currentIndex < m_frames.size()) {
+      m_frames[m_currentIndex]->m_surface->setCheckState(Qt::Unchecked);
+   }
+   m_currentIndex = n;
+}
+           
+
+void Combo::stepForward()
+{
+   setCurrentIndex(m_currentIndex+1);
+}
+
+
+void Combo::stepBack()
+{
+   setCurrentIndex(m_currentIndex-1);
+}
+
+
+void Combo::update(double const time, double const amplitude)
+{
+   Q_UNUSED(amplitude);
+
+   int n(m_frames.size());
+   int index(time*m_interpolationFrames);
+   index = m_bounce ? (index % (2*n)) : (index % n);
+   if (index >= n) index = 2*n - index - 1;
+
+   setCurrentIndex(index);
+}
+
+
+void Combo::setAlpha(double const alpha)
+{
+   DataList::iterator iter;
+   for (iter = m_frames.begin(); iter != m_frames.end(); ++iter) {
+       (*iter)->m_surface->setAlpha(alpha);
+   }
+}
+
+
+void Combo::setDrawMode(Layer::Surface::DrawMode const mode)
+{
+   DataList::iterator iter;
+   for (iter = m_frames.begin(); iter != m_frames.end(); ++iter) {
+       (*iter)->m_surface->setDrawMode(mode);
+   }
+}
+
+
+
 
 } } // end namespace IQmol::Animator

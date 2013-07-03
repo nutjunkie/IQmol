@@ -2,7 +2,7 @@
 #define IQMOL_PREFERENCES_H
 /*******************************************************************************
        
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
            
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -109,6 +109,9 @@ namespace Preferences {
     
    QVariantMap DefaultShaderParameters();
    void        DefaultShaderParameters(QVariantMap const&);
+
+   QVariantMap DefaultFilterParameters();
+   void        DefaultFilterParameters(QVariantMap const&);
 
    QString QChemDatabaseFilePath();
    void    QChemDatabaseFilePath(QString const&);

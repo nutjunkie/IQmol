@@ -65,7 +65,6 @@ macx {
    LIBS += -lopenbabel -lgfortran -lssl -lssh2 -lcrypto -lz
    LIBS += -L$(DEV)/Boost/lib -lboost_iostreams -lboost_serialization
 
-   #CONFIG += debug
    CONFIG += release
    QMAKE_INFO_PLIST = resources/Info.plist
    FORMS += PeriodicTableMac.ui
@@ -122,7 +121,8 @@ HEADERS += \
    BuildEFPFragmentHandler.h \
    EFPFragmentListConfigurator.h \
    BuildMoleculeFragmentHandler.h \
-   Shell.h  Grid.h MOCoefficients.h \
+   Shell.h  Grid.h \
+#MOCoefficients.h \
    ProgressDialog.h  SurfaceLayer.h  MarchingCubes.h CubeDataLayer.h \
    QChemParser.h  GlobalLayer.h MeshConfigurator.h  InfoLayer.h \
    InfoConfigurator.h  BaseConfigurator.h BackgroundConfigurator.h \
@@ -166,7 +166,11 @@ HEADERS += \
    ShaderLibrary.h \
    ShaderDialog.h \
    Lebedev.h \
+   GLSLmath.h \
+   GridInfoDialog.h \
+   SurfaceAnimatorDialog.h \
    AmbientOcclusionEngine.h \
+   BoundingBoxDialog.h \
    LocalConnectionThread.h
            
 
@@ -183,7 +187,9 @@ SOURCES += \
    BuildEFPFragmentHandler.C \
    EFPFragmentListConfigurator.C \
    BuildMoleculeFragmentHandler.C \
-   Shell.C  Grid.C  MOCoefficients.C  ProgressDialog.C \
+   Shell.C  Grid.C  \
+#MOCoefficients.C  \
+ ProgressDialog.C \
    SurfaceLayer.C  MarchingCubes.C  CubeDataLayer.C  QChemParser.C  InfoLayer.C \
    InfoConfigurator.C  BackgroundConfigurator.C  MoleculeConfigurator.C \
    SurfaceConfigurator.C  BaseParser.C  ExternalChargesParser.C \
@@ -221,7 +227,12 @@ SOURCES += \
    ShaderLibrary.C \
    ShaderDialog.C \
    Lebedev.C \
+   GLSLmath.C \
+   GridInfoDialog.C \
+   SurfaceAnimatorDialog.C \
    AmbientOcclusionEngine.C \
+   BoundingBoxDialog.C \
+   glloader.cpp \
    LocalConnectionThread.C
    
 
@@ -239,6 +250,8 @@ FORMS += \
    FragmentTable.ui   \
    ProcessMonitor.ui  SSHFileConfigurator.ui   \
    ServerDialog.ui  ServerOptionsDialog.ui  EFPFragmentListConfigurator.ui \
-   ServerQueueDialog.ui  ShaderDialog.ui
+   ServerQueueDialog.ui  ShaderDialog.ui  SurfaceAnimatorDialog.ui  GridInfoDialog.ui \
+   BoundingBoxDialog.ui
+   
 
    

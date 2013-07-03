@@ -2,7 +2,7 @@
 #define IQMOL_CUBEDATALAYER_H
 /*******************************************************************************
        
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
            
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -25,6 +25,7 @@
 #include "DataLayer.h"
 #include "CubeDataConfigurator.h"
 #include "SpatialProperty.h"
+#include "Geometry.h"
 
 
 namespace IQmol {
@@ -44,13 +45,19 @@ namespace Layer {
          CubeData(Grid* grid);
          ~CubeData();
 
+         void setMolecule(Molecule*);
          GridBased* createProperty();
+         Grid* grid() { return m_grid; } 
 
-      private Q_SLOTS:
+         void appendAtom(int const Z, qglviewer::Vec const& position);
+         IQmol::Data::Geometry const& geometry() const { return m_geometry; }
+
+      public Q_SLOTS:
          void calculateSurface(Layer::Surface*);
 
       private:
          Grid* m_grid;
+         IQmol::Data::Geometry m_geometry;
          Configurator::CubeData m_configurator;
    };
 

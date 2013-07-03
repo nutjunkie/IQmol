@@ -1,6 +1,6 @@
 /*******************************************************************************
        
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
            
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -219,7 +219,6 @@ void QChem::readMullikenCharges(QTextStream& textStream)
 
    double q, s;
    bool qOK(true), sOK(true), allOK;
-qDebug() << "Parser::QChem with spin = " << withSpin;
 
    while (!textStream.atEnd()) {
       line = textStream.readLine();

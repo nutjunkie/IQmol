@@ -1,6 +1,6 @@
 /*******************************************************************************
        
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
            
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -145,6 +145,11 @@ DataList OpenBabel::extractData(::OpenBabel::OBMol& obMol)
       ::OpenBabel::OBGridData* gridData = static_cast< ::OpenBabel::OBGridData* >(data);
       if (gridData) {
          Layer::CubeData* cubeData = new Layer::CubeData(new Grid(*gridData));
+         AtomList atomList(atoms->findLayers<Layer::Atom>(Layer::Children));
+         AtomList::iterator iter;
+         for (iter = atomList.begin(); iter != atomList.end(); ++iter) {
+             cubeData->appendAtom((*iter)->getAtomicNumber(), (*iter)->getPosition());
+         }
          dataList.append(cubeData);
       }
    }

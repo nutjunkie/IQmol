@@ -1,6 +1,6 @@
 /*******************************************************************************
        
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
            
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -144,10 +144,6 @@ if (0) {
 
 void Snapshot::capture()
 {
-if (0) {
-m_viewer->QGLViewer::saveSnapshot(true, true);
-return;
-}
    if (m_fileBaseName.isEmpty()) return;
 
    QString fileName(m_fileBaseName);
@@ -156,7 +152,16 @@ return;
       if (m_counter <  100) fileName += "0";
       if (m_counter <   10) fileName += "0";
       fileName += QString::number(m_counter);
+      ++m_counter;
    }
+
+if (1) {
+fileName += ".png";
+qDebug() << "Saving snapshot to" << fileName;
+m_viewer->QGLViewer::saveSnapshot(fileName, true);
+m_fileNames << fileName;
+return;
+}
 
    switch (m_fileFormat) {
       case JPG: 
@@ -190,7 +195,6 @@ return;
          break;
    }
  
-   if (m_flags & AutoIncrement) ++m_counter;
 }
 
 
@@ -237,7 +241,12 @@ qDebug() << "Making movies";
    }
 
    QStringList args;
-   args << movie.fileName() << m_fileNames;
+   args << movie.fileName();
+
+   for (int i = 0; i < m_fileNames.size(); ++i) {
+       QFileInfo info(m_fileNames[i]);
+       if (info.exists()) args << m_fileNames[i];
+   }
 
    qDebug() << "Starting QProcess" << script.filePath() << "with args:";
    qDebug() << args;

@@ -2,7 +2,7 @@
 #define IQMOL_SNAPSHOT_H
 /*******************************************************************************
        
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
            
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -23,6 +23,7 @@
 ********************************************************************************/
 
 #include <QStringList>
+#include <QImage>
 
 
 namespace IQmol {
@@ -30,7 +31,9 @@ namespace IQmol {
    class Viewer;
 
    /// Class that encapsulates the saving of snapshots and saving them to file.
-   class Snapshot {
+   class Snapshot : public QObject {
+
+      Q_OBJECT
 
       public:
          enum Format { JPG, PNG, TIFF, PPM, BMP, EPS, PDF, SVG };
@@ -44,10 +47,12 @@ namespace IQmol {
 
          Snapshot(Viewer* viewer, int const flags = 0);
 
-         void capture();
          bool requestFileName();
          void resetCounter() { m_counter = 0; } 
          void makeMovie();
+
+      public Q_SLOTS:
+         void capture();
 
       private:
          void captureVector(QString const& fileName, int const format);

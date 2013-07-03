@@ -2,7 +2,7 @@
 #define IQMOL_MOLECULELAYER_H
 /*******************************************************************************
        
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
            
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -31,6 +31,7 @@
 #include "ContainerLayer.h"
 #include "EFPFragmentListLayer.h"
 #include "MoleculeConfigurator.h"
+#include "SurfaceAnimatorDialog.h"
 #include "Animator.h"
 #include <QFileInfo>
 #include <QMap>
@@ -63,6 +64,10 @@ namespace Command {
    class ChangeAtomType;
 }
 
+namespace Data {
+   class Geometry;
+}
+
 
 class SpatialProperty;
 class PointChargePotential;
@@ -91,6 +96,8 @@ namespace Layer {
       friend class Frequencies;
       friend class ConformerList;
       friend class Configurator::Molecule;
+      friend class Animator::Combo;
+      //friend class SurfaceAnimatorDialog;
 
       // !!! some of these are no longer required to be friends
       friend class Command::AppendData;
@@ -184,6 +191,7 @@ namespace Layer {
          /// Converts the Molecule to an XYZ format and uses OpenBabel to parse this.  
          /// Useful for, e.g., reperceiving bonds.
          QString coordinatesAsString(bool const selectedOnly = false);
+         QStringList coordinatesForCubeFile();
 
 		 /// Assigns the atom indices based on the ordering selected by 
 		 /// the user via the reorderIndex variable in the Atom class.
@@ -195,17 +203,22 @@ namespace Layer {
 
          QList<qglviewer::Vec> coordinates();
          QList<double> atomicCharges();
+         void setGeometry(IQmol::Data::Geometry const&);
 
 		 // This is needed for fchk-file based surfaces and only covers ridgid
 		 // body motions of the molecule.
          qglviewer::Frame const& getReferenceFrame() const { return m_frame; }
          void setReferenceFrame(qglviewer::Frame const& frame) { m_frame = frame; }
 
+         void setReperceiveBondsForAnimation(bool tf) {
+              m_reperceiveBondsForAnimation = tf;
+         }
+
 
       public Q_SLOTS:
          void appendDataFile(Data*);
          void appendSurface(Layer::Surface*);
-         void reperceiveBonds( );
+         void reperceiveBonds() { reperceiveBonds(true); }
          void setGasteigerCharges();
          void setSandersonCharges();
          void setMullikenCharges();
@@ -215,10 +228,13 @@ namespace Layer {
          void constraintUpdated();
          void deleteConstraint();
          void selectAll();
+         void reperceiveBondsForAnimation() { 
+            if (m_reperceiveBondsForAnimation) reperceiveBonds(false);
+         }
+         void openSurfaceAnimator();
 
          /// Passes the remove signal on so that the ViewerModel can deal with it
          void removeMolecule() { removeMolecule(this); }
-
          void detectSymmetry();
          void autoDetectSymmetry();
 
@@ -249,6 +265,7 @@ namespace Layer {
 
          /// Updates the atom and bond indicies after, for example, deletion.
          void reindexAtomsAndBonds();
+         void reperceiveBonds(bool postCmd);
 
       private Q_SLOTS:
          void jobInfoChanged();
@@ -293,7 +310,7 @@ namespace Layer {
 		 /// (e.g. added hydrogens) are returned, otherwise a complete list of
 		 /// added primtives is returned.  The returned primitive list can be
          /// used for UndoCommands.  Note that this does not load all the data
-         /// in the OBMol (e.g. frequecny data), for that Parser::OpenBabel
+         /// in the OBMol (e.g. frequency data), for that, Parser::OpenBabel
          /// should be used.
 		 PrimitiveList fromOBMol(OpenBabel::OBMol*, AtomMap* = 0, BondMap* = 0, 
             GroupMap* = 0);
@@ -337,8 +354,10 @@ namespace Layer {
          /// model.
          bool m_smallerHydrogens;
          bool m_modified;
+         bool m_reperceiveBondsForAnimation;
 
          Configurator::Molecule m_configurator;
+         SurfaceAnimatorDialog  m_surfaceAnimator;
          
          // This is the last JobInfo we created
          JobInfo*    m_jobInfo;

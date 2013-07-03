@@ -1,6 +1,6 @@
 /*******************************************************************************
          
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
       
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -24,18 +24,32 @@
 #include "Preferences.h"
 #include "TextStream.h"
 #include "QsLog.h"
+#include "GLSLmath.h"
 #include <QDir>
 #include <QFileInfo>
+#include <QGLFramebufferObject>
 #include <cstdlib>
+#include <time.h>
+
 
 
 using namespace qglviewer;
 
 namespace IQmol {
 
+
 const QString ShaderLibrary::NoShader = "None";
 QString ShaderLibrary::s_currentShader;
 QVariantMap ShaderLibrary::s_currentMaterial = QVariantMap();
+
+QGLFramebufferObject* ShaderLibrary::s_normalBuffer = 0;
+QGLFramebufferObject* ShaderLibrary::s_filterBuffer = 0;
+
+GLuint   ShaderLibrary::s_rotationTextureId   = 0;
+GLuint   ShaderLibrary::s_rotationTextureSize = 64;
+GLfloat* ShaderLibrary::s_rotationTextureData = 0;
+
+
 
 ShaderLibrary* ShaderLibrary::s_instance = 0;
 QMap<QString, unsigned> ShaderLibrary::s_shaders = QMap<QString, unsigned>();
@@ -48,6 +62,7 @@ ShaderLibrary& ShaderLibrary::instance()
       s_instance->init();
       s_instance->loadAllShaders();
       s_instance->loadPreferences();
+      s_instance->setFilterVariables(QVariantMap()); 
       atexit(ShaderLibrary::destroy);
    }
    return *s_instance;
@@ -70,18 +85,29 @@ void ShaderLibrary::init()
 
 void ShaderLibrary::destroy()
 {
+   if (s_rotationTextureId) glDeleteTextures(1, &s_rotationTextureId);
+
    QMap<QString, unsigned>::iterator iter;
    for (iter = s_shaders.begin(); iter != s_shaders.end(); ++iter) {
        glDeleteProgram(iter.value());
    }
+
+   // These seem to cause a crash 
+   //if (s_normalBuffer) delete s_normalBuffer;
+   //if (s_filterBuffer) delete s_filterBuffer;
 }
 
 
-bool ShaderLibrary::install(QString const& shader)
+ShaderLibrary::~ShaderLibrary()
+{
+   delete s_rotationTextureData;
+}
+
+
+bool ShaderLibrary::bindShader(QString const& shader)
 {
    bool okay(false);
    if (s_shaders.contains(shader)) {
-      QLOG_DEBUG() << "Installing shader " << shader;
       glUseProgram(s_shaders.value(shader));
       s_currentShader = shader;
       okay = true;
@@ -90,7 +116,13 @@ bool ShaderLibrary::install(QString const& shader)
 }
 
 
-bool ShaderLibrary::uninstall()
+bool ShaderLibrary::resume()
+{
+   return bindShader(s_currentShader);
+}
+
+
+bool ShaderLibrary::suspend()
 {
    glUseProgram(0);
    return true;
@@ -103,7 +135,7 @@ void ShaderLibrary::loadPreferences()
     if (defaultShader.isEmpty()) defaultShader = NoShader;
     QVariantMap defaultShaderParameters(Preferences::DefaultShaderParameters());
     setUniformVariables(defaultShader, defaultShaderParameters);
-    install(defaultShader);
+    bindShader(defaultShader);
 }
 
 
@@ -135,18 +167,19 @@ void ShaderLibrary::loadAllShaders()
              name = name.replace("_", " ");
              program = createProgram(vertex.filePath(), fragment.filePath());          
              if (program > 0) {
+                QLOG_DEBUG() << "Shader compilation successful:" << name;
                 s_shaders.insert(name, program);
-                setUniformVariables(name, parseUniformVariables(vertex.filePath()));
+                QVariantMap uniforms(parseUniformVariables(vertex.filePath()));
+                uniforms.unite(parseUniformVariables(fragment.filePath()));
+                setUniformVariables(name, uniforms);
              }
           }
        }
    }
-
-   QLOG_INFO() << s_shaders.size() << " Shaders available";
 }
 
 
-QVariantMap ShaderLibrary::uniformVariableList(QString const& shaderName)
+QVariantMap ShaderLibrary::uniformUserVariableList(QString const& shaderName)
 {
    if (shaderName == NoShader) return s_currentMaterial;
    QVariantMap map;
@@ -170,7 +203,7 @@ QVariantMap ShaderLibrary::uniformVariableList(QString const& shaderName)
           buf[length] = 0;
           QString name(buf);
 
-          if (!name.startsWith("gl_")) {
+          if (name.startsWith("user_")) {
              location = glGetUniformLocation(program, buf);
 
              switch (type) {
@@ -191,6 +224,7 @@ QVariantMap ShaderLibrary::uniformVariableList(QString const& shaderName)
                    break;
 
                 default:
+                   // Assume anything else is installed by the Viewer
                    qDebug() << "Unknown GL_Type" << type;
                    break;
              }
@@ -217,7 +251,6 @@ unsigned ShaderLibrary::createProgram(QString const& vertexPath, QString const& 
    glAttachShader(program, vertexShader);
    glAttachShader(program, fragmentShader);
 
-
    glLinkProgram(program);
    glValidateProgram(program);
 
@@ -231,8 +264,8 @@ unsigned ShaderLibrary::createProgram(QString const& vertexPath, QString const& 
       QLOG_WARN() << "Failed to compile GLSL program";
       QLOG_WARN() << QString(msg);
 
-qDebug() <<  "Failed to compile GLSL program";
-qDebug() << QString(msg);
+      qDebug() <<  "Failed to compile GLSL program";
+      qDebug() << QString(msg);
 
       glDeleteProgram(program);
       program = 0;
@@ -289,11 +322,11 @@ uniform can be replaced by 'in' and if no default is given the floats default
 to 0.0 and the color to white.  Comments between the BEGIN and END lines are
 ignored.
 */
-QVariantMap ShaderLibrary::parseUniformVariables(QString const& vertexShaderPath)
+QVariantMap ShaderLibrary::parseUniformVariables(QString const& shaderPath)
 {
    QVariantMap map;
 
-   QFile file(vertexShaderPath);
+   QFile file(shaderPath);
    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
       Parser2::TextStream textStream(&file);
 
@@ -365,6 +398,38 @@ bool ShaderLibrary::setMaterialParameters(QVariantMap const& map)
 }
 
 
+bool ShaderLibrary::setTextureVariable(QString const& shader, QString const& variable, 
+   Texture const& texture)
+{
+   QSizeF size(1.0/texture.size.width(), 1.0/texture.size.height());
+   setUniformVariable(shader, variable+"_delta", size);
+   setUniformVariable(shader, variable, texture);
+   return true;
+}
+
+
+void ShaderLibrary::setFilterVariables(QVariantMap const& map)
+{
+   bool aa(map.contains("Antialias") && map.value("Antialias").toBool());
+   bool bd(map.contains("Border") && map.value("Border").toBool());
+   bool ao(map.contains("AmbientOcclusion") && map.value("AmbientOcclusion").toBool());
+   m_filtersActive = aa || bd || ao;
+
+   // Let the shaders know whether or not the Mask texture is valid
+   QStringList shaders(availableShaders());
+   QStringList::const_iterator iter;
+   for (iter = shaders.begin(); iter != shaders.end(); ++iter) {
+       setUniformVariable(*iter, "FiltersAreValid", m_filtersActive);
+   }
+
+   // Ambient Occlusion parameters
+   if (ao) {
+      setUniformVariables("Filters", map);
+   }
+}
+   
+
+
 bool ShaderLibrary::setUniformVariables(QString const& shaderName, QVariantMap const& map)
 {
    // If there is no shader, the parameters affect the material
@@ -406,20 +471,15 @@ bool ShaderLibrary::setUniformVariables(QString const& shaderName, QVariantMap c
 }
 
 
-template <class T>
-bool ShaderLibrary::setUniformVariable(QString const& shaderName, QString const& variable,
-   T const& value)
+void ShaderLibrary::setUniformVariable(GLuint program, GLint location, QSizeF const& value)
 {
-   if (!s_shaders.contains(shaderName)) return false;
-   unsigned program(s_shaders.value(shaderName));
-   glUseProgram(program);
+   glUniform2f(location, value.width(), value.height());
+}
 
-   QByteArray raw(variable.toLocal8Bit());
-   const char* c_str(raw.data());
-   GLint location(glGetUniformLocation(program, c_str));
-   if (location < 0) return false;
-   setUniformVariable(program, location, value);
-   return true;
+
+void ShaderLibrary::setUniformVariable(GLuint program, GLint location, QSize const& value)
+{
+   glUniform2i(location, value.width(), value.height());
 }
 
 
@@ -435,10 +495,302 @@ void ShaderLibrary::setUniformVariable(GLuint program, GLint location, double va
 }
 
 
+void ShaderLibrary::setUniformVariable(GLuint program, GLint location, GLFloatArray const& value)
+{
+   switch (value.type) {
+      case GLfloat1v:
+         glUniform1fv(location, value.size, value.ptr);
+         break;
+      case GLfloat2v:
+         glUniform2fv(location, value.size, value.ptr);
+         break;
+      case GLfloat3v:
+         glUniform3fv(location, value.size, value.ptr);
+         break;
+      case GLfloat4v:
+         glUniform4fv(location, value.size, value.ptr);
+         break;
+      default:
+         qDebug() << "Unrecognized GLFloatArray type value";
+   }
+}
+
+
+void ShaderLibrary::setUniformVariable(GLuint program, GLint location, GLfloat value)
+{
+   glUniform1f(location, value);
+}
+
+
 void ShaderLibrary::setUniformVariable(GLuint program, GLint location, QColor const& color)
 {
    glUniform4f(location, color.redF(), color.greenF(), color.blueF(), 
       color.alphaF()); 
 }
+
+void ShaderLibrary::setUniformVariable(GLuint program, GLint location, mat4x4 const& value)
+{
+   mat4x4 tmp(value);
+   glUniformMatrix4fv(location, 1, GL_FALSE, &tmp);
+}
+
+void ShaderLibrary::setUniformVariable(GLuint program, GLint location, Texture const& texture)
+{
+   GLuint w(texture.size.width());
+   GLuint h(texture.size.height());
+
+   switch (texture.slot) {
+      case NormalBuffer:     glActiveTexture(GL_TEXTURE0);  break;
+      case FilterBuffer:     glActiveTexture(GL_TEXTURE1);  break;
+      case RotationTexture:  glActiveTexture(GL_TEXTURE2);  break;
+   }
+
+   glBindTexture(GL_TEXTURE_2D, texture.id);
+   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_FLOAT, texture.data);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+   glUniform1i(location, (GLuint)texture.slot);
+}
+
+
+
+void ShaderLibrary::resizeScreenBuffers(QSize const& windowSize, double* projectionMatrix)
+{
+   delete s_normalBuffer;
+   delete s_filterBuffer;
+
+   s_normalBuffer = new QGLFramebufferObject(windowSize, QGLFramebufferObject::Depth);
+   s_filterBuffer = new QGLFramebufferObject(windowSize, QGLFramebufferObject::Depth);
+
+   GLfloat width(s_normalBuffer->size().width());
+   GLfloat height(s_normalBuffer->size().height());
+   
+   mat4x4  projection, projectionInverse, projectionBiasInverse;
+   for (int i = 0; i < 15; ++i) { projection[i] = (GLfloat)projectionMatrix[i]; }
+   projectionInverse     = PerspectiveProjectionMatrixInverse(projection);
+   projectionBiasInverse = projectionInverse * BiasMatrixInverse();
+
+   QSizeF size(width/s_rotationTextureSize, height/s_rotationTextureSize);
+   setUniformVariable("Filters", "Scale_xy", size);
+   setUniformVariable("Filters", "ProjectionInverse", projectionBiasInverse);
+}
+
+
+void ShaderLibrary::initializeTextures()
+{
+   int nSamples = 16;  // This is set in the shader too
+
+   GLfloat* angles = new GLfloat[2*nSamples];
+   GLfloat  angle  = (GLfloat)M_PI_4;
+   GLfloat  radius = 0.415f;  // This is the maximum length of the vector
+
+   for (int i = 0; i < nSamples; ++i) {
+       angles[2*i+0] = radius * cos(angle) * (i+1.0)/16.0f;
+       angles[2*i+1] = radius * sin(angle) * (i+1.0)/16.0f;
+       angle += (float)M_PI_2;
+       if (((i + 1) % 4) == 0) angle += 0.375*M_PI;
+   }
+
+   GLFloatArray array;
+   array.type = GLfloat2v;
+   array.size = nSamples;
+   array.ptr  = angles;
+
+   setUniformVariable("Filters", "SamplingVectors", array);
+   delete angles;
+
+
+   // generate a 64 x 64 rotation texture for rotating the sampling vectors
+   srand(time(0));
+   int n(s_rotationTextureSize);
+   s_rotationTextureData = new GLfloat[4*n*n];
+   angle = (2.0*M_PI) * rand() / RAND_MAX;
+
+   for (int i = 0; i < n*n; ++i) {
+       s_rotationTextureData[4*i+0] =  0.5f*cos(angle) + 0.5f;
+       s_rotationTextureData[4*i+1] =  0.5f*sin(angle) + 0.5f;
+       s_rotationTextureData[4*i+2] = -0.5f*sin(angle) + 0.5f;
+       s_rotationTextureData[4*i+3] =  0.5f*cos(angle) + 0.5f;
+       angle += (2.0*M_PI) * rand() / RAND_MAX;
+   }
+
+qDebug() << "Writing red rotation data";
+   for (int i = 0; i < n*n; ++i) {
+       s_rotationTextureData[4*i+0] =  1.0;
+       s_rotationTextureData[4*i+1] =  0.0;
+       s_rotationTextureData[4*i+2] =  0.0;
+       s_rotationTextureData[4*i+3] =  1.0;
+   }
+
+
+
+   glGenTextures(1, &s_rotationTextureId);
+
+   Texture texture;
+   texture.id   = s_rotationTextureId;
+   texture.size = QSize(n, n);
+   texture.slot = RotationTexture;
+   texture.data = s_rotationTextureData;
+   setTextureVariable("Filters", "RotationTexture", texture);
+}
+
+
+void ShaderLibrary::bindNormalMap(GLfloat near0, GLfloat far0)
+{
+   bindShader("Normal Map");
+   s_normalBuffer->bind();
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+   setUniformVariable("Normal Map", "Near", near0);
+   setUniformVariable("Normal Map", "Far", far0);
+}
+
+
+void ShaderLibrary::releaseNormalMap()
+{
+   s_normalBuffer->release();
+}
+
+
+void ShaderLibrary::generateFilters()
+{
+   GLuint texId(s_normalBuffer->texture()); 
+   QSize  size(s_normalBuffer->size()); 
+
+   Texture texture;
+   texture.id   = texId;
+   texture.size = size;
+   texture.slot = NormalBuffer;
+   texture.data = 0;
+ 
+   setTextureVariable("Filters", "NormalMap", texture);
+
+   s_filterBuffer->bind();
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+   bindShader("Filters");
+
+
+
+ 
+   texture.id   = s_normalBuffer->texture(); 
+   texture.size = size;
+   texture.slot = (Texture_t)0;
+   texture.data = 0;
+   setTextureVariable("Filters", "NormalMap", texture);
+
+   texture.id   = s_rotationTextureId;
+   texture.size = QSize(s_rotationTextureSize, s_rotationTextureSize);
+   texture.slot = (Texture_t)1;
+   texture.data = s_rotationTextureData;
+   setTextureVariable("Filters", "RotationTexture", texture);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   //bindTextures("Filters");
+/*
+   glActiveTexture(GL_TEXTURE0);  
+   glBindTexture(GL_TEXTURE_2D, texId);
+
+   glActiveTexture(GL_TEXTURE2);  
+   glBindTexture(GL_TEXTURE_2D, s_rotationTextureId);
+*/
+
+
+   float w(size.width());  float h(size.height());  float z(0.0);
+  
+   glMatrixMode(GL_PROJECTION);
+   glPushMatrix();
+   glLoadIdentity();
+   glOrtho(z, w, z, h, -1, 1);
+   glMatrixMode(GL_MODELVIEW);
+   glPushMatrix();
+   glLoadIdentity();
+
+   glBegin(GL_QUADS);
+      glTexCoord2f(1.0f,0.0f);  glVertex3f(w, z, z);
+      glTexCoord2f(0.0f,0.0f);  glVertex3f(z, z, z);
+      glTexCoord2f(0.0f,1.0f);  glVertex3f(z, h, z);
+      glTexCoord2f(1.0f,1.0f);  glVertex3f(w, h, z);
+   glEnd();
+
+   glMatrixMode(GL_PROJECTION);
+   glPopMatrix();
+   glMatrixMode(GL_MODELVIEW);
+   glPopMatrix();
+
+   s_filterBuffer->release();
+   releaseTextures();
+}
+
+
+void ShaderLibrary::bindTextures(QString const& shader)
+{
+   GLuint normalId(s_normalBuffer->texture()); 
+   GLuint filterId(s_filterBuffer->texture()); 
+   QSize  size(s_normalBuffer->size()); 
+
+   Texture texture;
+ 
+   texture.id   = normalId;
+   texture.size = size;
+   texture.slot = NormalBuffer;
+   texture.data = 0;
+   setTextureVariable(shader, "NormalMap", texture);
+
+   texture.id   = filterId;
+   texture.size = size;
+   texture.slot = FilterBuffer;
+   texture.data = 0;
+   setTextureVariable(shader, "FilterMap", texture);
+
+   texture.id   = s_rotationTextureId;
+   texture.size = QSize(s_rotationTextureSize, s_rotationTextureSize);
+   texture.slot = RotationTexture;
+   texture.data = s_rotationTextureData;
+   setTextureVariable(shader, "RotationTexture", texture);
+}
+
+
+void ShaderLibrary::releaseTextures()
+{
+   glActiveTexture(GL_TEXTURE0);  
+   glBindTexture(GL_TEXTURE_2D, 0);
+   glDisable(GL_TEXTURE_2D);
+
+   glActiveTexture(GL_TEXTURE1);  
+   glBindTexture(GL_TEXTURE_2D, 0);
+   glDisable(GL_TEXTURE_2D);
+
+   glActiveTexture(GL_TEXTURE2);  
+   glBindTexture(GL_TEXTURE_2D, 0);
+   glDisable(GL_TEXTURE_2D);
+}
+
+
+
+
+void ShaderLibrary::clearFrameBuffers()
+{
+   s_normalBuffer->bind();
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+   s_normalBuffer->release();
+
+   s_filterBuffer->bind();
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+   s_filterBuffer->release();
+}
+
 
 } // end namespace IQmol

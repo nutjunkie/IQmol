@@ -2,7 +2,7 @@
 #define IQMOL_SERVER_H
 /*******************************************************************************
          
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
       
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -112,7 +112,7 @@ namespace IQmol {
 
          /// These should be revisited to make sure they are actually needed
          Type type()                     const { return m_type; }
-         QString qchemEnvironment()      const { return m_qchemEnvironment; }
+         //QString qchemEnvironment()      const { return m_qchemEnvironment; }
          Authentication authentication() const { return m_authentication; }
          int port()                      const { return m_port; }
          QString workingDirectory()      const { return m_workingDirectory; }
@@ -191,7 +191,7 @@ namespace IQmol {
          QString m_name;
          Host m_host;
          Type m_type;
-         QString m_qchemEnvironment;
+         //QString m_qchemEnvironment;
          QString m_hostAddress;
          QString m_userName;
          Authentication m_authentication;

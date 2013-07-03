@@ -1,6 +1,6 @@
 /*******************************************************************************
        
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
            
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -436,7 +436,6 @@ void ProcessMonitor::contextMenu(QPoint const& pos)
    QAction* view   = menu->addAction(tr("View Output File"), process, SLOT(viewOutput()));
    QAction* open   = menu->addAction(tr("Visualize Results"), this, SLOT(openOutput()));
    QAction* copy   = menu->addAction(tr("Copy Results From Server"), this, SLOT(copyResults()));
-                       
 
    kill->setEnabled(false);
    query->setEnabled(true);

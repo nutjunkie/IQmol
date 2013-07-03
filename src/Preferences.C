@@ -1,6 +1,6 @@
 /*******************************************************************************
        
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
            
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -387,6 +387,23 @@ QVariantMap DefaultShaderParameters()
 void DefaultShaderParameters(QVariantMap const& map)
 {
    Set("DefaultShaderParameters", QVariant(map));
+}
+
+
+// ---------
+
+
+QVariantMap DefaultFilterParameters()
+{
+   QVariantMap map;
+   QVariant qvar(Get("DefaultFilterParameters"));
+   if (!qvar.isNull()) map = qvar.toMap();
+   return map;
+}
+
+void DefaultFilterParameters(QVariantMap const& map)
+{
+   Set("DefaultFilterParameters", QVariant(map));
 }
 
 

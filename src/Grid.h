@@ -2,7 +2,7 @@
 #define IQMOL_GRID_H
 /*******************************************************************************
          
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
       
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -39,6 +39,10 @@ namespace OpenBabel {
 
 
 namespace IQmol {
+
+namespace Layer {
+   class Molecule;
+}
 
 namespace Data {
    class Grid;
@@ -110,9 +114,11 @@ namespace Data {
                int const quality, bool upsample = false);
             Size(qglviewer::Vec const& boxMin, double const stepsize, int const nx,
                int const ny, int const nz, bool upsample = false);
-               
-
             Size(Size const& that) { copy(that); }
+
+            qglviewer::Vec bbMin() const;
+            qglviewer::Vec bbMax() const;
+
             Size& operator=(Size const& that);
             bool operator==(Size const& that) const;
             bool operator<=(Size const& that) const;
@@ -124,6 +130,7 @@ namespace Data {
             }
             void debugInfo() const;
             bool upsample() const {return m_upsample; }
+            int dataCount() const;
 
          protected:
             int m_xMin, m_yMin, m_zMin;
@@ -156,6 +163,8 @@ namespace Data {
          void setValue(int i, int j, int k, double const value);
          QPair<double, double> range() const;
          void debugInfo() const;
+         double dataSizeInKb() const;
+         bool saveToCubeFile(QString const& path, Layer::Molecule&, bool const invertSign) const;
 
          Grid& operator=(Grid const& that);
          Grid& operator+=(Grid const& that);

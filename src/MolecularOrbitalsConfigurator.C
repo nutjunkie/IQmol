@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -234,24 +234,32 @@ void MolecularOrbitals::enableNegativeColor(bool tf)
 
 void MolecularOrbitals::updateOrbitalRange(int nElectrons) 
 {
-   updateOrbitalRange(nElectrons, m_molecularOrbitalsConfigurator.orbitalRangeMin);
-   updateOrbitalRange(nElectrons, m_molecularOrbitalsConfigurator.orbitalRangeMax);
+   int index;
+   QComboBox* combo;
+
+   combo = m_molecularOrbitalsConfigurator.orbitalRangeMin;
+   index = combo->currentIndex();
+   updateOrbitalRange(nElectrons, combo);
+   if (index < 0 || index >= (int)m_nOrbitals) index = nElectrons-1;
+   combo->setCurrentIndex(index);
+
+   combo = m_molecularOrbitalsConfigurator.orbitalRangeMax;
+   index = combo->currentIndex();
+   updateOrbitalRange(nElectrons, combo);
+   if (index < 0 || index >= (int)m_nOrbitals) index = nElectrons;
+   combo->setCurrentIndex(index);
 }
 
 
 void MolecularOrbitals::updateOrbitalRange(int nElectrons, QComboBox* combo) 
 {
-   int index(combo->currentIndex());
    combo->clear();
-
    for (unsigned int i = 1; i <= m_nOrbitals; ++i) {
        combo->addItem(QString::number(i));
    }
    
    combo->setItemText(nElectrons-1, QString::number(nElectrons) + " (HOMO)");
    combo->setItemText(nElectrons,   QString::number(nElectrons+1) + " (LUMO)");
-   index = (index > 0) ? index : nElectrons-1;
-   combo->setCurrentIndex(index);
 }
 
 

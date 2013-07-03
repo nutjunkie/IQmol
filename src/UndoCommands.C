@@ -1,6 +1,6 @@
 /*******************************************************************************
        
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
            
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -119,20 +119,6 @@ EditPrimitives::~EditPrimitives()
 }
 
 
-EditPrimitives& EditPrimitives::add(PrimitiveList const& added) 
-{
-   m_added.append(added);
-   return *this;
-}
-
-
-EditPrimitives& EditPrimitives::remove(PrimitiveList const& remove) 
-{
-   m_removed.append(remove);
-   return *this;
-}
-
-
 void EditPrimitives::redo()
 {
    m_deleteRemoved = true;
@@ -210,7 +196,7 @@ void MoveObjects::redo()
       if (m_animate) {   
          for (int i = 0; i < m_objectList.size(); ++i) {
              m_objectList[i]->setFrame(m_initialFrames[i]);
-             m_animatorList.append(new Animator::Transform(m_objectList[i],
+             m_animatorList.append(new Animator::Move(m_objectList[i],
                  m_finalFrames[i]));
          }
       }

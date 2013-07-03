@@ -1,6 +1,6 @@
 /*******************************************************************************
        
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
            
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -41,7 +41,22 @@ IQmolApplication::IQmolApplication(int &argc, char **argv )
 {
    setOrganizationDomain("iqmol.org");
    setApplicationName("IQmol");
+   // Can't log anything yet as the logger hasn't been initialized
+}
 
+
+void IQmolApplication::queueOpenFiles(QStringList const& files)
+{
+   QStringList::const_iterator iter;
+   for (iter = files.begin(); iter != files.end(); ++iter) {
+       FileOpenEvent* event = new FileOpenEvent(*iter);
+       QApplication::postEvent(this, event, Qt::LowEventPriority);
+   }
+}
+
+
+void IQmolApplication::initOpenBabel()
+{
    QDir dir(QApplication::applicationDirPath());
    dir.cdUp();  
    QString path(dir.absolutePath());
@@ -56,30 +71,24 @@ IQmolApplication::IQmolApplication(int &argc, char **argv )
    QApplication::addLibraryPath(path + "/lib/plugins");
 #endif
 
-   QString env(path + "/lib/openbabel");
-   qputenv("BABEL_LIBDIR", env.toAscii());
-   QLOG_INFO() << "Setting BABEL_LIBDIR = " << env;
-   env = path + "/share/openbabel";
-   qputenv("BABEL_DATADIR", env.toAscii());
-   QLOG_INFO() << "Setting BABEL_DATADIR = " << env;
-}
-
-
-void IQmolApplication::queueOpenFiles(QStringList const& files)
-{
-   QStringList::const_iterator iter;
-   for (iter = files.begin(); iter != files.end(); ++iter) {
-       FileOpenEvent* event = new FileOpenEvent(*iter);
-       QApplication::postEvent(this, event, Qt::LowEventPriority);
+   QString env(qgetenv("BABEL_LIBDIR"));
+   if (env.isEmpty()) {
+      env = path + "/lib/openbabel";
+      qputenv("BABEL_LIBDIR", env.toAscii());
+      QLOG_INFO() << "Setting BABEL_LIBDIR = " << env;
+   }else {
+      QLOG_INFO() << "BABEL_LIBDIR already set: " << env;
    }
-}
 
+   env = qgetenv("BABEL_DATADIR");
+   if (env.isEmpty()) {
+      env = path + "/share/openbabel";
+      qputenv("BABEL_DATADIR", env.toAscii());
+      QLOG_INFO() << "Setting BABEL_DATADIR = " << env;
+   }else {
+      QLOG_INFO() << "BABEL_DATADIR already set: " << env;
+   }
 
-void IQmolApplication::open(QString const& file)
-{
-   // This is the first thing that is called once the event loop has started,
-   // even if there is no actual file to open (empty file name).  This is an
-   // ideal time to check if OpenBabel is around.  
 #ifdef Q_WS_WIN
    QLibrary openBabel("libopenbabel.dll");
 #else
@@ -99,7 +108,15 @@ void IQmolApplication::open(QString const& file)
       QApplication::quit();
       return;
    }
+}
 
+
+void IQmolApplication::open(QString const& file)
+{
+   // This is the first thing that is called once the event loop has started,
+   // even if there is no actual file to open (empty file name).  This is an
+   // ideal time to check if OpenBabel is around.  
+   initOpenBabel();
 
    MainWindow* mw;
    QWidget* window(QApplication::activeWindow());
@@ -118,8 +135,8 @@ void IQmolApplication::open(QString const& file)
       connect(this, SIGNAL(lastWindowClosed()), this, SLOT(maybeQuit()));
       connected = true;
    }
-//   QLOG_INFO() << "Number of threads:" << QThread::idealThreadCount();
-//   QLOG_INFO() << "Active    threads:" << QThreadPool::globalInstance()->activeThreadCount();
+   QLOG_INFO() << "Number of threads:" << QThread::idealThreadCount();
+   QLOG_INFO() << "Active    threads:" << QThreadPool::globalInstance()->activeThreadCount();
 }
 
 

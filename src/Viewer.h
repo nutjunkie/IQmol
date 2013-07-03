@@ -2,7 +2,7 @@
 #define IQMOL_VIEWER_H
 /*******************************************************************************
 
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -44,6 +44,7 @@
 class QUndoCommand;
 class QDropEvent;
 class QDragEnterEvent;
+class QGLFramebufferObject;
 
 namespace qglviewer {
    class Vec;
@@ -73,7 +74,7 @@ namespace IQmol {
             BuildAtom, BuildFunctionalGroup, BuildEFP, BuildMolecule };
 
          Viewer(ViewerModel& model, QWidget* parent);
-         ~Viewer() { }
+         ~Viewer();
          void init();
 
 		 // Returns the number of hits for the last select() action.  Note this
@@ -90,6 +91,7 @@ namespace IQmol {
          void openFileFromDrop(QString const& file);
          void escapeFullScreen();
          void recordingCancelled();
+         void animationStep();
 
       public Q_SLOTS:
          void setSceneRadius(double const);
@@ -97,6 +99,7 @@ namespace IQmol {
 
          /// Provided as a slot as the base function isn't.
          void updateGL() { QGLViewer::updateGL(); }
+         void resizeGL(int width, int height);
 
          void displayMessage(QString const& msg) { QGLViewer::displayMessage(msg, FOREVER); }
          void setActiveViewerMode(Viewer::Mode const mode);
@@ -111,6 +114,7 @@ namespace IQmol {
          void clearAnimators();
          void reindexAtoms(Layer::Molecule*);
          void setRecordingActive(bool);
+         void blockUpdate(bool tf);
 
       protected:
          void dropEvent(QDropEvent*);
@@ -138,6 +142,8 @@ namespace IQmol {
          static QFontMetrics s_labelFontMetrics;
 
          void draw();
+         void drawNew();
+         void fastDraw();
          void drawGlobals();
          void drawObjects(GLObjectList const&);
          void drawSelected(GLObjectList const&);
@@ -153,6 +159,7 @@ namespace IQmol {
          void removeFromSelection(int const id);
          void toggleSelection(int const id);
          void setHandler(Viewer::Mode const);
+         void initFramebuffers(int multisample = 1);
 
          // Event handlers
          void mousePressEvent(QMouseEvent *e);
@@ -201,6 +208,8 @@ namespace IQmol {
          Handler::ManipulateSelection   m_manipulateSelectionHandler;
 
          Snapshot* m_snapper;
+         QGLFramebufferObject* m_framebuffer;
+         bool m_blockUpdate;
    };
 
 

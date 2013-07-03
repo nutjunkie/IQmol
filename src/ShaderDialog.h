@@ -2,7 +2,7 @@
 #define IQMOL_SHADERDIALOG_H
 /*******************************************************************************
          
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
       
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -39,16 +39,22 @@ namespace IQmol {
 
       private Q_SLOTS:
          void on_shaderCombo_currentIndexChanged(int index);
+         void on_saveAsDefault_clicked(bool);
+         void on_ambientOcclusion_clicked(bool);
          void installShaderParameters(int);
-         void accept();
+         void installFilterParameters();
+         void installFilterParameters(bool) { installFilterParameters(); }
+         void installFilterParameters(int) { installFilterParameters(); }
 
       private:
          void hideOptionControls();
          void setParameters(QVariantMap const& parameters);
+         void setFilterParameters(QVariantMap const& parameters);
          QVariantMap getParameters();
+         QVariantMap getFilterParameters();
 
          static const int s_maxSliders = 4;
-         static const int s_maxCheckBoxes = 2;
+         static const int s_maxCheckBoxes = 4;
 
          QLabel* m_labels[s_maxSliders];
          QSlider* m_sliders[s_maxSliders];

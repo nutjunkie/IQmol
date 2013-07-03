@@ -2,7 +2,7 @@
 #define IQMOL_ATOMLAYER_H
 /*******************************************************************************
 
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -88,7 +88,7 @@ namespace Layer {
          double getCharge() const { return m_charge; }
          double getMass() const { return m_mass; }
          double getSpin() const { return m_spin; }
-         double getIndex() const { return m_index; }
+         int getIndex() const { return m_index; }
          int getReorderIndex() const { return m_reorderIndex; }
          double getRadius(bool const selected);
 

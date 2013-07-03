@@ -1,6 +1,6 @@
 /*******************************************************************************
          
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
       
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -62,18 +62,18 @@ qDebug() << "Testing BasicServer configuration";
    HostDelegate::FileFlags flags;
    QString file;
 
-   flags = HostDelegate::Directory | HostDelegate::Readable;
-   file  = m_server->qchemEnvironment();
-   test->addFileTest(file, flags);
+   //flags = HostDelegate::Directory | HostDelegate::Readable;
+   //file  = m_server->qchemEnvironment();
+   //test->addFileTest(file, flags);
 
    flags = HostDelegate::Directory | HostDelegate::Writable;
    file  = m_server->workingDirectory();
    if (!file.isEmpty()) test->addFileTest(file, flags);
    
 #ifndef Q_WS_WIN
-   flags = HostDelegate::Executable;
-   file  = m_server->qchemEnvironment() + "/exe/" + m_server->executableName();
-   test->addFileTest(file, flags);
+//   flags = HostDelegate::Executable;
+//   file  = m_server->qchemEnvironment() + "/exe/" + m_server->executableName();
+//   test->addFileTest(file, flags);
 #endif
 
    // These may not be required if we just assume the remote server is *nix based

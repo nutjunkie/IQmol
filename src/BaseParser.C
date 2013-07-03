@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
  
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -308,6 +308,10 @@ QLOG_DEBUG() << "Running OBparser on file " << fileName;
 
    }
 
+   DataList::iterator iter;
+   for (iter = dataList.begin(); iter != dataList.end(); ++iter) {
+       (*iter)->setFilePath(fileName);
+   }
    return dataList;
 }
 

@@ -30,6 +30,8 @@
 namespace IQmol {
 namespace Parser2 {
 
+// Note the grid data is read in as bohr, but converted to angstroms in the
+// Grid constructor
 Data::Bank& QChemPlot::parse(TextStream& textStream)
 {
    QString line;

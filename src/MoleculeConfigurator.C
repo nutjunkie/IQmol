@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -111,7 +111,6 @@ void Molecule::on_atomRadiusScale_valueChanged(int value)
        m_drawMode == Layer::Primitive::WireFrame) {
       m_moleculeConfigurator.bondRadiusScale->setValue(
          m_moleculeConfigurator.atomRadiusScale->value());
-      m_molecule->updateBondScale(value/10.0);
    }
    m_molecule->updateAtomScale(value/10.0);
 }

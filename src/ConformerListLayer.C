@@ -1,6 +1,6 @@
 /*******************************************************************************
        
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
            
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -25,6 +25,8 @@
 #include "IQmol.h"
 #include "QsLog.h"
 
+#include <QDebug>
+
 
 using namespace qglviewer;
 
@@ -34,7 +36,8 @@ namespace Layer {
 
 ConformerList::ConformerList(QList<Conformer*> const& conformers, Conformer* defaultConformer) 
   : Data("Geometries"), m_configurator(this), m_defaultConformer(defaultConformer), 
-    m_speed(0.125), m_reperceiveBonds(false), m_nConformers(conformers.size()), m_bounce(false)
+    m_speed(0.125), m_reperceiveBonds(false), m_nConformers(conformers.size()), m_bounce(false),
+    m_loop(false)
 {
    QList<Layer::Conformer*>::const_iterator iter;
    for (iter = conformers.begin(); iter != conformers.end(); ++iter) {
@@ -46,6 +49,12 @@ ConformerList::ConformerList(QList<Conformer*> const& conformers, Conformer* def
 }
 
 
+ConformerList::~ConformerList()
+{
+   deleteAnimators();
+}
+
+
 void ConformerList::setMolecule(Molecule* molecule)
 {
    QLOG_DEBUG() << "Setting ConformerList molecule to" << molecule;
@@ -54,24 +63,13 @@ void ConformerList::setMolecule(Molecule* molecule)
 
    connect(this, SIGNAL(pushAnimators(AnimatorList const&)),
       m_molecule, SIGNAL(pushAnimators(AnimatorList const&)));
+
    connect(this, SIGNAL(popAnimators(AnimatorList const&)),
       m_molecule, SIGNAL(popAnimators(AnimatorList const&)));
+
    connect(this, SIGNAL(update()), m_molecule, SIGNAL(softUpdate()));
 
-   AtomList atomList(m_molecule->findLayers<Atom>(Children));
-   QList<Conformer*> conformers(findLayers<Conformer>(Children));
-   QLOG_DEBUG() << "Number of atoms and geometries" << atomList.size() << conformers.size();
-
-   for (int i = 0; i < atomList.size(); ++i) {
-       QList<Vec> waypoints;
-       for (int j = 0; j < conformers.size(); ++j) {
-           waypoints.append(conformers[j]->m_coordinates[i]);
-       }
-       m_animatorList.append(new Animator::Path(atomList[i], waypoints, m_speed)); 
-   }
-
-   //connect(m_animatorList.last(), SIGNAL(finished()), &m_configurator, SLOT(reset()));
-
+   makeAnimators();
    setDefaultConformer();
 }
 
@@ -79,8 +77,8 @@ void ConformerList::setMolecule(Molecule* molecule)
 void ConformerList::setActiveConformer(Conformer const& conformer)
 {
    if (!m_molecule) return;
-   setPlay(false);
    AtomList atoms(m_molecule->findLayers<Atom>(Children));
+
    if (conformer.updateAtoms(atoms)) {
       m_molecule->energyAvailable(conformer.getEnergy(), Info::Hartree);
       m_molecule->dipoleAvailable(conformer.getDipole(), false);
@@ -97,14 +95,55 @@ void ConformerList::setActiveConformer(Conformer const& conformer)
 
 void ConformerList::setDefaultConformer()
 { 
-   if (m_defaultConformer) setActiveConformer(*m_defaultConformer); 
+   if (m_defaultConformer) {
+      setActiveConformer(*m_defaultConformer); 
+      m_molecule->reperceiveBondsForAnimation();
+   }
+}
+
+
+void ConformerList::deleteAnimators()
+{
+   AnimatorList::iterator iter;
+   for (iter = m_animatorList.begin(); iter != m_animatorList.end(); ++iter) {
+       delete (*iter);
+   }
+   m_animatorList.clear();
+}
+
+
+void ConformerList::makeAnimators()
+{
+   if (!m_animatorList.isEmpty()) {
+      popAnimators(m_animatorList);
+      deleteAnimators();
+   }
+
+   AtomList atomList(m_molecule->findLayers<Atom>(Children));
+   QList<Conformer*> conformers(findLayers<Conformer>(Children));
+
+   QLOG_DEBUG() << "Number of atoms and geometries" << atomList.size() << conformers.size();
+
+   for (int i = 0; i < atomList.size(); ++i) {
+       QList<Vec> waypoints;
+       for (int j = 0; j < conformers.size(); ++j) {
+           waypoints.append(conformers[j]->m_coordinates[i]);
+       }
+       m_animatorList.append(new Animator::Path(atomList[i], waypoints, m_speed, m_bounce)); 
+   }
+   setLoop(m_loop);
+
+   if (!m_animatorList.isEmpty()) {
+      connect(m_animatorList.last(), SIGNAL(finished()), &m_configurator, SLOT(reset()));
+   }
 }
 
 
 void ConformerList::setPlay(bool const play)
 {
-   QLOG_TRACE() << "Number of animators:" << m_animatorList.size();
    if (play) {
+      makeAnimators(); 
+      qDebug() << "Number of animators:" << m_animatorList.size();
       pushAnimators(m_animatorList);
    }else {
       popAnimators(m_animatorList);
@@ -112,7 +151,7 @@ void ConformerList::setPlay(bool const play)
       for (iter = m_animatorList.begin(); iter != m_animatorList.end(); ++iter) {
           (*iter)->reset();
       }
-      update();
+      m_molecule->reperceiveBondsForAnimation();
    }
 }
 
@@ -141,9 +180,10 @@ void ConformerList::setBounce(bool const bounce)
 
 void ConformerList::setLoop(bool const loop)
 {
+   m_loop = loop;
    AnimatorList::iterator iter;
    Animator::Path* pathAnimator;
-   int cycles(loop ? -1.0 : m_nConformers-1);
+   int cycles(m_loop ? -1.0 : m_nConformers-1);
    if (m_bounce) cycles *= 2;
 
    for (iter = m_animatorList.begin(); iter != m_animatorList.end(); ++iter) {
@@ -152,6 +192,12 @@ void ConformerList::setLoop(bool const loop)
    }
 }
 
+
+void ConformerList::reperceiveBonds(bool const tf) 
+{ 
+   m_reperceiveBonds = tf; 
+   m_molecule->setReperceiveBondsForAnimation(m_reperceiveBonds);
+}
 
 
 void ConformerList::configure()
@@ -244,7 +290,6 @@ void Conformer::setMultipoles(QList<double> const& multipoles)
 //! Computes the charge, dipole and quadrupole from the partial charges
 void Conformer::computeMoments()
 {
-      
 }
 
 } } // end namespace IQmol::Layer

@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -44,11 +44,52 @@ void Background::draw()
    if (checkState() == Qt::Checked) {
       glClearColor(m_backgroundColor.redF(), m_backgroundColor.greenF(), 
          m_backgroundColor.blueF(), m_backgroundColor.alphaF());
+      glClear(GL_COLOR_BUFFER_BIT);
    } else {
-      glClearColor(1.0f, 1.0f, 1.0f, 1.0f);  // white background, really should be transparent
+        glClearColor(1.0f, 1.0f, 1.0f, 0.0f); 
+        glClear(GL_COLOR_BUFFER_BIT);
    }
-
-   glClear(GL_COLOR_BUFFER_BIT);
 }
+
+
+void Background::drawGradient()
+{
+//   const float eps = 1.0e-6; 
+
+   glEnable(GL_LIGHTING);
+   glDisable(GL_DEPTH_TEST);
+   glShadeModel(GL_SMOOTH); 
+
+   glMatrixMode(GL_MODELVIEW); 
+   glPushMatrix();
+   glLoadIdentity(); 
+   glMatrixMode(GL_PROJECTION); 
+   glPushMatrix();
+   glLoadIdentity(); 
+   glOrtho(-1.0, 1.0, -1.0, 1.0, 1.0, -1.0); 
+
+   glBegin(GL_QUADS); 
+      //glColor4f(0.125, 0.361, 0.659, 1.0);
+      glColor4f(0.0, 0.0, 0.0, 1.0);
+      glVertex3f(-1.0f, -1.0f,  1.0f); 
+      glColor4f(0.0, 0.0, 0.0, 1.0);
+      glVertex3f( 1.0f, -1.0f,  1.0f); 
+
+      glColor4f(1.0, 1.0, 1.0, 1.0);
+      //glColor4f(0.15, 0.433, 0.792, 1.0);
+      glVertex3f( 1.0f,  1.0f,  1.0f); 
+      glColor4f(1.0, 1.0, 1.0, 1.0);
+      glVertex3f(-1.0f,  1.0f,  1.0f); 
+   glEnd(); 
+
+   //glMatrixMode(GL_PROJECTION);
+   glPopMatrix();
+   glMatrixMode(GL_MODELVIEW);
+   glPopMatrix();
+
+   glEnable(GL_DEPTH_TEST);
+   //glEnable(GL_LIGHTING);
+}
+
 
 } } // end namespace IQmol::Layer

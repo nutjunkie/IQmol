@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -28,7 +28,6 @@
 #include "JobInfo.h"
 #include "ServerRegistry.h"
 #include "ShaderDialog.h"
-#include "ShaderLibrary.h"
 #include "QUI/InputDialog.h"
 #include <QResizeEvent>
 #include <QDropEvent>
@@ -241,6 +240,9 @@ void MainWindow::createConnections()
 
    connect(&m_viewer, SIGNAL(escapeFullScreen()), 
       this, SLOT(fullScreen()));
+
+   connect(&m_viewer, SIGNAL(animationStep()), 
+      &m_viewerModel, SLOT(reperceiveBondsForAnimation()));
 
    // Selection
    connect(&m_viewerSelectionModel, 
@@ -602,6 +604,12 @@ void MainWindow::createMenus()
       connect(action, SIGNAL(triggered()), &m_viewerModel, SLOT(addHydrogens()));
       action->setShortcut(Qt::CTRL + Qt::Key_F);
 
+      name = "Reperceive Bonds";
+      action = menu->addAction(name);
+      connect(action, SIGNAL(triggered()), &m_viewerModel, SLOT(reperceiveBonds()));
+
+      menu->addSeparator();
+
       name = "Set Constraint";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), &m_viewerModel, SLOT(setConstraint()));
@@ -709,6 +717,7 @@ void MainWindow::createMenus()
       name = "Reset Password Vault Key";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), this, SLOT(setVaultPassword()));
+
 
 
    // ----- Help Menu -----
@@ -901,33 +910,6 @@ void MainWindow::configureAppearance()
       connect(m_shaderDialog, SIGNAL(updated()), &m_viewer, SLOT(updateGL()));
    }
    m_shaderDialog->show();
-}
-
-
-void MainWindow::setShader()
-{
-   QAction* action(qobject_cast<QAction*>(sender()));
-
-   bool turnOn(action->isChecked());
-
-   ShaderLibrary& library(ShaderLibrary::instance());
-   if (turnOn) {
-      if (!library.install(action->data().toString())) {
-         QMsgBox::warning(0, "IQmol", "Failed to load shader");
-      }
-   }else {
-      if (!library.uninstall()) {
-         QMsgBox::warning(0, "IQmol", "Failed to unload shader");
-      }
-   }
-
-   QList<QAction*>::iterator iter;
-   for (iter = m_labelActions.begin(); iter != m_labelActions.end(); ++iter) {
-       (*iter)->setChecked(false);
-   }
-   if (turnOn) action->setChecked(true);
-
-   m_viewer.updateGL();
 }
 
 

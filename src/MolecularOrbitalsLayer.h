@@ -2,7 +2,7 @@
 #define IQMOL_MOLECULARORBITALSLAYER_H
 /*******************************************************************************
 
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -66,14 +66,18 @@ namespace Layer {
          void processSurfaceQueue();
 
       protected:
-         void calculateOrbitalGrids(QList<Grid*> grids);
-         void calculateDensityGrids(Grid*& alpha, Grid*& beta);
-         void calculateDensityGrids2(Grid*& alpha, Grid*& beta);
+         // Returns false if the user cancels the calculation
+         bool calculateOrbitalGrids(QList<Grid*> grids);
+         bool calculateDensityGrids(Grid*& alpha, Grid*& beta);
          unsigned int m_nAlpha;
          unsigned int m_nBeta;
          unsigned int m_nBasis;
          unsigned int m_nOrbitals;
          bool m_restricted;
+
+      private Q_SLOTS:
+         void showGridInfo();
+         void editBoundingBox();
 
       private:
          void setCoefficients(QList<double>& alpha, QList<double>& beta);
@@ -81,7 +85,7 @@ namespace Layer {
 
          Grid* findGrid(Grid::DataType const& dataType, Grid::Size const& size,
             GridList const& gridList);
-         void processGridQueue();
+         bool processGridQueue();
          void calculateSurface(Layer::Surface* surface);
 
          QPair<double, double> computeGridPointDensity(ShellList const&, 
@@ -100,6 +104,9 @@ namespace Layer {
          SurfaceList m_surfaceQueue;
          GridList m_availableGrids;
          GridQueue  m_gridQueue;
+
+         qglviewer::Vec m_bbMin, m_bbMax;
+         bool m_bbSet;
    };
 
 } } // End namespace IQmol::Layer 

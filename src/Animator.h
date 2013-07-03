@@ -2,7 +2,7 @@
 #define IQMOL_ANIMATOR_H
 /*******************************************************************************
          
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
       
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -23,6 +23,8 @@
 ********************************************************************************/
 
 #include "GLObjectLayer.h"
+#include "SurfaceLayer.h"
+#include "Geometry.h"
 #include <QObject>
 #include <QList>
 
@@ -41,14 +43,20 @@ namespace Animator {
       Q_OBJECT
 
       public:
-         Base(Layer::GLObject* object, double const cycles, double const speed, Waveform const);
+         // If cycles < 0.0 then it animates until stopped
+         Base(double const cycles, double const speed, Waveform const waveform) : 
+            m_waveform(waveform), m_cycles(cycles), m_speed(speed), m_active(true), 
+            m_time(0.0) { }
          virtual ~Base() { }
+
          double getSpeed() const { return m_speed; }
-         void setCycles(double const cycles) { m_cycles = cycles; }
+         bool   isActive() const { return m_active; }
 
       public Q_SLOTS:
+         void setCycles(double const cycles) { m_cycles = cycles; }
          void setSpeed(double const speed) { m_speed = speed; }
-         void setWavefunction(Waveform const);
+         void setWavefunction(Waveform const waveform) { m_waveform = waveform; }
+
          void step();
          virtual void reset();
 
@@ -57,59 +65,97 @@ namespace Animator {
          void finished(Animator::Base*);
 
       protected:
-         Layer::GLObject* m_object;
-         qglviewer::Vec m_originalPosition;
          virtual void update(double const time, double const amplitude) = 0;
-         double m_time;
-         bool   m_active;
 
       private:
-         static double signum(double const t);
-         static double square(double const t);
-         static double ramp(double const t);
-         static double sigmoidal(double const t);
-         static double triangle(double const t);
-         static double sinusoidal(double const t);
+         double amplitude(double const t);
 
-         double (*wavefunction)(double const);
-         double m_cycles;  // < 0 => forever
-         double m_speed;
+         Waveform m_waveform;
+         double   m_cycles;  // < 0 => forever
+         double   m_speed;
+         bool     m_active;
+         double   m_time;
    };
 
 
-   class Vibration : public Base {
+
+   // ABC for animators that move (translate and/or rotate) an object
+   class Movement : public Base {
+
+      Q_OBJECT
+
+      public:
+         Movement(Layer::GLObject* object, double const cycles, double const speed, 
+            Waveform const waveform) : Base(cycles, speed, waveform), m_object(object)
+         {
+            m_beginFrame = m_object->getFrame();
+         }
+         virtual ~Movement() { }
+
+      public Q_SLOTS:
+         virtual void reset() {
+            Base::reset();
+            m_object->setFrame(m_beginFrame);
+         }
+
+      protected:
+         Layer::GLObject* m_object;
+         qglviewer::Frame m_beginFrame;
+   };
+
+
+
+   class Vibration : public Movement {
 
       Q_OBJECT
 
       public:
          Vibration(Layer::GLObject* object, qglviewer::Vec const& displacement, 
-            double const speed, double const scale, double cycles = -1.0) 
-              : Base(object, cycles, speed, Sinusoidal), 
-            m_displacement(displacement), m_scale(scale) { }
+            double const speed, double const scaleAmplitude, double cycles = -1.0) :
+            Movement(object, cycles, speed, Sinusoidal), m_displacement(displacement), 
+            m_scaleAmplitude(scaleAmplitude) { }
          ~Vibration() { reset(); }
             
          void update(double const time, double const amplitude);
-         void setScale(double const scale) { m_scale = scale; }
-         double getScale() const { return m_scale; }
+         void setScale(double const scaleAmplitude) { m_scaleAmplitude = scaleAmplitude; }
+         double getScale() const { return m_scaleAmplitude; }
 
       private:
          qglviewer::Vec m_displacement;
-         double m_scale;
+         double m_scaleAmplitude;
    };
 
 
-   class Path : public Base {
+
+   class Move : public Movement {
+
+      Q_OBJECT
+
+      public:
+         Move(Layer::GLObject* object, qglviewer::Frame const& endFrame, 
+            double const speed = 0.05);
+         Move(Layer::GLObject* object, qglviewer::Vec const& endPoint, 
+            double const speed = 0.05);
+
+         void update(double const time, double const amplitude);
+
+      private:
+         qglviewer::Frame m_endFrame;
+   };
+
+
+
+   class Path : public Movement {
 
       Q_OBJECT
 
       public:
          Path(Layer::GLObject* object, QList<qglviewer::Vec> const& waypoints, 
-           double const speed) : Base(object, -1.0, speed, Ramp), m_waypoints(waypoints), 
-           m_bounce(false) { }
+           double const speed, bool const bounce = false);
          ~Path() { reset(); }
            
          void update(double const time, double const amplitude);
-         void addWaypoint(qglviewer::Vec const& displacement);
+         void addWaypoint(qglviewer::Vec const& point);
          void setBounceMode(bool bounce) { m_bounce = bounce; }
          bool getBounceMode() { return m_bounce; }
 
@@ -119,42 +165,51 @@ namespace Animator {
    };
 
 
-   class Move : public Base {
+
+   // This works a little differently from the other animators.  We must first
+   // generate a list of surfaces and this class is repsonsible for determining
+   // which one needs to be visible at a given time.
+
+   class Combo : public Base {
 
       Q_OBJECT
 
       public:
-         Move(Layer::GLObject* object, qglviewer::Vec const& endPoint, 
-            double const speed = 0.05) : Base(object, 1.0, speed, Sigmoidal),
-            m_endPoint(endPoint) { }
-         void update(double const time, double const amplitude);
+         class Data {
+            friend class Combo;
+            public:
+               Data(IQmol::Data::Geometry const& geometry, Layer::Surface* surface) 
+                : m_geometry(geometry), m_surface(surface) { }
+            protected:
+               IQmol::Data::Geometry m_geometry;
+               Layer::Surface* m_surface;
+         };
 
-      public Q_SLOTS:
+         typedef QList<Data*> DataList;
+
+         Combo(Layer::Molecule*, DataList const& frames, int const interpolationFrames, 
+            double const speed, bool const bounce = false);
+         ~Combo();
+           
+         void update(double const time, double const amplitude);
+         void setBounceMode(bool bounce) { m_bounce = bounce; }
+         bool getBounceMode() { return m_bounce; }
+         void stepForward();
+         void stepBack();
          void reset();
+         void setAlpha(double const);
+         void setDrawMode(Layer::Surface::DrawMode const);
 
       private:
-         qglviewer::Vec m_endPoint;
+         void setCurrentIndex(int const n);
+         Layer::Molecule* m_molecule;
+         DataList m_frames;
+         bool m_bounce;
+         int  m_interpolationFrames;
+         int  m_currentIndex;
    };
 
 
-   // Similar to Move, but transforms by Frames rather than just positions.
-   // This is important for any object that has an orientation, such as Groups.
-   class Transform : public Base {
-
-      Q_OBJECT
-
-      public:
-         Transform(Layer::GLObject* object, qglviewer::Frame const& endPoint, 
-            double const speed = 0.05);
-         void update(double const time, double const amplitude);
-
-      public Q_SLOTS:
-         void reset();
-
-      private:
-         qglviewer::Frame m_startPoint;
-         qglviewer::Frame m_endPoint;
-   };
 
 }
 

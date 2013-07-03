@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -33,6 +33,7 @@
 #include <QDropEvent>
 #include <QtDebug>
 #include <QUrl>
+#include <QGLFramebufferObject>
 #include <cmath>
 #include "gl2ps.h"
 
@@ -67,10 +68,10 @@ Viewer::Viewer(ViewerModel& model, QWidget* parent) : QGLViewer(parent),
    m_buildMoleculeHandler(this),
    m_reindexAtomsHandler(this),
    m_manipulateSelectionHandler(this),
-   m_snapper(0)
+   m_snapper(0),
+   m_framebuffer(0),
+   m_blockUpdate(false)
 { 
-   setAcceptDrops(true);
-
    // Disable the default keybindings, the menu handles those we want
    setShortcut(DRAW_AXIS, 0);
    setShortcut(DRAW_GRID, 0);
@@ -88,11 +89,18 @@ Viewer::Viewer(ViewerModel& model, QWidget* parent) : QGLViewer(parent),
    // Disable zoom selection, which makes no sense in our context
    setWheelBinding(Qt::MetaModifier, CAMERA, NO_MOUSE_ACTION);
 
+   setAcceptDrops(true);
    // The following two lines must be in this order
    setDefaultBuildElement(6);
    setActiveViewerMode(BuildAtom);  // this should get overwritten by the MainWindow class
    setSceneRadius(DefaultSceneRadius);
    resetView();
+}
+
+
+Viewer::~Viewer()
+{
+   delete m_framebuffer;
 }
 
 
@@ -136,76 +144,214 @@ void Viewer::init()
    //glLightf( GL_LIGHT1, GL_CONSTANT_ATTENUATION,  0.1f);
    //glLightf( GL_LIGHT1, GL_LINEAR_ATTENUATION,    0.3f);
    //glLightf( GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.3f);
+
+    ShaderLibrary& library(ShaderLibrary::instance());
+   if (QGLFramebufferObject::hasOpenGLFramebufferObjects()) {
+      QLOG_INFO() << "OpenGL framebuffers are active";
+      library.setFiltersAvailable(true);
+      initFramebuffers(1); 
+   }else {
+      QLOG_INFO() << "OpenGL framebuffers are unavailable";
+      library.setFiltersAvailable(false);
+   }
 }
 
 
-
-void Viewer::draw()
+void Viewer::resizeGL(int width, int height)
 {
+   QGLViewer::resizeGL(width, height);
+
+   // Need to get rid of this
+   initFramebuffers(1);
+   GLdouble m[16]; 
+   camera()->getProjectionMatrix(m);
+
+   ShaderLibrary& library(ShaderLibrary::instance());
+   library.resizeScreenBuffers(QSize(width, height), m);
+}
+
+
+void Viewer::initFramebuffers(int multisample)
+{
+   delete m_framebuffer;
+   QSize s(multisample*size());
+   m_framebuffer = new QGLFramebufferObject(s, QGLFramebufferObject::Depth);
+}
+
+
+void Viewer::drawNew()
+{
+//qDebug() << "draw called";
+   m_objects = m_viewerModel.getVisibleObjects();
+   m_selectedObjects = m_viewerModel.getSelectedObjects();
+   ShaderLibrary& library(ShaderLibrary::instance());
+
+   if (!library.filtersActive() || animationIsStarted()) return fastDraw();
+   qDebug() << "Filters are on in drawNew";
+
    makeCurrent();
-   ShaderLibrary& library( ShaderLibrary::instance());
-
-
-   // Position the light(s)
-#if 0
    Vec cameraPosition(camera()->position());
-   Vec cameraDirection(camera()->viewDirection());
-   Vec cameraRight(camera()->rightVector());
-   Vec cameraUp(camera()->upVector());
+   Layer::GLObject::SetCameraPosition(cameraPosition);
 
-   double cameraDistance(camera()->sceneRadius());
-   Vec lightPosition(0.0, 5.0, 0.0);
-   Vec lightDirection(lightPosition.unit());
-   lightDirection = cameraDirection;
-
-   GLfloat pos[] = {lightPosition[0],  lightPosition[1],  lightPosition[2], 0.0};
-   GLfloat dir[] = {lightDirection[0], lightDirection[1], lightDirection[2], 0.0};
-
-   glLightfv(GL_LIGHT1, GL_POSITION, pos);
-   glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, dir);
-#endif
-
-
-/*
-   // Default material
-   GLfloat mat_specular[] = { 0.9, 0.9, 0.9, 1.0 };
-   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
-   GLfloat mat_ambient[] = { 0.2, 0.2, 0.2, 1.0 };
-   glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
-   GLfloat mat_diffuse[] = { 0.8, 0.8, 0.8, 1.0 };
-   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
-   GLfloat mat_shininess = 50.0;
-   glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
-*/
-
-   library.resumeShader();
+   QString shader(library.currentShader());
 
    glShadeModel(GL_SMOOTH);
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  
 
+   // Generate normal and filter maps
+   library.bindNormalMap(camera()->zNear(), camera()->zFar());
+   drawObjects(m_objects);
+   library.releaseNormalMap();
+   library.generateFilters();
 
-   // create the master object lists, do the surfaces neeed to be filtered out?
-   m_objects = m_viewerModel.getVisibleObjects();
-   m_selectedObjects = m_viewerModel.getSelectedObjects();
-
-   Layer::GLObject::SetCameraPosition(camera()->position());
+   // Redraw everything to get the transparency right
+   // library.clearBuffers();
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+   library.bindShader(shader);
+   library.bindTextures(shader);
 
    drawGlobals();
-
    drawObjects(m_objects);
-
    drawSelected(m_selectedObjects);
    drawObjects(m_currentBuildHandler->buildObjects());
-  
-   library.suspendShader();
+
+    // Suspend the shader for text rendering
+   library.suspend();
+   library.releaseTextures();
+   library.clearFrameBuffers();
 
    if (m_labelType != Layer::Atom::None) drawLabels(m_objects);
    if (m_currentHandler->selectionMode() != Handler::None) {
       drawSelectionRectangle(m_selectHandler.region());
    }
    displayGeometricParameter(m_selectedObjects);
+}
+
+
+void Viewer::draw()
+{
+if (m_blockUpdate) return;
+
+return drawNew();
+   m_objects = m_viewerModel.getVisibleObjects();
+   m_selectedObjects = m_viewerModel.getSelectedObjects();
+   ShaderLibrary& library(ShaderLibrary::instance());
+
+   if (!m_framebuffer || !library.filtersActive() || animationIsStarted()) return fastDraw();
+   qDebug() << "Filters are on";
+
+   makeCurrent();
+   Vec cameraPosition(camera()->position());
+   Layer::GLObject::SetCameraPosition(cameraPosition);
+
+   QString shader(library.currentShader());
+   library.resume();
+
+   glShadeModel(GL_SMOOTH);
+   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  
+
+   // Generate normal map
+   const GLfloat near(camera()->zNear());
+   GLfloat far(camera()->zFar());
+
+   library.setUniformVariable("Normal Map", "Near", near);
+   library.setUniformVariable("Normal Map", "Far",  far);
+
+   m_framebuffer->bind();
+   glActiveTexture(GL_TEXTURE0);   glBindTexture(GL_TEXTURE_2D, m_framebuffer->texture());
+
+   Texture texture;
+   texture.id   = m_framebuffer->texture();
+   texture.size = m_framebuffer->size();
+   texture.data  = 0;
+
+   library.bindShader("Normal Map");
+   //library.bindTextures("Normal Map");
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+   drawObjects(m_objects);
+
+   library.setTextureVariable("Filters", "Normal", texture);
+   library.bindShader("Filters");
    
-   //drawLight(GL_LIGHT1);
+
+   // QFile::remove("framebuffer.png");
+   // m_framebuffer->toImage().save("framebuffer.png");
+
+   // Generate the masks, by rendering a screen-aligned quad
+   float w(width());  float h(height());  float z(0.0);
+   
+   glMatrixMode(GL_PROJECTION);
+   glPushMatrix();
+   glLoadIdentity();
+   glOrtho(z, w, z, h, -1, 1);
+   glMatrixMode(GL_MODELVIEW);
+   glPushMatrix();
+   glLoadIdentity();
+
+   glBegin(GL_QUADS);
+      glTexCoord2f(1.0f,0.0f);  glVertex3f(w, z, z);
+      glTexCoord2f(0.0f,0.0f);  glVertex3f(z, z, z);
+      glTexCoord2f(0.0f,1.0f);  glVertex3f(z, h, z);
+      glTexCoord2f(1.0f,1.0f);  glVertex3f(w, h, z);
+   glEnd();
+
+   glMatrixMode(GL_PROJECTION);
+   glPopMatrix();
+   glMatrixMode(GL_MODELVIEW);
+   glPopMatrix();
+
+   // Now release the buffer and draw as usual
+   library.setTextureVariable(shader, "FilterMap", texture);
+   library.bindShader(shader);
+   m_framebuffer->release();
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+   // must redraw everything to get the transparency right
+   drawGlobals();
+   drawObjects(m_objects);
+   drawSelected(m_selectedObjects);
+   drawObjects(m_currentBuildHandler->buildObjects());
+
+   m_framebuffer->bind();
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+   m_framebuffer->release();
+
+    // Suspend the shader for text rendering
+   library.suspend();
+
+   if (m_labelType != Layer::Atom::None) drawLabels(m_objects);
+   if (m_currentHandler->selectionMode() != Handler::None) {
+      drawSelectionRectangle(m_selectHandler.region());
+   }
+   displayGeometricParameter(m_selectedObjects);
+}
+
+
+void Viewer::fastDraw()
+{
+if (m_blockUpdate) return;
+   makeCurrent();
+   Layer::GLObject::SetCameraPosition(camera()->position());
+
+   glShadeModel(GL_SMOOTH);
+   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+   ShaderLibrary& library(ShaderLibrary::instance());
+   library.resume();
+   drawGlobals();
+   drawObjects(m_objects);
+   drawSelected(m_selectedObjects);
+   drawObjects(m_currentBuildHandler->buildObjects());
+
+   // suspend the shader for writing text
+   library.suspend();
+
+   if (m_labelType != Layer::Atom::None) drawLabels(m_objects);
+   if (m_currentHandler->selectionMode() != Handler::None) {
+      drawSelectionRectangle(m_selectHandler.region());
+   }
+   displayGeometricParameter(m_selectedObjects);
 }
 
 
@@ -544,7 +690,9 @@ void Viewer::animate()
        (*iter)->step();
    }
 
-   if (m_snapper) m_snapper->capture();
+   draw();
+   animationStep();
+//qDebug() << "Animation step taken";
 }
 
 
@@ -562,6 +710,7 @@ void Viewer::setRecordingActive(bool activate)
          QLOG_WARN() << "Animation recording started with existing Snapshot object";
       }else {
          m_snapper = new Snapshot(this, Snapshot::Movie);
+         connect(this, SIGNAL(animationStep()), m_snapper, SLOT(capture()));
          if (!m_snapper->requestFileName()) {
             delete m_snapper;
             m_snapper = 0;
@@ -578,6 +727,16 @@ void Viewer::setRecordingActive(bool activate)
 }
 
 
+void Viewer::blockUpdate(bool tf)
+{ 
+   if (tf) {
+      qDebug() << "Viewer update blocked";
+   }else {
+      qDebug() << "Viewer update enabled";
+      
+   }
+   m_blockUpdate = tf; 
+}
 
 // ---------------- Selection functions ---------------
 

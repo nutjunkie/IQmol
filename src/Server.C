@@ -1,6 +1,6 @@
 /*******************************************************************************
          
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
       
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -162,7 +162,7 @@ void Server::setLocalDefaults()
 {
    m_host             = Local;
    m_type             = Basic;
-   m_qchemEnvironment = QString(qgetenv("QC"));
+   //m_qchemEnvironment = QString(qgetenv("QC"));
    m_hostAddress      = "localhost";
    m_userName         = QString(qgetenv("USER"));
    m_authentication   = None;
@@ -177,7 +177,7 @@ void Server::setRemoteDefaults()
 {
    m_host             = Remote;
    m_type             = Basic;
-   m_qchemEnvironment = "";
+   //m_qchemEnvironment = "";
    m_hostAddress      = "";
    m_userName         = QString(qgetenv("USER"));
    m_authentication   = Agent;
@@ -193,7 +193,7 @@ void Server::setWebDefaults()
 {
    m_host             = Web;
    m_type             = HTTP;
-   m_qchemEnvironment = "(unused)";
+   //m_qchemEnvironment = "(unused)";
    m_hostAddress      = "www.iqmol.org";
    m_userName         = "guest";
    m_port             = 80;
@@ -321,7 +321,7 @@ QVariant Server::toQVariant()
    map.insert("Name", m_name); 
    map.insert("Host", (int)m_host);
    map.insert("Type", (int)m_type);
-   map.insert("QChemEnvironment", m_qchemEnvironment);
+   //map.insert("QChemEnvironment", m_qchemEnvironment);
    map.insert("HostAddress", m_hostAddress);
    map.insert("UserName", m_userName);
    map.insert("Authentication", (int)m_authentication);
@@ -397,7 +397,7 @@ void Server::fromQVariant(QVariant const& qvar)
 
    // $QC
    if (map.contains("QChemEnvironment")) {
-	  m_qchemEnvironment = map.value("QChemEnvironment").toString();
+	  //m_qchemEnvironment = map.value("QChemEnvironment").toString();
    }
 
    // Host Address
@@ -519,7 +519,7 @@ QString Server::replaceMacros(QString const& input, Process* process)
 qDebug() << "Server::replaceMacros on string:" << output;
 
    output.replace("${USER}",      m_userName);
-   output.replace("${QC}",        m_qchemEnvironment);
+//   output.replace("${QC}",        m_qchemEnvironment);
    output.replace("${EXE_NAME}",  m_executableName);
    // bit of a hack, we don't need the executable name for an HTTP server, so
    // we store the location of the cgi scripts instead.

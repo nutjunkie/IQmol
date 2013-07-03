@@ -47,7 +47,7 @@ namespace Data {
          Type::ID typeID() const { return Type::MultipoleExpansion; }
 
          double moment(Index const index) { 
-            return index < m_multipoles.length() ? m_multipoles[index] : 0.0;
+            return (index < m_multipoles.size()) ? m_multipoles[index] : 0.0;
          }
 
 		 // The input for these are the Buckingham traceless values,  The order is 

@@ -2,7 +2,7 @@
 #define IQMOL_UNDOCOMMANDS_H
 /*******************************************************************************
        
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
            
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -54,9 +54,26 @@ namespace Command {
          EditPrimitives(QString const& text, Layer::Molecule* molecule)
           : QUndoCommand(text), m_molecule(molecule), m_deleteRemoved(true) { }
 
-         EditPrimitives& add(PrimitiveList const& added);
-         EditPrimitives& remove(PrimitiveList const& removed);
-            
+         template <class T>
+         EditPrimitives& add(T const& added) 
+         {
+            typename T::const_iterator iter;
+            for (iter = added.begin(); iter != added.end(); ++iter) {
+                m_added.append(*iter);
+            }
+            return *this;
+         }
+
+         template <class T>
+         EditPrimitives& remove(T const& removed) 
+         {
+            typename T::const_iterator iter;
+            for (iter = removed.begin(); iter != removed.end(); ++iter) {
+                m_removed.append(*iter);
+            }
+            return *this;
+         }
+
          ~EditPrimitives();
             
          virtual void redo();

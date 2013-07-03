@@ -2,7 +2,7 @@
 #define IQMOL_SURFACELAYER_H
 /*******************************************************************************
          
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
       
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -89,6 +89,8 @@ namespace Layer {
          void createToolTip(QString const& label = QString());
          double minPropertyValue() const { return m_min; }
          double maxPropertyValue() const { return m_max; }
+         void setAlpha(double alpha);
+         void setDrawMode(DrawMode const mode) { m_drawMode = mode; }
          
          Grid::DataType gridDataType() const { return m_type; }
          bool cubeIsSigned() const { return m_cubeIsSigned; }
@@ -102,7 +104,7 @@ namespace Layer {
          void setColor(QColor const& color, Sign sign = Positive);
          void computePropertyData(Function3D);
          void clearPropertyData();
-         void setAlpha(double alpha);
+
          void addAmbientOcclusion(bool);
          QColor color(Sign sign = Positive) const;
 

@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -622,6 +622,18 @@ Layer::Molecule* ViewerModel::activeMolecule()
 void ViewerModel::addHydrogens()
 {
    forAllMolecules(boost::bind(&Layer::Molecule::addHydrogens, _1));
+}
+
+
+void ViewerModel::reperceiveBonds()
+{
+   forAllMolecules(boost::bind(&Layer::Molecule::reperceiveBonds, _1));
+}
+
+
+void ViewerModel::reperceiveBondsForAnimation()
+{
+   forAllMolecules(boost::bind(&Layer::Molecule::reperceiveBondsForAnimation, _1));
 }
 
 

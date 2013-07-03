@@ -1,6 +1,6 @@
 /*******************************************************************************
          
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
       
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -169,9 +169,9 @@ void Surface::drawSelected()
 
 void Surface::draw() 
 {
-   if ( (checkState() != Qt::Checked) || !m_callListPositive || m_alpha < 0.01) return;
-//------------------------------------------------------------
+   if ( (checkState() != Qt::Checked) || m_alpha < 0.01) return;
 
+//-----------------------------------------------------------
    GLint program;
    glGetIntegerv(GL_CURRENT_PROGRAM, &program);
    GLint aoLoc(glGetAttribLocation(program, "ambient_occlusion"));

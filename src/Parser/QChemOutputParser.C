@@ -75,7 +75,7 @@ Data::Bank& QChemOutput::parse(TextStream& textStream)
          QChemInput parser;
          Data::Bank& bank(parser.parse(textStream));
          m_dataBank.merge(&bank);
-         if (!parser.errors().isEmpty()) m_errors.append(parser.errors());
+         if (!parser.errors().isEmpty()) m_errors << parser.errors();
 
       }else if (line.contains("Standard Nuclear Orientation")) {
          bool convertFromBohr(line.contains("Bohr"));
@@ -482,6 +482,8 @@ void QChemOutput::readDipoleMoment(TextStream& textStream, Data::Geometry* geome
 {
    if (!geometry) return;
 
+   Data::DipoleMoment* d(0);
+
    QStringList tokens;
    tokens = textStream.nextLineAsTokens();
    if (tokens.size() != 6) goto error;
@@ -493,7 +495,7 @@ void QChemOutput::readDipoleMoment(TextStream& textStream, Data::Geometry* geome
    y = tokens[3].toDouble(&ok);  if (!ok) goto error;
    z = tokens[5].toDouble(&ok);  if (!ok) goto error;
 
-   Data::DipoleMoment* d(geometry->getProperty<Data::DipoleMoment>());
+   d = geometry->getProperty<Data::DipoleMoment>();
    if (d) d->setValue(x, y, z);
    return;
 

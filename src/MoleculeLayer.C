@@ -1,6 +1,6 @@
 /*******************************************************************************
        
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
            
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -45,6 +45,7 @@
 #include "ConformerListLayer.h"
 #include "MultipoleExpansion.h"
 #include "GridData.h"
+#include "Geometry.h"
 
 #include "openbabel/mol.h"
 #include "openbabel/format.h"
@@ -77,7 +78,9 @@ Molecule::Molecule(QObject* parent) : Base(DefaultMoleculeName, parent),
    m_atomScale(1.0), m_bondScale(1.0), m_chargeScale(1.0), 
    m_smallerHydrogens(true), 
    m_modified(false),
+   m_reperceiveBondsForAnimation(false),
    m_configurator(this), 
+   m_surfaceAnimator(this), 
    m_jobInfo(0),
    m_info(this), 
    m_atomList(this, "Atoms"), 
@@ -194,6 +197,9 @@ void Molecule::appendData(DataList& dataList)
 
    for (iter = dataList.begin(); iter != dataList.end(); ++iter) {
        text = (*iter)->text();
+       // Hack to allow multiple cube data files
+       if (text == "Cube Data") text = "cubedata";
+qDebug() << "Adding data" << text;
        
        if ((files = qobject_cast<Files*>(*iter))) {
           FileList fileList(files->findLayers<File>(Children));
@@ -409,7 +415,6 @@ PrimitiveList Molecule::fromOBMol(OBMol* obMol, AtomMap* atomMap, BondMap* bondM
       groups = groupMap->values(); 
    }
 
-
    Atom* atom;
    Group* currentGroup(0);
    QList<Vec> coordinates;
@@ -491,7 +496,6 @@ OBMol* Molecule::toOBMol(AtomMap* atomMap, BondMap* bondMap, GroupMap* groupMap)
 
    obMol->BeginModify();
 
-
    for (atomIter = atoms.begin(); atomIter != atoms.end(); ++atomIter) {
        obAtom = obMol->NewAtom();
        atomMap->insert(obAtom, *atomIter);
@@ -555,7 +559,6 @@ OBMol* Molecule::toOBMol(AtomMap* atomMap, BondMap* bondMap, GroupMap* groupMap)
       
    }
 
-   QLOG_DEBUG() << "Setting OBMol charge and multiplicity:" << totalCharge() << multiplicity();
    obMol->SetTotalCharge(totalCharge());
    obMol->SetTotalSpinMultiplicity(multiplicity());
    obMol->EndModify();
@@ -593,6 +596,34 @@ Vec Molecule::getBuildAxis(Atom* atom)
 
    return axis;
 }
+
+
+
+QStringList Molecule::coordinatesForCubeFile()
+{
+   AtomList atomList(findLayers<Atom>(Children));
+   Vec position;
+   QString line;
+   QStringList coords;
+
+   AtomList::iterator iter;
+   for (int i = 1; i <=  atomList.size(); ++i) {
+       for (iter = atomList.begin(); iter != atomList.end(); ++iter) {
+           if ((*iter)->getIndex() == i) {
+              position = (*iter)->getPosition()*AngstromToBohr;
+              int Z = (*iter)->getAtomicNumber();
+              line  = QString("%1").arg(Z, 5);
+              line += QString("%1").arg((double)Z,  14, 'f', 6);
+              line += QString("%1").arg(position.x, 14, 'f', 6);
+              line += QString("%1").arg(position.y, 14, 'f', 6);
+              line += QString("%1").arg(position.z, 14, 'f', 6);
+              coords.append(line);
+           }
+       }
+   }
+   return coords;
+}
+
 
 
 QString Molecule::coordinatesAsString(bool const selectedOnly)
@@ -1024,8 +1055,6 @@ void Molecule::takePrimitives(PrimitiveList const& primitives)
 
    PrimitiveList::const_iterator primitive;
    for (primitive = primitives.begin(); primitive != primitives.end(); ++primitive) {
-       QLOG_TRACE() << "   removing row" << (*primitive)->row();
-
        // Make sure out primitive is no longer selected
        (*primitive)->deselect();
 
@@ -1273,6 +1302,20 @@ QList<Vec> Molecule::coordinates()
 }
 
 
+void Molecule::setGeometry(IQmol::Data::Geometry const& geometry)
+{
+   AtomList atoms(findLayers<Atom>(Children));
+   if (atoms.size() != geometry.nAtoms()) {
+      qDebug() << "Invalid Geometry passed to Molecule::setGeometry";
+      return;
+   }
+
+   for (int i = 0; i < atoms.size(); ++i) {
+       atoms[i]->setTranslation(geometry.position(i));
+   }
+}
+
+
 QList<double> Molecule::atomicCharges()
 {
    QList<double> charges;
@@ -1498,6 +1541,14 @@ void Molecule::minimizeEnergy(QString const& forceFieldName)
 }
 
 
+
+void Molecule::openSurfaceAnimator()
+{
+   m_surfaceAnimator.update();
+   m_surfaceAnimator.show();
+}
+
+
 void Molecule::autoDetectSymmetry() 
 { 
    if (s_autoDetectSymmetry) {
@@ -1651,38 +1702,48 @@ AtomList Molecule::getContiguousFragment(Atom* first, Atom* second)
 }
 
 
-void Molecule::reperceiveBonds()
+void Molecule::reperceiveBonds(bool postCmd)
 {
-   AtomList atomList(findLayers<Atom>(Children));
-   BondList bondList(findLayers<Bond>(Children));
-   PrimitiveList primitiveList;
+   AtomMap atomMap;
+   OBAtom* obAtom;
+   Vec     position;
 
-   AtomList::iterator atom;
-   for (atom = atomList.begin(); atom != atomList.end(); ++atom) {
-       primitiveList.append(*atom); 
+   OBMol* obMol(new OBMol());
+   AtomList::iterator atomIter;
+   AtomList atoms(findLayers<Atom>(Children | Visible));
+   obMol->BeginModify();
+   for (atomIter = atoms.begin(); atomIter != atoms.end(); ++atomIter) {
+       obAtom = obMol->NewAtom();
+       atomMap.insert(obAtom, *atomIter);
+       position = (*atomIter)->getPosition();
+       obAtom->SetAtomicNum((*atomIter)->getAtomicNumber());
+       obAtom->SetVector(position.x, position.y, position.z);
    }
-
-   BondList::iterator bond;
-   for (bond = bondList.begin(); bond != bondList.end(); ++bond) {
-       primitiveList.append(*bond); 
-   }
-
-   AtomList atoms(findLayers<Atom>(Children));
-   QString s(QString::number(atoms.size()));
-   s += "\n\n" + coordinatesAsString();
-
-   OBConversion conv;
-   conv.SetInFormat("xyz");
-   OBMol* obMol = new OBMol();
-   std::istringstream iss(std::string(s.toLatin1()));
-   conv.Read(obMol, &iss);
-   qDebug() << "Setting OBMol charge and multiplicity (2) to" << totalCharge() << multiplicity();
    obMol->SetTotalCharge(totalCharge());
    obMol->SetTotalSpinMultiplicity(multiplicity());
-   
-   Command::EditPrimitives* cmd(new Command::EditPrimitives("Reperceive bonds", this));
-   cmd->remove(primitiveList).add(fromOBMol(obMol));
-   postCommand(cmd);
+   obMol->EndModify();
+
+   obMol->ConnectTheDots();
+   obMol->PerceiveBondOrders();
+
+   BondList removed(findLayers<Bond>(Children));
+   PrimitiveList added(fromOBMol(obMol, &atomMap));
+
+   if (postCmd) {
+      Command::EditPrimitives* cmd(new Command::EditPrimitives("Reperceive bonds", this));
+      cmd->remove(removed).add(added);
+      postCommand(cmd);
+   }else {
+      appendPrimitives(added);
+      added.clear();
+      BondList::iterator iter;
+      for (iter = removed.begin(); iter != removed.end(); ++iter) {
+          added.append(*iter);
+      }
+      takePrimitives(added);
+   }
+
+   delete obMol;
 }
 
 
@@ -2074,8 +2135,6 @@ void Molecule::calculateVanDerWaals(Surface* surface, double const scale,
        delete (*iter2);
    }
 }
-
-
 
 
 

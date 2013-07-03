@@ -1,6 +1,6 @@
 /*******************************************************************************
        
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
            
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -43,6 +43,21 @@ CubeData::CubeData(Grid* grid) : Data("Cube Data"), m_grid(grid), m_configurator
 CubeData::~CubeData()
 {
    if (m_grid) delete m_grid;
+}
+
+
+void CubeData::setMolecule(Molecule* molecule) 
+{
+   m_molecule = molecule;
+   // Actions for the context menu
+   connect(newAction("Surface Animator"), SIGNAL(triggered()),
+      m_molecule, SLOT(openSurfaceAnimator()));
+}
+
+
+void CubeData::appendAtom(int const Z, qglviewer::Vec const& position)
+{
+   m_geometry.append(Z, position);
 }
 
 

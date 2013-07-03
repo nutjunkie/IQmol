@@ -1,6 +1,6 @@
 /*******************************************************************************
          
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
       
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -94,8 +94,8 @@ void ServerDialog::on_typeCombo_currentIndexChanged(int index)
 {
    Server::Type type = (Server::Type)index;
    bool web(type == Server::HTTP);
-   m_dialog.qcLabel->setEnabled(!web);
-   m_dialog.qcEnvironment->setEnabled(!web);
+   //m_dialog.qcLabel->setEnabled(!web);
+   //m_dialog.qcEnvironment->setEnabled(!web);
    m_dialog.workingDirectory->setEnabled(!web);
    m_dialog.workingDirectoryLabel->setEnabled(!web);
    m_dialog.authentication->setEnabled(!web);
@@ -144,7 +144,7 @@ void ServerDialog::copyFromServer(Server* server)
    }
 
    m_dialog.typeCombo->setCurrentIndex(server->m_type);
-   m_dialog.qcEnvironment->setText(server->m_qchemEnvironment);
+   //m_dialog.qcEnvironment->setText(server->m_qchemEnvironment);
    m_dialog.hostAddress->setText(server->m_hostAddress);
    m_dialog.userName->setText(server->m_userName);
    m_dialog.authentication->setCurrentIndex(server->m_authentication-1);
@@ -168,10 +168,10 @@ bool ServerDialog::copyToServer(Server* server)
       return false;
    }
 
-   if (m_dialog.qcEnvironment->text().trimmed().isEmpty()) {
-      QMsgBox::warning(this, "IQmol", "QChem environment variable must be set");
-      return false;
-   }
+   //if (m_dialog.qcEnvironment->text().trimmed().isEmpty()) {
+   //   QMsgBox::warning(this, "IQmol", "QChem environment variable must be set");
+   //   return false;
+   //}
 
    switch (m_dialog.typeCombo->currentIndex()) {
       case Server::HTTP:
@@ -198,7 +198,7 @@ bool ServerDialog::copyToServer(Server* server)
    }
 
    server->m_name             = m_dialog.name->text().trimmed();
-   server->m_qchemEnvironment = m_dialog.qcEnvironment->text().trimmed();
+   //server->m_qchemEnvironment = m_dialog.qcEnvironment->text().trimmed();
 
    if (server->m_host == Server::Local) return true;
 

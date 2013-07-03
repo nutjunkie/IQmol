@@ -2,7 +2,7 @@
 #define IQMOL_MAINWINDOW_H
 /*******************************************************************************
 
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -91,7 +91,6 @@ namespace IQmol {
          void setForceField();
          void setPartialChargeType();
          void setLabel();
-         void setShader();
          void reindexAtoms();
          void windowModified() { setWindowModified(true); }
          void setRecordingActive(bool);
@@ -128,9 +127,9 @@ namespace IQmol {
          QLabel          m_status;
          Viewer          m_viewer;
 
-         QItemSelectionModel  m_viewerSelectionModel;
-         LogMessageDialog     m_logMessageDialog;
-         Preferences::Browser m_preferencesBrowser;
+         QItemSelectionModel   m_viewerSelectionModel;
+         LogMessageDialog      m_logMessageDialog;
+         Preferences::Browser  m_preferencesBrowser;
 
          QMenu*   m_recentFilesMenu;
          QAction* m_fullScreenAction;

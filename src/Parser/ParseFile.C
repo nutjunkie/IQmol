@@ -157,7 +157,7 @@ void ParseFile::runParser(Base* parser, QString const& filePath)
       QString msg("Error parsing file: ");
       msg += info.fileName();
       m_errorList.append(msg);
-      m_errorList.append(errors);
+      m_errorList << errors;
    }
 }
 

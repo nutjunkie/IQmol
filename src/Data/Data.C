@@ -21,7 +21,7 @@
 ********************************************************************************/
 
 #include "Data.h"
-#include <sstream>"Data.h"
+#include <sstream>
 
 namespace IQmol {
 namespace Data {

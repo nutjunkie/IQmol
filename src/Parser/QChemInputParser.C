@@ -331,7 +331,7 @@ void QChemInput::readExternalChargesSection(TextStream& textStream)
    Data::ChargeList* charges(0);
 
    if (!parser.errors().isEmpty()) {
-      m_errors.append(parser.errors());
+      m_errors << parser.errors();
    }else if (!bank.isEmpty()) {
       Data::Base* base(bank.takeFirst());
       charges = dynamic_cast<Data::ChargeList*>(base);

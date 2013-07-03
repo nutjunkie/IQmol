@@ -2,7 +2,7 @@
 #define IQMOL_DATALAYER_H
 /*******************************************************************************
 
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011-2013 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -47,14 +47,15 @@ namespace Layer {
             setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
          }
          virtual void setMolecule(Molecule* molecule) { m_molecule = molecule; }
+         void setFilePath(QString const& filePath) { m_fileName = filePath; }
+         QString filePath() const { return m_fileName; }
 
       protected:
          QString m_fileName;   // where the data came from
          Molecule* m_molecule; // what Molecule the data is associated with
 
-
-         // Temporary hack for merging with the Data namespace
      public:
+         // Temporary hack for merging with the Data namespace
          void setData(IQmol::Data::Base* data) { m_data = data; }
          IQmol::Data::Base* getData() const { return m_data; }
 

@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>446</width>
-    <height>397</height>
+    <height>365</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -184,23 +184,6 @@ submitting a job.</string>
         </spacer>
        </item>
       </layout>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="qcLabel">
-       <property name="text">
-        <string>$QC</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="qcEnvironment">
-       <property name="toolTip">
-        <string>QChem environment variable</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
      </item>
     </layout>
    </item>
@@ -424,7 +407,6 @@ submitting a job.</string>
   <tabstop>remoteRadioButton</tabstop>
   <tabstop>typeCombo</tabstop>
   <tabstop>configureTypeButton</tabstop>
-  <tabstop>qcEnvironment</tabstop>
   <tabstop>hostAddress</tabstop>
   <tabstop>port</tabstop>
   <tabstop>userName</tabstop>
