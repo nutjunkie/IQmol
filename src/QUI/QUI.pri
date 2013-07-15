@@ -36,7 +36,6 @@ SOURCES += \
    $$PWD/Conditions.C \
    $$PWD/Actions.C \
    $$PWD/InputDialogLogic.C \
-   $$PWD/InitializeQChemLogic.C \
    $$PWD/Job.C \
    $$PWD/Qui.C \
    $$PWD/FileDisplay.C \

@@ -21,7 +21,7 @@
 ********************************************************************************/
 
 #include "AtomicProperty.h"
-#include "OpenBabel/mol.h"
+#include <openbabel/mol.h>
 #include <vector>
 #include <QDebug>
 

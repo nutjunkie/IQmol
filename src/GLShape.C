@@ -24,6 +24,11 @@
 #include "GLShape.h"
 #include <cmath>
 
+#ifdef Q_WS_MAC
+#include <OpenGL/glu.h>
+#else 
+#include <GL/glu.h>
+#endif
 
 using namespace qglviewer;
 

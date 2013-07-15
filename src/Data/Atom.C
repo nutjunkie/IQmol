@@ -22,7 +22,7 @@
 
 #include "Atom.h"
 #include "AtomicProperty.h"
-#include "OpenBabel/mol.h"
+#include <openbabel/mol.h>
 #include <QDebug>
 
 

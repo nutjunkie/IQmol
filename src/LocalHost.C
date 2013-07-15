@@ -61,6 +61,7 @@ bool LocalHost::getSaveDirectory(JobInfo* jobInfo)
       dialog.selectFile(dirName);
       dialog.setOption(QFileDialog::ShowDirsOnly, true);
       dialog.setFileMode(QFileDialog::Directory);
+      //dialog.setFileMode(QFileDialog::DirectoryOnly);
 
       if (dialog.exec() == QDialog::Rejected) return false;
 

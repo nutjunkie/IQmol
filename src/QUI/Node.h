@@ -65,9 +65,23 @@ class Node : public NodeBase {
          return boost::bind(&Node<T>::setValue, this, value); 
       }
 
+      Action shouldBeAtLeast(T value) { 
+         return boost::bind(&Node<T>::setAtLeast, this, value); 
+      }
+
+
+
       // This does not appear to be working at the moment
       Action makeSameAs(Node<T>* node) { 
          return boost::bind(&Node<T>::setValue2, this, node); 
+      }
+
+      virtual void setAtLeast(T const& value) {
+         if (m_value < value) {
+            m_value = value;
+            applyRules();
+            emitSignals();
+         }
       }
 
       virtual void setValue(T const& value) {

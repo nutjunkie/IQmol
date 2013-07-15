@@ -152,7 +152,7 @@ void ShaderDialog::setFilterParameters(QVariantMap const& map)
    m_dialog.aoStrength->setValue(int(100.0*value));
 
    value = map.contains("AOTotal") ? map.value("AOTotal").toDouble() : 0.0;
-   m_dialog.aoTotal->setValue(int(100*value));
+   m_dialog.aoTotal->setValue(int(100.0*value));
 }
 
 
@@ -182,6 +182,7 @@ void ShaderDialog::setParameters(QVariantMap const& map)
              break;
 
           case QVariant::Double:
+          case QMetaType::Float:
              val = iter.value().toDouble(&ok);  
              if (ok && val <= 1.0 && sliderCount < s_maxSliders) {  
                 m_labels[sliderCount]->show();

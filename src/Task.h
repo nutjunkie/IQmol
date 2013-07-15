@@ -24,121 +24,129 @@
 
 #include <QThread>
 #include <QTime>
-#include <QMutexLocker>
 #include <exception>
 
 
 namespace IQmol {
 
-   /// Base class for objects that should be run in a separate thread.  
+   /// Base class for tasks that need to run in a separate thread.  If no
+   /// thread is passed in the ctor, one is created and managed by the class.
    class Task : public QObject {
 
       Q_OBJECT
 
       public:
-         /// A mutex can be passed to the ctor to guard a resource.
-         Task(QMutex* mutex = 0, int timeout = 1000) : m_terminate(false), 
-            m_timeout(timeout), m_mutex(mutex), m_time(0.0)
+         enum Status { Pending, Running, Completed, Terminated, Error };
+ 
+         Task(QThread* thread = 0, int timeout = 1000) : m_terminate(false),
+            m_thread(thread), m_deleteThread(false), m_time(0.0), m_timeout(timeout)
          {
-            moveToThread(&m_thread);
-            connect(&m_thread, SIGNAL(started()), this, SLOT(process()));
+            if (!m_thread) {  
+               m_thread = new QThread();
+               m_deleteThread = true;
+            }
+
+            setStatus(Pending);
+            moveToThread(m_thread);
+            connect(m_thread, SIGNAL(started()), this, SLOT(process()));
          }
 
          virtual ~Task() {
             m_terminate = true;
             if (!wait(m_timeout)) {
-               m_thread.quit();
+               m_thread->quit();
                if (!wait(m_timeout)) {
-                  m_thread.terminate();
+                  m_thread->terminate();
                }
             } 
+            if (m_deleteThread) delete m_thread;
          }
 
          bool wait(unsigned long time = ULONG_MAX) {
-            return m_thread.wait(time);
+            return m_thread->wait(time);
          }
 
-         QString errorMessage() const {
-            return m_errorMessage;
-         }
-
-		 /// Provides a way of passing information on successful completion of
-		 /// the Task
-         QString outputMessage() const {
-            return m_outputMessage;
-         }
-
-         double timeTaken() const { return m_time; }
+         QString info() const { return m_info; } 
+         Status  status() const { return m_status; }
+         double  timeTaken() const { return m_time; }
 
 
       Q_SIGNALS:
-         /// Issued only on successful completion of the Task.
-         void finished();
-         /// Issued when the Task does not complete successfully.
-         void failed();
+		 /// Signals the task is no longer running, check the status to see if
+		 /// this is because it has completed, was terminated by the user or 
+         /// if an error occured.
+         void finished(); 
+
 		 /// Issued to update the caller on the progress of the Task.  Signal a
-		 /// total of 0 if the real total cannot be calculated.
-		 /// value if the percentage cannot be calculated.
+		 /// total of 0 if the actual total is unknown.
          void progress(int done, int total);
 
 
       public Q_SLOTS:
          virtual void start() {
-            m_thread.start();
+            m_thread->start();
          }
 
 		 /// This simply sets the m_terminate flag and does not actually kill
 		 /// the thread.  It is up to the dervived clasess to check the value
 		 /// of the flag when appropriate and terminate cleanly.
          virtual void stopWhatYouAreDoing() {
-            disconnect(&m_thread, SIGNAL(finished()), this, SLOT(finished()));
             m_terminate = true;
+            setStatus(Terminated);
          }
 
 
       protected:
-		 /// This function needs to be re-omplemented in the derived classes
+         void setStatus(Status const status) {
+            m_status = status;
+            switch (m_status) {
+               case Pending:
+               case Running:
+                  break;
+               case Completed:
+               case Terminated:
+               case Error:
+                  finished();
+                  break;
+            }
+         }
+		 /// This function needs to be re-implemented in the derived classes
 		 /// and is where all the work is done.
          virtual void run() = 0;
 
          bool m_terminate;
-         int  m_timeout;
-         QString m_errorMessage;
-         QString m_outputMessage;
+         QString  m_info;
+         QThread* m_thread;
 
 
-      protected Q_SLOTS:
+      private Q_SLOTS:
          /// We need to catch exceptions here as we are threaded
-         virtual void process() {
+         void process() {
+            setStatus(Running);
             QTime time;
             time.start();
             try {
-
-               if (m_mutex) {
-                  QMutexLocker locker(m_mutex);
-                  run();
-               }else {
-                  run();
-               }
-
-               m_thread.quit();
-               finished();
-
+               run();
+               m_thread->quit();
+               setStatus(Completed);
             } catch (std::exception& err) {
-               m_thread.quit();
-               m_errorMessage = QString(err.what());
-               failed();
+               m_thread->quit();
+               m_info = QString(err.what());
+               setStatus(Error);
             }
             m_time = time.elapsed() / 1000.0;
          }
 
 
       private:
-         QThread m_thread;
-         QMutex* m_mutex;
+         Status   m_status;
+         bool     m_deleteThread;
+         double   m_time;
+         int      m_timeout;  // in msec
+
+         // No copying
          Task(Task const&);
          Task& operator=(Task const&);
-         double m_time;
    };
 
 

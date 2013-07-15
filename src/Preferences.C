@@ -340,12 +340,8 @@ QString ShaderDirectory()
    if (value.isNull()) {
       QDir dir(QApplication::applicationDirPath());
       dir.cdUp();
-#ifdef Q_WS_MAC
       dir.cd("share/shaders");
       shaderDir = dir.absolutePath();
-#else
-      shaderDir = dir.absolutePath() + "/shaders";
-#endif
    }else {
       shaderDir = value.value<QString>();
    }

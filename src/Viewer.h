@@ -94,6 +94,7 @@ namespace IQmol {
          void animationStep();
 
       public Q_SLOTS:
+         void setDefaultSceneRadius() { setSceneRadius(DefaultSceneRadius); }
          void setSceneRadius(double const);
          void resetView();
 

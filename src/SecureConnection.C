@@ -57,9 +57,9 @@ static int NumberOfConnections = 0;
 // -----------------------------------------------------------------------------
 // used for KeyboardInteractive
 // -----------------------------------------------------------------------------
-static void KeyboardCallback(const char *name, int name_len, const char *instruction, 
-   int instruction_len, int num_prompts, const LIBSSH2_USERAUTH_KBDINT_PROMPT *prompts,
-   LIBSSH2_USERAUTH_KBDINT_RESPONSE *responses, void **abstract)
+static void KeyboardCallback(const char* /*name*/, int /*name_len*/, const char* /*instruction*/,
+   int /*instruction_len*/, int num_prompts, const LIBSSH2_USERAUTH_KBDINT_PROMPT *prompts,
+   LIBSSH2_USERAUTH_KBDINT_RESPONSE *responses, void** /*abstract*/)
 {
    QString password;
    bool ok(true);
@@ -75,7 +75,6 @@ static void KeyboardCallback(const char *name, int name_len, const char *instruc
         responses[i].length = password.length();
     }
 }
-
 
 
 Connection::Connection(QString const& hostname, QString const& username, int const port) 
@@ -160,7 +159,7 @@ QString Connection::lookupHost(QString const& hostname)
   struct addrinfo hints, *res;
   int errcode;
   char addrstr[100];
-  void *ptr;
+  void *ptr(0);
 
   memset (&hints, 0, sizeof (hints));
   hints.ai_family = PF_UNSPEC;

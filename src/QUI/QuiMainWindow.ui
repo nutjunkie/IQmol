@@ -1868,12 +1868,19 @@ QToolButton:checked {
           <widget class="QWidget" name="AdvancedDFT">
            <layout class="QVBoxLayout">
             <item>
+             <widget class="QCheckBox" name="fast_xc">
+              <property name="text">
+               <string>Use Fast XC</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QGroupBox" name="groupBox_3">
               <property name="title">
                <string>Grid</string>
               </property>
               <layout class="QGridLayout">
-               <item row="1" column="1">
+               <item row="2" column="1">
                 <layout class="QHBoxLayout">
                  <item>
                   <widget class="QSpinBox" name="qui_radial_grid"/>
@@ -1893,31 +1900,24 @@ QToolButton:checked {
                  </item>
                 </layout>
                </item>
-               <item row="0" column="0">
+               <item row="1" column="0">
                 <widget class="QLabel" name="label_80">
                  <property name="text">
                   <string>Angular Points</string>
                  </property>
                 </widget>
                </item>
-               <item row="1" column="0">
+               <item row="2" column="0">
                 <widget class="QLabel" name="label_16">
                  <property name="text">
                   <string>Radial Points</string>
                  </property>
                 </widget>
                </item>
-               <item row="2" column="0" colspan="2">
-                <widget class="QCheckBox" name="xc_smart_grid">
-                 <property name="text">
-                  <string>Use Smart Grid</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
+               <item row="1" column="1">
                 <widget class="QComboBox" name="xc_grid"/>
                </item>
-               <item row="0" column="2">
+               <item row="1" column="2">
                 <spacer>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
@@ -1930,14 +1930,14 @@ QToolButton:checked {
                  </property>
                 </spacer>
                </item>
+               <item row="0" column="0">
+                <widget class="QCheckBox" name="xc_smart_grid">
+                 <property name="text">
+                  <string>Use Smart Grid</string>
+                 </property>
+                </widget>
+               </item>
               </layout>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="fast_xc">
-              <property name="text">
-               <string>Use Fast XC</string>
-              </property>
              </widget>
             </item>
             <item>
@@ -2150,19 +2150,6 @@ values</string>
                 </property>
                </widget>
               </item>
-              <item row="3" column="3">
-               <spacer>
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
              </layout>
             </item>
             <item>
@@ -2237,32 +2224,32 @@ values</string>
                 </property>
                </spacer>
               </item>
-             </layout>
-            </item>
-            <item>
-             <layout class="QHBoxLayout">
-              <item>
+              <item row="4" column="0">
                <widget class="QLabel" name="label_94">
                 <property name="text">
                  <string>DIIS Metric</string>
                 </property>
                </widget>
               </item>
-              <item>
-               <widget class="QComboBox" name="diis_error_metric"/>
-              </item>
-              <item>
-               <spacer>
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
+              <item row="4" column="1" colspan="2">
+               <layout class="QHBoxLayout">
+                <item>
+                 <widget class="QComboBox" name="diis_error_metric"/>
+                </item>
+                <item>
+                 <spacer>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
               </item>
              </layout>
             </item>
@@ -2685,7 +2672,7 @@ values</string>
            <layout class="QVBoxLayout">
             <item>
              <layout class="QGridLayout">
-              <item row="1" column="1">
+              <item row="2" column="1">
                <layout class="QGridLayout">
                 <item row="0" column="0">
                  <widget class="QSpinBox" name="qui_plots_points"/>
@@ -2705,34 +2692,24 @@ values</string>
                 </item>
                </layout>
               </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_147">
-                <property name="text">
-                 <string>Property</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
+              <item row="1" column="1">
                <widget class="QComboBox" name="plots_grid"/>
               </item>
-              <item row="2" column="1">
-               <widget class="QComboBox" name="plots_property"/>
-              </item>
-              <item row="1" column="0">
+              <item row="2" column="0">
                <widget class="QLabel" name="label_149">
                 <property name="text">
                  <string>Points</string>
                 </property>
                </widget>
               </item>
-              <item row="0" column="0">
+              <item row="1" column="0">
                <widget class="QLabel" name="label_148">
                 <property name="text">
                  <string>Grid</string>
                 </property>
                </widget>
               </item>
-              <item row="0" column="2">
+              <item row="1" column="2">
                <spacer>
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
@@ -2744,6 +2721,16 @@ values</string>
                  </size>
                 </property>
                </spacer>
+              </item>
+              <item row="0" column="1">
+               <widget class="QComboBox" name="plots_property"/>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_147">
+                <property name="text">
+                 <string>Property</string>
+                </property>
+               </widget>
               </item>
              </layout>
             </item>
@@ -2770,7 +2757,7 @@ values</string>
            </layout>
           </widget>
           <widget class="QWidget" name="AdvancedLargeMoleculeMethods">
-           <layout class="QVBoxLayout">
+           <layout class="QVBoxLayout" name="verticalLayout_25">
             <item>
              <widget class="QGroupBox" name="groupBox_0">
               <property name="title">
@@ -2822,74 +2809,91 @@ values</string>
                <number>0</number>
               </property>
               <widget class="QWidget" name="LargeMoleculesCFMM">
-               <layout class="QGridLayout">
-                <item row="0" column="1">
-                 <widget class="QComboBox" name="cfmm_grain">
-                  <property name="editable">
-                   <bool>false</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="0">
-                 <widget class="QCheckBox" name="lin_k">
-                  <property name="text">
-                   <string>Use Lin K</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <layout class="QHBoxLayout">
-                  <item>
-                   <widget class="QSpinBox" name="cfmm_order">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
+               <layout class="QVBoxLayout" name="verticalLayout_24">
+                <item>
+                 <layout class="QGridLayout" name="gridLayout_10">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_47">
+                    <property name="text">
+                     <string>CFMM Grain</string>
                     </property>
                    </widget>
                   </item>
-                  <item>
-                   <spacer>
+                  <item row="0" column="1">
+                   <widget class="QComboBox" name="cfmm_grain">
+                    <property name="editable">
+                     <bool>false</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="label_46">
+                    <property name="text">
+                     <string>Multipole Order</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QCheckBox" name="lin_k">
+                    <property name="text">
+                     <string>Use Lin K</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <layout class="QHBoxLayout" name="_2">
+                    <item>
+                     <widget class="QSpinBox" name="cfmm_order">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <spacer>
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>40</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                   </layout>
+                  </item>
+                  <item row="0" column="2">
+                   <spacer name="spacer_4">
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
                     </property>
                     <property name="sizeHint" stdset="0">
                      <size>
-                      <width>40</width>
-                      <height>20</height>
+                      <width>20</width>
+                      <height>26</height>
                      </size>
                     </property>
                    </spacer>
                   </item>
                  </layout>
                 </item>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="label_47">
-                  <property name="text">
-                   <string>CFMM Grain</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="2">
-                 <spacer>
+                <item>
+                 <spacer name="verticalSpacer_10">
                   <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
+                   <enum>Qt::Vertical</enum>
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
                     <width>20</width>
-                    <height>26</height>
+                    <height>40</height>
                    </size>
                   </property>
                  </spacer>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="label_46">
-                  <property name="text">
-                   <string>Multipole Order</string>
-                  </property>
-                 </widget>
                 </item>
                </layout>
               </widget>
@@ -3025,14 +3029,14 @@ values</string>
              </widget>
             </item>
             <item>
-             <spacer>
+             <spacer name="verticalSpacer_11">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
                 <width>20</width>
-                <height>159</height>
+                <height>280</height>
                </size>
               </property>
              </spacer>
@@ -3639,1078 +3643,19 @@ values</string>
           </widget>
           <widget class="QWidget" name="AdvancedCCEOM"/>
           <widget class="QWidget" name="AdvancedEOMCorrelationTargetStates">
-           <widget class="QWidget" name="layoutWidget_3">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>10</y>
-              <width>295</width>
-              <height>26</height>
-             </rect>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_2">
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_188">
-               <property name="text">
-                <string>EOM correlation level</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QComboBox" name="eom_corr"/>
-             </item>
-             <item row="0" column="2">
-              <spacer>
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </widget>
-          </widget>
-          <widget class="QWidget" name="AdvancedEESF">
-           <widget class="QWidget" name="layoutWidget_9">
-            <property name="geometry">
-             <rect>
-              <x>1</x>
-              <y>1</y>
-              <width>301</width>
-              <height>481</height>
-             </rect>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_3">
-             <item>
-              <widget class="QLabel" name="label_154">
-               <property name="font">
-                <font>
-                 <pointsize>14</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>EOM Excited States</string>
-               </property>
-               <property name="textFormat">
-                <enum>Qt::AutoText</enum>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <layout class="QGridLayout" name="_2">
-               <item row="0" column="0">
-                <widget class="QLabel" name="label_193">
-                 <property name="text">
-                  <string>EE States</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="2">
-                <spacer>
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="3" column="0">
-                <widget class="QLabel" name="label_194">
-                 <property name="text">
-                  <string>EE Singlet States</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="0">
-                <widget class="QLabel" name="label_120">
-                 <property name="text">
-                  <string>EE Triplet States</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="1">
-                <widget class="QLineEdit" name="eom_ee_triplets"/>
-               </item>
-               <item row="3" column="1">
-                <widget class="QLineEdit" name="eom_ee_singlets"/>
-               </item>
-               <item row="0" column="1">
-                <widget class="QLineEdit" name="eom_ee_states"/>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_157">
-               <property name="font">
-                <font>
-                 <pointsize>14</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>EOM Spin-Flip States</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <layout class="QGridLayout" name="_3">
-               <item row="0" column="0">
-                <widget class="QLabel" name="label_213">
-                 <property name="text">
-                  <string>SF States</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="2">
-                <spacer>
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="0" column="1">
-                <widget class="QLineEdit" name="eom_sf_states"/>
-               </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="label_214">
-                 <property name="text">
-                  <string>DSF States</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QLineEdit" name="eom_dsf_states"/>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <spacer name="verticalSpacer_2">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>40</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </widget>
-          </widget>
-          <widget class="QWidget" name="AdvancedIPEA">
-           <widget class="QWidget" name="layoutWidget_6">
-            <property name="geometry">
-             <rect>
-              <x>0</x>
-              <y>0</y>
-              <width>301</width>
-              <height>481</height>
-             </rect>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_6">
-             <item>
-              <widget class="QLabel" name="label_218">
-               <property name="font">
-                <font>
-                 <pointsize>14</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>EOM Ionized States</string>
-               </property>
-               <property name="textFormat">
-                <enum>Qt::AutoText</enum>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <layout class="QGridLayout" name="_4">
-               <item row="0" column="0">
-                <widget class="QLabel" name="label_219">
-                 <property name="text">
-                  <string>IP States</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="2">
-                <spacer>
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="0" column="1">
-                <widget class="QLineEdit" name="eom_ip_states"/>
-               </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="label_221">
-                 <property name="text">
-                  <string>IP Alpha</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QLineEdit" name="eom_ip_alpha"/>
-               </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="label_222">
-                 <property name="text">
-                  <string>IP Beta</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="1">
-                <widget class="QLineEdit" name="eom_ip_beta"/>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_223">
-               <property name="font">
-                <font>
-                 <pointsize>14</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>EOM Electron Attachment</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <layout class="QGridLayout" name="_7">
-               <item row="0" column="0">
-                <widget class="QLabel" name="label_229">
-                 <property name="text">
-                  <string>EA States</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="2">
-                <spacer>
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="0" column="1">
-                <widget class="QLineEdit" name="eom_ea_states"/>
-               </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="label_230">
-                 <property name="text">
-                  <string>EA Alpha</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QLineEdit" name="eom_ea_alpha"/>
-               </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="label_231">
-                 <property name="text">
-                  <string>EA Beta</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="1">
-                <widget class="QLineEdit" name="eom_ea_beta"/>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <spacer name="verticalSpacer_3">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>40</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </widget>
-          </widget>
-          <widget class="QWidget" name="AdvancedDIP">
-           <widget class="QWidget" name="layoutWidget_28">
-            <property name="geometry">
-             <rect>
-              <x>0</x>
-              <y>10</y>
-              <width>301</width>
-              <height>481</height>
-             </rect>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_31">
-             <item>
-              <widget class="QLabel" name="label_923">
-               <property name="font">
-                <font>
-                 <pointsize>14</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>EOM Double IP</string>
-               </property>
-               <property name="textFormat">
-                <enum>Qt::AutoText</enum>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <layout class="QGridLayout" name="_503">
-               <item row="0" column="0">
-                <widget class="QLabel" name="label_924">
-                 <property name="text">
-                  <string>DIP States</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="2">
-                <spacer>
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="3" column="0">
-                <widget class="QLabel" name="label_925">
-                 <property name="text">
-                  <string>DIP Singlet States</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="0">
-                <widget class="QLabel" name="label_926">
-                 <property name="text">
-                  <string>DIP Triplet States</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="1">
-                <widget class="QLineEdit" name="eom_dip_triplets"/>
-               </item>
-               <item row="3" column="1">
-                <widget class="QLineEdit" name="eom_dip_singlets"/>
-               </item>
-               <item row="0" column="1">
-                <widget class="QLineEdit" name="eom_dip_states"/>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <spacer name="verticalSpacer_16">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>40</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </widget>
-          </widget>
-          <widget class="QWidget" name="AdvancedCCConvergence">
-           <widget class="QWidget" name="layoutWidget_1">
-            <property name="geometry">
-             <rect>
-              <x>9</x>
-              <y>11</y>
-              <width>291</width>
-              <height>281</height>
-             </rect>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_2">
-             <item>
-              <layout class="QGridLayout">
-               <item row="0" column="2">
-                <spacer>
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="0" column="0">
-                <widget class="QLabel" name="label_133">
-                 <property name="text">
-                  <string>Maximum Iterations</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QSpinBox" name="cc_max_iter"/>
-               </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="label_152">
-                 <property name="text">
-                  <string>Denominator Thresh</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="0">
-                <widget class="QLabel" name="label_151">
-                 <property name="text">
-                  <string>DIIS Method</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="1">
-                <widget class="QSpinBox" name="cc_diis"/>
-               </item>
-               <item row="4" column="0">
-                <widget class="QLabel" name="label_155">
-                 <property name="text">
-                  <string>DIIS Start</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="1">
-                <widget class="QSpinBox" name="cc_diis_start"/>
-               </item>
-               <item row="4" column="2">
-                <spacer name="spacer_2">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>27</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="label_224">
-                 <property name="text">
-                  <string>Convergence</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="1">
-                <widget class="QSpinBox" name="cc_t_conv"/>
-               </item>
-               <item row="1" column="1">
-                <widget class="QLineEdit" name="cc_dov_thresh"/>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QVBoxLayout" name="verticalLayout"/>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout"/>
-             </item>
-             <item>
-              <spacer>
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>288</width>
-                 <height>98</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </widget>
-          </widget>
-          <widget class="QWidget" name="AdvancedEOMConvergence">
-           <widget class="QWidget" name="layoutWidget_2">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>10</y>
-              <width>291</width>
-              <height>465</height>
-             </rect>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_4">
-             <item>
-              <widget class="QLabel" name="label_217">
-               <property name="font">
-                <font>
-                 <pointsize>14</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>Davidson Options</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <layout class="QGridLayout" name="gridLayout_3">
-               <item row="0" column="0">
-                <widget class="QLabel" name="label_215">
-                 <property name="text">
-                  <string>Convergence</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QSpinBox" name="eom_davidson_convergence"/>
-               </item>
-               <item row="0" column="2">
-                <spacer>
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="label_216">
-                 <property name="text">
-                  <string>Threshold</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="label_162">
-                 <property name="text">
-                  <string>Maxvector</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="0">
-                <widget class="QLabel" name="label_167">
-                 <property name="text">
-                  <string>Max iterations</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="1">
-                <widget class="QSpinBox" name="eom_davidson_maxvector"/>
-               </item>
-               <item row="3" column="1">
-                <widget class="QSpinBox" name="eom_davidson_max_iter"/>
-               </item>
-               <item row="1" column="1">
-                <widget class="QLineEdit" name="eom_davidson_threshold"/>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_161">
-               <property name="font">
-                <font>
-                 <pointsize>14</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>Guess Options</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <layout class="QGridLayout" name="gridLayout">
-               <item row="0" column="1">
-                <widget class="QSpinBox" name="cc_nguess_singles"/>
-               </item>
-               <item row="0" column="2">
-                <spacer>
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="label_196">
-                 <property name="text">
-                  <string>Doubles Guess Vectors</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QSpinBox" name="cc_nguess_doubles"/>
-               </item>
-               <item row="0" column="0">
-                <widget class="QLabel" name="label_195">
-                 <property name="text">
-                  <string>Singles Guess Vectors</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <spacer>
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>40</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </widget>
-          </widget>
-          <widget class="QWidget" name="AdvancedProperties">
-           <widget class="QWidget" name="layoutWidget_11">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>10</y>
-              <width>291</width>
-              <height>471</height>
-             </rect>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_7">
-             <item>
-              <widget class="QLabel" name="label_158">
-               <property name="font">
-                <font>
-                 <pointsize>14</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>EOM Properties</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <layout class="QGridLayout" name="gridLayout_4">
-               <item row="0" column="0">
-                <widget class="QLabel" name="label_220">
-                 <property name="text">
-                  <string>State to optimize</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QCheckBox" name="cc_eom_prop">
-                 <property name="text">
-                  <string>EOM properties</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="0">
-                <widget class="QCheckBox" name="cc_trans_prop">
-                 <property name="text">
-                  <string>Transition properties</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="2">
-                <spacer>
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="3" column="0" colspan="2">
-                <widget class="QCheckBox" name="cc_eom_prop_te">
-                 <property name="text">
-                  <string>Two electron transition properties</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QLineEdit" name="cc_state_to_opt">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>105</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
-                 <property name="sizeIncrement">
-                  <size>
-                   <width>0</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="0" colspan="2">
-                <widget class="QCheckBox" name="cc_fullresponse">
-                 <property name="text">
-                  <string>Relaxed properties</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_225">
-               <property name="font">
-                <font>
-                 <pointsize>14</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>CC Properties</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <layout class="QGridLayout" name="gridLayout_5">
-               <item row="0" column="0">
-                <widget class="QCheckBox" name="cc_ref_prop">
-                 <property name="text">
-                  <string>Reference properties</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QCheckBox" name="cc_ref_prop_te">
-                 <property name="text">
-                  <string>Two-electron reference properties</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <spacer name="verticalSpacer_4">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>58</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </widget>
-          </widget>
-          <widget class="QWidget" name="AdvancedSurfaceCrossing">
-           <widget class="QWidget" name="layoutWidget_12">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>10</y>
-              <width>291</width>
-              <height>451</height>
-             </rect>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_8">
-             <item>
-              <layout class="QGridLayout" name="gridLayout_6">
-               <item row="0" column="0">
-                <widget class="QLabel" name="label_33">
-                 <property name="text">
-                  <string>First electronic state</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QLineEdit" name="xopt_state_1">
-                 <property name="maximumSize">
-                  <size>
-                   <width>106</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="2">
-                <spacer name="horizontalSpacer_2">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="label_73">
-                 <property name="text">
-                  <string>Second electronic state</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QLineEdit" name="xopt_state_2">
-                 <property name="maximumSize">
-                  <size>
-                   <width>106</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="0">
-                <widget class="QCheckBox" name="xopt_seam_only">
-                 <property name="text">
-                  <string>Search for Seam Only</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <spacer>
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>40</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </widget>
-          </widget>
-          <widget class="QWidget" name="AdvancedEOMCCJobResources">
-           <widget class="QWidget" name="layoutWidget_4">
-            <property name="geometry">
-             <rect>
-              <x>0</x>
-              <y>0</y>
-              <width>301</width>
-              <height>488</height>
-             </rect>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_9">
-             <item>
-              <layout class="QGridLayout" name="CCMAN_layout_2">
-               <item row="0" column="0">
-                <widget class="QLabel" name="label_226">
-                 <property name="text">
-                  <string>CC Memory</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QSpinBox" name="cc_memory"/>
-               </item>
-               <item row="0" column="2">
-                <spacer>
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="label_227">
-                 <property name="text">
-                  <string>Print Level</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QSpinBox" name="cc_print"/>
-               </item>
-               <item row="1" column="2">
-                <spacer name="spacer_3">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="label_115">
-                 <property name="text">
-                  <string>Number of threads</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="1">
-                <widget class="QSpinBox" name="threads">
-                 <property name="maximum">
-                  <number>10000</number>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="2">
-                <spacer name="horizontalSpacer_3">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="cc_symmetry">
-               <property name="text">
-                <string>Use Symmetry</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="ccman2">
-               <property name="text">
-                <string>CCMAN2</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="verticalSpacer_5">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>333</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </widget>
-          </widget>
-          <widget class="QWidget" name="AdvancedPostHartreeFock"/>
-          <widget class="QWidget" name="AdvancedMP2">
-           <layout class="QVBoxLayout">
+           <layout class="QVBoxLayout" name="verticalLayout_26">
             <item>
-             <widget class="QCheckBox" name="qui_frozen_core">
-              <property name="text">
-               <string>Use Frozen Core</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <layout class="QGridLayout">
+             <layout class="QGridLayout" name="gridLayout_2">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_188">
+                <property name="text">
+                 <string>EOM correlation level</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QComboBox" name="eom_corr"/>
+              </item>
               <item row="0" column="2">
                <spacer>
                 <property name="orientation">
@@ -4724,6 +3669,915 @@ values</string>
                 </property>
                </spacer>
               </item>
+             </layout>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_12">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>492</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="AdvancedEESF">
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <item>
+             <widget class="QGroupBox" name="groupBox_4">
+              <property name="title">
+               <string>EOM Spin-Flip States</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_10">
+               <item>
+                <layout class="QGridLayout" name="_3">
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_213">
+                   <property name="text">
+                    <string>SF States</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QLineEdit" name="eom_sf_states"/>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_214">
+                   <property name="text">
+                    <string>DSF States</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QLineEdit" name="eom_dsf_states"/>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_5">
+              <property name="title">
+               <string>EOM Excited States</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_11">
+               <item>
+                <layout class="QGridLayout" name="gridLayout_7">
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_193">
+                   <property name="text">
+                    <string>EE States</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_194">
+                   <property name="text">
+                    <string>EE Singlet States</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="label_120">
+                   <property name="text">
+                    <string>EE Triplet States</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QLineEdit" name="eom_ee_states"/>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QLineEdit" name="eom_ee_singlets"/>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QLineEdit" name="eom_ee_triplets"/>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>281</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="AdvancedIPEA">
+           <layout class="QVBoxLayout" name="verticalLayout_6">
+            <item>
+             <widget class="QGroupBox" name="groupBox_11">
+              <property name="title">
+               <string>EOM Ionized States</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_13">
+               <item>
+                <layout class="QGridLayout" name="_4">
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_219">
+                   <property name="text">
+                    <string>IP States</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QLineEdit" name="eom_ip_states"/>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_221">
+                   <property name="text">
+                    <string>IP Alpha</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QLineEdit" name="eom_ip_alpha"/>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="label_222">
+                   <property name="text">
+                    <string>IP Beta</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QLineEdit" name="eom_ip_beta"/>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_8">
+              <property name="title">
+               <string>EOM Electron Attachment</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_12">
+               <item>
+                <layout class="QGridLayout" name="_7">
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_229">
+                   <property name="text">
+                    <string>EA States</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QLineEdit" name="eom_ea_states"/>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_230">
+                   <property name="text">
+                    <string>EA Alpha</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QLineEdit" name="eom_ea_alpha"/>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="label_231">
+                   <property name="text">
+                    <string>EA Beta</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QLineEdit" name="eom_ea_beta"/>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>249</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="AdvancedDIP">
+           <layout class="QVBoxLayout" name="verticalLayout_15">
+            <item>
+             <widget class="QGroupBox" name="groupBox_12">
+              <property name="title">
+               <string>EOM Double IP</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_14">
+               <item>
+                <layout class="QGridLayout" name="_503">
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_924">
+                   <property name="text">
+                    <string>DIP States</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_925">
+                   <property name="text">
+                    <string>DIP Singlet States</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="label_926">
+                   <property name="text">
+                    <string>DIP Triplet States</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QLineEdit" name="eom_dip_triplets"/>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QLineEdit" name="eom_dip_singlets"/>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QLineEdit" name="eom_dip_states"/>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_6">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>387</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="AdvancedCCConvergence">
+           <layout class="QVBoxLayout" name="verticalLayout">
+            <item>
+             <layout class="QGridLayout" name="gridLayout_8">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_133">
+                <property name="text">
+                 <string>Maximum Iterations</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <layout class="QHBoxLayout" name="horizontalLayout_4">
+                <item>
+                 <widget class="QSpinBox" name="cc_max_iter"/>
+                </item>
+                <item>
+                 <spacer>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_224">
+                <property name="text">
+                 <string>Convergence</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <layout class="QHBoxLayout" name="horizontalLayout_5">
+                <item>
+                 <widget class="QSpinBox" name="cc_t_conv"/>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_5">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_151">
+                <property name="text">
+                 <string>DIIS Method</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <layout class="QHBoxLayout" name="horizontalLayout_6">
+                <item>
+                 <widget class="QSpinBox" name="cc_diis"/>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_6">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_155">
+                <property name="text">
+                 <string>DIIS Start</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <layout class="QHBoxLayout" name="horizontalLayout_7">
+                <item>
+                 <widget class="QSpinBox" name="cc_diis_start"/>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_7">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_152">
+                <property name="text">
+                 <string>Denominator Thresh</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QLineEdit" name="cc_dov_thresh"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_7">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>346</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="AdvancedEOMConvergence">
+           <layout class="QVBoxLayout" name="verticalLayout_16">
+            <item>
+             <widget class="QGroupBox" name="groupBox_14">
+              <property name="title">
+               <string>Davidson Options</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_2">
+               <item>
+                <layout class="QGridLayout" name="gridLayout_9">
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_215">
+                   <property name="text">
+                    <string>Convergence</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <layout class="QHBoxLayout" name="horizontalLayout">
+                   <item>
+                    <widget class="QSpinBox" name="eom_davidson_convergence"/>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_8">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_162">
+                   <property name="text">
+                    <string>Maxvector</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <layout class="QHBoxLayout" name="horizontalLayout_8">
+                   <item>
+                    <widget class="QSpinBox" name="eom_davidson_maxvector"/>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_9">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="label_167">
+                   <property name="text">
+                    <string>Max iterations</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="1">
+                  <layout class="QHBoxLayout" name="horizontalLayout_9">
+                   <item>
+                    <widget class="QSpinBox" name="eom_davidson_max_iter"/>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_10">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </item>
+                 <item row="3" column="0">
+                  <widget class="QLabel" name="label_216">
+                   <property name="text">
+                    <string>Threshold</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="1">
+                  <widget class="QLineEdit" name="eom_davidson_threshold"/>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_17">
+              <property name="title">
+               <string>Guess Options</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_4">
+               <item>
+                <layout class="QGridLayout" name="gridLayout_3">
+                 <item row="0" column="1">
+                  <widget class="QSpinBox" name="cc_nguess_singles"/>
+                 </item>
+                 <item row="0" column="2">
+                  <spacer>
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_196">
+                   <property name="text">
+                    <string>Doubles Guess Vectors</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QSpinBox" name="cc_nguess_doubles"/>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_195">
+                   <property name="text">
+                    <string>Singles Guess Vectors</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_8">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>228</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="AdvancedProperties">
+           <layout class="QVBoxLayout" name="verticalLayout_20">
+            <item>
+             <widget class="QGroupBox" name="groupBox_18">
+              <property name="title">
+               <string>EOM Properties</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_7">
+               <item>
+                <layout class="QVBoxLayout" name="verticalLayout_17">
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_10">
+                   <item>
+                    <widget class="QLabel" name="label_220">
+                     <property name="text">
+                      <string>State to optimize</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="cc_state_to_opt">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>105</width>
+                       <height>16777215</height>
+                      </size>
+                     </property>
+                     <property name="sizeIncrement">
+                      <size>
+                       <width>0</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_11">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="cc_eom_prop">
+                   <property name="text">
+                    <string>EOM properties</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="cc_trans_prop">
+                   <property name="text">
+                    <string>Transition properties</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="cc_eom_prop_te">
+                   <property name="text">
+                    <string>Two electron transition properties</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="cc_fullresponse">
+                   <property name="text">
+                    <string>Relaxed properties</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_20">
+              <property name="title">
+               <string>CC Properties</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_18">
+               <item>
+                <layout class="QVBoxLayout" name="verticalLayout_19">
+                 <item>
+                  <widget class="QCheckBox" name="cc_ref_prop">
+                   <property name="text">
+                    <string>Reference properties</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="cc_ref_prop_te">
+                   <property name="text">
+                    <string>Two-electron reference properties</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>263</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="AdvancedSurfaceCrossing">
+           <layout class="QVBoxLayout" name="verticalLayout_8">
+            <item>
+             <layout class="QGridLayout" name="gridLayout">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_33">
+                <property name="text">
+                 <string>First electronic state</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="xopt_state_1">
+                <property name="maximumSize">
+                 <size>
+                  <width>106</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_73">
+                <property name="text">
+                 <string>Second electronic state</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="xopt_state_2">
+                <property name="maximumSize">
+                 <size>
+                  <width>106</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QCheckBox" name="xopt_seam_only">
+                <property name="text">
+                 <string>Search for Seam Only</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <spacer>
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>435</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="AdvancedEOMCCJobResources">
+           <layout class="QVBoxLayout" name="verticalLayout_29">
+            <item>
+             <layout class="QGridLayout" name="CCMAN_layout_2">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_226">
+                <property name="text">
+                 <string>CC Memory</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QSpinBox" name="cc_memory"/>
+              </item>
+              <item row="0" column="2">
+               <spacer>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_227">
+                <property name="text">
+                 <string>Print Level</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QSpinBox" name="cc_print"/>
+              </item>
+              <item row="1" column="2">
+               <spacer name="spacer_3">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_115">
+                <property name="text">
+                 <string>Number of threads</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QSpinBox" name="threads">
+                <property name="maximum">
+                 <number>10000</number>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="2">
+               <spacer name="horizontalSpacer_3">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="5" column="0">
+               <widget class="QCheckBox" name="cc_symmetry">
+                <property name="text">
+                 <string>Use Symmetry</string>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="0">
+               <widget class="QCheckBox" name="ccman2">
+                <property name="text">
+                 <string>CCMAN2</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QCheckBox" name="direct_ri">
+                <property name="text">
+                 <string>Direct RI</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_104">
+                <property name="text">
+                 <string>Cholesky Tolerance</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QSpinBox" name="cholesky_tol"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_5">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>266</width>
+                <height>370</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="AdvancedPostHartreeFock"/>
+          <widget class="QWidget" name="AdvancedMP2">
+           <layout class="QVBoxLayout">
+            <item>
+             <widget class="QCheckBox" name="qui_frozen_core">
+              <property name="text">
+               <string>Use Frozen Core</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QGridLayout">
               <item row="0" column="1">
                <widget class="QSpinBox" name="n_frozen_core"/>
               </item>
@@ -4733,14 +4587,14 @@ values</string>
               <item row="0" column="0">
                <widget class="QLabel" name="label_123">
                 <property name="text">
-                 <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Lucida Grande; font-size:13pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;No. Frozen Core Orbs&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 <string>Number Frozen Core Orbs</string>
                 </property>
                </widget>
               </item>
               <item row="1" column="0">
                <widget class="QLabel" name="label_234">
                 <property name="text">
-                 <string>No. Frozen Virtual Orbs</string>
+                 <string>Number Frozen Virtual Orbs</string>
                 </property>
                </widget>
               </item>
@@ -5399,29 +5253,12 @@ values</string>
               <item>
                <widget class="QLabel" name="label_38">
                 <property name="text">
-                 <string>Symmetry
-</string>
+                 <string>Symmetry</string>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QSpinBox" name="cc_reference_symmetry"/>
-              </item>
-              <item>
-               <spacer>
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Fixed</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
               </item>
               <item>
                <widget class="QLabel" name="label_42">
@@ -5676,64 +5513,68 @@ values</string>
               <property name="title">
                <string>Coupled-Cluster Memory</string>
               </property>
-              <layout class="QGridLayout">
-               <item row="0" column="2">
-                <spacer>
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="0" column="1">
-                <widget class="QSpinBox" name="cc_block_tensor_buffer_size">
-                 <property name="suffix">
-                  <string> Mb</string>
-                 </property>
-                 <property name="maximum">
-                  <number>9999</number>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="0">
-                <widget class="QLabel" name="label_206">
-                 <property name="text">
-                  <string>Block Tensors</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QSpinBox" name="cc_tmpbuffsize">
-                 <property name="suffix">
-                  <string> Mb</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="label_205">
-                 <property name="text">
-                  <string>Orbital Block Size</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="label_204">
-                 <property name="text">
-                  <string>Temporary Arrays</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="1">
-                <widget class="QSpinBox" name="cc_orbs_per_block">
-                 <property name="suffix">
-                  <string> Mb</string>
-                 </property>
-                </widget>
+              <layout class="QVBoxLayout" name="verticalLayout_21">
+               <item>
+                <layout class="QGridLayout" name="gridLayout_4">
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_206">
+                   <property name="text">
+                    <string>Block Tensors</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_204">
+                   <property name="text">
+                    <string>Temporary Arrays</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="label_205">
+                   <property name="text">
+                    <string>Orbital Block Size</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QSpinBox" name="cc_block_tensor_buffer_size">
+                   <property name="suffix">
+                    <string> Mb</string>
+                   </property>
+                   <property name="maximum">
+                    <number>9999</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QSpinBox" name="cc_tmpbuffsize">
+                   <property name="suffix">
+                    <string> Mb</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QSpinBox" name="cc_orbs_per_block">
+                   <property name="suffix">
+                    <string> Mb</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="2">
+                  <spacer name="spacer">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
                </item>
               </layout>
              </widget>
@@ -5766,41 +5607,59 @@ values</string>
               <property name="title">
                <string>Solvent Model</string>
               </property>
-              <layout class="QGridLayout">
-               <item row="1" column="2">
-                <widget class="QRadioButton" name="svp">
-                 <property name="text">
-                  <string>SVP</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QRadioButton" name="chemsol">
-                 <property name="text">
-                  <string>ChemSol</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QRadioButton" name="qui_solvent_onsager">
-                 <property name="text">
-                  <string>Onsager</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="0">
-                <widget class="QRadioButton" name="qui_solvent_none">
-                 <property name="text">
-                  <string>None</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QRadioButton" name="smx_solvation">
-                 <property name="text">
-                  <string>SM8</string>
-                 </property>
-                </widget>
+              <layout class="QVBoxLayout" name="verticalLayout_22">
+               <item>
+                <layout class="QGridLayout" name="gridLayout_5">
+                 <item row="0" column="0">
+                  <widget class="QRadioButton" name="qui_solvent_none">
+                   <property name="text">
+                    <string>None</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QRadioButton" name="chemsol">
+                   <property name="text">
+                    <string>ChemSol</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QRadioButton" name="smx_solvation">
+                   <property name="text">
+                    <string>SM8</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QRadioButton" name="qui_solvent_cosmo">
+                   <property name="text">
+                    <string>COSMO</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="2">
+                  <widget class="QRadioButton" name="svp">
+                   <property name="text">
+                    <string>SVP</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QRadioButton" name="qui_solvent_onsager">
+                   <property name="text">
+                    <string>Onsager</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="2">
+                  <widget class="QRadioButton" name="qui_solvent_pcm">
+                   <property name="text">
+                    <string>PCM</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </item>
               </layout>
              </widget>
@@ -5814,7 +5673,7 @@ values</string>
                </sizepolicy>
               </property>
               <property name="currentIndex">
-               <number>5</number>
+               <number>1</number>
               </property>
               <widget class="QWidget" name="SolventOnsager">
                <layout class="QVBoxLayout">
@@ -5835,7 +5694,7 @@ values</string>
                    </widget>
                   </item>
                   <item row="1" column="1">
-                   <widget class="QDoubleSpinBox" name="solvent_dielectric">
+                   <widget class="QDoubleSpinBox" name="qui_solvent_dielectric_onsager">
                     <property name="decimals">
                      <number>4</number>
                     </property>
@@ -5873,6 +5732,33 @@ values</string>
                     </property>
                    </spacer>
                   </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="label_37">
+                    <property name="text">
+                     <string>Multipole Order</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <layout class="QHBoxLayout" name="horizontalLayout_11">
+                    <item>
+                     <spacer name="horizontalSpacer_2">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>40</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                    <item>
+                     <widget class="QSpinBox" name="sol_order"/>
+                    </item>
+                   </layout>
+                  </item>
                  </layout>
                 </item>
                 <item>
@@ -5891,172 +5777,46 @@ values</string>
                </layout>
               </widget>
               <widget class="QWidget" name="SolventNone"/>
-              <widget class="QWidget" name="SolventSVP">
-               <layout class="QVBoxLayout">
+              <widget class="QWidget" name="SolventHidden">
+               <layout class="QVBoxLayout" name="verticalLayout_27">
                 <item>
-                 <layout class="QGridLayout">
-                  <item row="0" column="2">
-                   <spacer>
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeType">
-                     <enum>QSizePolicy::Fixed</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>20</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item row="4" column="1">
-                   <widget class="QLabel" name="label_164">
+                 <layout class="QHBoxLayout" name="horizontalLayout_14">
+                  <item>
+                   <widget class="QLabel" name="label_97">
                     <property name="text">
-                     <string>Sphere Radius</string>
+                     <string>Solvent Method</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="2" column="4">
-                   <spacer>
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item row="0" column="3">
-                   <widget class="QDoubleSpinBox" name="qui_svp_dielst"/>
-                  </item>
-                  <item row="2" column="0" colspan="2">
-                   <widget class="QLabel" name="label_b161">
-                    <property name="text">
-                     <string>Cavity Shape</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="0">
-                   <widget class="QLabel" name="label_c161">
-                    <property name="text">
-                     <string>Guess</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="3">
-                   <widget class="QDoubleSpinBox" name="qui_svp_rhoiso"/>
-                  </item>
-                  <item row="1" column="1">
-                   <spacer>
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item row="4" column="3">
-                   <widget class="QDoubleSpinBox" name="qui_svp_radsph"/>
-                  </item>
-                  <item row="2" column="2" colspan="2">
-                   <widget class="QComboBox" name="qui_svp_ishape"/>
-                  </item>
-                  <item row="1" column="2" colspan="2">
-                   <widget class="QComboBox" name="svp_guess"/>
-                  </item>
-                  <item row="3" column="0">
-                   <spacer>
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeType">
-                     <enum>QSizePolicy::Fixed</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>16</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item row="0" column="0" colspan="2">
-                   <widget class="QLabel" name="label_a161">
-                    <property name="text">
-                     <string>Dielectric Constant</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="1">
-                   <widget class="QLabel" name="label_163">
-                    <property name="text">
-                     <string>Isodensity</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="5" column="0" colspan="2">
-                   <widget class="QCheckBox" name="svp_path">
-                    <property name="text">
-                     <string>Run gas phase</string>
-                    </property>
-                   </widget>
+                  <item>
+                   <widget class="QComboBox" name="solvent_method"/>
                   </item>
                  </layout>
                 </item>
                 <item>
-                 <widget class="QGroupBox" name="groupBox_15">
-                  <property name="title">
-                   <string>Convergence</string>
-                  </property>
-                  <layout class="QHBoxLayout">
-                   <item>
-                    <widget class="QLabel" name="label_d161">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string>Cavity</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QSpinBox" name="svp_cavity_conv"/>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_e161">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string>Charge</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QSpinBox" name="svp_charge_conv"/>
-                   </item>
-                  </layout>
-                 </widget>
-                </item>
-                <item>
-                 <layout class="QHBoxLayout">
+                 <layout class="QHBoxLayout" name="horizontalLayout_16">
                   <item>
-                   <spacer>
+                   <widget class="QLabel" name="label_b160_3">
+                    <property name="text">
+                     <string>Solvent Dielectric</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QDoubleSpinBox" name="solvent_dielectric">
+                    <property name="decimals">
+                     <number>4</number>
+                    </property>
+                    <property name="maximum">
+                     <double>99.999899999999997</double>
+                    </property>
+                    <property name="singleStep">
+                     <double>0.000100000000000</double>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_14">
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
                     </property>
@@ -6068,10 +5828,100 @@ values</string>
                     </property>
                    </spacer>
                   </item>
-                  <item>
-                   <widget class="QPushButton" name="modifyGrid">
+                 </layout>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_13">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>318</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="SolventSVP">
+               <layout class="QVBoxLayout">
+                <item>
+                 <layout class="QGridLayout" name="gridLayout_6">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_f161">
                     <property name="text">
-                     <string>More</string>
+                     <string>Memory</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QSpinBox" name="svp_memory"/>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="label_d161">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>Cavity Convergence</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QSpinBox" name="svp_cavity_conv"/>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="label_e161">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>Charge Convergence</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QSpinBox" name="svp_charge_conv"/>
+                  </item>
+                  <item row="3" column="0" colspan="2">
+                   <layout class="QHBoxLayout" name="horizontalLayout_12">
+                    <item>
+                     <widget class="QLabel" name="label_c161">
+                      <property name="text">
+                       <string>Guess</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <spacer name="spacer_2">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>85</width>
+                        <height>17</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                    <item>
+                     <widget class="QComboBox" name="svp_guess"/>
+                    </item>
+                   </layout>
+                  </item>
+                  <item row="4" column="0">
+                   <widget class="QCheckBox" name="svp_path">
+                    <property name="text">
+                     <string>Run gas phase</string>
                     </property>
                    </widget>
                   </item>
@@ -6092,22 +5942,32 @@ values</string>
                 </item>
                </layout>
               </widget>
-              <widget class="QWidget" name="SolventSVP2">
-               <layout class="QVBoxLayout">
+              <widget class="QWidget" name="SolventCosmo">
+               <layout class="QVBoxLayout" name="verticalLayout_28">
                 <item>
-                 <layout class="QHBoxLayout">
+                 <layout class="QHBoxLayout" name="horizontalLayout_15">
                   <item>
-                   <widget class="QLabel" name="label_f161">
+                   <widget class="QLabel" name="label_b160_2">
                     <property name="text">
-                     <string>Memory</string>
+                     <string>Solvent Dielectric</string>
                     </property>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QSpinBox" name="svp_memory"/>
+                   <widget class="QDoubleSpinBox" name="qui_solvent_dielectric_cosmo">
+                    <property name="decimals">
+                     <number>4</number>
+                    </property>
+                    <property name="maximum">
+                     <double>99.999899999999997</double>
+                    </property>
+                    <property name="singleStep">
+                     <double>0.000100000000000</double>
+                    </property>
+                   </widget>
                   </item>
                   <item>
-                   <spacer>
+                   <spacer name="horizontalSpacer_13">
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
                     </property>
@@ -6122,68 +5982,58 @@ values</string>
                  </layout>
                 </item>
                 <item>
-                 <layout class="QHBoxLayout">
-                  <item>
-                   <widget class="QLabel" name="label_g161">
-                    <property name="text">
-                     <string>Operator</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QComboBox" name="iopprd"/>
-                  </item>
-                  <item>
-                   <spacer>
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <layout class="QHBoxLayout">
-                  <item>
-                   <widget class="QLabel" name="label_165">
-                    <property name="text">
-                     <string>Linear Equation Solver</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QComboBox" name="lineq"/>
-                  </item>
-                  <item>
-                   <spacer>
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>41</width>
-                      <height>26</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <spacer>
+                 <spacer name="verticalSpacer_14">
                   <property name="orientation">
                    <enum>Qt::Vertical</enum>
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
                     <width>20</width>
-                    <height>40</height>
+                    <height>354</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="SolventPCM">
+               <layout class="QVBoxLayout" name="verticalLayout_23">
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_13">
+                  <item>
+                   <widget class="QLabel" name="label_75">
+                    <property name="text">
+                     <string>Print Level</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="pcm_print"/>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_12">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_9">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>354</height>
                    </size>
                   </property>
                  </spacer>
@@ -6858,24 +6708,24 @@ values</string>
  <tabstops>
   <tabstop>serverCombo</tabstop>
   <tabstop>submitButton</tabstop>
+  <tabstop>qui_title</tabstop>
   <tabstop>job_type</tabstop>
-  <tabstop>exchange</tabstop>
-  <tabstop>correlation</tabstop>
-  <tabstop>unrestricted</tabstop>
-  <tabstop>scf_max_cycles</tabstop>
-  <tabstop>scf_convergence</tabstop>
-  <tabstop>jobList</tabstop>
   <tabstop>qui_charge</tabstop>
+  <tabstop>exchange</tabstop>
   <tabstop>qui_multiplicity</tabstop>
+  <tabstop>correlation</tabstop>
   <tabstop>basis</tabstop>
+  <tabstop>unrestricted</tabstop>
   <tabstop>ecp</tabstop>
+  <tabstop>scf_max_cycles</tabstop>
   <tabstop>basis2</tabstop>
+  <tabstop>scf_convergence</tabstop>
   <tabstop>auxiliary_basis</tabstop>
-  <tabstop>addJobButton</tabstop>
+  <tabstop>jobList</tabstop>
   <tabstop>deleteJobButton</tabstop>
-  <tabstop>geom_opt_tol_energy</tabstop>
-  <tabstop>geom_opt_tol_displacement</tabstop>
-  <tabstop>geom_opt_max_cycles</tabstop>
+  <tabstop>addJobButton</tabstop>
+  <tabstop>previewText</tabstop>
+  <tabstop>resetButton</tabstop>
   <tabstop>geom_opt_tol_gradient</tabstop>
   <tabstop>geom_opt_mode</tabstop>
   <tabstop>editConstraintsButton</tabstop>
@@ -6924,7 +6774,6 @@ values</string>
   <tabstop>rca_max_cycles</tabstop>
   <tabstop>purecart</tabstop>
   <tabstop>qui_radial_grid</tabstop>
-  <tabstop>xc_smart_grid</tabstop>
   <tabstop>xc_grid</tabstop>
   <tabstop>fast_xc</tabstop>
   <tabstop>dft_d_a</tabstop>
@@ -6969,14 +6818,10 @@ values</string>
   <tabstop>multipole_order</tabstop>
   <tabstop>qui_plots_points</tabstop>
   <tabstop>plots_grid</tabstop>
-  <tabstop>plots_property</tabstop>
   <tabstop>skip_cis_rpa</tabstop>
   <tabstop>qui_cfmm</tabstop>
   <tabstop>ftc</tabstop>
   <tabstop>use_case</tabstop>
-  <tabstop>cfmm_grain</tabstop>
-  <tabstop>lin_k</tabstop>
-  <tabstop>cfmm_order</tabstop>
   <tabstop>ftc_fast</tabstop>
   <tabstop>ftc_class_thresh_mult</tabstop>
   <tabstop>ftc_class_thresh_order</tabstop>
@@ -7063,27 +6908,8 @@ values</string>
   <tabstop>ao2mo_disk</tabstop>
   <tabstop>integrals_buffer</tabstop>
   <tabstop>mem_total</tabstop>
-  <tabstop>cc_block_tensor_buffer_size</tabstop>
-  <tabstop>cc_tmpbuffsize</tabstop>
-  <tabstop>cc_orbs_per_block</tabstop>
-  <tabstop>svp</tabstop>
-  <tabstop>chemsol</tabstop>
-  <tabstop>qui_solvent_onsager</tabstop>
-  <tabstop>qui_solvent_none</tabstop>
-  <tabstop>solvent_dielectric</tabstop>
+  <tabstop>qui_solvent_dielectric_onsager</tabstop>
   <tabstop>solute_radius</tabstop>
-  <tabstop>qui_svp_dielst</tabstop>
-  <tabstop>qui_svp_rhoiso</tabstop>
-  <tabstop>qui_svp_radsph</tabstop>
-  <tabstop>qui_svp_ishape</tabstop>
-  <tabstop>svp_guess</tabstop>
-  <tabstop>svp_path</tabstop>
-  <tabstop>svp_cavity_conv</tabstop>
-  <tabstop>svp_charge_conv</tabstop>
-  <tabstop>modifyGrid</tabstop>
-  <tabstop>svp_memory</tabstop>
-  <tabstop>iopprd</tabstop>
-  <tabstop>lineq</tabstop>
   <tabstop>chemsol_nn</tabstop>
   <tabstop>chemsol_efield</tabstop>
   <tabstop>chemsol_read_vdw</tabstop>
@@ -7107,7 +6933,7 @@ values</string>
   <tabstop>intracule_j_series_limit</tabstop>
   <tabstop>intracule_i_series_limit</tabstop>
   <tabstop>intracule_wigner_series_limit</tabstop>
-  <tabstop>previewText</tabstop>
+  <tabstop>geom_opt_tol_displacement</tabstop>
   <tabstop>setupTabWidget</tabstop>
   <tabstop>hess_proj_trm</tabstop>
   <tabstop>pdb_print</tabstop>
@@ -7116,9 +6942,6 @@ values</string>
   <tabstop>link_atom_projection</tabstop>
   <tabstop>qmmm_full_hessian</tabstop>
   <tabstop>eom_corr</tabstop>
-  <tabstop>eom_ee_triplets</tabstop>
-  <tabstop>eom_ee_singlets</tabstop>
-  <tabstop>eom_ee_states</tabstop>
   <tabstop>eom_sf_states</tabstop>
   <tabstop>eom_dsf_states</tabstop>
   <tabstop>eom_ip_states</tabstop>
@@ -7130,10 +6953,27 @@ values</string>
   <tabstop>eom_dip_triplets</tabstop>
   <tabstop>eom_dip_singlets</tabstop>
   <tabstop>eom_dip_states</tabstop>
+  <tabstop>smx_solvent</tabstop>
+  <tabstop>geom_opt_tol_energy</tabstop>
+  <tabstop>geom_opt_max_cycles</tabstop>
+  <tabstop>cancelButton</tabstop>
+  <tabstop>basis_projection_type</tabstop>
+  <tabstop>xc_smart_grid</tabstop>
+  <tabstop>meteco</tabstop>
+  <tabstop>plots_property</tabstop>
+  <tabstop>cfmm_grain</tabstop>
+  <tabstop>lin_k</tabstop>
+  <tabstop>cfmm_order</tabstop>
+  <tabstop>efp</tabstop>
+  <tabstop>efp_fragments_only</tabstop>
+  <tabstop>efp_input</tabstop>
+  <tabstop>eom_ee_states</tabstop>
+  <tabstop>eom_ee_singlets</tabstop>
+  <tabstop>eom_ee_triplets</tabstop>
   <tabstop>cc_max_iter</tabstop>
+  <tabstop>cc_t_conv</tabstop>
   <tabstop>cc_diis</tabstop>
   <tabstop>cc_diis_start</tabstop>
-  <tabstop>cc_t_conv</tabstop>
   <tabstop>cc_dov_thresh</tabstop>
   <tabstop>eom_davidson_convergence</tabstop>
   <tabstop>eom_davidson_maxvector</tabstop>
@@ -7141,10 +6981,10 @@ values</string>
   <tabstop>eom_davidson_threshold</tabstop>
   <tabstop>cc_nguess_singles</tabstop>
   <tabstop>cc_nguess_doubles</tabstop>
+  <tabstop>cc_state_to_opt</tabstop>
   <tabstop>cc_eom_prop</tabstop>
   <tabstop>cc_trans_prop</tabstop>
   <tabstop>cc_eom_prop_te</tabstop>
-  <tabstop>cc_state_to_opt</tabstop>
   <tabstop>cc_fullresponse</tabstop>
   <tabstop>cc_ref_prop</tabstop>
   <tabstop>cc_ref_prop_te</tabstop>
@@ -7156,11 +6996,26 @@ values</string>
   <tabstop>threads</tabstop>
   <tabstop>cc_symmetry</tabstop>
   <tabstop>ccman2</tabstop>
+  <tabstop>cc_block_tensor_buffer_size</tabstop>
+  <tabstop>cc_tmpbuffsize</tabstop>
+  <tabstop>cc_orbs_per_block</tabstop>
+  <tabstop>qui_solvent_none</tabstop>
+  <tabstop>chemsol</tabstop>
   <tabstop>smx_solvation</tabstop>
-  <tabstop>smx_solvent</tabstop>
-  <tabstop>qui_title</tabstop>
-  <tabstop>resetButton</tabstop>
-  <tabstop>cancelButton</tabstop>
+  <tabstop>qui_solvent_cosmo</tabstop>
+  <tabstop>svp</tabstop>
+  <tabstop>qui_solvent_onsager</tabstop>
+  <tabstop>qui_solvent_pcm</tabstop>
+  <tabstop>sol_order</tabstop>
+  <tabstop>solvent_method</tabstop>
+  <tabstop>solvent_dielectric</tabstop>
+  <tabstop>svp_memory</tabstop>
+  <tabstop>svp_cavity_conv</tabstop>
+  <tabstop>svp_charge_conv</tabstop>
+  <tabstop>svp_guess</tabstop>
+  <tabstop>svp_path</tabstop>
+  <tabstop>qui_solvent_dielectric_cosmo</tabstop>
+  <tabstop>pcm_print</tabstop>
  </tabstops>
  <resources>
   <include location="../IQmol.qrc"/>

@@ -44,20 +44,38 @@
    <img src="images/cursors/build.png">.  This mode can also be
    activated using the <i>alt</i> modifier when in manipulate mode.
 
-   <p>The build mode implements the following mouse functions:
+   <p>Build mode is used to add either atoms or fragments to the molecule
+   depending on if the build atom or build fragment Toolbar button is selected.
+   Fragments can either be functional groups, EFPs or entire molecules.
+
+   For adding atoms and functional groups, the build mode implements the
+   following mouse functions:
     
    <ul>
 	  <li> <B>Left click:</B> If no atoms exist, creates an atom. Clicking on
-		   an existing atom will convert it to the current build element shown
-           in the Toolbar.<br>
+		   an existing atom will convert it to the current build element or
+           group.<br>
       <li> <B>Click and drag:</B> If the click originates on an atom, this
-		   will create a bond and  a new atom.  If the drag occurs between two
-		   existing atoms, then a bond is created (if a bond already exists
-		   then the bond order is incresed). If the click does not originate on
-		   an atom, then this action rotates the molecule as in manipulate
-           mode. <br> 
+		   will create a bond and a new atom or group.  If the drag occurs
+		   between two existing atoms, then a bond is created (if a bond
+		   already exists then the bond order is incresed). If the click does
+		   not originate on an atom, then this action rotates the molecule as
+		   in manipulate mode. <br> 
        <li> <B>Right click:</B> Deletes any atom or bond under the cursor.
    </ul>
+
+   For adding EFPs or molecules, the build mode implements the following mouse
+   functions:
+    
+   <ul>
+	  <li> <B>Left click:</B> Creates a new EFP or molecule. <br>
+      <li> <B>Click and drag:</B> Creates a new EFP or molecule, and rotates
+           it about its center of mass. <br>
+	   <li> <B>Right click and drag:</B> Rotates the entire system about the
+			coordinate center.  This is similar to a left click and drag in
+            manipulate mode.
+   </ul>
+
 
 
 

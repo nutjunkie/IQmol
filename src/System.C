@@ -150,6 +150,18 @@ QString KillCommand()
 }
 
 
+QString SubmitCommand()
+{
+   QString cmd;
+#ifdef Q_WS_WIN
+   cmd = "${QC}/qcenv_s.bat ${JOB_NAME}.inp ${JOB_NAME}.out";
+#else
+   cmd = "./${JOB_NAME}.run";
+#endif
+   return cmd;
+}
+
+
 
 /*
 

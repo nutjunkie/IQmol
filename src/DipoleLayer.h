@@ -25,8 +25,14 @@
 #include "GLObjectLayer.h"
 #include "DipoleConfigurator.h"
 #include <QColor>
-//2.541746230211
+#ifdef Q_WS_MAC
+#include <OpenGL/glu.h>
+#else 
+#include <GL/glu.h>
+#endif
 
+
+//2.541746230211
 
 namespace IQmol {
 namespace Layer {

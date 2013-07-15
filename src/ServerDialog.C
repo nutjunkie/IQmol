@@ -268,7 +268,7 @@ void ServerDialog::on_testConfiguration_clicked(bool)
 void ServerDialog::testConfiguration()
 {
    if (m_task) {
-      QMsgBox::information(this, "IQmol", "Configuration test in progress");
+      QMsgBox::information(this, "IQmol", "Connection test in progress");
       return;
    }
 
@@ -287,7 +287,7 @@ void ServerDialog::testConfiguration()
          throw Server::Exception("Failed to connect to server");
       }
    } catch (std::exception& err) {
-      QString msg("Problem with server configuration:\n");
+      QString msg("Problem connecting to server:\n");
       msg += err.what();
       QMsgBox::warning(this, "IQmol", msg);
    }
@@ -301,11 +301,11 @@ void ServerDialog::configurationTested()
       QString message;
 
       if (errorMessage.isEmpty()) {
-         message = "Server test successful";
+         message = "Connection successful";
          QMsgBox::information(this, "IQmol", message);
          m_tested = true;
       }else {
-         message = "Problem with server configuration:\n"; 
+         message ="Problem connecting to server:\n"; 
          message += errorMessage;
          m_closeAfterTest = false;
          QMsgBox::warning(this, "IQmol", message);
@@ -328,8 +328,8 @@ void ServerDialog::verify()
    copyToServer(m_server);
    m_closeAfterTest = true;
 
-   if (!m_tested) {
-      QString msg("Would you like to test the current server configuration?");
+   if (!m_tested && m_dialog.remoteRadioButton->isChecked()) {
+      QString msg("Would you like to try connecting to the server?");
       if (QMsgBox::question(this, "IQmol", msg,
          QMessageBox::No | QMessageBox::Yes) == QMessageBox::Yes) {
          testConfiguration();

@@ -79,6 +79,8 @@ QString toString(ID const id)
    return s;
 }
 
+} // end namespace Type
+
 
 void Base::copy(Base const& that)
 {
@@ -106,4 +108,4 @@ void Base::copy(Base const& that)
 }
 
 
-} } } // end namespace IQmol::Data::Type
+} } // end namespace IQmol::Data

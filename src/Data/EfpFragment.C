@@ -25,7 +25,7 @@
 #include "Align.h"
 #include "IQmol.h"
 #include <QDebug>
-#include "OpenBabel/mol.h"
+#include <openbabel/mol.h>
 
 
 namespace IQmol {

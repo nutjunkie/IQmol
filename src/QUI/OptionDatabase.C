@@ -29,6 +29,7 @@
 #include "OptionDatabase.h"
 #include "Option.h"
 #include "QMsgBox.h"
+#include "QsLog.h"
 
 
 namespace Qui {
@@ -61,17 +62,18 @@ OptionDatabase::OptionDatabase() {
    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "QChem");
    QString dbFilename(Preferences::QChemDatabaseFilePath());
 
-   qDebug() << "Database file set to:" << dbFilename;
+   QLOG_INFO() << "QChem option database file set to: " << dbFilename;
    db.setDatabaseName(dbFilename);
    
    if (db.open()) {
-      qDebug() << "Database file opened okay";
       QStringList tables = db.tables();
 
       if (tables.contains("options")) {
          s_okay = true;
       }else {
-         qDebug() << "ERROR: Option data not found in" << dbFilename;
+         QString msg("No option data not found in ");
+         msg += dbFilename;
+         QMsgBox::critical(0, "IQmol", msg);
       }
 
    }else {

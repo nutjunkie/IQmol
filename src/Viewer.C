@@ -20,12 +20,12 @@
 
 ********************************************************************************/
 
+#include "ShaderLibrary.h"
 #include "Viewer.h"
 #include "ViewerModel.h"
 #include "IQmol.h"
 #include "QsLog.h"
 #include "MoleculeLayer.h"
-#include "ShaderLibrary.h"
 #include "EFPFragmentLayer.h"
 #include "Preferences.h"
 #include "ManipulatedFrameSetConstraint.h"
@@ -93,8 +93,6 @@ Viewer::Viewer(ViewerModel& model, QWidget* parent) : QGLViewer(parent),
    // The following two lines must be in this order
    setDefaultBuildElement(6);
    setActiveViewerMode(BuildAtom);  // this should get overwritten by the MainWindow class
-   setSceneRadius(DefaultSceneRadius);
-   resetView();
 }
 
 

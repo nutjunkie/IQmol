@@ -32,6 +32,10 @@ template<> const Type::ID VibrationalModeList::TypeID = Type::VibrationalModeLis
 void VibrationalMode::dump() const
 {
    qDebug() << "Mode: " << m_frequency << m_intensity << m_irActive << m_ramanActive;
+   for (int i = 0; i < m_eigenvector.size(); ++i) {
+       qglviewer::Vec v(m_eigenvector[i]); 
+       qDebug() << v.x << v.y << v.z;
+   }
 }
 
 } } // end namespace IQmol::Data

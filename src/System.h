@@ -70,11 +70,15 @@ namespace System {
    /// match.
    QString StatProcess(QString const& name, unsigned int const pid);
 
+   /// Returns the command used to submit a process on the local machine
+   QString SubmitCommand();
+
    /// Returns the command used to query a process on the local machine
    QString QueryCommand();
+
    /// Returns the command used to kill a process on the local machine
    QString KillCommand();
 
-} } // end namespace Qui
+} } // end namespace IQmol::System
 
 #endif

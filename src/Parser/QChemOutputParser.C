@@ -426,21 +426,21 @@ void QChemOutput::readVibrationalModes(TextStream& textStream)
          if (tokens.size() < 4 || tokens[0].contains("TransDip")) break;
 
          if (tokens.size() == 10) {
-            x = tokens[9].toDouble(&ok);  if (!ok) goto error;
+            x = tokens[7].toDouble(&ok);  if (!ok) goto error;
             y = tokens[8].toDouble(&ok);  if (!ok) goto error;
-            z = tokens[7].toDouble(&ok);  if (!ok) goto error;
+            z = tokens[9].toDouble(&ok);  if (!ok) goto error;
             if (v3) v3->appendDirectionVector(Vec(x,y,z)); 
          }
          if (tokens.size() >= 7) {
-            x = tokens[9].toDouble(&ok);  if (!ok) goto error;
-            y = tokens[8].toDouble(&ok);  if (!ok) goto error;
-            z = tokens[7].toDouble(&ok);  if (!ok) goto error;
+            x = tokens[4].toDouble(&ok);  if (!ok) goto error;
+            y = tokens[5].toDouble(&ok);  if (!ok) goto error;
+            z = tokens[6].toDouble(&ok);  if (!ok) goto error;
             if (v2) v2->appendDirectionVector(Vec(x,y,z)); 
          }
          if (tokens.size() >= 4) {
-            x = tokens[9].toDouble(&ok);  if (!ok) goto error;
-            y = tokens[8].toDouble(&ok);  if (!ok) goto error;
-            z = tokens[7].toDouble(&ok);  if (!ok) goto error;
+            x = tokens[1].toDouble(&ok);  if (!ok) goto error;
+            y = tokens[2].toDouble(&ok);  if (!ok) goto error;
+            z = tokens[3].toDouble(&ok);  if (!ok) goto error;
             if (v1) v1->appendDirectionVector(Vec(x,y,z)); 
          }
       }
@@ -465,6 +465,7 @@ void QChemOutput::readVibrationalModes(TextStream& textStream)
    if (tokens.size() == 4) entropy = tokens[2].toDouble(); 
 
    frequencies->setThermochemicalData(zpve, entropy, enthalpy);
+frequencies->dump();
    m_dataBank.append(frequencies);
    return;
 

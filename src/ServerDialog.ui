@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>446</width>
+    <width>469</width>
     <height>365</height>
    </rect>
   </property>
@@ -231,7 +231,7 @@ submitting a job.</string>
           <item>
            <widget class="QComboBox" name="authentication">
             <property name="currentIndex">
-             <number>0</number>
+             <number>5</number>
             </property>
             <item>
              <property name="text">
@@ -280,8 +280,28 @@ submitting a job.</string>
           </item>
          </layout>
         </item>
-        <item row="3" column="1" colspan="2">
+        <item row="4" column="0" colspan="3">
          <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="testConfiguration">
+            <property name="text">
+             <string>Test Connection</string>
+            </property>
+           </widget>
+          </item>
           <item>
            <widget class="QPushButton" name="setPassword">
             <property name="enabled">
@@ -299,34 +319,7 @@ submitting a job.</string>
             </property>
            </widget>
           </item>
-          <item>
-           <spacer name="horizontalSpacer_4">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
          </layout>
-        </item>
-        <item row="4" column="1" colspan="2">
-         <widget class="QLineEdit" name="workingDirectory">
-          <property name="toolTip">
-           <string>This is the directory on the server where calculations will be run</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="workingDirectoryLabel">
-          <property name="text">
-           <string>Working Directory</string>
-          </property>
-         </widget>
         </item>
         <item row="0" column="1" colspan="2">
          <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -359,6 +352,20 @@ submitting a job.</string>
           </item>
          </layout>
         </item>
+        <item row="3" column="1">
+         <widget class="QLineEdit" name="workingDirectory">
+          <property name="toolTip">
+           <string>This is the directory on the server where calculations will be run</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="workingDirectoryLabel">
+          <property name="text">
+           <string>Working Directory</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
      </layout>
@@ -366,13 +373,6 @@ submitting a job.</string>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
-     <item>
-      <widget class="QPushButton" name="testConfiguration">
-       <property name="text">
-        <string>Test Configuration</string>
-       </property>
-      </widget>
-     </item>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -401,7 +401,6 @@ submitting a job.</string>
   </layout>
  </widget>
  <tabstops>
-  <tabstop>buttonBox</tabstop>
   <tabstop>name</tabstop>
   <tabstop>localRadioButton</tabstop>
   <tabstop>remoteRadioButton</tabstop>
@@ -411,10 +410,11 @@ submitting a job.</string>
   <tabstop>port</tabstop>
   <tabstop>userName</tabstop>
   <tabstop>authentication</tabstop>
-  <tabstop>setPassword</tabstop>
-  <tabstop>configureSsh</tabstop>
   <tabstop>workingDirectory</tabstop>
   <tabstop>testConfiguration</tabstop>
+  <tabstop>setPassword</tabstop>
+  <tabstop>configureSsh</tabstop>
+  <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources>
   <include location="IQmol.qrc"/>

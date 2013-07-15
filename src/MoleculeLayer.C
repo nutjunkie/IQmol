@@ -607,6 +607,7 @@ QStringList Molecule::coordinatesForCubeFile()
    QStringList coords;
 
    AtomList::iterator iter;
+ // This additional loop may not be required.
    for (int i = 1; i <=  atomList.size(); ++i) {
        for (iter = atomList.begin(); iter != atomList.end(); ++iter) {
            if ((*iter)->getIndex() == i) {
@@ -1467,8 +1468,8 @@ void Molecule::minimizeEnergy(QString const& forceFieldName)
    if (!forceField)  {
       QString msg("Failed to load force field: ");
       msg += forceFieldName + "\nUnable to optimize structure";
+      msg += "BABEL_DATADIR environment variable may not be set correctly.";
       QMsgBox::warning(0, "IQmol", msg);
-      QLOG_ERROR() << "Failed to load force field";
       return;
    }
 
@@ -1494,9 +1495,10 @@ void Molecule::minimizeEnergy(QString const& forceFieldName)
 
    if (!forceField->Setup(*obMol, obffconstraints)) {
       QString msg("Failed to setup force field for molecule.  ");
-      msg += text() + "\nUnable to optimize structure.";
+      msg += text() + "\n";
+      msg += "Try using a differnt force field\n";
+      msg += "\nUnable to optimize structure.";
       QMsgBox::warning(0, "IQmol", msg);
-      QLOG_ERROR() << "Failed to setup force field";
       return;
    }
    forceField->SetConformers(*obMol);

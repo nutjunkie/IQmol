@@ -243,7 +243,7 @@ void BuildFunctionalGroup::leftMouseReleaseEvent(QMouseEvent* e)
          
       }
       added.append(m_bond);
-      added.append(m_group->ungroup());
+      added << m_group->ungroup();
    }
 
    if (!added.isEmpty()) {

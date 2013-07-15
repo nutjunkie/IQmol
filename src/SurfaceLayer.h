@@ -34,8 +34,6 @@ namespace qglviewer {
 }
 
 namespace IQmol {
-   class AmbientOcclusionEngine;
-
 namespace Layer {
 
    /// Representation of a OpenGL surface.  Note that a surface layer is 
@@ -105,7 +103,6 @@ namespace Layer {
          void computePropertyData(Function3D);
          void clearPropertyData();
 
-         void addAmbientOcclusion(bool);
          QColor color(Sign sign = Positive) const;
 
          Grid::DataType m_type;
@@ -114,9 +111,6 @@ namespace Layer {
          DrawMode m_drawMode;
          bool     m_upsample;
          Configurator::Surface m_configurator;
-
-      private Q_SLOTS:
-         void ambientOcclusionDataAvailable();
 
       private:
          void recompile();
@@ -139,10 +133,7 @@ namespace Layer {
          double m_areaNegative;
          bool m_cubeIsSigned;
 
-         void computeAmbientOcclusion();
-         AmbientOcclusionEngine* m_aoEngine;
          Data m_occlusionData;
-         bool  m_includeAmbientOcclusion;
    };
 
 } // end namespace Layer

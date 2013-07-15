@@ -23,7 +23,6 @@
 #include "SurfaceLayer.h"
 #include "Preferences.h"
 #include "QsLog.h"
-#include "AmbientOcclusionEngine.h"
 #include "QGLViewer/vec.h"
 #include <QColorDialog>
 #include <cmath>
@@ -41,7 +40,7 @@ Surface::Surface(Grid::DataType const type, int const quality, double const isov
    : m_type(type), m_quality(quality), m_isovalue(isovalue), m_drawMode(Fill), 
      m_upsample(upsample), m_configurator(this), m_callListPositive(0), 
      m_callListNegative(0), m_areaPositive(0.0), m_areaNegative(0.0), 
-     m_cubeIsSigned(true), m_aoEngine(0)
+     m_cubeIsSigned(true)
 { 
    setFlags(Qt::ItemIsUserCheckable);
    setCheckState(Qt::Unchecked);
@@ -171,34 +170,6 @@ void Surface::draw()
 {
    if ( (checkState() != Qt::Checked) || m_alpha < 0.01) return;
 
-//-----------------------------------------------------------
-   GLint program;
-   glGetIntegerv(GL_CURRENT_PROGRAM, &program);
-   GLint aoLoc(glGetAttribLocation(program, "ambient_occlusion"));
-
-//qDebug() << "GL currently using program" << program;
-//qDebug() << "  with AO data in location" << aoLoc;
-
-   GLuint buffer;
-
-   if (aoLoc > 0 && m_includeAmbientOcclusion && !m_occlusionData.isEmpty()) {
-      int nVertices(m_surfaceDataPositive.size() + m_surfaceDataNegative.size() );
-      nVertices /= 6;
-      qDebug() << "binding data" << m_occlusionData.first();
-      
-      glGenBuffers(1, &buffer);
-      glBindBuffer(GL_ARRAY_BUFFER, buffer);
-//      glBufferData(GL_ARRAY_BUFFER, nVertices*sizeof(GLfloat), m_aoData, GL_STATIC_DRAW);
-      glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-      glVertexAttribPointer(aoLoc, 1, GL_FLOAT, 0, 0, 0);
-      glEnableVertexAttribArray(aoLoc);
-   }
-
-//------------------------------------------------------------
-
-
-
    GLboolean lighting;
    GLboolean blend;
 
@@ -258,7 +229,6 @@ void Surface::draw()
       }
    }
 
-   if (m_includeAmbientOcclusion) glDeleteBuffers(1, &buffer);
 
    glPopMatrix();
    if (!blend) glDisable(GL_BLEND);
@@ -364,58 +334,6 @@ void Surface::computePropertyData(Function3D function)
    recompile(); 
 }
 
-
-void Surface::addAmbientOcclusion(bool tf) 
-{
-   m_includeAmbientOcclusion = tf;
-   if (m_includeAmbientOcclusion && m_occlusionData.isEmpty()) {
-      computeAmbientOcclusion();
-   }else {
-      recompile();
-   }
-}
-
-
-void Surface::computeAmbientOcclusion()
-{
-   if (m_aoEngine) return;
-   Data bothSurfaces(m_surfaceDataPositive);
-   bothSurfaces.append(m_surfaceDataNegative);
-   m_aoEngine = new AmbientOcclusionEngine(bothSurfaces, 15);
-   connect(m_aoEngine, SIGNAL(finished()), this, SLOT(ambientOcclusionDataAvailable()));
-   m_aoEngine->start();
-}
-
-
-void Surface::ambientOcclusionDataAvailable()
-{
-   qDebug() << "Ambient Occlusion data calculated in" << m_aoEngine->timeTaken() << "seconds";
-   m_occlusionData = m_aoEngine->occlusionData();
-
-   int nPos(m_surfaceDataPositive.size()/6);
-   int nNeg(m_surfaceDataNegative.size()/6);
-
-   qDebug() << "Total AO data" << m_occlusionData.size();
-   qDebug() << "     positive" << nPos;
-   qDebug() << "     negative" << nNeg;
-
-   m_propertyDataPositive.clear();
-   m_propertyDataNegative.clear();
-
-   for (int i = 0; i < nPos; ++i) {
-       m_propertyDataPositive << m_occlusionData[i];
-   }
-   for (int i = nPos; i < nPos+nNeg; ++i) {
-       m_propertyDataNegative << m_occlusionData[i];
-   }
-
-   m_min = 0.0;
-   m_max = 1.0;
-   recompile();
-
-   m_aoEngine->deleteLater();
-   m_aoEngine = 0;
-}
 
 
 /*

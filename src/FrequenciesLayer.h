@@ -37,6 +37,11 @@ namespace OpenBabel {
 }
 
 namespace IQmol {
+
+namespace Data {
+   class Frequencies;
+}
+
 namespace Layer {
 
    class Mode;
@@ -49,6 +54,7 @@ namespace Layer {
 
       public:
          explicit Frequencies(OpenBabel::OBVibrationData const&);
+         explicit Frequencies(IQmol::Data::Frequencies const&);
          bool haveIntensities() const { return m_haveIntensities; }
          void setMolecule(Molecule*);
          void setPlay(bool const play);
@@ -84,6 +90,9 @@ namespace Layer {
 
        public:
           Mode(double const frequency, Eigenvectors const& eigenvectors, 
+             double const intensity);
+
+          Mode(double const frequency, QList<qglviewer::Vec> const& eigenvectors, 
              double const intensity);
              
           double frequency() const { return m_frequency; } 

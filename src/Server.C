@@ -180,7 +180,7 @@ void Server::setRemoteDefaults()
    //m_qchemEnvironment = "";
    m_hostAddress      = "";
    m_userName         = QString(qgetenv("USER"));
-   m_authentication   = Agent;
+   m_authentication   = Prompt;
    m_port             = 22;
    m_workingDirectory =  "~/";
    m_executableName   = "qcprog.exe";
@@ -516,7 +516,7 @@ void Server::startTimer()
 QString Server::replaceMacros(QString const& input, Process* process)
 {
    QString output(input);
-qDebug() << "Server::replaceMacros on string:" << output;
+   //qDebug() << "Server::replaceMacros on string:" << output;
 
    output.replace("${USER}",      m_userName);
 //   output.replace("${QC}",        m_qchemEnvironment);
@@ -726,9 +726,7 @@ void Server::cleanUpFinished()
       process->setComment(err);
    }
 
-   qDebug() << "Task time set to " << task->time();
    if (task->time() > 0) {
-      qDebug() << "resetting timer with " << task->time();
       process->resetTimer(task->time());
    }
    

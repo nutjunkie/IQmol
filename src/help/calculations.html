@@ -28,11 +28,12 @@
 		   name) and select if the machine is local (i.e. the same machine as
            IQmol is running on) or remote.  Presently, remote servers must be
            Unix-based (i.e. not a Windows server). <br>
-	  <li> If there is PBS software running on the server, select the PBS
-		   'Type' option, otherwise the Basic option should suffice.  <br>
+	  <li> If there is PBS or SGE software running on the server, select the 
+		   appropriate 'Type' option, otherwise the Basic option should
+           suffice.  <br>
 	  <li> If required, the server can be further configured using the
 		   Configure button. Details on this can be found in the
-           <a href="#serverOptions">Server Options</a> section below. <br>
+            <a href="#serverOptions">Server Options</a> section below. <br>
 	  <li> For non-PBS servers the number of concurrent Q-Chem jobs can be
 		   limited using a simple inbuilt queuing system. The maximum number of
 		   jobs is set by the Job Limit control. If the Job Limit is set to
@@ -40,7 +41,6 @@
 		   concurrently.  Please note that this limit applies to the current
 		   IQmol session and does not account for jobs submitted by other users
            or by other IQmol sessions.  <br>
-      <li> The $QC environment variable should be entered in the given box.  <br>
 	  <li> For remote servers the address of the machine and your user name are
 		   also required. IQmol uses SSH to connect to remote machines and the
 		   most convenient way to set this up is by using authorized keys (see
@@ -71,12 +71,12 @@
            </ul>
       </ol>
 
-   <p> It is recommended that you test the server configuration to ensure
-   everything is working before attempting to submit a job. Multiple servers
-   can be configured if you have access to more than one machine with Q-Chem
-   installed, or if you have different account configurations. In this case the
-   default server is the first on the list and this can be changed by using the
-   arrow buttons in the Server List dialog. 
+   <p> For remote servers, it is recommended that you test the server connection
+   before attempting to submit a job. Multiple servers can be configured if you
+   have access to more than one machine with Q-Chem installed, or if you have
+   different account configurations. In this case the default server is the first
+   on the list and this can be changed by using the arrow buttons in the Server
+   List dialog. 
 
    <p> Note that changes made to an existing server may not take effect until
    IQmol has been restarted.  If problems are encountered, particularly after
@@ -99,13 +99,14 @@
 
    <p> The Run File Template is the script that is used to run the Q-Chem job
    and can be configured to include, for example, the hostname or start time in
-   the output file, or to copy scratch files to a permanent location.  Valid 
-   macros that appear in the template will be substituted with specified values
-   when submitting the job.
+   the output file, or to copy scratch files to a permanent location.   If the
+   necessary Q-Chem environment variables are not set in your .cshrc (or
+   equivalent), they will need to be explicitly set here.
 
-   <p> Macros are identified by the ${...} motif and are distinct from
-   environment variables (which do not include the braces).  The following
-   variables can be used:
+   <p> Valid macros that appear in the template will be substituted with
+   specified values when submitting the job.  Macros are identified by the
+   ${...} motif and are distinct from environment variables (which do not
+   include the braces).  The following variables can be used:
    <ul>
 	  <li> ${JOB_ID}: This is set to the PBS job number for PBS servers and the
            process ID otherwise.
@@ -122,9 +123,9 @@
 	  <li> ${QUEUE}: The name of the PBS queue to which the job is submitted.
 	  <li> ${WALLTIME}: The wall time limit for job.
 	  <li> ${MEMORY}: The virtual memeory limit for the job.
-	  <li> ${JOBFS}: The file space limit for the job.
-	  <li> ${NCPUS}: The number of CPUs to use.  Note you will need a parallel version
-           of Q-Chem for this option to have any effect.
+	  <li> ${SCRATCH}: The file space limit for the job.
+	  <li> ${NCPUS}: The number of CPUs to use.  Note you will need a parallel
+           version of Q-Chem for this option to have any effect.
    </ul>
 
    

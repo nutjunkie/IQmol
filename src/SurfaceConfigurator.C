@@ -253,12 +253,6 @@ void Surface::on_dotsButton_clicked(bool)
 }
 
 
-void Surface::on_ambientOcclusionCheckBox_clicked(bool tf)
-{
-   m_surface->addAmbientOcclusion(tf);
-}
-
-
 void Surface::setArea(double const area)
 {
    m_surfaceConfigurator.areaLabel->setText(QString::number(area, 'f', 3));

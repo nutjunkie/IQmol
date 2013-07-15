@@ -22,8 +22,8 @@
    
 ********************************************************************************/
 
-#include "qglviewer/Vec.h"
-#include "qglviewer/Quaternion.h"
+#include "QGLViewer/vec.h"
+#include "QGLViewer/quaternion.h"
 
 
 namespace IQmol {

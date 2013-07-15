@@ -25,11 +25,36 @@
 #include "openbabel/generic.h"
 #include "Animator.h"
 
+#include "Frequencies.h"
+
 
 using namespace qglviewer;
 
 namespace IQmol {
 namespace Layer {
+
+
+Frequencies::Frequencies(IQmol::Data::Frequencies const& vibrationData) 
+   : Data("Frequencies"), m_configurator(this), m_play(false), m_loop(-1.0), 
+   m_speed(0.0625), m_scale(0.25)
+{        
+
+   IQmol::Data::VibrationalModeList::const_iterator iter;
+   IQmol::Data::VibrationalModeList const& modes(vibrationData.modes());
+   double intensity, frequency;
+
+   for (iter = modes.begin(); iter != modes.end(); ++iter) {
+       intensity = (*iter)->intensity();
+       frequency = (*iter)->frequency();
+       Mode* mode = new Mode(frequency, (*iter)->eigenvector(), intensity);
+       connect(mode, SIGNAL(playMode(Mode const&)), this, SLOT(playMode(Mode const&)));
+       appendLayer(mode);
+   }
+
+   m_configurator.load();
+   setConfigurator(&m_configurator);
+}
+
 
 Frequencies::Frequencies(OpenBabel::OBVibrationData const& vibrationData) 
    : Data("Frequencies"), m_configurator(this), m_play(false), m_loop(-1.0), 
@@ -168,6 +193,20 @@ void Frequencies::setScale(double const scale)
 
 // --------------- Mode ---------------
 
+Mode::Mode(double const frequency, QList<qglviewer::Vec> const& eigenvectors, 
+   double const intensity) : m_frequency(frequency), m_intensity(intensity),
+   m_eigenvectors(eigenvectors)
+{
+   if (m_frequency < 0.0) {
+      setText(QString("%1i").arg(-m_frequency, 8, 'f', 2));
+    }else {
+      setText(QString("%1 ").arg(m_frequency, 8, 'f', 2));
+    }
+
+    setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+}
+
+
 Mode::Mode(double const frequency, Eigenvectors const& eigenvectors, double const intensity) 
  : m_frequency(frequency), m_intensity(intensity)
 {
@@ -188,6 +227,7 @@ Mode::Mode(double const frequency, Eigenvectors const& eigenvectors, double cons
 
     setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 }
+
 
 Vec const& Mode::eigenvector(unsigned int atom) const
 {

@@ -99,7 +99,6 @@ bool InputDialog::init()
    }
 
    initializeMenus();
-   InitializeQChemLogic();
    initializeQuiLogic();
    initializeControls();
    appendNewJob();
@@ -172,7 +171,7 @@ void InputDialog::setJobInfo(IQmol::JobInfo* jobInfo)
    m_reg.get("JOB_TYPE").applyRules();
 
    if (m_currentJob && m_jobInfo->efpOnlyJob()) {
-       m_currentJob->printOption("BASIS", false);
+      m_currentJob->printOption("BASIS", false);
    }
 
    updatePreviewText();
@@ -742,6 +741,14 @@ void InputDialog::on_ftc_toggled(bool on) {
    toggleStack(m_ui.largeMoleculesStack, on, "LargeMoleculesFTC");
 }
 
+void InputDialog::on_qui_solvent_pcm_toggled(bool on) {
+   toggleStack(m_ui.solventStack, on, "SolventPCM");
+}
+
+void InputDialog::on_qui_solvent_cosmo_toggled(bool on) {
+   toggleStack(m_ui.solventStack, on, "SolventCosmo");
+}
+
 void InputDialog::on_qui_solvent_onsager_toggled(bool on) {
    toggleStack(m_ui.solventStack, on, "SolventOnsager");
 }
@@ -759,9 +766,9 @@ void InputDialog::on_smx_solvation_toggled(bool on) {
 }
 
 void InputDialog::on_svp_toggled(bool on) {
-   toggleStack(m_ui.solventStack, on, "SolventSVP2");
    toggleStack(m_ui.solventStack, on, "SolventSVP");
 }
+
 
 
 void InputDialog::on_advancedOptionsTree_itemClicked(QTreeWidgetItem* item, int) {

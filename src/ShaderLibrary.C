@@ -89,7 +89,7 @@ void ShaderLibrary::destroy()
 
    QMap<QString, unsigned>::iterator iter;
    for (iter = s_shaders.begin(); iter != s_shaders.end(); ++iter) {
-       glDeleteProgram(iter.value());
+       if (iter.value() != 0) glDeleteProgram(iter.value());
    }
 
    // These seem to cause a crash 
@@ -471,31 +471,31 @@ bool ShaderLibrary::setUniformVariables(QString const& shaderName, QVariantMap c
 }
 
 
-void ShaderLibrary::setUniformVariable(GLuint program, GLint location, QSizeF const& value)
+void ShaderLibrary::setUniformVariable(GLuint /*program*/, GLint location, QSizeF const& value)
 {
    glUniform2f(location, value.width(), value.height());
 }
 
 
-void ShaderLibrary::setUniformVariable(GLuint program, GLint location, QSize const& value)
+void ShaderLibrary::setUniformVariable(GLuint /*program*/, GLint location, QSize const& value)
 {
    glUniform2i(location, value.width(), value.height());
 }
 
 
-void ShaderLibrary::setUniformVariable(GLuint program, GLint location, bool value)
+void ShaderLibrary::setUniformVariable(GLuint /*program*/, GLint location, bool value)
 {
    glUniform1i(location, (GLint)value);
 }
 
 
-void ShaderLibrary::setUniformVariable(GLuint program, GLint location, double value)
+void ShaderLibrary::setUniformVariable(GLuint /*program*/, GLint location, double value)
 {
    glUniform1f(location, (GLfloat)value);
 }
 
 
-void ShaderLibrary::setUniformVariable(GLuint program, GLint location, GLFloatArray const& value)
+void ShaderLibrary::setUniformVariable(GLuint /*program*/, GLint location, GLFloatArray const& value)
 {
    switch (value.type) {
       case GLfloat1v:
@@ -516,25 +516,25 @@ void ShaderLibrary::setUniformVariable(GLuint program, GLint location, GLFloatAr
 }
 
 
-void ShaderLibrary::setUniformVariable(GLuint program, GLint location, GLfloat value)
+void ShaderLibrary::setUniformVariable(GLuint /*program*/, GLint location, GLfloat value)
 {
    glUniform1f(location, value);
 }
 
 
-void ShaderLibrary::setUniformVariable(GLuint program, GLint location, QColor const& color)
+void ShaderLibrary::setUniformVariable(GLuint /*program*/, GLint location, QColor const& color)
 {
    glUniform4f(location, color.redF(), color.greenF(), color.blueF(), 
       color.alphaF()); 
 }
 
-void ShaderLibrary::setUniformVariable(GLuint program, GLint location, mat4x4 const& value)
+void ShaderLibrary::setUniformVariable(GLuint /*program*/, GLint location, mat4x4 const& value)
 {
    mat4x4 tmp(value);
    glUniformMatrix4fv(location, 1, GL_FALSE, &tmp);
 }
 
-void ShaderLibrary::setUniformVariable(GLuint program, GLint location, Texture const& texture)
+void ShaderLibrary::setUniformVariable(GLuint /*program*/, GLint location, Texture const& texture)
 {
    GLuint w(texture.size.width());
    GLuint h(texture.size.height());

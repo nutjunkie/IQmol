@@ -41,6 +41,7 @@ namespace Data {
             double const entropy);
 
          void dump() const;
+         VibrationalModeList const& modes() const { return m_modes; }
 
          void serialize(InputArchive& ar, unsigned int const version = 0) {
             privateSerialize(ar, version);

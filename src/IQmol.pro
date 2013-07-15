@@ -20,8 +20,8 @@ DESTDIR      = ../
 MOC_DIR      = ../build/moc
 UI_DIR       = ../build/ui
 
-#QMAKE_CXXFLAGS += -O2
-QMAKE_CXXFLAGS += -O0 -g
+QMAKE_CXXFLAGS += -O2
+#QMAKE_CXXFLAGS += -O0 -g
 
 ######################################################################
 #
@@ -71,13 +71,16 @@ macx {
 }
 
 win32 {
-   INCLUDEPATH += "C:\Program Files\boost\old versions\boost_1_36_0"
    INCLUDEPATH += "C:\Users\qchem\Documents\extlib\include"
+   INCLUDEPATH += "C:\Users\qchem\Documents\IQmol\src"
+   INCLUDEPATH += C:\Users\qchem\Documents\boost_1_51_0
 
    LIBS += -LC:\Users\qchem\Documents\extlib\lib
    LIBS += -lQGLViewerd2 -lssh2 -lz -lssl -lcrypto -lgdi32
    LIBS += -lws2_32 -lopenbabel
    LIBS += -L"C:\Program Files\gfortran\bin" -lgfortran-3 -lgcc_s_dw2-1
+   LIBS += C:\Users\qchem\Documents\boost_1_51_0\stage\lib\libboost_serialization-mgw34-mt-1_51.a
+   LIBS += C:\Users\qchem\Documents\boost_1_51_0\stage\lib\libboost_iostreams-mgw34-mt-1_51.a  -lz
 
    SOURCES += QUI/getpids.C
    ICON = resources/IQmol.ico
@@ -85,6 +88,8 @@ win32 {
    RC_FILE += resources/windows.rc
    include(OpenBabel/OpenBabel.pro)
    FORMS += PeriodicTable.ui
+   include(GLEW/GLEW.pri)
+   DEFINES += GLEW_STATIC
 }
 
 unix:!macx {
@@ -94,6 +99,7 @@ unix:!macx {
    LIBS += -L/usr/lib -lopenbabel
    LIBS += -L/usr/local/gfortran/lib -lgfortran
    LIBS += -L$(DEV)/extlib/lib -lssh2 -lcrypto -lz -lssl
+   LIBS += -lboost_iostreams -lboost_serialization
    LIBS += $(DEV)/extlib/lib/libQGLViewer.a
    CONFIG += release
    FORMS += PeriodicTable.ui
@@ -122,7 +128,6 @@ HEADERS += \
    EFPFragmentListConfigurator.h \
    BuildMoleculeFragmentHandler.h \
    Shell.h  Grid.h \
-#MOCoefficients.h \
    ProgressDialog.h  SurfaceLayer.h  MarchingCubes.h CubeDataLayer.h \
    QChemParser.h  GlobalLayer.h MeshConfigurator.h  InfoLayer.h \
    InfoConfigurator.h  BaseConfigurator.h BackgroundConfigurator.h \
@@ -169,7 +174,6 @@ HEADERS += \
    GLSLmath.h \
    GridInfoDialog.h \
    SurfaceAnimatorDialog.h \
-   AmbientOcclusionEngine.h \
    BoundingBoxDialog.h \
    LocalConnectionThread.h
            
@@ -188,8 +192,7 @@ SOURCES += \
    EFPFragmentListConfigurator.C \
    BuildMoleculeFragmentHandler.C \
    Shell.C  Grid.C  \
-#MOCoefficients.C  \
- ProgressDialog.C \
+   ProgressDialog.C \
    SurfaceLayer.C  MarchingCubes.C  CubeDataLayer.C  QChemParser.C  InfoLayer.C \
    InfoConfigurator.C  BackgroundConfigurator.C  MoleculeConfigurator.C \
    SurfaceConfigurator.C  BaseParser.C  ExternalChargesParser.C \
@@ -230,9 +233,8 @@ SOURCES += \
    GLSLmath.C \
    GridInfoDialog.C \
    SurfaceAnimatorDialog.C \
-   AmbientOcclusionEngine.C \
    BoundingBoxDialog.C \
-   glloader.cpp \
+#  glloader.cpp \
    LocalConnectionThread.C
    
 

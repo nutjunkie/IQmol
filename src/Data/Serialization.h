@@ -94,13 +94,15 @@ inline void serialize(Archive &ar, QList<U>& t, unsigned const version)
 
 // ---------- QMap ----------
 template<class Archive, class K, class V >
-inline void save(Archive& ar, const QMap<K,V>& map, const unsigned /* version */)
+inline void save(Archive& ar, QMap<K,V> const& map, const unsigned /* version */)
 {
    QList<K> keys(map.keys());
-   QList<V> values(map.values());
-   if (keys.size() != values.size()) {
-      throw std::runtime_error("Attempt to serialize invalid map");
+   QList<V> values;
+
+   for (int i = 0; i < keys.size(); ++i) {
+       values.append(map.value(keys[i]));
    }
+
    ar & keys;
    ar & values;
 }
@@ -114,7 +116,7 @@ inline void load(Archive& ar, QMap<K,V>& map, unsigned const /* version */)
    ar & keys;
    ar & values;
    if (keys.size() != values.size()) {
-      throw std::runtime_error("Attempt to serialize invalid map");
+      throw std::runtime_error("Attempt to deserialize invalid map");
    }
    map.clear();
    for (int i = 0; i < keys.size(); ++i) {

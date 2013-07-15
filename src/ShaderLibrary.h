@@ -22,13 +22,21 @@
    
 ********************************************************************************/
 
+
+#include <QtGlobal>
+#ifdef Q_WS_LINUX
+#define GL_GLEXT_PROTOTYPES
+#include <GL/gl.h>
+#include <GL/glext.h>
+#endif
+
 #include <QColor>
 #include <QSize>
 #include <QVariant>
 #include <QStringList>
 #include "QGLViewer/vec.h"
 #include <QDebug>
-//#include "glloader.h"
+
 
 
 class QGLFramebufferObject;

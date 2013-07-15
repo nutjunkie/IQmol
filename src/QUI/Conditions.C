@@ -15,7 +15,21 @@
 
 namespace Qui {
 
-bool isCompoundFunctional() {
+
+bool True() 
+{ 
+   return true; 
+}
+
+
+bool False() 
+{ 
+   return false; 
+}
+
+
+bool isCompoundFunctional() 
+{
    OptionRegister &reg = OptionRegister::instance();
    NodeT& exchange = reg.get("EXCHANGE");
    String value(ToUpper(exchange.getValue()));
@@ -30,14 +44,15 @@ bool isPostHF() {
    OptionRegister &reg = OptionRegister::instance();
    NodeT& correlation = reg.get("CORRELATION");
    String value(ToUpper(correlation.getValue()));
-   return (value == "MP2")     || (value == "MP3")       || (value == "MP4") ||
-          (value == "MP4SDQ")  || (value == "LOCAL_MP2") || (value == "RIMP2") ||
-          (value == "SOSMP2")  || (value == "MOSMP2")    || (value == "RILMP2") ||
-          (value == "CCD")     || (value == "CCD(2)")    || (value == "CCSD") ||
-          (value == "CCSD(T)") || (value == "CCSD(2)")   || (value == "QCCD") ||
+   return (value == "MP2")     || (value == "MP3")       || (value == "MP4")      ||
+          (value == "MP4SDQ")  || (value == "LOCAL_MP2") || (value == "RIMP2")    ||
+          (value == "SOSMP2")  || (value == "MOSMP2")    || (value == "RILMP2")   ||
+          (value == "CCD")     || (value == "CCD(2)")    || (value == "CCSD")     ||
+          (value == "CCSD(T)") || (value == "CCSD(2)")   || (value == "QCCD")     ||
           (value == "VQCCD")   || (value == "QCISD")     || (value == "QCISD(T)") ||
-          (value == "OD")      || (value == "OD(T)")     || (value == "OD(2)") ||
-          (value == "VOD")     || (value == "VOD(2)");
+          (value == "OD")      || (value == "OD(T)")     || (value == "OD(2)")    ||
+          (value == "VOD")     || (value == "VOD(2)")    || (value == "CIS(D)")   ||
+          (value == "RCIS(D)") || (value == "SOSCIS(D)") || (value == "SOSCIS(D0)");
 }
 
 

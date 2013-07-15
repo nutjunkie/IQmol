@@ -79,6 +79,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent),
    m_viewerView.setModel(&m_viewerModel);
    m_viewerView.setSelectionModel(&m_viewerSelectionModel);
    m_viewer.setActiveViewerMode(Viewer::BuildAtom);
+
+   m_viewer.setDefaultSceneRadius();
+   m_viewer.resetView();
 }
 
 MainWindow::~MainWindow()
@@ -692,7 +695,7 @@ void MainWindow::createMenus()
    // ----- Calculation Menu -----
    menu = menuBar()->addMenu("Calculation");
 
-      name = "QChem Setup";
+      name = "Q-Chem Setup";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), this, SLOT(openQChemUI()));
       action->setShortcut(Qt::CTRL + Qt::Key_U );

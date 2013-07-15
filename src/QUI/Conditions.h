@@ -13,6 +13,9 @@
 
 namespace Qui {
 
+
+bool True();
+bool False();
 bool isCompoundFunctional();
 bool isPostHF();
 bool isDFT();

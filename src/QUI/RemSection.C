@@ -47,13 +47,11 @@ void RemSection::addAdHoc(QString const& rem, QString const& quiValue,
 
 //! Sets the neccessary default values required for a job to run successfully.
 void RemSection::init() {
-qDebug()  << "Printing basis again";
    m_options.clear();
    m_toPrint.clear();
 
    m_options["QUI_CHARGE"] = "0";
    m_options["QUI_MULTIPLICITY"] = "1";
-   m_options["QUI_COORDINATES"] = "Cartesian";
 
    m_options["EXCHANGE"] = "HF";
    m_toPrint.insert("EXCHANGE");
@@ -64,8 +62,8 @@ qDebug()  << "Printing basis again";
    m_options["GUI"] = "1";
    m_toPrint.insert("GUI");
 
-   m_options["DMA"] = "1";
-   m_toPrint.insert("DMA");
+//   m_options["DMA"] = "1";
+//   m_toPrint.insert("DMA");
 
 
    // These are necessary for obsure reasons.  Essentially this is a hack for

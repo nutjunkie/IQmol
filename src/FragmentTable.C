@@ -22,6 +22,7 @@
 
 #include "FragmentTable.h"
 #include "Preferences.h"
+#include <QHeaderView>
 
 
 namespace IQmol {
@@ -43,6 +44,7 @@ FragmentTable::FragmentTable(QWidget* parent) : QFrame(parent), m_fileName(s_inv
        
    loadFragments();
    on_functionalGroupsButton_clicked(true);
+   m_fragmentTable.fragmentList->header()->close();
 }
 
 

@@ -27,62 +27,120 @@ namespace Qui {
 typedef QString S;
 
 
-void InputDialog::initializeQuiLogic() {
+void InputDialog::initializeQuiLogic() 
+{
+   // These are just for convenience
+   QString QtTrue(QString::number(Qt::Checked));
+   QString QtFalse(QString::number(Qt::Unchecked));
 
-  OptionRegister& reg = OptionRegister::instance();
+   OptionRegister& reg = OptionRegister::instance();
 
-  // These are just for convenience
-  QString QtTrue(QString::number(Qt::Checked));
-  QString QtFalse(QString::number(Qt::Unchecked));
-
-  QtNode *node, *node2;
-  Rule rule;
+   Rule rule;
 
 
-   // Setup -> Energy
-   node = &reg.get("EXCHANGE");
-   node->addRule(
-      If(*node == S("User-defined"),  
-         Disable(m_ui.correlation)
-      )
-   );
-   node->addRule(
-     If(isCompoundFunctional, 
-        Disable(m_ui.correlation), 
-        Enable(m_ui.correlation) 
-     )
-   );
+   QtNode* basis(&reg.get("BASIS"));
+   QtNode* basis2(&reg.get("BASIS2"));
+   QtNode* ecp(&reg.get("ECP"));
 
-   node = &reg.get("CORRELATION");
-   node->addRule(
-      If(*node == S("MP2"), 
-         Enable(m_ui.cd_algorithm), 
-         Disable(m_ui.cd_algorithm) 
-      )
-   );
+   rule = If(*basis2 == S("6-311+G**"), basis->shouldBe("6-311++G(3df,3pd)"));
+   basis2->addRule(rule);
+      
+   rule = If(*basis2 == S("rcc-pVTZ"), basis->shouldBe("cc-pVTZ"));
+   basis2->addRule(rule);
+      
+   rule = If(*basis2 == S("rcc-pVQZ"), basis->shouldBe("cc-pVQZ"));
+   basis2->addRule(rule);
 
-   node->addRule(
-      If(*node == S("RIMP2") || *node == S("SOSMP2") || *node == S("MOSMP2"),
-         Enable(m_ui.auxiliary_basis), 
-         Disable(m_ui.auxiliary_basis) 
-      )
-   );
+   rule = If(*basis2 != S("None"), ecp->shouldBe("None") );
+   basis2->addRule(rule);
+ 
+   rule = If(*ecp != S("None"), basis->makeSameAs(ecp));
+   ecp->addRule(rule);
 
-   node = &reg.get("ECP");
-   node->addRule(
-      If(*node != S("None"), 
-         reg.get("BASIS").makeSameAs(node) 
-      )
-   );
+   rule = If(*basis2 == S("6-311+G**") ||  
+             *basis2 == S("rcc-pVTZ")  ||  
+             *basis2 == S("rcc-pVQZ"), 
+             reg.get("DUAL_BASIS_ENERGY").shouldBe("true"),
+             reg.get("DUAL_BASIS_ENERGY").shouldBe("false"));
+   basis2->addRule(rule);
 
-   node = &reg.get("BASIS2");
-   node->addRule(
-      If(*node != S("None"), 
-         reg.get("ECP").shouldBe("None") 
-      )
-   );
+
+
+   QtNode* jobType(&reg.get("JOB_TYPE"));
+
+   rule = If(requiresDerivatives, 
+             reg.get("THRESH").shouldBe("12"), 
+             reg.get("THRESH").shouldBe("8"));
+   jobType->addRule(rule);
+      
+   rule = If(requiresDerivatives, 
+             reg.get("SCF_CONVERGENCE").shouldBe("8"),
+             reg.get("SCF_CONVERGENCE").shouldBe("5"));
+   jobType->addRule(rule);
+
  
 
+   QtNode* exchange(&reg.get("EXCHANGE"));
+   QtNode* correlation(&reg.get("CORRELATION"));
+   QtNode* cis_n_roots(&reg.get("CIS_N_ROOTS"));
+
+   rule = If(*exchange == S("User-defined"), Disable(m_ui.correlation));
+   exchange->addRule(rule);
+
+   rule = If(isCompoundFunctional, Disable(m_ui.correlation), Enable(m_ui.correlation) );
+   exchange->addRule(rule);
+        
+   rule = If(*correlation == S("MP2"), Enable(m_ui.cd_algorithm), Disable(m_ui.cd_algorithm));
+   correlation->addRule(rule);
+
+   rule = If(isPostHF, exchange->shouldBe("HF"));
+   correlation->addRule(rule);
+
+   rule = If(*correlation == S("RIMP2")      || 
+             *correlation == S("SOSMP2")     || 
+             *correlation == S("MOSMP2")     ||
+             *correlation == S("RICIS(D)")   ||
+             *correlation == S("SOSCIS(D)")  ||
+             *correlation == S("SOSCIS(D0)") ||
+
+             *correlation == S("CCD")        ||
+             *correlation == S("CCD(2)")     ||
+             *correlation == S("CCSD")       ||
+             *correlation == S("CCSD(T)")    ||
+             *correlation == S("CCSD(2)")    ||
+             *correlation == S("CCSD(dT)")   ||
+             *correlation == S("CCSD(fT)")   ||
+             *correlation == S("QCCD")       ||
+             *correlation == S("QCISD")      ||
+             *correlation == S("QCISD(T)")   ||
+             *correlation == S("OD")         ||
+             *correlation == S("OD(T)")      ||
+             *correlation == S("OD(2)")      ||
+             *correlation == S("VOD")        ||
+             *correlation == S("VOD(2)")     ||
+             *correlation == S("VQCCD")      ||
+
+             *exchange    == S("XYGJOS")     ||
+             *exchange    == S("LXYGJOS"),
+             Enable(m_ui.auxiliary_basis), 
+             Disable(m_ui.auxiliary_basis) 
+          );
+
+   correlation->addRule(rule);
+   exchange->addRule(rule);
+
+   rule = If(*correlation == S("CIS(D)")    || 
+             *correlation == S("RICIS(D)")  || 
+             *correlation == S("SOSCIS(D)") || 
+             *correlation == S("SOSCIS(D0)"), cis_n_roots->shouldBeAtLeast("1"));
+             
+   correlation->addRule(rule);
+
+
+
+ 
+   QtNode* node;
+   QtNode* node2;
 
    // Setup -> Frequencies
    node = &reg.get("ANHARMONIC");
@@ -229,13 +287,9 @@ void InputDialog::initializeQuiLogic() {
 
 
    // Advanced -> Wavefunction Analysis
-   node = &reg.get("DMA");
-   node->addRule(
-      If(*node == QtTrue, 
-         Enable(m_ui.dma_midpoints), 
-         Disable(m_ui.dma_midpoints) 
-      )
-   );
+   QtNode* dma(&reg.get("DMA"));
+   rule = If(*node == QtTrue, Enable(m_ui.dma_midpoints), Disable(m_ui.dma_midpoints));
+   dma->addRule(rule);
 
   
    // Advanced -> Wavefunction Analysis -> Plots
@@ -410,7 +464,7 @@ void InputDialog::initializeQuiLogic() {
          Enable(m_ui.cc_mp2no_grad) + Enable(m_ui.threads), 
          Disable(m_ui.cc_mp2no_grad) + Disable(m_ui.threads)
       ) 
-   );//*/
+   );*/
 
 
    // Advanced -> Correlated Methods -> Coupled-Cluster -> Convergence
@@ -420,7 +474,7 @@ void InputDialog::initializeQuiLogic() {
          Enable(m_ui.cc_diis12_switch), 
          Disable(m_ui.cc_diis12_switch)
       ) 
-   );//*/
+   );*/
 
 
    // Advanced -> Correlated Methods -> Active Space
@@ -480,7 +534,7 @@ void InputDialog::initializeQuiLogic() {
          + Disable(m_ui.cc_eom_full_response) 
          + Disable(m_ui.cc_eom_two_particle_properties) 
       )
-   );//*/
+   );*/
 
 
    // Advanced -> Excited States -> XOPT
@@ -509,7 +563,7 @@ void InputDialog::initializeQuiLogic() {
         node2->shouldBe(QtTrue), 
         node2->shouldBe(QtFalse)
       )
-   );//*/
+   );*/
 
 
    // Advanced -> Solvation Models -> ChemSol
@@ -526,6 +580,42 @@ void InputDialog::initializeQuiLogic() {
          + Disable(m_ui.chemsol_read_vdw) 
       )
    );
+
+
+   QtNode* dielectricOnsager(&reg.get("QUI_SOLVENT_DIELECTRIC_ONSAGER"));
+   QtNode* dielectricCosmo(&reg.get("QUI_SOLVENT_DIELECTRIC_COSMO"));
+   QtNode* solventDielectric(&reg.get("SOLVENT_DIELECTRIC"));
+
+   rule = If(True, solventDielectric->makeSameAs(dielectricOnsager));
+   dielectricOnsager->addRule(rule);
+   rule = If(True, solventDielectric->makeSameAs(dielectricCosmo));
+   dielectricCosmo->addRule(rule);
+
+   QtNode* cosmo(&reg.get("QUI_SOLVENT_COSMO"));
+   rule = If(*cosmo == QtTrue, reg.get("SOLVENT_METHOD").shouldBe("COSMO"));
+   cosmo->addRule(rule);
+
+   QtNode* pcm(&reg.get("QUI_SOLVENT_PCM"));
+   rule = If(*pcm == QtTrue, reg.get("SOLVENT_METHOD").shouldBe("PCM"));
+   pcm->addRule(rule);
+
+   QtNode* onsager(&reg.get("QUI_SOLVENT_ONSAGER"));
+   rule = If(*onsager == QtTrue, reg.get("SOLVENT_METHOD").shouldBe("SCRF"));
+   onsager->addRule(rule);
+
+
+   rule = If(*cosmo == QtTrue || *pcm == QtTrue || *onsager == QtTrue,
+            Enable(m_ui.solvent_method), Disable(m_ui.solvent_method));
+
+   cosmo->addRule(rule);
+   pcm->addRule(rule);
+   onsager->addRule(rule);
+   
+   rule = If(*cosmo == QtTrue || *onsager == QtTrue,
+            Enable(m_ui.solvent_dielectric), Disable(m_ui.solvent_dielectric));
+
+   cosmo->addRule(rule);
+   onsager->addRule(rule);
 
 
 
@@ -616,9 +706,6 @@ void InputDialog::initializeQuiLogic() {
    );
 
 
-
-
 }
-
 
 } // end namespace Qui
