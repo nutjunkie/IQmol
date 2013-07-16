@@ -33,9 +33,9 @@ QMAKE_CXXFLAGS += -O2
 #  and swap the comments in the following SOURCES and OBJECTS
 #
 ######################################################################
+
 #SOURCES += symmol.f90
 OBJECTS += symmol.o
-
 
 include(QsLog/QsLog.pri)
 include(GL2PS/GL2PS.pri)
@@ -94,9 +94,11 @@ win32 {
 
 unix:!macx {
    INCLUDEPATH += $(DEV)/extlib/include
-   INCLUDEPATH += $(DEV)/openbabel/include/openbabel-2.0
+   INCLUDEPATH += /usr/include/openbabel-2.0
    LIBS += -L/usr/lib64
-   LIBS += -L/usr/lib -lopenbabel
+   LIBS += -L/usr/lib 
+   LIBS += -lGLU 
+   LIBS += -lopenbabel
    LIBS += -L/usr/local/gfortran/lib -lgfortran
    LIBS += -L$(DEV)/extlib/lib -lssh2 -lcrypto -lz -lssl
    LIBS += -lboost_iostreams -lboost_serialization

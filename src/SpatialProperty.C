@@ -102,12 +102,12 @@ void PromoleculeDensity::boundingBox(Vec& min, Vec& max)
     for (int i = 0; i < m_atomicDensities.size(); ++i) {
         r = m_atomicDensities[i]->computeSignificantRadius(s_thresh);
         v = m_coordinates[i];
-        min.x = std::min(min.x, v.x-r);
-        min.y = std::min(min.y, v.y-r);
-        min.z = std::min(min.z, v.z-r);
-        max.x = std::max(max.x, v.x+r);
-        max.y = std::max(max.y, v.y+r);
-        max.z = std::max(max.z, v.z+r);
+        min.x = std::min(double(min.x), v.x-r);
+        min.y = std::min(double(min.y), v.y-r);
+        min.z = std::min(double(min.z), v.z-r);
+        max.x = std::max(double(max.x), v.x+r);
+        max.y = std::max(double(max.y), v.y+r);
+        max.z = std::max(double(max.z), v.z+r);
    }
 }
 

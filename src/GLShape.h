@@ -25,6 +25,7 @@
 #include <cmath>
 #include "QGLViewer/vec.h"
 
+class GLUquadric;
 
 namespace IQmol {
 namespace GLShape {

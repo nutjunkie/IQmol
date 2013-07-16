@@ -24,7 +24,7 @@
 
 
 #include <QtGlobal>
-#ifdef Q_WS_LINUX
+#ifdef Q_OS_LINUX
 #define GL_GLEXT_PROTOTYPES
 #include <GL/gl.h>
 #include <GL/glext.h>

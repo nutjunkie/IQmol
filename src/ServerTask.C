@@ -27,14 +27,17 @@
 #include "JobInfo.h"
 #include "QsLog.h"
 #include "System.h"
+#include "SecureConnectionException.h"
 #include <QTemporaryFile>
 #include <QFileInfo>
 #include <QProcess>
 #include <QDir>
-
+#ifndef Q_WS_WIN
+#include <unistd.h>
+#endif
+ 
 #include <QDebug>
 
-#include "SecureConnectionException.h"
 
 namespace IQmol {
 namespace ServerTask {
