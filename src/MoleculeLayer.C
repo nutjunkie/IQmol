@@ -197,8 +197,10 @@ void Molecule::appendData(DataList& dataList)
 
    for (iter = dataList.begin(); iter != dataList.end(); ++iter) {
        text = (*iter)->text();
-       // Hack to allow multiple cube data files
+       // Hack to allow multiple cube data files and frequencies
        if (text == "Cube Data") text = "cubedata";
+       if (text == "Frequencies") text = "frequencies";
+
 qDebug() << "Adding data" << text;
        
        if ((files = qobject_cast<Files*>(*iter))) {
@@ -1467,7 +1469,7 @@ void Molecule::minimizeEnergy(QString const& forceFieldName)
    OBForceField* forceField = OBForceField::FindForceField(obff);
    if (!forceField)  {
       QString msg("Failed to load force field: ");
-      msg += forceFieldName + "\nUnable to optimize structure";
+      msg += forceFieldName + "\nUnable to optimize structure\n";
       msg += "BABEL_DATADIR environment variable may not be set correctly.";
       QMsgBox::warning(0, "IQmol", msg);
       return;

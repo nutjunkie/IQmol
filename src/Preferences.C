@@ -313,10 +313,11 @@ QString QChemDatabaseFilePath()
 
    if (value.isNull()) {
       QDir dir(QApplication::applicationDirPath());
-#ifdef Q_WS_MAC
       dir.cdUp();
+#ifdef Q_WS_MAC
       dir.cd("Resources");
-      databaseFilePath = dir.absolutePath();
+#else
+      dir.cd("bin");
 #endif
       databaseFilePath = dir.absolutePath() + "/qchem_option.db";
    }else {
@@ -414,12 +415,8 @@ QString FragmentDirectory()
    if (value.isNull()) {
       QDir dir(QApplication::applicationDirPath());
       dir.cdUp();
-#ifdef Q_WS_MAC
       dir.cd("share/fragments");
       fragDir = dir.absolutePath();
-#else
-      fragDir = dir.absolutePath() + "/fragments";
-#endif
    }else {
       fragDir = value.value<QString>();
    }

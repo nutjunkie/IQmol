@@ -70,12 +70,14 @@ Data::Bank& QChemOutput::parse(TextStream& textStream)
          msg += QString::number(textStream.lineNumber());
          m_errors.append(msg + "\n" + textStream.nextLine());
 
+/*
       }else if (line.contains("User input:") && !line.contains(" of ")) {
          textStream.skipLine();
          QChemInput parser;
          Data::Bank& bank(parser.parse(textStream));
          m_dataBank.merge(&bank);
          if (!parser.errors().isEmpty()) m_errors << parser.errors();
+*/
 
       }else if (line.contains("Standard Nuclear Orientation")) {
          bool convertFromBohr(line.contains("Bohr"));

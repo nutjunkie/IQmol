@@ -219,13 +219,12 @@ bank.dump();
 
            // Frequencies
            QList<Data::Frequencies*> freq = bank.findData<Data::Frequencies>();
-           if (!freq.isEmpty()) {
-              Layer::Frequencies* frequencies = new Layer::Frequencies(*(freq.first()));
-              dataList += frequencies;
+           QList<Data::Frequencies*>::iterator frequencies;
+           for (frequencies = freq.begin(); frequencies != freq.end(); ++frequencies) {
+               dataList += new Layer::Frequencies(*(*frequencies));
            }
 
-
-           // Geometries
+           // Fragments
            QList<Data::EfpFragmentList*> frags = bank.findData<Data::EfpFragmentList>();
            if (!frags.isEmpty()) {
               Data::EfpFragmentList* fragments(frags.first());
