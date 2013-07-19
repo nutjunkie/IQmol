@@ -62,13 +62,17 @@ void IQmolApplication::initOpenBabel()
    QString path(dir.absolutePath());
 
 #ifdef Q_WS_MAC
-   // IQmol.app/Contents/MacOS/IQmol
+   // Assumed directory structure: IQmol.app/Contents/MacOS/IQmol
    QApplication::addLibraryPath(path + "/Frameworks");
    QApplication::addLibraryPath(path + "/PlugIns");
 #else
-   // IQmol/bin/IQmol
+   // Assumed directory structure: IQmol-xx/bin/IQmol
    QApplication::addLibraryPath(path + "/lib");
    QApplication::addLibraryPath(path + "/lib/plugins");
+#endif
+
+#ifdef Q_OS_LINUX
+   return;
 #endif
 
    QString env(qgetenv("BABEL_LIBDIR"));
