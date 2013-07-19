@@ -34,7 +34,7 @@
 #include "openbabel/griddata.h"
 
 
-using namespace OpenBabel;
+using namespace ::OpenBabel;
 using namespace qglviewer;
 
 namespace IQmol {
@@ -84,7 +84,8 @@ DataList OpenBabel::extractData(::OpenBabel::OBMol& obMol)
    Layer::Atom* atom;
    Layer::AtomMap atomMap;
 
-   FOR_ATOMS_OF_MOL(obAtom, &obMol) {
+   for (::OpenBabel::OBMolAtomIter obAtom(&obMol); obAtom; ++obAtom) {
+//   FOR_ATOMS_OF_MOL(obAtom, &obMol) {
       Vec pos(obAtom->x(), obAtom->y(), obAtom->z());
       atom = new Layer::Atom(obAtom->GetAtomicNum());  // Need to set parent !!!
       atom->setCharge(obAtom->GetPartialCharge());     // display options (Molecule::createAtom())
@@ -104,7 +105,8 @@ DataList OpenBabel::extractData(::OpenBabel::OBMol& obMol)
    Layer::Bond* bond;
    Layer::Atom *begin, *end;
 
-   FOR_BONDS_OF_MOL(obBond, &obMol) {
+   for (::OpenBabel::OBMolBondIter obBond(&obMol); obBond; ++obBond) {
+//   FOR_BONDS_OF_MOL(obBond, &obMol) {
       begin = atomMap.value(obBond->GetBeginAtom());
       end   = atomMap.value(obBond->GetEndAtom());
 
