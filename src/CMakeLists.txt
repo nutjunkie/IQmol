@@ -172,6 +172,8 @@ set(IQmol_FORMS
 
 if(APPLE)
     set(IQmol_FORMS ${IQmol_FORMS} PeriodicTableMac.ui)
+else(APPLE)
+    set(IQmol_FORMS ${IQmol_FORMS} PeriodicTable.ui)
 endif(APPLE)
 
 set(IQmol_RESOURCES
