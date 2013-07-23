@@ -324,3 +324,11 @@ target_link_libraries(IQmol
     ${Boost_LIBRARIES} ${ZLIB_LIBRARIES}
 )
 
+install(TARGETS IQmol DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/share/fragments
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/iqmol)
+install(FILES QUI/qchem_option.db
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/iqmol/QUI)
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/share/shaders
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/iqmol)
+
