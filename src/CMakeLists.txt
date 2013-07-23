@@ -91,65 +91,72 @@ set(IQmol_HEADERS
 )
 
 set(IQmol_SOURCES
-   symmol.f90
-   IQmolApplication.C  main.C  MainWindow.C  ToolBar.C  Preferences.C  Viewer.C 
-   HelpBrowser.C  PeriodicTable.C  ViewerModel.C  MeshLayer.C 
-   MeshConfigurator.C  AxesLayer.C  BackgroundLayer.C  MoleculeLayer.C 
-   ManipulatedFrameSetConstraint.C  AtomLayer.C  BondLayer.C  ChargeLayer.C 
-   UndoCommands.C  SymmetryToleranceDialog.C  ViewerModelView.C  Cursors.C 
-   ManipulateHandler.C  SelectHandler.C  ManipulateSelectionHandler.C 
-   BuildHandler.C  PrimitiveLayer.C 
-   BuildAtomHandler.C  
-   BuildFunctionalGroupHandler.C 
-   BuildEFPFragmentHandler.C 
-   EFPFragmentListConfigurator.C 
-   BuildMoleculeFragmentHandler.C 
-   Shell.C  Grid.C  
-   ProgressDialog.C 
-   SurfaceLayer.C  MarchingCubes.C  CubeDataLayer.C  QChemParser.C  InfoLayer.C 
-   InfoConfigurator.C  BackgroundConfigurator.C  MoleculeConfigurator.C 
-   SurfaceConfigurator.C  BaseParser.C  ExternalChargesParser.C 
-   OpenBabelParser.C  FrequenciesConfigurator.C  FrequenciesLayer.C  Animator.C 
-   ConformerListLayer.C  FormattedCheckpointParser.C   MolecularOrbitalsLayer.C 
-   MolecularOrbitalsConfigurator.C  DipoleLayer.C  ConformerListConfigurator.C 
-   CubeDataConfigurator.C  FileConfigurator.C  DipoleConfigurator.C  Gradient.C 
-   ColorGrid.C  SpatialProperty.C  AtomicDensity.C  IQmol.C  
-   ReindexAtomsHandler.C  ConstraintLayer.C 
-   ConstraintConfigurator.C  GLShape.C LogMessageDialog.C  Snapshot.C  
-   EnigmaMachine.C  PasswordVault.C  Server.C  ServerListDialog.C 
-   ProcessMonitor.C 
-   JobInfo.C Process.C  Timer.C  System.C  
-   SecureConnection.C  SSHFileConfigurator.C  
-   ServerRegistry.C 
-   ServerQueue.C  ServerQueueDialog.C  
-   SecureConnectionThread.C 
-   ServerDialog.C  ServerOptionsDialog.C 
-   LocalHost.C 
-   RemoteHost.C 
-   HttpServer.C 
-   WebHost.C 
-   HttpThread.C 
-   ServerTask.C 
-   BasicServer.C 
-   PBSServer.C 
-   SGEServer.C 
-   FragmentTable.C 
-#  Sanderson.C  
-   GLShapeLibrary.C 
-   GroupLayer.C 
-   EFPFragmentLayer.C 
-   EFPFragmentListLayer.C 
-   EFPFragmentParser.C 
-   ShaderLibrary.C 
-   ShaderDialog.C 
-   Lebedev.C 
-   GLSLmath.C 
-   GridInfoDialog.C 
-   SurfaceAnimatorDialog.C 
-   BoundingBoxDialog.C 
-#  glloader.cpp 
-   LocalConnectionThread.C
-   QMsgBox/QMsgBox.C
+    symmol.f90
+    IQmolApplication.C
+    main.C
+    MainWindow.C
+    ToolBar.C
+    Preferences.C
+    Viewer.C 
+    HelpBrowser.C  PeriodicTable.C  ViewerModel.C  MeshLayer.C 
+    MeshConfigurator.C  AxesLayer.C  BackgroundLayer.C  MoleculeLayer.C 
+    ManipulatedFrameSetConstraint.C  AtomLayer.C  BondLayer.C  ChargeLayer.C 
+    UndoCommands.C  SymmetryToleranceDialog.C  ViewerModelView.C  Cursors.C 
+    ManipulateHandler.C  SelectHandler.C  ManipulateSelectionHandler.C 
+    BuildHandler.C  PrimitiveLayer.C 
+    BuildAtomHandler.C  
+    BuildFunctionalGroupHandler.C 
+    BuildEFPFragmentHandler.C 
+    EFPFragmentListConfigurator.C 
+    BuildMoleculeFragmentHandler.C 
+    Shell.C  Grid.C  
+    ProgressDialog.C 
+    SurfaceLayer.C  MarchingCubes.C  CubeDataLayer.C  QChemParser.C
+    InfoLayer.C 
+    InfoConfigurator.C  BackgroundConfigurator.C  MoleculeConfigurator.C 
+    SurfaceConfigurator.C  BaseParser.C  ExternalChargesParser.C 
+    OpenBabelParser.C  FrequenciesConfigurator.C  FrequenciesLayer.C
+    Animator.C 
+    ConformerListLayer.C  FormattedCheckpointParser.C
+    MolecularOrbitalsLayer.C 
+    MolecularOrbitalsConfigurator.C  DipoleLayer.C
+    ConformerListConfigurator.C 
+    CubeDataConfigurator.C  FileConfigurator.C  DipoleConfigurator.C
+    Gradient.C 
+    ColorGrid.C  SpatialProperty.C  AtomicDensity.C  IQmol.C  
+    ReindexAtomsHandler.C  ConstraintLayer.C 
+    ConstraintConfigurator.C  GLShape.C LogMessageDialog.C  Snapshot.C  
+    EnigmaMachine.C  PasswordVault.C  Server.C  ServerListDialog.C 
+    ProcessMonitor.C 
+    JobInfo.C Process.C  Timer.C  System.C  
+    SecureConnection.C  SSHFileConfigurator.C  
+    ServerRegistry.C 
+    ServerQueue.C  ServerQueueDialog.C  
+    SecureConnectionThread.C 
+    ServerDialog.C  ServerOptionsDialog.C 
+    LocalHost.C 
+    RemoteHost.C 
+    HttpServer.C 
+    WebHost.C 
+    HttpThread.C 
+    ServerTask.C 
+    BasicServer.C 
+    PBSServer.C 
+    SGEServer.C 
+    FragmentTable.C 
+    GLShapeLibrary.C 
+    GroupLayer.C 
+    EFPFragmentLayer.C 
+    EFPFragmentListLayer.C 
+    EFPFragmentParser.C 
+    ShaderLibrary.C 
+    ShaderDialog.C 
+    Lebedev.C 
+    GLSLmath.C 
+    GridInfoDialog.C 
+    SurfaceAnimatorDialog.C 
+    BoundingBoxDialog.C 
+    LocalConnectionThread.C
 )
 
 set(IQmol_FORMS
@@ -166,7 +173,8 @@ set(IQmol_FORMS
    FragmentTable.ui   
    ProcessMonitor.ui  SSHFileConfigurator.ui   
    ServerDialog.ui  ServerOptionsDialog.ui  EFPFragmentListConfigurator.ui 
-   ServerQueueDialog.ui  ShaderDialog.ui  SurfaceAnimatorDialog.ui  GridInfoDialog.ui 
+   ServerQueueDialog.ui  ShaderDialog.ui  SurfaceAnimatorDialog.ui
+   GridInfoDialog.ui 
    BoundingBoxDialog.ui
 )
 
@@ -230,6 +238,10 @@ set(IQmol_QCPRotation_SOURCES
     QCPRotation/Align.C
 )
 
+set(IQmol_QMsgBox_SOURCES
+    QMsgBox/QMsgBox.C
+)
+
 set(IQmol_QsLog_SOURCES
     QsLog/QsLogDest.cpp
     QsLog/QsLog.cpp
@@ -240,65 +252,70 @@ set_property(SOURCE ${IQmol_QsLog_SOURCES} APPEND PROPERTY
     COMPILE_DEFINITIONS QS_LOG_LINE_NUMBERS)
 
 set(IQmol_QUI_HEADERS
-   QUI/OptionDatabaseForm.h
-   QUI/OptionEditors.h
-   QUI/InputDialog.h
-   QUI/QtNode.h
-   QUI/FileDisplay.h
-   QUI/GeometryConstraint.h
-   QUI/FindDialog.h
-   QUI/QuiMolecule.h
+    QUI/OptionDatabaseForm.h
+    QUI/OptionEditors.h
+    QUI/InputDialog.h
+    QUI/QtNode.h
+    QUI/FileDisplay.h
+    QUI/GeometryConstraint.h
+    QUI/FindDialog.h
+    QUI/QuiMolecule.h
+)
+
+set(IQmol_QUI_HEADERS2
+    JobInfo.h
+    Preferences.h
 )
 
 set(IQmol_QUI_SOURCES
-   QUI/OptionDatabaseForm.C
-   QUI/Option.C
-   QUI/OptionDatabase.C
-   QUI/OptionEditors.C
-   QUI/Conditions.C
-   QUI/Actions.C
-   QUI/InputDialogLogic.C
-   QUI/Job.C
-   QUI/Qui.C
-   QUI/FileDisplay.C
-   QUI/KeywordSection.C
-   QUI/ReadInput.C
-   QUI/RemSection.C
-   QUI/MoleculeSection.C
-   QUI/InputDialog.C
-   QUI/GeometryConstraint.C
-   QUI/OptSection.C
-   QUI/ExternalChargesSection.C
-   QUI/LJParametersSection.C
-   QUI/FindDialog.C
-   QUI/KillProcess.C
-   QUI/RunCommand.C
-   QUI/GetParentProcessChain.C
-   QUI/GetMatchingProcesses.C
-   QUI/IQmolInterface.C
-   QUI/QuiMolecule.C
-   QUI/QuiReadFile.C
+    QUI/OptionDatabaseForm.C
+    QUI/Option.C
+    QUI/OptionDatabase.C
+    QUI/OptionEditors.C
+    QUI/Conditions.C
+    QUI/Actions.C
+    QUI/InputDialogLogic.C
+    QUI/Job.C
+    QUI/Qui.C
+    QUI/FileDisplay.C
+    QUI/KeywordSection.C
+    QUI/ReadInput.C
+    QUI/RemSection.C
+    QUI/MoleculeSection.C
+    QUI/InputDialog.C
+    QUI/GeometryConstraint.C
+    QUI/OptSection.C
+    QUI/ExternalChargesSection.C
+    QUI/LJParametersSection.C
+    QUI/FindDialog.C
+    QUI/KillProcess.C
+    QUI/RunCommand.C
+    QUI/GetParentProcessChain.C
+    QUI/GetMatchingProcesses.C
+    QUI/IQmolInterface.C
+    QUI/QuiMolecule.C
+    QUI/QuiReadFile.C
 )
 
 set(IQmol_QUI_FORMS
-   QUI/OptionDatabaseForm.ui
-   QUI/OptionListEditor.ui
-   QUI/OptionNumberEditor.ui
-   QUI/FileDisplay.ui
-   QUI/QuiMainWindow.ui
-   QUI/GeometryConstraintDialog.ui
-   QUI/FindDialog.ui
+    QUI/OptionDatabaseForm.ui
+    QUI/OptionListEditor.ui
+    QUI/OptionNumberEditor.ui
+    QUI/FileDisplay.ui
+    QUI/QuiMainWindow.ui
+    QUI/GeometryConstraintDialog.ui
+    QUI/FindDialog.ui
 )
 
 set_property(SOURCE ${IQmol_QUI_SOURCES} APPEND PROPERTY
     COMPILE_DEFINITIONS QCHEM_UI)
 
-qt4_wrap_cpp(IQmol_HEADERS_MOC
-    ${IQmol_HEADERS} ${IQmol_Parser_HEADERS} ${IQmol_QUI_HEADERS})
-qt4_wrap_ui(IQmol_FORMS_HEADERS
-    ${IQmol_FORMS} ${IQmol_QUI_FORMS})
-qt4_add_resources(IQmol_RESOURCES_RCC
-    ${IQmol_RESOURCES})
+qt4_wrap_cpp(IQmol_HEADERS_MOC ${IQmol_HEADERS} ${IQmol_Parser_HEADERS})
+qt4_wrap_cpp(IQmol_QUI_HEADERS_MOC ${IQmol_QUI_HEADERS})
+qt4_wrap_cpp(IQmol_QUI_HEADERS2_MOC ${IQmol_QUI_HEADERS2})
+qt4_wrap_ui(IQmol_FORMS_HEADERS ${IQmol_FORMS})
+qt4_wrap_ui(IQmol_QUI_FORMS_HEADERS ${IQmol_QUI_FORMS})
+qt4_add_resources(IQmol_RESOURCES_RCC ${IQmol_RESOURCES})
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
@@ -310,11 +327,13 @@ add_executable(IQmol
     ${IQmol_GL2PS_SOURCES}
     ${IQmol_Parser_SOURCES}
     ${IQmol_QCPRotation_SOURCES}
+    ${IQmol_QMsgBox_SOURCES}
     ${IQmol_QsLog_SOURCES}
     ${IQmol_QUI_SOURCES}
-    ${IQmol_HEADERS_MOC} ${IQmol_FORMS_HEADERS} ${IQmol_RESOURCES_RCC}
+    ${IQmol_HEADERS_MOC} ${IQmol_QUI_HEADERS_MOC}
+    ${IQmol_FORMS_HEADERS} ${IQmol_QUI_FORMS_HEADERS}
+    ${IQmol_RESOURCES_RCC}
 )
-
 target_link_libraries(IQmol
     ${OPENBABEL2_LIBRARIES}
     ${QGLVIEWER_LIBRARIES}
@@ -324,7 +343,23 @@ target_link_libraries(IQmol
     ${Boost_LIBRARIES} ${ZLIB_LIBRARIES}
 )
 
-install(TARGETS IQmol DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+add_executable(QUI
+    ${IQmol_QUI_SOURCES} QUI/main.C
+    ${IQmol_QUI_HEADERS_MOC} ${IQmol_QUI_HEADERS2_MOC}
+    ${IQmol_QUI_FORMS_HEADERS}
+    GLSLmath.C Preferences.C ShaderLibrary.C JobInfo.C
+    ${IQmol_QMsgBox_SOURCES}
+    ${IQmol_QsLog_SOURCES}
+)
+target_link_libraries(QUI
+    ${OPENBABEL2_LIBRARIES}
+    ${QT_LIBRARIES}
+    ${OPENGL_LIBRARIES}
+)
+
+set_target_properties(IQmol QUI PROPERTIES RUNTIME_OUTPUT_DIRECTORY bin)
+
+install(TARGETS IQmol QUI DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/share/fragments
     DESTINATION ${CMAKE_INSTALL_PREFIX}/share/iqmol)
 install(FILES QUI/qchem_option.db

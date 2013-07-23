@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
 
     QString iconFile = ":/resources/icons/qchem.png";
 
-    Q_INIT_RESOURCE(QUI);
+    //Q_INIT_RESOURCE(QUI);
     
     if (argc > 1 && std::string(argv[1]) == "-dbedit" ) {
        Qui::OptionDatabaseForm form;
