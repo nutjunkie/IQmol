@@ -1,4 +1,38 @@
 #!/bin/sh
+
+CMAKE_INSTALL_PREFIX="/usr/local"
+
+function usage() {
+    echo "./configure --prefix=..."
+    echo ""
+}
+
+while [ "$1" != "" ]; do
+    PARAM=`echo $1 | awk -F= '{print $1}'`
+    VALUE=`echo $1 | sed 's/^[^=]*=//g'`
+    case $PARAM in
+        -h | --help)
+            usage
+            exit
+            ;;
+        --prefix)
+            CMAKE_INSTALL_PREFIX=$VALUE
+            ;;
+        *)
+            echo "Unknown parameter \"$PARAM\""
+            usage
+            exit 1
+            ;;
+    esac
+    shift
+done
+
 mkdir -p build
-cd build && cmake ..
+cd build
+
+if [ -e CMakeCache.txt ]; then
+    rm CMakeCache.txt
+fi
+
+cmake -DCMAKE_INSTALL_PREFIX=$CMAKE_INSTALL_PREFIX ..
 

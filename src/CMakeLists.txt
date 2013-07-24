@@ -359,11 +359,11 @@ target_link_libraries(QUI
 
 set_target_properties(IQmol QUI PROPERTIES RUNTIME_OUTPUT_DIRECTORY bin)
 
-install(TARGETS IQmol QUI DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+install(TARGETS IQmol QUI DESTINATION bin)
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/share/fragments
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/iqmol)
+    DESTINATION share/iqmol)
 install(FILES QUI/qchem_option.db
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/iqmol/QUI)
+    DESTINATION share/iqmol/QUI)
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/share/shaders
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/iqmol)
+    DESTINATION share/iqmol)
 
