@@ -584,7 +584,7 @@ void SGESubmit::run()
       bool ok;
       id = tokens[2].toInt(&ok);
       if (ok) {
-         m_process->setId(output);
+         m_process->setId(tokens[2]);
          m_process->setStatus(Process::Queued);
          m_server->addToWatchList(m_process);
          QLOG_DEBUG() << "SGE job submitted with id" << m_process->id();
