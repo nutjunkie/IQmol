@@ -100,7 +100,7 @@ QColor Function::interpolateRGB(double delta, QColor const& col1, QColor const& 
    if (delta <= 0.0) return col1;
    if (delta >= 1.0) return col2;
 
-   double r1, r2, g1, g2, b1, b2;
+   qreal r1, r2, g1, g2, b1, b2;
    col1.getRgbF(&r1, &g1, &b1);
    col2.getRgbF(&r2, &g2, &b2);
 
@@ -119,7 +119,7 @@ QColor Function::interpolateHSV(double delta, QColor const& col1, QColor const& 
    if (delta <= 0.0) return col1;
    if (delta >= 1.0) return col2;
 
-   double h1, h2, s1, s2, v1, v2;
+   qreal h1, h2, s1, s2, v1, v2;
    col1.getHsvF(&h1, &s1, &v1);
    col2.getHsvF(&h2, &s2, &v2);
 
