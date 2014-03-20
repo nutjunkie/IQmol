@@ -28,87 +28,119 @@
 
 
 namespace IQmol {
-namespace Parser2 {
+namespace Parser {
 
 // Note the grid data is read in as bohr, but converted to angstroms in the
 // Grid constructor
-Data::Bank& QChemPlot::parse(TextStream& textStream)
+bool QChemPlot::parse(TextStream& textStream)
 {
-   QString line;
-   QString description;
-   QStringList tokens;
-
-   while (!textStream.atEnd() && !line.contains("Grid point positions")) {
-      line = textStream.nextLine();
-   }
-
-   if (line.contains("esp values")) {
-      description = "Electrostatic Potential ";
-   }else if (line.contains("electronic density")) {
-      description = "Electronic Density ";
-   }else if (line.contains("MO values")) {
-      description = "Molecular Orbital ";
-   }
-
    QList<double> values;
 
-   textStream.skipLine();
-   tokens = textStream.nextLineAsTokens();
-   int nProperties(tokens.size()-3);
+   QList<Data::SurfaceType> surfaceTypes(parseForProperties(textStream));
+   unsigned nProperties(surfaceTypes.size());
    if (nProperties < 1) goto error;
-
-   m_data = new Data::GridList;
-   for (int i = 0; i < nProperties; ++i) {
-       m_data->append(new Data::Grid(description + tokens[i+3]));
-   }
-
+   
    values = textStream.nextLineAsDoubles();
-   if (values.size() != 3 + nProperties) goto error;
-   for (int i = 0; i < nProperties; ++i) {
-       (*m_data)[i]->append(values[i+3]);
-   }
+   if ((unsigned)values.size() != 3 + nProperties) goto error;
 
    {/**/
-      double xMin(values[0]), yMin(values[1]), zMin(values[2]);
-      double xMax(xMin), yMax(yMin), zMax(zMin);
-      int nx(1), ny(1), nz(1);
+      double xMin(values[0]);
+      double yMin(values[1]);
+      double zMin(values[2]);
+      double xMax(xMin);
+      double yMax(yMin);
+      double zMax(zMin);
+
+      typedef QList<double> List;
+      List* data = new List[nProperties];
+
+      for (unsigned i = 0; i < nProperties; ++i) {
+          data[i].append(values[i+3]);
+      }
+
+      unsigned nx(1), ny(1), nz(1);
 
       while (!textStream.atEnd()) {
-         if (values.size() == 3 + nProperties) {
+         if ((unsigned)values.size() == 3 + nProperties) {
             if (values[0] > xMax) { xMax = values[0]; ++nx; }
             if (values[1] > yMax) { yMax = values[1]; ++ny; }
             if (values[2] > zMax) { zMax = values[2]; ++nz; }
-            for (int i = 0; i < nProperties; ++i) {
-                (*m_data)[i]->append(values[i+3]);
+            for (unsigned i = 0; i < nProperties; ++i) {
+                data[i].append(values[i+3]);
             }
          }
          values = textStream.nextLineAsDoubles();
       }
 
-      for (int i = 0; i < nProperties; ++i) {
-          (*m_data)[i]->setMin(xMin, yMin, zMin);
-          (*m_data)[i]->setMax(xMax, yMax, zMax);
-          (*m_data)[i]->setNum(nx, ny, nz);
-          (*m_data)[i]->dump();
-          if (!(*m_data)[i]->isValid()) goto error;
+      qglviewer::Vec delta((xMax-xMin)/nx, (yMax-yMin)/ny, (zMax-zMin)/nz);
+      qglviewer::Vec origin(xMin, yMin, zMin);
+      Data::GridDataList* gridList(new Data::GridDataList);
+
+      try {
+
+         for (unsigned i = 0; i < nProperties; ++i) {
+             Data::GridSize size(origin, delta, nx, ny, nz);
+             gridList->append(new Data::GridData(size, surfaceTypes[i]));
+         }
+
+         m_dataBank.append(gridList);
+
+      } catch (...) {
+         m_errors.append("Problem creating QChem plot data");
+         delete gridList; 
       }
+
+      delete[] data;
    }/**/
 
-   m_dataBank.append(m_data);
-   return m_dataBank;
+   return m_errors.isEmpty();
 
    error:
       QString msg("Problem parsing QChem plot data, line ");
       m_errors.append(msg += QString::number(textStream.lineNumber()));
-qDebug() << m_errors;
-      if (m_data) {
-         for (int i = 0; i < m_data->size(); ++i) {
-             delete (*m_data)[i];
-         }
-         delete m_data;
-       }
+      return false;
+}
 
-   return m_dataBank;
+
+QList<Data::SurfaceType> QChemPlot::parseForProperties(TextStream& textStream)
+{
+   QString firstLine;
+   while (!textStream.atEnd() && !firstLine.contains("Grid point positions")) {
+      firstLine = textStream.nextLine();
+   }
+
+   bool esp(firstLine.contains("esp values"));
+   bool rho(firstLine.contains("electronic density values"));
+
+   textStream.skipLine();
+   QString secondLine(textStream.nextLine());
+
+   QList<Data::SurfaceType> surfaceTypes;
+
+   unsigned count(1);
+   while (!secondLine.isEmpty()) {
+      QString field(secondLine.left(13));
+      secondLine.remove(0, 13);
+      field = field.trimmed();
+
+      if (field == "X" || field == "Y" || field == "Z") {
+         // ignore
+      }else if(field.contains("ALPHA")) {
+         surfaceTypes.append(
+           Data::SurfaceType(Data::SurfaceType::AlphaOrbital, count++));
+      }else if(field.contains("BETA")) {
+         surfaceTypes.append(
+           Data::SurfaceType(Data::SurfaceType::BetaOrbital, count++));
+      }else if (esp) {
+         surfaceTypes.append(
+           Data::SurfaceType(Data::SurfaceType::ElectrostaticPotential, count++));
+      }else if (rho) {
+         surfaceTypes.append(
+           Data::SurfaceType(Data::SurfaceType::TotalDensity, count++));
+      }
+   }
+   
+   return surfaceTypes;
 }
 
 } } // end namespace IQmol::Parser

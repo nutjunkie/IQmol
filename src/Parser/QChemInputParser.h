@@ -23,17 +23,17 @@
 ********************************************************************************/
 
 #include "Parser.h"
-#include "DataList.h"
 #include "Geometry.h"
+#include "GeometryList.h"
 
 
 namespace IQmol {
-namespace Parser2 {
+namespace Parser {
 
    class QChemInput : public Base {
 
       public:
-         Data::Bank& parse(TextStream&);
+         bool parse(TextStream&);
 
       private:
          void readRemSection(TextStream&);

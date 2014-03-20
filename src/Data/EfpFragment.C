@@ -22,10 +22,10 @@
 
 #include "EfpFragment.h"
 #include "EfpFragmentLibrary.h"
+#include "EulerAngles.h"
 #include "Align.h"
-#include "IQmol.h"
+#include "openbabel/mol.h"
 #include <QDebug>
-#include <openbabel/mol.h>
 
 
 namespace IQmol {
@@ -43,7 +43,7 @@ EfpFragment::EfpFragment(QString const& name, Vec const& position, double const 
 
 void EfpFragment::setEulerAngles(double const alpha, double const beta, double const gamma)
 { 
-   m_orientation = FromEulerAngles(alpha, beta, gamma);
+   m_orientation = Util::EulerAngles::toQuaternion(alpha, beta, gamma);
 }
 
 
@@ -54,15 +54,14 @@ bool EfpFragment::align(QList<Vec> const& coordinates)
    if (!defined) return false;
 
    Geometry const& geometry(library.geometry(m_name));
-   if (geometry.nAtoms() != coordinates.size()) return false;
+   if (geometry.nAtoms() != (unsigned)coordinates.size()) return false;
    
-/// tmp
    QList<double> weights;
-   for (int i = 0; i < geometry.nAtoms(); ++i) {
+   for (unsigned i = 0; i < geometry.nAtoms(); ++i) {
        weights.append(OpenBabel::etab.GetMass(geometry.atomicNumber(i))); 
    }
 
-   Align align(geometry.coordinates(), coordinates, weights);
+   Util::Align align(geometry.coordinates(), coordinates, weights);
    if (!align.computeAlignment()) return false;
 
    m_position = align.translation();
@@ -70,6 +69,7 @@ bool EfpFragment::align(QList<Vec> const& coordinates)
 
    return true;
 }
+
 
 
 void EfpFragment::dump() const

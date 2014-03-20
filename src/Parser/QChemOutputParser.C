@@ -25,12 +25,15 @@
 #include "QChemInputParser.h"
 #include "TextStream.h"
 #include "AtomicProperty.h"
-#include "GeometricProperty.h"
 #include "Frequencies.h"
+#include "Hessian.h"
+#include "Energy.h"
+#include "PointGroup.h"
+#include "DipoleMoment.h"
 #include "EfpFragmentLibrary.h"
 #include "MultipoleExpansion.h"
 #include "EfpFragment.h"
-#include "IQmol.h"
+#include "Constants.h"
 
 #include <QtDebug>
 
@@ -38,9 +41,28 @@
 using qglviewer::Vec;
 
 namespace IQmol {
-namespace Parser2 {
+namespace Parser {
 
-Data::Bank& QChemOutput::parse(TextStream& textStream)
+QStringList QChemOutput::parseForErrors(TextStream& textStream)
+{
+   QString line;
+   QStringList errors;
+
+   while (!textStream.atEnd()) {
+      line = textStream.readLine();
+      if (line.contains("Q-Chem fatal error")) {
+         textStream.skipLine();  // blank line
+         line = textStream.readLine().trimmed();
+         if (line.isEmpty()) line = "Fatal error occured at end of output file";
+         errors.append(line);
+      }
+   }
+
+   return errors;
+}
+
+
+bool QChemOutput::parse(TextStream& textStream)
 {
    // A single output file can contain multiple jobs, but they all must
    // correspond to a single molecule (possibly with different geometries).
@@ -55,8 +77,6 @@ Data::Bank& QChemOutput::parse(TextStream& textStream)
    while (!textStream.atEnd()) {
       line = textStream.nextLine();
 
-// Orbtial Energies and symmetries
-
       if (line.contains("Welcome to Q-Chem")) {
          if (geometryList && !geometryList->isEmpty()) {
             m_dataBank.append(geometryList);
@@ -70,14 +90,17 @@ Data::Bank& QChemOutput::parse(TextStream& textStream)
          msg += QString::number(textStream.lineNumber());
          m_errors.append(msg + "\n" + textStream.nextLine());
 
-/*
       }else if (line.contains("User input:") && !line.contains(" of ")) {
          textStream.skipLine();
          QChemInput parser;
-         Data::Bank& bank(parser.parse(textStream));
-         m_dataBank.merge(&bank);
-         if (!parser.errors().isEmpty()) m_errors << parser.errors();
-*/
+         if (parser.parse(textStream)) {
+            // Remove the input geometry list
+            Data::Bank& bank(parser.data());
+            bank.deleteData<Data::GeometryList>();
+            m_dataBank.merge(bank);
+         }else {
+            m_errors << parser.errors();
+         }
 
       }else if (line.contains("Standard Nuclear Orientation")) {
          bool convertFromBohr(line.contains("Bohr"));
@@ -85,7 +108,7 @@ Data::Bank& QChemOutput::parse(TextStream& textStream)
          Data::Geometry* geometry(readStandardCoordinates(textStream));
 
          if (geometry) {
-            if (convertFromBohr) geometry->scaleCoordinates(BohrToAngstrom);
+            if (convertFromBohr) geometry->scaleCoordinates(Constants::BohrToAngstrom);
             if (!firstGeometry) firstGeometry = geometry;
 
             if (!geometryList) {
@@ -109,17 +132,23 @@ Data::Bank& QChemOutput::parse(TextStream& textStream)
             break;
          }
 
+      }else if (line.contains("Molecular Point Group")) {
+         tokens = TextStream::tokenize(line);
+         if (tokens.size() >= 3 && currentGeometry) {
+            Data::PointGroup& pg = currentGeometry->getProperty<Data::PointGroup>();
+            pg.setValue(tokens[3]);
+         }
+
       }else if (line.contains("Total energy in the final basis set")) {
          tokens = TextStream::tokenize(line);
          if (tokens.size() == 9 && currentGeometry) {
             bool ok;
             double energy(tokens[8].toDouble(&ok));
             if (ok) {
-               Data::Energy* data;
-               data = currentGeometry->getProperty<Data::ScfEnergy>();
-               if (data) data->setValue(energy, Data::Energy::Hartree);
-               data = currentGeometry->getProperty<Data::TotalEnergy>();
-               if (data) data->setValue(energy, Data::Energy::Hartree);
+               Data::ScfEnergy& scf = currentGeometry->getProperty<Data::ScfEnergy>();
+               scf.setValue(energy, Data::Energy::Hartree);
+               Data::TotalEnergy& total = currentGeometry->getProperty<Data::TotalEnergy>();
+               total.setValue(energy, Data::Energy::Hartree);
             }
          }
 
@@ -160,6 +189,10 @@ Data::Bank& QChemOutput::parse(TextStream& textStream)
          textStream.skipLine(4);
          readDipoleMoment(textStream, currentGeometry);
 
+      }else if (line.contains("Hessian of the SCF Energy") || 
+                line.contains("Final Hessian.")) {
+         readHessian(textStream, currentGeometry);
+
       }else if (line.contains("VIBRATIONAL ANALYSIS")) {
          textStream.skipLine(9);
          readVibrationalModes(textStream);
@@ -179,11 +212,12 @@ Data::Bank& QChemOutput::parse(TextStream& textStream)
       if (geometryList->isEmpty()) {
          delete geometryList;
       }else {
+         geometryList->setDefaultIndex(-1);
          m_dataBank.append(geometryList);
       }
    }
 
-   return m_dataBank;
+   return m_errors.isEmpty();
 }
 
 
@@ -292,8 +326,8 @@ void QChemOutput::setTotalEnergy(QString const& field, Data::Geometry* geometry)
    bool ok;
    double energy(field.toDouble(&ok));
    if (!ok) return;
-   Data::TotalEnergy* data(geometry->getProperty<Data::TotalEnergy>());
-   if (data) data->setValue(energy, Data::Energy::Hartree);
+   Data::TotalEnergy& data(geometry->getProperty<Data::TotalEnergy>());
+   data.setValue(energy, Data::Energy::Hartree);
 }
 
 
@@ -467,7 +501,6 @@ void QChemOutput::readVibrationalModes(TextStream& textStream)
    if (tokens.size() == 4) entropy = tokens[2].toDouble(); 
 
    frequencies->setThermochemicalData(zpve, entropy, enthalpy);
-frequencies->dump();
    m_dataBank.append(frequencies);
    return;
 
@@ -485,8 +518,6 @@ void QChemOutput::readDipoleMoment(TextStream& textStream, Data::Geometry* geome
 {
    if (!geometry) return;
 
-   Data::DipoleMoment* d(0);
-
    QStringList tokens;
    tokens = textStream.nextLineAsTokens();
    if (tokens.size() != 6) goto error;
@@ -498,13 +529,51 @@ void QChemOutput::readDipoleMoment(TextStream& textStream, Data::Geometry* geome
    y = tokens[3].toDouble(&ok);  if (!ok) goto error;
    z = tokens[5].toDouble(&ok);  if (!ok) goto error;
 
-   d = geometry->getProperty<Data::DipoleMoment>();
-   if (d) d->setValue(x, y, z);
+   geometry->getProperty<Data::DipoleMoment>().setValue(x,y,z);
    return;
 
    error:
       QString msg("Problem parsing dipole moment, line number ");
       m_errors.append(msg + QString::number(textStream.lineNumber()));
+}
+
+
+void QChemOutput::readHessian(TextStream& textStream, Data::Geometry* geometry)
+{
+   if (!geometry) return;
+
+   unsigned nAtoms(geometry->nAtoms());
+   Matrix hessian(3*nAtoms, 3*nAtoms);
+   QStringList tokens;
+   QList<double> values;
+
+   unsigned firstCol(0);
+   unsigned lastCol(0);
+   unsigned nCol(0);
+
+   while (firstCol < 3*nAtoms) {
+       // header line
+       tokens  = textStream.nextLineAsTokens();
+       nCol    = tokens.size();
+       lastCol = firstCol + tokens.size();
+
+       for (unsigned row = 0; row < 3*nAtoms; ++row) {
+           values = textStream.nextLineAsDoubles();
+           if ((unsigned)values.size() != lastCol-firstCol+1) {  // +1 for the row index
+              QString msg("Problem parsing hessian, line number ");
+              m_errors.append(msg + QString::number(textStream.lineNumber()));
+              return;
+           }
+           values.removeFirst();
+           for (unsigned col = firstCol; col < lastCol; ++col) {
+               hessian(row, col) = values.takeFirst();
+           }
+       }
+       firstCol += nCol;
+   }
+
+   Data::Hessian& h(geometry->getProperty<Data::Hessian>());
+   h.setData(hessian);
 }
 
 

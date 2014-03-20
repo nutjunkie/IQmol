@@ -32,11 +32,10 @@ namespace Data {
 template<> const Type::ID AtomList::TypeID = Type::AtomList;
 
 
-int Atom::atomicNumber(QString const& symbol) 
+unsigned Atom::atomicNumber(QString const& symbol) 
 {
-   int z(OpenBabel::etab.GetAtomicNum(symbol.toLatin1().data()));
-   // we return -1 for invalid atomic symbols
-   return (z == 0 ? -1 : z);
+   unsigned z(OpenBabel::etab.GetAtomicNum(symbol.toLatin1().data()));
+   return z;
 }
 
 

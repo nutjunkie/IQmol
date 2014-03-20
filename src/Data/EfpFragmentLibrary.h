@@ -47,7 +47,7 @@ namespace Data {
          bool add(QString const& fragmentName);
 
          QStringList availableFragments() const;
-         Geometry const& geometry(QString const& fragmentName) const;
+         Geometry const& geometry(QString const& fragmentName);
          QString const& parameters(QString const& fragmentName) const;
          QString getFilePath(QString const& fragmentName);
 

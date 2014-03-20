@@ -10,7 +10,7 @@
  *  \date January 2008
  */
 
-#include <map>
+#include <QMap>
 #include <set>
 #include <QString>
 #include "KeywordSection.h" 
@@ -36,7 +36,7 @@ class RemSection : public KeywordSection {
       // This is a debug function and probably shouldn't have public access.
       static void printAdHoc();
 
-      std::map<QString,QString> getOptions() {
+      QMap<QString,QString> getOptions() {
          return m_options;
       } 
       
@@ -53,10 +53,10 @@ class RemSection : public KeywordSection {
 
    private:
       // ---------- Data ---------
-      static std::map<QString,QString> m_adHoc;
+      static QMap<QString,QString> m_adHoc;
 
       //! Contains a list of the option values that have been set
-      std::map<QString,QString> m_options;
+      QMap<QString,QString> m_options;
 	  //! Contains a list of only those options that should be printed to the
 	  //! input file.  This acts as a filter on the contents of the m_options
 	  //! list.
@@ -71,7 +71,7 @@ class RemSection : public KeywordSection {
       //   return m_toPrint.count(option) > 0;
       //}
 
-      void setOptions(std::map<QString,QString> const& options);
+      void setOptions(QMap<QString,QString> const& options);
       void setPrint(std::set<QString> const& toPrint);
 };
 

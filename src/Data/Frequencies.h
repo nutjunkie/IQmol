@@ -28,7 +28,6 @@
 namespace IQmol {
 namespace Data {
 
-   /// Data class representing molecule with a particular geometry.  
    class Frequencies : public Base {
 
       friend class boost::serialization::access;

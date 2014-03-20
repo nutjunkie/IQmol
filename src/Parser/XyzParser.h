@@ -27,14 +27,14 @@
 
 
 namespace IQmol {
-namespace Parser2 {
+namespace Parser {
 
    /// Parser for XYZ format files.  Note that the file may contain more than
    /// one structure which may be useful in the case of animations.
    class Xyz : public Base {
 
       public:
-         Data::Bank& parse(TextStream&);
+         bool  parse(TextStream&);
 
       private:
          Data::Geometry* readNextGeometry(TextStream&);

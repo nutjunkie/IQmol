@@ -1,0 +1,16 @@
+To compile a stand-alone executable for testing the Parser module, uncomment
+the following line in the Parser.pro file:
+
+CONFIG += debug_parser
+
+The executable can be run from the command line (for Mac you need to type the
+full path to the executable file, i.e.: Parser.app/Contents/MacOS/Parser).  The
+program takes single argument, which should be a valid file name (for example
+those in the test directory).  If the input file is water.out, then an output
+file water.out.iqm is produced, which contains the IQmol compressed archive
+data.  
+
+If you run the program on one of the references, the checksums should be the
+same (assuming you ran it in the test directory).  If they are not then re-run
+the Parser with the -d switch on the problem file and archive.  This will give
+a plain text output which can be diff'd.

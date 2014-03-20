@@ -36,23 +36,28 @@ QString toString(ID const id)
       case Atom:                   s = "Data::Atom";                   break;
       case AtomList:               s = "Data::List<Atom>";             break;
       case Bank:                   s = "Data::Bank";                   break;
-      case Charge:                 s = "Data::Charge";                 break;
-      case ChargeList:             s = "Data::List<Charge>";           break;
+      case PointCharge:            s = "Data::PointCharge";            break;
+      case PointChargeList:        s = "Data::List<PointCharge>";      break;
       case EfpFragment:            s = "Data::EfpFragment";            break;
       case EfpFragmentList:        s = "Data::List<EfpFragment>";      break;
       case EfpFragmentLibrary:     s = "Data::EfpFragmentLibrary";     break;
-      case Grid:                   s = "Data::Grid";                   break;
-      case GridList:               s = "Data::GridList";               break;
+      case GridData:               s = "Data::GridData";               break;
+      case GridDataList:           s = "Data::GridDataList";           break;
       case File:                   s = "Data::File";                   break;
       case FileList:               s = "Data::List<File>";             break;
       case Geometry:               s = "Data::Geometry";               break;
       case GeometryList:           s = "Data::List<Geometry>";         break;
-      case Molecule:               s = "Data::Molecule";               break;
-      case MoleculeList:           s = "Data::List<Molecule>";         break;
       case RemSection:             s = "Data::RemSection";             break;
       case Frequencies:            s = "Data::Frequencies";            break;
       case VibrationalMode:        s = "Data::VibrationalMode";        break;
       case VibrationalModeList:    s = "Data::VibrationalModeList";    break;
+      case MolecularOrbitals:      s = "Data::MolecularOrbitals";      break;
+      case MolecularOrbitalsList:  s = "Data::MolecularOrbitalsList";  break;
+      case Shell:                  s = "Data::Shell";                  break;
+      case ShellList:              s = "Data::ShellList";              break;
+      case Energy:                 s = "Data::Energy";                 break;
+      case Hessian:                s = "Data::Hessian";                break;
+      case ConformerEnergy:        s = "Data::ConformerEnergy";        break;
 
       case AtomicProperty:         s = "Data::AtomicProperty";         break;
       case AtomicSymbol:           s = "Data::AtomicSymbol";           break;
@@ -60,20 +65,29 @@ QString toString(ID const id)
       case NmrShiftIsotropic:      s = "Data::NmrShiftIsotropic";      break;
       case NmrShiftRelative:       s = "Data::NmrShiftRelative";       break;
       case Mass:                   s = "Data::Mass";                   break;
+      case AtomicCharge:           s = "Data::AtomicCharge";           break;
       case MullikenCharge:         s = "Data::MullikenCharge";         break;
       case StewartCharge:          s = "Data::StewartCharge";          break;
       case SpinDensity:            s = "Data::SpinDensity";            break;
       case VdwRadius:              s = "Data::VdwRadius";              break;
 
-      case GeometricProperty:      s = "Data::GeometricProperty";      break;
       case DipoleMoment:           s = "Data::DipoleMoment";           break;
       case TotalEnergy:            s = "Data::TotalEnergy";            break;
       case ScfEnergy:              s = "Data::ScfEnergy";              break;
       case ForceFieldEnergy:       s = "Data::ForceFieldEnergy";       break;
+      case PointGroup:             s = "Data::PointGroup";             break;
 
+      case ChargeMultiplicity:     s = "Data::ChargeMultiplicity";     break;
       case MultipoleExpansion:     s = "Data::MultipoleExpansion";     break;
       case MultipoleExpansionList: s = "Data::MultipoleExpansionList"; break;
 
+      case Mesh:                   s = "Data::Mesh";                   break;
+      case MeshList:               s = "Data::MeshList";               break;
+      case Surface:                s = "Data::Surface";                break;
+      case SurfaceType:            s = "Data::SurfaceType";            break;
+      case SurfaceList:            s = "Data::SurfaceList";            break;
+      case SurfaceInfo:            s = "Data::SurfaceInfo";            break;
+      case SurfaceInfoList:        s = "Data::SurfaceInfoList";        break;
    }
 
    return s;

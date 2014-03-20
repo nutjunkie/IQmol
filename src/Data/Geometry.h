@@ -22,11 +22,8 @@
 
 ********************************************************************************/
 
-#include "DataList.h"
 #include "Atom.h"
 
-
-using qglviewer::Vec;
 
 namespace IQmol {
 namespace Data {
@@ -41,57 +38,66 @@ namespace Data {
 		 // numbers and positions.  Atom and Geometry properties are not copied.
          Geometry();
          Geometry(Geometry const&);
+         Geometry(QList<unsigned> const& atomicNumbers, QList<double> const& coordinates);
 
          Type::ID typeID() const { return Type::Geometry; }
          
-         int nAtoms() const { return m_atoms.size(); }
-         QString atomicSymbol(int const i) const;
-         int atomicNumber(int const i) const;
-         Vec position(int const i) const;
-         QList<Vec> const& coordinates() const { return m_coordinates; }
+         unsigned nAtoms() const { return (unsigned)m_atoms.size(); }
+         QString atomicSymbol(unsigned const i) const;
+         unsigned atomicNumber(unsigned const i) const;
+         qglviewer::Vec position(unsigned const i) const;
+         QList<qglviewer::Vec> const& coordinates() const { return m_coordinates; }
 
          /// Use to convert between Bohr and Angstrom
          void scaleCoordinates(double const);
+         void translate(qglviewer::Vec const&);
 
-		 /// Two geometries are considered the same if their AtomLists contain
-		 /// the same atoms in the same order.  Everything else could be
-		 /// different.  This allows, for example, the structures of a geometry
+         /// Two geometries are considered the same if their AtomLists contain
+         /// the same atoms in the same order.  Everything else could be
+         /// different.  This allows, for example, the structures of a geometry
          /// optimization to be considered the same.
          bool sameAtoms(Geometry const&) const;
          bool sameAtoms(QStringList const& symbols) const;
 
-         void append(int const z, Vec const& position);
-         void append(QString const& symbol, Vec const& position);
-         void append(QList<int> const& z, QList<Vec> const& positions);
+         void append(unsigned const z, qglviewer::Vec const& position);
+         void append(QString const& symbol, qglviewer::Vec const& position);
+         void append(QList<unsigned> const& z, QList<qglviewer::Vec> const& positions);
 
          void setCharge(int const charge);
-         void setMultiplicity(int const multiplicity);
-         void setChargeAndMultiplicity(int const charge, int const multiplicity);
+         void setMultiplicity(unsigned const multiplicity);
+         void setChargeAndMultiplicity(int const charge, unsigned const multiplicity);
+         int  charge() const { return m_charge; }
+         unsigned multiplicity() const { return m_multiplicity; }
 
          template <class P>
          bool setAtomicProperty(QList<double> values) {
             if (values.size() != m_atoms.size()) return false; 
-            for (int i = 0; i < m_atoms.size(); ++i) {
-                P* p(m_atoms[i]->getProperty<P>());
-                if (!p) return false;
-                p->setValue(values[i]);
+            AtomList::iterator iter;
+            unsigned i(0);
+            for (iter = m_atoms.begin(); iter != m_atoms.end(); ++iter, ++i) {
+                P& p((*iter)->getProperty<P>());
+                p.setValue(values[i]);
             }
             return true;
          }
 
+//------------------------------------
+// TODO: This causes an referene to reference error 
+         //template <class P>
+         //QList<P&> getAtomicProperty() {
+         //   QList<P&> atomicProperties;
+         //   AtomList::iterator iter;
+         //   for (iter = m_atoms.begin(); iter != m_atoms.end(); ++iter) {
+         //       atomicProperties.append((*iter)->getProperty<P>());
+         //   }
+         //   return atomicProperties;
+         //}
+
          template <class P>
-         P* getProperty() {
-            P* p(0);
-            Bank::iterator iter;
-            for (iter = m_properties.begin(); iter != m_properties.end(); ++iter) {
-                if ( (p = dynamic_cast<P*>(*iter)) ) break; 
-            }
-            if (p == 0) {
-               p = new P;
-               m_properties.append(p);
-            }
-            return p;
+         P& getAtomicProperty(unsigned i) {
+            return m_atoms[i]->getProperty<P>();
          }
+//------------------------------------
 
          template <class P>
          QStringList getLabels() {
@@ -103,15 +109,46 @@ namespace Data {
             return labels;
          }
 
+
+         template <class P>
+         P& getProperty() {
+            P* p(0);
+            Bank::iterator iter;
+            for (iter = m_properties.begin(); iter != m_properties.end(); ++iter) {
+                if ( (p = dynamic_cast<P*>(*iter)) ) break; 
+            }
+            if (p == 0) {
+               p = new P;
+               m_properties.append(p);
+            }
+            return *p;
+         }
+
+
+         template <class P>
+         bool hasProperty() const {
+            P* p(0);
+            Bank::const_iterator iter;
+            for (iter = m_properties.begin(); iter != m_properties.end(); ++iter) {
+                if ( (p = dynamic_cast<P*>(*iter)) ) return true;
+            }
+            return false;
+         }
+
+
+         void appendProperty(Data::Base* data) {
+            m_properties.append(data);
+         }
+
+         void serialize(InputArchive& ar, unsigned const version = 0) {
+            privateSerialize(ar, version);
+         }
+
+         void serialize(OutputArchive& ar, unsigned const version = 0) {
+            privateSerialize(ar, version);
+         }
+
          void dump() const;
-
-         void serialize(InputArchive& ar, unsigned int const version = 0) {
-            privateSerialize(ar, version);
-         }
-
-         void serialize(OutputArchive& ar, unsigned int const version = 0) {
-            privateSerialize(ar, version);
-         }
 
       private:
          template <class Archive>
@@ -123,16 +160,14 @@ namespace Data {
             m_properties.serialize(ar);
          }
 
-         int totalNuclearCharge() const;
+         unsigned totalNuclearCharge() const;
 
          AtomList m_atoms;
-         QList<Vec> m_coordinates;
+         QList<qglviewer::Vec> m_coordinates;
          int m_charge;
-         int m_multiplicity;
+         unsigned m_multiplicity;
          Bank m_properties;
    };
-
-   typedef Data::List<Data::Geometry> GeometryList;
 
 } } // end namespace IQmol::Data
 

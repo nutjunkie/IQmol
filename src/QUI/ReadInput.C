@@ -23,9 +23,8 @@
 #include <QRegExp>
 #include <QMessageBox>
 
-#include "QuiReadFile.h"
 #include "Job.h"
-#include "Qui.h"  // includes <vector>
+#include "Qui.h" 
 #include "RemSection.h"
 #include "MoleculeSection.h"
 
@@ -39,7 +38,7 @@ class Molecule;
 
 //! Opens the specified QChem input/output file and attempts to read in a list
 //! of jobs which are separated by @@@.  Returns the number of jobs created.
-int ReadInput(QFileInfo const&, std::vector<Job*>* ) {
+int ReadInput(QFileInfo const&, QList<Job*>* ) {
    return 0;
 }
 
@@ -50,46 +49,11 @@ int ReadMolecule(QFileInfo const& , Molecule* ) {
 }
 
 
-//! Reads in a specified file and attempts to generate valid Job objects The
-//! input file can be either a Q-Chem input file, or an xyz file.  If the 
-//! latter then the file name must end with ".xyz" and the coordinates are
-//! returned as a string.
-void ReadInputFile(QFile& file, std::vector<Job*>* jobs, QString* coordinates) {
-   QString error("");
-   QString name(file.fileName());
-   QString contents(ReadFileToString(file));
-
-   // Attempt to determine what sort of file we have based on the contents
-   if ( contents.contains("$molecule\n", Qt::CaseInsensitive) &&
-        contents.contains("$rem\n", Qt::CaseInsensitive) ) {
-      // Assume a Q-Chem input/output file
-      *jobs = ParseQChemFileContents(contents);
-
-   }else if(name.endsWith(".xyz", Qt::CaseInsensitive)) {
-      // Assume an XYZ file
-      *coordinates = ParseXyzFileContents(contents);
-      MoleculeSection* mol = new MoleculeSection(*coordinates);
-      Job* job = new Job();
-      job->addSection(mol);
-      jobs->push_back(job);
-
-   }else {
-      QString msg("The specified file does not appear to be a valid input file.  "
-              "The following formats are supported:\n"
-              " - Q-Chem input file\n"
-              " - Q-Chem output file\n"
-              " - XYZ coordinate file");
-      QMessageBox::warning(0, "Input File Error", msg);
-   }
-
-}
-
-
-
 //! Takes a string containing the contents of a QChem input file and extracts
 //! Jobs from it.
-std::vector<Job*> ParseQChemFileContents(QString const& contents) {
-   std::vector<Job*> jobs;
+QList<Job*> ParseQChemFileContents(QString const& contents) 
+{
+   QList<Job*> jobs;
    QStringList blocks;
 
    if (contents.contains("A Quantum Leap Into The Future Of Chemistry")) {
@@ -104,7 +68,7 @@ std::vector<Job*> ParseQChemFileContents(QString const& contents) {
 
    for (int i = 0; i < blocks.count(); ++i) {
        Job* job = new Job(ReadKeywordSections(blocks.at(i)));
-       jobs.push_back(job);
+       jobs.append(job);
    }
 
    return jobs;

@@ -31,7 +31,7 @@ namespace Data {
    class Geometry;
 }
 
-namespace Parser2 {
+namespace Parser {
 
    class TextStream;
 

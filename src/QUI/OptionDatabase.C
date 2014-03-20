@@ -8,12 +8,7 @@
  *  \date August 2008
  */
 
-#ifdef QCHEM_UI
-#include "../Preferences.h"
-#define Preferences IQmol::Preferences
-#else
 #include "Preferences.h"
-#endif
 
 #include <QString>
 #include <QDebug>
@@ -31,6 +26,8 @@
 #include "QMsgBox.h"
 #include "QsLog.h"
 
+
+using namespace IQmol;
 
 namespace Qui {
 

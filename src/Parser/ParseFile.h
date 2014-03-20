@@ -23,34 +23,40 @@
 ********************************************************************************/
 
 #include "Task.h"
+#include "Bank.h"
 #include <QStringList>
 
 
 namespace IQmol {
 
-namespace Data {
-   class Bank;
-}
+class JobInfo;
 
-namespace Parser2 {
+namespace Parser {
 
    class Base;
 
    /// This is the main file parsing class that parses files in a separate
-   /// thread allowing the sub-parsers to perform some computational work 
-   /// if required.
+   /// thread, allowing the sub-parsers to perform some computational work 
+   /// if required.  If a directory is passed to the constructor, the
+   /// directory is searched for all files with the same base name as the
+   /// directory.  For example, if the directory is ~/Ethane, then we look
+   /// for all files of the form ~/Ethane/Ethane.* 
    class ParseFile : public Task {
 
       Q_OBJECT 
 
       public:
-         ParseFile(QStringList filePaths);
-         ParseFile(QString filePath);
+         /// Constructs a ParseFile object for the given path.  Note that no
+         /// parsing actually takes place untilt the start() member function
+         /// (inherited from Task) is called.
+         ParseFile(QString const& filePath);
 
-		 /// Returns the composite data found in the file(s).  Note that the
-		 /// caller takes ownership of the Data::Bank and this will return a
-		 /// null pointer if called more than once.
-         Data::Bank* takeData();
+		 /// Returns the file path passed to the constructor (either an actual
+		 /// file or directory).
+         QString filePath() { return m_filePath; }
+
+		 /// Returns the composite data found in the file(s).
+         Data::Bank& data() { return m_dataBank; } 
 
          /// Returns a list of errors encountered when processing the file(s).
          QStringList const& errors() const { return m_errorList; }
@@ -59,13 +65,18 @@ namespace Parser2 {
          void run();
 
       private:
-         static bool obSupported(QString const& extension);
-         static QStringList s_obFormats;
+         /// Create a list of files paths to parse.  In the case of a 
+         /// directory this may correspond to more than one file.
+         void setFilePaths(QString const&);
 
-         /// Parses the file, returning false only if the file doesn't exist.
+         /// Parses a file, returning false only if the file doesn't exist.
          bool parse(QString const& filePath);
+
+         /// Convenience function that runs a sub-parser over the file.
          void runParser(Base* parser, QString const& filePath);
-         Data::Bank* m_dataBank;
+
+         QString     m_filePath;
+         Data::Bank  m_dataBank;
          QStringList m_filePaths;
          QStringList m_errorList;
    };

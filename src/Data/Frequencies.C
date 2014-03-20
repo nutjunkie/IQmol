@@ -37,7 +37,10 @@ void Frequencies::setThermochemicalData(double const zpve, double const enthalpy
 
 void Frequencies::dump() const
 {
-   qDebug() << "Thermochemical Data: " << m_zpve << m_enthalpy << m_entropy;
+   qDebug() << "  Thermochemical Data:"
+            << "ZPVE =" << m_zpve     << "kcal/mol"
+            << " H ="   << m_enthalpy << "kcal/mol"
+            << " S ="   << m_entropy  << "cal/(mol.K)";
    m_modes.dump();
 }
 

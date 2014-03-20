@@ -23,7 +23,6 @@
 #include "openbabel/forcefield.h"
 
 #include "QuiMolecule.h"
-#include "QuiReadFile.h"
 
 
 using namespace OpenBabel;
@@ -38,6 +37,7 @@ Molecule::Molecule() {
 }
 
 
+/*
 
 
 //! The following should be able to read the molecule from any file format
@@ -47,7 +47,7 @@ bool Molecule::loadFromFile(QFileInfo const& info) {
    QString name(info.filePath());
 
    //qDebug() << "Attempting to load molecule from " << name;
-   //qDebug() << name.toAscii().data();
+   //qDebug() << name.toLatin1().data();
    //qDebug() << "----  File Contents ---";
    //qDebug() << ReadFileToString(info);
    //qDebug() << "-----------------------";
@@ -65,7 +65,7 @@ bool Molecule::loadFromFile(QFileInfo const& info) {
    }
 
    std::ifstream ifs;
-   ifs.open( info.filePath().toAscii().data() );
+   ifs.open( info.filePath().toLatin1().data() );
 
    if (!ifs) {
       QString msg("Could not open file for reading:\n");
@@ -90,6 +90,7 @@ bool Molecule::loadFromFile(QFileInfo const& info) {
    ifs.close();
    return true;
 }
+*/
 
 
 

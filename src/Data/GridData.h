@@ -23,76 +23,112 @@
 ********************************************************************************/
 
 #include "DataList.h"
+#include "GridSize.h"
+#include "SurfaceType.h"
+#include "Matrix.h"
 
 
 namespace IQmol {
 namespace Data {
 
-   /// Very basic Data class for data on a grid.  Spacings should be regular in
-   /// each of the cartesian coordinates.
-   class Grid : public Base {
+   class GridSize;
+
+   /// Basic Data class for holding real data on a 3D grid.
+   class GridData : public Base {
 
       friend class boost::serialization::access;
 
       public:
-         Grid(QString const& description = QString(), 
-            qglviewer::Vec const& min = qglviewer::Vec(),
-            qglviewer::Vec const& max = qglviewer::Vec(),
-            int const nx = 0, int const ny = 0, int const nz = 0, 
-            QList<double> const& data = QList<double>()) : m_description(description),
-            m_min(min), m_max(max), m_nx(nx), m_ny(ny), m_nz(nz), m_data(data) { }
+         Type::ID typeID() const { return Type::GridData; }
 
-         Type::ID typeID() const { return Type::Grid; }
+         GridData(GridSize const&, SurfaceType const&);
+         GridData(GridSize const&, SurfaceType const&, QList<double> const& data);
+         GridData(GridData const&);
 
-         void setMin(double const x, double const y, double const z) {
-            m_min = qglviewer::Vec(x,y,z);
-         }
-         void setMax(double const x, double const y, double const z) {
-            m_max = qglviewer::Vec(x,y,z);
-         }
-         void setNum(int const nx, int const ny, int const nz) { 
-            m_nx = nx;  m_ny = ny;  m_nz = nz;
-         }
-         void append(double const value) { m_data.append(value); }
+         GridData() { }  // for boost::serialize;
 
-         void getNumberOfPoints(int& nx, int& ny, int& nz) const {
-            nx = m_nx;  ny = m_ny;  nz = m_nz;
-         }
-         qglviewer::Vec const& getMax() const { return m_max; }
-         qglviewer::Vec const& getMin() const { return m_min; }
-         double getValue(int const i) const { return m_data[i]; }
+         void getNumberOfPoints(unsigned& nx, unsigned& ny, unsigned& nz) const;
 
-         bool isValid() const;
+         void getBoundingBox(qglviewer::Vec& min, qglviewer::Vec& max) const;
+
+         void getRange(double& min, double& max);
+
+         double dataSizeInKb() const;
+
+         SurfaceType const& surfaceType() const { return m_surfaceType; }
+
+         GridSize size() const;
+
+         qglviewer::Vec const& origin() const { return m_origin; }
+
+         qglviewer::Vec const& delta() const {return m_delta; }
+
+         bool saveToCubeFile(QString const& filePath, QStringList const& coordinates,
+            bool const invertSign) const;
+           
+         GridData& operator=(GridData const& that);
+         GridData& operator+=(GridData const& that);
+         GridData& operator-=(GridData const& that);
+         GridData& operator*=(double const that);
+
+         double const& operator()(unsigned const i, unsigned const j, unsigned const k) const
+         {
+            return m_data[i][j][k];
+         }
+
+         double& operator()(unsigned const i, unsigned const j, unsigned const k)
+         {
+            return m_data[i][j][k];
+         }
+
+		 /// Performs a tri-linear interpolation of the grid data at each of 
+		 /// the 8 nearest grid points about (x,y,z). Returns 0 outside the 
+         /// range of the grid
+
+         // This is very weird.  A 3-argument version of this causes the ISO C++
+         // ambiguous error with the overloaded unsigned version above.  We add
+         // the extra argument only to resolve the abiguity.
+         double operator()(double const x, double const y, double const z, bool) const;
+
+		 /// Performs a tri-linear interpolation of the gradient grid data at each
+		 /// of the 8 nearest grid points about (x,y,z). Returns (0,0,0) outside 
+         /// the range of the grid
+         qglviewer::Vec normal(double const x, double const y, double const z) const;
+
+         void serialize(InputArchive& ar, unsigned const version = 0) 
+         {
+            privateSerialize(ar, version);
+         }
+
+         void serialize(OutputArchive& ar, unsigned const version = 0) 
+         {
+            privateSerialize(ar, version);
+         }
+
          void dump() const;
 
-         void serialize(InputArchive& ar, unsigned int const version = 0) {
-            privateSerialize(ar, version);
-         }
-
-         void serialize(OutputArchive& ar, unsigned int const version = 0) {
-            privateSerialize(ar, version);
-         }
-
       private:
+         void copy(GridData const&);
+
+         // computes this = a*this + b*B
+         void combine(double const a, double const b, GridData const& B);
+
          template <class Archive>
-         void privateSerialize(Archive& ar, unsigned int const) {
-            ar & m_description;
-            ar & m_min;
-            ar & m_max;
-            ar & m_nx;
-            ar & m_ny;
-            ar & m_nz;
+         void privateSerialize(Archive& ar, unsigned const) 
+         {
+            ar & m_surfaceType;
+            ar & m_origin;
+            ar & m_delta;
             ar & m_data;
          }
 
-         QString m_description;
-         qglviewer::Vec m_min;
-         qglviewer::Vec m_max;
-         int m_nx, m_ny, m_nz;
-         QList<double> m_data;
+         SurfaceType m_surfaceType;
+         qglviewer::Vec m_origin;
+         qglviewer::Vec m_delta;
+         Array3D m_data;
    };
 
-   typedef Data::List<Data::Grid> GridList;
+   typedef Data::List<Data::GridData> GridDataList;
 
 } } // end namespace IQmol::Data
 

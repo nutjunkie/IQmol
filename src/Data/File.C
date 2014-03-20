@@ -32,7 +32,7 @@ template<> const Type::ID FileList::TypeID = Type::FileList;
 
 void File::dump() const 
 {
-   qDebug() << "File path: " << m_filePath;
+   qDebug() << "  Path: " << m_filePath;
 }
 
 } } // end namespace IQmol::Data

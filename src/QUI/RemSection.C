@@ -26,7 +26,7 @@ namespace Qui {
 //! option the value is associated with.   This function is called in
 //! InputDialog::initializeControl() to avoid additional database access.
 
-std::map<QString,QString> RemSection::m_adHoc;
+QMap<QString,QString> RemSection::m_adHoc;
 
 void RemSection::addAdHoc(QString const& rem, QString const& quiValue, 
    QString const& qchemValue) {
@@ -122,12 +122,12 @@ void RemSection::read(QString const& input) {
 
 QString RemSection::dump()  {
    QString s("$rem\n");
-   std::map<QString,QString>::const_iterator iter;
+   QMap<QString,QString>::const_iterator iter;
    QString name, value;
 
    for (iter = m_options.begin(); iter != m_options.end(); ++iter) {
-       name  = iter->first;
-       value = iter->second;
+       name  = iter.key();
+       value = iter.value();
        if (printOption(name) && fixOptionForQChem(name, value)) {
           s += "   " + name + "  =  " + value + "\n";
        }
@@ -148,7 +148,7 @@ RemSection* RemSection::clone() const {
 
 
 
-void RemSection::setOptions(std::map<QString,QString> const& options) {
+void RemSection::setOptions(QMap<QString,QString> const& options) {
    m_options.clear();
    m_options = options;
 }
@@ -353,9 +353,9 @@ bool RemSection::fixOptionForQChem(QString& name, QString& value) {
 
 //! This is a debug fuction to check what ad hoc changes we are making.
 void RemSection::printAdHoc() {
-   std::map<QString,QString>::iterator iter;
+   QMap<QString,QString>::iterator iter;
    for (iter = m_adHoc.begin(); iter != m_adHoc.end(); ++iter) {
-       qDebug() << "ADHOC::" << iter->first << "->" << iter->second;
+       qDebug() << "ADHOC::" << iter.key() << "->" << iter.value();
    }
 }
 

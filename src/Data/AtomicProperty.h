@@ -71,7 +71,7 @@ namespace Data {
          ScalarProperty() { }
 
          QString label() const { return QString::number(m_value, 'f', 3); }
-         double getValue() const { return m_value; }
+         double value() const { return m_value; }
          void setValue(double const value) { m_value = value; }
          void dump() const;
 
@@ -104,13 +104,6 @@ namespace Data {
    };
 
 
-   class MullikenCharge : public ScalarProperty {
-      public:
-         MullikenCharge(double const q = 0.0) { m_value = q; }
-         Type::ID typeID() const { return Type::MullikenCharge; }
-   };
-
-
    class SpinDensity : public ScalarProperty {
       public:
          SpinDensity(double const spin = 0.0) { m_value = spin; }
@@ -118,7 +111,22 @@ namespace Data {
    };
 
 
-   class StewartCharge : public ScalarProperty {
+   class AtomicCharge : public ScalarProperty {
+      public:
+         AtomicCharge(double const q = 0.0) { m_value = q; }
+         Type::ID typeID() const { return Type::AtomicCharge; }
+   };
+
+
+ 
+   class MullikenCharge : public AtomicCharge {
+      public:
+         MullikenCharge(double const q = 0.0) { m_value = q; }
+         Type::ID typeID() const { return Type::MullikenCharge; }
+   };
+
+
+   class StewartCharge : public AtomicCharge {
       public:
          StewartCharge(double const q = 0.0) { m_value = q; }
          Type::ID typeID() const { return Type::StewartCharge; }
@@ -130,6 +138,7 @@ namespace Data {
          NmrShiftIsotropic(double const s = 0.0) { m_value = s; }
          Type::ID typeID() const { return Type::NmrShiftIsotropic; }
    };
+
 
    class NmrShiftRelative : public ScalarProperty {
       public:

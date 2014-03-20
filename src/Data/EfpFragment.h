@@ -51,6 +51,7 @@ namespace Data {
 
          void setName(QString const& name) { m_name = name; }
          void setPosition(Vec const& position) { m_position = position; };
+         void setOrientation(Quaternion const& orientation) { m_orientation = orientation; }
          void setEulerAngles(double const alpha, double const beta, double const gamma);
          bool align(QList<Vec> const&);
 

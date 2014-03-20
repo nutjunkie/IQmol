@@ -22,25 +22,29 @@
          
 ********************************************************************************/
 
-#include "ui_QuiMainWindow.h"
-#include "OptionRegister.h"
-#include "OptionDatabase.h"
-#include "Process.h"
 #include <QFileInfo>
 #include <QStatusBar>
-
+#include "Logic.h"
+#include "OptionRegister.h"
+#include "OptionDatabase.h"
+#include "ui_QuiMainWindow.h"
 
 class QResizeEvent;
+class QStackedWidget;
 class QFont;
+
 
 namespace IQmol {
    class JobInfo;
 }
 
+namespace Ui {
+   class MainWindow;
+}
+
 
 namespace Qui {
 
-class OptionDatabase;
 class QtNode;
 class Option;
 class Molecule;
@@ -48,10 +52,10 @@ class Job;
 
 template<class K, class T> class Register;
 
-typedef std::map<String,String> StringMap;
-typedef boost::function<void(String const&)> Update;
+typedef boost::function<void(QString const&)> Update;
+typedef QList<Job*> JobList;
 
-using Process::Monitored;
+//using Process::Monitored;
 
 
 /// \brief This is the main class for the QChem input file generator.  If you
@@ -75,7 +79,6 @@ class InputDialog : public QMainWindow {
 
       /// Allows the update of the servers in the server ComboBox
       void setServerList(QStringList const& servers);
-      void enableSubmit(bool tf);
 
    public Q_SLOTS:
       void showMessage(QString const& msg);
@@ -85,16 +88,16 @@ class InputDialog : public QMainWindow {
 
 
    private Q_SLOTS:
-      void on_resetButton_clicked(bool) { resetJob(); }
+      void on_resetButton_clicked(bool) { resetInput(); }
       void on_advancedOptionsTree_itemClicked(QTreeWidgetItem* item, int col);
       void on_job_type_currentIndexChanged(QString const& text);
       void on_jobList_currentIndexChanged(int);
       void on_stackedOptions_currentChanged(int);
-      void on_previewText_textChanged() { m_taint = true; }
+      void on_previewText_textChanged() { setTaint(true, 0); }
       void on_qui_title_textChanged();
       void on_qui_charge_valueChanged(int);
       void on_qui_multiplicity_valueChanged(int);
-      void on_addJobButton_clicked(bool) { appendNewJob(); }
+      void on_addJobButton_clicked(bool) { addNewJob(); }
       void on_deleteJobButton_clicked(bool); 
       void on_submitButton_clicked(bool) { submitJob(); }
 
@@ -124,13 +127,13 @@ class InputDialog : public QMainWindow {
       void changeLineEdit(QString const& name, QString const& value);
       void changeRadioButton(QString const& name, QString const& value);
 
-      void updatePreviewText();
+      void updatePreviewText() { updatePreviewText(m_jobs, m_currentJob); }
 
       // Menu Slots
       void menuSave()   { saveFile(false);  }
       void menuSaveAs() { saveFile(true);  }
-      void appendNewJob();
-      void resetJob();
+      void addNewJob();
+      void resetInput();
       void submitJob();
       void fontBigger()  { fontAdjust(true);  }
       void fontSmaller() { fontAdjust(false); }
@@ -143,30 +146,32 @@ class InputDialog : public QMainWindow {
 
    private:
       // ---------- Data ----------
-      Ui::MainWindow m_ui;
+      Ui::MainWindow  m_ui;
       IQmol::JobInfo* m_jobInfo;
       OptionDatabase& m_db;
       OptionRegister& m_reg;
       bool m_taint;
 
       Job* m_currentJob;
-      std::vector<Job*> m_jobs;
+      JobList m_jobs;
       std::vector<Action*> m_resetActions;
-      std::map<String,Update*> m_setUpdates;
+      std::map<QString,Update*> m_setUpdates;
       QFileInfo m_fileIn;
       QStatusBar m_statusBar;
 
 
       // ---------- Functions ----------
-      int  currentJobNumber();
-      bool firstJob(Job*);
-      void finalizeJob();
-      bool deleteAllJobs(bool const prompt = true);
 
-      void capturePreviewText();
+      void finalizeJob(Job*);
+
+      void addJobToList(Job*);
+      void removeJobFromList(Job*);
+      void deleteAllJobs(bool const prompt = true);
+
+      void capturePreviewTextChanges();
+      void updatePreviewText(JobList const&, Job const* currentJob);
+
       void initializeQuiLogic();
-      void widgetError(QString const& name);
-
       void setControls(Job* job);
       void resetControls();
       void initializeMenus();
@@ -185,21 +190,17 @@ class InputDialog : public QMainWindow {
       void connectControl(Option const& opt, QRadioButton* radio);
       void connectControl(Option const& opt, QDoubleSpinBox* dspin);
 
-      void printSection(String const& name, bool doPrint);
+      void widgetError(QString const& name);
+      void printSection(QString const& name, bool doPrint);
       void updateLJParameters();
       bool saveFile(bool prompt);
-      void editConstraints();
 
       void fontAdjust(bool makeBigger);
       void changePreviewFont(QFont const& font);
-      void addJobToList(Job*);
-      void appendJob(Job*);
+      void setTaint(bool const tf, int line);
 
-      QString generateInputDeck(bool preview);
-      QStringList generateInputDeckJobs(bool preview);
-      // Deprecate
-      void watchProcess(Process::Monitored* process);
-      void displayJobOutput();
+      QStringList generateInputJobStrings(JobList const&, bool preview);
+      QString generateInputString();
 
       QString prependRemName(QString const& name, QString const& description);
 };

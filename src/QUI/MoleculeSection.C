@@ -21,7 +21,6 @@
 namespace Qui {
 
 
-
 //! Takes a the text from between the $molecule-$end tags and parses it.
 void MoleculeSection::read(QString const& input) {
    QStringList lines( input.trimmed().split(QRegExp("\\n")) );
@@ -135,10 +134,12 @@ void MoleculeSection::parseCoordinates() {
    return;
 }
 
+
 void MoleculeSection::setCharge(int charge) {
    m_charge = charge;
    if (m_molecule) m_molecule->SetTotalCharge(charge);
 }
+
 
 void MoleculeSection::setMultiplicity(int multiplicity) {
    m_multiplicity = multiplicity;

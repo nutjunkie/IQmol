@@ -20,7 +20,9 @@
    
 ********************************************************************************/
 
+#include "Energy.h"
 #include "XyzParser.h"
+#include "GeometryList.h"
 #include "CartesianCoordinatesParser.h"
 #include "TextStream.h"
 
@@ -28,9 +30,9 @@
 
 
 namespace IQmol {
-namespace Parser2 {
+namespace Parser {
 
-Data::Bank& Xyz::parse(TextStream& textStream)
+bool Xyz::parse(TextStream& textStream)
 {
    Data::GeometryList* geometryList(new Data::GeometryList);
    Data::Geometry* geometry(0);
@@ -48,33 +50,42 @@ Data::Bank& Xyz::parse(TextStream& textStream)
       m_dataBank.append(geometryList);
    }
 
-   return m_dataBank;
+   return m_errors.isEmpty();
 }
 
 
 Data::Geometry* Xyz::readNextGeometry(TextStream& textStream)
 {
+   const QRegExp integerOnly("^\\d+$");  // note nextLine() returns a trimmed line
+   const QRegExp anyReal("([-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?)");
+
+   Data::Geometry* geometry(0);
+   QString line(textStream.previousLine());
+
    // We look for a line with a single integer giving the number of atoms, this
    // may be the previousLine in the TextStream if the XYZ blocks are back to
    // back. Note that the number is maximal, i.e. if there are more coordinates
    // they will not be read.   
-
-   Data::Geometry* geometry(0);
-   QRegExp integerOnly("^\\d+$");
-   QString line(textStream.previousLine());
    if (!line.contains(integerOnly)) {
       line = textStream.seek(integerOnly);
    }
 
    bool ok;
-   int n(line.toInt(&ok));
+   int nAtoms(line.toInt(&ok));
+   double energy;
 
    if (ok) {
-      textStream.skipLine();   // skip comment line
-      CartesianCoordinates parser(n);
+      // Search for an energy/real quantity on the comment line
+      energy = 0.0;
+      line = textStream.nextLine();
+      if (anyReal.indexIn(line) > -1) energy = anyReal.cap(1).toDouble(&ok);
+
+      CartesianCoordinates parser(nAtoms);
       geometry = parser.parse(textStream);
 
       if (geometry) {
+         Data::TotalEnergy& totalEnergy(geometry->getProperty<Data::TotalEnergy>());
+         totalEnergy.setValue(energy, Data::Energy::Hartree);
          QString error(parser.error());
          if (!error.isEmpty()) m_errors.append(error);
       }else {

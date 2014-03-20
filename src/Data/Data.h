@@ -29,6 +29,12 @@
 #include <boost/serialization/export.hpp>
 
 
+/// The Data namespace includes POD classes that can be serialized.  The
+/// Data::Base class herein takes care of this serialization and also
+/// implements a generic copy behavior.  New Data classes must have an
+/// identifier added to the ID enum below and be added to the DataFactory 
+/// ensure the serialization process can occur.
+
 namespace IQmol {
 namespace Data {
 
@@ -37,14 +43,28 @@ namespace Data {
 
    namespace Type {
       enum ID { Undefined = 0, 
-                Atom, AtomList, Bank, Charge, ChargeList, EfpFragment, 
-                EfpFragmentList, EfpFragmentLibrary, Grid, GridList, File, FileList, 
-                Geometry, GeometryList, Molecule, MoleculeList, RemSection,
-                GeometricProperty, ScfEnergy, TotalEnergy, ForceFieldEnergy,
-                DipoleMoment, VibrationalMode, VibrationalModeList, Frequencies,
-                AtomicProperty, AtomicSymbol, AtomColor, NmrShiftIsotropic, 
-                NmrShiftRelative, Mass, MultipoleExpansion, MultipoleExpansionList,
-                MullikenCharge, StewartCharge, SpinDensity, VdwRadius
+               /*---------------------  *---------------------  *--------------------- */
+                Atom,                   AtomList,               Bank, 
+                PointCharge,            PointChargeList,        EfpFragment, 
+                EfpFragmentList,        EfpFragmentLibrary,     GridData, 
+                GridDataList,           File,                   FileList, 
+                Geometry,               GeometryList,           RemSection,
+                ChargeMultiplicity,
+                Energy,                 ConformerEnergy,        Hessian,
+                ScfEnergy,              TotalEnergy,            ForceFieldEnergy,
+                DipoleMoment,           VibrationalMode,        VibrationalModeList, 
+                PointGroup,
+                Frequencies,            MolecularOrbitals,      MolecularOrbitalsList,
+                Shell,                  ShellList,              Mesh,
+                MeshList,               Surface,                SurfaceList,
+                SurfaceInfo,            SurfaceInfoList,        SurfaceType, 
+               /*---------------------  *---------------------  *--------------------- */
+                AtomicProperty,         AtomicSymbol,           AtomColor, 
+                NmrShiftIsotropic,      NmrShiftRelative,       Mass, 
+                MultipoleExpansion,     MullikenCharge,         StewartCharge, 
+                AtomicCharge,
+                SpinDensity,            VdwRadius,              MultipoleExpansionList
+               /*---------------------  *---------------------  *--------------------- */
       };
 
       QString toString(ID const);
@@ -70,7 +90,7 @@ namespace Data {
 
 		 /// This can't be a template function as templates and virtual
 		 /// functions don't play nicely together.
-         virtual void serialize(InputArchive&, unsigned int const version = 0) = 0;
+         virtual void serialize(InputArchive&,  unsigned int const version = 0) = 0;
          virtual void serialize(OutputArchive&, unsigned int const version = 0) = 0;
 
          /// This is only meant for debugging;
@@ -86,6 +106,6 @@ namespace Data {
          virtual void copy(Base const& that);
    };
 
-} } // end namepspace IQmol::Data
+} } // end namespace IQmol::Data
 
 #endif

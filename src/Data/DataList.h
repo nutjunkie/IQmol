@@ -43,14 +43,18 @@ namespace Data {
          const static Type::ID TypeID;
          Type::ID typeID() const { return TypeID; }
 
-         void serialize(InputArchive& ar, unsigned int const version = 0) {
-            load(ar, version);
-         }
-         void serialize(OutputArchive& ar, unsigned int const version = 0) {
-            save(ar, version);
+         virtual void serialize(InputArchive& ar, unsigned int const version = 0) 
+         {
+            serializeList(ar, version);
          }
 
-         void dump() const {
+         virtual void serialize(OutputArchive& ar, unsigned int const version = 0) 
+         {
+            serializeList(ar, version);
+         }
+
+         virtual void dump() const 
+         {
             for (int i = 0; i < this->size(); ++i) {
                 this->at(i)->dump();
             }
@@ -58,27 +62,15 @@ namespace Data {
 
 
       protected:
-         void destroy() {
+         void destroy() 
+         {
             for (int i = 0; i < this->size(); ++i) {
                 delete this->at(i);
             }
             this->clear();
          }
 
-
-      private:
-         template<class Archive>
-         void save(Archive & ar, const unsigned int version) const
-         {
-            int n(this->size());
-            ar & n;
-            for (int i = 0; i < n; ++i) {
-                this->at(i)->serialize(ar, version);
-            }
-         }
-
-         template<class Archive>
-         void load(Archive & ar, const unsigned int version)
+         void serializeList(InputArchive& ar, unsigned int const version = 0) 
          {
             int n;
             ar & n;
@@ -86,6 +78,15 @@ namespace Data {
                 T* t(new T());
                 t->serialize(ar, version);
                 this->append(t);
+            }
+         }
+
+         void serializeList(OutputArchive& ar, unsigned int const version = 0) 
+         {
+            int n(this->size());
+            ar & n;
+            for (int i = 0; i < n; ++i) {
+                this->at(i)->serialize(ar, version);
             }
          }
 

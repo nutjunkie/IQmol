@@ -23,51 +23,60 @@
 #include "ParseFile.h"
 #include "Bank.h"
 #include "File.h"
+#include "QsLog.h"
 #include "XyzParser.h"
+#include "CubeParser.h"
 #include "IQmolParser.h"
+#include "MeshParser.h"
 #include "QChemInputParser.h"
 #include "QChemOutputParser.h"
 #include "QChemPlotParser.h"
-#include "EfpFragmentParser2.h"
-#include "ExternalChargesParser2.h"
-/*
-#include "OpenBabelParser.h"
+#include "EfpFragmentParser.h"
+#include "ExternalChargesParser.h"
 #include "FormattedCheckpointParser.h"
-*/
+#include "OpenBabelParser.h"
 
-#include "openbabel/plugin.h"
 #include <QFileInfo>
-#include <vector>
+#include <QDir>
 
-#include <QDebug>
 
 namespace IQmol {
-namespace Parser2 {
+namespace Parser {
 
-QStringList ParseFile::s_obFormats = QStringList();
 
-ParseFile::ParseFile(QStringList filePaths) : m_dataBank(0), m_filePaths(filePaths)
+ParseFile::ParseFile(QString const& filePath)
 {
+   setFilePaths(filePath);
 }
 
 
-ParseFile::ParseFile(QString filePath) : m_dataBank(0)
+void ParseFile::setFilePaths(QString const& filePath)
 {
-   m_filePaths << filePath;
-}
+   QFileInfo info(filePath);
+   m_filePath = filePath;
 
+   if (info.isDir()) {
+      QDir dir(filePath);
 
-Data::Bank* ParseFile::takeData()
-{
-   Data::Bank* tmp(m_dataBank);
-   m_dataBank = 0;
-   return tmp;
+      QStringList list;
+      list << dir.dirName() + ".*";
+      dir.setNameFilters(list);
+
+      QDir::Filters filters(QDir::Files | QDir::Readable);
+      m_filePaths << dir.entryList(filters);
+
+      QStringList::iterator iter;
+      for (iter = m_filePaths.begin(); iter != m_filePaths.end(); ++iter) {
+          (*iter).prepend(m_filePath + "/");
+      }
+   }else {
+      m_filePaths.append(filePath);
+   }
 }
 
 
 void ParseFile::run()
 {
-   m_dataBank = new Data::Bank;
    Data::FileList* fileList = new Data::FileList();
 
    QStringList::const_iterator file;
@@ -78,7 +87,7 @@ void ParseFile::run()
    if (fileList->isEmpty()) {
       delete fileList;
    }else {
-      m_dataBank->append(fileList);
+      m_dataBank.append(fileList);
    }
 }
 
@@ -98,7 +107,12 @@ bool ParseFile::parse(QString const& filePath)
    QString extension(fileInfo.suffix().toLower());
    Base* parser(0);
 
+   if (extension == "run" || extension == "err") {
+      return false;
+   }
+
    if (extension == "xyz") {
+      QLOG_INFO() << "Using Xyz parser";
       parser = new Xyz;
    }
 
@@ -111,73 +125,70 @@ bool ParseFile::parse(QString const& filePath)
    }
 
    if (extension == "in"  || extension == "qcin"  || extension == "inp") {
+      QLOG_INFO() << "Using QChemInput parser";
       parser = new QChemInput;
    }
 
    if (extension == "out"  || extension == "qcout") {
+      QLOG_INFO() << "Using QChemOutput parser";
       parser = new QChemOutput;
    }
 
-   if (extension == "iqmol") {
+   if (extension == "iqmol" || extension == "iqm") {
+      QLOG_DEBUG() << "Using IQmol parser";
       parser = new IQmol;
+   }
+
+   if (extension == "cube" || extension == "cub") {
+      parser = new Cube;
    }
 
    if (extension == "chg") {
       parser = new ExternalCharges;
    }
 
-/*
-   if (extension == "fchk") {
+   if (extension == "fchk" || extension == "fck" || extension == "fch") {
+      QLOG_DEBUG() << "Using FormattedCheckpoint parser";
       parser = new FormattedCheckpoint;
    }
 
-   // Only if we do not have a custom parser do we let Open Babel have a craic.
-   if (dataBank.isEmpty() && obSupported(extension)) {
+   if (extension == "ply" || extension == "obj" || 
+       extension == "stl" || extension == "off" ) {
+      QLOG_DEBUG() << "Using Mesh parser";
+      parser = new Mesh;
+   }
+   
+   if (!parser && OpenBabel::formatSupported(extension)) {
+      // Only if we do not have a custom parser do we let Open Babel at it
+      QLOG_DEBUG() << "Using OpenBabel parser";
       parser = new OpenBabel;
    }
-*/
 
-   if (parser) {
-      runParser(parser, filePath);
-      delete parser;
+   if (!parser) {
+      QLOG_WARN() << "Failed to find parser for file:" << filePath << extension;
+      return false;
    }
 
-   return true;
+   runParser(parser, filePath);
+   delete parser;
+   return m_errorList.isEmpty();
 }
 
 
 void ParseFile::runParser(Base* parser, QString const& filePath)
 {
-   Data::Bank& bank(parser->parseFile(filePath));
-   m_dataBank->merge(&bank);
-   QStringList errors(parser->errors());
-
-   if (!errors.isEmpty()) {
+   if (parser->parseFile(filePath)) {
+      QLOG_INFO() << "File parsed successfully: " << filePath;
+      Data::Bank& bank(parser->data());
+      m_dataBank.merge(bank);
+   }else {
+      QStringList errors(parser->errors());
       QFileInfo info(filePath);
       QString msg("Error parsing file: ");
       msg += info.fileName();
       m_errorList.append(msg);
       m_errorList << errors;
    }
-}
-
-
-bool ParseFile::obSupported(QString const& extension)
-{
-   // Check out extension list has been initialized.
-   if (s_obFormats.isEmpty()) {
-      std::vector<std::string> formats;
-      if (::OpenBabel::OBPlugin::ListAsVector("formats", 0, formats)) {
-          std::vector<std::string>::iterator iter;
-          for (iter = formats.begin(); iter != formats.end(); ++iter) {
-              QString fmt(QString::fromStdString(*iter));
-              fmt = fmt.split(QRegExp("\\s+"), QString::SkipEmptyParts).first();
-              s_obFormats.append(fmt.toLower());
-          }
-      }
-   }
-
-   return s_obFormats.contains(extension);
 }
 
 } } // end namespace IQmol::Parser

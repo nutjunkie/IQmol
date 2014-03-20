@@ -1,0 +1,19 @@
+These files all cause problems in the Parser module, or are not handled correctly.
+
+ - Alanine-path.pdb  
+   File is read by the OpenBabel parser, but only a single geometry is
+   displayed.  Need to probe Open Babel for multiple conformers.
+
+  - AcetyleneOpt.gam
+	Geometries are displayed and can be animated, but energies are not
+    displayed.
+
+  - AceticAcid_g98.log
+    Geometries and Frequencies are loaded, but energies are not.
+
+  - 3UT3.pdb
+    Bus error encountered in OpenBabel::expandKekulize()
+
+  - cube1.off
+	Mesh file read.  File is parsed and displayed, but attempts to decimate the
+    mesh or draw the vertex/face normals causes a crash in the OpenMesh library.

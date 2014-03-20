@@ -50,7 +50,7 @@ void RemSection::dump() const
 {
    QMap<QString, QString>::const_iterator iter;
    for (iter = m_rem.begin(); iter != m_rem.end(); ++iter) {
-       qDebug() << iter.key() << " = " << iter.value();
+       qDebug() << "  " << iter.key() << " = " << iter.value();
    }
 }
 

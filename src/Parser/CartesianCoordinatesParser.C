@@ -28,20 +28,20 @@
 #include <QDebug>
 
 namespace IQmol {
-namespace Parser2 {
+namespace Parser {
 
 Data::Geometry* CartesianCoordinates::parse(TextStream& textStream)
 {
-   int cnt(0);
-   QStringList tokens;
    Data::Geometry* geometry(new Data::Geometry);
    // Initialize these in case the parser is used more than once.
    m_error.clear();
 
    double x, y, z;
-   int a, offset(0);
+   int offset(0), cnt(0);
+   unsigned a;
+   QStringList tokens;
 
-   while (!textStream.atEnd() && cnt <= m_max) {
+   while (!textStream.atEnd() && cnt < m_max) {
       tokens = textStream.nextNonEmptyLineAsTokens();
       bool allOk(tokens.size() >= 4), ok;
 
@@ -56,9 +56,9 @@ Data::Geometry* CartesianCoordinates::parse(TextStream& textStream)
 
       if (allOk) {
          // Make sure we can get a valid atomic number
-         a = tokens[0+offset].toInt(&ok);
+         a = tokens[0+offset].toUInt(&ok);
          if (!ok) a = Data::Atom::atomicNumber(tokens[0+offset]);
-         if (a < 0) allOk = false;   
+         if (a == 0) allOk = false;   
       }
 
       if (allOk) {

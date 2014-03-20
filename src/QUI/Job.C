@@ -14,7 +14,6 @@
 #include "MoleculeSection.h"
 #include "ExternalChargesSection.h"
 
-#include <QtDebug>  //tmp
 
 namespace Qui {
 
@@ -51,9 +50,9 @@ Job::~Job() {
 
 
 void Job::destroy() {
-   std::map<QString,KeywordSection*>::iterator iter;
+   QMap<QString,KeywordSection*>::iterator iter;
    for (iter = m_sections.begin(); iter != m_sections.end(); ++iter) {
-       delete iter->second;
+       delete iter.value();
    }
    m_sections.clear();
 }
@@ -63,13 +62,13 @@ void Job::destroy() {
 void Job::copy(Job const& that) {
    destroy();
 
-   std::map<QString,KeywordSection*>::const_iterator iter;
+   QMap<QString,KeywordSection*>::const_iterator iter;
    for (iter = that.m_sections.begin(); iter != that.m_sections.end(); ++iter) {
-       addSection(iter->second->clone());
+       addSection(iter.value()->clone());
    }
 
    // Make sure we have the necessary sections.
-   std::map<QString,KeywordSection*>::iterator iter2;
+   QMap<QString,KeywordSection*>::iterator iter2;
 
    iter2 = m_sections.find("rem");
    if (iter2 == m_sections.end()) addSection(new RemSection());
@@ -87,14 +86,14 @@ void Job::copy(Job const& that) {
 //! the same name
 void Job::addSection(KeywordSection* section) {
    QString name(section->name());
-   std::map<QString,KeywordSection*>::iterator iter(m_sections.find(name));
+   QMap<QString,KeywordSection*>::iterator iter(m_sections.find(name));
 
    if (iter != m_sections.end()) {
-      delete iter->second;
+      delete iter.value();
       m_sections.erase(iter);
    }
 
-   m_sections.insert(std::make_pair(name,section));
+   m_sections.insert(name, section);
 
    if (name == "rem") {
       m_remSection = dynamic_cast<RemSection*>(section);
@@ -104,7 +103,8 @@ void Job::addSection(KeywordSection* section) {
 }
  
 
-StringMap Job::getOptions()  {
+StringMap Job::getOptions()  
+{
    StringMap opts;
    if (m_remSection) opts = m_remSection->getOptions();
    return opts;
@@ -191,10 +191,23 @@ QString Job::getComment() {
 }
 
 
+void Job::setComment(QString const& s) 
+{
+   GenericSection* comment = dynamic_cast<GenericSection*>(getSection("comment"));
+   if (comment) {
+      comment->read(s);
+   }else {
+      addSection("comment", s);
+   }
+   setOption("QUI_TITLE", s);
+}
+
+
+
 //! Note that this function return a null pointer if no KeywordSection of the
 //! given name exists.
 KeywordSection* Job::getSection(QString const& name) {
-   std::map<QString,KeywordSection*>::iterator iter(m_sections.find(name));
+   QMap<QString,KeywordSection*>::iterator iter(m_sections.find(name));
    if (iter != m_sections.end()) {
       return m_sections[name];
    }else {
@@ -233,36 +246,37 @@ void Job::printSection(QString const& name, bool doPrint) {
 }
 
 
-QString Job::format(bool const preview) {
-   std::map<QString,KeywordSection*>::iterator iter, 
+QString Job::format(bool const preview) 
+{
+   QMap<QString,KeywordSection*>::iterator iter, 
       begin(m_sections.begin()), end(m_sections.end());
 
    QString s, name;
 
    iter = m_sections.find("comment");
-   if (iter != end) s += iter->second->format() + "\n";
+   if (iter != end) s += iter.value()->format() + "\n";
    iter = m_sections.find("molecule");
-   if (iter != end) s += iter->second->format() + "\n";
+   if (iter != end) s += iter.value()->format() + "\n";
    iter = m_sections.find("rem");
-   if (iter != end) s += iter->second->format() + "\n";
+   if (iter != end) s += iter.value()->format() + "\n";
 
 
    iter = m_sections.find("external_charges");
    if (iter != end) {
       if (preview) {
          ExternalChargesSection* x;
-         x = dynamic_cast<ExternalChargesSection*>(iter->second);
+         x = dynamic_cast<ExternalChargesSection*>(iter.value());
          s += x->previewFormat() + "\n";
       }else {
-         s += iter->second->format() + "\n";
+         s += iter.value()->format() + "\n";
       }
    }
 
    for (iter = begin; iter != end; ++iter) {
-	   name = iter->first;
+	   name = iter.key();
 	   if (name != "comment" && name != "molecule" && 
            name != "rem"     && name != "external_charges") {
-           s += iter->second->format();
+           s += iter.value()->format();
 	   }
    }
 
