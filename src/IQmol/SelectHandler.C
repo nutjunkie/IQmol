@@ -49,7 +49,7 @@ void Select::mouseReleaseEvent(QMouseEvent* e)
    m_viewer->setSelectRegionHeight(m_rectangle.height());
 
    // Movement of less than 3 pixels is considered a click
-   bool click((m_rectangle.width() < 3) && (m_rectangle.width() < 3));
+   bool click((m_rectangle.width() < 3) && (m_rectangle.height() < 3));
 
    if (e->button() == Qt::LeftButton) {
       if (click) {
