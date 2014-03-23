@@ -25,8 +25,6 @@
 #include "MoleculeLayer.h"
 #include "Numerical.h"
 
-#include <QDebug>
-
 
 using namespace qglviewer;
 
@@ -255,7 +253,6 @@ void Info::setDipole(qglviewer::Vec const& value, bool const estimated)
 
 void Info::setDipoleValid(bool tf)
 {
-qDebug() << "Setting dipole valid to" << tf;
    QList<Dipole*> list(findLayers<Dipole>(Children));
    if (!list.isEmpty()) {
       Dipole* dipole(list.first());
@@ -267,7 +264,6 @@ qDebug() << "Setting dipole valid to" << tf;
 
 void Info::setPointGroup(QString const& pointGroup) 
 { 
-qDebug() << "Layer::Info point group set to" << pointGroup;
    m_pointGroup = pointGroup;
    updated();
 }

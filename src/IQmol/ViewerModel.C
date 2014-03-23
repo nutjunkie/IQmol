@@ -129,7 +129,11 @@ bool ViewerModel::dropMimeData(QMimeData const* data, Qt::DropAction, int, int,
 
 void ViewerModel::open(QString const& filePath)
 {
-   ParseJobFiles* parser = new ParseJobFiles(filePath);
+   QString path(filePath);
+   while (path.endsWith("/")) {
+       path.chop(1);
+   }
+   ParseJobFiles* parser = new ParseJobFiles(path);
    connect(parser, SIGNAL(finished()), this, SLOT(fileOpenFinished()));
    parser->start();
 }
@@ -775,7 +779,7 @@ void ViewerModel::checkItemChanged(QStandardItem* item)
             QList<Layer::Base*> children(base->findLayers<Layer::Base>(Layer::Children));
             QList<Layer::Base*>::iterator child;
             for (child = children.begin(); child != children.end(); ++child) {
-                (*child)->closeConfigurator();
+                if (*child) (*child)->closeConfigurator();
             }
          }     
       }

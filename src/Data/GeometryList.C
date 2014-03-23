@@ -32,11 +32,13 @@ template<> const Type::ID Data::List<Data::Geometry>::TypeID = Type::GeometryLis
 
 void GeometryList::setDefaultIndex(int index) 
 { 
+qDebug() << "Setting default index in GeometryList" << index;
    if (index < 0) {
       m_defaultIndex = size()-1;
    }else if (index < size()) {
       m_defaultIndex = index; 
    }
+qDebug() << "  index now" << m_defaultIndex;
 }
 
 

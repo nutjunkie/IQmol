@@ -123,7 +123,7 @@ QString QueryCommand()
    args << "/v" << "/fo list" << "/fi " + spid << "/fi " + sname;
    cmd = tasklist.filePath() + " " + args.join(" ");
 #else
-   cmd = "/bin/ps xc -o command=,pid=,time= ${JOB_ID}";
+   cmd = "/bin/ps xc -S -o command=,pid=,time= ${JOB_ID}";
 #endif
    return cmd;
 }
@@ -209,12 +209,15 @@ unsigned int ExecutablePid(QString const& processName, QProcess const& parent)
           qDebug() << "Found child process" << processName << "on PID" << *iter;
           for (jter = ancestry.begin(); jter != ancestry.end(); ++jter) {
               if (*jter == qpid) {
-                 qDebug() << "  ->" << *jter <<"*";
+                 qDebug() << "  ->" << *jter << "* (QProcess)";
               }else {
                  qDebug() << "  ->" << *jter;
               }
           }
           
+		  // return the PID for the spawning script in case there are multiple
+		  // jobs in the input file
+          if (ancestry.size() > 1) return ancestry[1];
           return *iter;
        }
    }
@@ -295,7 +298,7 @@ QList<unsigned int> GetParentProcessChain(unsigned int const pid)
           parent = tokens[1].toUInt(&isUInt1);
           if (isUInt0 && isUInt1) {
              psMap[child] = parent;
-          }else {
+          }else if (tokens[0].toLower() == "pid") {
              qDebug() << "Bad PID in GetParentProcessChain:" 
                        << tokens[0] << tokens[1];
           }

@@ -169,11 +169,19 @@ qDebug() << "Reading Hessian information";
 
    }
 
-   m_dataBank.append(geometryList);
+   if (geometryList) {
+      if (geometryList->isEmpty()) {
+         delete geometryList;
+      }else {
+         geometryList->setDefaultIndex(-1);
+         m_dataBank.append(geometryList);
+      }
+   }
+   
    return m_errors.isEmpty();
  
    error:
-      QString msg("Error parsing checkpoint data aournd line number ");
+      QString msg("Error parsing checkpoint data around line number ");
       msg += QString::number(textStream.lineNumber());
       m_errors.append(msg);
 

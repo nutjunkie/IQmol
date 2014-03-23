@@ -125,9 +125,8 @@ void BasicServer::runQueue()
    }
    int running(m_server->watchedWithStatus(Process::Running));
 
-   qDebug() << "runQueue() jobLimit:" << m_jobLimit;
-   qDebug() << "runQueue() queued:  " << m_queue.size();
-   qDebug() << "runQueue() running: " << running;
+   qDebug() << "BasicServer::runQueue() jobLimit/queued/running:" 
+            << m_jobLimit << m_queue.size() << running;
 
    while (!m_queue.isEmpty() && running < m_jobLimit) {
       Process* process(m_queue.dequeue());
@@ -175,7 +174,7 @@ ServerTask::Base* BasicServer::query(Process* process)
 
 Process::Status BasicServer::parseQueryString(QString const& query, Process* process)
 {
-//   qDebug() <<"BasicServer::parseQueryString handed" << query;
+   //qDebug() <<"BasicServer::parseQueryString handed" << query;
    QStringList lines(query.split(QRegExp("\\n"), QString::SkipEmptyParts));
    Process::Status status(Process::Unknown);
 
@@ -183,9 +182,10 @@ Process::Status BasicServer::parseQueryString(QString const& query, Process* pro
    id = " " + id + " ";
    QStringList::iterator line;
    for (line = lines.begin(); line != lines.end(); ++line) {
-       if ((*line).contains(m_server->executableName()) && (*line).contains(id)) {
+       if ((*line).contains(id)) {
+       //if ((*line).contains(m_server->executableName()) && (*line).contains(id)) {
           QString time((*line).split(QRegExp("\\s+"), QString::SkipEmptyParts).last());
-          process->resetTimer(Timer::toSeconds(time));
+          //process->resetTimer(Timer::toSeconds(time));
           status = Process::Running;
        }
    }

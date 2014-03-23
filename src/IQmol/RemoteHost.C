@@ -191,7 +191,9 @@ bool RemoteHost::getWorkingDirectoryFromUser(JobInfo* jobInfo)
    dirName = QInputDialog::getText(0, "IQmol", msg, QLineEdit::Normal, dirName, &okPushed);
    if (!okPushed || dirName.isEmpty()) return false;
 
-   if (dirName.endsWith("/")) dirName.remove(dirName.length()-1,1);
+   while (dirName.endsWith("/")) {
+      dirName.chop(1);
+   }
 
    QFileInfo info(dirName);
    jobInfo->set(JobInfo::RemoteWorkingDirectory, dirName);

@@ -291,9 +291,9 @@ void Setup::run()
 {
    // Check working directory
    JobInfo* jobInfo(m_process->jobInfo());
-qDebug() << "8888888888888888888888888888888888888888888";
-jobInfo->dump();
-qDebug() << "8888888888888888888888888888888888888888888";
+   //qDebug() << "8888888888888888888888888888888888888888888";
+   //jobInfo->dump();
+   //qDebug() << "8888888888888888888888888888888888888888888";
    QString dir(workingDirectory(jobInfo));
    HostDelegate::FileFlags flags;
 
@@ -307,7 +307,9 @@ qDebug() << "8888888888888888888888888888888888888888888";
          QDir qDir(dir);
          QFileInfo output(qDir, jobInfo->get(JobInfo::OutputFileName));
          QFileInfo fchk(qDir, jobInfo->get(JobInfo::AuxFileName));
+qDebug() << "ServerTask: removing output     file" << output.filePath();
          remove(output.filePath());
+qDebug() << "ServerTask: removing checkpoint file" << fchk.filePath();
          remove(fchk.filePath());
       }
    }else {
@@ -514,11 +516,11 @@ void BasicSubmit::runLocal()
    qprocess->start(submitCommand, args);
 
    qDebug() << "Parent QProcess has PID =" << qprocess->pid() << System::ProcessID(*qprocess);
-   // attempt to get the actual PID of the qchem.exe process, but we need to
+
+   // Attempt to get the actual PID of the qchem.exe process, but we need to
    // give the exe a chance to fire up.
    unsigned int pid(0);
-   for (int i = 0; i < 5; ++i) {
-       // wait a second for the job to start
+   for (int i = 0; i < 7; ++i) {
 #ifdef Q_WS_WIN
        Sleep(1000); 
 #else
@@ -528,9 +530,8 @@ void BasicSubmit::runLocal()
        qDebug() << "PID search returned" << pid;
        if (pid > 0) break;
    }
-   pid = qprocess->pid();
 
-   // Note that if the job has alread finsished (crashed) then the pid will be
+   // Note that if the job has already finsished (crashed) then the pid will be
    // set to 0.  The server will pick this up the next time it updates the
    // processes, won't find the pid=0 process and so will attempt a clean up.
    m_process->setId(QString::number(pid));

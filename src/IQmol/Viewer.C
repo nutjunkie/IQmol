@@ -883,7 +883,9 @@ void Viewer::dropEvent(QDropEvent* event)
    
    for (iter = urls.begin(); iter != urls.end(); ++iter) {
        QString filePath((*iter).path());
-       if (filePath.endsWith("/")) filePath.chop(1);
+       while (filePath.endsWith("/")) {
+          filePath.chop(1);
+       }
        openFileFromDrop(filePath);
    }
    event->acceptProposedAction();

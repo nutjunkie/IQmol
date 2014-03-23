@@ -114,7 +114,7 @@ namespace IQmol {
          JobInfo* m_jobInfo;
          Status   m_status;
          QString  m_submitTime;
-         QString  m_runTime;
+         unsigned m_runTime;
          Timer    m_timer;
          Status   m_preCopyStatus;
          int      m_copyProgress; // block count

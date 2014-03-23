@@ -30,9 +30,16 @@
 #include <cmath>
 
 
-
 namespace IQmol {
 namespace Layer {
+
+// Static Data
+GLint   Primitive::s_resolution            = 32;
+GLfloat Primitive::s_selectColor[]         = { 0.5f, 0.0f, 0.0f, 0.6f };
+GLfloat Primitive::s_selectOffset          = 0.08;
+GLfloat Primitive::s_selectOffsetWireFrame = 6.08;  // pixels
+
+
 
 PrimitiveList::PrimitiveList(IQmol::Data::Geometry const& geometry, bool includeBonds)
 {

@@ -40,13 +40,7 @@ using namespace OpenBabel;
 namespace IQmol {
 namespace Layer {
 
-
 // Static Data
-GLint   Primitive::s_resolution            = 32;
-GLfloat Primitive::s_selectColor[]         = { 0.4f, 0.0f, 0.0f, 0.5f };
-GLfloat Primitive::s_selectOffset          = 0.08;
-GLfloat Primitive::s_selectOffsetWireFrame = 6.08;  // pixels
-
 GLfloat Atom::s_radiusBallsAndSticks       = 0.40;
 GLfloat Atom::s_radiusWireFrame            = 0.50;  // pixels
 GLfloat Atom::s_radiusTubes                = 0.10;

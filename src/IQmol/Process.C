@@ -66,6 +66,7 @@ QVariant Process::serialize()
 {
    Status status = (m_status == Copying) ? m_preCopyStatus : m_status;
    QList<QVariant> list;
+   m_runTime = m_timer.time();
    list << m_jobInfo->serialize();  // 0
    list << (int)status;             // 1
    list << m_comment;               // 2
@@ -121,10 +122,10 @@ Process* Process::deserialize(QVariant const& qvariant)
    process->m_comment    = list[2].toString();
    process->m_id         = list[3].toString();
    process->m_submitTime = list[4].toString();
-   process->m_runTime    = list[5].toString();
+   process->m_runTime    = list[5].toUInt();
    process->m_status     = status;
 
-   process->m_timer.reset(Timer::toSeconds(process->m_runTime));
+   process->m_timer.reset(process->m_runTime);
 
    return process;
 }
@@ -133,7 +134,6 @@ Process* Process::deserialize(QVariant const& qvariant)
 void Process::resetTimer(int const seconds)
 { 
    m_timer.reset(seconds); 
-   m_runTime = m_timer.toString();
 }
 
 
@@ -142,7 +142,7 @@ QStringList Process::monitorItems() const
    QString status;
    QStringList items;
    items << name() << serverName() << m_submitTime;
-   items << (m_timer.isRunning() ? m_timer.toString() : m_runTime);
+   items <<  m_timer.toString();
    status = toString(m_status);
    if (m_status == Copying) {
       status += ": " + QString::number(int(100.0*m_copyProgress/m_copyTarget)) +"%";
@@ -185,20 +185,16 @@ void Process::setStatus(Status const status)
          break;
       case Suspended:
          m_timer.stop();
-         m_runTime = m_timer.toString();
          break;
       case Killed:
          m_timer.stop();
-         m_runTime.clear();
          break;
       case Error:
          m_timer.stop();
-         m_runTime = m_timer.toString();
          finished();
          break;
       case Finished:
          m_timer.stop();
-         m_runTime = m_timer.toString();
          finished();
          break;
       case Copying:
@@ -206,7 +202,6 @@ void Process::setStatus(Status const status)
          break;
       case Unknown:
          m_timer.stop();
-         m_runTime.clear();
          break;
    }
 
@@ -249,12 +244,16 @@ bool Process::getLocalSaveDirectory()
          msg += dir.dirName() + " exists, overwrite?";
 
          if (QMsgBox::question(0, "IQmol", msg,
-            QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) break;
+            QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+            break;
+         }
       }
    }
 
    QString dirPath(dir.path());
-   if (dirPath.endsWith("/")) dirPath.remove(dirPath.length()-1,1);
+   while (dirPath.endsWith("/")) { 
+      dirPath.chop(1);
+   }
    m_jobInfo->set(JobInfo::LocalWorkingDirectory, dirPath);
 
    QFileInfo info(dir, m_jobInfo->get(JobInfo::InputFileName));
@@ -305,7 +304,7 @@ void Process::setCopyActive(bool const tf)
 void Process::setCopyTarget(int kbBlocks)
 {
    m_copyTarget = kbBlocks;
-   qDebug() << "Setting copy target to"<< m_copyTarget << "blocks";
+   qDebug() << "Setting copy target to" << m_copyTarget << "blocks";
 }
 
 

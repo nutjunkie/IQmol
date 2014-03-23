@@ -85,7 +85,10 @@ bool LocalHost::getSaveDirectory(JobInfo* jobInfo)
    }
 
    QString dirPath(dir.path());
-   if (dirPath.endsWith("/")) dirPath.remove(dirPath.length()-1,1);
+   while (dirPath.endsWith("/")) {
+      dirPath.chop(1);
+   }
+
    jobInfo->set(JobInfo::LocalWorkingDirectory, dirPath);
 
    QFileInfo info(dir, jobInfo->get(JobInfo::InputFileName));

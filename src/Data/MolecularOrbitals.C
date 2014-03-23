@@ -138,7 +138,7 @@ void MolecularOrbitals::dump() const
    qDebug() << "Shell types:              " << types;
    qDebug() << "                          " << tally;
 
-   m_shellList.dump();
+   //m_shellList.dump();
 
    SurfaceList::const_iterator surface;
    for (surface = m_surfaceList.begin(); surface != m_surfaceList.end(); ++surface) {

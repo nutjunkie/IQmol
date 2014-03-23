@@ -37,13 +37,15 @@ namespace IQmol {
           ~Timer() { }
 
           bool isRunning() const { return m_running; }
+          void reset(unsigned const seconds);
+          unsigned time() const;
           QString toString() const;
-          void reset(int seconds);
 
 		  /// Takes a string formatted as hh:mm:ss or hh:mm:ss.xx 
           /// and returns the total number of seconds.  
-          /// Returns -1 if the format is incorrect
-          static int toSeconds(QString const&);
+          /// Returns 0 if the format is incorrect
+          static unsigned toSeconds(QString const&);
+          static QString formatTime(unsigned const seconds);
 
       public Q_SLOTS:
          void start();
@@ -54,13 +56,11 @@ namespace IQmol {
          void anotherDay();
 
       private:
-         QString formatTime(int const seconds) const;
-         int  m_seconds;
+         unsigned  m_seconds;
          bool m_running;
 
          QTime   m_timer;
          QTimer  m_dayTimer;
-         QString m_formattedTime;
    };
 
 } // end namespace IQmol
