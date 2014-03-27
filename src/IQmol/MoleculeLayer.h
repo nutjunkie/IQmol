@@ -126,7 +126,6 @@ namespace IQmol {
             /// of that kind does not exist already.
             void appendData(IQmol::Data::Bank&);
             void appendData(Layer::List&);
-            void removeData(Layer::List&);
    
             void appendSurface(Data::Surface*);
    
@@ -341,6 +340,10 @@ namespace IQmol {
             void calculateSuperposition(Data::SurfaceInfo const&, bool const doCharges = false);
    
             void calculateVanDerWaals(Data::SurfaceInfo const&, bool const solvent = false);
+
+            void deleteProperties();
+
+            void initProperties();
    
             QFileInfo m_inputFile;
    

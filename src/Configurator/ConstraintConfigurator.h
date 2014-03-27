@@ -1,5 +1,5 @@
-#ifndef IQMOL_CONSTRAINTCONFIGURATOR_H
-#define IQMOL_CONSTRAINTCONFIGURATOR_H
+#ifndef IQMOL_CONFIGURATOR_CONSTRAINT_H
+#define IQMOL_CONFIGURATOR_CONSTRAINT_H
 /*******************************************************************************
 
   Copyright (C) 2011-2013 Andrew Gilbert
@@ -41,14 +41,10 @@ namespace Configurator {
       Q_OBJECT
 
       public:
-         Constraint(Layer::Constraint* constraint) : m_constraint(constraint) { }
+         Constraint(Layer::Constraint& constraint) : m_constraint(constraint) { }
 
       protected:
-         Layer::Constraint* m_constraint;
-         QChar m_unit;
-         static int const s_precisionDistance = 3;
-         static int const s_precisionAngle    = 2;
-         static int const s_precisionTorsion  = 1;
+         Layer::Constraint& m_constraint;
    };
 
 
@@ -59,7 +55,7 @@ namespace Configurator {
       Q_OBJECT
 
       public:
-         VectorConstraint(Layer::Constraint* constraint);
+         VectorConstraint(Layer::Constraint& constraint);
 
       public Q_SLOTS:
          void init();
@@ -80,7 +76,7 @@ namespace Configurator {
       Q_OBJECT
 
       public:
-         ScalarConstraint(Layer::Constraint* constraint);
+         ScalarConstraint(Layer::Constraint& constraint);
 
       public Q_SLOTS:
          void init();

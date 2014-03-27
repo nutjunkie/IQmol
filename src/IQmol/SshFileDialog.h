@@ -1,3 +1,5 @@
+#ifndef IQMOL_SSHFILEDIALOG_H
+#define IQMOL_SSHFILEDIALOG_H
 /*******************************************************************************
          
   Copyright (C) 2011-2013 Andrew Gilbert
@@ -20,28 +22,28 @@
    
 ********************************************************************************/
 
-#include "SSHFileConfigurator.h"
-#include "Preferences.h"
+#include "ui_SshFileDialog.h"
 
 
 namespace IQmol {
 
-SSHFileConfigurator::SSHFileConfigurator(QWidget* parent) : QDialog(parent)
-{
-   m_dialog.setupUi(this);
-   m_dialog.knownHosts->setText(Preferences::SSHKnownHostsFile());
-   m_dialog.publicKey->setText(Preferences::SSHPublicIdentityFile());
-   m_dialog.privateKey->setText(Preferences::SSHPrivateIdentityFile());
-   connect(this, SIGNAL(accepted()), this, SLOT(updatePreferences()));
-}
+   /// A simple dialog that allows the user to customize the locations of the
+   /// SSH configuration files.
+   class SshFileDialog : public QDialog {
 
+      Q_OBJECT
 
-void SSHFileConfigurator::updatePreferences()
-{
-    Preferences::SSHKnownHostsFile(m_dialog.knownHosts->text());
-    Preferences::SSHPublicIdentityFile(m_dialog.publicKey->text());
-    Preferences::SSHPrivateIdentityFile(m_dialog.privateKey->text());
-}
+      public: 
+         SshFileDialog(QWidget* parent = 0);
 
+      private Q_SLOTS:
+         void updatePreferences();
+
+      private:
+         Ui::SshFileDialog m_dialog;
+   };
 
 } // end namespace IQmol
+
+
+#endif

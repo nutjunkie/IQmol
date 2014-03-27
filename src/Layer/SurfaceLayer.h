@@ -1,5 +1,5 @@
-#ifndef IQMOL_SURFACELAYER_H
-#define IQMOL_SURFACELAYER_H
+#ifndef IQMOL_LAYER_SURFACE_H
+#define IQMOL_LAYER_SURFACE_H
 /*******************************************************************************
          
   Copyright (C) 2011-2013 Andrew Gilbert

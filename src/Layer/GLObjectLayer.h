@@ -1,5 +1,5 @@
-#ifndef IQMOL_GLOBJECTLAYER_H
-#define IQMOL_GLOBJECTLAYER_H
+#ifndef IQMOL_LAYER_GLOBJECT_H
+#define IQMOL_LAYER_GLOBJECT_H
 /*******************************************************************************
 
   Copyright (C) 2011-2013 Andrew Gilbert

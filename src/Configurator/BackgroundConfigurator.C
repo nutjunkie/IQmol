@@ -30,9 +30,9 @@
 namespace IQmol {
 namespace Configurator {
 
-Background::Background(Layer::Background* background) : m_background(background), 
-   m_backgroundColor(m_background->m_backgroundColor),
-   m_foregroundColor(m_background->m_foregroundColor)
+Background::Background(Layer::Background& background) : m_background(background), 
+   m_backgroundColor(m_background.m_backgroundColor),
+   m_foregroundColor(m_background.m_foregroundColor)
 {
    m_backgroundConfigurator.setupUi(this);
    Util::SetButtonColor(*(m_backgroundConfigurator.backgroundColorButton), m_backgroundColor);
@@ -77,11 +77,11 @@ void Background::on_foregroundColorButton_clicked(bool)
 
 void Background::on_applyButton_clicked(bool)
 {
-   m_background->foregroundColorChanged(m_foregroundColor);
-   m_background->m_backgroundColor = m_backgroundColor;
-   m_background->m_foregroundColor = m_foregroundColor;
-   m_background->updated();
-   m_background->updated();  // Apply doesn't seem to take effect with one update.
+   m_background.foregroundColorChanged(m_foregroundColor);
+   m_background.m_backgroundColor = m_backgroundColor;
+   m_background.m_foregroundColor = m_foregroundColor;
+   m_background.updated();
+   m_background.updated();  // Apply doesn't seem to take effect with one update.
 }
 
 

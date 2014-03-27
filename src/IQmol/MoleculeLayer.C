@@ -20,7 +20,6 @@
    
 ********************************************************************************/
 
-//#include "Grid.h"
 #include "QsLog.h"
 #include "QMsgBox.h"
 #include "JobInfo.h"
@@ -47,6 +46,7 @@
 
 #include "GridEvaluator.h"
 #include "GridData.h"
+#include "AtomicProperty.h"
 #include "Geometry.h"
 #include "GeometryList.h"
 #include "MolecularOrbitals.h"
@@ -118,14 +118,10 @@ Molecule::Molecule(QObject* parent) : Base(DefaultMoleculeName, parent),
    // initialized unless an OBConversion is used first.  This is a
    // problem if I try to use a force field before converting anything.
    // The following gets around this.
-
-   //OBMol* mol(parseQChemMolecule("0 1\nH  0.00 0.00 0.00"));
-   //if (mol) delete mol;
    OBConversion conv;
    conv.SetInFormat("xyz");
-
-   m_properties << new RadialDistance() 
-                << new PointChargePotential("ESP (Charges)", this);
+ 
+   initProperties();
 
    // Add actions for the context menu
    connect(newAction("Configure"), SIGNAL(triggered()), 
@@ -147,10 +143,7 @@ Molecule::Molecule(QObject* parent) : Base(DefaultMoleculeName, parent),
 
 Molecule::~Molecule()
 {
-   QList<SpatialProperty*>::iterator iter;
-   for (iter = m_properties.begin(); iter != m_properties.end(); ++iter) {
-       delete (*iter);
-   }
+   deleteProperties();
 }
 
 
@@ -176,15 +169,8 @@ void Molecule::appendData(IQmol::Data::Bank& bank)
 }
 
 
-void Molecule::removeData(Layer::List&)
-{
-   qDebug() << "Layer::Molecule::removeData not implemented";
-}
-
-
 void Molecule::appendData(Layer::List& list)
 {
-
    // !!! This needs fixing !!!
    // This is a bit cheesy, we rely on the QStandardItem text 
    // to determine the type of Layer.  
@@ -215,7 +201,7 @@ void Molecule::appendData(Layer::List& list)
        if (text == "Cube Data") text = "cubedata";
        if (text == "Frequencies") text = "frequencies";
 
-qDebug() << "Adding data" << text;
+       qDebug() << "Adding data" << text;
        
        if ((files = qobject_cast<Files*>(*iter))) {
           FileList fileList(files->findLayers<File>(Children));
@@ -293,7 +279,6 @@ qDebug() << "Adding data" << text;
        if ( (cubeData = qobject_cast<CubeData*>(*iter)) ) {
           m_properties << cubeData->createProperty(); 
        }
-
    }
 
    appendPrimitives(primitiveList);
@@ -781,7 +766,7 @@ void Molecule::appendConstraint(Constraint* constraint)
        }
    }
 
-   m_constraintList.appendLayer(constraint);
+   if (constraint->optimizeConstraint()) m_constraintList.appendLayer(constraint);
 
    applyConstraint(constraint);
    connect(constraint, SIGNAL(updated()), this, SLOT(constraintUpdated()));
@@ -808,6 +793,8 @@ void Molecule::applyConstraint(Constraint* constraint)
 {
    Command::ApplyConstraint* cmd = new Command::ApplyConstraint(this, constraint);
 
+   QString msg = constraint->optimizeConstraint() ? "Apply" : "Set";
+
    switch (constraint->constraintType()) {
       case Constraint::Invalid:
          delete cmd;
@@ -815,21 +802,28 @@ void Molecule::applyConstraint(Constraint* constraint)
          break;
       case Constraint::Position:
          QLOG_TRACE() << "Applying position constraint";
+         msg += " position";
          applyPositionConstraint(constraint);
          break;
       case Constraint::Distance:
          QLOG_TRACE() << "Applying distance constraint";
+         msg += " bond";
          applyDistanceConstraint(constraint);
          break;
       case Constraint::Angle:
          QLOG_TRACE() << "Applying angle constraint";
+         msg += " angle";
          applyAngleConstraint(constraint);
          break;
       case Constraint::Torsion:
          QLOG_TRACE() << "Applying torsion constraint";
+         msg += " torsion";
          applyTorsionConstraint(constraint);
          break;
    }
+
+   if (constraint->optimizeConstraint()) msg += " constraint";
+   cmd->setText(msg);
 
    postCommand(cmd);
    postMessage(constraint->message());
@@ -1326,6 +1320,9 @@ void Molecule::setGeometry(IQmol::Data::Geometry& geometry)
 
    for (unsigned i = 0; i < nAtoms; ++i) {
        atoms[i]->setTranslation(geometry.position(i));
+       Data::MullikenCharge& charge(geometry.getAtomicProperty<Data::MullikenCharge>(i));
+qDebug() << "Setting charge on atom" << i<< "to"<< charge.value();
+       atoms[i]->setCharge(charge.value());
    }
 
    centerOfNuclearChargeAvailable(centerOfNuclearCharge());
@@ -1337,6 +1334,32 @@ void Molecule::setGeometry(IQmol::Data::Geometry& geometry)
    }else {
       bool estimated(true);
       dipoleAvailable(dipoleFromPointCharges(), estimated);
+   }
+
+   initProperties();
+
+   if (geometry.hasProperty<Data::MultipoleExpansionList>()) {
+      Data::MultipoleExpansionList& dma(geometry.getProperty<Data::MultipoleExpansionList>());
+      if (!dma.isEmpty()) {
+         int maxOrder(dma.first()->order());
+         MultipolePotential* dmaEsp;
+         if (maxOrder >= 0) {
+               dmaEsp = new MultipolePotential("ESP (DMA, charges)", 0, dma);
+               m_properties << dmaEsp;
+         }
+         if (maxOrder >= 1) {
+               dmaEsp = new MultipolePotential("ESP (DMA, dipoles)", 1, dma);
+               m_properties << dmaEsp;
+         }
+         if (maxOrder >= 2) {
+               dmaEsp = new MultipolePotential("ESP (DMA, quadrupoles)", 2, dma);
+               m_properties << dmaEsp;
+         }
+         if (maxOrder >= 3) {
+               dmaEsp = new MultipolePotential("ESP (DMA, octopoles)", 3, dma);
+               m_properties << dmaEsp;
+         }
+      }
    }
 }
 
@@ -2029,8 +2052,6 @@ void Molecule::updateChargeScale(double const scale)
 }
 
 
-
-
 int Molecule::totalCharge() const
 {
    return m_info.getCharge();
@@ -2040,6 +2061,30 @@ int Molecule::totalCharge() const
 int Molecule::multiplicity() const
 {
    return m_info.getMultiplicity();
+}
+
+
+void Molecule::deleteProperties()
+{
+   QList<SpatialProperty*>::iterator iter;
+   for (iter = m_properties.begin(); iter != m_properties.end(); ++iter) {
+       delete (*iter);
+   }
+   m_properties.clear();
+}
+
+
+void Molecule::initProperties()
+{
+   deleteProperties();
+   m_properties << new RadialDistance() 
+                << new PointChargePotential("ESP (Charges)", this);
+
+   QList<CubeData*> cubeFiles(findLayers<CubeData>(Children));
+   QList<CubeData*>::iterator iter;
+   for (iter = cubeFiles.begin(); iter != cubeFiles.end(); ++iter) {
+       m_properties << (*iter)->createProperty();
+   }
 }
 
 

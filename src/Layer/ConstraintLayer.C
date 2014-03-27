@@ -22,6 +22,7 @@
 
 #include "ConstraintConfigurator.h"
 #include "ConstraintLayer.h"
+#include "Constraint.h"
 #include "GLShape.h"
 
 
@@ -36,19 +37,50 @@ GLfloat const Constraint::s_tubeResolution = 0.02;
 GLfloat const Constraint::s_satisfiedColor[]   = { 0.0, 0.8, 0.0, s_alpha };
 GLfloat const Constraint::s_unsatisfiedColor[] = { 0.8, 0.0, 0.0, s_alpha };
 
-Constraint::Constraint() : m_configurator(0), m_axes(0)
+
+/* deprecate - not used
+Constraint::Constraint() : m_optimizeConstraint(false), m_configurator(0), m_axes(0)
 { 
    setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
    setCheckState(Qt::Checked);
 }
+*/
 
 
-Constraint::Constraint(AtomList const& atoms) : m_atoms(atoms), m_configurator(0),
-   m_axes(0)
+Constraint::Constraint(AtomList const& atoms) : m_atoms(atoms), m_optimizeConstraint(false), 
+   m_configurator(0),  m_axes(0)
 { 
    setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
    setCheckState(Qt::Checked);
    setAtomList(atoms);
+}
+
+
+Constraint::Constraint(Data::PositionConstraint const& constraint) : 
+   m_optimizeConstraint(true), m_configurator(0),  m_axes(0)
+{
+   //m_targetPosition = constraint.position();
+}
+
+
+Constraint::Constraint(Data::DistanceConstraint const& constraint) : 
+   m_optimizeConstraint(true), m_configurator(0),  m_axes(0)
+{
+   //m_targetValue = constraint.value();
+}
+
+
+Constraint::Constraint(Data::AngleConstraint const& constraint) : 
+   m_optimizeConstraint(true), m_configurator(0),  m_axes(0)
+{
+   //m_targetValue = constraint.value();
+}
+
+
+Constraint::Constraint(Data::TorsionConstraint const& constraint) : 
+   m_optimizeConstraint(true), m_configurator(0),  m_axes(0)
+{
+   //m_targetValue = constraint.value();
 }
 
 
@@ -61,22 +93,22 @@ void Constraint::setAtomList(AtomList const& atoms)
    switch (m_atoms.size()) {
       case 1:
          m_type = Position; 
-         m_configurator = new Configurator::VectorConstraint(this);
+         m_configurator = new Configurator::VectorConstraint(*this);
          setText("Atom Position");
          break;
       case 2:
          m_type = Distance; 
-         m_configurator = new Configurator::ScalarConstraint(this);
+         m_configurator = new Configurator::ScalarConstraint(*this);
          setText("Bond Distance");
          break;
       case 3:
          m_type = Angle; 
-         m_configurator = new Configurator::ScalarConstraint(this);
+         m_configurator = new Configurator::ScalarConstraint(*this);
          setText("Angle");
          break;
       case 4:
          m_type = Torsion; 
-         m_configurator = new Configurator::ScalarConstraint(this);
+         m_configurator = new Configurator::ScalarConstraint(*this);
          setText("Torsion");
          break;
       default:

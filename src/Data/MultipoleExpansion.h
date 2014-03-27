@@ -72,7 +72,6 @@ namespace Data {
             return MultipoleExpansion(*this) += that;
          }
 
-
          void serialize(InputArchive& ar, unsigned int const version = 0) {
             privateSerialize(ar, version);
          }

@@ -42,7 +42,7 @@ namespace Configurator {
       Q_OBJECT
 
       public:
-         explicit Background(Layer::Background* background);
+         explicit Background(Layer::Background& background);
 
       private Q_SLOTS:
          void on_backgroundColorButton_clicked(bool);
@@ -52,7 +52,7 @@ namespace Configurator {
 
       private:
          Ui::BackgroundConfigurator m_backgroundConfigurator;
-         Layer::Background* m_background;
+         Layer::Background& m_background;
          QColor m_backgroundColor;
          QColor m_foregroundColor;
    };

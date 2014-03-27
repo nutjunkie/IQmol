@@ -26,6 +26,7 @@
 #include "AtomicProperty.h"
 #include "Bank.h"
 #include "ChargeMultiplicity.h"
+#include "Constraint.h"
 #include "DipoleMoment.h"
 #include "EfpFragment.h"
 #include "Energy.h"
@@ -119,6 +120,11 @@ Base* Factory::create(Type::ID const id)
 
       case Type::MultipoleExpansion:      data = new MultipoleExpansion();      break;
       case Type::MultipoleExpansionList:  data = new MultipoleExpansionList();  break;
+
+      case Type::PositionConstraint:      data = new PositionConstraint();      break;
+      case Type::DistanceConstraint:      data = new DistanceConstraint();      break;
+      case Type::AngleConstraint:         data = new AngleConstraint();         break;
+      case Type::TorsionConstraint:       data = new TorsionConstraint();       break;
 
       // ---------- Molecular Properties ---------
       case Type::ChargeMultiplicity:      data = new ChargeMultiplicity();      break;

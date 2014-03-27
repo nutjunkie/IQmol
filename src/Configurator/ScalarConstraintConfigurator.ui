@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>300</width>
-    <height>122</height>
+    <width>348</width>
+    <height>130</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Constraint Value</string>
+   <string>Set Value</string>
   </property>
   <property name="toolTip">
    <string/>
@@ -22,18 +22,7 @@
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Distance between atom 1 and 2: 0.000</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Constrain to:</string>
+        <string>Set distance between atom 1 and 2: </string>
        </property>
       </widget>
      </item>
@@ -47,6 +36,17 @@
        </property>
        <property name="singleStep">
         <double>0.010000000000000</double>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QCheckBox" name="constrainCheckBox">
+       <property name="text">
+        <string>Constrain</string>
        </property>
       </widget>
      </item>
@@ -90,7 +90,7 @@
      <item>
       <widget class="QPushButton" name="applyButton">
        <property name="text">
-        <string>Apply</string>
+        <string>Set</string>
        </property>
        <property name="default">
         <bool>true</bool>

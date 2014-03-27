@@ -1,5 +1,5 @@
-#ifndef IQMOL_INFOLAYER_H
-#define IQMOL_INFOLAYER_H
+#ifndef IQMOL_LAYER_INFO_H
+#define IQMOL_LAYER_INFO_H
 /*******************************************************************************
        
   Copyright (C) 2011-2013 Andrew Gilbert

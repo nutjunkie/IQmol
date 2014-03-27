@@ -9,6 +9,7 @@ SOURCES = \
    $$PWD/AtomicProperty.C \
    $$PWD/Bank.C \
    $$PWD/ChargeMultiplicity.C \
+   $$PWD/Constraint.C \
    $$PWD/Data.C \
    $$PWD/DataFactory.C \
    $$PWD/EfpFragment.C \
@@ -36,7 +37,8 @@ HEADERS = \
    $$PWD/Atom.h \
    $$PWD/AtomicProperty.h \
    $$PWD/Bank.h \
-   $$PWD/ChargeMultiplicity.C \
+   $$PWD/ChargeMultiplicity.h \
+   $$PWD/Constraint.h \
    $$PWD/Data.h \
    $$PWD/DataFactory.h \
    $$PWD/DataList.h \

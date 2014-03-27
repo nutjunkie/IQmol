@@ -29,7 +29,7 @@
 namespace IQmol {
 namespace Configurator {
 
-AxesMesh::AxesMesh(Layer::AxesMesh* mesh) : m_mesh(mesh)
+AxesMesh::AxesMesh(Layer::AxesMesh& mesh) : m_mesh(mesh)
 {
    m_meshConfigurator.setupUi(this);
 }
@@ -37,73 +37,73 @@ AxesMesh::AxesMesh(Layer::AxesMesh* mesh) : m_mesh(mesh)
 
 void AxesMesh::sync()
 {
-   m_meshConfigurator.xyCheckBox->setChecked (m_mesh->m_xy);
-   m_meshConfigurator.xzCheckBox->setChecked (m_mesh->m_xz);
-   m_meshConfigurator.yzCheckBox->setChecked (m_mesh->m_yz);
-   m_meshConfigurator.polarButton->setChecked(m_mesh->m_polar);
-   m_meshConfigurator.stepButton->setChecked (m_mesh->m_useStepSize);
-   m_meshConfigurator.ticksSpinBox->setValue (m_mesh->m_ticks);
-   m_meshConfigurator.stepSpinBox->setValue  (m_mesh->m_stepSize);
+   m_meshConfigurator.xyCheckBox->setChecked (m_mesh.m_xy);
+   m_meshConfigurator.xzCheckBox->setChecked (m_mesh.m_xz);
+   m_meshConfigurator.yzCheckBox->setChecked (m_mesh.m_yz);
+   m_meshConfigurator.polarButton->setChecked(m_mesh.m_polar);
+   m_meshConfigurator.stepButton->setChecked (m_mesh.m_useStepSize);
+   m_meshConfigurator.ticksSpinBox->setValue (m_mesh.m_ticks);
+   m_meshConfigurator.stepSpinBox->setValue  (m_mesh.m_stepSize);
 }
 
 
 void AxesMesh::on_xyCheckBox_clicked(bool tf) 
 { 
-   m_mesh->m_xy = tf; 
-   m_mesh->updated();
+   m_mesh.m_xy = tf; 
+   m_mesh.updated();
 }
 
 
 void AxesMesh::on_xzCheckBox_clicked(bool tf) 
 {
-   m_mesh->m_xz = tf; 
-   m_mesh->updated();
+   m_mesh.m_xz = tf; 
+   m_mesh.updated();
 }
 
 
 void AxesMesh::on_yzCheckBox_clicked(bool tf) 
 {
-   m_mesh->m_yz = tf; 
-   m_mesh->updated();
+   m_mesh.m_yz = tf; 
+   m_mesh.updated();
 }
 
 
 void AxesMesh::on_ticksSpinBox_valueChanged(int value)
 {
-   m_mesh->m_ticks = value;
-   m_mesh->updated();
+   m_mesh.m_ticks = value;
+   m_mesh.updated();
 }
 
 
 void AxesMesh::on_stepSpinBox_valueChanged(double value)
 {
-   m_mesh->m_stepSize = value;
-   m_mesh->updated();
+   m_mesh.m_stepSize = value;
+   m_mesh.updated();
 }
 
 
 void AxesMesh::on_polarButton_clicked(bool tf)
 {
-   m_mesh->m_polar = tf;
-   m_mesh->updated();
+   m_mesh.m_polar = tf;
+   m_mesh.updated();
 }
 
 void AxesMesh::on_cartesianButton_clicked(bool tf)
 {
-   m_mesh->m_polar = !tf;
-   m_mesh->updated();
+   m_mesh.m_polar = !tf;
+   m_mesh.updated();
 }
 
 void AxesMesh::on_totalButton_clicked(bool tf)
 {
-   m_mesh->m_useStepSize = !tf;
-   m_mesh->updated();
+   m_mesh.m_useStepSize = !tf;
+   m_mesh.updated();
 }
 
 void AxesMesh::on_stepButton_clicked(bool tf)
 {
-   m_mesh->m_useStepSize = tf;
-   m_mesh->updated();
+   m_mesh.m_useStepSize = tf;
+   m_mesh.updated();
 }
 
 } } // end namespace IQmol::Layer

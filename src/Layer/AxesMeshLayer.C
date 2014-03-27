@@ -31,7 +31,7 @@ namespace IQmol {
 namespace Layer {
 
 
-AxesMesh::AxesMesh() : Global("Mesh"), m_configurator(this)
+AxesMesh::AxesMesh() : Global("Mesh"), m_configurator(*this)
 {
    init();
    setConfigurator(&m_configurator);

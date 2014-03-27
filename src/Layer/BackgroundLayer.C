@@ -29,8 +29,7 @@ namespace IQmol {
 namespace Layer {
 
 Background::Background() : m_backgroundColor(Preferences::BackgroundColor()), 
-   m_foregroundColor(Preferences::ForegroundColor()), m_configurator(this) 
-   
+   m_foregroundColor(Preferences::ForegroundColor()), m_configurator(*this) 
 { 
    setText("Background");
    setCheckState(Qt::Checked);

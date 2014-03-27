@@ -1,5 +1,5 @@
-#ifndef IQMOL_CONTAINERLAYER_H
-#define IQMOL_CONTAINERLAYER_H
+#ifndef IQMOL_AXESMESHCONFIGURATOR_H
+#define IQMOL_AXESMESHCONFIGURATOR_H
 /*******************************************************************************
 
   Copyright (C) 2011-2013 Andrew Gilbert
@@ -22,27 +22,43 @@
 
 ********************************************************************************/
 
-#include "Layer.h"
+#include "Configurator.h"
+#include "ui_AxesMeshConfigurator.h"
 
 
 namespace IQmol {
-namespace Layer {
 
-   /// Template Layer that holds a list of other Layers of a single type. 
-   /// Container Layers are unattached when empty, and automatically attach
-   /// themselves to the persistent parent when children are added. 
-   class Container : public Base {
+namespace Layer {
+   class AxesMesh;
+}
+
+namespace Configurator {
+
+   /// Dialog that allows the user to change the appearance of the mesh.
+   class AxesMesh : public Base {
 
       Q_OBJECT
 
       public:
-		 Container(Layer::Base* parent, QString const& label) : Base(label) {
-            setPersistentParent(parent);
-            setProperty(RemoveWhenChildless);
-         }
+         explicit AxesMesh(Layer::AxesMesh& mesh);
+         void sync();
+
+      private Q_SLOTS:
+         void on_xyCheckBox_clicked(bool);
+         void on_xzCheckBox_clicked(bool);
+         void on_yzCheckBox_clicked(bool);
+         void on_ticksSpinBox_valueChanged(int);
+         void on_stepSpinBox_valueChanged(double);
+         void on_polarButton_clicked(bool);
+         void on_cartesianButton_clicked(bool);
+         void on_totalButton_clicked(bool);
+         void on_stepButton_clicked(bool);
+   
+      private:
+         Ui::AxesMeshConfigurator m_meshConfigurator;
+         Layer::AxesMesh& m_mesh;
    };
 
-
-} } // end namespace IQmol::Layer
+} } // end namespace IQmol::Configurator
 
 #endif

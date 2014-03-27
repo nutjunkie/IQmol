@@ -119,13 +119,11 @@ namespace IQmol {
 
       public:
          MultipolePotential(QString const& type, int const order, 
-            Data::MultipoleExpansionList* siteList);
-
-         ~MultipolePotential();
+            Data::MultipoleExpansionList const& siteList);
 
       private:
          int m_order;
-         Data::MultipoleExpansionList* m_siteList;
+         Data::MultipoleExpansionList const& m_siteList;
          double potential(double const x, double const y, double const z) const;
    };
 

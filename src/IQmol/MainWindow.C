@@ -594,7 +594,7 @@ void MainWindow::createMenus()
 
       menu->addSeparator();
 
-      name = "Set Constraint";
+      name = "Set Geometric Constraint";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), &m_viewerModel, SLOT(setConstraint()));
       action->setShortcut(Qt::CTRL + Qt::Key_K);

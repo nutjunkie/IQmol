@@ -1,5 +1,5 @@
-#ifndef IQMOL_CONSTRAINTLAYER_H
-#define IQMOL_CONSTRAINTLAYER_H
+#ifndef IQMOL_LAYER_CONSTRAINT_H
+#define IQMOL_LAYER_CONSTRAINT_H
 /*******************************************************************************
 
   Copyright (C) 2011-2013 Andrew Gilbert
@@ -33,6 +33,13 @@ class QFontMetrics;
 
 namespace IQmol {
 
+namespace Data {
+   class PositionConstraint;
+   class DistanceConstraint;
+   class AngleConstraint;
+   class TorsionConstraint;
+}
+
 namespace Configurator {
    class Constraint;
    class ScalarConstraint;
@@ -56,9 +63,17 @@ namespace Layer {
          enum Type { Invalid, Position, Distance, Angle, Torsion };
 
 		 /// The type of constraint is determined by the number of Atoms.
-		 Constraint();
+		 //Constraint();
+
 		 Constraint(AtomList const& atoms);
+
+         Constraint(Data::PositionConstraint const&);
+         Constraint(Data::DistanceConstraint const&);
+         Constraint(Data::AngleConstraint const& );
+         Constraint(Data::TorsionConstraint const&);
+
          Constraint(Constraint const& that) : GLObject() { copy(that); }
+
          ~Constraint();
 
          Type constraintType() const { return m_type; }
@@ -71,6 +86,9 @@ namespace Layer {
 
          /// Passes the return value from the Configurator dialog 
          bool accepted() const { return m_accepted; }
+
+         // Returns if the constraint is passed over to the MM and QM optimizers.
+         bool optimizeConstraint() const { return m_optimizeConstraint; }
 
 		 /// Determines if the constraint is considered to be satisfied.  Note
 		 /// that this function contains some hard-wired thresholds for satisfaction.
@@ -116,7 +134,8 @@ namespace Layer {
 
          AtomList m_atoms;
          QString  m_mesg;
-
+		 bool     m_optimizeConstraint; 
+       
       private:
          void setAtomList(AtomList const&);
          void copy(Constraint const& that);

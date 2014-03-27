@@ -6,6 +6,11 @@ INCLUDEPATH += ../Data ../Util ../IQmol ../Configurator ../Parser
 INCLUDEPATH += $$BUILD_DIR/IQmol
 
 SOURCES = \
+   $$PWD/AxesLayer.C \
+   $$PWD/AxesMeshLayer.C \
+   $$PWD/BackgroundLayer.C \
+   $$PWD/ConstraintLayer.C \
+   $$PWD/ContainerLayer.C \
    $$PWD/CubeDataLayer.C \
    $$PWD/DipoleLayer.C \
    $$PWD/GeometryLayer.C \
@@ -22,6 +27,11 @@ SOURCES = \
    $$PWD/SurfaceLayer.C
 
 HEADERS = \
+   $$PWD/AxesLayer.h \
+   $$PWD/AxesMeshLayer.h \
+   $$PWD/BackgroundLayer.h \
+   $$PWD/ConstraintLayer.h \
+   $$PWD/ContainerLayer.h \
    $$PWD/CubeDataLayer.h \
    $$PWD/DipoleLayer.h \
    $$PWD/GeometryLayer.h \

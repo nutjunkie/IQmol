@@ -168,16 +168,10 @@ double PointChargePotential::potential(double const x, double const y, double co
 
 // --------------- MultipolePotential ---------------
 MultipolePotential::MultipolePotential(QString const& type, int const order, 
-   Data::MultipoleExpansionList* siteList) : SpatialProperty(type), m_order(order), 
+   Data::MultipoleExpansionList const& siteList) : SpatialProperty(type), m_order(order), 
    m_siteList(siteList) 
 { 
    m_function = boost::bind(&MultipolePotential::potential, this, _1, _2, _3);
-}
-
-
-MultipolePotential::~MultipolePotential() 
-{ 
-   delete m_siteList; 
 }
 
 
@@ -190,7 +184,7 @@ double MultipolePotential::potential(double const x, double const y, double cons
 
    Data::MultipoleExpansionList::const_iterator site;
 
-   for (site = m_siteList->begin(); site != m_siteList->end(); ++site) {
+   for (site = m_siteList.begin(); site != m_siteList.end(); ++site) {
        R   = pos-(*site)->position();
        R  *= Constants::AngstromToBohr;
        R2  = R.squaredNorm();

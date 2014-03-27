@@ -59,6 +59,9 @@ namespace Data {
                 MeshList,               Surface,                SurfaceList,
                 SurfaceInfo,            SurfaceInfoList,        SurfaceType, 
                /*---------------------  *---------------------  *--------------------- */
+                Constraint,             PositionConstraint,     DistanceConstraint,
+                AngleConstraint,        TorsionConstraint,
+               /*---------------------  *---------------------  *--------------------- */
                 AtomicProperty,         AtomicSymbol,           AtomColor, 
                 NmrShiftIsotropic,      NmrShiftRelative,       Mass, 
                 MultipoleExpansion,     MullikenCharge,         StewartCharge, 

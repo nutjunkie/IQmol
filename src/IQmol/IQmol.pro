@@ -26,11 +26,6 @@ SOURCES += \
    $$PWD/Animator.C \
    $$PWD/AtomLayer.C \
    $$PWD/AtomicDensity.C \
-   $$PWD/AxesLayer.C \
-   $$PWD/AxesMeshConfigurator.C \
-   $$PWD/AxesMeshLayer.C \
-   $$PWD/BackgroundConfigurator.C \
-   $$PWD/BackgroundLayer.C \
    $$PWD/BasicServer.C \
    $$PWD/BondLayer.C \
    $$PWD/BoundingBoxDialog.C \
@@ -41,8 +36,6 @@ SOURCES += \
    $$PWD/BuildMoleculeFragmentHandler.C \
    $$PWD/ChargeLayer.C \
    $$PWD/ColorGrid.C \
-   $$PWD/ConstraintConfigurator.C \
-   $$PWD/ConstraintLayer.C \
    $$PWD/Cursors.C \
    $$PWD/EnigmaMachine.C \
    $$PWD/FragmentTable.C \
@@ -82,7 +75,7 @@ SOURCES += \
    $$PWD/ReindexAtomsHandler.C \
    $$PWD/RemoteHost.C \
    $$PWD/SGEServer.C \
-   $$PWD/SSHFileConfigurator.C \
+   $$PWD/SSHFileDialog.C \
    $$PWD/SecureConnection.C \
    $$PWD/SecureConnectionThread.C \
    $$PWD/SelectHandler.C \
@@ -116,11 +109,6 @@ HEADERS += \
    $$PWD/Animator.h \
    $$PWD/AtomLayer.h \
    $$PWD/AtomicDensity.h \
-   $$PWD/AxesLayer.h \
-   $$PWD/AxesMeshConfigurator.h \
-   $$PWD/AxesMeshLayer.h \
-   $$PWD/BackgroundConfigurator.h \
-   $$PWD/BackgroundLayer.h \
    $$PWD/BasicServer.h \
    $$PWD/BondLayer.h \
    $$PWD/BoundingBoxDialog.h \
@@ -131,9 +119,6 @@ HEADERS += \
    $$PWD/BuildMoleculeFragmentHandler.h \
    $$PWD/ChargeLayer.h \
    $$PWD/ColorGrid.h \
-   $$PWD/ConstraintConfigurator.h \
-   $$PWD/ConstraintLayer.h \
-   $$PWD/ContainerLayer.h \
    $$PWD/Cursors.h \
    $$PWD/EnigmaMachine.h \
    $$PWD/FragmentTable.h \
@@ -175,7 +160,7 @@ HEADERS += \
    $$PWD/ReindexAtomsHandler.h \
    $$PWD/RemoteHost.h \
    $$PWD/SGEServer.h \
-   $$PWD/SSHFileConfigurator.h \
+   $$PWD/SshFileDialog.h \
    $$PWD/SecureConnection.h \
    $$PWD/SecureConnectionThread.h \
    $$PWD/SelectHandler.h \
@@ -208,9 +193,6 @@ HEADERS += \
 
 FORMS += \
    $$PWD/AboutDialog.ui \
-   $$PWD/AxesMeshConfigurator.ui \
-   $$PWD/BackgroundConfigurator.ui \
-   $$PWD/BoundingBoxDialog.ui\
    $$PWD/FragmentTable.ui \
    $$PWD/GetVaultKeyDialog.ui \
    $$PWD/GradientDialog.ui \
@@ -221,8 +203,7 @@ FORMS += \
    $$PWD/PreferencesBrowser.ui \
    $$PWD/ProcessMonitor.ui \
    $$PWD/ProgressDialog.ui \
-   $$PWD/SSHFileConfigurator.ui \
-   $$PWD/ScalarConstraintConfigurator.ui \
+   $$PWD/SSHFileDialog.ui \
    $$PWD/ServerDialog.ui \
    $$PWD/ServerListDialog.ui \
    $$PWD/ServerOptionsDialog.ui \
@@ -232,4 +213,3 @@ FORMS += \
    $$PWD/SurfaceAnimatorDialog.ui \
    $$PWD/SymmetryToleranceDialog.ui \
    $$PWD/ToolBar.ui \
-   $$PWD/VectorConstraintConfigurator.ui \

@@ -77,6 +77,12 @@ QString toString(ID const id)
       case ForceFieldEnergy:       s = "Data::ForceFieldEnergy";       break;
       case PointGroup:             s = "Data::PointGroup";             break;
 
+      case Constraint:             s = "Data::Constraint:";            break;
+      case PositionConstraint:     s = "Data::PositionConstraint:";    break;
+      case DistanceConstraint:     s = "Data::DistanceConstraint:";    break;
+      case AngleConstraint:        s = "Data::AngleConstraint:";       break;
+      case TorsionConstraint:      s = "Data::TorsionConstraint:";     break;
+
       case ChargeMultiplicity:     s = "Data::ChargeMultiplicity";     break;
       case MultipoleExpansion:     s = "Data::MultipoleExpansion";     break;
       case MultipoleExpansionList: s = "Data::MultipoleExpansionList"; break;

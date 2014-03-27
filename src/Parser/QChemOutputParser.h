@@ -44,7 +44,7 @@ namespace Parser {
          void readHessian(TextStream&, Data::Geometry*);
          void readVibrationalModes(TextStream&);
          void readEffectiveRegion(TextStream&);
-         void readDMA(TextStream&);
+         void readDMA(TextStream&, Data::Geometry*);
          void setTotalEnergy(QString const&, Data::Geometry*);
    };
 

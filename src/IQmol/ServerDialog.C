@@ -24,7 +24,7 @@
 #include "ServerOptionsDialog.h"
 #include "Server.h"
 #include "ServerTask.h"
-#include "SSHFileConfigurator.h"
+#include "SshFileDialog.h"
 #include "ServerRegistry.h"
 #include "PasswordVault.h"
 #include "QMsgBox.h"
@@ -253,7 +253,7 @@ void ServerDialog::on_setPassword_clicked(bool)
 
 void ServerDialog::on_configureSsh_clicked(bool)
 {
-  SSHFileConfigurator ssh(this); 
+  SshFileDialog ssh(this); 
   ssh.exec();
 }
 

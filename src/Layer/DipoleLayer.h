@@ -1,5 +1,5 @@
-#ifndef IQMOL_DIPOLELAYER_H
-#define IQMOL_DIPOLELAYER_H
+#ifndef IQMOL_LAYER_DIPOLE_H
+#define IQMOL_LAYER_DIPOLE_H
 /*******************************************************************************
 
   Copyright (C) 2011-2013 Andrew Gilbert

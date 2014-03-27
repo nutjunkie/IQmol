@@ -70,7 +70,8 @@ namespace Data {
          unsigned multiplicity() const { return m_multiplicity; }
 
          template <class P>
-         bool setAtomicProperty(QList<double> values) {
+         bool setAtomicProperty(QList<double> values) 
+         {
             if (values.size() != m_atoms.size()) return false; 
             AtomList::iterator iter;
             unsigned i(0);
@@ -81,26 +82,15 @@ namespace Data {
             return true;
          }
 
-//------------------------------------
-// TODO: This causes an referene to reference error 
-         //template <class P>
-         //QList<P&> getAtomicProperty() {
-         //   QList<P&> atomicProperties;
-         //   AtomList::iterator iter;
-         //   for (iter = m_atoms.begin(); iter != m_atoms.end(); ++iter) {
-         //       atomicProperties.append((*iter)->getProperty<P>());
-         //   }
-         //   return atomicProperties;
-         //}
-
          template <class P>
-         P& getAtomicProperty(unsigned i) {
+         P& getAtomicProperty(unsigned i) 
+         {
             return m_atoms[i]->getProperty<P>();
          }
-//------------------------------------
 
          template <class P>
-         QStringList getLabels() {
+         QStringList getLabels() 
+         {
             QStringList labels;
             QList<Atom*>::iterator iter;
             for (iter = m_atoms.begin(); iter != m_atoms.end(); ++iter) {
@@ -109,9 +99,9 @@ namespace Data {
             return labels;
          }
 
-
          template <class P>
-         P& getProperty() {
+         P& getProperty() 
+         {
             P* p(0);
             Bank::iterator iter;
             for (iter = m_properties.begin(); iter != m_properties.end(); ++iter) {
@@ -124,7 +114,6 @@ namespace Data {
             return *p;
          }
 
-
          template <class P>
          bool hasProperty() const {
             P* p(0);
@@ -134,7 +123,6 @@ namespace Data {
             }
             return false;
          }
-
 
          void appendProperty(Data::Base* data) {
             m_properties.append(data);

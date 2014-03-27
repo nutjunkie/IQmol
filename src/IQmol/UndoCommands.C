@@ -447,7 +447,8 @@ void AppendData::redo()
 
 void AppendData::undo()
 {
-   m_molecule->removeData(m_dataList);
+   // why undo this?
+   //m_molecule->removeData(m_dataList);
    m_molecule->updated();
 }
 
@@ -456,7 +457,8 @@ void AppendData::undo()
 // --------------- RemoveData ---------------
 void RemoveData::redo()
 {
-   m_molecule->removeData(m_dataList);
+   qDebug() << "RemoveData::redo() cannot remove data";
+   //m_molecule->removeData(m_dataList);
    m_molecule->updated();
 }
 

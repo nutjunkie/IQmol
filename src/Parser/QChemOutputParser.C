@@ -172,7 +172,6 @@ bool QChemOutput::parse(TextStream& textStream)
          tokens = TextStream::tokenize(line);
          if (tokens.size() == 3) setTotalEnergy(tokens[2], currentGeometry);
 
-
       }else if (line.contains("Ground-State Mulliken Net Atomic Charges")) {
          textStream.skipLine(3);
          readCharges(textStream, currentGeometry, "Mulliken");
@@ -199,7 +198,7 @@ bool QChemOutput::parse(TextStream& textStream)
 
       }else if (line.contains("DISTRIBUTED MULTIPOLE ANALYSIS")) {
          textStream.skipLine(4);
-         readDMA(textStream);
+         readDMA(textStream, currentGeometry);
 
       // There is a typo in the print out of the word Coordinates
       }else if (line.contains("atoms in the effective region (ANGSTROMS)")) {
@@ -221,7 +220,7 @@ bool QChemOutput::parse(TextStream& textStream)
 }
 
 
-void QChemOutput::readDMA(TextStream& textStream)
+void QChemOutput::readDMA(TextStream& textStream, Data::Geometry* geometry)
 {
    Data::MultipoleExpansionList* dma(new Data::MultipoleExpansionList);
    Data::MultipoleExpansion* site;
@@ -241,7 +240,6 @@ void QChemOutput::readDMA(TextStream& textStream)
 
    if (dma->isEmpty()) return;
    m_dataBank.append(dma);
-
 
    line = textStream.nextLine();
    if (!line.contains("DIPOLES")) return;
@@ -267,7 +265,6 @@ void QChemOutput::readDMA(TextStream& textStream)
       goto error;
    }
 
-
    line = textStream.nextLine();
    if (!line.contains("QUADRUPOLES")) return;
    textStream.skipLine(2);
@@ -284,7 +281,6 @@ void QChemOutput::readDMA(TextStream& textStream)
        if (x.size() < 3)  goto error;
        dma->at(i)->addQuadrupole(0.0, 0.0, 0.0, 0.0, x[1], x[2]);
    }
-
 
    textStream.skipLine();
    line = textStream.nextLine();
@@ -310,6 +306,8 @@ void QChemOutput::readDMA(TextStream& textStream)
        if (x.size() < 3)  goto error;
        dma->at(i)->addOctopole(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, x[1], x[2]);
    }
+
+   geometry->appendProperty(dma);
 
    return;
 

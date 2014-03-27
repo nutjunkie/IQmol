@@ -1,5 +1,5 @@
-#ifndef IQMOL_GROUPLAYER_H
-#define IQMOL_GROUPLAYER_H
+#ifndef IQMOL_LAYER_GROUP_H
+#define IQMOL_LAYER_GROUP_H
 /*******************************************************************************
 
   Copyright (C) 2011-2013 Andrew Gilbert

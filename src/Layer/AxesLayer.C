@@ -21,14 +21,9 @@
 ********************************************************************************/
 
 #include "AxesLayer.h"
+#include "OpenGL.h"
 #include <QtOpenGL>
 #include <QtDebug>
-#ifdef Q_WS_MAC
- #include <OpenGL/glu.h>
-#else
- #include <GL/glu.h>
-#endif
-
 
 
 namespace IQmol {
