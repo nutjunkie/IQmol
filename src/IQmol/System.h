@@ -36,13 +36,6 @@ namespace System {
    QStringList RunCommand(QString const& command, QStringList const& arguments,
       unsigned int waitTimeInMilliSeconds = 5000);
 
-   /// A low-level function for killing a process based on its PID.
-   /// \b Note: This function is outside the QProcess framework.  It is required
-   /// because if the process started with a QProcess object spawns a child
-   /// process (via a script, for example), the child process is not killed when
-   /// QProcess::kill() is invoked on the parent.
-   void KillProcess(unsigned int const pid);
-
    // Finds the system process ID number of the processName process.  The
    // process is expected to have been spawned by the given QProcess but 
    // the pids may not necessarily be the same as the QProcess may spawn 
@@ -62,14 +55,6 @@ namespace System {
    /// raw PIDs.
    QList<unsigned int> GetParentProcessChain(unsigned int const pid);
 
-   /// Checks to see if if the given PID is running and returns the run time in 
-   /// the format hh:mm:ss if it is.   A return of 0:00:00 indicates the process 
-   /// is no longer running.  An empty string indicates that the process command 
-   /// (either ps or tasklist) could not be found.  Note the match is done on 
-   /// both the PID and executable name to lessen the chance of an accidental 
-   /// match.
-   QString StatProcess(QString const& name, unsigned int const pid);
-
    /// Returns the command used to submit a process on the local machine
    QString SubmitCommand();
 
@@ -78,6 +63,10 @@ namespace System {
 
    /// Returns the command used to kill a process on the local machine
    QString KillCommand();
+
+   QString ExecutableName();
+
+   QString RunFileTemplate();
 
 } } // end namespace IQmol::System
 

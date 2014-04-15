@@ -26,11 +26,10 @@ HEADERS += \
    $$PWD/QtNode.h \
    $$PWD/Register.h \
    $$PWD/RemSection.h \
-   $$PWD/ReadInput.h \
+#  $$PWD/ReadInput.h \
 
 SOURCES += \
    $$PWD/Actions.C \
-   $$PWD/Conditions.C \
    $$PWD/ExternalChargesSection.C \
    $$PWD/GeometryConstraint.C \
    $$PWD/InputDialog.C \

@@ -71,45 +71,6 @@ QStringList RunCommand(QString const& command, QStringList const& arguments,
 }
 
 
-/*
-QString StatProcess(QString const& name, unsigned int const pid)
-{
-   QString time("0:00:00");
-   QString pattern;
-   QStringList args;
-   QStringList tokens;
-
-#ifdef Q_WS_WIN
-   QFileInfo tasklist("/Windows/System32/tasklist.exe");
-   if (!tasklist.exists()) return QString();
-
-   QString spid("\"PID eq ");
-   spid += QString::number(pid) + "\"";
-   QString sname("\"IMAGENAME eq ");
-   sname += name + "\"";
-   args << "/v" << "/fo list" << "/fi " + spid << "/fi " + sname;
-   args = RunCommand(tasklist.filePath(), args);
-   pattern = "CPU";
-#else
-   args << "xc" << "-o" << "command,pid,time";
-   args << QString::number(pid);
-   args = RunCommand("/bin/ps", args);
-   pattern = name;
-#endif
-
-   for (int i = 0; i < args.size(); ++i) {
-       if (args[i].contains(pattern, Qt::CaseInsensitive)) {
-          tokens = args[i].split(QRegExp("\\s+"), QString::SkipEmptyParts);
-          time = tokens.last();
-          break;
-       } 
-   }
-
-   return time;
-}
-*/
-
-
 QString QueryCommand()
 {
    QString cmd;
@@ -162,30 +123,30 @@ QString SubmitCommand()
 }
 
 
-
-/*
-
-void KillProcess(unsigned int const pid) 
+QString RunFileTemplate()
 {
+   QString cmd;
 #ifdef Q_WS_WIN
-   QFileInfo taskkill("/Windows/System32/taskkill.exe");
-   QFileInfo tskill("/Windows/System32/tskill.exe");
-   QStringList args;
-
-   if (taskkill.exists()) {  // Vista
-      args << "/f" << "/pid" << QString::number(pid);
-      RunCommand(taskkill.filePath(), args);
-   }else {                   // XP
-      args << QString::number(pid);
-      RunCommand(tskill.filePath(), args);
-   }
+   cmd = "(unused)";
 #else
-   QStringList args;
-   args << "-HUP" << QString::number(pid);
-   RunCommand("/bin/kill", args);
+   cmd = "#! /bin/csh\nsource ~/.cshrc\nqchem ${JOB_NAME}.inp ${JOB_NAME}.out";
 #endif
+   return cmd;
 }
-*/
+
+
+QString ExecutableName()
+{
+   QString cmd;
+#ifdef Q_WS_WIN
+   cmd = "qchem_s.exe";
+#else
+   cmd = "qchem.exe";
+#endif
+   return cmd;
+}
+
+
 
 
 unsigned int ExecutablePid(QString const& processName, QProcess const& parent) 
@@ -226,7 +187,6 @@ unsigned int ExecutablePid(QString const& processName, QProcess const& parent)
 }
 
 
-
 int ProcessID(QProcess const& process)
 {
 #ifdef Q_WS_WIN
@@ -239,9 +199,7 @@ int ProcessID(QProcess const& process)
 #else
    return process.pid();
 #endif
-
 }
-
 
 
 QList<unsigned int> GetMatchingProcessIds(QString const& pattern) 
@@ -270,7 +228,6 @@ qDebug() << "MATCHED!" << processes[i];
    
    return pids;
 }
-
 
 
 QList<unsigned int> GetParentProcessChain(unsigned int const pid) 

@@ -34,6 +34,7 @@
 #include <map>
 #include "Logic.h"
 
+#include <QDebug>
 
 namespace Qui {
 
@@ -49,8 +50,6 @@ class NodeBase {
 };
 
 
-
-
 template <class T> 
 class Node : public NodeBase {
 
@@ -61,22 +60,24 @@ class Node : public NodeBase {
 
       T getValue() const { return m_value; }
 
-      Action shouldBe(T value) { 
+      Action shouldBe(T value) 
+      {
          return boost::bind(&Node<T>::setValue, this, value); 
       }
 
-      Action shouldBeAtLeast(T value) { 
+      Action shouldBeAtLeast(T value) 
+      {
          return boost::bind(&Node<T>::setAtLeast, this, value); 
       }
 
-
-
       // This does not appear to be working at the moment
-      Action makeSameAs(Node<T>* node) { 
-         return boost::bind(&Node<T>::setValue2, this, node); 
+      Action makeSameAs(Node<T>& node) 
+      {
+         return boost::bind(&Node<T>::setValue2, this, &node); 
       }
 
-      virtual void setAtLeast(T const& value) {
+      virtual void setAtLeast(T const& value) 
+      {
          if (m_value < value) {
             m_value = value;
             applyRules();
@@ -84,7 +85,8 @@ class Node : public NodeBase {
          }
       }
 
-      virtual void setValue(T const& value) {
+      virtual void setValue(T const& value) 
+      {
          if (value != m_value) {
             m_value = value;
             applyRules();
@@ -92,8 +94,8 @@ class Node : public NodeBase {
          }
       }
 
-
-      void addRule(Rule const& rule) {
+      void addRule(Rule const& rule) 
+      {
          m_rules.insert(
             std::make_pair( 
                new Condition(rule.get<0>()),
@@ -105,7 +107,8 @@ class Node : public NodeBase {
                new Action(rule.get<2>()) ));
       }
 
-      void applyRules() {
+      void applyRules() 
+      {
          std::multimap<Condition*, Action*>::iterator iter;
          for (iter = m_rules.begin(); iter != m_rules.end(); ++iter) {
              if((iter->first )->operator()() ) {
@@ -115,9 +118,9 @@ class Node : public NodeBase {
       }
 
 
-   //protected:
-      // This is protected as a Register should be used for destruction
-      virtual ~Node() {
+      // This should be protected as a Register should be used for destruction
+      virtual ~Node() 
+      {
          std::multimap<Condition*, Action*>::iterator iter;      
          for (iter = m_rules.begin(); iter != m_rules.end(); ++iter) {
              delete iter->first;
@@ -142,136 +145,6 @@ class Node : public NodeBase {
       Node(Node const& that) { }
       Node const& operator=(Node const& that) {  }
 };
-
-
-
-
-// Node Logic functions.  These are used for overloading the operators below
-// and do not form part of the Node interface.
-template <class T>
-inline bool Equals(Node<T> const* node, T const& value) {
-   return node->getValue() == value;
-}
-
-template <class T>
-inline bool Equals2(Node<T> const* node1, Node<T> const* node2) {
-   return node1->getValue() == node2->getValue();
-}
-
-template <class T>
-inline bool LessThan(Node<T> const* node, T const& value) {
-   return node->getValue() < value;
-}
-
-template <class T>
-inline bool LessThan2(Node<T> const* node1, Node<T> const* node2) {
-   return node1->getValue() < node2->getValue();
-}
-
-//Overloaded versions for Strings to allow case insensitive comparisons
-inline bool Equals(Node<QString> const* node, QString const& value) {
-   return QString::compare(node->getValue(), value, Qt::CaseInsensitive) == 0;
-}
-
-inline bool Equals2(Node<QString> const* node1, Node<QString> const* node2) {
-   return QString::compare(node1->getValue(), node2->getValue(), 
-      Qt::CaseInsensitive) == 0;
-}
-
-
-
-
-// Node Logic Operators.  These are all overloaded to return Conditions rather
-// than bools
-template <class T>
-inline Condition const operator==(T const& value, Node<T> const& node) {
-   return boost::bind(&Equals<T>, &node, value);
-}
-template <class T>
-inline Condition const operator==(Node<T> const& node, T const& value) {
-   return boost::bind(&Equals<T>, &node, value);
-} 
-template <class T>
-inline Condition const operator==(Node<T> const& node1, Node<T> const& node2) {
-   return boost::bind(&Equals2<T>, &node1, &node2);
-} 
-
-
-// <
-template <class T>
-inline Condition const operator<(T const& value, Node<T> const& node) {
-   return boost::bind(&LessThan<T>, &node, value);
-} 
-template <class T>
-inline Condition const operator<(Node<T> const& node, T const& value) {
-   return boost::bind(&LessThan<T>, &node, value);
-} 
-template <class T>
-inline Condition const operator<(Node<T> const& node1, Node<T> const& node2) {
-   return boost::bind(&LessThan2<T>, &node1, &node2);
-} 
-
-
-// !=
-template <class T>
-inline Condition const operator!=(T const& value, Node<T> const& node) {
-   return !(node == value);
-} 
-template <class T>
-inline Condition const operator!=(Node<T> const& node, T const& value) {
-   return !(node == value);
-} 
-template <class T>
-inline Condition const operator!=(Node<T> const& node1, Node<T> const& node2) {
-   return !(node1 == node2);
-} 
-
-
-// >
-template <class T>
-inline Condition const operator>(T const& value, Node<T> const& node) {
-   return !(node == value) && !(node < value);
-} 
-template <class T>
-inline Condition const operator>(Node<T> const& node, T const& value) {
-   return !(node == value) && !(node < value);
-} 
-template <class T>
-inline Condition const operator>(Node<T> const& node1, Node<T> const& node2) {
-   return !(node1 == node2) && !(node1 < node2);
-} 
-
-
-// <=
-template <class T>
-inline Condition const operator<=(T const& value, Node<T> const& node) {
-   return !(node > value);
-} 
-template <class T>
-inline Condition const operator<=(Node<T> const& node, T const& value) {
-   return !(node > value);
-} 
-template <class T>
-inline Condition const operator<=(Node<T> const& node1, Node<T> const& node2) {
-   return !(node1 > node2);
-} 
-
-
-// >=
-template <class T>
-inline Condition const operator>=(T const& value, Node<T> const& node) {
-   return !(node < value);
-} 
-template <class T>
-inline Condition const operator>=(Node<T> const& node, T const& value) {
-   return !(node < value);
-} 
-template <class T>
-inline Condition const operator>=(Node<T> const& node1, Node<T> const& node2) {
-   return !(node1 < node2);
-} 
-
-
 
 } // end namespace Qui
 

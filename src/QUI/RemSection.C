@@ -53,18 +53,15 @@ void RemSection::init() {
    m_options["QUI_CHARGE"] = "0";
    m_options["QUI_MULTIPLICITY"] = "1";
 
+   m_options["METHOD"] = "HF";
    m_options["EXCHANGE"] = "HF";
-   m_toPrint.insert("EXCHANGE");
+   m_toPrint.insert("METHOD");
 
    m_options["BASIS"] = "6-31G";
    m_toPrint.insert("BASIS");
 
-   m_options["GUI"] = "1";
+   m_options["GUI"] = "2";
    m_toPrint.insert("GUI");
-
-//   m_options["DMA"] = "1";
-//   m_toPrint.insert("DMA");
-
 
    // These are necessary for obsure reasons.  Essentially this is a hack for
    // when we want to combine several controls into the one rem.  Only one of
@@ -258,6 +255,8 @@ bool RemSection::fixOptionForQChem(QString& name, QString& value) {
    // Skip internal QUI options
    if (name.startsWith("qui_",Qt::CaseInsensitive)) shouldPrint = false;
 
+   if (name == "METHOD" && value == "Custom")  shouldPrint = false;
+
    // Perform some ad hoc conversions.  These are all triggered in the database
    // by having an entry of the form a|b where a is replaced by b in the input
    // file.  These are set in the InputDialog::initializeControl member function
@@ -272,8 +271,6 @@ bool RemSection::fixOptionForQChem(QString& name, QString& value) {
          value = QString::number(1);
       }
    }
-
-
 
    //fix reals
    if (name == "CC_DIIS_MAXIMUM_OVERLAP" || 

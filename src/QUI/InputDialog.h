@@ -90,11 +90,9 @@ class InputDialog : public QMainWindow {
    private Q_SLOTS:
       void on_resetButton_clicked(bool) { resetInput(); }
       void on_advancedOptionsTree_itemClicked(QTreeWidgetItem* item, int col);
-      void on_job_type_currentIndexChanged(QString const& text);
       void on_jobList_currentIndexChanged(int);
-      void on_stackedOptions_currentChanged(int);
       void on_previewText_textChanged() { setTaint(true, 0); }
-      void on_qui_title_textChanged();
+      void on_editJobSectionButton_clicked();
       void on_qui_charge_valueChanged(int);
       void on_qui_multiplicity_valueChanged(int);
       void on_addJobButton_clicked(bool) { addNewJob(); }
@@ -159,6 +157,8 @@ class InputDialog : public QMainWindow {
       QFileInfo m_fileIn;
       QStatusBar m_statusBar;
 
+      QMap<QString, QWidget*> m_toolBoxOptions;
+
 
       // ---------- Functions ----------
 
@@ -171,11 +171,13 @@ class InputDialog : public QMainWindow {
       void capturePreviewTextChanges();
       void updatePreviewText(JobList const&, Job const* currentJob);
 
-      void initializeQuiLogic();
       void setControls(Job* job);
       void resetControls();
       void initializeMenus();
       void initializeControls();
+      void initializeQuiLogic();
+      void initializeToolBoxOptions();
+
       void initializeControl(Option const& opt, QComboBox* combo);
       void initializeControl(Option const& opt, QCheckBox* check);
       void initializeControl(Option const& opt, QLineEdit* edit);

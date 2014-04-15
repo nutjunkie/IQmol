@@ -168,7 +168,7 @@ void Server::setLocalDefaults()
    m_authentication   = None;
    m_port             = 0;
    m_workingDirectory = QString(qgetenv("HOME"));
-   m_executableName   = "qcprog.exe";
+   m_executableName   = System::ExecutableName();
    setUpdateInterval(10);
 }
 
@@ -217,17 +217,11 @@ void Server::setBasicDefaults(Host const host)
    m_queueInfo       = "(unused)";
    m_killCommand     = System::KillCommand();
    m_queryCommand    = System::QueryCommand();
-   m_runFileTemplate = "#! /bin/csh\nsource ~/.cshrc\nqchem ${JOB_NAME}.inp ${JOB_NAME}.out";
+   m_submitCommand   = System::SubmitCommand();
+   m_runFileTemplate = System::RunFileTemplate();
 
-   if (host == Local) {
-#ifdef Q_WS_WIN
-      m_submitCommand   = "${QC}/qcenv_s.bat ${JOB_NAME}.inp ${JOB_NAME}.out";
-     // note we make the textedit read-only in ServerOptionsDialog
-      m_runFileTemplate = "(unused)";  
-#else
-      m_submitCommand   = "./${JOB_NAME}.run";
-#endif
-   }else {
+   if (host != Local) {
+      // Override the defaults for Basic remote servers as they need a bit more magic
       m_submitCommand   = "nohup ./${JOB_NAME}.run < /dev/null >& ${JOB_NAME}.err";
       m_runFileTemplate += " &";
    }

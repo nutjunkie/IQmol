@@ -11,7 +11,7 @@ SOURCES = \
    $$PWD/qcprot.C \
    $$PWD/ScanDirectory.C \
    $$PWD/SetButtonColor.C \
-   $$PWD/Task.C
+   $$PWD/Task.C \
 
 HEADERS = \
    $$PWD/Align.h \
@@ -25,7 +25,7 @@ HEADERS = \
    $$PWD/qcprot.h \
    $$PWD/ScanDirectory.h \
    $$PWD/SetButtonColor.h \
-   $$PWD/Task.h
+   $$PWD/Task.h \
 
 
 # QMsgBox

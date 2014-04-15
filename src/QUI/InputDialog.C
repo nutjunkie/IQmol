@@ -35,7 +35,6 @@
 #include "Qui.h"
 #include "QMsgBox.h"
 #include "RemSection.h"
-//#include "QuiMolecule.h"
 #include "MoleculeSection.h"
 #include "QsLog.h"
 
@@ -53,6 +52,7 @@
 #include <QMimeData>
 #include <QFont>
 #include <QPixmap>
+#include <QInputDialog>
 
 #include <QDebug>
 
@@ -65,14 +65,9 @@ using namespace IQmol;
 namespace Qui {
 
 
-InputDialog::InputDialog(QWidget* parent) : 
-   QMainWindow(parent), 
-   m_jobInfo(0),
-   m_db(OptionDatabase::instance()), 
-   m_reg(OptionRegister::instance()), 
-   m_taint(false), 
-   m_currentJob(0), 
-   m_fileIn("")
+InputDialog::InputDialog(QWidget* parent) : QMainWindow(parent), m_jobInfo(0),
+   m_db(OptionDatabase::instance()), m_reg(OptionRegister::instance()), 
+   m_taint(false), m_currentJob(0), m_fileIn("")
 {
    m_ui.setupUi(this);
    resize(Preferences::QuiWindowSize());
@@ -96,9 +91,14 @@ bool InputDialog::init()
    }
 
    initializeMenus();
+
+   // this must be called before the logic is initialized
+   initializeToolBoxOptions();
+
    initializeQuiLogic();
    initializeControls();
-   addNewJob();
+
+   resetInput();
 
    return true;
 }
@@ -117,6 +117,22 @@ InputDialog::~InputDialog()
    std::map<QString,Update*>::iterator iter3;
    for (iter3 = m_setUpdates.begin(); iter3 != m_setUpdates.end(); ++iter3) {
        delete iter3->second;
+   }
+}
+
+
+void InputDialog::initializeToolBoxOptions() 
+{
+   qDebug() << "Initializing ToolBoxOptions";
+
+   int numberOfUndeletedPages(2);
+   while (m_ui.toolBoxOptions->count() > numberOfUndeletedPages) {
+      QWidget* widget(m_ui.toolBoxOptions->widget(0)); 
+      QString name(m_ui.toolBoxOptions->itemText(0)); 
+      widget->hide();
+      m_ui.toolBoxOptions->removeItem(0);
+      m_toolBoxOptions.insert(name, widget);
+      qDebug() << "Saving widget" << name << widget;
    }
 }
 
@@ -140,6 +156,10 @@ void InputDialog::setJobInfo(IQmol::JobInfo* jobInfo)
 
    if (m_jobInfo->efpOnlyJob()) {
       m_ui.basis->setEnabled(false);
+      m_ui.label_basis->setEnabled(false);
+      m_ui.ecp->setEnabled(false);
+      m_ui.label_ecp->setEnabled(false);
+
       m_currentJob->setOption("SYMMETRY_IGNORE", "true");
       m_ui.efp_input->setEnabled(true);
       m_currentJob->setOption("EFP_INPUT", "true");
@@ -147,6 +167,10 @@ void InputDialog::setJobInfo(IQmol::JobInfo* jobInfo)
       m_currentJob->setOption("GUI",  "0");
    }else {
       m_ui.basis->setEnabled(true);
+      m_ui.label_basis->setEnabled(true);
+      m_ui.ecp->setEnabled(true);
+      m_ui.label_ecp->setEnabled(true);
+
       m_ui.efp_input->setEnabled(false);
       m_currentJob->setOption("GUI",  "2");
       m_currentJob->setOption("EFP_FRAGMENTS_ONLY", "false");
@@ -205,16 +229,18 @@ void InputDialog::showMessage(QString const& msg)
 
 void InputDialog::setTaint(bool const tf, int line)
 {
+   Q_UNUSED(line);
    m_taint = tf;
-   qDebug() << "Taint set to:" << tf << "on line" << line;;
+   //qDebug() << "Taint set to:" << tf << "on line" << line;;
 }
+
+
 
 /***********************************************************************
  *   
  *  Private Member functions
  *  
  ***********************************************************************/
-
 
 
 // --------------- Menu Section --------------- //
@@ -403,7 +429,8 @@ void InputDialog::resetInput()
 
 /********** Font *********/
 //! Changes the font size either up or down by one unit.
-void InputDialog::fontAdjust(bool makeBigger) {
+void InputDialog::fontAdjust(bool makeBigger) 
+{
    QFont font(Preferences::PreviewFont());
    int size = font.pointSize();
    size += makeBigger ? 1 : -1;
@@ -413,7 +440,8 @@ void InputDialog::fontAdjust(bool makeBigger) {
 
 
 //! Prompts the user for a specific font to use in the preview box.
-void InputDialog::setFont() {
+void InputDialog::setFont() 
+{
    bool ok;
    QFont font(Preferences::PreviewFont());
    font = QFontDialog::getFont(&ok, font, this);
@@ -462,6 +490,14 @@ void InputDialog::finalizeJob(Job* job)
        // with something the user wrote into the preview box, so we just 
 	   // leave things alone.
        if (w) job->printOption(name, w->isEnabled());
+   }
+
+   // Special case code to avoid writing the method keyword when custom is
+   // chosen (for backward compatibility)
+   QComboBox* method(findChild<QComboBox*>("method"));
+   if (method && method->currentText() == "Custom") {
+      job->printOption("METHOD", false);
+      job->printOption("EXCHANGE", true);
    }
 }
 
@@ -537,8 +573,8 @@ QString InputDialog::generateInputString()
 
 void InputDialog::capturePreviewTextChanges() 
 {
-qDebug() << "capturePreviewTextChanges() called";
    if (!m_taint) return;
+qDebug() << "capturePreviewTextChanges() called";
 qDebug() << "    with changes";
 
    QString text(m_ui.previewText->toPlainText());
@@ -673,7 +709,8 @@ void InputDialog::deleteAllJobs(bool const prompt)
 }
 
 
-void InputDialog::printSection(String const& name, bool doPrint) {
+void InputDialog::printSection(QString const& name, bool doPrint) 
+{
    if (m_currentJob) m_currentJob->printSection(name, doPrint);
 }
 
@@ -718,7 +755,8 @@ void InputDialog::submitJob()
 
 // The following is used to change the displayed page on a QStackedWidget based
 // on a radio box group. 
-void InputDialog::toggleStack(QStackedWidget* stack, bool on, QString model) {
+void InputDialog::toggleStack(QStackedWidget* stack, bool on, QString model) 
+{
    QWidget* widget;
    if (on) {
       widget = stack->findChild<QWidget*>(model);
@@ -731,43 +769,54 @@ void InputDialog::toggleStack(QStackedWidget* stack, bool on, QString model) {
    }
 }
 
-void InputDialog::on_qui_cfmm_toggled(bool on) {
+
+void InputDialog::on_qui_cfmm_toggled(bool on) 
+{
    toggleStack(m_ui.largeMoleculesStack, on, "LargeMoleculesCFMM");
 }
 
-void InputDialog::on_use_case_toggled(bool on) {
+void InputDialog::on_use_case_toggled(bool on) 
+{
    toggleStack(m_ui.largeMoleculesStack, on, "LargeMoleculesCASE");
 }
 
-void InputDialog::on_ftc_toggled(bool on) {
+void InputDialog::on_ftc_toggled(bool on) 
+{
    toggleStack(m_ui.largeMoleculesStack, on, "LargeMoleculesFTC");
 }
 
-void InputDialog::on_qui_solvent_pcm_toggled(bool on) {
+void InputDialog::on_qui_solvent_pcm_toggled(bool on) 
+{
    toggleStack(m_ui.solventStack, on, "SolventPCM");
 }
 
-void InputDialog::on_qui_solvent_cosmo_toggled(bool on) {
+void InputDialog::on_qui_solvent_cosmo_toggled(bool on) 
+{
    toggleStack(m_ui.solventStack, on, "SolventCosmo");
 }
 
-void InputDialog::on_qui_solvent_onsager_toggled(bool on) {
+void InputDialog::on_qui_solvent_onsager_toggled(bool on) 
+{
    toggleStack(m_ui.solventStack, on, "SolventOnsager");
 }
 
-void InputDialog::on_qui_solvent_none_toggled(bool on) {
+void InputDialog::on_qui_solvent_none_toggled(bool on) 
+{
    toggleStack(m_ui.solventStack, on, "SolventNone");
 }
 
-void InputDialog::on_chemsol_toggled(bool on) {
+void InputDialog::on_chemsol_toggled(bool on) 
+{
    toggleStack(m_ui.solventStack, on, "SolventChemSol");
 }
 
-void InputDialog::on_smx_solvation_toggled(bool on) {
+void InputDialog::on_smx_solvation_toggled(bool on) 
+{
    toggleStack(m_ui.solventStack, on, "SolventSM8");
 }
 
-void InputDialog::on_svp_toggled(bool on) {
+void InputDialog::on_svp_toggled(bool on) 
+{
    toggleStack(m_ui.solventStack, on, "SolventSVP");
 }
 
@@ -789,56 +838,31 @@ void InputDialog::on_advancedOptionsTree_itemClicked(QTreeWidgetItem* item, int)
 }
 
 
-void InputDialog::on_job_type_currentIndexChanged(QString const& text) 
+void InputDialog::on_editJobSectionButton_clicked()
 {
-   QString label(text);
-   if (label == "Transition State") label = "Geometry";
-   label =  "Options" + label.replace(" ","");
+   QString currentText(m_ui.jobList->currentText());
 
-   QWidget* widget = m_ui.stackedOptions->findChild<QWidget*>(label);
-   if (widget) {
-      m_ui.stackedOptions->setCurrentWidget(widget);
-   }else {
-     qDebug() << "InputDialog::on_job_type_currentIndexChanged:\n"
-              << "  Widget not found: " << label;
-   }
-}
+   bool ok(false);
+   QString text = QInputDialog::getText(this, "IQmol", "Job Section Comment", 
+      QLineEdit::Normal, currentText, &ok);
 
-
-void InputDialog::on_stackedOptions_currentChanged(int index) 
-{
-   capturePreviewTextChanges();
-   for (int i = 0; i < m_ui.stackedOptions->count(); ++i) {
-       m_ui.stackedOptions->widget(i)->setEnabled(false);
-   }
-   m_ui.stackedOptions->widget(index)->setEnabled(true);
-   updatePreviewText();
-}
-
-
-void InputDialog::on_qui_title_textChanged() 
-{
-   QString text(m_ui.qui_title->text());
-   if (text.trimmed().isEmpty()) return;
+   if (!ok || text.trimmed().isEmpty()) return;
 
    if (m_currentJob) {
       m_currentJob->addSection("comment", text);
       m_currentJob->printSection("comment", true);
    }
 
-   if (text.size() > 10) {
-      text.truncate(10); 
-      text += "...";
-   }
-
-   int i(m_ui.jobList->currentIndex());
-   m_ui.jobList->setItemText(i,text);
+   int currentIndex(m_ui.jobList->currentIndex());
+   m_ui.jobList->setItemText(currentIndex, text);
+   updatePreviewText();
 }
 
 
 // This will only keep things consistent if the user 
 // only uses the buttons to inc/dec the charge
-void InputDialog::on_qui_charge_valueChanged(int value) {
+void InputDialog::on_qui_charge_valueChanged(int value) 
+{
    if (m_currentJob) {
       m_currentJob->setCharge(value);
       int multiplicity(m_ui.qui_multiplicity->value()); 
@@ -852,11 +876,11 @@ void InputDialog::on_qui_charge_valueChanged(int value) {
 }
 
 
-void InputDialog::on_qui_multiplicity_valueChanged(int value) {
+void InputDialog::on_qui_multiplicity_valueChanged(int value) 
+{
    if (m_currentJob) m_currentJob->setMultiplicity(value);
    if (m_jobInfo)  m_jobInfo->set(IQmol::JobInfo::Multiplicity, value);
 }
-
 
 
 
@@ -874,8 +898,8 @@ void InputDialog::on_qui_multiplicity_valueChanged(int value) {
 // a similar way.  What this means is that this function should be the only one
 // that has the implementation case switch logic and also the only one that needs
 // to perform dynamic casts on the controls.
-void InputDialog::initializeControls() {
-
+void InputDialog::initializeControls() 
+{
    QList<QWidget*> controls(findChildren<QWidget*>());
    QWidget* control;
    QString name, value;
@@ -955,7 +979,8 @@ void InputDialog::initializeControls() {
 //! A simple loop for reseting the controls to their default values.  This
 //! routine takes advantage of the reset Actions that are set up in the
 //! initializeControl functions.  
-void InputDialog::resetControls() {
+void InputDialog::resetControls() 
+{
    std::vector<Action*>::iterator iter;
    for (iter = m_resetActions.begin(); iter != m_resetActions.end(); ++iter) {
        (*iter)->operator()(); 
@@ -968,9 +993,11 @@ void InputDialog::resetControls() {
 //! functions that are bind'ed in the initializeControl functions.  These Updates
 //! allow a QControl widget to have its value changed based on a string,
 //! irrespective of its type.
-void InputDialog::setControls(Job* job) {
-   StringMap::iterator iter;
-   StringMap opts(job->getOptions());
+void InputDialog::setControls(Job* job) 
+{
+   typedef QMap<QString, QString> QStringMap;
+   QStringMap::iterator iter;
+   QStringMap opts(job->getOptions());
    for (iter = opts.begin(); iter != opts.end(); ++iter) {
        if (m_setUpdates.count(iter.key())) {
           m_setUpdates[iter.key()]->operator()(iter.value());
@@ -1009,8 +1036,8 @@ QString InputDialog::prependRemName(QString const& name, QString const& descript
 //!    logic in InitializeQChemLogic and initializeQuiLogic.
 //!  - Binding an Action to enable the control to be reset to the default value.
 //!  - Binding an Update to enable the control to be reset to a string value.
-void InputDialog::initializeControl(Option const& opt, QComboBox* combo) {
-
+void InputDialog::initializeControl(Option const& opt, QComboBox* combo) 
+{
    QString name = opt.getName();
    QStringList opts = opt.getOptions();
    QStringList split;
@@ -1064,7 +1091,8 @@ void InputDialog::initializeControl(Option const& opt, QComboBox* combo) {
 }
 
 
-void InputDialog::initializeControl(Option const& opt, QCheckBox* check) {
+void InputDialog::initializeControl(Option const& opt, QCheckBox* check) 
+{
    connectControl(opt, check);
    check->setToolTip(prependRemName(opt.getName(), opt.getDescription()));
 
@@ -1080,7 +1108,8 @@ void InputDialog::initializeControl(Option const& opt, QCheckBox* check) {
 }
 
 
-void InputDialog::initializeControl(Option const& opt, QSpinBox* spin) {
+void InputDialog::initializeControl(Option const& opt, QSpinBox* spin) 
+{
    connectControl(opt, spin);
    spin->setToolTip(prependRemName(opt.getName(), opt.getDescription()));
    spin->setRange(opt.intMin(), opt.intMax());  
@@ -1098,7 +1127,8 @@ void InputDialog::initializeControl(Option const& opt, QSpinBox* spin) {
 }
 
 
-void InputDialog::initializeControl(Option const& opt, QDoubleSpinBox* dspin) {
+void InputDialog::initializeControl(Option const& opt, QDoubleSpinBox* dspin) 
+{
    connectControl(opt, dspin);
    dspin->setToolTip(prependRemName(opt.getName(), opt.getDescription()));
    dspin->setRange(opt.doubleMin(), opt.doubleMax());  
@@ -1116,7 +1146,8 @@ void InputDialog::initializeControl(Option const& opt, QDoubleSpinBox* dspin) {
 }
 
 
-void InputDialog::initializeControl(Option const& opt, QRadioButton* radio) {
+void InputDialog::initializeControl(Option const& opt, QRadioButton* radio) 
+{
    connectControl(opt, radio);
    radio->setToolTip(prependRemName(opt.getName(), opt.getDescription()));
 
@@ -1132,7 +1163,8 @@ void InputDialog::initializeControl(Option const& opt, QRadioButton* radio) {
 }
 
 
-void InputDialog::initializeControl(Option const& opt, QLineEdit* edit) {
+void InputDialog::initializeControl(Option const& opt, QLineEdit* edit) 
+{
    connectControl(opt, edit);
    edit->setToolTip(prependRemName(opt.getName(), opt.getDescription()));
 
@@ -1152,7 +1184,8 @@ void InputDialog::initializeControl(Option const& opt, QLineEdit* edit) {
 //! The connectControl routines make the necessary signal-slot connections
 //! between the control, the current Job and Nodes in the OptionRegister (for
 //! program logic purposes).
-void InputDialog::connectControl(Option const& opt, QComboBox* combo) {
+void InputDialog::connectControl(Option const& opt, QComboBox* combo) 
+{
    QString name = opt.getName();
 
    connect(combo, SIGNAL(currentIndexChanged(const QString&)),
@@ -1171,7 +1204,8 @@ void InputDialog::connectControl(Option const& opt, QComboBox* combo) {
 }
 
 
-void InputDialog::connectControl(Option const& opt, QRadioButton* radio) {
+void InputDialog::connectControl(Option const& opt, QRadioButton* radio) 
+{
    QString name = opt.getName();
 
    connect(radio, SIGNAL(toggled(bool)), 
@@ -1185,7 +1219,8 @@ void InputDialog::connectControl(Option const& opt, QRadioButton* radio) {
 }
 
 
-void InputDialog::connectControl(Option const& opt, QCheckBox* check) {
+void InputDialog::connectControl(Option const& opt, QCheckBox* check) 
+{
    QString name = opt.getName();
 
    connect(check, SIGNAL(stateChanged(int)), 
@@ -1199,7 +1234,8 @@ void InputDialog::connectControl(Option const& opt, QCheckBox* check) {
 }
 
 
-void InputDialog::connectControl(Option const& opt, QDoubleSpinBox* dspin) {
+void InputDialog::connectControl(Option const& opt, QDoubleSpinBox* dspin) 
+{
    QString name = opt.getName();
 
    connect(dspin, SIGNAL(valueChanged(const QString&)),
@@ -1213,7 +1249,8 @@ void InputDialog::connectControl(Option const& opt, QDoubleSpinBox* dspin) {
 }
 
 
-void InputDialog::connectControl(Option const& opt, QSpinBox* spin) {
+void InputDialog::connectControl(Option const& opt, QSpinBox* spin) 
+{
    QString name = opt.getName();
 
    connect(spin, SIGNAL(valueChanged(int)), 
@@ -1227,7 +1264,8 @@ void InputDialog::connectControl(Option const& opt, QSpinBox* spin) {
 }
 
 
-void InputDialog::connectControl(Option const& opt, QLineEdit* edit) {
+void InputDialog::connectControl(Option const& opt, QLineEdit* edit) 
+{
    QString name = opt.getName();
 
    connect(edit, SIGNAL(textChanged(const QString&)), 
@@ -1245,37 +1283,50 @@ void InputDialog::connectControl(Option const& opt, QLineEdit* edit) {
 // The following are required as wrappers for the SetControl() functions
 // as the signature needs to match the signals.
 
-void InputDialog::changeComboBox(QString const& name, QString const& value) {
+void InputDialog::changeComboBox(QString const& name, QString const& value) 
+{
    QComboBox* combo = findChild<QComboBox*>(name.toLower());
    combo ? SetControl(combo, value) : widgetError(name);
 }
 
-void InputDialog::changeDoubleSpinBox(QString const& name, QString const& value) {
+
+void InputDialog::changeDoubleSpinBox(QString const& name, QString const& value) 
+{
    QDoubleSpinBox* spin = findChild<QDoubleSpinBox*>(name.toLower());
    spin ? SetControl(spin, value) : widgetError(name);
 }
 
-void InputDialog::changeSpinBox(QString const& name, QString const& value) {
+
+void InputDialog::changeSpinBox(QString const& name, QString const& value) 
+{
    QSpinBox* spin = findChild<QSpinBox*>(name.toLower());
    spin ? SetControl(spin, value) : widgetError(name);
 }
 
-void InputDialog::changeCheckBox(QString const& name, QString const& value) {
+
+void InputDialog::changeCheckBox(QString const& name, QString const& value) 
+{
    QCheckBox* check = findChild<QCheckBox*>(name.toLower());
    check ? SetControl(check, value) : widgetError(name);
 }
 
-void InputDialog::changeRadioButton(QString const& name, QString const& value) {
+
+void InputDialog::changeRadioButton(QString const& name, QString const& value) 
+{
    QRadioButton* radio = findChild<QRadioButton*>(name.toLower());
    radio ? SetControl(radio, value) : widgetError(name);
 }
 
-void InputDialog::changeLineEdit(QString const& name, QString const& value) {
+
+void InputDialog::changeLineEdit(QString const& name, QString const& value) 
+{
    QLineEdit* edit = findChild<QLineEdit*>(name.toLower());
    edit ? SetControl(edit, value) : widgetError(name);
 }
 
-void InputDialog::widgetError(QString const& name) {
+
+void InputDialog::widgetError(QString const& name) 
+{
    qDebug() << "Error in QChem::InputDialog:\n"
             << "Could not find widget" << name;
 }
@@ -1283,26 +1334,31 @@ void InputDialog::widgetError(QString const& name) {
 
 
 // These widgetChanged functions are used to connect widgets to QtNodes
-void InputDialog::widgetChanged(QString const& value) {
+void InputDialog::widgetChanged(QString const& value) 
+{
    QObject* orig = qobject_cast<QObject*>(sender());
    widgetChanged(orig, value);
 }
 
 
-void InputDialog::widgetChanged(int const& value) {
+void InputDialog::widgetChanged(int const& value) 
+{
    QObject* orig = qobject_cast<QObject*>(sender());
    QString val(QString::number(value));
    widgetChanged(orig, val);
 }
 
-void InputDialog::widgetChanged(bool const& value) {
+
+void InputDialog::widgetChanged(bool const& value) 
+{
    QObject* orig = qobject_cast<QObject*>(sender());
    QString val = value ? QString::number(Qt::Checked) : QString::number(Qt::Unchecked);
    widgetChanged(orig, val);
 }
 
 
-void InputDialog::widgetChanged(QObject* orig, QString const& value) {
+void InputDialog::widgetChanged(QObject* orig, QString const& value) 
+{
    QString name(orig->objectName().toUpper());
    if (m_reg.exists(name)) m_reg.get(name).setValue(value);
    if (m_currentJob) {
@@ -1312,6 +1368,5 @@ void InputDialog::widgetChanged(QObject* orig, QString const& value) {
       updatePreviewText();
    }
 }
-
 
 } // end namespace Qui
