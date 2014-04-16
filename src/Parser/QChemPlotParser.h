@@ -24,19 +24,19 @@
 
 #include "Parser.h"
 #include "GridData.h"
+#include "SurfaceType.h"
 
 
 namespace IQmol {
-namespace Parser2 {
+namespace Parser {
 
-   class QChemPlot: public Base {
+   class QChemPlot : public Base {
 
       public:
-         QChemPlot() : Base(), m_data(0) { }
-         Data::Bank& parse(TextStream&);
-
+         QChemPlot() : Base() { }
+         bool parse(TextStream&);
       private:
-         Data::GridList* m_data;
+         QList<Data::SurfaceType> parseForProperties(TextStream& textStream);
    };
 
 } } // end namespace IQmol::Parser

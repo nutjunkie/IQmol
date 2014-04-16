@@ -32,14 +32,16 @@ namespace Data {
    class Geometry;
 }
 
-namespace Parser2 {
+namespace Parser {
 
    class TextStream;
 
    /// Parses a single list of cartesian coordinates of the format:
-   ///    atom  x(float)  y(float)  z(float)
+   ///
+   ///    atom(int|string)  x(float)  y(float)  z(float)
    /// or 
-   ///    index(int)  atom  x(float)  y(float)  z(float)
+   ///    index(int)  atom(int|string)  x(float)  y(float)  z(float)
+   ///
    /// Atoms can be either atomic numbers or symbols.  Empty lines are ignored,
    /// as are any tokens beyond the 5th.  The parser stops when it reaches an
    /// invalid line, but does not issue a warning message.  The last (invalid)
@@ -48,7 +50,11 @@ namespace Parser2 {
    /// not correspond to a file type.
    class CartesianCoordinates {
       public:
+		 /// Optional argument max limits the number of coordinates that are
+		 /// read in.  This may be useful if the TextStream containts a 
+         /// concatenation of several geometries of the same molecule.
          CartesianCoordinates(int max = INT_MAX) : m_max(max) { }
+
          Data::Geometry* parse(TextStream&);
          QString const& error() const { return m_error; }
 

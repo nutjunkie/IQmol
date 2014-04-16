@@ -42,7 +42,6 @@ namespace Data {
                        
          MultipoleExpansion(qglviewer::Vec const& position = qglviewer::Vec()) 
            : m_order(-1), m_position(position) { }
-         //MultipoleExpansion(MultipoleExpansion const& that) : Base(that) { copy(that); }
 
          Type::ID typeID() const { return Type::MultipoleExpansion; }
 
@@ -51,7 +50,7 @@ namespace Data {
          }
 
 		 // The input for these are the Buckingham traceless values,  The order is 
-         // that which QChem them out, for better or worse.
+         // that which QChem prints them out, for better or worse.
          MultipoleExpansion& addCharge(double const q);
          MultipoleExpansion& addDipole(double const x, double const y, double const z);
          MultipoleExpansion& addQuadrupole(
@@ -72,7 +71,6 @@ namespace Data {
          MultipoleExpansion const operator+(MultipoleExpansion const& that) const {
             return MultipoleExpansion(*this) += that;
          }
-
 
          void serialize(InputArchive& ar, unsigned int const version = 0) {
             privateSerialize(ar, version);
@@ -97,7 +95,6 @@ namespace Data {
          qglviewer::Vec m_position;
          QList<double> m_multipoles;
    };
-
 
    typedef Data::List<Data::MultipoleExpansion> MultipoleExpansionList;
 

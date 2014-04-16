@@ -1,4 +1,0 @@
-INCLUDEPATH += $$PWD
-DEFINES += GL2PS
-SOURCES += $$PWD/gl2ps.C
-HEADERS += $$PWD/gl2ps.h

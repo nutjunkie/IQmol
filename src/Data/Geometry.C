@@ -21,24 +21,21 @@
 ********************************************************************************/
 
 #include "Geometry.h"
-#include "Atom.h"
 #include "AtomicProperty.h"
-#include "IQmol.h"
+#include "Numerical.h"
 #include <QDebug>
 
 
 namespace IQmol {
 namespace Data {
 
-template<> const Type::ID GeometryList::TypeID = Type::GeometryList;
-
 
 Geometry::Geometry() : m_charge(0), m_multiplicity(1) { }
 
 Geometry::Geometry(Geometry const& that) : Base()
 {
-   int n(that.nAtoms());
-   for (int i = 0; i < n; ++i) {
+   unsigned n(that.nAtoms());
+   for (unsigned i = 0; i < n; ++i) {
        append(that.atomicNumber(i), that.position(i));
    }
    m_charge = that.m_charge;
@@ -46,26 +43,47 @@ Geometry::Geometry(Geometry const& that) : Base()
 }
 
 
-QString Geometry::atomicSymbol(int const i) const
+Geometry::Geometry(QList<unsigned> const& atomicNumbers, QList<double> const& coordinates)
+{
+   unsigned n(atomicNumbers.size());
+   if (3*n > (unsigned)coordinates.size()) {
+      qDebug() << "Array length mismatch in Geometry constructor: 3x" 
+               << atomicNumbers.size() << "!=" << coordinates.size();
+      n = coordinates.size()/3;
+   }
+
+   double x, y, z;
+   for (unsigned i = 0; i < n; ++i) {
+       x = coordinates[3*i+0];
+       y = coordinates[3*i+1];
+       z = coordinates[3*i+2];
+       append(atomicNumbers[i], qglviewer::Vec(x, y, z));
+   }  
+   m_charge = 0;
+   m_multiplicity = 1;
+}
+
+
+QString Geometry::atomicSymbol(unsigned const i) const
 {
    QString symbol;
-   if (i < m_atoms.size()) symbol = m_atoms[i]->getLabel<AtomicSymbol>();
+   if (i < (unsigned)m_atoms.size()) symbol = m_atoms[i]->getLabel<AtomicSymbol>();
    return symbol;
 }
 
 
-int Geometry::atomicNumber(int const i) const
+unsigned Geometry::atomicNumber(unsigned const i) const
 {
    int z(0);
-   if (i < m_atoms.size()) z = m_atoms[i]->atomicNumber();
+   if (i < (unsigned)m_atoms.size()) z = m_atoms[i]->atomicNumber();
    return z;
 }
 
 
-qglviewer::Vec Geometry::position(int const i) const
+qglviewer::Vec Geometry::position(unsigned const i) const
 {
    qglviewer::Vec v;
-   if (i < m_coordinates.size()) v = m_coordinates[i];
+   if (i < (unsigned)m_coordinates.size()) v = m_coordinates[i];
    return v;
 }
 
@@ -73,10 +91,8 @@ qglviewer::Vec Geometry::position(int const i) const
 bool Geometry::sameAtoms(Geometry const& that) const
 {
    bool same(m_atoms.size() == that.m_atoms.size());
-   if (same) {
-      for (int i = 0; i < m_atoms.size(); ++i) {
-          same = same && (m_atoms[i]->atomicNumber() == that.m_atoms[i]->atomicNumber());
-      }
+   for (int i = 0; i < m_atoms.size(); ++i) {
+       same = same && (m_atoms[i]->atomicNumber() == that.m_atoms[i]->atomicNumber());
    }
    return same;
 }
@@ -84,17 +100,16 @@ bool Geometry::sameAtoms(Geometry const& that) const
 
 bool Geometry::sameAtoms(QStringList const& symbols) const
 {
-   bool same(m_atoms.size() == symbols.size());
-   if (same) {
-      for (int i = 0; i < m_atoms.size(); ++i) {
-          same = same && (m_atoms[i]->getLabel<AtomicSymbol>() == symbols[i]);
-      }
+   unsigned nAtoms(m_atoms.size());
+   bool same(nAtoms == (unsigned)symbols.size());
+   for (unsigned i = 0; i < nAtoms; ++i) {
+       same = same && (m_atoms[i]->getLabel<AtomicSymbol>() == symbols[i]);
    }
    return same;
 }
 
 
-void Geometry::append(int const z, qglviewer::Vec const& position)
+void Geometry::append(unsigned const z, qglviewer::Vec const& position)
 {
    Atom* atom = new Atom(z);
    m_atoms.push_back(atom);
@@ -110,13 +125,13 @@ void Geometry::append(QString const& symbol, qglviewer::Vec const& position)
 }
 
 
-void Geometry::append(QList<int> const& z, QList<qglviewer::Vec> const& positions)
+void Geometry::append(QList<unsigned> const& z, QList<qglviewer::Vec> const& positions)
 {
    if (z.size() != positions.size()) {
       throw std::runtime_error("Invalid coordinate data");
    }
 
-   for (int i = 0; i < z.size(); ++i) {
+   for (unsigned i = 0; i < (unsigned)z.size(); ++i) {
        append(z[i], positions[i]);
    }
 }
@@ -126,44 +141,44 @@ void Geometry::setCharge(int const charge)
 {
    m_charge = charge;
    int numberOfElectrons(totalNuclearCharge()-m_charge);
-   if (isEven(numberOfElectrons)) {
-      if (isEven(m_multiplicity)) {
+   if (Util::isEven(numberOfElectrons)) {
+      if (Util::isEven(m_multiplicity)) {
          m_multiplicity -= 1;
       }
    }else {
-      if (isOdd(m_multiplicity)) {
+      if (Util::isOdd(m_multiplicity)) {
           m_multiplicity += (m_multiplicity == 1) ? 1 : -1;
       }
    }
 }
 
 
-void Geometry::setChargeAndMultiplicity(int const charge, int const multiplicity)
+void Geometry::setChargeAndMultiplicity(int const charge, unsigned const multiplicity)
 {
    setMultiplicity(multiplicity);
    setCharge(charge);
 }
 
 
-void Geometry::setMultiplicity(int const multiplicity)
+void Geometry::setMultiplicity(unsigned const multiplicity)
 {
    m_multiplicity = multiplicity;
    int numberOfElectrons(totalNuclearCharge()-m_charge);
-   if (isEven(m_multiplicity)) {
-      if (isEven(numberOfElectrons)) {
+   if (Util::isEven(m_multiplicity)) {
+      if (Util::isEven(numberOfElectrons)) {
          m_charge += m_charge > 0 ? -1 : 1;
       }
    }else {
-      if (isOdd(numberOfElectrons)) {
+      if (Util::isOdd(numberOfElectrons)) {
          m_charge += (numberOfElectrons == 1) ? -1 : 1;
       }
    }
 }
 
 
-int Geometry::totalNuclearCharge() const
+unsigned Geometry::totalNuclearCharge() const
 {
-   int totalNuclearCharge(0);
+   unsigned totalNuclearCharge(0);
    QList<Atom*>::const_iterator atom;
    for (atom = m_atoms.begin(); atom != m_atoms.end(); ++atom) {
        totalNuclearCharge += (*atom)->atomicNumber();
@@ -176,10 +191,10 @@ void Geometry::dump() const
 {
    qDebug() << "Geometry:";
    for (int i = 0; i < m_atoms.size(); ++i) {
-        qDebug() << atomicSymbol(i)    << "  " 
-                 << m_coordinates[i].x << "  " 
-                 << m_coordinates[i].y << "  " 
-                 << m_coordinates[i].z;
+        qDebug() << "  " << atomicSymbol(i)    << "  " 
+                         << m_coordinates[i].x << "  " 
+                         << m_coordinates[i].y << "  " 
+                         << m_coordinates[i].z;
    }
    m_properties.dump();
 #if 0 
@@ -197,5 +212,12 @@ void Geometry::scaleCoordinates(double const scale)
    }
 }
 
+
+void Geometry::translate(qglviewer::Vec const& shift)
+{
+   for (int i = 0; i < m_coordinates.size(); ++i) {
+       m_coordinates[i] += shift;
+   }
+}
 
 } } // end namespace IQmol::Data

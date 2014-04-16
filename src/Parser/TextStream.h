@@ -1,5 +1,5 @@
-#ifndef IQMOL_PARSER_TEXTSTREAM_H
-#define IQMOL_PARSER_TEXTSTREAM_H
+#ifndef IQMOL_TEXTSTREAM_H
+#define IQMOL_TEXTSTREAM_H
 /*******************************************************************************
 
   Copyright (C) 2011-13 Andrew Gilbert
@@ -27,7 +27,7 @@
 
 
 namespace IQmol {
-namespace Parser2 {
+namespace Parser {
 
    /// A wrapper around an input QTextStream that adds some useful
    /// functionality like line counting, seeking and tokenization.

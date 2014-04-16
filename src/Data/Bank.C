@@ -27,18 +27,13 @@
 namespace IQmol {
 namespace Data {
 
-Bank::~Bank() { 
-   for (int i = 0; i < size(); ++i) {
-qDebug() << "Bank bust: deleting " << Type::toString(at(i)->typeID());
-       delete at(i);
-   }
-}
-
-
-void Bank::merge(Bank* bank)
-{
-   while (!bank->isEmpty()) {
-      append(bank->takeFirst());
+Bank::~Bank() 
+{ 
+   if (m_deleteContents) {
+       for (int i = 0; i < size(); ++i) {
+           //qDebug() << "Bank bust: deleting " << Type::toString(at(i)->typeID());
+           delete at(i);
+       }
    }
 }
 

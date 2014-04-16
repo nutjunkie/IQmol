@@ -31,23 +31,24 @@ namespace Data {
 
    class AtomicProperty;
 
-   /// Data structure representing an atom.  Note that 
+   /// Data structure representing an atom.
    class Atom : public Base {
 
       friend class boost::serialization::access;
 
       public:
-         Atom(int const Z = 0) :  m_atomicNumber(Z) { }
+         Atom(unsigned const Z = 0) :  m_atomicNumber(Z) { }
          Atom(QString const& symbol);
 
          Type::ID typeID() const { return Type::Atom; }
-         int atomicNumber() const { return m_atomicNumber; }
-         void dump() const;
+         unsigned atomicNumber() const { return m_atomicNumber; }
 
-         /// Returns a pointer to the requested AtomicProperty, if it exists, 
-         /// otherwise creates a new one and adds it to the list.
+		 /// Returns a reference to the requested AtomicProperty.  If the
+		 /// property does not exist, then a new one is created and added to 
+		 /// the list.
          template <class P>
-         P* getProperty() {
+         P& getProperty() 
+         {
             P* p(0);
             Bank::iterator iter;
             for (iter = m_properties.begin(); iter != m_properties.end(); ++iter) {
@@ -57,37 +58,39 @@ namespace Data {
                p = new P(m_atomicNumber);
                m_properties.append(p);
             }
-            return p;
+            return *p;
          }
 
          template <class P>
-         QString getLabel() {
-            return getProperty<P>()->label();
-         }
+         QString getLabel() { return getProperty<P>().label(); }
  
-         void serialize(InputArchive& ar, unsigned int const version = 0) {
+         void serialize(InputArchive& ar, unsigned const version = 0) 
+         {
             privateSerialize(ar, version);
          }
 
-         void serialize(OutputArchive& ar, unsigned int const version = 0) {
+         void serialize(OutputArchive& ar, unsigned const version = 0) 
+         {
             privateSerialize(ar, version);
          }
 
-         static int atomicNumber(QString const&);
+         void dump() const;
+
+         static unsigned atomicNumber(QString const&);
 
       private:
          template <class Archive>
-         void privateSerialize(Archive& ar, unsigned int const) {
+         void privateSerialize(Archive& ar, unsigned const) 
+         {
             ar & m_atomicNumber;
             m_properties.serialize(ar);
          }
 
-         int m_atomicNumber;
+         unsigned m_atomicNumber;
          Bank m_properties;
    };
 
    typedef Data::List<Data::Atom> AtomList;
-
 
 } } // end namespace IQmol::Data
 

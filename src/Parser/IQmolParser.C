@@ -28,9 +28,9 @@
 
 
 namespace IQmol {
-namespace Parser2 {
+namespace Parser {
 
-Data::Bank& IQmol::parseFile(QString const& filePath)
+bool IQmol::parseFile(QString const& filePath)
 {
    std::ifstream ifs(filePath.toStdString().data(), std::ios_base::binary);
 
@@ -46,11 +46,13 @@ Data::Bank& IQmol::parseFile(QString const& filePath)
       m_errors.append(msg);
    }
 
-   return m_dataBank;
+   return m_errors.isEmpty();
 }
 
 
-void IQmol::saveData(QString const& filePath, Data::Bank& data)
+// Note the Bank should be a const&, but the serialize functions are declared
+// non-const for some Boost-related reason.
+bool IQmol::save(QString const& filePath, Data::Bank& data)
 {
    std::ofstream ofs(filePath.toStdString().data(), std::ios_base::binary);
    if (ofs.is_open()) {
@@ -64,6 +66,8 @@ void IQmol::saveData(QString const& filePath, Data::Bank& data)
       msg += filePath;
       m_errors.append(msg);
     }
+
+    return m_errors.isEmpty();
 }
 
 } } // end namespace IQmol::Parser

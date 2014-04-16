@@ -29,6 +29,7 @@ class QtNode : public QObject, public Node<QString> {
          QString const& value = QString()) : 
          Node<QString>(value), m_name(name) { }
 
+      QString const& name() const { return m_name; }
 
    public Q_SLOTS:
       void setValue(QString const& value) {
@@ -52,7 +53,6 @@ class QtNode : public QObject, public Node<QString> {
    private:
       QString m_name;
 };
-
 
 } // end namespace Qui
 

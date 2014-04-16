@@ -21,19 +21,30 @@
 ********************************************************************************/
 
 #include "DataFactory.h"
+
 #include "Atom.h"
 #include "AtomicProperty.h"
 #include "Bank.h"
-#include "Charge.h"
+#include "ChargeMultiplicity.h"
+#include "Constraint.h"
+#include "DipoleMoment.h"
 #include "EfpFragment.h"
+#include "Energy.h"
 #include "File.h"
-#include "Geometry.h"
-#include "GridData.h"
-#include "Molecule.h"
-#include "GeometricProperty.h"
-#include "RemSectionData.h"
-#include "MultipoleExpansion.h"
 #include "Frequencies.h"
+#include "Geometry.h"
+#include "GeometryList.h"
+#include "GridData.h"
+#include "Hessian.h"
+#include "Mesh.h"
+#include "Surface.h"
+#include "SurfaceInfo.h"
+#include "SurfaceType.h"
+#include "MultipoleExpansion.h"
+#include "MolecularOrbitals.h"
+#include "PointCharge.h"
+#include "PointGroup.h"
+#include "RemSectionData.h"
 
 #include <cstdlib>
 #include <exception>
@@ -69,22 +80,23 @@ Base* Factory::create(Type::ID const id)
       case Type::Atom:                    data = new Atom();                    break;
       case Type::AtomList:                data = new AtomList();                break;
       case Type::Bank:                    data = new Bank();                    break;
-      case Type::Charge:                  data = new Charge();                  break;
-      case Type::ChargeList:              data = new ChargeList();              break;
+      case Type::PointCharge:             data = new PointCharge();             break;
+      case Type::PointChargeList:         data = new PointChargeList();         break;
       case Type::EfpFragment:             data = new EfpFragment();             break;
       case Type::EfpFragmentList:         data = new EfpFragmentList();         break;
-      case Type::Grid:                    data = new Grid();                    break;
+      case Type::GridData:                data = new GridData();                break;
       case Type::File:                    data = new File();                    break;
       case Type::FileList:                data = new FileList();                break;
       case Type::Geometry:                data = new Geometry();                break;
       case Type::GeometryList:            data = new GeometryList();            break;
-      case Type::Molecule:                data = new Molecule();                break;
-      case Type::MoleculeList:            data = new MoleculeList();            break;
       case Type::RemSection:              data = new RemSection();              break;
 
       case Type::VibrationalMode:         data = new VibrationalMode();         break;
       case Type::Frequencies:             data = new Frequencies();             break;
       case Type::VibrationalModeList:     data = new VibrationalModeList();     break;
+      case Type::MolecularOrbitals:       data = new MolecularOrbitals();       break;
+      case Type::MolecularOrbitalsList:   data = new MolecularOrbitalsList();   break;
+      case Type::Energy:                  data = new Energy();                  break;
 
       // ---------- Atomic Properties ---------
       case Type::AtomicSymbol:            data = new AtomicSymbol();            break;
@@ -92,6 +104,7 @@ Base* Factory::create(Type::ID const id)
       case Type::NmrShiftIsotropic:       data = new NmrShiftIsotropic();       break;
       case Type::NmrShiftRelative:        data = new NmrShiftRelative();        break;
       case Type::Mass:                    data = new Mass();                    break;
+      case Type::AtomicCharge:            data = new AtomicCharge();            break;
       case Type::MullikenCharge:          data = new MullikenCharge();          break;
       case Type::StewartCharge:           data = new StewartCharge();           break;
       case Type::SpinDensity:             data = new SpinDensity();             break;
@@ -101,10 +114,30 @@ Base* Factory::create(Type::ID const id)
       case Type::DipoleMoment:            data = new DipoleMoment();            break;
       case Type::ScfEnergy:               data = new ScfEnergy();               break;
       case Type::TotalEnergy:             data = new TotalEnergy();             break;
+      case Type::ForceFieldEnergy:        data = new ForceFieldEnergy();        break;
+      case Type::PointGroup:              data = new PointGroup();              break;
+      case Type::Hessian:                 data = new Hessian();                 break;
 
       case Type::MultipoleExpansion:      data = new MultipoleExpansion();      break;
       case Type::MultipoleExpansionList:  data = new MultipoleExpansionList();  break;
 
+      case Type::PositionConstraint:      data = new PositionConstraint();      break;
+      case Type::DistanceConstraint:      data = new DistanceConstraint();      break;
+      case Type::AngleConstraint:         data = new AngleConstraint();         break;
+      case Type::TorsionConstraint:       data = new TorsionConstraint();       break;
+
+      // ---------- Molecular Properties ---------
+      case Type::ChargeMultiplicity:      data = new ChargeMultiplicity();      break;
+
+      case Type::Mesh:                    data = new Mesh();                    break;
+      case Type::MeshList:                data = new MeshList();                break;
+      case Type::Surface:                 data = new Surface();                 break;
+      case Type::SurfaceList:             data = new SurfaceList();             break;
+
+      case Type::SurfaceInfo:             data = new SurfaceInfo();             break;
+      case Type::SurfaceInfoList:         data = new SurfaceInfoList();         break;
+
+      case Type::SurfaceType:             data = new SurfaceType();             break;
 
    default: 
       qDebug() << "TypeID:" << id;

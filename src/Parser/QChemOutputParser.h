@@ -27,12 +27,13 @@
 
 
 namespace IQmol {
-namespace Parser2 {
+namespace Parser {
 
    class QChemOutput : public Base {
 
       public:
-         Data::Bank& parse(TextStream&);
+         bool parse(TextStream&);
+         QStringList parseForErrors(TextStream&);
 
       private:
          Data::Geometry* readStandardCoordinates(TextStream&);
@@ -40,9 +41,10 @@ namespace Parser2 {
          void readCharges(TextStream&, Data::Geometry*, QString const& label);
          void readNmrShifts(TextStream&, Data::Geometry*);
          void readDipoleMoment(TextStream&, Data::Geometry*);
+         void readHessian(TextStream&, Data::Geometry*);
          void readVibrationalModes(TextStream&);
          void readEffectiveRegion(TextStream&);
-         void readDMA(TextStream&);
+         void readDMA(TextStream&, Data::Geometry*);
          void setTotalEnergy(QString const&, Data::Geometry*);
    };
 

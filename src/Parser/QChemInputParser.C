@@ -23,20 +23,20 @@
 #include "QChemInputParser.h"
 #include "CartesianCoordinatesParser.h"
 #include "ZMatrixCoordinatesParser.h"
-#include "ExternalChargesParser2.h"
-#include "EfpFragmentParser2.h"
+#include "ExternalChargesParser.h"
+#include "EfpFragmentParser.h"
 #include "RemSectionData.h"
 #include "EfpFragment.h"
 #include "TextStream.h"
-#include "Charge.h"
+#include "PointCharge.h"
 
 #include <QtDebug>
 
 
 namespace IQmol {
-namespace Parser2 {
+namespace Parser {
 
-Data::Bank& QChemInput::parse(TextStream& textStream)
+bool QChemInput::parse(TextStream& textStream)
 {
    QString line;
    m_geometryList = new Data::GeometryList;
@@ -74,14 +74,15 @@ Data::Bank& QChemInput::parse(TextStream& textStream)
       m_dataBank.append(m_geometryList);
    }
 
-   return m_dataBank;
+   return m_errors.isEmpty();
 }
 
 
 void QChemInput::readMoleculeSection(TextStream& textStream)
 {
    QString msg("Invalid $molecule format on line ");
-   int charge(0), multiplicity(1);
+   int charge(0);
+   unsigned multiplicity(1);
    bool ok;
 
    // First line
@@ -96,20 +97,24 @@ void QChemInput::readMoleculeSection(TextStream& textStream)
       break;
 
       case 1:
-         if (tokens[0].contains("read", Qt::CaseInsensitive) && m_geometryList->size() > 0) {
-             // copy last geometry
-             Data::Geometry* geometry(new Data::Geometry(*(m_geometryList->last()))); 
-             m_geometryList->append(geometry);
-             return;
+         if (tokens[0].contains("read", Qt::CaseInsensitive)) {
+            if (m_geometryList->size() > 0) {
+                // copy previous geometry
+                Data::Geometry* geometry(new Data::Geometry(*(m_geometryList->last()))); 
+                m_geometryList->append(geometry);
+             }else {
+				// We assume we are reading an input section 
+				// from an output file, so don't cause a stir
+             }
           }else {
              m_errors.append(msg + QString::number(textStream.lineNumber()));
-             return;
           }
+          return;
       break;
 
       default:
          charge = tokens[0].toInt(&ok);
-         if (ok) multiplicity = tokens[1].toInt(&ok);
+         if (ok) multiplicity = tokens[1].toUInt(&ok);
          if (!ok) {
             m_errors.append(msg + QString::number(textStream.lineNumber()));
             return;
@@ -327,15 +332,16 @@ void QChemInput::readEfpParamsSection(TextStream& textStream)
 void QChemInput::readExternalChargesSection(TextStream& textStream)
 {
    ExternalCharges parser;
-   Data::Bank& bank(parser.parse(textStream));
-   Data::ChargeList* charges(0);
 
-   if (!parser.errors().isEmpty()) {
+   if (parser.parse(textStream)) {
+      Data::Bank& bank(parser.data());
+      if (!bank.isEmpty()) {
+         Data::Base* base(bank.takeFirst());
+         Data::PointChargeList* charges(dynamic_cast<Data::PointChargeList*>(base));
+         if (charges) m_dataBank.append(charges);
+      }
+   }else {
       m_errors << parser.errors();
-   }else if (!bank.isEmpty()) {
-      Data::Base* base(bank.takeFirst());
-      charges = dynamic_cast<Data::ChargeList*>(base);
-      if (charges) m_dataBank.append(charges);
    }
 }
    

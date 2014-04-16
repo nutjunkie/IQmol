@@ -48,7 +48,7 @@ void ReadInputFile(QFile& file, std::vector<Job*>*, QString* coordinates);
 QString ParseXyzFileContents(QString const& lines, bool bailOnError = false);
 QString ParseXyzCoordinates(QStringList const& lines, bool bailOnError = false);
 
-std::vector<Job*> ParseQChemFileContents(QString const& lines);
+QList<Job*> ParseQChemFileContents(QString const& lines);
 
 
 

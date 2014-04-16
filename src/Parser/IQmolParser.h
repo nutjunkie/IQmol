@@ -26,17 +26,17 @@
 
 
 namespace IQmol {
-namespace Parser2 {
+namespace Parser {
 
    /// Parser for IQmol archive files which store compressed serialized data.
    class IQmol : public Base {
 
       public:
-         Data::Bank& parseFile(QString const& filePath);
-         void saveData(QString const& filePath, Data::Bank&);
+         bool parseFile(QString const& filePath);
+         bool save(QString const& filePath, Data::Bank&);
 
          // This is not implemented as it shouldn't ever be required.
-         Data::Bank& parse(TextStream&) { return m_dataBank; }
+         bool parse(TextStream&) { return false; }
    };
 
 } } // end namespace IQmol::Parser

@@ -24,6 +24,7 @@
 
 #include <QMap>
 #include <QList>
+#include <QColor>
 #include <QString>
 #include <QGLViewer/vec.h>
 #include <QGLViewer/quaternion.h>
@@ -32,14 +33,15 @@
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/list.hpp>
 #include <exception>
- 
+#include "Matrix.h"
+
 
 namespace boost {
 namespace serialization {
  
 // ---------- QString ----------
 template<class Archive>
-inline void save( Archive& ar, const QString& s, const unsigned int /*version*/ )
+inline void save( Archive& ar, const QString& s, const unsigned /*version*/ )
 {
 	using boost::serialization::make_nvp;
 	std::string stdStr(s.toStdString());
@@ -48,7 +50,7 @@ inline void save( Archive& ar, const QString& s, const unsigned int /*version*/ 
  
 
 template<class Archive>
-inline void load( Archive& ar, QString& s, const unsigned int /*version*/ )
+inline void load( Archive& ar, QString& s, const unsigned /*version*/ )
 {
 	using boost::serialization::make_nvp;
 	std::string stdStr;
@@ -58,12 +60,101 @@ inline void load( Archive& ar, QString& s, const unsigned int /*version*/ )
  
 
 template<class Archive>
-inline void serialize(Archive& ar, QString& s, const unsigned int file_version )
+inline void serialize(Archive& ar, QString& s, const unsigned file_version )
 {
 	boost::serialization::split_free(ar, s, file_version);
 }
  
  
+// ---------- boost::Array3D ----------
+template<class Archive>
+inline void save(Archive& ar, const IQmol::Array3D& m, const unsigned /* version */)
+{
+   size_t s0(m.shape()[0]);
+   size_t s1(m.shape()[1]);
+   size_t s2(m.shape()[2]);
+
+   ar << s0 << s1 << s2;
+
+   for (size_t i = 0; i < s0; ++i) {
+       for (size_t j = 0; j < s1; ++j) {
+           for (size_t k = 0; k < s2; ++k) {
+               ar << m[i][j][k];
+           }
+       }
+   }
+}
+
+
+template<class Archive>
+inline void load(Archive& ar, IQmol::Array3D& m, unsigned const /* version */)
+{
+   size_t s0, s1, s2;
+
+   ar >> s0 >> s1 >> s2;
+
+   IQmol::Array3D::extent_gen extents;
+   m.resize(extents[s0][s1][s2]);
+   
+   for (size_t i = 0; i < s0; ++i) {
+       for (size_t j = 0; j < s1; ++j) {
+           for (size_t k = 0; k < s2; ++k) {
+               ar >> m[i][j][k];
+           }
+       }
+   }
+}
+
+
+template<class Archive>
+inline void serialize(Archive& ar, IQmol::Array3D& m, unsigned const version)
+{
+   boost::serialization::split_free(ar, m, version);
+}
+
+
+// ---------- boost::Matrix ----------
+template<class Archive>
+inline void save(Archive& ar, const IQmol::Matrix& m, const unsigned /* version */)
+{
+   size_t nRow(m.size1());
+   size_t nCol(m.size2());
+
+   ar << nRow;
+   ar << nCol;
+
+   for (size_t i = 0; i < nRow; ++i) {
+       for (size_t j = 0; j < nCol; ++j) {
+           ar << m(i,j);
+       }
+   }
+}
+
+
+template<class Archive>
+inline void load(Archive& ar, IQmol::Matrix& m, unsigned const /* version */)
+{
+   size_t nCol, nRow;
+
+   ar >> nRow;
+   ar >> nCol;
+
+   m.resize(nCol, nRow);
+
+   for (size_t i = 0; i < nRow; ++i) {
+       for (size_t j = 0; j < nCol; ++j) {
+           ar >> m(i,j);
+       }
+   }
+}
+
+
+template<class Archive>
+inline void serialize(Archive& ar, IQmol::Matrix& m, unsigned const version)
+{
+   boost::serialization::split_free(ar, m, version);
+}
+
 
 // ---------- QList ----------
 template<class Archive, class U >
@@ -132,10 +223,45 @@ inline void serialize(Archive& ar, QMap<K,V>& map, unsigned const version)
 }
 
 
+// ---------- QColor ----------
+template<class Archive>
+inline void save( Archive& ar, QColor const& color, const unsigned /*version*/ )
+{
+   int r(color.red());
+   int g(color.green());
+   int b(color.blue());
+   int a(color.alpha());
+
+   ar & r;
+   ar & g;
+   ar & b;
+   ar & a;
+}
+ 
+
+template<class Archive>
+inline void load( Archive& ar, QColor& color, const unsigned /*version*/ )
+{
+   int r, g, b, a;
+   ar & r;
+   ar & g;
+   ar & b;
+   ar & a;
+
+   color.setRgb(r, g, b, a);
+}
+ 
+
+template<class Archive>
+inline void serialize( Archive& ar, QColor& color, const unsigned file_version )
+{
+	boost::serialization::split_free(ar, color, file_version);
+}
+
 
 // ---------- qglviewer::Vec ----------
 template<class Archive>
-inline void save( Archive& ar, const qglviewer::Vec& v, const unsigned int /*version*/ )
+inline void save( Archive& ar, const qglviewer::Vec& v, const unsigned /*version*/ )
 {
 	ar << v.x;
 	ar << v.y;
@@ -144,7 +270,7 @@ inline void save( Archive& ar, const qglviewer::Vec& v, const unsigned int /*ver
  
 
 template<class Archive>
-inline void load( Archive& ar, qglviewer::Vec& v, const unsigned int /*version*/ )
+inline void load( Archive& ar, qglviewer::Vec& v, const unsigned /*version*/ )
 {
     double x, y, z;
     ar >> x;
@@ -155,7 +281,7 @@ inline void load( Archive& ar, qglviewer::Vec& v, const unsigned int /*version*/
  
 
 template<class Archive>
-inline void serialize( Archive& ar, qglviewer::Vec& v, const unsigned int file_version )
+inline void serialize( Archive& ar, qglviewer::Vec& v, const unsigned file_version )
 {
 	boost::serialization::split_free(ar, v, file_version);
 }
@@ -163,7 +289,7 @@ inline void serialize( Archive& ar, qglviewer::Vec& v, const unsigned int file_v
 
 // ---------- qglviewer::Quaternion ----------
 template<class Archive>
-inline void save( Archive& ar, const qglviewer::Quaternion& q, const unsigned int /*version*/ )
+inline void save( Archive& ar, const qglviewer::Quaternion& q, const unsigned /*version*/ )
 {
     double q0(q[0]), q1(q[1]), q2(q[2]), q3(q[3]);
 	ar << q0;
@@ -174,7 +300,7 @@ inline void save( Archive& ar, const qglviewer::Quaternion& q, const unsigned in
 
 
 template<class Archive>
-inline void load( Archive& ar, qglviewer::Quaternion& q, const unsigned int /*version*/ )
+inline void load( Archive& ar, qglviewer::Quaternion& q, const unsigned /*version*/ )
 {
     double q0, q1, q2, q3;
     ar >> q0;
@@ -186,7 +312,7 @@ inline void load( Archive& ar, qglviewer::Quaternion& q, const unsigned int /*ve
  
 
 template<class Archive>
-inline void serialize( Archive& ar, qglviewer::Quaternion& q, const unsigned int file_version )
+inline void serialize( Archive& ar, qglviewer::Quaternion& q, const unsigned file_version )
 {
 	boost::serialization::split_free(ar, q, file_version);
 }

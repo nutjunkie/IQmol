@@ -26,22 +26,23 @@
 
 
 namespace IQmol {
-namespace Parser2 {
+namespace Parser {
 
-Data::Bank& Base::parseFile(QString const& filePath)
+bool Base::parseFile(QString const& filePath)
 {
-   QFile file(filePath);
+   m_filePath = filePath;
+   QFile file(m_filePath);
    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
       TextStream textStream(&file);
       parse(textStream);
       file.close();
    }else {
-      QString msg("Failed to open file for read: ");
-      msg += filePath;
+      QString msg("Failed to open file for reading: ");
+      msg += m_filePath;
       m_errors.append(msg);
    }
 
-   return m_dataBank;
+   return m_errors.isEmpty();
 }
 
 } } // end namespace IQmol::Parser

@@ -13,7 +13,7 @@
  *  \date November 2008
  */
 
-#include <map>
+#include <QMap>
 #include <vector>
 #include <QString>
 
@@ -21,7 +21,7 @@
 
 namespace Qui {
 
-typedef std::map<QString,QString> StringMap;
+typedef QMap<QString,QString> StringMap;
 
 class RemSection;
 class KeywordSection;
@@ -68,6 +68,7 @@ class Job {
       StringMap getOptions();
       QString getOption(QString const& name);
       QString getComment();
+      void setComment(QString const&);
 
       KeywordSection* getSection(QString const& name);
       Molecule* getMolecule();
@@ -81,7 +82,7 @@ class Job {
 
 	  //! This contains a list of all the sections, including the RemSection
 	  //! and MoleculeSection
-      std::map<QString,KeywordSection*> m_sections;
+      QMap<QString,KeywordSection*> m_sections;
 
 	  //! destroy is responsibe for deleting any resources that we own the
 	  //! pointers to

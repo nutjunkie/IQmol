@@ -21,7 +21,7 @@
 ********************************************************************************/
 
 #include "MultipoleExpansion.h"
-#include "IQmol.h"
+#include "Constants.h"
 #include <QDebug>
 
 
@@ -40,7 +40,6 @@ MultipoleExpansion& MultipoleExpansion::operator+=(MultipoleExpansion const& tha
    }
    return *this;
 }
-
 
 
 MultipoleExpansion& MultipoleExpansion::addCharge(double const charge)
@@ -133,9 +132,9 @@ void MultipoleExpansionList::dump() const
    double x(0), y(0), z(0);
    for (int i = 0; i < size(); ++i) {
        q  = value(i)->moment(MultipoleExpansion::Q);
-       x += q*value(i)->position().x*AngstromToBohr;
-       y += q*value(i)->position().y*AngstromToBohr;
-       z += q*value(i)->position().z*AngstromToBohr;
+       x += q*value(i)->position().x*Constants::AngstromToBohr;
+       y += q*value(i)->position().y*Constants::AngstromToBohr;
+       z += q*value(i)->position().z*Constants::AngstromToBohr;
        Q += q;
    }
    qDebug() << "   Charge:" << Q;

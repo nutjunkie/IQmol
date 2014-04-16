@@ -28,32 +28,29 @@
 
 #include <QDebug>
 
-using namespace OpenBabel;
-using namespace qglviewer;
 
 namespace IQmol {
-namespace Parser2 {
+namespace Parser {
 
 Data::Geometry* ZMatrixCoordinates::parse(QString const& str)
 {
-   OBConversion conv;
+   OpenBabel::OBConversion conv;
    conv.SetInFormat("gzmat");
    // create dummy z-matrix input
    std::string s("#\n\nzmat\n\n0  1\n");
    s += str.toStdString();
 
-   //OpenBabel::OBMol* mol(new OpenBabel::OBMol);
-   OBMol mol;
+   OpenBabel::OBMol mol;
    std::istringstream iss(s);
    conv.Read(&mol, &iss);
 
    Data::Geometry* geometry(new Data::Geometry);
 
-   FOR_ATOMS_OF_MOL(obAtom, &mol) {
-      geometry->append(obAtom->GetAtomicNum(), Vec(obAtom->x(), obAtom->y(), obAtom->z()));
+   for (::OpenBabel::OBMolAtomIter obAtom(&mol); obAtom; ++obAtom) {
+       qglviewer::Vec position(obAtom->x(), obAtom->y(), obAtom->z());
+       unsigned Z(obAtom->GetAtomicNum());
+       geometry->append(Z, position);
    }
-
-   //delete mol;
 
    return geometry;
 }

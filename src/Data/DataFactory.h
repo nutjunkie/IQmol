@@ -30,7 +30,7 @@ namespace Data {
    class Base;
 
    /// Singleton factory class for creation of Data classes.  Note that the
-   /// implemetation is basic - derived Data classes must be explicitly added to
+   /// implementation is basic - derived Data classes must be explicitly added to
    /// create() before they will work with the DataFactory.
    class Factory {
       public:

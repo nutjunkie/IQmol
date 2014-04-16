@@ -1,0 +1,49 @@
+/*******************************************************************************
+
+  Copyright (C) 2011-2013 Andrew Gilbert
+
+  This file is part of IQmol, a free molecular visualization program. See
+  <http://iqmol.org> for more details.
+
+  IQmol is free software: you can redistribute it and/or modify it under the
+  terms of the GNU General Public License as published by the Free Software
+  Foundation, either version 3 of the License, or (at your option) any later
+  version.
+
+  IQmol is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+  details.
+
+  You should have received a copy of the GNU General Public License along
+  with IQmol.  If not, see <http://www.gnu.org/licenses/>.
+
+********************************************************************************/
+
+#include "ScanDirectory.h"
+
+
+namespace IQmol {
+namespace Util {
+
+QString ScanDirectory(QDir const& dir, QString const& fileName, 
+   Qt::CaseSensitivity caseSensitive)
+{  
+   QString filePath;
+   QFileInfoList list(dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot));
+   QFileInfoList::iterator iter;
+   for (iter = list.begin(); iter != list.end(); ++iter) {
+       if ((*iter).isDir()) {
+          filePath = ScanDirectory((*iter).filePath(), fileName);
+          if (!filePath.isEmpty()) break;
+       }else if ( (*iter).fileName().contains(fileName, caseSensitive)){
+          filePath = (*iter).filePath();
+          break;
+       }
+   }
+
+   return filePath;
+}
+
+
+} }  // end namespace IQmol::Util

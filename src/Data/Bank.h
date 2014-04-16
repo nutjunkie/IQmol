@@ -30,23 +30,30 @@
 namespace IQmol {
 namespace Data {
 
-   /// Class representing a group of Data objects.  Basically this class
-   /// manages the serialization of several different objects (of the same
-   /// or different classes) to the one file.  The load functions makes 
-   /// use of the Data::Factory to create the required objects based on 
-   /// the saved TypeIDs.  Note that the Bank assumes ownership of the
-   /// objects and deletes them in the dtor.  To avoid this the the objects
-   /// should be taken using the QList::take*() functions.
+   /// Class representing and managing a list of Data objects.  It allows for
+   /// the serialization of several different objects (of the same or different
+   /// classes) to the one file.  The load functions makes use of the 
+   /// Data::Factory to create the required objects based on the saved TypeIDs.
+   /// Note that the Bank has ownership of the objects and deletes them in the
+   /// dtor.  
    class Bank : public Base, public QList<Base*> {
 
 	  friend class boost::serialization::access;
 
 	  public: 
-         Bank() { }
+         Bank() : m_deleteContents(true)  { }
          ~Bank();
          Type::ID typeID() const { return Type::Bank; }
 
-         void merge(Bank* bank);
+		 /// Moves the data from that Bank to this Bank.  After a merge, that
+		 /// will have no data.
+         void merge(Bank& that) {
+            while (!that.isEmpty()) { append(that.takeFirst()); }
+         }
+
+         /// Sets whether or not to delete the contents of the Bank 
+         /// when the destructor is called.  The default is to delete
+         void setDeleteContents(bool tf) { m_deleteContents = tf; }
 
          template <class T>
          QList<T*> findData() {
@@ -56,6 +63,16 @@ namespace Data {
                 if ( (t = dynamic_cast<T*>(value(i))) ) list.append(t);
             }
             return list;
+         }
+
+         /// Used to remove and delete all Data objects of a given type from the Bank
+         template <class T>
+         void deleteData() {
+            QList<T*> list(findData<T>());
+            for (int i = 0; i < list.size(); ++i) {
+                removeAll(list[i]);
+                delete list[i];
+            }
          }
 
          void serialize(OutputArchive& ar, unsigned int const version = 0) {
@@ -85,6 +102,7 @@ namespace Data {
          void dump() const;
 
       private:
+         bool m_deleteContents;
          Bank(Bank const&);
 
          BOOST_SERIALIZATION_SPLIT_MEMBER();

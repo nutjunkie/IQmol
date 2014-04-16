@@ -26,7 +26,7 @@ namespace Qui {
 //! option the value is associated with.   This function is called in
 //! InputDialog::initializeControl() to avoid additional database access.
 
-std::map<QString,QString> RemSection::m_adHoc;
+QMap<QString,QString> RemSection::m_adHoc;
 
 void RemSection::addAdHoc(QString const& rem, QString const& quiValue, 
    QString const& qchemValue) {
@@ -53,18 +53,15 @@ void RemSection::init() {
    m_options["QUI_CHARGE"] = "0";
    m_options["QUI_MULTIPLICITY"] = "1";
 
+   m_options["METHOD"] = "HF";
    m_options["EXCHANGE"] = "HF";
-   m_toPrint.insert("EXCHANGE");
+   m_toPrint.insert("METHOD");
 
    m_options["BASIS"] = "6-31G";
    m_toPrint.insert("BASIS");
 
-   m_options["GUI"] = "1";
+   m_options["GUI"] = "2";
    m_toPrint.insert("GUI");
-
-//   m_options["DMA"] = "1";
-//   m_toPrint.insert("DMA");
-
 
    // These are necessary for obsure reasons.  Essentially this is a hack for
    // when we want to combine several controls into the one rem.  Only one of
@@ -122,12 +119,12 @@ void RemSection::read(QString const& input) {
 
 QString RemSection::dump()  {
    QString s("$rem\n");
-   std::map<QString,QString>::const_iterator iter;
+   QMap<QString,QString>::const_iterator iter;
    QString name, value;
 
    for (iter = m_options.begin(); iter != m_options.end(); ++iter) {
-       name  = iter->first;
-       value = iter->second;
+       name  = iter.key();
+       value = iter.value();
        if (printOption(name) && fixOptionForQChem(name, value)) {
           s += "   " + name + "  =  " + value + "\n";
        }
@@ -148,7 +145,7 @@ RemSection* RemSection::clone() const {
 
 
 
-void RemSection::setOptions(std::map<QString,QString> const& options) {
+void RemSection::setOptions(QMap<QString,QString> const& options) {
    m_options.clear();
    m_options = options;
 }
@@ -258,6 +255,8 @@ bool RemSection::fixOptionForQChem(QString& name, QString& value) {
    // Skip internal QUI options
    if (name.startsWith("qui_",Qt::CaseInsensitive)) shouldPrint = false;
 
+   if (name == "METHOD" && value == "Custom")  shouldPrint = false;
+
    // Perform some ad hoc conversions.  These are all triggered in the database
    // by having an entry of the form a|b where a is replaced by b in the input
    // file.  These are set in the InputDialog::initializeControl member function
@@ -272,8 +271,6 @@ bool RemSection::fixOptionForQChem(QString& name, QString& value) {
          value = QString::number(1);
       }
    }
-
-
 
    //fix reals
    if (name == "CC_DIIS_MAXIMUM_OVERLAP" || 
@@ -353,9 +350,9 @@ bool RemSection::fixOptionForQChem(QString& name, QString& value) {
 
 //! This is a debug fuction to check what ad hoc changes we are making.
 void RemSection::printAdHoc() {
-   std::map<QString,QString>::iterator iter;
+   QMap<QString,QString>::iterator iter;
    for (iter = m_adHoc.begin(); iter != m_adHoc.end(); ++iter) {
-       qDebug() << "ADHOC::" << iter->first << "->" << iter->second;
+       qDebug() << "ADHOC::" << iter.key() << "->" << iter.value();
    }
 }
 

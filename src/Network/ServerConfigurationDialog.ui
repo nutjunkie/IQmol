@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ServerDialog</class>
+ <widget class="QDialog" name="ServerDialog">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>471</width>
+    <height>397</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Edit Server</string>
+  </property>
+  <property name="styleSheet">
+   <string>QToolButton {
+   color: #333;
+   background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, 
+          stop: 0 #fff,
+          stop: 0.5 #eee, 
+          stop: 1 #999);
+   border-width: 2px;
+   border-color: #333;
+   border-style: solid;
+   border-radius: 5;
+   padding: 0px;
+   font-size: 24px;
+   min-width: 24px;
+   max-width: 24px;
+   min-height: 24px;
+   max-height: 24px;
+}
+
+QToolButton:disabled {
+  background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, 
+          stop: 0 #fff,
+          stop: 0.5 #eee, 
+          stop: 1 #bbb);
+   border-color: #aaa;
+   color: #aaa;
+}
+
+QToolButton:pressed {
+   background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, 
+          stop: 0 #999,
+          stop: 0.5 #eee, 
+          stop: 1 #fff);
+}
+
+
+QToolButton:checked {
+   border-color: #b00;
+   background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, 
+          stop: 0 #999,
+          stop: 0.5 #eee, 
+          stop: 1 #fff);
+}
+
+QToolTip {
+   border: 2px solid darkkhaki;
+   padding: 2px;
+   border-radius: 3px;
+   opacity: 500;
+   font-size: 10px;
+}</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Server Name</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="typeLabel">
+       <property name="text">
+        <string>Queue System</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <widget class="QLineEdit" name="name">
+         <property name="toolTip">
+          <string>Server mnemonic (does not have to match actual server name)</string>
+         </property>
+         <property name="text">
+          <string>Server</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="2" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QComboBox" name="queueCombo">
+         <property name="toolTip">
+          <string>Basic simply runs the qchem command on the server.  
+
+Use PBS or SGE if there is a queue system on the server.  
+You will be prompted for additional resource limits when 
+submitting a job.</string>
+         </property>
+         <item>
+          <property name="text">
+           <string>None</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Basic</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>PBS</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>SGE</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Auto</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="configureButton">
+         <property name="text">
+          <string>Configure</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_6">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Protocol</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_7">
+       <item>
+        <widget class="QRadioButton" name="localRadioButton">
+         <property name="text">
+          <string>Local</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="sshRadioButton">
+         <property name="text">
+          <string>SSH</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="httpRadioButton">
+         <property name="text">
+          <string>HTTP</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="remoteLoginGroupBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="title">
+      <string>Remote Host</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Host Address</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="userLabel">
+          <property name="text">
+           <string>User Name</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="userName">
+          <property name="toolTip">
+           <string>Account name on the server</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0" colspan="3">
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="clearCookieButton">
+            <property name="text">
+             <string>Clear Cookie</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="configureSshButton">
+            <property name="text">
+             <string>Configure SSH</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="testConnectionButton">
+            <property name="text">
+             <string>Test Connection</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="0" column="1" colspan="2">
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <widget class="QLineEdit" name="hostAddress">
+            <property name="toolTip">
+             <string>Server name or IP address</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>Port</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="port">
+            <property name="minimum">
+             <number>0</number>
+            </property>
+            <property name="maximum">
+             <number>65535</number>
+            </property>
+            <property name="value">
+             <number>22</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLineEdit" name="workingDirectory">
+          <property name="toolTip">
+           <string>This is the directory on the server where calculations will be run</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="workingDirectoryLabel">
+          <property name="text">
+           <string>Working Directory</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="authenticationLabel">
+          <property name="text">
+           <string>Authentication</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QComboBox" name="authenticationCombo">
+            <property name="currentIndex">
+             <number>0</number>
+            </property>
+            <item>
+             <property name="text">
+              <string>SSH Agent</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>SSH Public Key</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>SSH Host Based</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>SSH Keyboard Interactive</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>SSH Prompt</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QPushButton" name="loadButton">
+       <property name="text">
+        <string>Load</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="saveAsButton">
+       <property name="text">
+        <string>Save As</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>288</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QDialogButtonBox" name="buttonBox">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="standardButtons">
+        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>name</tabstop>
+  <tabstop>queueCombo</tabstop>
+  <tabstop>configureButton</tabstop>
+  <tabstop>hostAddress</tabstop>
+  <tabstop>port</tabstop>
+  <tabstop>userName</tabstop>
+  <tabstop>authenticationCombo</tabstop>
+  <tabstop>workingDirectory</tabstop>
+  <tabstop>testConnectionButton</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../IQmol.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>ServerDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

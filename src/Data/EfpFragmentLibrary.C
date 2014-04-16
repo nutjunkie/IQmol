@@ -21,10 +21,10 @@
 ********************************************************************************/
 
 #include "EfpFragmentLibrary.h"
-#include "EfpFragmentParser2.h"
-#include "Geometry.h"
+#include "EfpFragmentParser.h"
+#include "ScanDirectory.h"
 #include "Preferences.h"
-#include "IQmol.h"
+#include "Geometry.h"
 #include <QDebug>
 
 
@@ -74,7 +74,7 @@ bool EfpFragmentLibrary::add(QString const& fragmentName)
    if (isLoaded(fragmentName)) return true;
 
    QString filePath(getFilePath(fragmentName));
-   Parser2::EfpFragment parser;
+   Parser::EfpFragment parser;
    // This relies on the side effect of the parser, which inserts any parsed
    // EFP fragments into the library.
    parser.readFragment(filePath);
@@ -84,6 +84,7 @@ bool EfpFragmentLibrary::add(QString const& fragmentName)
 
 bool EfpFragmentLibrary::defined(QString const& fragmentName)
 {
+   if (isLoaded(fragmentName)) return true;
    return add(fragmentName);
 }
 
@@ -98,15 +99,15 @@ QString EfpFragmentLibrary::getFilePath(QString const& fragmentName)
 {
    QString filePath;
    QDir dir(Preferences::FragmentDirectory());
-   if (dir.exists() && dir.cd("EFP")) filePath = ScanDirectory(dir, fragmentName);
+   if (dir.exists() && dir.cd("EFP")) filePath = Util::ScanDirectory(dir, fragmentName);
    return filePath;
 }
 
 
-Geometry const& EfpFragmentLibrary::geometry(QString const& name) const
+Geometry const& EfpFragmentLibrary::geometry(QString const& name)
 {
    QString tmp(name.toLower());
-   if (!isLoaded(name)) tmp = "empty";
+   if (!defined(name)) tmp = "empty";
    return *s_geometries.value(tmp);
    
 }

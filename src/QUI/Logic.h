@@ -42,26 +42,34 @@ inline void DoNothing() { }
 //! Convenience function used to create a new Rule from an existing Condition
 //! and Action(s)
 inline Rule If(Condition const& condition, Action const& trueAction, 
-   Action const& falseAction = DoNothing) {
+   Action const& falseAction = DoNothing) 
+{
    return boost::make_tuple(condition, trueAction, falseAction);
 }
 
 
 
 //! The following are really only requred for binding in the operators below.
-inline bool Not(Condition const& cond) { 
+inline bool Not(Condition const& cond) 
+{
    return !cond(); 
 }
 
-inline bool  Or(Condition const& cond1, Condition const& cond2) { 
+
+inline bool  Or(Condition const& cond1, Condition const& cond2) 
+{
    return cond1() || cond2(); 
 }
 
-inline bool And(Condition const& cond1, Condition const& cond2) { 
+
+inline bool And(Condition const& cond1, Condition const& cond2) 
+{
    return cond1() && cond2(); 
 }
 
-inline void Plus(Action const& act1, Action const& act2) { 
+
+inline void Plus(Action const& act1, Action const& act2) 
+{
    act1(); act2(); 
 }
 
@@ -71,19 +79,23 @@ inline void Plus(Action const& act1, Action const& act2) {
 
 //! The following operators can be used to combine Conditions in an intuitive
 //! manner.  Note that they return new Conditions and not boolean values.
-inline Condition const operator!(Condition const& cond) {
+inline Condition const operator!(Condition const& cond) 
+{
    return boost::bind(&Not, cond);
 } 
 
-inline Condition const operator||(Condition const& cond1, Condition const& cond2) {
+inline Condition const operator||(Condition const& cond1, Condition const& cond2) 
+{
    return boost::bind(&Or, cond1, cond2);
 } 
 
-inline Condition const operator&&(Condition const& cond1, Condition const& cond2) {
+inline Condition const operator&&(Condition const& cond1, Condition const& cond2) 
+{
    return boost::bind(&And, cond1, cond2);
 }
 
-inline Action const operator+(Action const& act1, Action const& act2) { 
+inline Action const operator+(Action const& act1, Action const& act2) 
+{
    return boost::bind(&Plus, act1, act2);
 }
 

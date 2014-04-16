@@ -1,0 +1,126 @@
+<RCC>
+  <qresource prefix="/" >
+    <file>resources/icons/AddFragment.png</file>
+    <file>resources/icons/T14.png</file>
+    <file>resources/icons/T24.png</file>
+    <file>resources/icons/AddHydrogens.png</file>
+    <file>resources/icons/Add.png</file>
+    <file>resources/icons/Abort.png</file>
+    <file>resources/icons/Back.png</file>
+    <file>resources/icons/Delete.png</file>
+    <file>resources/icons/Configure.png</file>
+    <file>resources/icons/Display.png</file>
+    <file>resources/icons/Equipment.png</file>
+    <file>resources/icons/Equipment_sm.png</file>
+    <file>resources/icons/Minimize.png</file>
+    <file>resources/icons/Favourites.png</file>
+    <file>resources/icons/Film.png</file>
+    <file>resources/icons/Forward.png</file>
+    <file>resources/icons/GoBack.png</file>
+    <file>resources/icons/GoForward.png</file>
+    <file>resources/icons/Go.png</file>
+    <file>resources/icons/Help.png</file>
+    <file>resources/icons/Home.png</file>
+    <file>resources/icons/MagicWand.png</file>
+    <file>resources/icons/Manipulate.png</file>
+    <file>resources/icons/NewDocument.png</file>
+    <file>resources/icons/Open.png</file>
+    <file>resources/icons/Play.png</file>
+    <file>resources/icons/Plus.png</file>
+    <file>resources/icons/Question.png</file>
+    <file>resources/icons/Remove.png</file>
+    <file>resources/icons/Refresh.png</file>
+    <file>resources/icons/Save.png</file>
+    <file>resources/icons/Search.png</file>
+    <file>resources/icons/Stop.png</file>
+    <file>resources/icons/iqmol.png</file>
+    <file>resources/icons/Movie.png</file>
+    <file>resources/icons/Camera.png</file>
+    <file>resources/icons/Up.png</file>
+    <file>resources/icons/Down.png</file>
+    <file>resources/cursors/build.png</file>
+    <file>resources/cursors/closed_hand.png</file>
+    <file>resources/cursors/closed_hand_select.png</file>
+    <file>resources/cursors/open_hand.png</file>
+    <file>resources/cursors/open_hand_select.png</file>
+    <file>resources/cursors/rotate.png</file>
+    <file>resources/cursors/select.png</file>
+    <file>resources/cursors/translate.png</file>
+    <file>resources/cursors/translate_selection.png</file>
+    <file>resources/cursors/zoom.png</file>
+    <file>resources/unhappy.png</file>
+  </qresource>
+
+  <qresource prefix="/" >
+    <file>help/index.html</file>
+    <file>help/search.html</file>
+    <file>help/surfaces.html</file>
+    <file>help/overview.html</file>
+    <file>help/toolbar.html</file>
+    <file>help/modes.html</file>
+    <file>help/modelview.html</file>
+    <file>help/credits.html</file>
+    <file>help/layers.html</file>
+    <file>help/calculations.html</file>
+    <file>help/paths.html</file>
+    <file>help/vibrations.html</file>
+    <file>help/movies.html</file>
+
+    <file>help/images/header.png</file>
+    <file>help/images/ModelView.png</file>
+    <file>help/images/VibrationsWindow.png</file>
+    <file>help/images/PathWindow.png</file>
+    <file>help/images/MoleculeConfigurator.png</file>
+    <file>help/images/MainWindow.png</file>
+    <file>help/images/Favourites.png</file>
+    <file>help/images/ServerDialog.png</file>
+    <file>help/images/ServerOptions.png</file>
+    <file>help/images/ProcessMonitor.png</file>
+    <file>help/images/SurfaceConfigurator.png</file>
+
+    <file>help/images/buttons/Manipulate.png</file>
+    <file>help/images/buttons/Equipment.png</file>
+    <file>help/images/buttons/AddFragment.png</file>d
+    <file>help/images/buttons/AddHydrogens.png</file>d
+    <file>help/images/buttons/Open.png</file>d
+    <file>help/images/buttons/Minimize.png</file>d
+    <file>help/images/buttons/MagicWand.png</file>
+    <file>help/images/buttons/NewDocument.png</file>
+    <file>help/images/buttons/Movie.png</file>
+    <file>help/images/buttons/Camera.png</file>
+    <file>help/images/buttons/Save.png</file>
+    <file>help/images/buttons/Delete.png</file>
+    <file>help/images/buttons/Display.png</file>
+    <file>help/images/buttons/Help.png</file>
+    <file>help/images/buttons/Film.png</file>
+
+    <file>help/images/buttons/GoForward.png</file>
+    <file>help/images/buttons/GoBack.png</file>
+    <file>help/images/buttons/Play.png</file>
+
+    <file>help/images/cursors/build.png</file>
+    <file>help/images/cursors/closed_hand.png</file>
+    <file>help/images/cursors/closed_hand_select.png</file>
+    <file>help/images/cursors/open_hand.png</file>
+    <file>help/images/cursors/open_hand_select.png</file>
+    <file>help/images/cursors/rotate.png</file>
+    <file>help/images/cursors/select.png</file>
+    <file>help/images/cursors/translate.png</file>
+    <file>help/images/cursors/translate_selection.png</file>
+    <file>help/images/cursors/zoom.png</file>
+  </qresource>
+
+  <qresource prefix="/" >
+    <file alias="imageCritical" >resources/QMsgBox/critical.png</file>
+    <file alias="imageInformation" >resources/QMsgBox/information.png</file>
+    <file alias="imageQuestion" >resources/QMsgBox/question.png</file>
+    <file alias="imageWarning" >resources/QMsgBox/warning.png</file>
+  </qresource>
+
+  <qresource prefix="/" >
+    <file>resources/IQmol.icns</file>
+    <file>resources/IQmolDocument.icns</file>
+    <file>resources/IQmol.png</file>
+    <file>resources/IQmolDocument.png</file>
+  </qresource>
+</RCC>

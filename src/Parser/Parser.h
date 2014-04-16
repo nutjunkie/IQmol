@@ -25,7 +25,7 @@
 #include "Bank.h"
 
 namespace IQmol {
-namespace Parser2 {
+namespace Parser {
 
    class TextStream;
 
@@ -36,18 +36,22 @@ namespace Parser2 {
          virtual ~Base() { }
 
 		 /// The default implementation performs basic checks on the file
-		 /// bfore handing the work off to the parse() function. 
-		 virtual Data::Bank& parseFile(QString const& filePath);
+		 /// bfore handing the work off to the parse() function. Returns
+         /// true only if no errors were encountered.
+		 virtual bool parseFile(QString const& filePath);
 
          /// This function does the actual work of parsing the file contents 
-         /// and must be reimplemented for a specific file type.
-         virtual Data::Bank& parse(TextStream&) = 0;
+         /// and must be reimplemented for a specific file type.  Returns
+         /// true only if no errors were encountered.
+         virtual bool parse(TextStream&) = 0;
 
          QStringList const& errors() const { return m_errors; } 
+         Data::Bank& data() { return m_dataBank; }
 
       protected:
+         QString     m_filePath;
          QStringList m_errors;
-         Data::Bank m_dataBank;
+         Data::Bank  m_dataBank;
    };
 
 } } // end namespace IQmol::Parser
