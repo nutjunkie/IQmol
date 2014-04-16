@@ -17,7 +17,7 @@ namespace Qui {
 template <class T>
 inline bool Equals(Node<T> const* node, T const& value) 
 {
-   qDebug() << "Inside Equals" << node->getValue() << value << (node->getValue() == value);
+//   qDebug() << "Inside Equals" << node->getValue() << value << (node->getValue() == value);
    return (node->getValue() == value);
 }
 
@@ -26,7 +26,7 @@ inline bool Equals(Node<T> const* node, T const& value)
 inline bool Equals2(QtNode const* node, QString const& value) 
 {
    bool tf = (QString::compare(node->getValue(), value, Qt::CaseInsensitive) == 0);
-   qDebug() << "Inside Equals 2" << node->name() << node->getValue() << value << tf;
+//   qDebug() << "Inside Equals 2" << node->name() << node->getValue() << value << tf;
    return tf;
 }
 
@@ -49,13 +49,13 @@ inline Condition const operator==(T const& value, Node<T> const& node)
 template <class T>
 inline Condition const operator==(Node<T> const& node, T const& value) 
 {
-   qDebug() << "Operator==<NodeT> required" << node.getValue() << value;
+//   qDebug() << "Operator==<NodeT> required" << node.getValue() << value;
    return boost::bind(&Equals<T>, &node, value);
 } 
 
 inline Condition const operator==(QtNode const& node, const char* value) 
 {
-   qDebug() << "Operator == required" << node.getValue() << QString(value);
+//   qDebug() << "Operator == required" << node.getValue() << QString(value);
    return boost::bind(&Equals2, &node, QString(value));
 } 
 

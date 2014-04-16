@@ -56,7 +56,7 @@ inline bool Not(Condition const& cond)
 }
 
 
-inline bool  Or(Condition const& cond1, Condition const& cond2) 
+inline bool Or(Condition const& cond1, Condition const& cond2) 
 {
    return cond1() || cond2(); 
 }

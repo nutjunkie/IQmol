@@ -26,15 +26,12 @@
 
 namespace Qui {
 
-typedef QString S;  // deprecate
-
 // We declare these here to keep all the logic in one place
 
 bool True() 
 { 
    return true; 
 }
-
 
 bool False() 
 { 
@@ -211,8 +208,7 @@ void InputDialog::initializeQuiLogic()
 
    jobType.addRule(
       If(jobType == "Energy"   || jobType == "Forces"           || 
-         jobType == "Geometry" || jobType == "Transition State" ||
-         jobType == "Chemical Shifts",
+         jobType == "Geometry" || jobType == "Chemical Shifts",
          RemovePages(m_ui.toolBoxOptions, pages)
       )
    );
@@ -222,6 +218,14 @@ void InputDialog::initializeQuiLogic()
       If(jobType == s,
         RemovePages(m_ui.toolBoxOptions, pages)
          + AddPage(m_ui.toolBoxOptions, m_toolBoxOptions.value(s), s)
+      )
+   );
+
+   s = "Transition State";
+   jobType.addRule(
+      If(jobType == s,
+         RemovePages(m_ui.toolBoxOptions, pages)
+          + AddPage(m_ui.toolBoxOptions, m_toolBoxOptions.value(s), s)
       )
    );
 
@@ -322,49 +326,57 @@ void InputDialog::initializeQuiLogic()
 
 
 
-  // ----- A D V A N C E D -----
  
-   QtNode* node;
-   QtNode* node2;
+  // ----- T A B B E D   W I D G E T   O P T I O N S -----
 
 
    // Setup -> Frequencies
    QtNode& anharmonic(reg.get("ANHARMONIC"));
-   anharmonic.addRule( If(anharmonic == QtTrue, Enable(m_ui.vci),  Disable(m_ui.vci)) );
+   anharmonic.addRule( 
+       If (anharmonic == QtTrue, 
+          Enable(m_ui.vci),  
+          Disable(m_ui.vci)
+       )
+   );
+
 
    // Setup -> Ab Initio MD
-   node = &reg.get("AIMD_METHOD");
-   node->addRule(
-      If(*node == S("BOMD"), 
+   QtNode& aimd_method(reg.get("AIMD_METHOD"));
+   aimd_method.addRule(
+      If (aimd_method == "BOMD", 
          Disable(m_ui.deuterate), 
          Enable(m_ui.deuterate) 
       )
    );
-   node = &reg.get("AIMD_INITIAL_VELOCITIES");
-   node->addRule(
-      If(*node == QString("Thermal"), 
-         Enable(m_ui.aimd_temperature), 
-         Disable(m_ui.aimd_temperature) 
+
+   QtNode& aimd_initial_velocities(reg.get("AIMD_INITIAL_VELOCITIES"));
+   aimd_initial_velocities.addRule(
+      If (aimd_initial_velocities == QString("Thermal"), 
+          Enable(m_ui.aimd_temperature), 
+          Disable(m_ui.aimd_temperature) 
       )
    );
 
 
    // Setup -> Transition State
-   node = &reg.get("JOB_TYPE");
-   node->addRule(
-      If(*node == S("Transition State"),  
+   jobType.addRule(
+      If (jobType == "Transition State", 
          Enable(m_ui.geom_opt_mode), 
-         Disable(m_ui.geom_opt_mode) 
-      )
+         Disable(m_ui.geom_opt_mode))
    );
 
 
+   // ----- A D V A N C E D   O P T I O N S   P A N E L -----
 
+   QtNode* node;
+   QtNode* node2;
+
+   typedef QString S;
 
    // Advanced -> SCF Control
    node = &reg.get("SCF_ALGORITHM");
    node->addRule(
-      If(*node == S("DM"),  
+      If(*node == "DM",  
          Enable(m_ui.pseudo_canonical), 
          Disable(m_ui.pseudo_canonical) 
       )
@@ -393,14 +405,7 @@ void InputDialog::initializeQuiLogic()
    );
 
 
-   // Advanced -> SCF Control -> DFT
-   node = &reg.get("XC_GRID");
-   node->addRule(
-      If(*node == S("SG-0") || *node == S("SG-1"),  
-         Disable(m_ui.qui_radial_grid),
-         Enable(m_ui.qui_radial_grid)
-      )
-   );
+   // Advanced -> DFT
 
    node = &reg.get("DFT_D");
    node->addRule(
@@ -409,8 +414,6 @@ void InputDialog::initializeQuiLogic()
          Disable(m_ui.dft_d_a)
       )
    );
-
-
 
    node = &reg.get("INCDFT");
    node->addRule(
@@ -428,7 +431,7 @@ void InputDialog::initializeQuiLogic()
    );
 
 
-   // Advanced -> SCF Control -> DFT -> Constrained DFT
+   // Advanced -> DFT -> Constrained DFT
    node = &reg.get("CDFT");
    node->addRule(
       If(*node == QtTrue, 
@@ -442,14 +445,60 @@ void InputDialog::initializeQuiLogic()
       )
    );
 
+   // Advanced -> DFT -> Dispersion Correction
+   QtNode& dft_d(reg.get("DFT_D"));
+   dft_d.addRule(
+      If (dft_d == "DFT-D3", 
+         Enable(m_ui.groupBox_dft_d),
+         Disable(m_ui.groupBox_dft_d)
+      )
+   );
+   
+
+   // Advanced -> DFT -> XDM
+   QtNode& dftvdw_jobnumber(reg.get("DFTVDW_JOBNUMBER"));
+   QtNode& dftvdw_method(reg.get("DFTVDW_METHOD"));
+
+   dftvdw_jobnumber.addRule(
+      If (dftvdw_jobnumber == "None", 
+         Disable(m_ui.dftvdw_method)           + Disable(m_ui.dftvdw_print) +
+         Disable(m_ui.dftvdw_mol1natoms)       + Disable(m_ui.dftvdw_kai) +
+         Disable(m_ui.label_dftvdw_method)     + Disable(m_ui.label_dftvdw_print) +
+         Disable(m_ui.label_dftvdw_mol1natoms) + Disable(m_ui.label_dftvdw_kai) +
+         Disable(m_ui.dftvdw_alpha1)           + Disable(m_ui.dftvdw_alpha2) +
+         Disable(m_ui.label_dftvdw_alpha1)     + Disable(m_ui.label_dftvdw_alpha2),
+
+         Enable(m_ui.dftvdw_method)     + Enable(m_ui.dftvdw_print) +
+         Enable(m_ui.dftvdw_mol1natoms) + Enable(m_ui.dftvdw_kai) +
+         Enable(m_ui.label_dftvdw_method)     + Enable(m_ui.label_dftvdw_print) +
+         Enable(m_ui.label_dftvdw_mol1natoms) + Enable(m_ui.label_dftvdw_kai)
+      )
+   );
+
+   rule = If ((dftvdw_jobnumber != "None") && (dftvdw_method == "C6 Term Only"), 
+              Disable(m_ui.dftvdw_alpha1)       + Disable(m_ui.dftvdw_alpha2) +
+              Disable(m_ui.label_dftvdw_alpha1) + Disable(m_ui.label_dftvdw_alpha2)
+          );
+   dftvdw_method.addRule(rule);
+   dftvdw_jobnumber.addRule(rule);
+
+   rule = If ((dftvdw_jobnumber != "None") && (dftvdw_method != "C6 Term Only"), 
+              Enable(m_ui.dftvdw_alpha1)        + Enable(m_ui.dftvdw_alpha2) +
+              Enable(m_ui.label_dftvdw_alpha1)  + Enable(m_ui.label_dftvdw_alpha2)
+          );
+   dftvdw_method.addRule(rule);
+   dftvdw_jobnumber.addRule(rule);
+
+
+
 
    // Advanced -> SCF Control -> Print Options
    node = &reg.get("QUI_PRINT_ORBITALS");
    node2 = &reg.get("PRINT_ORBITALS");
    node->addRule(
       If(*node == QtTrue,
-         Enable(m_ui.print_orbitals) + node2->shouldBe("5"),
-         Disable(m_ui.print_orbitals)
+         Enable(m_ui.print_orbitals) + Enable(m_ui.label_print_orbitals) + node2->shouldBe("5"),
+         Disable(m_ui.print_orbitals) + Disable(m_ui.label_print_orbitals)
       )
    );
 
@@ -491,6 +540,7 @@ void InputDialog::initializeQuiLogic()
 
 
    // Advanced -> Wavefunction Analysis -> Intracules
+/*
    node = &reg.get("INTRACULE");
    node->addRule(
       If(*node == QtTrue,
@@ -509,6 +559,7 @@ void InputDialog::initializeQuiLogic()
          + Disable(m_ui.intracule_conserve_memory) 
       )
    );
+*/
 
 
    // Advanced -> Large Molecule Methods -> CFMM

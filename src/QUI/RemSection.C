@@ -67,7 +67,7 @@ void RemSection::init() {
    // when we want to combine several controls into the one rem.  Only one of
    // them triggers the print to the input file, but the others also have to be
    // in the m_options list as they will be referenced.
-/*   m_options["QUI_RADIAL_GRID"] = "50";
+/*   
    m_options["QUI_XOPT_SPIN1"]  = "Low";
    m_options["QUI_XOPT_IRREP1"] = "1";
    m_options["QUI_XOPT_STATE1"] = "0";
@@ -228,14 +228,13 @@ bool RemSection::fixOptionForQui(QString& name, QString& value) {
       value = QString::number(value.toInt()*10);
    }
 
-   if (name == "XC_GRID") {
+   if (name == "XC_GRID" || name == "NL_GRID") {
       bool isInt(false);
-      int g = value.toInt(&isInt); 
+      int g(value.toInt(&isInt)); 
       if (isInt) {
-         int a = g % 1000000;
-         int r = g / 1000000;
-         value =QString::number(a); 
-         m_options["QUI_RADIAL_GRID"] = QString::number(r);
+         int a(g % 1000000);
+         int r(g / 1000000);
+         value = QString::number(a) + "," + QString::number(r); 
       }
    }
 
@@ -303,14 +302,19 @@ bool RemSection::fixOptionForQChem(QString& name, QString& value) {
       shouldPrint = true;
    }
 
-   if (name == "XC_GRID") {
-      int ang(value.toInt(&isInt));
+   if (name == "XC_GRID" || name == "NL_GRID") {
+      QStringList tokens(value.split(","));
+      if (tokens.size() == 2) {
+         bool angularIsInt(false);
+         bool radialIsInt(false);
+         int  rad(tokens[0].toInt(&radialIsInt));
+         int  ang(tokens[1].toInt(&angularIsInt));
 
-      if (isInt) {
-         value = QString("%1").arg(ang);
-         value = m_options["QUI_RADIAL_GRID"] + value.rightJustified(6,'0');
-      }
-
+         if (angularIsInt && radialIsInt) {
+            value = QString("%1").arg(ang);
+            value = QString::number(rad) + value.rightJustified(6,'0');
+         }
+      } 
    }
 
   
