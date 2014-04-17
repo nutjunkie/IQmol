@@ -198,69 +198,72 @@ void InputDialog::initializeQuiLogic()
 
    // JOB_TYPE
 
-   QtNode& jobType(reg.get("JOB_TYPE"));
+   QtNode& job_type(reg.get("JOB_TYPE"));
 
    QStringList pages;
    pages << "Frequencies" 
          << "Reaction Path" 
          << "Ab Initio MD" 
+         << "Transition State"
+         << "Energy Decomposition"
+         << "BSSE"
          << "Properties";
 
-   jobType.addRule(
-      If(jobType == "Energy"   || jobType == "Forces"           || 
-         jobType == "Geometry" || jobType == "Chemical Shifts",
+   job_type.addRule(
+      If(job_type == "Energy"   || job_type == "Forces" || 
+         job_type == "Geometry" || job_type == "Chemical Shifts",
          RemovePages(m_ui.toolBoxOptions, pages)
       )
    );
 
    QString s("Frequencies");
-   jobType.addRule(
-      If(jobType == s,
+   job_type.addRule(
+      If(job_type == s,
         RemovePages(m_ui.toolBoxOptions, pages)
          + AddPage(m_ui.toolBoxOptions, m_toolBoxOptions.value(s), s)
       )
    );
 
    s = "Transition State";
-   jobType.addRule(
-      If(jobType == s,
+   job_type.addRule(
+      If(job_type == s,
          RemovePages(m_ui.toolBoxOptions, pages)
           + AddPage(m_ui.toolBoxOptions, m_toolBoxOptions.value(s), s)
       )
    );
 
    s = "Reaction Path";
-   jobType.addRule(
-      If(jobType == s,
+   job_type.addRule(
+      If(job_type == s,
          RemovePages(m_ui.toolBoxOptions, pages)
           + AddPage(m_ui.toolBoxOptions, m_toolBoxOptions.value(s), s)
       )
    );
 
    s = "Ab Initio MD";
-   jobType.addRule(
-      If(jobType == s,
+   job_type.addRule(
+      If(job_type == s,
          RemovePages(m_ui.toolBoxOptions, pages)
           + AddPage(m_ui.toolBoxOptions, m_toolBoxOptions.value(s), s)
       )
    );
 
    s = "Properties";
-   jobType.addRule(
-      If(jobType == s,
+   job_type.addRule(
+      If(job_type == s,
          RemovePages(m_ui.toolBoxOptions, pages)
           + AddPage(m_ui.toolBoxOptions, m_toolBoxOptions.value(s), s)
       )
    );
 
-   jobType.addRule(
+   job_type.addRule(
       If (requiresDerivatives, 
           reg.get("THRESH").shouldBeAtLeast("12"), 
           reg.get("THRESH").shouldBeAtLeast("8")
       )
    );
       
-   jobType.addRule(
+   job_type.addRule(
       If(requiresDerivatives, 
          reg.get("SCF_CONVERGENCE").shouldBeAtLeast("8"),
          reg.get("SCF_CONVERGENCE").shouldBeAtLeast("5"))
@@ -276,6 +279,16 @@ void InputDialog::initializeQuiLogic()
    correlation.addRule(rule);
    exchange.addRule(rule);
    method.addRule(rule);
+
+   s = "CIS";
+   method.addRule(
+      If (method == "CIS", 
+          AddPage(m_ui.toolBoxOptions, m_toolBoxOptions.value(s), s),
+          RemovePage(m_ui.toolBoxOptions, s)
+      )
+   );
+
+
 
    QtNode& dma(reg.get("DMA"));
    dma.addRule(
@@ -359,11 +372,23 @@ void InputDialog::initializeQuiLogic()
 
 
    // Setup -> Transition State
-   jobType.addRule(
-      If (jobType == "Transition State", 
+   job_type.addRule(
+      If (job_type == "Transition State", 
          Enable(m_ui.geom_opt_mode), 
          Disable(m_ui.geom_opt_mode))
    );
+
+
+   // Setup -> CIS
+   job_type.addRule(
+      If(job_type == "Geometry"    || job_type == "Reaction Path"    ||
+         job_type == "Frequencies" || job_type == "Transition State" ||
+         job_type == "Forces", 
+         Enable(m_ui.cis_state_derivative)  + Enable(m_ui.label_cis_state_derivative), 
+         Disable(m_ui.cis_state_derivative) + Disable(m_ui.label_cis_state_derivative) 
+      )
+   );
+
 
 
    // ----- A D V A N C E D   O P T I O N S   P A N E L -----
@@ -713,14 +738,6 @@ void InputDialog::initializeQuiLogic()
 
 
    // Advanced -> Excited States -> CIS
-   node = &reg.get("JOB_TYPE");
-   node->addRule(
-      If(*node == S("Geometry") || *node == S("Frequencies") 
-                                || *node == S("Forces"), 
-         Enable(m_ui.cis_state_derivative), 
-         Disable(m_ui.cis_state_derivative) 
-      )
-   );
    node = &reg.get("CIS_GUESS_DISK");
    node->addRule(
       If(*node == QtTrue,
