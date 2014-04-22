@@ -1,9 +1,9 @@
 #!/bin/sh
 
 CMAKE_INSTALL_PREFIX="/usr/local"
-CMAKE_BUILD_TYPE=
+CMAKE_BUILD_TYPE=""
 
-function usage() {
+usage() {
     echo "./configure [--prefix=...] [--debug]"
     echo ""
 }
@@ -17,10 +17,10 @@ while [ "$1" != "" ]; do
             exit
             ;;
         --prefix)
-            CMAKE_INSTALL_PREFIX=$VALUE
+            CMAKE_INSTALL_PREFIX="$VALUE"
             ;;
         --debug)
-            CMAKE_BUILD_TYPE=DEBUG
+            CMAKE_BUILD_TYPE="DEBUG"
             ;;
         *)
             echo "Unknown parameter \"$PARAM\""
@@ -38,5 +38,5 @@ if [ -e CMakeCache.txt ]; then
     rm CMakeCache.txt
 fi
 
-cmake -DCMAKE_INSTALL_PREFIX=$CMAKE_INSTALL_PREFIX -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE ..
+cmake -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" ..
 
