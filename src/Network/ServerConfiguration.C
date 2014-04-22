@@ -129,4 +129,3 @@ void ServerConfiguration::fromQVariant(QVariant const& map)
 
 } } // end namespace IQmol::Network
 
-#endif
