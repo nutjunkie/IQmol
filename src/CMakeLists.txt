@@ -346,6 +346,11 @@ set(IQmol_Parser_SOURCES
     Parser/ZMatrixCoordinatesParser.C
 )
 
+set(IQmol_Util_HEADERS
+    Util/QMsgBox.h
+    Util/Task.h
+)
+
 set(IQmol_Util_SOURCES
     Util/Align.C
     Util/EulerAngles.C
@@ -412,7 +417,7 @@ set_property(SOURCE ${IQmol_QUI_SOURCES} APPEND PROPERTY
     COMPILE_DEFINITIONS QCHEM_UI)
 
 qt4_wrap_cpp(IQmol_HEADERS_MOC ${IQmol_HEADERS} ${IQmol_Configurator_HEADERS}
-    ${IQmol_Layer_HEADERS} ${IQmol_Network_HEADERS} ${IQmol_Parser_HEADERS})
+    ${IQmol_Layer_HEADERS} ${IQmol_Parser_HEADERS} ${IQmol_Util_HEADERS})
 qt4_wrap_cpp(IQmol_QUI_HEADERS_MOC ${IQmol_QUI_HEADERS})
 qt4_wrap_cpp(IQmol_QUI_HEADERS2_MOC ${IQmol_QUI_HEADERS2})
 qt4_wrap_ui(IQmol_FORMS_HEADERS ${IQmol_FORMS} ${IQmol_Configurator_FORMS})
@@ -428,7 +433,7 @@ add_executable(IQmol
     ${IQmol_Configurator_SOURCES}
     ${IQmol_Data_SOURCES}
     ${IQmol_Layer_SOURCES}
-    ${IQmol_Network_SOURCES}
+#    ${IQmol_Network_SOURCES}
     ${IQmol_Parser_SOURCES}
     ${IQmol_Util_SOURCES}
     ${IQmol_QUI_SOURCES}
@@ -438,6 +443,7 @@ add_executable(IQmol
 )
 target_link_libraries(IQmol
     ${OPENBABEL2_LIBRARIES}
+    ${OPENMESH_LIBRARIES}
     ${QGLVIEWER_LIBRARIES}
     ${QT_LIBRARIES}
     ${OPENGL_LIBRARIES}
