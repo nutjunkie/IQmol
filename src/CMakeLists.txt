@@ -466,6 +466,7 @@ target_link_libraries(IQmol
 
 #set_target_properties(IQmol QUI PROPERTIES RUNTIME_OUTPUT_DIRECTORY bin)
 set_target_properties(IQmol PROPERTIES RUNTIME_OUTPUT_DIRECTORY bin)
+set_target_properties(IQmol PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 #install(TARGETS IQmol QUI DESTINATION bin)
 install(TARGETS IQmol DESTINATION bin)
