@@ -157,7 +157,7 @@ namespace IQmol {
             static double   s_vertices[12][3];
             static unsigned s_indices[20][3];
    
-            void VanDerWaals::generateTriangle(Data::Mesh& mesh, 
+            void generateTriangle(Data::Mesh& mesh, 
                Data::OMMesh::VertexHandle const& Av, Data::OMMesh::VertexHandle const& Bv, 
                Data::OMMesh::VertexHandle const& Cv, int div);
                
