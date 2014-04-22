@@ -12,12 +12,14 @@ find_package(ZLIB REQUIRED)
 set(CMAKE_MODULE_PATH ${IQmol_SOURCE_DIR}/cmake)
 find_package(OpenBabel2 REQUIRED)
 find_package(QGLViewer REQUIRED)
+find_package(OpenMesh REQUIRED)
 find_package(LibSsh2 REQUIRED)
 unset(CMAKE_MODULE_PATH)
 
 include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS} ${QGLVIEWER_DEFINITIONS})
-include_directories(${OPENBABEL2_INCLUDE_DIR} ${QGLVIEWER_INCLUDE_DIR} ${LIBSSH2_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})
+include_directories(${OPENBABEL2_INCLUDE_DIR} ${OPENMESH_INCLUDE_DIR}
+    ${QGLVIEWER_INCLUDE_DIR} ${LIBSSH2_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})
 
 add_subdirectory(src)
 
