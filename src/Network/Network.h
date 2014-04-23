@@ -22,6 +22,7 @@
    
 ********************************************************************************/
 
+#include <climits> // for UINT_MAX
 #include <QString>
 
 namespace IQmol {
