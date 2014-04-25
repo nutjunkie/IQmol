@@ -78,7 +78,7 @@ namespace Layer {
          void computeDensityVectors();
          void computeShellPairs(qglviewer::Vec const& gridPoint);
 
-         Data::GridData* MolecularOrbitals::findGrid(Data::SurfaceType const& type, 
+         Data::GridData* findGrid(Data::SurfaceType const& type, 
             Data::GridSize const& size, Data::GridDataList const& gridList);
 
          bool processGridQueue(GridQueue const&);

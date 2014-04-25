@@ -36,13 +36,13 @@
 #include "CubeDataLayer.h"
 #include "DipoleLayer.h"
 #include "GeometryLayer.h"
-#include "GeometrylistLayer.h"
+#include "GeometryListLayer.h"
 #include "EfpFragmentListLayer.h"
 #include "EfpFragmentLayer.h"
 #include "FrequenciesLayer.h"
 #include "MolecularOrbitalsLayer.h"
 #include "QsLog.h"
-#include "openbabel/mol.h";
+#include "openbabel/mol.h"
 
 #include <typeinfo>   // for std::bad_cast
 

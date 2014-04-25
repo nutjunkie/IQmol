@@ -27,7 +27,7 @@
 #include "Geometry.h"
 #include "GridData.h"
 #include "QsLog.h"
-#include "QFile.h"
+#include <QtCore/QFile>
 #include <cmath>
 
 

@@ -29,7 +29,7 @@
 #include "JobInfo.h"
 #include "ServerRegistry.h"
 #include "ShaderDialog.h"
-#include "Qui/InputDialog.h"
+#include "QUI/InputDialog.h"
 #include <QResizeEvent>
 #include <QDropEvent>
 #include <QVBoxLayout>
