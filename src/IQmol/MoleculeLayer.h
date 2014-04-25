@@ -183,11 +183,14 @@ namespace IQmol {
             void appendPrimitives(PrimitiveList const&);
             void appendPrimitive(Primitive*);
    
-            /// Checks to see if a Constraint already exists involving the same
-            /// atoms. If it does, the existing Constraint is updated with the new
-            /// target value, if not the new Constraint is appended to the list.
-      		void appendConstraint(Constraint*);
-            void removeConstraint(Constraint*);
+            Constraint* findMatchingConstraint(AtomList const&);
+            bool canAcceptConstraint(Constraint*);
+      		void addConstraint(Constraint*);
+
+			// These simpy add or remove the Constraint layer to the model view
+			// and are used by the undo commands.
+            void addConstraintLayer(Constraint*);
+            void removeConstraintLayer(Constraint*);
    
             /// Converts the Molecule to an XYZ format and uses OpenBabel to parse this.  
             /// Useful for, e.g., reperceiving bonds.
@@ -226,7 +229,7 @@ namespace IQmol {
             void ungroupSelection();
             void applyConstraint(Constraint*);
             void constraintUpdated();
-            void deleteConstraint();
+            void removeConstraint();
             void selectAll();
 
             void openSurfaceAnimator();
@@ -282,6 +285,7 @@ namespace IQmol {
             int totalCharge() const;
             int multiplicity() const;
             QString constraintsAsString();
+            QString scanCoordinatesAsString();
             QString efpFragmentsAsString();
             QString efpParametersAsString();
    
@@ -383,6 +387,7 @@ namespace IQmol {
             Layer::Container m_fileList;
             Layer::Container m_surfaceList;
             Layer::Container m_constraintList;
+            Layer::Container m_scanList;
             Layer::Container m_groupList;
    
             Layer::EfpFragmentList m_efpFragmentList;

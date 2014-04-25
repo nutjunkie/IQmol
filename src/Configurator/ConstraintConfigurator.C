@@ -42,6 +42,7 @@ VectorConstraint::VectorConstraint(Layer::Constraint& constraint) : Constraint(c
    m_constraintConfigurator.xValue->setSuffix(QString(" ") + unit);
    m_constraintConfigurator.yValue->setSuffix(QString(" ") + unit);
    m_constraintConfigurator.zValue->setSuffix(QString(" ") + unit);
+   m_constraintConfigurator.deleteButton->setVisible(false);
 
    init();
 }
@@ -49,9 +50,9 @@ VectorConstraint::VectorConstraint(Layer::Constraint& constraint) : Constraint(c
 
 void VectorConstraint::init()
 {
-   QString text("Set position of atom ");
-   text += QString::number(m_constraint.m_atoms[0]->getIndex()) + ":";
-   m_constraintConfigurator.label->setText(text);
+   QString atoms(QString::number(m_constraint.m_atoms[0]->getIndex()));
+   m_constraintConfigurator.label->setText("Set position of atom " + atoms);
+   m_constraint.setText("Position " + atoms);
 }
 
 
@@ -61,6 +62,13 @@ void VectorConstraint::sync()
    m_constraintConfigurator.xValue->setValue(position.x);
    m_constraintConfigurator.yValue->setValue(position.y);
    m_constraintConfigurator.zValue->setValue(position.z);
+}
+
+
+void VectorConstraint::on_deleteButton_clicked(bool)
+{
+   reject(); 
+   m_constraint.invalid();
 }
 
 
@@ -81,8 +89,9 @@ void VectorConstraint::accept()
 
    m_constraint.setTargetValue(axes, position);
 
-   bool constrain(m_constraintConfigurator.constrainCheckBox->checkState() == Qt::Checked);
+   bool constrain(m_constraintConfigurator.constrainButton->isChecked());
    m_constraint.m_optimizeConstraint = constrain;
+   m_constraintConfigurator.deleteButton->setVisible(true);
 
    QDialog::accept();
 }
@@ -94,6 +103,9 @@ void VectorConstraint::accept()
 ScalarConstraint::ScalarConstraint(Layer::Constraint& constraint) : Constraint(constraint)
 {
    m_constraintConfigurator.setupUi(this);
+   on_scanButton_clicked(false);
+   m_constraintConfigurator.deleteButton->setVisible(false);
+  
    init();
 }
 
@@ -111,49 +123,67 @@ void ScalarConstraint::init()
 
 void ScalarConstraint::initDistance()
 {  
-   setWindowTitle("Set Distance");
+   setWindowTitle("Configure Distance");
    QChar unit(QChar(0x00c5));
+
    m_constraintConfigurator.value->setSuffix(QString(" ") + unit);
    m_constraintConfigurator.value->setDecimals(3);
    m_constraintConfigurator.value->setRange(0.000, 1000.0);
 
-   QString text("Set distance between atoms ");
-   text += QString::number(m_constraint.m_atoms[0]->getIndex()) + "-" +
-           QString::number(m_constraint.m_atoms[1]->getIndex());
-   m_constraintConfigurator.label->setText(text);
+   m_constraintConfigurator.valueMax->setDecimals(3);
+   m_constraintConfigurator.valueMax->setSuffix(QString(" ") + unit);
+   m_constraintConfigurator.valueMax->setRange(0.000, 1000.0);
+
+   QString atoms(QString::number(m_constraint.m_atoms[0]->getIndex()) + "-" +
+                 QString::number(m_constraint.m_atoms[1]->getIndex()));
+
+   m_constraintConfigurator.label->setText("Distance between atoms " + atoms);
+   m_constraint.setText("Distance " + atoms);
 }
 
 
 void ScalarConstraint::initAngle()
 {
-   setWindowTitle("Set Angle");
+   setWindowTitle("Configure Angle");
    QChar unit(QChar(0x00b0));
+
    m_constraintConfigurator.value->setSuffix(QString(" ") + unit);
    m_constraintConfigurator.value->setDecimals(2);
    m_constraintConfigurator.value->setRange(0.00, 180.0);
 
-   QString text("Set angle between atoms ");
-   text += QString::number(m_constraint.m_atoms[0]->getIndex()) + "-" +
-           QString::number(m_constraint.m_atoms[1]->getIndex()) + "-" +
-           QString::number(m_constraint.m_atoms[2]->getIndex());
-   m_constraintConfigurator.label->setText(text);
+   m_constraintConfigurator.valueMax->setSuffix(QString(" ") + unit);
+   m_constraintConfigurator.valueMax->setDecimals(2);
+   m_constraintConfigurator.valueMax->setRange(0.00, 180.0);
+
+   QString atoms(QString::number(m_constraint.m_atoms[0]->getIndex()) + "-" +
+                 QString::number(m_constraint.m_atoms[1]->getIndex()) + "-" +
+                 QString::number(m_constraint.m_atoms[2]->getIndex()));
+
+   m_constraintConfigurator.label->setText("Angle between atoms " + atoms);
+   m_constraint.setText("Angle " + atoms);
 }
 
 
 void ScalarConstraint::initTorsion()
 {
-   setWindowTitle("Set Torsion");
+   setWindowTitle("Configure Torsion");
    QChar unit(QChar(0x00b0));
+
    m_constraintConfigurator.value->setSuffix(QString(" ") + unit);
    m_constraintConfigurator.value->setDecimals(1);
    m_constraintConfigurator.value->setRange(-179.9, 180.0);
 
-   QString text("Set torsion between atoms ");
-   text += QString::number(m_constraint.m_atoms[0]->getIndex()) + "-" +
-           QString::number(m_constraint.m_atoms[1]->getIndex()) + "-" +
-           QString::number(m_constraint.m_atoms[2]->getIndex()) + "-" +
-           QString::number(m_constraint.m_atoms[3]->getIndex());
-   m_constraintConfigurator.label->setText(text);
+   m_constraintConfigurator.valueMax->setSuffix(QString(" ") + unit);
+   m_constraintConfigurator.valueMax->setDecimals(1);
+   m_constraintConfigurator.valueMax->setRange(-179.9, 180.0);
+
+   QString atoms(QString::number(m_constraint.m_atoms[0]->getIndex()) + "-" +
+                 QString::number(m_constraint.m_atoms[1]->getIndex()) + "-" +
+                 QString::number(m_constraint.m_atoms[2]->getIndex()) + "-" +
+                 QString::number(m_constraint.m_atoms[3]->getIndex()));
+
+   m_constraintConfigurator.label->setText("Torsion between atoms " + atoms);
+   m_constraint.setText("Torsion " + atoms);
 }
 
 
@@ -173,6 +203,7 @@ void ScalarConstraint::syncDistance()
    double current(Layer::Atom::distance(m_constraint.m_atoms[0], 
                                         m_constraint.m_atoms[1]));
    m_constraintConfigurator.value->setValue(current);
+   m_constraintConfigurator.valueMax->setValue(current);
 }
 
 
@@ -182,6 +213,7 @@ void ScalarConstraint::syncAngle()
                                      m_constraint.m_atoms[1], 
                                      m_constraint.m_atoms[2]));
    m_constraintConfigurator.value->setValue(current);
+   m_constraintConfigurator.valueMax->setValue(current);
 
 }
 
@@ -193,8 +225,26 @@ void ScalarConstraint::syncTorsion()
                                        m_constraint.m_atoms[2], 
                                        m_constraint.m_atoms[3]));
    m_constraintConfigurator.value->setValue(current);
+   m_constraintConfigurator.valueMax->setValue(current);
 }
- 
+
+
+void ScalarConstraint::updateRange()
+{
+   bool tf(m_constraintConfigurator.scanButton->isChecked());
+   m_constraintConfigurator.valueMax->setVisible(tf);
+   m_constraintConfigurator.points->setVisible(tf);
+   m_constraintConfigurator.labelTo->setVisible(tf);
+   m_constraintConfigurator.labelPoints->setVisible(tf);
+}
+
+
+void ScalarConstraint::on_deleteButton_clicked(bool)
+{
+   reject(); 
+   m_constraint.invalid();
+}
+
 
 void ScalarConstraint::accept()
 {
@@ -215,10 +265,22 @@ void ScalarConstraint::accept()
          break;
    }
 
-   bool constrain(m_constraintConfigurator.constrainCheckBox->checkState() == Qt::Checked);
-   m_constraint.m_optimizeConstraint = constrain;
+   bool optimize(m_constraintConfigurator.constrainButton->isChecked());
+   m_constraint.m_optimizeConstraint = optimize;
+
+   bool scan(m_constraintConfigurator.scanButton->isChecked());
+   m_constraint.m_scanConstraint = scan;
+   if (scan) {
+      m_constraint.m_maxValue = m_constraintConfigurator.valueMax->value();
+      m_constraint.m_points   = m_constraintConfigurator.points->value();
+   }
 
    QDialog::accept();
+   m_constraintConfigurator.setButton->setEnabled(false);
+   m_constraintConfigurator.constrainButton->setEnabled(optimize);
+   m_constraintConfigurator.scanButton->setEnabled(scan);
+
+   m_constraintConfigurator.deleteButton->setVisible(true);
 }
 
 

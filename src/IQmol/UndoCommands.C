@@ -244,32 +244,35 @@ void MoveObjects::loadFrames(QList<Frame> const& frames)
 }
 
 
-
-// --------------- ApplyConstraint ---------------
-ApplyConstraint::ApplyConstraint(Layer::Molecule* molecule, Layer::Constraint* constraint)
-   : MoveObjects(molecule, "Apply constraint", true), m_deleteConstraint(false), 
+// --------------- AddConstraint ---------------
+AddConstraint::AddConstraint(Layer::Molecule* molecule, Layer::Constraint* constraint)
+   : QUndoCommand("Add constraint"), m_deleteConstraint(false), m_molecule(molecule),
      m_constraint(constraint) 
 { 
+   if (constraint->scanConstraint()) setText("Add scan coordinated");
 }
 
 
-ApplyConstraint::~ApplyConstraint()
+AddConstraint::~AddConstraint()
 {
-   if (m_deleteConstraint) delete m_constraint;
+   if (m_deleteConstraint && m_constraint) {
+      delete m_constraint;
+      m_constraint = 0;
+   }
 }
 
 
-void ApplyConstraint::undo()
+void AddConstraint::undo()
 {
+   m_molecule->removeConstraintLayer(m_constraint);
    m_deleteConstraint = true;
-   MoveObjects::undo();
 }
 
 
-void ApplyConstraint::redo()
+void AddConstraint::redo()
 {
+   m_molecule->addConstraintLayer(m_constraint);
    m_deleteConstraint = false;
-   MoveObjects::redo();
 }
 
 

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>897</width>
-    <height>792</height>
+    <width>888</width>
+    <height>742</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -435,7 +435,7 @@ QToolButton:checked {
               <bool>true</bool>
              </property>
              <property name="currentIndex">
-              <number>0</number>
+              <number>8</number>
              </property>
              <property name="tabSpacing">
               <number>-1</number>
@@ -445,8 +445,8 @@ QToolButton:checked {
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>474</width>
-                <height>122</height>
+                <width>437</width>
+                <height>72</height>
                </rect>
               </property>
               <attribute name="label">
@@ -500,8 +500,8 @@ QToolButton:checked {
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>474</width>
-                <height>122</height>
+                <width>437</width>
+                <height>72</height>
                </rect>
               </property>
               <attribute name="label">
@@ -551,6 +551,14 @@ QToolButton:checked {
               </layout>
              </widget>
              <widget class="QWidget" name="pageCIS">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>-29</y>
+                <width>422</width>
+                <height>101</height>
+               </rect>
+              </property>
               <attribute name="label">
                <string>CIS</string>
               </attribute>
@@ -770,8 +778,8 @@ QToolButton:checked {
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>474</width>
-                <height>122</height>
+                <width>437</width>
+                <height>72</height>
                </rect>
               </property>
               <attribute name="label">
@@ -825,7 +833,7 @@ QToolButton:checked {
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>459</width>
+                <width>423</width>
                 <height>151</height>
                </rect>
               </property>
@@ -924,8 +932,8 @@ QToolButton:checked {
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>474</width>
-                <height>122</height>
+                <width>422</width>
+                <height>84</height>
                </rect>
               </property>
               <attribute name="label">
@@ -986,7 +994,7 @@ QToolButton:checked {
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>459</width>
+                <width>422</width>
                 <height>159</height>
                </rect>
               </property>
@@ -1128,8 +1136,8 @@ QToolButton:checked {
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>474</width>
-                <height>122</height>
+                <width>450</width>
+                <height>110</height>
                </rect>
               </property>
               <attribute name="label">
@@ -1138,31 +1146,10 @@ QToolButton:checked {
               <layout class="QVBoxLayout" name="verticalLayout_44">
                <item>
                 <layout class="QGridLayout" name="gridLayout_13">
-                 <item row="0" column="0">
-                  <widget class="QCheckBox" name="stability_analysis">
-                   <property name="text">
-                    <string>Stability Analysis</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QCheckBox" name="nbo">
-                   <property name="text">
-                    <string>NBO Analysis</string>
-                   </property>
-                  </widget>
-                 </item>
                  <item row="0" column="1">
                   <widget class="QCheckBox" name="dma">
                    <property name="text">
                     <string>Distributed Multipole Analysis</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="0">
-                  <widget class="QCheckBox" name="gui">
-                   <property name="text">
-                    <string>Generate Checkpoint File</string>
                    </property>
                   </widget>
                  </item>
@@ -1192,6 +1179,27 @@ QToolButton:checked {
                     </widget>
                    </item>
                   </layout>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QCheckBox" name="gui">
+                   <property name="text">
+                    <string>Generate Checkpoint File</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QCheckBox" name="nbo">
+                   <property name="text">
+                    <string>NBO Analysis</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QCheckBox" name="stability_analysis">
+                   <property name="text">
+                    <string>Stability Analysis</string>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
@@ -6779,7 +6787,7 @@ QToolButton:checked {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>897</width>
+     <width>888</width>
      <height>22</height>
     </rect>
    </property>

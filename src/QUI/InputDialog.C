@@ -152,6 +152,7 @@ void InputDialog::setJobInfo(IQmol::JobInfo* jobInfo)
    m_currentJob->setCoordinates(m_jobInfo->get(IQmol::JobInfo::Coordinates));
    m_currentJob->setEfpFragments(m_jobInfo->get(IQmol::JobInfo::EfpFragments));
    m_currentJob->setConstraints(m_jobInfo->get(IQmol::JobInfo::Constraints));
+   m_currentJob->setScanCoordinates(m_jobInfo->get(IQmol::JobInfo::ScanCoordinates));
    m_currentJob->setEfpParameters(m_jobInfo->get(IQmol::JobInfo::EfpParameters));
 
    if (m_jobInfo->efpOnlyJob()) {

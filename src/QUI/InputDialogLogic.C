@@ -927,14 +927,22 @@ void InputDialog::initializeQuiLogic()
       )
    );
   
-   node = &reg.get("JOB_TYPE");
-   node->addRule(
-      If (*node == S("Geometry") || *node == S("Reaction Path")
-       || *node == S("Transition State"),
+   job_type.addRule(
+      If (job_type == "Geometry" || job_type == "Reaction Path" ||
+          job_type == "Transition State" || job_type == "PES Scan",
          boost::bind(&InputDialog::printSection, this, "opt", true),
          boost::bind(&InputDialog::printSection, this, "opt", false)
       )
    );
+
+
+   job_type.addRule(
+      If (job_type == "PES Scan",
+         boost::bind(&InputDialog::printSection, this, "scan", true),
+         boost::bind(&InputDialog::printSection, this, "scan", false)
+      )
+   );
+
 
 
    //node = &reg.get("QMMM");

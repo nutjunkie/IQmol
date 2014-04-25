@@ -89,6 +89,7 @@ void JobInfo::set(Field const field, QString const& value)
       case InputString:
       case Coordinates:
       case Constraints:
+      case ScanCoordinates:
       case EfpFragments:
       case EfpParameters:
       case Queue:

@@ -139,45 +139,65 @@ Molecule* Job::getMolecule() {
 
 
 
-void Job::setCharge(int value) {
+void Job::setCharge(int value) 
+{
    if (m_moleculeSection) m_moleculeSection->setCharge(value);
 }
 
-void Job::setMultiplicity(int value) {
+
+void Job::setMultiplicity(int value) 
+{
    if (m_moleculeSection) m_moleculeSection->setMultiplicity(value);
 }
 
-void Job::setCoordinates(QString const& coords) {
+
+void Job::setCoordinates(QString const& coords) 
+{
    if (m_moleculeSection) m_moleculeSection->setCoordinates(coords);
 }
 
-void Job::setConstraints(QString const& constraints) {
+
+void Job::setConstraints(QString const& constraints) 
+{
    addSection("opt", constraints);
 }
 
 
-void Job::setEfpFragments(QString const& efpFragments) {
+void Job::setScanCoordinates(QString const& scan) 
+{
+   addSection("scan", scan);
+}
+
+
+
+void Job::setEfpFragments(QString const& efpFragments) 
+{
    KeywordSection* efp = addSection("efp_fragments", efpFragments);
    efp->print(!efpFragments.isEmpty());
 }
 
 
-void Job::setEfpParameters(QString const& efpParameters) {
+void Job::setEfpParameters(QString const& efpParameters) 
+{
    KeywordSection* efp = addSection("efp_parameters", efpParameters);
    efp->print(!efpParameters.isEmpty());
 }
 
 
-void Job::setMolecule(Molecule* mol) {
+void Job::setMolecule(Molecule* mol) 
+{
    if (m_moleculeSection) m_moleculeSection->setMolecule(mol);
 }
 
-void Job::setOption(QString const& name, QString const& value) {
+
+void Job::setOption(QString const& name, QString const& value) 
+{
    if (m_remSection) m_remSection->setOption(name, value);
 }
 
 
-KeywordSection* Job::addSection(QString const& name, QString const& value) {
+KeywordSection* Job::addSection(QString const& name, QString const& value) 
+{
    KeywordSection* section(KeywordSectionFactory(name));
    section->read(value);
    addSection(section);
@@ -185,7 +205,8 @@ KeywordSection* Job::addSection(QString const& name, QString const& value) {
 }
 
 
-QString Job::getComment() {
+QString Job::getComment() 
+{
    GenericSection* comment = dynamic_cast<GenericSection*>(getSection("comment"));
    return comment ? comment->rawData() : QString();
 }

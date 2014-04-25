@@ -44,8 +44,8 @@ namespace IQmol {
          enum Field { BaseName, InputFileName, OutputFileName, AuxFileName, 
             EspFileName, MoFileName, DensityFileName, ErrorFileName,
             RunFileName, ServerName, LocalWorkingDirectory, RemoteWorkingDirectory, 
-            InputString, Charge, Multiplicity, Coordinates, Constraints, EfpFragments,
-            EfpParameters,
+            InputString, Charge, Multiplicity, Coordinates, Constraints, ScanCoordinates,
+            EfpFragments, EfpParameters,
             Queue, Walltime, Memory, Scratch, Ncpus };
             
             

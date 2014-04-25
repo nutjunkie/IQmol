@@ -102,6 +102,7 @@ Molecule::Molecule(QObject* parent) : Base(DefaultMoleculeName, parent),
    m_fileList(this, "Files"), 
    m_surfaceList(this, "Surfaces"), 
    m_constraintList(this, "Constraints"), 
+   m_scanList(this, "Scan Coordinates"), 
    m_groupList(this, "Groups"), 
    m_efpFragmentList(this)
 {
@@ -722,12 +723,16 @@ QString Molecule::constraintsAsString()
 
    ConstraintList::iterator iter;
    for (iter = constraints.begin(); iter != constraints.end(); ++iter) {
-       if ((*iter)->type() == Constraint::Position) {
-          fixed.append(*iter);
-       }else {
-          internal.append(*iter);
+       if ((*iter)->optimizeConstraint()) {
+          if ((*iter)->type() == Constraint::Position) {
+             fixed.append(*iter);
+          }else {
+             internal.append(*iter);
+          }
        }
    }
+
+   if (internal.isEmpty() && fixed.isEmpty()) return QString();
 
    QString s("$opt\n");
 
@@ -752,33 +757,88 @@ QString Molecule::constraintsAsString()
 }
 
 
-void Molecule::appendConstraint(Constraint* constraint)
+QString Molecule::scanCoordinatesAsString() 
 {
-   // Check to see if we already have a constraint involving these atoms.
-   ConstraintList constraints(findLayers<Constraint>(Children));
+   ConstraintList constraints(findLayers<Constraint>(Visible|Children));
+
+   QString s;
    ConstraintList::iterator iter;
    for (iter = constraints.begin(); iter != constraints.end(); ++iter) {
-       if (*(*iter) == *constraint) {
-          *(*iter) = *constraint;
-          delete constraint;
-          applyConstraint(*iter);
-          return;
+       if ((*iter)->scanConstraint()) {
+          s += (*iter)->formatQChem();
        }
    }
 
-   if (constraint->optimizeConstraint()) m_constraintList.appendLayer(constraint);
+   return s;
+}
 
-   applyConstraint(constraint);
+
+Constraint* Molecule::findMatchingConstraint(AtomList const& atoms)
+{
+   ConstraintList::iterator iter;
+   ConstraintList constraints(findLayers<Constraint>(Children));
+
+   for (iter = constraints.begin(); iter != constraints.end(); ++iter) {
+       if ((*iter)->sameAtoms(atoms)) return (*iter);
+   }
+   return 0;
+}
+
+
+bool Molecule::canAcceptConstraint(Constraint* constraint)
+{
+   int scanCount(m_scanList.findLayers<Constraint>().size());
+   return constraint->scanConstraint() ? (scanCount < 2) : true;
+}
+
+
+void Molecule::addConstraintLayer(Constraint* constraint)
+{
+   if (!constraint) return;
+   if (constraint->scanConstraint()) {
+      qDebug() << "Appending scan constraint";
+      m_scanList.appendLayer(constraint);
+   }else {
+      m_constraintList.appendLayer(constraint);
+      qDebug() << "Appending optimize constraint";
+   }
+
    connect(constraint, SIGNAL(updated()), this, SLOT(constraintUpdated()));
-   connect(constraint, SIGNAL(invalid()), this, SLOT(deleteConstraint()));
+   connect(constraint, SIGNAL(invalid()), this, SLOT(removeConstraint()));
    updated();
 }
 
 
-void Molecule::deleteConstraint()
+void Molecule::removeConstraintLayer(Constraint* constraint)
 {
-   Constraint* constraint(qobject_cast<Constraint*>(sender()));
-   m_constraintList.removeLayer(constraint);
+   if (!constraint) return;
+   if (constraint->optimizeConstraint()) {
+      qDebug() << "Removing scan constraint";
+      m_constraintList.removeLayer(constraint);
+   }else if (constraint->scanConstraint()) {
+      qDebug() << "Removing scan constraint";
+      m_scanList.removeLayer(constraint);
+   }
+
+   disconnect(constraint, SIGNAL(updated()), this, SLOT(constraintUpdated()));
+   disconnect(constraint, SIGNAL(invalid()), this, SLOT(removeConstraint()));
+   updated();
+}
+
+
+void Molecule::removeConstraint()
+{
+   removeConstraintLayer(qobject_cast<Constraint*>(sender()));
+}
+
+
+void Molecule::addConstraint(Constraint* constraint)
+{
+   if (constraint->scanConstraint() || constraint->optimizeConstraint()) {
+      Command::AddConstraint* cmd(new Command::AddConstraint(this, constraint));
+      postCommand(cmd);
+   }
+   applyConstraint(constraint);
 }
 
 
@@ -791,7 +851,7 @@ void Molecule::constraintUpdated()
 
 void Molecule::applyConstraint(Constraint* constraint)
 {
-   Command::ApplyConstraint* cmd = new Command::ApplyConstraint(this, constraint);
+   Command::MoveObjects* cmd(new Command::MoveObjects(this, "", true));
 
    QString msg = constraint->optimizeConstraint() ? "Apply" : "Set";
 
@@ -980,8 +1040,13 @@ void Molecule::applyRingConstraint()
 
    // Note that this simply uses the default force field, which may not be the
    // current one.  This avoids polling the ViewerModel for the latest forcefield.
-   if (messageBox.clickedButton() == nowButton) minimizeEnergy(Preferences::DefaultForceField());
+   if (messageBox.clickedButton() == nowButton) {
+      minimizeEnergy(Preferences::DefaultForceField());
+   }
 }
+
+
+
 
 
 // This is not active at the moment.  Data layers should be deleted
@@ -990,7 +1055,6 @@ void Molecule::clearData()
    return;
    takeRow(m_fileList.row());
 }
-
 
 
 void Molecule::takePrimitive(Primitive* primitive)
@@ -1449,6 +1513,7 @@ JobInfo* Molecule::jobInfo()
    m_jobInfo->set(JobInfo::Multiplicity, multiplicity());
    m_jobInfo->set(JobInfo::Coordinates, coordinatesAsString());
    m_jobInfo->set(JobInfo::Constraints, constraintsAsString());
+   m_jobInfo->set(JobInfo::ScanCoordinates, scanCoordinatesAsString());
    m_jobInfo->set(JobInfo::EfpFragments, efpFragmentsAsString());
    m_jobInfo->set(JobInfo::EfpParameters, efpParametersAsString());
 
@@ -1551,7 +1616,7 @@ void Molecule::minimizeEnergy(QString const& forceFieldName)
       QLOG_DEBUG() << "Enforcing" << constraints.size() << "active constraints";
       ConstraintList::iterator iter;
       for (iter = constraints.begin(); iter != constraints.end(); ++iter) {
-          (*iter)->addTo(obffconstraints);
+          if ((*iter)->optimizeConstraint()) (*iter)->addTo(obffconstraints);
       }
    }
 

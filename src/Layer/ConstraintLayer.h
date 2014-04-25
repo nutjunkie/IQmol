@@ -63,8 +63,6 @@ namespace Layer {
          enum Type { Invalid, Position, Distance, Angle, Torsion };
 
 		 /// The type of constraint is determined by the number of Atoms.
-		 //Constraint();
-
 		 Constraint(AtomList const& atoms);
 
          Constraint(Data::PositionConstraint const&);
@@ -77,18 +75,20 @@ namespace Layer {
          ~Constraint();
 
          Type constraintType() const { return m_type; }
+
          void draw();
          void drawFast() { }
          void drawSelected() { }
 
          bool isValid() const { return m_type != Invalid; }
-         AtomList atomList() const { return m_atoms; }
+         AtomList const& atomList() const { return m_atoms; }
 
          /// Passes the return value from the Configurator dialog 
          bool accepted() const { return m_accepted; }
 
          // Returns if the constraint is passed over to the MM and QM optimizers.
          bool optimizeConstraint() const { return m_optimizeConstraint; }
+         bool scanConstraint() const { return m_scanConstraint; }
 
 		 /// Determines if the constraint is considered to be satisfied.  Note
 		 /// that this function contains some hard-wired thresholds for satisfaction.
@@ -108,17 +108,13 @@ namespace Layer {
 		 /// Layer.  All Constraints have the same (static) value for transparency.
          double getAlpha() const { return s_alpha; }
 
-		 /// Two constraints are considered equal if they involve the same
-		 /// atoms in either the same or reverse order.  The target values do
-		 /// not have to match.
-         bool operator==(Constraint const& that) const;
+         bool sameAtoms(AtomList const&) const;
          Constraint& operator=(Constraint const&); 
 
          /// Adds the current constraint to the OBFFConstraints object.
          void addTo(OpenBabel::OBFFConstraints&) const;
 
          QString formatQChem() const;
-
 
       Q_SIGNALS:
          /// Signal sent when one of the atoms is destroyed
@@ -128,15 +124,19 @@ namespace Layer {
          void configure();
 
       protected:
-         int precision() const;
-         double minValue() const;
-         double maxValue() const;
-
+         Type     m_type;
          AtomList m_atoms;
          QString  m_mesg;
 		 bool     m_optimizeConstraint; 
+         bool     m_scanConstraint;
+         double   m_targetValue;
+         double   m_maxValue;
+         int      m_points;
+         qglviewer::Vec m_targetPosition;
+         unsigned char m_axes;
        
       private:
+         void init();
          void setAtomList(AtomList const&);
          void copy(Constraint const& that);
          void drawPosition();
@@ -148,6 +148,7 @@ namespace Layer {
          static GLfloat const s_alpha;
          static GLfloat const s_tubeRadius;
          static GLfloat const s_tubeResolution;
+         static GLfloat const s_scanColor[];
          static GLfloat const s_satisfiedColor[];
          static GLfloat const s_unsatisfiedColor[];
 
@@ -156,14 +157,8 @@ namespace Layer {
 		 /// everything else.
          Configurator::Constraint* m_configurator;
 
-         Type m_type;
-         double m_targetValue;
-         qglviewer::Vec m_targetPosition;
-         unsigned char m_axes;
          bool m_accepted;  // used to pass the return from the Configurator
-         int m_precision;
-         double m_minValue;
-         double m_maxValue;
+         GLfloat const* m_color;
    };
 
 } // end namespace Layer

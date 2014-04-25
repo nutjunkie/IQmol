@@ -162,10 +162,11 @@ namespace Command {
    };
 
 
-   class ApplyConstraint : public MoveObjects {
+   class AddConstraint : public QUndoCommand {
+
       public:
-         ApplyConstraint(Layer::Molecule*, Layer::Constraint*);
-         ~ApplyConstraint();
+         AddConstraint(Layer::Molecule*, Layer::Constraint*);
+         ~AddConstraint();
 
          void redo();
          void undo();
@@ -174,9 +175,9 @@ namespace Command {
 		 // Determines if the Constraint needs to be deleted when the command
          // goes out of scope.
          bool m_deleteConstraint;
+         Layer::Molecule*   m_molecule;
          Layer::Constraint* m_constraint;
    };
-
 
 
    // Commands associated with changes to primitives

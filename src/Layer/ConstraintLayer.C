@@ -25,6 +25,7 @@
 #include "Constraint.h"
 #include "GLShape.h"
 
+#include <QDebug>
 
 using namespace qglviewer;
 
@@ -34,53 +35,64 @@ namespace Layer {
 GLfloat const Constraint::s_alpha = 0.3;
 GLfloat const Constraint::s_tubeRadius = 0.03;
 GLfloat const Constraint::s_tubeResolution = 0.02;
+GLfloat const Constraint::s_scanColor[]        = { 0.6, 0.4, 1.0, s_alpha };
 GLfloat const Constraint::s_satisfiedColor[]   = { 0.0, 0.8, 0.0, s_alpha };
 GLfloat const Constraint::s_unsatisfiedColor[] = { 0.8, 0.0, 0.0, s_alpha };
 
 
-/* deprecate - not used
-Constraint::Constraint() : m_optimizeConstraint(false), m_configurator(0), m_axes(0)
+Constraint::Constraint(AtomList const& atoms)
 { 
-   setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
-   setCheckState(Qt::Checked);
-}
-*/
-
-
-Constraint::Constraint(AtomList const& atoms) : m_atoms(atoms), m_optimizeConstraint(false), 
-   m_configurator(0),  m_axes(0)
-{ 
-   setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
-   setCheckState(Qt::Checked);
+   init();
    setAtomList(atoms);
 }
 
 
-Constraint::Constraint(Data::PositionConstraint const& constraint) : 
-   m_optimizeConstraint(true), m_configurator(0),  m_axes(0)
+Constraint::Constraint(Data::PositionConstraint const& constraint)
 {
+   init();
+   qDebug() << "Warning: constraint not correctly copied";
    //m_targetPosition = constraint.position();
 }
 
 
-Constraint::Constraint(Data::DistanceConstraint const& constraint) : 
-   m_optimizeConstraint(true), m_configurator(0),  m_axes(0)
+Constraint::Constraint(Data::DistanceConstraint const& constraint)
 {
+   init();
+   qDebug() << "Warning: constraint not correctly copied";
    //m_targetValue = constraint.value();
 }
 
 
-Constraint::Constraint(Data::AngleConstraint const& constraint) : 
-   m_optimizeConstraint(true), m_configurator(0),  m_axes(0)
+Constraint::Constraint(Data::AngleConstraint const& constraint)
 {
+   init();
+   qDebug() << "Warning: constraint not correctly copied";
    //m_targetValue = constraint.value();
 }
 
 
-Constraint::Constraint(Data::TorsionConstraint const& constraint) : 
-   m_optimizeConstraint(true), m_configurator(0),  m_axes(0)
+Constraint::Constraint(Data::TorsionConstraint const& constraint)
 {
+   init();
+   qDebug() << "Warning: constraint not correctly copied";
    //m_targetValue = constraint.value();
+}
+
+
+void Constraint::init()
+{
+   connect(newAction("Configure"), SIGNAL(triggered()), this, SLOT(configure())); 
+   connect(newAction("Delete"), SIGNAL(triggered()), this, SIGNAL(invalid())); 
+   setFlags( Qt::ItemIsSelectable | 
+             Qt::ItemIsEnabled | 
+             Qt::ItemIsEditable);
+
+   m_type               = Invalid;
+   m_optimizeConstraint = false;
+   m_scanConstraint     = false;
+   m_points             = 2;
+   m_configurator       = 0;
+   m_axes               = 0;
 }
 
 
@@ -88,28 +100,24 @@ void Constraint::setAtomList(AtomList const& atoms)
 { 
    m_atoms = atoms;
    if (m_configurator) delete m_configurator;
-    m_configurator = 0;
+   m_configurator = 0;
 
    switch (m_atoms.size()) {
       case 1:
          m_type = Position; 
          m_configurator = new Configurator::VectorConstraint(*this);
-         setText("Atom Position");
          break;
       case 2:
          m_type = Distance; 
          m_configurator = new Configurator::ScalarConstraint(*this);
-         setText("Bond Distance");
          break;
       case 3:
          m_type = Angle; 
          m_configurator = new Configurator::ScalarConstraint(*this);
-         setText("Angle");
          break;
       case 4:
          m_type = Torsion; 
          m_configurator = new Configurator::ScalarConstraint(*this);
-         setText("Torsion");
          break;
       default:
          m_type = Invalid; 
@@ -133,20 +141,18 @@ Constraint::~Constraint()
 }
 
 
-bool Constraint::operator==(Constraint const& that) const
+bool Constraint::sameAtoms(AtomList const& atoms) const
 {
-   bool equal(false);
-   int n(m_atoms.size());
-   if (n == that.m_atoms.size()) {
-      if (m_atoms == that.m_atoms) {
-         equal = true;
-      }else {
-         equal = true;
-         for (int i = 0; i < n; ++i) {
-             equal = equal && m_atoms[i] == that.m_atoms[n-i-1];
-         }
-      }
+   if (m_atoms.size() != atoms.size()) return false;
+   if (m_atoms == atoms) return true;
+
+   // check for reverse atom ordering as well
+   int  n(m_atoms.size());
+   bool equal(true);
+   for (int i = 0; i < n; ++i) {
+        equal = equal && m_atoms[i] == atoms[n-i-1];
    }
+
    return equal;
 }
 
@@ -160,11 +166,16 @@ Constraint& Constraint::operator=(Constraint const& that)
 
 void Constraint::copy(Constraint const& that)
 {
-   setAtomList(that.m_atoms);
-   m_mesg  = that.m_mesg;
-   m_axes  = that.m_axes;
-   m_targetValue    = that.m_targetValue;
-   m_targetPosition = that.m_targetPosition;
+   setAtomList(that.m_atoms);  // sets m_type too
+   m_mesg               = that.m_mesg;
+   m_optimizeConstraint = that.m_optimizeConstraint;
+   m_scanConstraint     = that.m_scanConstraint;
+   m_targetValue        = that.m_targetValue;
+   m_maxValue           = that.m_maxValue;
+   m_points             = that.m_points;
+   m_targetPosition     = that.m_targetPosition;
+   m_axes               = that.m_axes;
+
    m_configurator->init();
 }
 
@@ -276,37 +287,49 @@ void Constraint::addTo(OpenBabel::OBFFConstraints& constraints) const
 QString Constraint::formatQChem() const
 {
    QString str;
+   int precision(3);
+
    switch (m_type) {
       case Invalid:
          break;
 
       case Position: 
-         str += QString::number(m_atoms[0]->getIndex()) + " XYZ\n";
+         str += QString::number(m_atoms[0]->getIndex()) + " XYZ";
          break;
 
       case Distance:
+         precision = 3;
          str += "stre  " + QString::number(m_atoms[0]->getIndex()) + "  "
                          + QString::number(m_atoms[1]->getIndex()) + "  "
-                         + QString::number(m_targetValue, 'f', 3)  + "\n";
+                         + QString::number(m_targetValue, 'f', precision);
          break;
 
       case Angle:
+         precision = 2;
          str += "bend  " + QString::number(m_atoms[0]->getIndex()) + "  "
                          + QString::number(m_atoms[1]->getIndex()) + "  "
                          + QString::number(m_atoms[2]->getIndex()) + "  "
-                         + QString::number(m_targetValue, 'f', 2)  + "\n";
+                         + QString::number(m_targetValue, 'f', precision);
          break;
 
       case Torsion:
+         precision = 1;
          str += "tors  " + QString::number(m_atoms[0]->getIndex()) + "  "
                          + QString::number(m_atoms[1]->getIndex()) + "  "
                          + QString::number(m_atoms[2]->getIndex()) + "  "
                          + QString::number(m_atoms[3]->getIndex()) + "  "
-                         + QString::number(m_targetValue, 'f', 1)  + "\n";
+                         + QString::number(m_targetValue, 'f', precision);
           break;
    }
 
-   return str;
+
+   if (m_scanConstraint) {
+      double delta( (m_maxValue - m_targetValue)/(m_points-1));
+      str += "  " + QString::number(m_maxValue, 'f', precision)
+           + "  " + QString::number(delta, 'f', precision);
+   }
+
+   return str + "\n";
 }
 
 // ------------------------------------------------------------------------------
@@ -314,10 +337,18 @@ QString Constraint::formatQChem() const
 
 void Constraint::draw()
 {
-   if (checkState() != Qt::Checked) return;
+   if (m_scanConstraint) {
+      m_color = s_scanColor;
+   }else if (satisfied()) {
+      m_color = s_satisfiedColor;
+   }else {
+      m_color = s_unsatisfiedColor;
+   }
+
+   glColor3fv(m_color);
 
    switch (m_type) {
-      case Invalid:                   break;
+      case Invalid:                    break;
       case Position:  drawPosition();  break;
       case Distance:  drawDistance();  break;
       case Angle:     drawAngle();     break;
@@ -335,12 +366,6 @@ void Constraint::drawPosition()
    bool selected(false);
    double radius(m_atoms[0]->getRadius(selected)+0.1);
 
-   if (satisfied()) {
-      glColor3fv(s_satisfiedColor);
-   }else {
-      glColor3fv(s_unsatisfiedColor);
-   }
-
    if (m_axes & ZAxis) {
       glRotatef(00.0f, 1.0f, 0.0f, 0.0f);
       GLShape::Torus(radius, s_tubeRadius, s_tubeResolution);
@@ -352,13 +377,6 @@ void Constraint::drawPosition()
    if (m_axes & ZAxis) {
       glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
       GLShape::Torus(radius, s_tubeRadius, s_tubeResolution);
-   }
-
-
-   if (satisfied()) {
-      glColor4fv(s_satisfiedColor);
-   }else {
-      glColor4fv(s_unsatisfiedColor);
    }
 
    bool fill(true);
@@ -392,12 +410,6 @@ void Constraint::drawDistance()
    Vec b(m_atoms[1]->getPosition());
    Vec ab(b-a);
 
-   if (satisfied()) {
-      glColor3fv(s_satisfiedColor);
-   }else {
-      glColor3fv(s_unsatisfiedColor);
-   }
-
    GLShape::Tube(a, b, s_tubeRadius, s_tubeResolution);
 
    Quaternion orientation(Vec(0.0, 0.0, 1.0), ab);
@@ -406,21 +418,11 @@ void Constraint::drawDistance()
    glPushMatrix();
    glMultMatrixd(frame.matrix());
 
-   ///GLUquadric* quadric = gluNewQuadric();
-   //gluQuadricOrientation(quadric, GLU_OUTSIDE);
-   //gluCylinder(quadric, s_tubeRadius, s_tubeRadius, ab.norm(), 12, 1);
-
-   //GLShape::Tube(a, b, s_tubeRadius, s_tubeResolution);
    glTranslatef(0.0, 0.0, ab.norm()/2);
    double radius(0.2);
    GLShape::Torus(radius, s_tubeRadius, s_tubeResolution);
 
-   if (satisfied()) {
-      glColor4fv(s_satisfiedColor);
-   }else {
-      glColor4fv(s_unsatisfiedColor);
-   }
-
+   glColor4fv(m_color);
    glEnable(GL_BLEND);
    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
    glDisable(GL_LIGHTING);
@@ -446,12 +448,6 @@ void Constraint::drawAngle()
    double resolution(0.1f);         // arc-length of sector 
    double angle(std::acos(ab*cb));  // angle of sector
 
-   if (satisfied()) {
-      glColor3fv(s_satisfiedColor);
-   }else {
-      glColor3fv(s_unsatisfiedColor);
-   }
-
    GLShape::Tube(a, b, s_tubeRadius, s_tubeResolution);
    GLShape::Tube(c, b, s_tubeRadius, s_tubeResolution);
 
@@ -472,12 +468,7 @@ void Constraint::drawAngle()
    glDisable(GL_LIGHTING);
    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-   if (satisfied()) {
-      glColor4fv(s_satisfiedColor);
-   }else {
-      glColor4fv(s_unsatisfiedColor);
-   }
-
+   glColor4fv(m_color);
    bool fill(true);
    GLShape::Sector(radius, resolution, fill, angle);
 
@@ -496,12 +487,6 @@ void Constraint::drawTorsion()
    Vec e(a+c-b);
    Vec f(d+b-c);
 
-   if (satisfied()) {
-      glColor3fv(s_satisfiedColor);
-   }else {
-      glColor3fv(s_unsatisfiedColor);
-   }
-
    GLShape::Tube(a, b, s_tubeRadius, s_tubeResolution);
    GLShape::Tube(c, b, s_tubeRadius, s_tubeResolution);
    GLShape::Tube(a, e, s_tubeRadius, s_tubeResolution);
@@ -511,9 +496,6 @@ void Constraint::drawTorsion()
    GLShape::Tube(b, c, s_tubeRadius, s_tubeResolution);
    GLShape::Tube(d, f, s_tubeRadius, s_tubeResolution);
    GLShape::Tube(b, f, s_tubeRadius, s_tubeResolution);
-
-   //GLShape::Tube(a, c, s_tubeRadius, s_tubeResolution);
-   //GLShape::Tube(d, b, s_tubeRadius, s_tubeResolution);
 
    GLShape::Sphere(e, s_tubeRadius, s_tubeResolution);
    GLShape::Sphere(f, s_tubeRadius, s_tubeResolution);
@@ -541,12 +523,7 @@ void Constraint::drawTorsion()
    glEnable(GL_BLEND);
    glDisable(GL_LIGHTING);
    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-   if (satisfied()) {
-      glColor4fv(s_satisfiedColor);
-   }else {
-      glColor4fv(s_unsatisfiedColor);
-   }
+   glColor4fv(m_color);
 
    glBegin(GL_QUAD_STRIP);
       glVertex3f(a.x, a.y, a.z);

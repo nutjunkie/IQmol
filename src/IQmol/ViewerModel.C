@@ -564,6 +564,7 @@ void ViewerModel::setConstraint()
    // Check all the selected atoms belong to the same Molecule.
    unsigned int findFlags(Layer::Parents | Layer::Visible);
    MoleculeList parents(m_selectedObjects[0]->findLayers<Layer::Molecule>(findFlags));
+   if (parents.isEmpty()) return;
 
    for (int i = 1; i < n; ++i) {
        if (m_selectedObjects[i]->findLayers<Layer::Molecule>(findFlags) != parents) {
@@ -593,13 +594,31 @@ void ViewerModel::setConstraint()
       return;
    }
 
-   Layer::Constraint* constraint = new Layer::Constraint(atoms);
-   constraint->configure();
-   if (constraint->accepted()) {
-      selectNone();
-      parents.first()->appendConstraint(constraint);
+   Layer::Molecule* molecule(parents.first());
+   Layer::Constraint* constraint(molecule->findMatchingConstraint(atoms));
+
+   if (constraint) {
+      constraint->configure();
+      if (constraint->accepted()) {
+         selectNone();
+         molecule->applyConstraint(constraint);
+      }
    }else {
-      delete constraint;
+      constraint = new Layer::Constraint(atoms);
+      constraint->configure();
+      if (constraint->accepted()) {
+         if (molecule->canAcceptConstraint(constraint)) {
+            selectNone();
+            molecule->addConstraint(constraint);
+         }else {
+            QMsgBox::information(0, "IQmol", 
+               "A maximum of two scan coordinates are permitted");
+            delete constraint;
+         }
+         
+      }else {
+         delete constraint;
+      }
    }
 }
 

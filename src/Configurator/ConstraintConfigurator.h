@@ -60,6 +60,7 @@ namespace Configurator {
       public Q_SLOTS:
          void init();
          void sync();
+         void on_deleteButton_clicked(bool);
 
       private Q_SLOTS:
          void accept();
@@ -81,9 +82,13 @@ namespace Configurator {
       public Q_SLOTS:
          void init();
          void sync();
+         void on_deleteButton_clicked(bool);
 
       private Q_SLOTS:
          void accept();
+         void on_scanButton_clicked(bool) { updateRange(); }
+         void on_setButton_clicked(bool) { updateRange(); }
+         void on_constrainButton_clicked(bool) { updateRange(); }
 
       private:
          void initDistance();
@@ -92,6 +97,7 @@ namespace Configurator {
          void syncDistance();
          void syncAngle();
          void syncTorsion();
+         void updateRange();
          Ui::ScalarConstraintConfigurator m_constraintConfigurator;
    };
 
