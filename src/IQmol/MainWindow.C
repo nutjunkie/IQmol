@@ -516,15 +516,13 @@ void MainWindow::createMenus()
          action->setCheckable(true);
          m_labelActions << action;
 
-/*
          name = "NMR Shifts";
          action = subMenu->addAction(name);
          connect(action, SIGNAL(triggered()), this, SLOT(setLabel()));
-         action->setData(Layer::Atom::NmrShifts);
+         action->setData(Layer::Atom::NmrShift);
          action->setShortcut(Qt::Key_N);
          action->setCheckable(true);
          m_labelActions << action;
-*/
 
          name = "Partial Charge";
          action = subMenu->addAction(name);
@@ -542,41 +540,13 @@ void MainWindow::createMenus()
          action->setCheckable(true);
          m_labelActions << action;
 
+
    menu->addSeparator();
 
    name = "Configure Appearance";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), this, SLOT(configureAppearance()));
 
-
-      // These are not working correctly at the moment.
-/*
-      name = "Partial Charge Type";
-      QActionGroup* partialChargeGroup = new QActionGroup(this);
-      subMenu = menu->addMenu(name);
-
-         QString pc("Gasteiger");
-         action = subMenu->addAction(pc);
-         action->setCheckable(true);
-         action->setChecked(true);
-         action->setData(pc);
-         partialChargeGroup->addAction(action);
-         connect(action, SIGNAL(triggered()), this, SLOT(setPartialChargeType()));
-
-         pc = "Sanderson";
-         action = subMenu->addAction(pc);
-         action->setCheckable(true);
-         action->setData(pc);
-         partialChargeGroup->addAction(action);
-         connect(action, SIGNAL(triggered()), this, SLOT(setPartialChargeType()));
-
-         pc = "Mulliken";
-         action = subMenu->addAction(pc);
-         action->setCheckable(true);
-         action->setData(pc);
-         partialChargeGroup->addAction(action);
-         connect(action, SIGNAL(triggered()), this, SLOT(setPartialChargeType()));
-*/
 
 
 
@@ -854,13 +824,6 @@ void MainWindow::setForceField()
 {
    QAction* action = qobject_cast<QAction*>(sender());
    if (action) m_viewerModel.setForceField(action->data().toString());
-}
-
-
-void MainWindow::setPartialChargeType()
-{
-   QAction* action = qobject_cast<QAction*>(sender());
-   if (action) m_viewerModel.setPartialChargeType(action->data().toString());
 }
 
 

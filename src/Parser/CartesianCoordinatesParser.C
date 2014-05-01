@@ -85,6 +85,7 @@ Data::Geometry* CartesianCoordinates::parse(TextStream& textStream)
          m_error += QString::number(textStream.lineNumber());
          m_error += ":\nExpected: [int|symbol]   float  float  float";
       }
+      geometry->computeGasteigerCharges();
    }
 
    return geometry;

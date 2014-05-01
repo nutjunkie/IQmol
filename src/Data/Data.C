@@ -61,13 +61,15 @@ QString toString(ID const id)
 
       case AtomicProperty:         s = "Data::AtomicProperty";         break;
       case AtomicSymbol:           s = "Data::AtomicSymbol";           break;
+      case AtomicNumber:           s = "Data::AtomicNumber";           break;
       case AtomColor:              s = "Data::AtomColor";              break;
       case NmrShiftIsotropic:      s = "Data::NmrShiftIsotropic";      break;
       case NmrShiftRelative:       s = "Data::NmrShiftRelative";       break;
       case Mass:                   s = "Data::Mass";                   break;
       case AtomicCharge:           s = "Data::AtomicCharge";           break;
       case MullikenCharge:         s = "Data::MullikenCharge";         break;
-      case StewartCharge:          s = "Data::StewartCharge";          break;
+      case GasteigerCharge:        s = "Data::GasteigerCharge";        break;
+      case MultipoleDerivedCharge: s = "Data::MultipoleDerivedCharge"; break;
       case SpinDensity:            s = "Data::SpinDensity";            break;
       case VdwRadius:              s = "Data::VdwRadius";              break;
 
@@ -94,6 +96,9 @@ QString toString(ID const id)
       case SurfaceList:            s = "Data::SurfaceList";            break;
       case SurfaceInfo:            s = "Data::SurfaceInfo";            break;
       case SurfaceInfoList:        s = "Data::SurfaceInfoList";        break;
+
+      case NmrReference:           s = "Data::NmrReference";           break;
+      case NmrReferenceList:       s = "Data::NmrReferenceList";       break;
    }
 
    return s;

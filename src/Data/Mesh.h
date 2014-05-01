@@ -179,6 +179,8 @@ namespace Data {
          /// Moves vertex A to the intersection of the plane (n, p0) with AB
          void moveToLinePlaneIntersection(Normal const& n, Point const& p0, Vertex& A, 
             Vertex const& B);
+
+         void removeDisconnectedVertices();
              
          /// This is the key data structure holding the Mesh information.
          OMMesh m_omMesh;

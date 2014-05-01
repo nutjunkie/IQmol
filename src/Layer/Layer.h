@@ -91,6 +91,10 @@ namespace Layer {
          virtual void removeLayer(Base* child);
          virtual void orphanLayer();
 
+		 // This is used to pass the change in the checkbox status from the
+		 // QStandardItem to the Layer.
+         virtual void setCheckStatus(Qt::CheckState const) { }
+
          virtual void setMolecule(Molecule* molecule) { m_molecule = molecule; }
 
          template <class T>

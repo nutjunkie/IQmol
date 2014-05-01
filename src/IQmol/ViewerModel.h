@@ -59,8 +59,6 @@ namespace IQmol {
          void displayGlobals();
 
          void setForceField(QString const& forceField) { m_forceField = forceField; }
-         void setPartialChargeType(QString const& type);
-
          double sceneRadius(bool visibleOnly = true);
          MoleculeList moleculeList(bool visibleOnly = true);
          Layer::Molecule* activeMolecule();

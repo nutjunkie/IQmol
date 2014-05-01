@@ -99,7 +99,7 @@ qDebug() << "Layer::GeometryList::setCurrentGeometry with index" << index;
    for (unsigned i = 0; i < nAtoms; ++i) {
        atoms[i]->setPosition(geometry->atomicPosition(i));
        atoms[i]->setCharge(geometry->atomicCharge(i));
-       atoms[i]->setSpin(geometry->atomicSpin(i));
+       atoms[i]->setSpinDensity(geometry->atomicSpin(i));
    }
 
    m_molecule->energyAvailable(geometry->energy(), Info::Hartree);

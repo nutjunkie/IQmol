@@ -52,6 +52,8 @@ namespace Data {
 
          double opacity() const { return m_opacity; }
          void setOpacity(double const opacity ) { m_opacity = opacity; }
+         bool isVisible() const { return m_isVisible; }
+         void setVisibility(bool const tf) { m_isVisible = tf; }
 
 // Deprecate - is this really needed? - apparently in Layer::Molecule
          bool hasProperty() const;
@@ -83,6 +85,7 @@ namespace Data {
             ar & m_colors;
             ar & m_opacity;
             ar & m_isSigned;
+            ar & m_isVisible;
             ar & m_meshPositive;
             ar & m_meshNegative;
 
@@ -95,6 +98,7 @@ namespace Data {
          QList<QColor> m_colors;
          double m_opacity;
          bool   m_isSigned;
+         bool   m_isVisible;
          Mesh   m_meshPositive;
          Mesh   m_meshNegative;
 

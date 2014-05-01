@@ -44,18 +44,20 @@ double Base::computeSignificantRadius(double const thresh) const
 
    // Note the search is only along the z direction, which 
    // will not be valid for non-spherical densities.
-   double y1(density(Vec(0.0, 0.0, r1)) - thresh);
-   double y2(density(Vec(0.0, 0.0, r2)) - thresh);
+   double z1(density(Vec(0.0, 0.0, r1)) - thresh);
+   double z2(density(Vec(0.0, 0.0, r2)) - thresh);
 
    // Sanity check to make sure we bracket the root, 
    // if not give a large radius to turn off cutoffs
-   return (y1 > 0.0 && y2 < 0.0) ? binarySearch(r1, r2, y1, y2, thresh) : r2;
+   return (z1 > 0.0 && z2 < 0.0) ? binarySearch(r1, r2, z1, z2, thresh) : r2;
 }
 
 
 double Base::binarySearch(double r1, double r2, double y1, double y2, double thresh) const
 {
-   if (std::abs(r2-r1) < 0.1) return r2;  // only a rough radius is required
+   if (std::abs(r2-r1) < 0.1) {
+      return  r2;  // only a rough radius is required
+   }
    double r3 = (r2+r1) / 2.0;
    double y3(density(Vec(0.0, 0.0, r3)) - thresh);
    return (y3 > 0.0) ? binarySearch(r3, r2, y3, y2, thresh) 

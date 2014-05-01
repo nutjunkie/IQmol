@@ -66,9 +66,9 @@ GridSize::GridSize(qglviewer::Vec const& min, qglviewer::Vec const& max, unsigne
    qglviewer::Vec delta(max-min);
    delta /= d;
 
-   m_nx = std::ceil(delta.x);
-   m_ny = std::ceil(delta.y);
-   m_nz = std::ceil(delta.z);
+   m_nx = std::ceil(delta.x) + 1;
+   m_ny = std::ceil(delta.y) + 1;
+   m_nz = std::ceil(delta.z) + 1;
 }
 
 

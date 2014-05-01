@@ -95,9 +95,9 @@ namespace Command {
    class MoveObjects : public QUndoCommand {
       public:
          MoveObjects(Layer::Molecule*, QString const& text = "Move items", 
-            bool const animiate = false);
+            bool const animiate = false, bool invalidateSymmetry = true);
          MoveObjects(GLObjectList const&, QString const& text = "Move items", 
-            bool const animiate = false);
+            bool const animiate = false, bool invalidateSymmetry = true);
          ~MoveObjects();
            
          virtual void redo();
@@ -116,6 +116,7 @@ namespace Command {
          GLObjectList m_objectList;
          bool m_finalStateSaved;
          bool m_animate;
+         bool m_invalidateSymmetry;
          QString m_msg;
          AnimatorList m_animatorList;
    };
@@ -151,14 +152,14 @@ namespace Command {
    class MinimizeStructure: public MoveObjects {
       public:
          MinimizeStructure(Layer::Molecule* molecule) 
-            : MoveObjects(molecule, "Minimize energy", true) { }
+            : MoveObjects(molecule, "Minimize energy", true, true) { }
    };
  
 
    class SymmetrizeStructure : public MoveObjects {
       public:
          SymmetrizeStructure(Layer::Molecule* molecule)
-            : MoveObjects(molecule, "Symmetrize structure", true) { }
+            : MoveObjects(molecule, "Symmetrize structure", true, false) { }
    };
 
 

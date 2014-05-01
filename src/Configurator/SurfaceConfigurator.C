@@ -59,9 +59,10 @@ void Surface::sync()
       m_surfaceConfigurator.swapColorsButton->setEnabled(false);
    }
 
-   if (m_surface.hasProperty()) {
-      m_gradientColors = m_surface.colors();
-   }
+   if (m_surface.hasProperty()) m_gradientColors = m_surface.colors();
+
+   double area(m_surface.area());
+   m_surfaceConfigurator.areaLabel->setText(QString::number(area, 'f', 3));
 
    m_surfaceConfigurator.transparencySlider->setValue(100*m_surface.getAlpha());
    
@@ -261,12 +262,6 @@ void Surface::on_dotsButton_clicked(bool)
 {
    m_surface.setDrawMode(Layer::Surface::Dots);
    m_surface.updated();
-}
-
-
-void Surface::setArea(double const area)
-{
-   m_surfaceConfigurator.areaLabel->setText(QString::number(area, 'f', 3));
 }
 
 } } // end namespace IQmol::Configurator

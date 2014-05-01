@@ -30,7 +30,7 @@ namespace IQmol {
 namespace Data {
 
 //  ---------- AtomicSymbol ----------
-AtomicSymbol::AtomicSymbol(int const Z)
+void AtomicSymbol::setDefault(int const Z)
 {
    if (Z > 0) m_symbol = QString(OpenBabel::etab.GetSymbol(Z));
 }
@@ -52,7 +52,7 @@ void ScalarProperty::dump() const
 
 
 //  ---------- Mass ----------
-Mass::Mass(int const Z)
+void Mass::setDefault(int const Z)
 {
    if (Z > 0) m_value = OpenBabel::etab.GetMass(Z);
 }
@@ -60,7 +60,7 @@ Mass::Mass(int const Z)
 
 
 //  ---------- VdwRadius ----------
-VdwRadius::VdwRadius(int const Z)
+void VdwRadius::setDefault(int const Z)
 {
    if (Z > 0) m_value = OpenBabel::etab.GetVdwRad(Z);
 }
@@ -68,7 +68,7 @@ VdwRadius::VdwRadius(int const Z)
 
 
 //  ---------- AtomColor ----------
-AtomColor::AtomColor(int const Z)
+void AtomColor::setDefault(int const Z)
 {
    if (Z > 0) {
       std::vector<double> rgb(OpenBabel::etab.GetRGB(Z));

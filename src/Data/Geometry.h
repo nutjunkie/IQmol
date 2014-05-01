@@ -68,6 +68,7 @@ namespace Data {
          void setChargeAndMultiplicity(int const charge, unsigned const multiplicity);
          int  charge() const { return m_charge; }
          unsigned multiplicity() const { return m_multiplicity; }
+         void computeGasteigerCharges();
 
          template <class P>
          bool setAtomicProperty(QList<double> values) 
@@ -121,7 +122,10 @@ namespace Data {
             for (iter = m_properties.begin(); iter != m_properties.end(); ++iter) {
                 if ( (p = dynamic_cast<P*>(*iter)) ) return true;
             }
-            return false;
+			// Now check for an atomic property, we cheat a bit by only looking
+			// at the first atom.
+            if (m_atoms.isEmpty()) return false;
+            return m_atoms.first()->hasProperty<P>();
          }
 
          void appendProperty(Data::Base* data) {

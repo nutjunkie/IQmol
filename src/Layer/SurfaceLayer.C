@@ -86,6 +86,12 @@ void Surface::setMolecule(Molecule* molecule)
 }
 
 
+void Surface::setCheckStatus(Qt::CheckState const state)
+{
+   m_surface.setVisibility(state == Qt::Checked);
+}
+
+
 void Surface::getPropertyRange(double& min, double& max) const
 {
    m_surface.getPropertyRange(min, max);

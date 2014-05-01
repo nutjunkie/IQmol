@@ -65,6 +65,17 @@ void ParseFile::setFilePaths(QString const& filePath)
       QDir::Filters filters(QDir::Files | QDir::Readable);
       m_filePaths << dir.entryList(filters);
 
+//  ---
+    // This is a hack to ensure the .out file gets read before the other files
+    qDebug() << "Reversing directory file order";
+
+    QStringList filePaths;
+    for (int i = 0; i < m_filePaths.size(); ++i) {
+        filePaths.prepend(m_filePaths[i]);
+    }
+    m_filePaths = filePaths;
+//  ---
+
       QStringList::iterator iter;
       for (iter = m_filePaths.begin(); iter != m_filePaths.end(); ++iter) {
           (*iter).prepend(m_filePath + "/");
@@ -188,6 +199,7 @@ void ParseFile::runParser(Base* parser, QString const& filePath)
       msg += info.fileName();
       m_errorList.append(msg);
       m_errorList << errors;
+qDebug() << m_errorList;
    }
 }
 

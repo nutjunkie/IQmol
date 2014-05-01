@@ -73,6 +73,7 @@ bool Cube::parseCoordinates(TextStream& textStream, unsigned nAtoms)
    } 
 
    geometry->scaleCoordinates(m_scale);
+   geometry->computeGasteigerCharges();
    m_dataBank.append(geometry);
    return true;
 

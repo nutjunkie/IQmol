@@ -233,7 +233,7 @@ void QChemOutput::readDMA(TextStream& textStream, Data::Geometry* geometry)
    while (!textStream.atEnd()) {
       x = textStream.nextLineAsDoubles();
       if (x.size() < 5) break;
-      site = new Data::MultipoleExpansion(Vec(x[1],x[2],x[3]));
+      site = new Data::MultipoleExpansion(Vec(x[1], x[2], x[3]));
       site->addCharge(x[4]);
       dma->append(site);
    }
@@ -586,18 +586,22 @@ void QChemOutput::readNmrShifts(TextStream& textStream, Data::Geometry* geometry
 
    int n;
    bool done(false), allOk(true), ok;
+   bool haveRelativeShifts(false);
 
    while (!textStream.atEnd() && !done && allOk) {
       tokens = textStream.nextLineAsTokens();
       n = tokens.size();
 
       if (n == 6) {
+         haveRelativeShifts = true;
          relative.append(tokens[5].toDouble(&ok)); 
          allOk = allOk && ok;
+      }else if (n == 5) {
+         relative.append(0.0);
       }
 
       if (n >= 5) {
-         isotropic.append(tokens[4].toDouble(&ok)); 
+         isotropic.append(tokens[3].toDouble(&ok)); 
          allOk = allOk && ok;
          atomicSymbols.append(tokens[1]);
       }else {
@@ -618,11 +622,13 @@ void QChemOutput::readNmrShifts(TextStream& textStream, Data::Geometry* geometry
    }
 
    allOk = geometry->setAtomicProperty<Data::NmrShiftIsotropic>(isotropic);
-   if (allOk && !relative.isEmpty()) {
-      allOk = allOk && geometry->setAtomicProperty<Data::NmrShiftRelative>(relative);
-   }
 
-   if (!allOk) m_errors.append("Problem setting atomic charges");
+   if (!allOk) m_errors.append("Failed to read NMR Isotropic shifts");
+
+   if (haveRelativeShifts) {
+      allOk = geometry->setAtomicProperty<Data::NmrShiftRelative>(relative);
+      if (!allOk) m_errors.append("Failed to read NMR Relative shifts");
+   }
 }
 
 
@@ -675,7 +681,7 @@ void QChemOutput::readCharges(TextStream& textStream, Data::Geometry* geometry,
          allOk = allOk && geometry->setAtomicProperty<Data::SpinDensity>(spins);
       }
    }else if (label == "Stewart") {
-      allOk = geometry->setAtomicProperty<Data::StewartCharge>(charges);
+      allOk = geometry->setAtomicProperty<Data::MultipoleDerivedCharge>(charges);
    }else {
       m_errors.append("Unknown charge type");
    }
@@ -701,6 +707,5 @@ Data::Geometry* QChemOutput::readStandardCoordinates(TextStream& textStream)
 
    return geometry;
 } 
-
 
 } } // end namespace IQmol::Parser

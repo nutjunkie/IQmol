@@ -206,7 +206,7 @@ namespace IQmol {
             Charge* createCharge(double const q, qglviewer::Vec const& position);
    
             QList<qglviewer::Vec> coordinates();
-            QList<double> atomicCharges();
+            QList<double> atomicCharges(Data::Type::ID type);
             void setGeometry(IQmol::Data::Geometry&);
    
       		 // This is needed for fchk-file based surfaces and only covers ridgid
@@ -222,9 +222,6 @@ namespace IQmol {
    
          public Q_SLOTS:
             void surfaceRequest(Data::SurfaceInfo const&);
-            void setGasteigerCharges();
-            void setSandersonCharges();
-            void setMullikenCharges();
             void groupSelection();
             void ungroupSelection();
             void applyConstraint(Constraint*);
@@ -244,6 +241,7 @@ namespace IQmol {
             void removeMolecule() { removeMolecule(this); }
             void detectSymmetry();
             void autoDetectSymmetry();
+            void invalidateSymmetry();
    
          Q_SIGNALS:
             void softUpdate(); // issue if the number of primitives does not change
@@ -279,6 +277,9 @@ namespace IQmol {
             /// to the Molecule.  Currently this is the charge and multiplicity.
             void jobInfoChanged();
             void dumpData() { m_bank.dump(); }
+            void setAtomicCharges(Data::Type::ID type);
+            void updateAtomicCharges();
+
    
          private:
             static bool s_autoDetectSymmetry;
@@ -288,7 +289,15 @@ namespace IQmol {
             QString scanCoordinatesAsString();
             QString efpFragmentsAsString();
             QString efpParametersAsString();
-   
+
+            template <class T>
+            QList<double> atomicCharges();
+            qglviewer::Vec dipoleFromPointCharges();
+
+            QList<double> zeroCharges();
+            QList<double> gasteigerCharges();
+
+
             /// Writes the molecule to the specified file.  The format is
             /// determined from the file extension and a Parser::IOError 
             /// exception is thrown if there are any problems.
@@ -338,7 +347,6 @@ namespace IQmol {
                qglviewer::Vec const& normal = qglviewer::Vec(0.0, 1.0, 0.0));
 
             void clearData();
-            qglviewer::Vec dipoleFromPointCharges();
    
             template <class T>
             void calculateSuperposition(Data::SurfaceInfo const&, bool const doCharges = false);
@@ -367,8 +375,7 @@ namespace IQmol {
             /// default value.
             double m_chargeScale;
    
-            /// Determines if the hydrogen atoms should be drawn smaller in the CPK
-            /// model.
+            /// Determines if the hydrogen atoms are drawn smaller in the CPK model
             bool m_smallerHydrogens;
 
             bool m_modified;
@@ -395,6 +402,10 @@ namespace IQmol {
             QList<SpatialProperty*> m_properties;
             qglviewer::Frame m_frame;
             Data::Bank m_bank;
+
+            Data::Geometry* m_currentGeometry;
+            Data::Type::ID m_chargeType;
+            QAction* m_atomicChargesMenu;
       };
    
    } // end namespace Layer

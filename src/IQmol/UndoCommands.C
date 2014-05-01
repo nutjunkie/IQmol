@@ -139,30 +139,19 @@ void EditPrimitives::undo()
 
 
 // --------------- MoveObjects ---------------
-MoveObjects::MoveObjects(Layer::Molecule* molecule, QString const& text, bool const animate) 
-   : QUndoCommand(text), m_molecule(molecule), m_finalStateSaved(false), m_animate(animate)
+MoveObjects::MoveObjects(Layer::Molecule* molecule, QString const& text, bool const animate,
+   bool const invalidateSymmetry) : QUndoCommand(text), m_molecule(molecule), 
+   m_finalStateSaved(false), m_animate(animate), m_invalidateSymmetry(invalidateSymmetry)
 { 
-/*
-   AtomList atomList(m_molecule->findLayers<Layer::Atom>(Layer::Children));
-   AtomList::iterator atom;
-   for (atom = atomList.begin(); atom != atomList.end(); ++atom) {
-       m_objectList.append(*atom);
-   }
-
-   GroupList groupList(m_molecule->findLayers<Layer::Group>(Layer::Children));
-   GroupList::iterator group;
-   for (group = groupList.begin(); group != groupList.end(); ++group) {
-       m_objectList.append(*group);
-   }
-*/
    m_objectList = m_molecule->findLayers<Layer::GLObject>(Layer::Children);
    saveFrames(m_initialFrames);
 }
 
 
 MoveObjects::MoveObjects(GLObjectList const& objectList, QString const& text, 
-   bool const animate) : QUndoCommand(text), m_molecule(0), m_objectList(objectList), 
-   m_finalStateSaved(false), m_animate(animate)
+   bool const animate, bool const invalidateSymmetry) : QUndoCommand(text), m_molecule(0),
+   m_objectList(objectList), m_finalStateSaved(false), m_animate(animate), 
+   m_invalidateSymmetry(invalidateSymmetry)
 { 
    // Need a Molecule handle for the Viewer update (yugh)
    MoleculeList parents;
@@ -214,14 +203,22 @@ void MoveObjects::redo()
       loadFrames(m_finalFrames);
    }
 
-   if (m_molecule) m_molecule->postMessage(m_msg);
+   if (m_molecule) {
+      if (m_invalidateSymmetry) m_molecule->invalidateSymmetry();
+      m_molecule->autoDetectSymmetry();
+      m_molecule->postMessage(m_msg);
+   }
 }
 
 
 void MoveObjects::undo() 
 {
    loadFrames(m_initialFrames);
-   if (m_molecule) m_molecule->postMessage("");
+   if (m_molecule) {
+      m_molecule->postMessage("");
+      if (m_invalidateSymmetry) m_molecule->invalidateSymmetry();
+      m_molecule->autoDetectSymmetry();
+   }
 }
 
 

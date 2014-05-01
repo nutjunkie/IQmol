@@ -70,6 +70,7 @@
 #include <QDropEvent>
 #include <QProcess>
 #include <QTime>
+#include <QMenu>
 #include <QUrl>
 #include <vector>
 
@@ -104,7 +105,8 @@ Molecule::Molecule(QObject* parent) : Base(DefaultMoleculeName, parent),
    m_constraintList(this, "Constraints"), 
    m_scanList(this, "Scan Coordinates"), 
    m_groupList(this, "Groups"), 
-   m_efpFragmentList(this)
+   m_efpFragmentList(this),
+   m_currentGeometry(0), m_chargeType(Data::Type::GasteigerCharge)
 {
    setFlags(Qt::ItemIsSelectable | Qt::ItemIsDropEnabled | 
       Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
@@ -121,8 +123,6 @@ Molecule::Molecule(QObject* parent) : Base(DefaultMoleculeName, parent),
    // The following gets around this.
    OBConversion conv;
    conv.SetInFormat("xyz");
- 
-   initProperties();
 
    // Add actions for the context menu
    connect(newAction("Configure"), SIGNAL(triggered()), 
@@ -131,10 +131,15 @@ Molecule::Molecule(QObject* parent) : Base(DefaultMoleculeName, parent),
       this, SLOT(selectAll()));
    connect(newAction("Reperceive Bonds"), SIGNAL(triggered()), 
       this, SLOT(reperceiveBonds()));
+
+   m_atomicChargesMenu = newAction("Atomic Charges");
+
    connect(newAction("Remove"), SIGNAL(triggered()), 
       this, SLOT(removeMolecule()));
    connect(newAction("Dump Data"), SIGNAL(triggered()), 
       this, SLOT(dumpData()));
+
+   initProperties();
 
    connect(&m_efpFragmentList, SIGNAL(updated()), this, SIGNAL(softUpdate()));
    connect(&m_groupList, SIGNAL(updated()), this, SIGNAL(softUpdate()));
@@ -202,8 +207,6 @@ void Molecule::appendData(Layer::List& list)
        if (text == "Cube Data") text = "cubedata";
        if (text == "Frequencies") text = "frequencies";
 
-       qDebug() << "Adding data" << text;
-       
        if ((files = qobject_cast<Files*>(*iter))) {
           FileList fileList(files->findLayers<File>(Children));
           FileList::iterator file;
@@ -237,44 +240,12 @@ void Molecule::appendData(Layer::List& list)
                  primitiveList.append(*efp);
              }
 
-#warning "Data being ignored"
-/*
-// deprecate This needs to be fixed once the Layers are Data'ized
-
-   IQmol::Data::Base* baseData(0);  // This was up further
-          }else if ((baseData = (*iter)->data())) {
-             IQmol::Data::MultipoleExpansionList* dma;
-             dma = dynamic_cast<IQmol::Data::MultipoleExpansionList*>(baseData);
-             if (dma && !dma->isEmpty()) {
-                int order(dma->first()->order());
-                MultipolePotential* dmaEsp;
-                if (order >= 0) {
-                   dmaEsp = new MultipolePotential("ESP (DMA, charges)", 0, dma);
-                   m_properties << dmaEsp;
-                }
-                if (order >= 1) {
-                   dmaEsp = new MultipolePotential("ESP (DMA, dipoles)", 1, dma);
-                   m_properties << dmaEsp;
-                }
-                if (order >= 2) {
-                   dmaEsp = new MultipolePotential("ESP (DMA, quadrupoles)", 2, dma);
-                   m_properties << dmaEsp;
-                }
-                if (order >= 3) {
-                   dmaEsp = new MultipolePotential("ESP (DMA, octopoles)", 3, dma);
-                   m_properties << dmaEsp;
-                }
-             }
-
-*/
-
-          }else {
+           }else {
 			 // The ordering of this is all wrong as the atoms have not been
 			 // appended yet and some Layers need this in their setMolecule
 			 // function.
              toSet.append(*iter);
-          }
-
+            }
        } 
 
        if ( (cubeData = qobject_cast<CubeData*>(*iter)) ) {
@@ -286,9 +257,15 @@ void Molecule::appendData(Layer::List& list)
    BondList bondList(findLayers<Bond>(Children));
    if (bondList.isEmpty()) reperceiveBonds();
 
+   Surface* surface(0);
+
    for (iter = toSet.begin(); iter != toSet.end(); ++iter) {
        (*iter)->setMolecule(this);
-       appendLayer(*iter);
+       if ((surface = qobject_cast<Surface*>(*iter))) {
+          m_surfaceList.appendLayer(surface);
+       }else {
+          appendLayer(*iter);
+       }
    }
 
    reindexAtomsAndBonds();
@@ -344,6 +321,17 @@ bool Molecule::save(bool prompt)
       qDebug() << "Attempting to save" << m_inputFile.filePath();
       if (m_inputFile.suffix().endsWith("iqmol", Qt::CaseInsensitive)) {
          Parser::IQmol iqmol;
+
+         if (!m_currentGeometry) {
+            m_currentGeometry = new Data::Geometry();
+            m_bank.prepend(m_currentGeometry);
+            AtomList atoms(findLayers<Atom>(Children));
+            for (int i = 0; i < atoms.size(); ++i) {
+                unsigned Z(atoms[i]->getAtomicNumber());
+                m_currentGeometry->append(Z, atoms[i]->getPosition());
+            }
+         }
+
          iqmol.save(m_inputFile.filePath(), m_bank);
       }else {
          writeToFile(m_inputFile.filePath());
@@ -445,10 +433,8 @@ PrimitiveList Molecule::fromOBMol(OBMol* obMol, AtomMap* atomMap, BondMap* bondM
             coordinates.append(pos);
          }
       }else {
-         atom->setCharge(obAtom->GetPartialCharge());
          atom->setPosition(pos);
        }
-
    }
 
    // Tidy up last Group
@@ -474,10 +460,26 @@ PrimitiveList Molecule::fromOBMol(OBMol* obMol, AtomMap* atomMap, BondMap* bondM
       
    }
 
+   // Special case code for H2, for some reason OpenBabel doesn't always give it
+   // a bond.
+/*
+   if (addedPrimitives.size() == 2) {
+      Atom* h1(dynamic_cast<Atom*>(addedPrimitives[0]));
+      Atom* h2(dynamic_cast<Atom*>(addedPrimitives[1]));
+      if (h1 && h2 && h1->getAtomicNumber() == && h2->getAtomicNumber() == 1) {
+         double r( < 0.8)
+         if (r < 0.8) addedPrimitives.append(createBond(h1, h2, 1));
+      }
+   }
+*/
+
+/*
+   // Don't do this as Open Babel doesn't seem to respect the values passed in.
    QLOG_DEBUG() << "Retrieving charge and multiplicity from OBMol:" 
             << obMol->GetTotalCharge() << obMol->GetTotalSpinMultiplicity();
    m_info.setCharge(obMol->GetTotalCharge());
    m_info.setMultiplicity(obMol->GetTotalSpinMultiplicity());
+*/
 
    if (deleteAtomMap) delete atomMap;
    if (deleteBondMap) delete bondMap;
@@ -494,8 +496,7 @@ OBMol* Molecule::toOBMol(AtomMap* atomMap, BondMap* bondMap, GroupMap* groupMap)
    OBMol* obMol(new OBMol());
    atomMap->clear();
    bondMap->clear();
-
-   AtomList atoms(findLayers<Atom>(Children | Visible));
+   AtomList atoms(findLayers<Atom>(Children));
    AtomList::iterator atomIter;
 
    obMol->BeginModify();
@@ -526,7 +527,7 @@ OBMol* Molecule::toOBMol(AtomMap* atomMap, BondMap* bondMap, GroupMap* groupMap)
 
    if (groupMap) {
       groupMap->clear();
-      QList<Group*> efps(findLayers<Group>(Children | Visible));
+      QList<Group*> efps(findLayers<Group>(Children));
 
       QList<Group*>::iterator efp;
       for (efp = efps.begin(); efp != efps.end(); ++efp) {
@@ -573,7 +574,7 @@ OBMol* Molecule::toOBMol(AtomMap* atomMap, BondMap* bondMap, GroupMap* groupMap)
 
 Vec Molecule::getBuildAxis(Atom* atom)
 {
-   BondList bonds(findLayers<Bond>(Children));
+   BondList bonds(findLayers<Bond>(Children | Visible));
    BondList::iterator bondIter;
    Atom* beginAtom;
    Atom* endAtom;
@@ -595,7 +596,7 @@ Vec Molecule::getBuildAxis(Atom* atom)
    if (bondCount == 0) {
       axis.setValue(0.0, 0.0, 1.0);
    }else if (axis.normalize() < 0.001) {
-      qDebug() << "Could not determine build axis";
+      QLOG_DEBUG() << "Could not determine build axis";
    }
 
    return axis;
@@ -607,7 +608,7 @@ Vec Molecule::getBuildAxis(Atom* atom)
 
 QStringList Molecule::coordinatesForCubeFile() 
 {
-   AtomList atomList(findLayers<Atom>(Children));
+   AtomList atomList(findLayers<Atom>(Children | Visible));
    Vec position;
    QString line;
    QStringList coords;
@@ -634,7 +635,7 @@ QStringList Molecule::coordinatesForCubeFile()
 
 QString Molecule::coordinatesAsString(bool const selectedOnly)
 {
-   AtomList atomList(findLayers<Atom>(Children));
+   AtomList atomList(findLayers<Atom>(Children | Visible));
    Vec position;
    QString coords;
 
@@ -759,7 +760,7 @@ QString Molecule::constraintsAsString()
 
 QString Molecule::scanCoordinatesAsString() 
 {
-   ConstraintList constraints(findLayers<Constraint>(Visible|Children));
+   ConstraintList constraints(findLayers<Constraint>(Visible | Children));
 
    QString s;
    ConstraintList::iterator iter;
@@ -776,7 +777,7 @@ QString Molecule::scanCoordinatesAsString()
 Constraint* Molecule::findMatchingConstraint(AtomList const& atoms)
 {
    ConstraintList::iterator iter;
-   ConstraintList constraints(findLayers<Constraint>(Children));
+   ConstraintList constraints(findLayers<Constraint>(Children | Visible));
 
    for (iter = constraints.begin(); iter != constraints.end(); ++iter) {
        if ((*iter)->sameAtoms(atoms)) return (*iter);
@@ -795,12 +796,11 @@ bool Molecule::canAcceptConstraint(Constraint* constraint)
 void Molecule::addConstraintLayer(Constraint* constraint)
 {
    if (!constraint) return;
+
    if (constraint->scanConstraint()) {
-      qDebug() << "Appending scan constraint";
       m_scanList.appendLayer(constraint);
    }else {
       m_constraintList.appendLayer(constraint);
-      qDebug() << "Appending optimize constraint";
    }
 
    connect(constraint, SIGNAL(updated()), this, SLOT(constraintUpdated()));
@@ -812,11 +812,10 @@ void Molecule::addConstraintLayer(Constraint* constraint)
 void Molecule::removeConstraintLayer(Constraint* constraint)
 {
    if (!constraint) return;
+
    if (constraint->optimizeConstraint()) {
-      qDebug() << "Removing scan constraint";
       m_constraintList.removeLayer(constraint);
    }else if (constraint->scanConstraint()) {
-      qDebug() << "Removing scan constraint";
       m_scanList.removeLayer(constraint);
    }
 
@@ -906,7 +905,7 @@ void Molecule::applyPositionConstraint(Constraint* constraint)
 
 void Molecule::applyDistanceConstraint(Constraint* constraint)
 {
-   AtomList allAtoms(findLayers<Atom>(Children));
+   AtomList allAtoms(findLayers<Atom>(Children | Visible));
    AtomList atoms(constraint->atomList());
    Atom *A(atoms[0]), *B(atoms[1]);
 
@@ -1083,8 +1082,6 @@ void Molecule::appendPrimitives(PrimitiveList const& primitives)
 
    AtomList atoms(findLayers<Atom>(Children));
    int initialNumberOfAtoms(atoms.size());
-//   QLOG_TRACE() << "Appending" << primitives.size() 
-//                << "primitives to Molecule with" << initialNumberOfAtoms << "atoms"; 
 
    PrimitiveList::const_iterator primitive;
    for (primitive = primitives.begin(); primitive != primitives.end(); ++primitive) {
@@ -1131,7 +1128,7 @@ void Molecule::takePrimitives(PrimitiveList const& primitives)
    EfpFragment* efp;
    Group* group;
 
-   AtomList atoms(findLayers<Atom>(Children));
+   AtomList atoms(findLayers<Atom>(Children | Visible));
    int initialNumberOfAtoms(atoms.size());
 //   QLOG_TRACE() << "Taking" << primitives.size() 
 //                << "primitives from molecule with" << initialNumberOfAtoms << "atoms";
@@ -1176,8 +1173,14 @@ void Molecule::takePrimitives(PrimitiveList const& primitives)
 
 void Molecule::updateInfo()
 {
-   AtomList atoms(findLayers<Atom>(Children));
    m_info.clear();
+   AtomList atoms(findLayers<Atom>(Children));
+   if (atoms.isEmpty()) return;
+
+   setAtomicCharges(Data::Type::GasteigerCharge);
+   bool estimated(true);
+   dipoleAvailable(dipoleFromPointCharges(), estimated); 
+
    m_info.addAtoms(atoms);
    autoDetectSymmetry();
 }
@@ -1197,7 +1200,7 @@ void Molecule::deleteSelection()
 {
    // Must also delete any bond attached to any atom we are deleting.
    BondList::iterator bond;
-   BondList allBonds(findLayers<Bond>(Visible|Children));
+   BondList allBonds(findLayers<Bond>(Visible | Children));
 
    for (bond = allBonds.begin(); bond != allBonds.end(); ++bond) {
        if ( (*bond)->beginAtom()->isSelected() || (*bond)->endAtom()->isSelected() ) {
@@ -1205,16 +1208,11 @@ void Molecule::deleteSelection()
        }
    }
 
-   PrimitiveList deleteTargets(findLayers<Primitive>(Visible|Children|SelectedOnly));
+   PrimitiveList deleteTargets(findLayers<Primitive>(Visible | Children | SelectedOnly));
 
    if (!deleteTargets.isEmpty()) {
       QLOG_DEBUG() << "Deleting" << deleteTargets.size() << "selected objects";
       PrimitiveList::iterator iter;
-/*
-      for (iter = deleteTargets.begin(); iter != deleteTargets.end(); ++iter) {
-          QLOG_TRACE() << "   Target: "<< (*iter)->text();
-      }
-*/
       Command::EditPrimitives* cmd(new Command::EditPrimitives("Remove atoms/bonds", this));
       cmd->remove(deleteTargets);
       postCommand(cmd);
@@ -1227,13 +1225,13 @@ PrimitiveList Molecule::getSelected(bool danglingBonds)
 {
    PrimitiveList selected;
 
-   AtomList allAtoms(findLayers<Atom>(Visible|Children));
+   AtomList allAtoms(findLayers<Atom>(Visible | Children));
    AtomList::iterator atom;
    for (atom = allAtoms.begin(); atom != allAtoms.end(); ++atom) {
        if ((*atom)->isSelected()) selected.append(*atom);
    } 
 
-   BondList allBonds(findLayers<Bond>(Visible|Children));
+   BondList allBonds(findLayers<Bond>(Visible | Children));
    BondList::iterator bond;
    for (bond = allBonds.begin(); bond != allBonds.end(); ++bond) {
        if ((*bond)->isSelected()) {
@@ -1246,7 +1244,7 @@ PrimitiveList Molecule::getSelected(bool danglingBonds)
        }
    } 
 
-   ChargeList allCharges(findLayers<Charge>(Visible|Children));
+   ChargeList allCharges(findLayers<Charge>(Visible | Children));
    ChargeList::iterator charge;
    for (charge = allCharges.begin(); charge != allCharges.end(); ++charge) {
        if ((*charge)->isSelected()) selected.append(*charge);
@@ -1352,7 +1350,7 @@ void Molecule::ungroupSelection()
 
 void Molecule::updateAtomOrder()
 {
-   AtomList atoms(findLayers<Atom>(Children));
+   AtomList atoms(findLayers<Atom>(Children | Visible));
    AtomList::iterator iter;
    QStandardItem* parent;
 
@@ -1370,26 +1368,32 @@ void Molecule::updateAtomOrder()
 }
 
 
-
-
-
 void Molecule::setGeometry(IQmol::Data::Geometry& geometry)
 {
+   m_currentGeometry = &geometry;
    AtomList atoms(findLayers<Atom>(Children));
    unsigned nAtoms(atoms.size());
    if (nAtoms != geometry.nAtoms()) {
-      qDebug() << "Invalid Geometry passed to Molecule::setGeometry";
+      QLOG_DEBUG() << "Invalid Geometry passed to Molecule::setGeometry";
       return;
    }
 
    for (unsigned i = 0; i < nAtoms; ++i) {
        atoms[i]->setTranslation(geometry.position(i));
-       Data::MullikenCharge& charge(geometry.getAtomicProperty<Data::MullikenCharge>(i));
-qDebug() << "Setting charge on atom" << i<< "to"<< charge.value();
-       atoms[i]->setCharge(charge.value());
+       atoms[i]->setSpinDensity(geometry.getAtomicProperty<Data::SpinDensity>(i).value());
+       double shift(0.0);
+       if (geometry.hasProperty<Data::NmrShiftRelative>()) {
+          shift = geometry.getAtomicProperty<Data::NmrShiftRelative>(i).value();
+       }else {
+          shift = geometry.getAtomicProperty<Data::NmrShiftIsotropic>(i).value();
+       }
+       atoms[i]->setNmrShift(shift);
    }
 
+   setAtomicCharges(m_chargeType);
    centerOfNuclearChargeAvailable(centerOfNuclearCharge());
+
+   initProperties();
 
    if (geometry.hasProperty<Data::DipoleMoment>()) {
       Data::DipoleMoment const& dipole(geometry.getProperty<Data::DipoleMoment>());
@@ -1399,43 +1403,6 @@ qDebug() << "Setting charge on atom" << i<< "to"<< charge.value();
       bool estimated(true);
       dipoleAvailable(dipoleFromPointCharges(), estimated);
    }
-
-   initProperties();
-
-   if (geometry.hasProperty<Data::MultipoleExpansionList>()) {
-      Data::MultipoleExpansionList& dma(geometry.getProperty<Data::MultipoleExpansionList>());
-      if (!dma.isEmpty()) {
-         int maxOrder(dma.first()->order());
-         MultipolePotential* dmaEsp;
-         if (maxOrder >= 0) {
-               dmaEsp = new MultipolePotential("ESP (DMA, charges)", 0, dma);
-               m_properties << dmaEsp;
-         }
-         if (maxOrder >= 1) {
-               dmaEsp = new MultipolePotential("ESP (DMA, dipoles)", 1, dma);
-               m_properties << dmaEsp;
-         }
-         if (maxOrder >= 2) {
-               dmaEsp = new MultipolePotential("ESP (DMA, quadrupoles)", 2, dma);
-               m_properties << dmaEsp;
-         }
-         if (maxOrder >= 3) {
-               dmaEsp = new MultipolePotential("ESP (DMA, octopoles)", 3, dma);
-               m_properties << dmaEsp;
-         }
-      }
-   }
-}
-
-
-QList<double> Molecule::atomicCharges()
-{
-   QList<double> charges;
-   AtomList atoms(findLayers<Atom>(Children));
-   for (int i = 0; i < atoms.size(); ++i) {
-       charges << atoms[i]->getCharge();
-   }
-   return charges;
 }
 
 
@@ -1456,7 +1423,7 @@ void Molecule::reindexAtomsAndBonds()
 double Molecule::radius()
 {
    double radius(0);
-   PrimitiveList primitives(findLayers<Primitive>(Children));
+   PrimitiveList primitives(findLayers<Primitive>(Children | Visible));
    PrimitiveList::iterator iter;
    for (iter = primitives.begin(); iter != primitives.end(); ++iter) {
        radius = std::max(radius, (double)(*iter)->getPosition().norm());
@@ -1517,18 +1484,15 @@ JobInfo* Molecule::jobInfo()
    m_jobInfo->set(JobInfo::EfpFragments, efpFragmentsAsString());
    m_jobInfo->set(JobInfo::EfpParameters, efpParametersAsString());
 
-   AtomList atomList(findLayers<Atom>(Children));
+   AtomList atomList(findLayers<Atom>(Children | Visible));
    if (atomList.isEmpty()) {
       m_jobInfo->setEfpOnlyJob(true);
    }
 
    QString name;
-qDebug() << "Creating JobInfo in Layer::Molecule::jobInfo():" << text();
-
 
    if (m_inputFile.filePath().isEmpty()) {
       QFileInfo fileInfo(Preferences::LastFileAccessed());
-qDebug() << "LastFile = " << Preferences::LastFileAccessed();
       m_jobInfo->set(JobInfo::LocalWorkingDirectory, fileInfo.path());
       m_jobInfo->set(JobInfo::BaseName, text());
    }else {
@@ -1610,7 +1574,7 @@ void Molecule::minimizeEnergy(QString const& forceFieldName)
 
    // constraints
    OBFFConstraints obffconstraints;
-   ConstraintList  constraints(findLayers<Constraint>(Visible|Children));
+   ConstraintList  constraints(findLayers<Constraint>(Visible | Children));
 
    if (!constraints.isEmpty()) {
       QLOG_DEBUG() << "Enforcing" << constraints.size() << "active constraints";
@@ -1666,6 +1630,7 @@ void Molecule::minimizeEnergy(QString const& forceFieldName)
    }
    
    centerOfNuclearChargeAvailable(centerOfNuclearCharge());
+   setAtomicCharges(Data::Type::GasteigerCharge);
    bool estimated(true);
    dipoleAvailable(dipoleFromPointCharges(), estimated);
 
@@ -1688,6 +1653,13 @@ void Molecule::autoDetectSymmetry()
 }
 
 
+void Molecule::invalidateSymmetry()
+{
+   pointGroupAvailable("?");
+   postMessage("");
+}
+
+
 void Molecule::detectSymmetry()
 {
    symmetrize(0.00001, false); 
@@ -1701,7 +1673,7 @@ void Molecule::symmetrize(double tolerance, bool updateCoordinates)
    QTime time;
    time.start();
 
-   AtomList atomList(findLayers<Atom>(Children));
+   AtomList atomList(findLayers<Atom>(Children | Visible));
    Command::SymmetrizeStructure* cmd = new Command::SymmetrizeStructure(this);
    QString pointGroup;
    int nAtoms(atomList.size());
@@ -1764,7 +1736,6 @@ void Molecule::symmetrize(double tolerance, bool updateCoordinates)
       delete[] atomicNumbers;
    }
 
-qDebug() << "Molecule symmetrize point group" << pointGroup;
    pointGroupAvailable(pointGroup);
 
    if (updateCoordinates) {
@@ -1780,6 +1751,7 @@ qDebug() << "Molecule symmetrize point group" << pointGroup;
       softUpdate();
 
       centerOfNuclearChargeAvailable(centerOfNuclearCharge());
+      setAtomicCharges(Data::Type::GasteigerCharge);
       bool estimated(true);
       dipoleAvailable(dipoleFromPointCharges(), estimated); 
       // invalidate the energy
@@ -1790,27 +1762,6 @@ qDebug() << "Molecule symmetrize point group" << pointGroup;
 
    double t = time.elapsed() / 1000.0;
    QLOG_TRACE() << "Point group symmetry set to" << pointGroup << " time taken:" << t << "s";
-}
-
-
-Vec Molecule::dipoleFromPointCharges()
-{
-   AtomList atomList(findLayers<Atom>(Children));
-   if (atomList.isEmpty()) return Vec(0.0, 0.0, 0.0);
-
-   Vec conc(centerOfNuclearCharge());
-   Vec dipole;
-
-   AtomList::iterator atom;
-   for (atom = atomList.begin(); atom != atomList.end(); ++atom) {
-       double q((*atom)->getCharge());
-       dipole += q*( (*atom)->getPosition() - conc);
-   }
-
-   double const ea0toDebye(0.393430307);
-   dipole *= Constants::AngstromToBohr/ea0toDebye;
-
-   return dipole;
 }
 
 
@@ -1859,7 +1810,7 @@ void Molecule::reperceiveBonds(bool postCmd)
    obMol->ConnectTheDots();
    obMol->PerceiveBondOrders();
 
-   BondList removed(findLayers<Bond>(Children));
+   BondList removed(findLayers<Bond>(Children | Visible));
    PrimitiveList added(fromOBMol(obMol, &atomMap));
 
    if (postCmd) {
@@ -1880,19 +1831,89 @@ void Molecule::reperceiveBonds(bool postCmd)
 }
 
 
-void Molecule::setMullikenCharges()
+// - - - - - Point Charges - - - - -
+
+template <class T>
+QList<double> Molecule::atomicCharges()
 {
-   AtomList::iterator iter;
-   AtomList atoms(findLayers<Atom>(Children));
-   for (iter = atoms.begin(); iter != atoms.end(); ++iter) {
-       (*iter)->setCharge(0.0);
+   QList<double> charges;
+   if (m_currentGeometry) {
+      unsigned nAtoms(m_currentGeometry->nAtoms());
+      for (unsigned i = 0; i < nAtoms; ++i) {
+          T& t(m_currentGeometry->getAtomicProperty<T>(i));
+          charges << t.value();
+      }
+   }else {
+      charges = zeroCharges();
    }
-   qDebug() << "Warning: setting Mulliken charges to 0";
+   return charges;
 }
 
 
-void Molecule::setGasteigerCharges()
+QList<double> Molecule::atomicCharges(Data::Type::ID type)
 {
+   QList<double> charges; 
+
+   switch (type) {
+      case Data::Type::GasteigerCharge:
+         charges = gasteigerCharges();
+         break;
+      case Data::Type::MullikenCharge:
+         charges = atomicCharges<Data::MullikenCharge>();
+         break;
+      case Data::Type::MultipoleDerivedCharge:
+         charges = atomicCharges<Data::MultipoleDerivedCharge>();
+         break;
+      case Data::Type::AtomicNumber:
+         charges = atomicCharges<Data::AtomicNumber>();
+         break;
+      default:
+         QLOG_WARN() << "Invalid charge type passed to Molecule::atomicCharges" << type;
+         charges = zeroCharges();
+         break;
+   }
+
+   return charges;
+}
+
+
+void Molecule::setAtomicCharges(Data::Type::ID type)
+{
+   QList<double> charges(atomicCharges(type));
+   AtomList atoms(findLayers<Atom>(Children));
+   int nAtoms(atoms.size());
+
+   if (nAtoms != charges.size()) {
+      QLOG_WARN() << "Invalid charges in Molecule::setAtomicCharges";
+      return;
+   }
+
+   double totalCharge(0.0);
+   for (int i = 0; i < nAtoms; ++i) {
+       double charge(charges[i]);
+       totalCharge += charge;
+       atoms[i]->setCharge(charge);
+   }
+   m_chargeType = type;
+   m_info.setCharge(totalCharge);
+}
+
+
+void Molecule::updateAtomicCharges()
+{
+   QAction* action(qobject_cast<QAction*>(sender()));
+   if (action) {
+      int data(action->data().toInt());
+      Data::Type::ID type(static_cast<Data::Type::ID>(data));
+      setAtomicCharges(type);
+   }
+   softUpdate();
+}
+
+
+QList<double> Molecule::gasteigerCharges()
+{
+   QList<double> charges;
    AtomMap atomMap;
    BondMap bondMap;
 
@@ -1901,44 +1922,50 @@ void Molecule::setGasteigerCharges()
    Atom* atom;
    FOR_ATOMS_OF_MOL(obAtom, obMol) {
       atom = atomMap.value(&*obAtom); 
-      if (atom) atom->setCharge(obAtom->GetPartialCharge());
+      if (atom) charges << obAtom->GetPartialCharge();
    }
 
    delete obMol;
+   return charges;
 }
 
 
-void Molecule::setSandersonCharges()
+QList<double> Molecule::zeroCharges()
 {
-   QList<Vec> coordinates;
-   QList<int> atomicNumbers;
-
+   QList<double> charges;
    AtomList atoms(findLayers<Atom>(Children));
-   AtomList::iterator iter;
-   for (iter = atoms.begin(); iter != atoms.end(); ++iter) {
-       coordinates.append( (*iter)->getPosition() );
-       atomicNumbers.append( (*iter)->getAtomicNumber());
+   unsigned nAtoms(atoms.size());
+   for (unsigned i = 0; i < nAtoms; ++i) {
+       charges << 0.0;
    }
-   // TMP
-   for (int i = 0; i < atoms.size(); ++i) {
-       atoms[i]->setCharge(0.0);
-   }
-   
-/* No Sanderson at the moment
-   qDebug() << "Total charge set to" << totalCharge();
-   Sanderson eem(atomicNumbers, coordinates, totalCharge());
-   QList<double> charges = eem.solve();
+   return charges;
+}
 
-   for (int i = 0; i < atoms.size(); ++i) {
-       atoms[i]->setCharge(charges[i]);
+
+Vec Molecule::dipoleFromPointCharges()
+{
+   AtomList atomList(findLayers<Atom>(Children));
+   if (atomList.isEmpty()) return Vec(0.0, 0.0, 0.0);
+
+   Vec conc(centerOfNuclearCharge());
+   Vec dipole;
+
+   AtomList::iterator atom;
+   for (atom = atomList.begin(); atom != atomList.end(); ++atom) {
+       double q((*atom)->getCharge());
+       dipole += q*( (*atom)->getPosition() - conc);
    }
-*/
+
+   double const ea0toDebye(0.393430307);
+   dipole *= Constants::AngstromToBohr/ea0toDebye;
+
+   return dipole;
 }
 
 
 BondList Molecule::getBonds(Atom* A)
 {
-  BondList allBonds(findLayers<Bond>(Visible|Children));
+  BondList allBonds(findLayers<Bond>(Children));
   BondList bonds;
   BondList::iterator bond;
 
@@ -1955,7 +1982,7 @@ BondList Molecule::getBonds(Atom* A)
 
 Bond* Molecule::getBond(Atom* A, Atom* B)
 {
-   BondList allBonds(findLayers<Bond>(Visible|Children));
+   BondList allBonds(findLayers<Bond>(Children));
    BondList::iterator bond;
 
    for (bond = allBonds.begin(); bond != allBonds.end(); ++bond) {
@@ -2136,19 +2163,87 @@ void Molecule::deleteProperties()
        delete (*iter);
    }
    m_properties.clear();
+
+   if (m_atomicChargesMenu) {
+      QMenu* menu(m_atomicChargesMenu->menu());
+      if (menu) delete menu;
+   }
 }
 
 
 void Molecule::initProperties()
 {
    deleteProperties();
-   m_properties << new RadialDistance() 
-                << new PointChargePotential("ESP (Charges)", this);
+
+   m_properties << new RadialDistance();
 
    QList<CubeData*> cubeFiles(findLayers<CubeData>(Children));
    QList<CubeData*>::iterator iter;
    for (iter = cubeFiles.begin(); iter != cubeFiles.end(); ++iter) {
        m_properties << (*iter)->createProperty();
+   }
+
+   QMenu* menu(new QMenu);
+   m_atomicChargesMenu->setMenu(menu);
+   QActionGroup* chargeTypes(new QActionGroup(menu));
+
+   // Gasteiger
+   QAction* action(menu->addAction("Gasteiger"));
+   action->setCheckable(true);
+   action->setChecked(true);
+   action->setData(Data::Type::GasteigerCharge);
+   chargeTypes->addAction(action);
+   connect(action, SIGNAL(triggered()), this, SLOT(updateAtomicCharges()));
+   m_properties.append( new PointChargePotential(Data::Type::GasteigerCharge, 
+       "ESP (Gasteiger)", this) );
+
+   if (!m_currentGeometry) return;
+
+   // Mulliken
+   if (m_currentGeometry->hasProperty<Data::MullikenCharge>()) {
+      action = menu->addAction("Mulliken");
+      action->setCheckable(true);
+      action->setData(Data::Type::MullikenCharge);
+      chargeTypes->addAction(action);
+      connect(action, SIGNAL(triggered()), this, SLOT(updateAtomicCharges()));
+      m_properties 
+        << new PointChargePotential(Data::Type::MullikenCharge, "ESP (Mulliken)", this);
+   }
+
+   // Multipole Derived
+   if (m_currentGeometry->hasProperty<Data::MultipoleDerivedCharge>()) {
+      action = menu->addAction("Multipole Derived");
+      action->setCheckable(true);
+      action->setData(Data::Type::MultipoleDerivedCharge);
+      chargeTypes->addAction(action);
+      connect(action, SIGNAL(triggered()), this, SLOT(updateAtomicCharges()));
+      m_properties 
+        << new PointChargePotential(Data::Type::MultipoleDerivedCharge, "ESP (MDC)", this);
+   }
+
+   if (m_currentGeometry->hasProperty<Data::MultipoleExpansionList>()) {
+      Data::MultipoleExpansionList& dma(
+         m_currentGeometry->getProperty<Data::MultipoleExpansionList>());
+      if (!dma.isEmpty()) {
+         int maxOrder(dma.first()->order());
+         MultipolePotential* dmaEsp;
+         if (maxOrder >= 0) {
+            dmaEsp = new MultipolePotential("ESP (DMA, charges)", 0, dma);
+            m_properties << dmaEsp;
+         }
+         if (maxOrder >= 1) {
+            dmaEsp = new MultipolePotential("ESP (DMA, dipoles)", 1, dma);
+            m_properties << dmaEsp;
+         }
+         if (maxOrder >= 2) {
+            dmaEsp = new MultipolePotential("ESP (DMA, quadrupoles)", 2, dma);
+            m_properties << dmaEsp;
+         }
+         if (maxOrder >= 3) {
+            dmaEsp = new MultipolePotential("ESP (DMA, octopoles)", 3, dma);
+            m_properties << dmaEsp;
+         }
+      }
    }
 }
 
@@ -2169,7 +2264,6 @@ Function3D Molecule::getPropertyEvaluator(QString const& name)
    QList<SpatialProperty*>::iterator iter;
    for (iter = m_properties.begin(); iter != m_properties.end(); ++iter) {
        if ( (*iter)->text() == name) {
-          qDebug() << "Returning evaluator for" << name;
           return (*iter)->evaluator();
        }
    }
@@ -2181,7 +2275,6 @@ Function3D Molecule::getPropertyEvaluator(QString const& name)
 
 void Molecule::surfaceRequest(Data::SurfaceInfo const& surfaceInfo)
 {
-qDebug() << "Requesting surface" << surfaceInfo.toString();
    switch (surfaceInfo.type().kind()) {
       case Data::SurfaceType::VanDerWaals:
          calculateVanDerWaals(surfaceInfo);
@@ -2212,16 +2305,14 @@ void Molecule::appendSurface(Data::Surface* surfaceData)
    Layer::Surface* surfaceLayer(new Layer::Surface(*surfaceData));
 
 qDebug() << "Need to check if surface needs to be oriented to the molecular frame";
-// surfaceLayer->setFrame(getReferenceFraem());
+// surfaceLayer->setFrame(getReferenceFrame());
    connect(surfaceLayer, SIGNAL(updated()), this, SIGNAL(softUpdate()));
    surfaceLayer->setCheckState(Qt::Checked);
+   surfaceLayer->setCheckStatus(Qt::Checked);
    m_surfaceList.appendLayer(surfaceLayer);
    updated();
 }
 
-
-
-//********************************************************************** edit
 
 template <class T>
 void Molecule::calculateSuperposition(Data::SurfaceInfo const& surfaceInfo, 

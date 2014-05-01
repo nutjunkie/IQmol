@@ -23,6 +23,7 @@
 ********************************************************************************/
 
 #include "Function.h"
+#include "Data.h"
 #include "GridData.h"
 #include "MultipoleExpansion.h"
 #include "QGLViewer/vec.h"
@@ -97,14 +98,17 @@ namespace IQmol {
 
    class PointChargePotential : public SpatialProperty {
       public:
-         PointChargePotential(QString const& type, Layer::Molecule* molecule);
+         PointChargePotential(Data::Type::ID type, QString const& label, 
+            Layer::Molecule* molecule);
+
          Function3D const& evaluator();
 
       private:
          Layer::Molecule* m_molecule;
+         Data::Type::ID m_type;
          QList<double> m_charges;
          QList<qglviewer::Vec> m_coordinates;
-         double  potential(double const x, double const y, double const z) const;
+         double potential(double const x, double const y, double const z) const;
    };
 
 

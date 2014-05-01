@@ -488,12 +488,36 @@ bool Mesh::computeFaceNormals()
        C = m_omMesh.point(vertex);
        
        m_omMesh.property(m_faceCentroidsHandle, face) = (A+B+C)/3.0;
-//       A = (B-A)%(C-A);
-//       m_omMesh.set_normal(face, A.normalize());
    }
    m_omMesh.update_face_normals();
 
    return true;
+}
+
+
+void Mesh::removeDisconnectedVertices()
+{
+   unsigned count[5] = { 0, 0, 0, 0, 0 };
+
+   OMMesh::VertexIter vi;
+   OMMesh::VertexVertexIter vvi;
+
+   for (vi = vbegin(); vi != vend(); ++vi) {
+       unsigned c(0);
+       for (vvi = m_omMesh.vv_iter(vi); vvi; ++vvi) {++c; }
+       if (c == 0) {
+          ++count[0];
+          m_omMesh.delete_vertex(vi, false);
+       }else if (c >= 4 ) {
+          ++count[4];
+       }else {
+          ++count[c];
+       }
+   }
+
+   qDebug() << "Vertex stats:" 
+            << count[0] << count[1] << count[2] << count[3] << count[4];
+   m_omMesh.garbage_collection();
 }
 
 
@@ -604,6 +628,7 @@ void Mesh::clip(Vec const& normal, Vec const& pointOnPlane)
    }
    
    m_omMesh.garbage_collection();
+   removeDisconnectedVertices();
 }
 
 

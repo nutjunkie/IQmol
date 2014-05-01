@@ -198,6 +198,7 @@ Data::Geometry* FormattedCheckpoint::makeGeometry(GeomData const& geomData)
    if (nAtoms > 0 && 3*nAtoms == (unsigned)geomData.coordinates.size()) {
       geom = new Data::Geometry(geomData.atomicNumbers, geomData.coordinates);
       geom->scaleCoordinates(Constants::BohrToAngstrom);
+      geom->computeGasteigerCharges();
    }
    return geom;
 }

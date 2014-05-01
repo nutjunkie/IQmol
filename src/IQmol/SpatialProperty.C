@@ -49,7 +49,7 @@ double RadialDistance::distance(double const x, double const y, double const z) 
 
 // --------------- PromoleculeDensity ---------------
 
-double const PromoleculeDensity::s_thresh = 0.001; // for the bounding box limits
+double const PromoleculeDensity::s_thresh = 0.0001; // for the bounding box limits
 
 PromoleculeDensity::PromoleculeDensity(QString const& label, QList<AtomicDensity::Base*> atoms,
    QList<Vec> coordinates) : SpatialProperty(label), m_atomicDensities(atoms), 
@@ -126,22 +126,18 @@ void PromoleculeDensity::boundingBox(Vec& min, Vec& max) const
 
 
 // --------------- PointChargePotential ---------------
-PointChargePotential::PointChargePotential(QString const& type, Layer::Molecule* molecule) 
-  : SpatialProperty(type), m_molecule(molecule) 
+PointChargePotential::PointChargePotential(Data::Type::ID type, QString const& label, 
+   Layer::Molecule* molecule) : SpatialProperty(label), m_molecule(molecule), m_type(type)
 { 
-   // call this to initialize m_function, otherwise a null function gets passed around
-   evaluator();
 }
 
 
 Function3D const& PointChargePotential::evaluator() 
 {
    // update the data first
-qDebug() << "updating charges for eSP";
    m_coordinates = m_molecule->coordinates();
-   m_charges = m_molecule->atomicCharges();
+   m_charges = m_molecule->atomicCharges(m_type);
 
-qDebug() << m_charges;
    if (m_charges.size() != m_coordinates.size()) {
       QLOG_ERROR() << "Unequal atom list lengths passed to PointChargePotential";
       return NullFunction3D;

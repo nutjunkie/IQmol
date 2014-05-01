@@ -37,6 +37,7 @@
 #include "GridData.h"
 #include "Hessian.h"
 #include "Mesh.h"
+#include "NmrReference.h"
 #include "Surface.h"
 #include "SurfaceInfo.h"
 #include "SurfaceType.h"
@@ -100,13 +101,15 @@ Base* Factory::create(Type::ID const id)
 
       // ---------- Atomic Properties ---------
       case Type::AtomicSymbol:            data = new AtomicSymbol();            break;
+      case Type::AtomicNumber:            data = new AtomicNumber();            break;
       case Type::AtomColor:               data = new AtomColor();               break;
       case Type::NmrShiftIsotropic:       data = new NmrShiftIsotropic();       break;
       case Type::NmrShiftRelative:        data = new NmrShiftRelative();        break;
       case Type::Mass:                    data = new Mass();                    break;
       case Type::AtomicCharge:            data = new AtomicCharge();            break;
       case Type::MullikenCharge:          data = new MullikenCharge();          break;
-      case Type::StewartCharge:           data = new StewartCharge();           break;
+      case Type::GasteigerCharge:         data = new GasteigerCharge();         break;
+      case Type::MultipoleDerivedCharge:  data = new MultipoleDerivedCharge();  break;
       case Type::SpinDensity:             data = new SpinDensity();             break;
       case Type::VdwRadius:               data = new VdwRadius();               break;
 
@@ -136,8 +139,9 @@ Base* Factory::create(Type::ID const id)
 
       case Type::SurfaceInfo:             data = new SurfaceInfo();             break;
       case Type::SurfaceInfoList:         data = new SurfaceInfoList();         break;
-
       case Type::SurfaceType:             data = new SurfaceType();             break;
+
+      case Type::NmrReference:            data = new NmrReference();            break;
 
    default: 
       qDebug() << "TypeID:" << id;

@@ -25,6 +25,7 @@ SOURCES = \
    $$PWD/Mesh.C \
    $$PWD/MolecularOrbitals.C \
    $$PWD/MultipoleExpansion.C \
+   $$PWD/NmrReference.C \
    $$PWD/PointCharge.C \
    $$PWD/RemSectionData.C \
    $$PWD/Shell.C \
@@ -56,6 +57,7 @@ HEADERS = \
    $$PWD/Mesh.h \
    $$PWD/MolecularOrbitals.h \
    $$PWD/MultipoleExpansion.h \
+   $$PWD/NmrReference.h \
    $$PWD/PointCharge.h \
    $$PWD/PointGroup.h \
    $$PWD/RemSectionData.h \

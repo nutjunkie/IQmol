@@ -34,7 +34,37 @@ namespace Data {
 
       public:
          Type::ID typeID() const { return Type::AtomicProperty; }
+         virtual void setDefault(int const /* Z */) { }
          virtual QString label() const = 0;
+   };
+
+
+   class AtomicNumber : public AtomicProperty {
+
+      friend class boost::serialization::access;
+
+      public:
+         Type::ID typeID() const { return Type::AtomicNumber; }
+
+         AtomicNumber(int const Z = 0) { setDefault(Z); }
+         void setDefault(int const Z) { m_atomicNumber = Z; }
+
+         QString label() const { return QString::number(m_atomicNumber); }
+         int value() const { return m_atomicNumber; }
+         void setValue(int const Z) { m_atomicNumber = Z; }
+         void dump() const { };
+
+         void serialize(InputArchive& ar, unsigned int const version = 0) {
+            Q_UNUSED(version);
+            ar & m_atomicNumber;
+         }
+         void serialize(OutputArchive& ar, unsigned int const version = 0) {
+            Q_UNUSED(version);
+            ar & m_atomicNumber;
+         }
+
+      private:
+         int m_atomicNumber;
    };
 
 
@@ -43,8 +73,10 @@ namespace Data {
       friend class boost::serialization::access;
 
       public:
-         AtomicSymbol(int const Z = 0);
          Type::ID typeID() const { return Type::AtomicSymbol; }
+
+         AtomicSymbol(int const Z = 0) { setDefault(Z); }
+         void setDefault(int const Z);
 
          QString label() const { return m_symbol; }
          void dump() const;
@@ -68,7 +100,7 @@ namespace Data {
       friend class boost::serialization::access;
 
       public:
-         ScalarProperty() { }
+         ScalarProperty() : m_value(0.0) { }
 
          QString label() const { return QString::number(m_value, 'f', 3); }
          double value() const { return m_value; }
@@ -92,61 +124,58 @@ namespace Data {
 
    class Mass: public ScalarProperty {
       public:
-         Mass(int const Z = 0);
          Type::ID typeID() const { return Type::Mass; }
+         void setDefault(int const Z);
    };
 
 
    class VdwRadius : public ScalarProperty {
       public:
-         VdwRadius(int const Z = 0);
          Type::ID typeID() const { return Type::VdwRadius; }
+         void setDefault(int const Z);
    };
 
 
    class SpinDensity : public ScalarProperty {
       public:
-         SpinDensity(double const spin = 0.0) { m_value = spin; }
          Type::ID typeID() const { return Type::SpinDensity; }
    };
 
 
    class AtomicCharge : public ScalarProperty {
       public:
-         AtomicCharge(double const q = 0.0) { m_value = q; }
          Type::ID typeID() const { return Type::AtomicCharge; }
    };
 
 
+   class GasteigerCharge : public AtomicCharge {
+      public:
+         Type::ID typeID() const { return Type::GasteigerCharge; }
+   };
+
  
    class MullikenCharge : public AtomicCharge {
       public:
-         MullikenCharge(double const q = 0.0) { m_value = q; }
          Type::ID typeID() const { return Type::MullikenCharge; }
    };
 
 
-   class StewartCharge : public AtomicCharge {
+   class MultipoleDerivedCharge : public AtomicCharge {
       public:
-         StewartCharge(double const q = 0.0) { m_value = q; }
-         Type::ID typeID() const { return Type::StewartCharge; }
+         Type::ID typeID() const { return Type::MultipoleDerivedCharge; }
    };
 
 
    class NmrShiftIsotropic : public ScalarProperty {
       public:
-         NmrShiftIsotropic(double const s = 0.0) { m_value = s; }
          Type::ID typeID() const { return Type::NmrShiftIsotropic; }
    };
 
 
    class NmrShiftRelative : public ScalarProperty {
       public:
-         NmrShiftRelative(double const s = 0.0) { m_value = s; }
          Type::ID typeID() const { return Type::NmrShiftRelative; }
    };
-
-
 
 
    class AtomColor : public AtomicProperty {
@@ -154,9 +183,9 @@ namespace Data {
       friend class boost::serialization::access;
 
       public:
-         AtomColor(int const Z = 0);
          Type::ID typeID() const { return Type::AtomColor; }
 
+         void setDefault(int const Z);
          QString label() const { return QString(); }
          const double* asArray() const { return m_color; }
          QColor get() const;
@@ -179,6 +208,5 @@ namespace Data {
 
 
 } } // end namespace IQmol::Data
-
 
 #endif

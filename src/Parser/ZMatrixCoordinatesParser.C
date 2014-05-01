@@ -52,6 +52,7 @@ Data::Geometry* ZMatrixCoordinates::parse(QString const& str)
        geometry->append(Z, position);
    }
 
+   geometry->computeGasteigerCharges();
    return geometry;
 }
 

@@ -55,10 +55,22 @@ namespace Data {
                 if ( (p = dynamic_cast<P*>(*iter)) ) break; 
             }
             if (p == 0) {
-               p = new P(m_atomicNumber);
+               p = new P();
+               p->setDefault(m_atomicNumber);
                m_properties.append(p);
             }
             return *p;
+         }
+
+         template <class P>
+         bool hasProperty() const
+         {
+            P* p(0);
+            Bank::const_iterator iter;
+            for (iter = m_properties.begin(); iter != m_properties.end(); ++iter) {
+                if ( (p = dynamic_cast<P*>(*iter)) ) return true; 
+            }
+            return false;
          }
 
          template <class P>

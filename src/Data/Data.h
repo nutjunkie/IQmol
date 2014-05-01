@@ -63,10 +63,12 @@ namespace Data {
                 AngleConstraint,        TorsionConstraint,
                /*---------------------  *---------------------  *--------------------- */
                 AtomicProperty,         AtomicSymbol,           AtomColor, 
+                AtomicNumber,
                 NmrShiftIsotropic,      NmrShiftRelative,       Mass, 
-                MultipoleExpansion,     MullikenCharge,         StewartCharge, 
-                AtomicCharge,
-                SpinDensity,            VdwRadius,              MultipoleExpansionList
+                MultipoleExpansion,     MullikenCharge,         MultipoleDerivedCharge, 
+                AtomicCharge,           GasteigerCharge, 
+                SpinDensity,            VdwRadius,              MultipoleExpansionList,
+                NmrReference,           NmrReferenceList
                /*---------------------  *---------------------  *--------------------- */
       };
 

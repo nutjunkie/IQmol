@@ -45,6 +45,7 @@ Surface::Surface(SurfaceInfo const& info) : m_opacity(0.999), m_min(0.0), m_max(
    m_isSigned = info.isSigned();
    m_colors << info.negativeColor();
    m_colors << info.positiveColor();
+   m_isVisible = false;
 }
 
 
@@ -118,11 +119,12 @@ double Surface::area() const
 
 void Surface::dump() const
 {
-   qDebug() << "Surface:";
+   qDebug() << " --- Surface --- ";
    m_meshPositive.dump();   
    m_meshNegative.dump();   
    qDebug() << "Color list has" << m_colors.size() << "colors:";
    qDebug() << m_colors;
+   qDebug() << "Surface is visible?" << m_isVisible;
 }
 
 } } // end namespace IQmol::Data

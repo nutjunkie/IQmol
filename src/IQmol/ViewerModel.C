@@ -770,18 +770,6 @@ double ViewerModel::sceneRadius(bool visibleOnly)
 }
 
 
-void ViewerModel::setPartialChargeType(QString const& type)
-{
-   if (type == "Gasteiger") {
-      forAllMolecules(boost::bind(&Layer::Molecule::setGasteigerCharges, _1));
-   }else if (type == "Sanderson") {
-      forAllMolecules(boost::bind(&Layer::Molecule::setSandersonCharges, _1));
-   }else if (type == "Mulliken") {
-      forAllMolecules(boost::bind(&Layer::Molecule::setMullikenCharges, _1));
-   }
-}
-
-
 void ViewerModel::checkItemChanged(QStandardItem* item)
 {
    if (item->isCheckable()) {
@@ -801,6 +789,11 @@ void ViewerModel::checkItemChanged(QStandardItem* item)
                 if (*child) (*child)->closeConfigurator();
             }
          }     
+      }
+
+      Layer::Surface* layer;
+      if ((layer = dynamic_cast<Layer::Surface*>(item))) {
+         layer->setCheckStatus(item->checkState());
       }
 
       Layer::Molecule* molecule;

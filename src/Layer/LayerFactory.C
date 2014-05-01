@@ -140,6 +140,13 @@ Layer::List Factory::toLayers(Data::Base& data)
             layers.append(surfaceLayer);
          } break;
 
+         case Data::Type::Surface: {
+            Data::Surface& surface(dynamic_cast<Data::Surface&>(data));
+            Layer::Surface* surfaceLayer(new Surface(surface));
+            surfaceLayer->setCheckState(surface.isVisible() ? Qt::Checked : Qt::Unchecked);
+            layers.append(surfaceLayer);
+         } break;
+
          default:
             QLOG_WARN() << "Conversion from unimplemented data type in Layer::Factory";
             break;

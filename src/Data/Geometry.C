@@ -24,6 +24,7 @@
 #include "AtomicProperty.h"
 #include "Numerical.h"
 #include <QDebug>
+#include "openbabel/mol.h"
 
 
 namespace IQmol {
@@ -184,6 +185,34 @@ unsigned Geometry::totalNuclearCharge() const
        totalNuclearCharge += (*atom)->atomicNumber();
    }
    return totalNuclearCharge;
+}
+
+void Geometry::computeGasteigerCharges()
+{
+// This is returning zero charges for some reason
+return;
+    qDebug() << "Geometry::computeGasteigerCharges() not working correctly";
+    OpenBabel::OBAtom* obAtom(0);
+    OpenBabel::OBMol obMol;
+
+    obMol.BeginModify();
+    obMol.UnsetPartialChargesPerceived();
+    for (int i = 0; i < m_atoms.size(); ++i) {
+        obAtom = obMol.NewAtom();
+        obAtom->SetAtomicNum(m_atoms[i]->atomicNumber());
+        obAtom->SetVector(m_coordinates[i].x, m_coordinates[i].y, m_coordinates[i].z);
+    }
+    obMol.SetTotalCharge(m_charge);
+    obMol.SetTotalSpinMultiplicity(m_multiplicity);
+    obMol.EndModify();
+    
+    OpenBabel::OBMolAtomIter iter(&obMol);
+    for (int i = 0; i < m_atoms.size(); ++i, ++iter) {
+        int index(iter->GetIdx());
+        qDebug() << "Setting Gasteiger Charge for" << index << "to" << iter->GetPartialCharge();
+        GasteigerCharge& charge(m_atoms[i]->getProperty<GasteigerCharge>());
+        charge.setValue(iter->GetPartialCharge());
+    }
 }
 
   

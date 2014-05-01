@@ -63,6 +63,7 @@ namespace IQmol {
             void setAlpha(double alpha);
 
             void setMolecule(Molecule*);
+            void setCheckStatus(Qt::CheckState const);
 
          protected:
             void setColors(QList<QColor> const& colors);
@@ -78,6 +79,7 @@ namespace IQmol {
             bool hasProperty() const { return m_surface.hasProperty(); }
             void getPropertyRange(double& min, double& max) const;
             void setDrawMode(DrawMode const mode) { m_drawMode = mode; }
+            double area() const { return m_surface.area(); }
 
          private Q_SLOTS:
             void toggleVertexNormals();

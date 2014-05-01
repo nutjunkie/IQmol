@@ -50,7 +50,7 @@ namespace Layer {
 
       public:
          enum LabelType { None, Index, Element, Charge, Mass, Spin, Reindex, NmrShift };
-         enum ChargeType { Unknown = -1, Gasteiger, Sanderson, Mulliken };
+         //enum ChargeType { Unknown = -1, Gasteiger, Sanderson, Mulliken };
 
          Atom(int Z);
          ~Atom() { }
@@ -78,9 +78,10 @@ namespace Layer {
          void setAtomicNumber(unsigned int const Z);
          void setSmallerHydrogens(bool const tf) { m_smallerHydrogens = tf; }
          void setCharge(double const charge) {m_charge = charge; }
-         void setSpin(double const spin) {m_spin = spin; }
+         void setSpinDensity(double const spin) {m_spin = spin; }
          void setIndex(int const index);
          void setReorderIndex(int const reorderIndex) { m_reorderIndex = reorderIndex; }
+         void setNmrShift(double const nmrShift) {m_nmrShift = nmrShift; }
 
          int getAtomicNumber() const { return m_atomicNumber; }
          QString getAtomicSymbol() const { return m_symbol; }

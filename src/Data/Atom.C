@@ -47,7 +47,7 @@ Atom::Atom(QString const& symbol)
 
 void Atom::dump() const
 {
-   qDebug() << "Z =" << m_atomicNumber;
+   qDebug() << "Atom dump for Z =" << m_atomicNumber;
    m_properties.dump();
 }
 

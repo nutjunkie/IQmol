@@ -95,7 +95,6 @@ namespace IQmol {
          void windowModified() { setWindowModified(true); }
 
          void setForceField();
-         void setPartialChargeType();
          void setLabel();
          void reindexAtoms();
 
