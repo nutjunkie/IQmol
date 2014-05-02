@@ -238,8 +238,12 @@ void QChemOutput::readDMA(TextStream& textStream, Data::Geometry* geometry)
       dma->append(site);
    }
 
-   if (dma->isEmpty()) return;
-   m_dataBank.append(dma);
+   if (dma->isEmpty()) {
+      delete dma;
+      return;
+   }
+
+   geometry->appendProperty(dma);
 
    line = textStream.nextLine();
    if (!line.contains("DIPOLES")) return;
@@ -259,7 +263,7 @@ void QChemOutput::readDMA(TextStream& textStream, Data::Geometry* geometry)
       for (int i = nAtoms-1; i >= 0; --i) {
           site = dma->takeLast();
           *(dma->at(i)) += *site;
-          delete site;
+      //    delete site;
       }
    }else {
       goto error;
@@ -306,8 +310,6 @@ void QChemOutput::readDMA(TextStream& textStream, Data::Geometry* geometry)
        if (x.size() < 3)  goto error;
        dma->at(i)->addOctopole(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, x[1], x[2]);
    }
-
-   geometry->appendProperty(dma);
 
    return;
 

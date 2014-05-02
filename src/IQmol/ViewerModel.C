@@ -375,7 +375,6 @@ Layer::Molecule* ViewerModel::newMolecule()
 
 void ViewerModel::removeMolecule(Layer::Molecule* molecule)
 {
-   QLOG_INFO() << "Removing molecule" << molecule->text();
    postCommand(new Command::RemoveMolecule(molecule, invisibleRootItem()));
 }
 

@@ -31,7 +31,7 @@ Bank::~Bank()
 { 
    if (m_deleteContents) {
        for (int i = 0; i < size(); ++i) {
-           qDebug() << "Bank bust: deleting " << Type::toString(at(i)->typeID());
+           //qDebug() << "Bank bust deleting " << at(i) << Type::toString(at(i)->typeID());
            delete at(i);
        }
    }

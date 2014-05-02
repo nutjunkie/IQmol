@@ -35,6 +35,8 @@ namespace Data {
       friend class boost::serialization::access;
 
       public:
+         Type::ID typeID() const { return Type::MultipoleExpansion; }
+
          enum Index { Q = 0, 
                       X, Y, Z, 
                       XX, XY, XZ, YY, YZ, ZZ,
@@ -43,7 +45,6 @@ namespace Data {
          MultipoleExpansion(qglviewer::Vec const& position = qglviewer::Vec()) 
            : m_order(-1), m_position(position) { }
 
-         Type::ID typeID() const { return Type::MultipoleExpansion; }
 
          double moment(Index const index) { 
             return (index < m_multipoles.size()) ? m_multipoles[index] : 0.0;

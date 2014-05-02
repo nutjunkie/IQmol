@@ -190,8 +190,6 @@ void ParseFile::runParser(Base* parser, QString const& filePath)
 {
    if (parser->parseFile(filePath)) {
       QLOG_INFO() << "File parsed successfully: " << filePath;
-      Data::Bank& bank(parser->data());
-      m_dataBank.merge(bank);
    }else {
       QStringList errors(parser->errors());
       QFileInfo info(filePath);
@@ -199,8 +197,10 @@ void ParseFile::runParser(Base* parser, QString const& filePath)
       msg += info.fileName();
       m_errorList.append(msg);
       m_errorList << errors;
-qDebug() << m_errorList;
    }
+
+   Data::Bank& bank(parser->data());
+   m_dataBank.merge(bank);
 }
 
 } } // end namespace IQmol::Parser

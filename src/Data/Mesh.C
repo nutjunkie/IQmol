@@ -497,27 +497,22 @@ bool Mesh::computeFaceNormals()
 
 void Mesh::removeDisconnectedVertices()
 {
-   unsigned count[5] = { 0, 0, 0, 0, 0 };
+   unsigned orphans(0);
 
    OMMesh::VertexIter vi;
    OMMesh::VertexVertexIter vvi;
 
    for (vi = vbegin(); vi != vend(); ++vi) {
-       unsigned c(0);
-       for (vvi = m_omMesh.vv_iter(vi); vvi; ++vvi) {++c; }
-       if (c == 0) {
-          ++count[0];
+       unsigned count(0);
+       for (vvi = m_omMesh.vv_iter(vi); vvi; ++vvi) { ++count; }
+       if (count == 0) {
+          ++orphans;
           m_omMesh.delete_vertex(vi, false);
-       }else if (c >= 4 ) {
-          ++count[4];
-       }else {
-          ++count[c];
        }
    }
 
-   qDebug() << "Vertex stats:" 
-            << count[0] << count[1] << count[2] << count[3] << count[4];
    m_omMesh.garbage_collection();
+   //qDebug() << "Mesh cliping removed" << orphans << "vertices";
 }
 
 

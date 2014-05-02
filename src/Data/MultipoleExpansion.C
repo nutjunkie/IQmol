@@ -28,7 +28,7 @@
 namespace IQmol {
 namespace Data {
 
-template<> const Type::ID MultipoleExpansionList::TypeID = Type:: MultipoleExpansionList;
+template<> const Type::ID MultipoleExpansionList::TypeID = Type::MultipoleExpansionList;
 
 
 MultipoleExpansion& MultipoleExpansion::operator+=(MultipoleExpansion const& that)
