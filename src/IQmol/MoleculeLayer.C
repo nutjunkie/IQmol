@@ -460,26 +460,8 @@ PrimitiveList Molecule::fromOBMol(OBMol* obMol, AtomMap* atomMap, BondMap* bondM
       
    }
 
-   // Special case code for H2, for some reason OpenBabel doesn't always give it
-   // a bond.
-/*
-   if (addedPrimitives.size() == 2) {
-      Atom* h1(dynamic_cast<Atom*>(addedPrimitives[0]));
-      Atom* h2(dynamic_cast<Atom*>(addedPrimitives[1]));
-      if (h1 && h2 && h1->getAtomicNumber() == && h2->getAtomicNumber() == 1) {
-         double r( < 0.8)
-         if (r < 0.8) addedPrimitives.append(createBond(h1, h2, 1));
-      }
-   }
-*/
-
-/*
-   // Don't do this as Open Babel doesn't seem to respect the values passed in.
-   QLOG_DEBUG() << "Retrieving charge and multiplicity from OBMol:" 
-            << obMol->GetTotalCharge() << obMol->GetTotalSpinMultiplicity();
-   m_info.setCharge(obMol->GetTotalCharge());
-   m_info.setMultiplicity(obMol->GetTotalSpinMultiplicity());
-*/
+   // We don't copy the charge and multiplicity values as Open Babel doesn't
+   // seem to respect the values passed in.
 
    if (deleteAtomMap) delete atomMap;
    if (deleteBondMap) delete bondMap;
@@ -1789,20 +1771,27 @@ AtomList Molecule::getContiguousFragment(Atom* first, Atom* second)
 void Molecule::reperceiveBonds(bool postCmd)
 {
    AtomMap atomMap;
+   BondMap bondMap;
    OBAtom* obAtom;
    Vec     position;
 
+   AtomList hydrogens;
+
    OBMol* obMol(new OBMol());
    AtomList::iterator atomIter;
-   AtomList atoms(findLayers<Atom>(Children | Visible));
+   AtomList atoms(findLayers<Atom>(Children));
    obMol->BeginModify();
+
    for (atomIter = atoms.begin(); atomIter != atoms.end(); ++atomIter) {
        obAtom = obMol->NewAtom();
        atomMap.insert(obAtom, *atomIter);
        position = (*atomIter)->getPosition();
-       obAtom->SetAtomicNum((*atomIter)->getAtomicNumber());
+       int atomicNumber((*atomIter)->getAtomicNumber());
+       obAtom->SetAtomicNum(atomicNumber);
        obAtom->SetVector(position.x, position.y, position.z);
+       if (atomicNumber == 1) hydrogens.append(*atomIter);
    }
+
    obMol->SetTotalCharge(totalCharge());
    obMol->SetTotalSpinMultiplicity(multiplicity());
    obMol->EndModify();
@@ -1810,8 +1799,36 @@ void Molecule::reperceiveBonds(bool postCmd)
    obMol->ConnectTheDots();
    obMol->PerceiveBondOrders();
 
-   BondList removed(findLayers<Bond>(Children | Visible));
-   PrimitiveList added(fromOBMol(obMol, &atomMap));
+   BondList removed(findLayers<Bond>(Children));
+   PrimitiveList added(fromOBMol(obMol, &atomMap, &bondMap));
+
+   // Special case code for Hydrogen atoms as OB doesn't seem to bond them
+   QMap<QPair<Atom*, Atom*>, Bond*> h2Bonds;
+   BondMap::iterator bondIter;
+   for (bondIter = bondMap.begin(); bondIter != bondMap.end(); ++bondIter) {
+       Bond* bond(*bondIter);
+       if (bond->beginAtom()->getAtomicNumber() == 1 &&
+           bond->endAtom()->getAtomicNumber() == 1) {
+           h2Bonds.insert(qMakePair(bond->beginAtom(), bond->endAtom()), bond);
+       }
+   }
+
+   int nHydrogens(hydrogens.size());
+   double hydrogenBondLength(0.76);
+   for (int i = 0; i < nHydrogens-1; ++i) {
+       Atom* h1(hydrogens[i]);
+       for (int j = i+1; j < nHydrogens; ++j) {
+           Atom* h2(hydrogens[j]);
+           if (Atom::distance(h1, h2) < hydrogenBondLength) {
+              qDebug() << "Found H2 bond" << Atom::distance(h1, h2);
+              // Check if the two hydrogens are already bonded
+              if (h2Bonds.contains(qMakePair(h1, h2)) || h2Bonds.contains(qMakePair(h2, h1))) {
+              }else {
+                 added.append(createBond(h1, h2, 1)); 
+              }
+           }
+       }
+   }
 
    if (postCmd) {
       Command::EditPrimitives* cmd(new Command::EditPrimitives("Reperceive bonds", this));
