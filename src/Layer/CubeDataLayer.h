@@ -32,7 +32,7 @@ namespace IQmol {
 class GridBased;
 
 namespace Data {
-   class GridData;
+   class CubeData;
    class SurfaceInfo;
 }
 
@@ -46,9 +46,7 @@ namespace Layer {
       Q_OBJECT
 
       public:
-         CubeData(Data::GridData const&);
-
-         void setGeometry(Data::Geometry const& geometry);
+         CubeData(Data::CubeData const&);
 
          Data::Geometry const& geometry() const;
 
@@ -57,20 +55,17 @@ namespace Layer {
          GridBased* createProperty() const;
 
          // required for the SurfaceAnimator
-         Data::GridData const& grid() const 
+         Data::CubeData const& cubeData() const 
          { 
-            return m_grid; 
+            return m_cube; 
          } 
-
 
       public Q_SLOTS:
          Surface* calculateSurface(Data::SurfaceInfo const&);
 
-
       private:
          Configurator::CubeData m_configurator;
-         Data::GridData const& m_grid;
-         Data::Geometry m_geometry;
+         Data::CubeData const& m_cube;
    };
 
 } } // End namespace IQmol::Layer

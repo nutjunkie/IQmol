@@ -26,14 +26,16 @@
 #include "CubeDataLayer.h"
 #include "QVariantPointer.h"
 #include "MarchingCubes.h"
-#include "GridData.h"
+#include "MeshDecimator.h"
+#include "CubeData.h"
 #include "SurfaceInfo.h"
-   
+#include "QsLog.h"
 #include "Geometry.h"
 #include "QMsgBox.h"
 #include <QColorDialog>
 #include <QFileDialog>
 #include <QProgressDialog>
+
 
 using namespace qglviewer;
 
@@ -81,12 +83,7 @@ void SurfaceAnimatorDialog::update()
    QList<Layer::CubeData*>::iterator iter;
    for (iter = cubeFiles.begin(); iter != cubeFiles.end(); ++iter) {
        QListWidgetItem* item = new QListWidgetItem();
-
-//       QFileInfo info((*iter)->filePath());
-//       item->setText(info.fileName());
-#warning "Item text for cube layers needs fixing"
-         item->setText((*iter)->text());
-
+       item->setText((*iter)->cubeData().label());
        QVariant qvar(QVariantPointer<Layer::CubeData>::toQVariant(*iter)); 
        item->setData(Qt::UserRole, qvar);
        fileList->addItem(item);
@@ -229,16 +226,17 @@ void SurfaceAnimatorDialog::computeIsovalueAnimation()
 
    Layer::Surface* surface(0);
    Animator::Combo::DataList frames;
-   Data::Geometry const& geom(cube->geometry());
+   Data::Geometry const& geom(cube->cubeData().geometry());
+
+   unsigned quality(0);
+   bool isSigned(true);
+   bool simplifyMesh(m_dialog.simplifyMesh->isChecked());
 
    for (int i = 0; i < nFrames; ++i) {
        if (surface) surface->setCheckState(Qt::Unchecked);
 
-       unsigned quality(0);
-       bool isSigned(true);
-
        Data::SurfaceInfo surfaceInfo(Data::SurfaceType::CubeData, quality, isovalue1,
-          m_colorPositive, m_colorNegative, isSigned);
+          m_colorPositive, m_colorNegative, isSigned, simplifyMesh);
 
        surface = cube->calculateSurface(surfaceInfo);
 
@@ -250,6 +248,7 @@ void SurfaceAnimatorDialog::computeIsovalueAnimation()
    }
 
    m_animator = new Animator::Combo(m_molecule, frames, nFrames, m_speed);
+   connect(m_animator, SIGNAL(finished()), this, SLOT(animationStopped()));
    m_dialog.playbackBox->setEnabled(true); 
 }
 
@@ -269,13 +268,13 @@ void SurfaceAnimatorDialog::computeMultiGridAnimation()
    QListWidgetItem* item(fileList->item(0));
    Layer::CubeData* cube(QVariantPointer<Layer::CubeData>::toPointer(item->data(Qt::UserRole)));
 
-   Data::GridData* A = new Data::GridData(cube->grid());
-   Data::GridData* B(0);
+   Data::CubeData* A = new Data::CubeData(cube->cubeData());
+   Data::CubeData* B(0);
 
    Data::SurfaceType surfaceType(Data::SurfaceType::CubeData);
-   Data::GridSize    size(A->size());
-   Data::GridData    dAB(size, surfaceType);
-   Data::GridData      t(size, surfaceType);
+   Data::GridSize size(A->size());
+   Data::GridData dAB(size, surfaceType);
+   Data::GridData   t(size, surfaceType);
 
    Animator::Combo::DataList frames;
    Layer::Surface* surface;
@@ -294,10 +293,10 @@ void SurfaceAnimatorDialog::computeMultiGridAnimation()
    for (int i = 1; i < m_referenceFrames; ++i) {
        if (progressDialog.wasCanceled()) return;
 
-       Data::Geometry const& geomA(cube->geometry());
+       Data::Geometry const& geomA(cube->cubeData().geometry());
        item = fileList->item(i);
        cube = QVariantPointer<Layer::CubeData>::toPointer(item->data(Qt::UserRole));
-       Data::Geometry const& geomB(cube->geometry());
+       Data::Geometry const& geomB(cube->cubeData().geometry());
 
 //qDebug() << "first geom";
 //geomA.dump();
@@ -312,7 +311,7 @@ void SurfaceAnimatorDialog::computeMultiGridAnimation()
        }
 
        // Grid displacements
-       B    = new Data::GridData(cube->grid());
+       B    = new Data::CubeData(cube->cubeData());
        t    = (*A);
        dAB  = (*B);
        dAB -= t;
@@ -353,13 +352,13 @@ void SurfaceAnimatorDialog::computeMultiGridAnimation()
    surface->setText("Cube Data " + QString::number(m_referenceFrames));
    cube->appendLayer(surface);
 
-   frames.append(new Animator::Combo::Data(cube->geometry(), surface));
+   frames.append(new Animator::Combo::Data(cube->cubeData().geometry(), surface));
    m_animator = new Animator::Combo(m_molecule, frames, interpolationFrames, m_speed);
    connect(m_animator, SIGNAL(finished()), this, SLOT(animationStopped()));
    m_dialog.playbackBox->setEnabled(true); 
 
-delete A;
-delete B;
+   delete A;
+   delete B;
 }
 
 
@@ -367,14 +366,30 @@ Layer::Surface* SurfaceAnimatorDialog::calculateSurface(Data::GridData const& gr
    double const isovalue)
 {
    bool isSigned(true);
-   Data::SurfaceType type(Data::SurfaceType::CubeData);
-   Data::SurfaceInfo info(type, 0, isovalue, m_colorPositive, m_colorNegative, isSigned);
+   bool simplifyMesh(m_dialog.simplifyMesh->isChecked());
 
-   Data::Surface* surfaceData(new Data::Surface(info));
+   Data::SurfaceType type(Data::SurfaceType::CubeData);
+   Data::SurfaceInfo surfaceInfo(type, 0, isovalue, m_colorPositive, m_colorNegative, 
+      isSigned, simplifyMesh);
+
+   Data::Surface* surfaceData(new Data::Surface(surfaceInfo));
 
    MarchingCubes mc(grid);
    mc.generateMesh( isovalue, surfaceData->meshPositive());
    mc.generateMesh(-isovalue, surfaceData->meshNegative());
+
+   double delta(Data::GridSize::stepSize(surfaceInfo.quality()));
+
+   if (surfaceInfo.simplifyMesh()) {
+      MeshDecimator posdec(surfaceData->meshPositive());
+      if (!posdec.decimate(delta)) {
+         QLOG_ERROR() << "Mesh decimation failed:" << posdec.error();
+      }
+      MeshDecimator negdec(surfaceData->meshPositive());
+      if (!negdec.decimate(delta)) {
+         QLOG_ERROR() << "Mesh decimation failed:" << negdec.error();
+      }
+   }
 
    Layer::Surface* surfaceLayer(new Layer::Surface(*surfaceData));
 

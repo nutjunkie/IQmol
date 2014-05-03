@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>390</width>
-    <height>690</height>
+    <width>378</width>
+    <height>646</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -148,6 +148,9 @@ QToolTip {
         </item>
         <item>
          <widget class="QToolButton" name="upButton">
+          <property name="toolTip">
+           <string>Move selection up</string>
+          </property>
           <property name="text">
            <string>+</string>
           </property>
@@ -165,6 +168,9 @@ QToolTip {
         </item>
         <item>
          <widget class="QToolButton" name="downButton">
+          <property name="toolTip">
+           <string>Move selection down</string>
+          </property>
           <property name="text">
            <string>-</string>
           </property>
@@ -193,28 +199,28 @@ QToolTip {
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="3" column="0">
+        <item row="4" column="0">
          <widget class="QLabel" name="label_8">
           <property name="text">
            <string>Opacity</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
+        <item row="3" column="0">
          <widget class="QLabel" name="label">
           <property name="text">
            <string>Colors</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
+        <item row="2" column="0">
          <widget class="QLabel" name="label_3">
           <property name="text">
            <string>Isovalue</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
+        <item row="4" column="1">
          <widget class="QSlider" name="transparencySlider">
           <property name="maximum">
            <number>100</number>
@@ -230,7 +236,7 @@ QToolTip {
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
+        <item row="3" column="1">
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
            <widget class="QToolButton" name="negativeColorButton">
@@ -297,7 +303,7 @@ QToolTip {
           </item>
          </layout>
         </item>
-        <item row="1" column="1">
+        <item row="2" column="1">
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
            <widget class="QDoubleSpinBox" name="isovalue">
@@ -362,7 +368,7 @@ QToolTip {
         <item row="0" column="0">
          <widget class="QLabel" name="label_2">
           <property name="text">
-           <string>Appearance</string>
+           <string>Render</string>
           </property>
          </widget>
         </item>
@@ -406,6 +412,19 @@ QToolTip {
            </spacer>
           </item>
          </layout>
+        </item>
+        <item row="1" column="1">
+         <widget class="QCheckBox" name="simplifyMesh">
+          <property name="toolTip">
+           <string>Use mesh decimation to reduce the complexity of the surface mesh</string>
+          </property>
+          <property name="text">
+           <string>Simplify Mesh</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -672,6 +691,30 @@ QToolTip {
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>calculateButton</tabstop>
+  <tabstop>fileList</tabstop>
+  <tabstop>interpolationFrames</tabstop>
+  <tabstop>upButton</tabstop>
+  <tabstop>downButton</tabstop>
+  <tabstop>fillButton</tabstop>
+  <tabstop>linesButton</tabstop>
+  <tabstop>dotsButton</tabstop>
+  <tabstop>simplifyMesh</tabstop>
+  <tabstop>isovalue</tabstop>
+  <tabstop>isovalue2</tabstop>
+  <tabstop>negativeColorButton</tabstop>
+  <tabstop>positiveColorButton</tabstop>
+  <tabstop>transparencySlider</tabstop>
+  <tabstop>backButton</tabstop>
+  <tabstop>playButton</tabstop>
+  <tabstop>forwardButton</tabstop>
+  <tabstop>loopButton</tabstop>
+  <tabstop>bounceButton</tabstop>
+  <tabstop>updateBondsButton</tabstop>
+  <tabstop>speedSlider</tabstop>
+  <tabstop>cancelButton</tabstop>
+ </tabstops>
  <resources>
   <include location="IQmol.qrc"/>
  </resources>

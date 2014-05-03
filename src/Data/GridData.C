@@ -78,7 +78,12 @@ void GridData::copy(GridData const& that)
    m_surfaceType  = that.m_surfaceType;
    m_origin       = that.m_origin;
    m_delta        = that.m_delta;
-   m_data         = that.m_data;
+
+   unsigned nx, ny, nz;
+   that.getNumberOfPoints(nx, ny, nz);
+   Array3D::extent_gen extents;
+   m_data.resize(extents[nx][ny][nz]);
+   m_data = that.m_data;
 }
 
 

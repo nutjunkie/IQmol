@@ -1,5 +1,5 @@
-#ifndef IQMOL_DATA_GRID_H
-#define IQMOL_DATA_GRID_H
+#ifndef IQMOL_DATA_GRIDDATA_H
+#define IQMOL_DATA_GRIDDATA_H
 /*******************************************************************************
 
   Copyright (C) 2011-2013 Andrew Gilbert
@@ -25,6 +25,7 @@
 #include "DataList.h"
 #include "GridSize.h"
 #include "SurfaceType.h"
+#include "Geometry.h"
 #include "Matrix.h"
 
 
@@ -127,6 +128,7 @@ namespace Data {
          qglviewer::Vec m_delta;
          Array3D m_data;
    };
+
 
    typedef Data::List<Data::GridData> GridDataList;
 

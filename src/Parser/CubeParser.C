@@ -25,9 +25,10 @@
 #include "Constants.h"
 #include "TextStream.h"
 #include "Geometry.h"
-#include "GridData.h"
+#include "CubeData.h"
 #include "QsLog.h"
 #include <QtCore/QFile>
+#include <QFileInfo>
 #include <cmath>
 
 
@@ -164,13 +165,21 @@ void Cube::parseGridData(TextStream& textStream)
       data += textStream.nextLineAsDoubles();
    }   
 
-   QString description("Cube File Data");
-   Data::GridData* grid;
+   QList<Data::Geometry*> geometryList(m_dataBank.findData<Data::Geometry>());
+   if (geometryList.isEmpty()) {
+      m_errors.append("Geometry data not found in cube file");
+      return;
+   }
+
    try {
       Data::SurfaceType type(Data::SurfaceType::CubeData);
       Data::GridSize    size(m_origin, m_delta, m_nx, m_ny, m_nz);
-      grid = new Data::GridData(size, type, data);
-      m_dataBank.append(grid);
+
+      Data::CubeData* cube(new Data::CubeData(*(geometryList.last()),size, type, data));
+      m_dataBank.append(cube);
+
+      QFileInfo info(m_filePath);
+      cube->setLabel(info.completeBaseName());
    } catch (std::out_of_range const& err) {
       m_errors.append("Invalid grid data in cube file");
    }

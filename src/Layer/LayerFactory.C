@@ -26,7 +26,7 @@
 #include "Mesh.h"
 
 #include "Surface.h"
-#include "GridData.h"
+#include "CubeData.h"
 #include "Frequencies.h"
 #include "MolecularOrbitals.h"
 
@@ -117,9 +117,16 @@ Layer::List Factory::toLayers(Data::Base& data)
          } break;
 
          case Data::Type::GridData: {
-            Data::GridData& grid(dynamic_cast<Data::GridData&>(data));
-            layers.append(new CubeData(grid));
+            QLOG_WARN() << "Data::GridData passed to LayerFactory";
+            //Data::GridData& grid(dynamic_cast<Data::GridData&>(data));
+            //layers.append(new CubeData(grid));
          } break;
+
+         case Data::Type::CubeData: {
+            Data::CubeData& cube(dynamic_cast<Data::CubeData&>(data));
+            layers.append(new CubeData(cube));
+         } break;
+
 
          case Data::Type::EfpFragment: {
             Data::EfpFragment& efp(dynamic_cast<Data::EfpFragment&>(data));

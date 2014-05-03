@@ -40,6 +40,7 @@ HEADERS = \
    $$PWD/Bank.h \
    $$PWD/ChargeMultiplicity.h \
    $$PWD/Constraint.h \
+   $$PWD/CubeData.h \
    $$PWD/Data.h \
    $$PWD/DataFactory.h \
    $$PWD/DataList.h \

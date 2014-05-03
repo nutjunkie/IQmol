@@ -27,32 +27,29 @@
 #include "MarchingCubes.h"
 #include "MeshDecimator.h"
 #include "SpatialProperty.h"
-#include "GridData.h"
+#include "CubeData.h"
 #include "QsLog.h"
 
+#include <QDebug>
 
 
 namespace IQmol {
 namespace Layer {
 
-CubeData::CubeData(Data::GridData const& grid) : Base("Cube Data"), m_configurator(*this),
-   m_grid(grid)
+CubeData::CubeData(Data::CubeData const& cube) : Base("Cube Data"), m_configurator(*this),
+   m_cube(cube)
 {
    connect(&m_configurator, SIGNAL(calculateSurface(Data::SurfaceInfo const&)),
       this, SLOT(calculateSurface(Data::SurfaceInfo const&)));
    setConfigurator(&m_configurator);
-}
-
-
-void CubeData::setGeometry(Data::Geometry const& geometry) 
-{ 
-   m_geometry = geometry; 
+   setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
+   setText("Cube Data (" + m_cube.label() + ")");
 }
 
 
 Data::Geometry const& CubeData::geometry() const 
 { 
-   return m_geometry; 
+   return m_cube.geometry(); 
 }
 
 
@@ -67,7 +64,7 @@ void CubeData::setMolecule(Molecule* molecule)
 
 GridBased* CubeData::createProperty() const
 {
-   return new GridBased("Cube Data", m_grid);
+   return new GridBased(text(), m_cube);
 }
 
 
@@ -78,11 +75,11 @@ Surface* CubeData::calculateSurface(Data::SurfaceInfo const& surfaceInfo)
       return 0;
    }
 
-   MarchingCubes mc(m_grid);
+   MarchingCubes mc(m_cube);
    qDebug() << "The Data::Surface needs to be appended to the molecule's Data::Bank";
    Data::Surface* surfaceData(new Data::Surface(surfaceInfo));
 
-   qglviewer::Vec d(m_grid.delta());
+   qglviewer::Vec d(m_cube.delta());
    double delta((d.x+d.y+d.z)/3.0);
 
    mc.generateMesh(surfaceInfo.isovalue(), surfaceData->meshPositive());

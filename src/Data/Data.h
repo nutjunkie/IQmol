@@ -49,7 +49,7 @@ namespace Data {
                 EfpFragmentList,        EfpFragmentLibrary,     GridData, 
                 GridDataList,           File,                   FileList, 
                 Geometry,               GeometryList,           RemSection,
-                ChargeMultiplicity,
+                ChargeMultiplicity,     CubeData,
                 Energy,                 ConformerEnergy,        Hessian,
                 ScfEnergy,              TotalEnergy,            ForceFieldEnergy,
                 DipoleMoment,           VibrationalMode,        VibrationalModeList, 

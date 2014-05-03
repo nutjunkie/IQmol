@@ -41,6 +41,7 @@ QString toString(ID const id)
       case EfpFragment:            s = "Data::EfpFragment";            break;
       case EfpFragmentList:        s = "Data::List<EfpFragment>";      break;
       case EfpFragmentLibrary:     s = "Data::EfpFragmentLibrary";     break;
+      case CubeData:               s = "Data::CubeData";               break;
       case GridData:               s = "Data::GridData";               break;
       case GridDataList:           s = "Data::GridDataList";           break;
       case File:                   s = "Data::File";                   break;
