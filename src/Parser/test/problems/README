@@ -15,5 +15,10 @@ These files all cause problems in the Parser module, or are not handled correctl
     Bus error encountered in OpenBabel::expandKekulize()
 
   - cube1.off
-	Mesh file read.  File is parsed and displayed, but attempts to decimate the
+    Mesh file read.  File is parsed and displayed, but attempts to decimate the
     mesh or draw the vertex/face normals causes a crash in the OpenMesh library.
+
+  - qmmm.*
+    The QChemOutputParser complains about a mismatch in the number of atoms because 
+    of the way the QM and MM atoms are merged in the coordinate list.  The FChk file
+    is parsed okay.
