@@ -59,6 +59,7 @@ namespace Data {
          bool hasProperty() const;
          bool isSigned() const { return m_isSigned; }
          QString const& description() const { return m_description; }
+         void setDescription(QString const& description) { m_description = description; }
 
          Mesh& meshPositive() { return m_meshPositive; }
          Mesh& meshNegative() { return m_meshNegative; }

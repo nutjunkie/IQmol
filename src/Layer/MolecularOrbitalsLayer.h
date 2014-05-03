@@ -86,7 +86,7 @@ namespace Layer {
          void dumpGridInfo() const;
          void appendSurfaces(Data::SurfaceList&);
 
-         QString description(Data::SurfaceType const&);
+         QString description(Data::SurfaceInfo const&, bool const tooltip);
 
          Configurator::MolecularOrbitals m_configurator;
          Data::MolecularOrbitals& m_molecularOrbitals;

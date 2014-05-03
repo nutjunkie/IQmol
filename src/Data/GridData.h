@@ -58,6 +58,8 @@ namespace Data {
 
          SurfaceType const& surfaceType() const { return m_surfaceType; }
 
+         void setSurfaceType(SurfaceType::Kind const& kind) { m_surfaceType.setKind(kind); }
+
          GridSize size() const;
 
          qglviewer::Vec const& origin() const { return m_origin; }

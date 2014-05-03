@@ -203,6 +203,13 @@ Data::GridData* MolecularOrbitals::findGrid(Data::SurfaceType const& type,
    Data::GridData* grid(0);
    Data::GridDataList::const_iterator iter;
 
+   qDebug() << "Looking for grid";
+   type.dump();
+   size.dump();
+   qDebug() << "List";
+   gridList.dump();
+  
+
    for (iter = gridList.begin(); iter != gridList.end(); ++iter) {
        if ( type == (*iter)->surfaceType() && size == (*iter)->size() ) {
           grid = (*iter);
@@ -226,8 +233,9 @@ void MolecularOrbitals::dumpGridInfo() const
 
 
 
-QString MolecularOrbitals::description(Data::SurfaceType const& type)
+QString MolecularOrbitals::description(Data::SurfaceInfo const& info, bool const tooltip)
 {
+   Data::SurfaceType const& type(info.type());
    QString label(type.toString());
 
    if (type.isOrbital()) {
@@ -254,9 +262,15 @@ QString MolecularOrbitals::description(Data::SurfaceType const& type)
          label += " (LUMO+1)";
       }
 
-      label += "\nEnergy   = ";
-      label += QString::number(orbitalEnergy, 'f', 3);
+      if (tooltip) {
+         label += "\nEnergy   = " + QString::number(orbitalEnergy, 'f', 3);
+      }
    }
+
+   if (tooltip) {
+      label += "\nIsovalue = " + QString::number(info.isovalue(), 'f', 3);
+   }
+ 
 
    return label;
 }
@@ -305,6 +319,7 @@ qDebug() << "Grid already exists";
 
    Qt::CheckState checked(Qt::Checked);
    for (iter = m_surfaceInfoQueue.begin(); iter != m_surfaceInfoQueue.end(); ++iter) {
+qDebug() << "Calculating Surface:" << (*iter).toString();
        Data::Surface* surfaceData(generateSurface(*iter));
 
        if (surfaceData) {
@@ -318,6 +333,9 @@ qDebug() << "Grid already exists";
              if (m_molecule) {
                 surfaceLayer->setFrame(m_molecule->getReferenceFrame());
              }
+
+             surfaceLayer->setText(description(*iter, false));
+             surfaceLayer->setToolTip(description(*iter, true));
 
              appendLayer(surfaceLayer);
           }
@@ -387,14 +405,15 @@ bool MolecularOrbitals::processGridQueue(GridQueue const& gridQueue)
 
           Data::GridData* spinGrid  = new Data::GridData(*alphaGrid);
           *spinGrid -= *betaGrid;
+          spinGrid->setSurfaceType(Data::SurfaceType::SpinDensity);
 
           Data::GridData* totalGrid = new Data::GridData(*alphaGrid);
           *totalGrid += *betaGrid;
+          totalGrid->setSurfaceType(Data::SurfaceType::TotalDensity);
 
           m_availableGrids.append(spinGrid);
           m_availableGrids.append(totalGrid);
        }
-
 
        Data::GridDataList grids;
        std::set<Data::SurfaceType>::iterator iter;
@@ -616,9 +635,9 @@ bool MolecularOrbitals::computeDensityGrids(Data::GridData*& alpha, Data::GridDa
    progressDialog.setWindowModality(Qt::WindowModal);
    progressDialog.show();
 
-   for (i = 0, x = origin.x; i < nx; i += 2, x += 2*delta.x) {
-       for (j = 0, y = origin.y; j < ny; j += 2, y += 2*delta.y) {
-           for (k = 0, z = origin.z; k < nz; k += 2, z += 2*delta.z) {
+   for (i = 0, x = origin.x; i < nx; i += 2, x += 2.0*delta.x) {
+       for (j = 0, y = origin.y; j < ny; j += 2, y += 2.0*delta.y) {
+           for (k = 0, z = origin.z; k < nz; k += 2, z += 2.0*delta.z) {
                Vec gridPoint(x, y, z);
                computeShellPairs(gridPoint);
                (*alpha)(i, j, k) = inner_prod(m_alphaDensity, m_shellPairValues);
