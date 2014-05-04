@@ -77,6 +77,7 @@ namespace Data {
 		 static double s_thresh; 
 		 /// Shell values are stored in this static array, the length of which
 		 /// is sufficient for up to f angular momentum.
+         /// This could cause problems if Shells are ever used in parallel
          static double s_values[10];
 
          double computeSignificantRadius(double const thresh);

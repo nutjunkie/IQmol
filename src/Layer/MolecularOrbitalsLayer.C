@@ -759,13 +759,13 @@ void MolecularOrbitals::computeShellPairs(Vec const& gridPoint)
    double* values;
    Data::ShellList::const_iterator shell;
    unsigned k(0);
-   for (shell = shells.begin(); shell != shells.end(); ++shell, ++k) {
+   for (shell = shells.begin(); shell != shells.end(); ++shell) {
        if ( (values = (*shell)->evaluate(gridPoint)) ) {
-          for (unsigned j = 0; j < (*shell)->nBasis(); ++j) {
+          for (unsigned j = 0; j < (*shell)->nBasis(); ++j, ++k) {
               m_shellValues[k] = values[j];
           }
        }else {
-          for (unsigned j = 0; j < (*shell)->nBasis(); ++j) {
+          for (unsigned j = 0; j < (*shell)->nBasis(); ++j, ++k) {
               m_shellValues[k] = 0.0;
           }
        }
