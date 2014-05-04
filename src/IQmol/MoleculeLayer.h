@@ -218,6 +218,8 @@ namespace IQmol {
             void setReperceiveBondsForAnimation(bool tf) {
                  m_reperceiveBondsForAnimation = tf;
             }
+
+            unsigned maxAtomicNumber() { return m_maxAtomicNumber; }
    
    
          public Q_SLOTS:
@@ -406,6 +408,7 @@ namespace IQmol {
             Data::Geometry* m_currentGeometry;
             Data::Type::ID m_chargeType;
             QAction* m_atomicChargesMenu;
+            unsigned m_maxAtomicNumber;
       };
    
    } // end namespace Layer

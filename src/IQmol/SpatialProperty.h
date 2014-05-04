@@ -147,6 +147,17 @@ namespace IQmol {
    };
 
 
+   class MeshIndex : public SpatialProperty {
+      public:
+         MeshIndex(QString const&);
+
+      private:
+         double index(double const x, double const y, double const z) const;
+   };
+
+
+
+
    class GridBased : public SpatialProperty {
       public:
          GridBased(QString const& type, Data::GridData const& grid);

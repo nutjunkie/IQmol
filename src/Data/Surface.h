@@ -44,6 +44,7 @@ namespace Data {
          Surface() { }  // for serialization
 
          void computeSurfaceProperty(Function3D const&);
+         void computeIndexProperty();
          void clearSurfaceProperty();
          void getPropertyRange(double& min, double& max) const;
 
@@ -55,7 +56,6 @@ namespace Data {
          bool isVisible() const { return m_isVisible; }
          void setVisibility(bool const tf) { m_isVisible = tf; }
 
-// Deprecate - is this really needed? - apparently in Layer::Molecule
          bool hasProperty() const;
          bool isSigned() const { return m_isSigned; }
          QString const& description() const { return m_description; }

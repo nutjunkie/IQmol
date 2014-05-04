@@ -202,8 +202,6 @@ void Molecule::appendData(Layer::List& list)
    PrimitiveList primitiveList;
    Layer::List toSet;
 
-
-#warning "Geometry needs to be set for Layer::CubeData"
    for (iter = list.begin(); iter != list.end(); ++iter) {
        text = (*iter)->text();
        // Hack to allow multiple cube data files and frequencies
@@ -1393,9 +1391,11 @@ void Molecule::setGeometry(IQmol::Data::Geometry& geometry)
 
 void Molecule::reindexAtomsAndBonds()
 {
+   m_maxAtomicNumber = 0;
    AtomList atoms(findLayers<Atom>(Children));
    for (int i = 0; i < atoms.size(); ++i) {
        atoms[i]->setIndex(i+1);
+       m_maxAtomicNumber = std::max((int)m_maxAtomicNumber, atoms[i]->getAtomicNumber());
    }
 
    BondList bonds(findLayers<Bond>(Children));
@@ -2197,6 +2197,8 @@ void Molecule::initProperties()
 
    m_properties << new RadialDistance();
 
+   m_properties << new MeshIndex("Nuclei"); 
+
    QList<CubeData*> cubeFiles(findLayers<CubeData>(Children));
    QList<CubeData*>::iterator iter;
    for (iter = cubeFiles.begin(); iter != cubeFiles.end(); ++iter) {
@@ -2455,7 +2457,8 @@ void Molecule::calculateVanDerWaals(Data::SurfaceInfo const& surfaceInfo,
        atom = new AtomicDensity::VanDerWaals( (*iter)->getAtomicNumber(), 
                       (*iter)->getPosition(), scale, solventRadius);
        vdwAtoms.append(atom);
-       atomIndices.append(i);
+       //atomIndices.append(i);
+       atomIndices.append((*iter)->getAtomicNumber()-1);
    }
 
    Data::Surface* surfaceData = new Data::Surface(surfaceInfo);

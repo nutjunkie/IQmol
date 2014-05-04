@@ -21,6 +21,7 @@
 ********************************************************************************/
 
 #include "SurfaceLayer.h"
+#include "SurfaceType.h"
 #include "MoleculeLayer.h"
 #include "Preferences.h"
 #include "QsLog.h"
@@ -41,7 +42,7 @@ namespace Layer {
 
 Surface::Surface(Data::Surface& surface) : m_surface(surface), m_configurator(*this), 
    m_drawMode(Fill), m_callListPositive(0), m_callListNegative(0), m_drawVertexNormals(false),
-   m_drawFaceNormals(false), m_decimator(0)
+   m_drawFaceNormals(false), m_balanceScale(false), m_decimator(0)
 {
    setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled |
       Qt::ItemIsEditable);
@@ -73,7 +74,6 @@ Surface::Surface(Data::Surface& surface) : m_surface(surface), m_configurator(*t
    setData(m_surface.description(), Qt::ToolTipRole);
 
    setAlpha(m_surface.opacity()); 
-   //recompile();
    updated();
 }
 
@@ -86,6 +86,14 @@ void Surface::setMolecule(Molecule* molecule)
 }
 
 
+bool Surface::isVdW() const
+{
+   //hack
+   Data::SurfaceType type(Data::SurfaceType::VanDerWaals);
+   return text() == type.toString();
+}
+
+
 void Surface::setCheckStatus(Qt::CheckState const state)
 {
    m_surface.setVisibility(state == Qt::Checked);
@@ -95,6 +103,10 @@ void Surface::setCheckStatus(Qt::CheckState const state)
 void Surface::getPropertyRange(double& min, double& max) const
 {
    m_surface.getPropertyRange(min, max);
+   if (m_balanceScale && min < 0.0 && max > 0.0) {
+      min = std::min(min, -max);
+      max = std::max(max, -min);
+   }
 }
 
 
@@ -105,21 +117,6 @@ Surface::~Surface()
 }
 
 
-/*
-void Surface::createToolTip(QString const& label)
-{
-   QString info = label.isEmpty() ? m_type.info() : label; 
-
-   if (m_quality < 0) {
-      info += "\nQuality   = default";
-   }else {
-      info += "\nQuality   = " + QString::number(m_quality);
-   }
-   info += "\nIsovalue = " + QString::number(m_isovalue, 'f', 3);
-}
-*/
-
-
 void Surface::setAlpha(double alpha) 
 {
    m_alpha = alpha;
@@ -127,7 +124,6 @@ void Surface::setAlpha(double alpha)
    m_colorPositive[3] = m_alpha;
    m_colorNegative[3] = m_alpha;
    recompile(); // this is really only needed if there is a property
-//qDebug() << "setAlpha not recompiling";
 }
 
 
@@ -266,6 +262,14 @@ void Surface::draw()
 
    if (m_drawVertexNormals) drawVertexNormals();
    if (m_drawFaceNormals) drawFaceNormals();
+}
+
+
+void Surface::balanceScale(bool const tf)
+{
+   m_balanceScale = tf;
+   recompile();
+   updated();
 }
 
 
@@ -443,6 +447,13 @@ void Surface::clearPropertyData()
 void Surface::computePropertyData(Function3D const& function) 
 {
    m_surface.computeSurfaceProperty(function);
+   recompile(); 
+}
+
+
+void Surface::computeIndexField() 
+{
+   m_surface.computeIndexProperty();
    recompile(); 
 }
 

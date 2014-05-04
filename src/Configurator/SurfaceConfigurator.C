@@ -34,13 +34,12 @@ using namespace qglviewer;
 namespace IQmol {
 namespace Configurator {
 
-Gradient::ColorList Surface::s_atomColors;
-
 Surface::Surface(Layer::Surface& surface) : m_surface(surface), 
    m_gradientColors(Preferences::DefaultGradientColors()), m_initialized(false)
 {        
    m_surfaceConfigurator.setupUi(this);
    m_surfaceConfigurator.ambientOcclusionCheckBox->setVisible(false);
+   m_surfaceConfigurator.scaleButton->setEnabled(false);
 }
 
 
@@ -59,7 +58,10 @@ void Surface::sync()
       m_surfaceConfigurator.swapColorsButton->setEnabled(false);
    }
 
-   if (m_surface.hasProperty()) m_gradientColors = m_surface.colors();
+   if (m_surface.hasProperty()) {
+      m_gradientColors = m_surface.colors();
+      m_surfaceConfigurator.scaleButton->setEnabled(true);
+   }
 
    double area(m_surface.area());
    m_surfaceConfigurator.areaLabel->setText(QString::number(area, 'f', 3));
@@ -82,7 +84,12 @@ void Surface::sync()
    if (parents.isEmpty()) {
       QLOG_ERROR() << "Could not find Molecule parent for surface";
    }else {
-      m_surfaceConfigurator.propertyCombo->addItems(parents.first()->getAvailableProperties());
+      QStringList properties(parents.first()->getAvailableProperties());
+      // remove Nuclei for non-vdW surfaces 
+      if (!m_surface.isVdW()) {
+         properties.removeAll("Nuclei");
+      }
+      m_surfaceConfigurator.propertyCombo->addItems(properties);
    }
 }  
 
@@ -96,6 +103,7 @@ void Surface::on_propertyCombo_currentIndexChanged(int)
       m_surfaceConfigurator.positiveColorButton->setProperty("gradient",false);
       m_surfaceConfigurator.negativeLabel->setVisible(false);
       m_surfaceConfigurator.positiveLabel->setText("Positive");
+      m_surfaceConfigurator.scaleButton->setEnabled(false);
       setPositiveColor(m_surface.colorPositive());
       connect(m_surfaceConfigurator.positiveColorButton, SIGNAL(clicked(bool)),
          this, SLOT(on_positiveColorButton_clicked(bool)));
@@ -108,14 +116,15 @@ void Surface::on_propertyCombo_currentIndexChanged(int)
  
       m_surface.clearPropertyData();
 
-   }else if (type == "Nearest nucleus") {
+   }else if (type == "Nuclei") {
 
       QList<Layer::Molecule*> parents = m_surface.findLayers<Layer::Molecule>(Layer::Parents);
       if (parents.isEmpty()) {
          QLOG_ERROR() << "No Molecule found";
       }else {
-         m_surface.setColors(atomColorGradient());
-         m_surface.computePropertyData(parents.first()->getPropertyEvaluator(type));
+         m_surface.setColors(atomColorGradient(parents.first()->maxAtomicNumber()));
+         m_surface.computeIndexField();
+         updateScale();
       }
 
    }else {
@@ -128,6 +137,7 @@ void Surface::on_propertyCombo_currentIndexChanged(int)
       m_surfaceConfigurator.negativeLabel->setVisible(true);
       m_surfaceConfigurator.negativeColorButton->setVisible(false);
       m_surfaceConfigurator.swapColorsButton->setEnabled(false);
+      m_surfaceConfigurator.scaleButton->setEnabled(true);
 
       QList<Layer::Molecule*> parents(m_surface.findLayers<Layer::Molecule>(Layer::Parents));
 
@@ -138,34 +148,13 @@ void Surface::on_propertyCombo_currentIndexChanged(int)
          m_surface.computePropertyData(parents.first()->getPropertyEvaluator(type));
       }
 
-      double min, max;
-      m_surface.getPropertyRange(min, max);
-      QString v1(QString::number(min, 'f', 4));
-      QString v2(QString::number(max, 'f', 4));
-
-      m_surfaceConfigurator.negativeLabel->setText(v1);
-      m_surfaceConfigurator.positiveLabel->setText(v2);
+      updateScale();
    }
 
    m_surface.updated();
 }
 
-
-Gradient::ColorList const& Surface::atomColorGradient()
-{
-   if (s_atomColors.isEmpty()) {
-      QColor color;
-      for (unsigned int Z = 1; Z <= 9; ++Z) {
-          std::vector<double> rgb(OpenBabel::etab.GetRGB(Z));
-          color.setRgbF(rgb[0],rgb[1],rgb[2],1.0);
-          s_atomColors.append(color);
-      }
-   }
-
-   return s_atomColors;
-}
-
-   
+  
 void Surface::on_positiveColorButton_clicked(bool)
 {
    QColor color(m_surface.colorPositive());
@@ -182,6 +171,25 @@ void Surface::on_negativeColorButton_clicked(bool)
 }
 
 
+void Surface::on_scaleButton_clicked(bool tf)
+{
+   m_surface.balanceScale(tf);
+   updateScale();
+}
+
+
+void Surface::updateScale()
+{
+   double min, max;
+   m_surface.getPropertyRange(min, max);
+   QString v1(QString::number(min, 'f', 4));
+   QString v2(QString::number(max, 'f', 4));
+
+   m_surfaceConfigurator.negativeLabel->setText(v1);
+   m_surfaceConfigurator.positiveLabel->setText(v2);
+}
+
+
 void Surface::on_swapColorsButton_clicked(bool)
 {
    QColor positive(m_surface.colorPositive());
@@ -192,6 +200,26 @@ void Surface::on_swapColorsButton_clicked(bool)
 }
    
 
+Gradient::ColorList Surface::atomColorGradient(unsigned const maxAtomicNumber)
+{
+   Gradient::ColorList atomColors;
+   QColor color;
+   for (unsigned int Z = 1; Z <= maxAtomicNumber; ++Z) {
+       std::vector<double> rgb(OpenBabel::etab.GetRGB(Z));
+       color.setRgbF(rgb[0],rgb[1],rgb[2],1.0);
+       atomColors.append(color);
+   }
+
+/*
+   setPositiveColor(atomColors);
+   m_surface.recompile();
+   m_surface.updated();
+*/
+
+   return atomColors;
+}
+
+ 
 void Surface::editGradientColors(bool)
 {
    QList<QColor> colors(m_gradientColors);
@@ -221,7 +249,6 @@ void Surface::setPositiveColor(QColor const& color)
       m_surface.setColors(negative, color);
    }
 }
-
 
 
 void Surface::setNegativeColor(QColor const& color)

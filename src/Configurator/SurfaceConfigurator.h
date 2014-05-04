@@ -52,6 +52,7 @@ namespace Configurator{
          void on_positiveColorButton_clicked(bool);
          void on_negativeColorButton_clicked(bool);
          void on_swapColorsButton_clicked(bool);
+         void on_scaleButton_clicked(bool);
          void on_propertyCombo_currentIndexChanged(int);
          void on_fillButton_clicked(bool);
          void on_linesButton_clicked(bool);
@@ -65,13 +66,13 @@ namespace Configurator{
          void setPositiveColor(QColor const& color);
          void setPositiveColor(QList<QColor> const& colors);
          void setNegativeColor(QColor const& color);
+         void updateScale();
 
          Layer::Surface& m_surface;
          QList<QColor> m_gradientColors;
          bool m_initialized;
 
-         static Gradient::ColorList s_atomColors;
-         Gradient::ColorList const& atomColorGradient();
+         Gradient::ColorList atomColorGradient(unsigned const maxAtomicNumber);
    };
 
 } } // end namespace IQmol::Configurator

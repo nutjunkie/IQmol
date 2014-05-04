@@ -355,6 +355,30 @@ bool Mesh::computeScalarField(Function3D const& function)
 }
 
 
+bool Mesh::computeIndexField()
+{
+   if (!hasProperty(MeshIndex) && !requestProperty(MeshIndex))  return false;
+   if (!hasProperty(ScalarField) && !requestProperty(ScalarField))  return false;
+
+   OMMesh::FaceIter face;
+   OMMesh::FaceVertexIter vertex;
+   for (face = fbegin(); face != fend(); ++face) {
+       int index( m_omMesh.property(m_meshIndexHandle, face));
+       // add a little bit to avoid round-off changing the int value
+       double value(index + 0.0001);
+   
+       vertex = m_omMesh.fv_iter(face);
+       m_omMesh.property(m_scalarFieldHandle, vertex) = value;
+       ++vertex;
+       m_omMesh.property(m_scalarFieldHandle, vertex) = value;
+       ++vertex;
+       m_omMesh.property(m_scalarFieldHandle, vertex) = value;
+   }
+
+   return true;
+}
+
+
 bool Mesh::setMeshIndex(int const index)
 {
    if (!hasProperty(MeshIndex) && !requestProperty(MeshIndex)) return false;

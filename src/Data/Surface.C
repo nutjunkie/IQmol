@@ -52,9 +52,7 @@ Surface::Surface(SurfaceInfo const& info) : m_opacity(0.999), m_min(0.0), m_max(
 Surface::Surface(Mesh const& mesh) : m_opacity(0.999), m_min(0.0), m_max(0.0)
 {
    m_description = "Mesh";
-   //m_meshPositive += mesh;
    m_meshPositive = mesh;
-// m_meshPositive.dump();
 // add isovalue info to description
    m_isSigned = false;
    m_colors << Preferences::NegativeSurfaceColor();
@@ -70,12 +68,20 @@ void Surface::computeSurfaceProperty(Function3D const& function)
 }
 
 
+void Surface::computeIndexProperty()
+{
+   m_meshPositive.computeIndexField();
+   if (m_isSigned) m_meshNegative.computeIndexField();
+   computeSurfacePropertyRange();
+}
+
+
 bool Surface::hasProperty() const 
 { 
    return m_meshPositive.hasProperty(Mesh::ScalarField) || 
           m_meshPositive.hasProperty(Mesh::ScalarField);
 }
- 
+
 
 void Surface::clearSurfaceProperty()
 {

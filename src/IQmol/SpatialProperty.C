@@ -161,6 +161,18 @@ double PointChargePotential::potential(double const x, double const y, double co
 }
 
 
+// --------------- MeshIndex---------------
+MeshIndex::MeshIndex(QString const& type) : SpatialProperty(type)
+{ 
+   m_function = boost::bind(&MeshIndex::index, this, _1, _2, _3);
+}
+
+
+double MeshIndex::index(double const, double const, double const) const
+{
+   return 0.0;
+}
+
 
 // --------------- MultipolePotential ---------------
 MultipolePotential::MultipolePotential(QString const& type, int const order, 

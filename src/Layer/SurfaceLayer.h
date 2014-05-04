@@ -74,12 +74,15 @@ namespace IQmol {
             QList<QColor> const& colors() const;
 
             void computePropertyData(Function3D const&);
+            void computeIndexField();
             void clearPropertyData();
             bool isSigned() const { return m_surface.isSigned(); }
             bool hasProperty() const { return m_surface.hasProperty(); }
+            bool isVdW() const;
             void getPropertyRange(double& min, double& max) const;
             void setDrawMode(DrawMode const mode) { m_drawMode = mode; }
             double area() const { return m_surface.area(); }
+            void balanceScale(bool const);
 
          private Q_SLOTS:
             void toggleVertexNormals();
@@ -108,6 +111,7 @@ namespace IQmol {
 
             bool m_drawVertexNormals;
             bool m_drawFaceNormals;
+            bool m_balanceScale;  // for properties
 
             MeshDecimatorTask* m_decimator;
       };

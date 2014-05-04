@@ -114,6 +114,7 @@ namespace Data {
          void deleteProperty(Property const property);
 
          bool computeScalarField(Function3D const&);
+         bool computeIndexField();
 
          void getScalarFieldRange(double& min, double& max);
 
