@@ -101,7 +101,7 @@ class InputDialog : public QMainWindow {
 
       // Radio toggles for switching pages on stacked widgets
       void toggleStack(QStackedWidget* stack, bool on, QString model);
-      void on_use_case_toggled(bool);
+      void on_qui_use_case_toggled(bool);
       void on_ftc_toggled(bool);
       void on_qui_cfmm_toggled(bool);
       void on_qui_solvent_cosmo_toggled(bool);
@@ -194,6 +194,7 @@ class InputDialog : public QMainWindow {
 
       void widgetError(QString const& name);
       void printSection(QString const& name, bool doPrint);
+      void printOption(QString const& name, bool doPrint);
       void updateLJParameters();
       bool saveFile(bool prompt);
 

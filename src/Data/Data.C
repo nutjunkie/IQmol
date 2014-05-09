@@ -71,6 +71,7 @@ QString toString(ID const id)
       case MullikenCharge:         s = "Data::MullikenCharge";         break;
       case GasteigerCharge:        s = "Data::GasteigerCharge";        break;
       case MultipoleDerivedCharge: s = "Data::MultipoleDerivedCharge"; break;
+      case ChelpgCharge:           s = "Data::ChelpgCharge";           break;
       case SpinDensity:            s = "Data::SpinDensity";            break;
       case VdwRadius:              s = "Data::VdwRadius";              break;
 

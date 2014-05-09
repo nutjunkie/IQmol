@@ -53,6 +53,7 @@
 #include <QFont>
 #include <QPixmap>
 #include <QInputDialog>
+#include <QRegExpValidator>
 
 #include <QDebug>
 
@@ -404,7 +405,6 @@ void InputDialog::addNewJob()
       job = new Job();
    }
 
-qDebug() << "Adding Job in addNewJob";
    addJobToList(job);
 
    int index(m_jobs.indexOf(job));
@@ -470,37 +470,6 @@ void InputDialog::changePreviewFont(QFont const& font)
  *  Job Control
  *  
  ***********************************************************************/
-
-
-
-//! The Job options are synchronised using the widgetChanged slot, but we still
-//! need to determine if the options should be printed as part of the job.  This
-//! is based on whether or not the associated control is enabled or not.
-void InputDialog::finalizeJob(Job* job) 
-{
-   if (!job) return;
-   QWidget* w;
-   QString name;
-   StringMap::const_iterator iter;
-   StringMap s = job->getOptions();
-
-   for (iter = s.begin(); iter != s.end(); ++iter) {
-       name  = iter.key();
-       w = findChild<QWidget*>(name.toLower());
-	   // If there is no widget of this name, then we are probably dealing 
-       // with something the user wrote into the preview box, so we just 
-	   // leave things alone.
-       if (w) job->printOption(name, w->isEnabled());
-   }
-
-   // Special case code to avoid writing the method keyword when custom is
-   // chosen (for backward compatibility)
-   QComboBox* method(findChild<QComboBox*>("method"));
-   if (method && method->currentText() == "Custom") {
-      job->printOption("METHOD", false);
-      job->printOption("EXCHANGE", true);
-   }
-}
 
 
 /// Updates the contents of the preview panel with the input for the JobList
@@ -574,9 +543,9 @@ QString InputDialog::generateInputString()
 
 void InputDialog::capturePreviewTextChanges() 
 {
+//qDebug() << "capturePreviewTextChanges() called";
    if (!m_taint) return;
-qDebug() << "capturePreviewTextChanges() called";
-qDebug() << "    with changes";
+//qDebug() << "    with changes";
 
    QString text(m_ui.previewText->toPlainText());
    JobList jobs(ParseQChemFileContents(text));
@@ -592,10 +561,17 @@ qDebug() << "    with changes";
 
    JobList::iterator iter;
    for (iter = jobs.begin(); iter != jobs.end(); ++iter) {
+	   // This is a bit of a hack.  Adding jobs triggers the
+	   // currentIndexChanged slot below, which updates m_currentJob.
+       // This causes the jobs to be added in a funny order, so we
+       // need to reset m_currentJob before adding each job to ensure
+       // they get appended properly.
+       m_currentJob = 0;
        addJobToList(*iter);
    }
 
    m_currentJob = m_jobs[index];
+   m_ui.jobList->setCurrentIndex(index);
    TAINT(false);
 }
 
@@ -605,6 +581,7 @@ void InputDialog::on_jobList_currentIndexChanged(int index)
 {
    if (index < 0 || index >= m_jobs.count()) return;
    capturePreviewTextChanges();
+   m_ui.jobList->setCurrentIndex(index);
 
    // Need to set this so resetControls doesn't affect the current job
    m_currentJob = 0;
@@ -710,18 +687,54 @@ void InputDialog::deleteAllJobs(bool const prompt)
 }
 
 
-void InputDialog::printSection(QString const& name, bool doPrint) 
-{
-   if (m_currentJob) m_currentJob->printSection(name, doPrint);
-}
-
-
 void InputDialog::updateLJParameters() {
    if (m_currentJob) {
       LJParametersSection* lj = new LJParametersSection();
       lj->generateData(m_currentJob->getCoordinates());
       m_currentJob->addSection(lj);
    }
+}
+
+
+//! The Job options are synchronised using the widgetChanged slot, but we still
+//! need to determine if the options should be printed as part of the job.  This
+//! is based on whether or not the associated control is enabled or not.
+void InputDialog::finalizeJob(Job* job) 
+{
+   if (!job) return;
+   QWidget* w;
+   QString name;
+   StringMap::const_iterator iter;
+   StringMap s = job->getOptions();
+
+   for (iter = s.begin(); iter != s.end(); ++iter) {
+       name  = iter.key();
+       w = findChild<QWidget*>(name.toLower());
+	   // If there is no widget of this name, then we are probably dealing 
+       // with something the user wrote into the preview box, so we just 
+	   // leave things alone.
+       if (w) job->printOption(name, w->isEnabled());
+   }
+
+   // Special case code to avoid writing the method keyword when custom is
+   // chosen (for backward compatibility)
+   QComboBox* method(findChild<QComboBox*>("method"));
+   QString m(method->currentText());
+   if (method && (m == "Custom" || m == "TD-DFT")) {
+      job->printOption("METHOD", false);
+      job->printOption("EXCHANGE", true);
+   }
+}
+
+
+void InputDialog::printSection(QString const& name, bool doPrint) 
+{
+   if (m_currentJob) m_currentJob->printSection(name, doPrint);
+}
+
+void InputDialog::printOption(QString const& name, bool doPrint) 
+{
+   if (m_currentJob) m_currentJob->printOption(name, doPrint);
 }
 
 
@@ -776,7 +789,7 @@ void InputDialog::on_qui_cfmm_toggled(bool on)
    toggleStack(m_ui.largeMoleculesStack, on, "LargeMoleculesCFMM");
 }
 
-void InputDialog::on_use_case_toggled(bool on) 
+void InputDialog::on_qui_use_case_toggled(bool on) 
 {
    toggleStack(m_ui.largeMoleculesStack, on, "LargeMoleculesCASE");
 }
@@ -968,11 +981,8 @@ void InputDialog::initializeControls()
              break;
           }
  
- 
           if (m_reg.exists(name)) m_reg.get(name).setValue(opt.getDefaultValue());
- 
        }
- 
     }
 }
 
@@ -1178,6 +1188,13 @@ void InputDialog::initializeControl(Option const& opt, QLineEdit* edit)
          static_cast<void(*)(QLineEdit*, QString const&)>(SetControl), edit, _1));
    QString name = opt.getName();
    m_setUpdates[name] = update;
+
+   if (opt.getType() == Option::Type_Array) {
+      QRegExp rx("^\\[(\\d+,?)+\\]$");
+      QValidator* validator(new QRegExpValidator(rx, this));
+      edit->setValidator(validator);
+      //edit->setMask("");
+   }
 }
 
 
@@ -1331,7 +1348,6 @@ void InputDialog::widgetError(QString const& name)
    qDebug() << "Error in QChem::InputDialog:\n"
             << "Could not find widget" << name;
 }
-
 
 
 // These widgetChanged functions are used to connect widgets to QtNodes

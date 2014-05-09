@@ -110,6 +110,7 @@ Base* Factory::create(Type::ID const id)
       case Type::MullikenCharge:          data = new MullikenCharge();          break;
       case Type::GasteigerCharge:         data = new GasteigerCharge();         break;
       case Type::MultipoleDerivedCharge:  data = new MultipoleDerivedCharge();  break;
+      case Type::ChelpgCharge:            data = new ChelpgCharge();            break;
       case Type::SpinDensity:             data = new SpinDensity();             break;
       case Type::VdwRadius:               data = new VdwRadius();               break;
 

@@ -44,10 +44,10 @@ bool isCompoundFunctional()
    OptionRegister& reg(OptionRegister::instance());
    QtNode& exchange(reg.get("EXCHANGE"));
    QString value(exchange.getValue().toUpper());
-   return (value == "B3LYP")   || (value == "B3LYP5") || (value == "EDF1") ||
-          (value == "B3PW91")  || (value == "EDF2")   || (value == "HCTH") ||
-          (value == "BECKE97") || (value == "BMK")    || (value == "M05")  ||  
-          (value == "M06");
+   return (value != "HF")     && (value != "Slater") && (value != "B86")  &&
+          (value != "B88")    && (value != "B97-D")  && (value != "GG99") &&
+          (value != "Gill96") && (value != "PBE")    && (value != "PW86") &&
+          (value != "PW91")   && (value != "revPBE") && (value != "rPW86");
 }
 
 
@@ -96,10 +96,17 @@ bool requiresDerivatives()
 }
 
 
+bool closedShell()
+{
+   OptionRegister& reg(OptionRegister::instance());
+   QtNode& qui_multiplicity(reg.get("QUI_MULTIPLICITY"));
+   return (qui_multiplicity.getValue() == "1");
+}
+
+
 bool requiresAuxBasis()
 {
    OptionRegister& reg(OptionRegister::instance());
-   QtNode& exchange(reg.get("EXCHANGE"));
    QtNode& correlation(reg.get("CORRELATION"));
    QString value(correlation.getValue().toUpper());
 
@@ -115,8 +122,39 @@ bool requiresAuxBasis()
            (value == "OD(2)")     ||  (value == "VOD")        ||
            (value == "VOD(2)")    ||  (value == "VQCCD"));
 
+   QtNode& exchange(reg.get("EXCHANGE"));
    value = exchange.getValue().toUpper();
    tf = tf || (value == "XYGJOS") ||  (value == "LXYGJOS") ;
+
+   QtNode& method(reg.get("METHOD"));
+   value = method.getValue().toUpper();
+   tf = tf || (value == "RI-CIS(D)") || (value == "SOS-CIS(D)") || (value == "SOS-CIS(D0)");
+
+   return tf;
+}
+
+
+bool requiresOmega()
+{
+   OptionRegister& reg(OptionRegister::instance());
+   QtNode& correlation(reg.get("CORRELATION"));
+   QString value(correlation.getValue().toUpper());
+
+   bool tf((value == "SOSMP2") || (value == "MOSMP2"));
+
+   QtNode& exchange(reg.get("EXCHANGE"));
+   value = exchange.getValue().toUpper();
+   tf = tf || (value == "CAM-B3LYP")       || (value == "LRC-WPBEPBE")
+           || (value == "LRC-WPBEHPBE")    || (value == "MUB88")
+           || (value == "MUPBE")           || (value == "OMEGAB97")
+           || (value == "OMEGAB97X")       || (value == "OMEGAB97X-D")
+           || (value == "OMEGAB97X-2(LP)") || (value == "OMEGAB97X-2(TQZ)")
+           || (value == "wPBE")            || (value == "OMEGAB97X-2(TQZ)");
+
+   QtNode& qui_use_case(reg.get("QUI_USE_CASE"));
+   QString QtTrue(QString::number(Qt::Checked));
+   value = qui_use_case.getValue();
+   tf = tf || (value == QtTrue);
 
    return tf;
 }
@@ -162,9 +200,11 @@ void InputDialog::initializeQuiLogic()
       If (exchange == "User-defined", Disable(m_ui.correlation))
    );
 
+/*
    exchange.addRule(
      If (isCompoundFunctional, Disable(m_ui.correlation), Enable(m_ui.correlation) )
    );
+*/
         
    correlation.addRule(
       If (correlation == "MP2", Enable(m_ui.cd_algorithm), Disable(m_ui.cd_algorithm))
@@ -174,20 +214,10 @@ void InputDialog::initializeQuiLogic()
       If (isPostHF, exchange.shouldBe("HF")) 
    );
 
-   QtNode& cis_n_roots(reg.get("CIS_N_ROOTS"));
-
-   rule = If(correlation == "CIS(D)"    || 
-             correlation == "RICIS(D)"  || 
-             correlation == "SOSCIS(D)" || 
-             correlation == "SOSCIS(D0)", cis_n_roots.shouldBeAtLeast("1"));
-             
-   correlation.addRule(rule);
-
-
-
    QtNode& method(reg.get("METHOD"));
-   method.addRule(
-      If (method == "Custom",
+
+    method.addRule(
+      If (method == "Custom" || method == "TD-DFT",
          Enable( m_ui.exchange)     + Enable( m_ui.label_exchange) +
          Enable( m_ui.correlation)  + Enable( m_ui.label_correlation),
          Disable( m_ui.exchange)    + Disable( m_ui.label_exchange) +
@@ -195,8 +225,13 @@ void InputDialog::initializeQuiLogic()
       )
    );
 
+   method.addRule(
+      If (method == "TD-DFT", exchange.shouldBe("B3LYP"))
+   );
 
-   // JOB_TYPE
+
+
+  // ----- T A B B E D   W I D G E T   O P T I O N S -----
 
    QtNode& job_type(reg.get("JOB_TYPE"));
 
@@ -280,20 +315,35 @@ void InputDialog::initializeQuiLogic()
    exchange.addRule(rule);
    method.addRule(rule);
 
-   s = "CIS";
+
+   s = "Atenuation Parameter";
+   rule = If(requiresOmega, 
+             AddPage(m_ui.toolBoxOptions, m_toolBoxOptions.value(s), s),
+             RemovePage(m_ui.toolBoxOptions, s)
+          );
+
+   QtNode& qui_use_case(reg.get("QUI_USE_CASE"));
+   qui_use_case.addRule(rule);
+   exchange.addRule(rule);
+   correlation.addRule(rule);
+
+
+   s = "CIS/TD-DFT";
    method.addRule(
-      If (method == "CIS", 
+      If (method == "CIS" || method == "CIS(D)" || method == "TD-DFT", 
           AddPage(m_ui.toolBoxOptions, m_toolBoxOptions.value(s), s),
           RemovePage(m_ui.toolBoxOptions, s)
       )
    );
 
-
-
-   QtNode& dma(reg.get("DMA"));
-   dma.addRule(
-      If(dma == QtTrue, Enable(m_ui.dma_midpoints), Disable(m_ui.dma_midpoints))
+   s = "EOM";
+   method.addRule(
+      If(method == "EOM-CCSD", 
+         AddPage(m_ui.toolBoxOptions, m_toolBoxOptions.value(s), s),
+         RemovePage(m_ui.toolBoxOptions, s)
+      )
    );
+ 
 
 
    // SCF Control
@@ -307,40 +357,120 @@ void InputDialog::initializeQuiLogic()
 
    QtNode& dualBasisEnergy(reg.get("DUAL_BASIS_ENERGY"));
 
-   rule = If( (dualBasisEnergy == QtTrue && basis2 == "6-311+G**"),
-              basis.shouldBe("6-311++G(3df,3pd)"));
+   QString b1("6-311++G(3df,3pd)");
+   QString b2("6-311+G*");
+   rule = If( (dualBasisEnergy == QtTrue && basis2 == b2), basis.shouldBe(b1));
    dualBasisEnergy.addRule(rule);
    basis2.addRule(rule);
 
-   rule = If( (dualBasisEnergy == QtTrue && basis == "6-311++G(3df,3pd)"),
-              basis2.shouldBe("6-311+G**"));
-   dualBasisEnergy.addRule(rule);
-   basis.addRule(rule);
-
-   rule = If( (dualBasisEnergy == QtTrue && basis2 == "rcc-pVTZ"),
-              basis.shouldBe("cc-pVTZ"));
+   b2 = "6-311G*";
+   rule = If( (dualBasisEnergy == QtTrue && basis2 == b2), basis.shouldBe(b1));
    dualBasisEnergy.addRule(rule);
    basis2.addRule(rule);
 
-   rule = If( (dualBasisEnergy == QtTrue && basis == "cc-pVTZ"),
-           basis2.shouldBe("rcc-pVTZ"));
+   rule = If( (dualBasisEnergy == QtTrue && basis  == b1), basis2.shouldBe(b2));
    dualBasisEnergy.addRule(rule);
    basis.addRule(rule);
 
-   rule = If( (dualBasisEnergy == QtTrue && basis2 == "rcc-pVQZ"),
-               basis.shouldBe("cc-pVQZ"));
+   b1 = "6-31++G**";
+   b2 = "6-31G*";
+   rule = If( (dualBasisEnergy == QtTrue && basis2 == b2), basis.shouldBe(b1));
    dualBasisEnergy.addRule(rule);
    basis2.addRule(rule);
 
-   rule = If( (dualBasisEnergy == QtTrue && basis == "cc-pVQZ"),
-              basis2.shouldBe("rcc-pVQZ"));
+   rule = If( (dualBasisEnergy == QtTrue && basis == b1), basis2.shouldBe(b2));
+   dualBasisEnergy.addRule(rule);
+   basis.addRule(rule);
+
+   b1 = "6-31G**";
+   b2 = "6-31G";
+   rule = If( (dualBasisEnergy == QtTrue && basis2 == b2), basis.shouldBe(b1));
+   dualBasisEnergy.addRule(rule);
+   basis2.addRule(rule);
+
+   b2 = "r64G";
+   rule = If( (dualBasisEnergy == QtTrue && basis2 == b2), basis.shouldBe(b1));
+   dualBasisEnergy.addRule(rule);
+   basis2.addRule(rule);
+
+   rule = If( (dualBasisEnergy == QtTrue && basis  == b1), basis2.shouldBe(b2));
+   dualBasisEnergy.addRule(rule);
+   basis.addRule(rule);
+
+   b1 = "6-31G*";
+   b2 = "6-31G";
+   rule = If( (dualBasisEnergy == QtTrue && basis2 == b2), basis.shouldBe(b1));
+   dualBasisEnergy.addRule(rule);
+   basis2.addRule(rule);
+
+   b2 = "r64G";
+   rule = If( (dualBasisEnergy == QtTrue && basis2 == b2), basis.shouldBe(b1));
+   dualBasisEnergy.addRule(rule);
+   basis2.addRule(rule);
+
+   rule = If( (dualBasisEnergy == QtTrue && basis  == b1), basis2.shouldBe(b2));
+   dualBasisEnergy.addRule(rule);
+   basis.addRule(rule);
+
+   b1 = "cc-pVTZ";
+   b2 = "rcc-pVTZ";
+   rule = If( (dualBasisEnergy == QtTrue && basis2 == b2), basis.shouldBe(b1));
+   dualBasisEnergy.addRule(rule);
+   basis2.addRule(rule);
+
+   rule = If( (dualBasisEnergy == QtTrue && basis == b1), basis2.shouldBe(b2));
+   dualBasisEnergy.addRule(rule);
+   basis.addRule(rule);
+
+   b1 = "cc-pVQZ";
+   b2 = "rcc-pVQZ";
+   rule = If( (dualBasisEnergy == QtTrue && basis2 == b2), basis.shouldBe(b1));
+   dualBasisEnergy.addRule(rule);
+   basis2.addRule(rule);
+
+   rule = If( (dualBasisEnergy == QtTrue && basis == b1), basis2.shouldBe(b2));
+   dualBasisEnergy.addRule(rule);
+   basis.addRule(rule);
+
+   b1 = "aug-cc-pVDZ";
+   b2 = "racc-pVDZ";
+   rule = If( (dualBasisEnergy == QtTrue && basis2 == b2), basis.shouldBe(b1));
+   dualBasisEnergy.addRule(rule);
+   basis2.addRule(rule);
+
+   rule = If( (dualBasisEnergy == QtTrue && basis == b1), basis2.shouldBe(b2));
+   dualBasisEnergy.addRule(rule);
+   basis.addRule(rule);
+
+   b1 = "aug-cc-pVTZ";
+   b2 = "racc-pVTZ";
+   rule = If( (dualBasisEnergy == QtTrue && basis2 == b2), basis.shouldBe(b1));
+   dualBasisEnergy.addRule(rule);
+   basis2.addRule(rule);
+
+   rule = If( (dualBasisEnergy == QtTrue && basis == b1), basis2.shouldBe(b2));
+   dualBasisEnergy.addRule(rule);
+   basis.addRule(rule);
+
+   b1 = "aug-cc-pVQZ";
+   b2 = "racc-pVQZ";
+   rule = If( (dualBasisEnergy == QtTrue && basis2 == b2), basis.shouldBe(b1));
+   dualBasisEnergy.addRule(rule);
+   basis2.addRule(rule);
+
+   rule = If( (dualBasisEnergy == QtTrue && basis == b1), basis2.shouldBe(b2));
    dualBasisEnergy.addRule(rule);
    basis.addRule(rule);
 
 
 
- 
-  // ----- T A B B E D   W I D G E T   O P T I O N S -----
+
+   // Setup -> Wavefunction Analysis
+   QtNode& dma(reg.get("DMA"));
+   dma.addRule(
+      If(dma == QtTrue, Enable(m_ui.dma_midpoints), Disable(m_ui.dma_midpoints))
+   );
+
 
 
    // Setup -> Frequencies
@@ -379,7 +509,7 @@ void InputDialog::initializeQuiLogic()
    );
 
 
-   // Setup -> CIS
+   // Setup -> CIS/TD-DFT
    job_type.addRule(
       If(job_type == "Geometry"    || job_type == "Reaction Path"    ||
          job_type == "Frequencies" || job_type == "Transition State" ||
@@ -389,57 +519,253 @@ void InputDialog::initializeQuiLogic()
       )
    );
 
+   QtNode& cis_n_roots(reg.get("CIS_N_ROOTS"));
+   QtNode& spin_flip_xcis(reg.get("SPIN_FLIP_XCIS"));
+             
+   method.addRule(
+      If(method == "CIS"       || 
+         method == "TD-DFT"    || 
+         method == "RICIS(D)"  || 
+         method == "SOSCIS(D)" || 
+         method == "SOSCIS(D0)", cis_n_roots.shouldBeAtLeast("1"))
+   );
+
+   spin_flip_xcis.addRule(
+      If(spin_flip_xcis == QtTrue, Disable(m_ui.sts_mom), Enable(m_ui.sts_mom))
+   );
+
+   QtNode& spin_flip(reg.get("SPIN_FLIP"));
+   rule = If(method == "TD-DFT" && spin_flip == QtTrue, Disable(m_ui.rpa), Enable(m_ui.rpa));
+   method.addRule(rule);
+   spin_flip.addRule(rule);
+
+
+   // Setup -> EOM
+
+   QtNode& multiplicity(reg.get("QUI_MULTIPLICITY"));
+   QtNode& qui_eom_ee(reg.get("QUI_EOM_EE"));
+   QtNode& qui_eom_sf(reg.get("QUI_EOM_SF"));
+   QtNode& qui_eom_ip(reg.get("QUI_EOM_IP"));
+   QtNode& qui_eom_ea(reg.get("QUI_EOM_EA"));
+   QtNode& qui_eom_dip(reg.get("QUI_EOM_DIP"));
+
+   QtNode& qui_eom_states1(reg.get("QUI_EOM_STATES1"));
+   QtNode& qui_eom_states2(reg.get("QUI_EOM_STATES2"));
+   
+   rule = If((qui_eom_ee == QtTrue || qui_eom_dip == QtTrue) && multiplicity != "1",
+      Hide(m_ui.label_eom2) + Hide(m_ui.qui_eom_states2),
+      Show(m_ui.label_eom2) + Show(m_ui.qui_eom_states2));
+
+   qui_eom_ee.addRule(rule);   qui_eom_sf.addRule(rule);   qui_eom_ip.addRule(rule);   
+   qui_eom_ea.addRule(rule);   qui_eom_dip.addRule(rule);  multiplicity.addRule(rule);
+   
+   // ----- EE -----
+   QtNode& ee_states(reg.get("EE_STATES"));
+   QtNode& ee_singlets(reg.get("EE_SINGLETS"));
+   QtNode& ee_triplets(reg.get("EE_TRIPLETS"));
+ 
+   rule = If(qui_eom_ee == QtTrue && multiplicity == "1",
+      Enable(m_ui.ee_singlets) + Enable(m_ui.ee_triplets) + Disable(m_ui.ee_states)
+       + ee_singlets.makeSameAs(qui_eom_states1) + ee_triplets.makeSameAs(qui_eom_states2)
+       + SetLabel(m_ui.label_eom1, "Singlets") + SetLabel(m_ui.label_eom2, "Triplets")
+   );
+
+   qui_eom_ee.addRule(rule);    qui_eom_states1.addRule(rule);
+   multiplicity.addRule(rule);  qui_eom_states2.addRule(rule);
+   
+   rule = If(qui_eom_ee == QtTrue && multiplicity != "1",
+      Disable(m_ui.ee_singlets) + Disable(m_ui.ee_triplets) + Enable(m_ui.ee_states)
+       + ee_states.makeSameAs(qui_eom_states1) + SetLabel(m_ui.label_eom1, "States")
+   );
+
+   qui_eom_ee.addRule(rule);    qui_eom_states1.addRule(rule);
+   multiplicity.addRule(rule);  
+
+   rule = If(qui_eom_ee == QtFalse,
+      Disable(m_ui.ee_singlets) + Disable(m_ui.ee_triplets) + Disable(m_ui.ee_states));
+
+   qui_eom_ee.addRule(rule);   qui_eom_sf.addRule(rule);  qui_eom_dip.addRule(rule);
+   qui_eom_ip.addRule(rule);   qui_eom_ea.addRule(rule);
+
+
+   // ----- DIP -----
+   QtNode& dip_states(reg.get("DIP_STATES"));
+   QtNode& dip_singlets(reg.get("DIP_SINGLETS"));
+   QtNode& dip_triplets(reg.get("DIP_TRIPLETS"));
+ 
+   rule = If(qui_eom_dip == QtTrue && multiplicity == "1",
+      Enable(m_ui.dip_singlets) + Enable(m_ui.dip_triplets) + Disable(m_ui.dip_states)
+       + dip_singlets.makeSameAs(qui_eom_states1) + dip_triplets.makeSameAs(qui_eom_states2)
+       + SetLabel(m_ui.label_eom1, "Singlets") + SetLabel(m_ui.label_eom2, "Triplets")
+   );
+
+   qui_eom_dip.addRule(rule);   qui_eom_states1.addRule(rule);
+   multiplicity.addRule(rule);  qui_eom_states2.addRule(rule);
+   
+   rule = If(qui_eom_dip == QtTrue && multiplicity != "1",
+      Disable(m_ui.dip_singlets) + Disable(m_ui.dip_triplets) + Enable(m_ui.dip_states)
+       + dip_states.makeSameAs(qui_eom_states1) + SetLabel(m_ui.label_eom1, "States")
+   );
+
+   qui_eom_dip.addRule(rule);    qui_eom_states1.addRule(rule);
+   multiplicity.addRule(rule);  
+
+   rule = If(qui_eom_dip == QtFalse,
+      Disable(m_ui.dip_singlets) + Disable(m_ui.dip_triplets) + Disable(m_ui.dip_states));
+
+   qui_eom_ee.addRule(rule);   qui_eom_sf.addRule(rule);  qui_eom_dip.addRule(rule);
+   qui_eom_ip.addRule(rule);   qui_eom_ea.addRule(rule);
+
+
+   // ----- SF -----
+   QtNode& sf_states(reg.get("SF_STATES"));
+   QtNode& dsf_states(reg.get("DSF_STATES"));
+ 
+   rule = If(qui_eom_sf == QtTrue, 
+      Enable(m_ui.sf_states) + Enable(m_ui.dsf_states)
+       + sf_states.makeSameAs(qui_eom_states1) + dsf_states.makeSameAs(qui_eom_states2)
+       + SetLabel(m_ui.label_eom1, "Spin-Flip") + SetLabel(m_ui.label_eom2, "Double SF")
+   );
+
+   qui_eom_sf.addRule(rule);   qui_eom_states1.addRule(rule);  qui_eom_states2.addRule(rule);
+   
+   rule = If(qui_eom_sf == QtFalse, Disable(m_ui.sf_states) + Disable(m_ui.dsf_states));
+
+   qui_eom_ee.addRule(rule);   qui_eom_sf.addRule(rule);  qui_eom_dip.addRule(rule);
+   qui_eom_ip.addRule(rule);   qui_eom_ea.addRule(rule);
+
+   // ----- IP -----
+   QtNode& ip_alpha(reg.get("EOM_IP_ALPHA"));
+   QtNode& ip_beta(reg.get("EOM_IP_BETA"));
+ 
+   rule = If(qui_eom_ip == QtTrue, 
+      Enable(m_ui.eom_ip_alpha) + Enable(m_ui.eom_ip_beta)
+       + ip_beta.makeSameAs(qui_eom_states1) + ip_alpha.makeSameAs(qui_eom_states2)
+       + SetLabel(m_ui.label_eom1, "Beta") + SetLabel(m_ui.label_eom2, "Alpha")
+   );
+
+   qui_eom_ip.addRule(rule);   qui_eom_states1.addRule(rule);  qui_eom_states2.addRule(rule);
+   
+   rule = If(qui_eom_ip == QtFalse, Disable(m_ui.eom_ip_alpha) + Disable(m_ui.eom_ip_beta));
+
+   qui_eom_ee.addRule(rule);   qui_eom_sf.addRule(rule);  qui_eom_dip.addRule(rule);
+   qui_eom_ip.addRule(rule);   qui_eom_ea.addRule(rule);
+
+   // ----- EA -----
+   QtNode& ea_alpha(reg.get("EOM_EA_ALPHA"));
+   QtNode& ea_beta(reg.get("EOM_EA_BETA"));
+ 
+   rule = If(qui_eom_ea == QtTrue, 
+      Enable(m_ui.eom_ea_alpha) + Enable(m_ui.eom_ea_beta)
+       + ea_beta.makeSameAs(qui_eom_states1) + ea_alpha.makeSameAs(qui_eom_states2)
+       + SetLabel(m_ui.label_eom1, "Beta") + SetLabel(m_ui.label_eom2, "Alpha")
+   );
+
+   qui_eom_ea.addRule(rule);   qui_eom_states1.addRule(rule);  qui_eom_states2.addRule(rule);
+   
+   rule = If(qui_eom_ea == QtFalse, Disable(m_ui.eom_ea_alpha) + Disable(m_ui.eom_ea_beta));
+
+   qui_eom_ee.addRule(rule);   qui_eom_sf.addRule(rule);  qui_eom_dip.addRule(rule);
+   qui_eom_ip.addRule(rule);   qui_eom_ea.addRule(rule);
+
+
+
+
 
 
    // ----- A D V A N C E D   O P T I O N S   P A N E L -----
 
-   QtNode* node;
-   QtNode* node2;
-
-   typedef QString S;
-
    // Advanced -> SCF Control
-   node = &reg.get("SCF_ALGORITHM");
-   node->addRule(
-      If(*node == "DM",  
+   QtNode& scf_algorithm(reg.get("SCF_ALGORITHM"));
+   scf_algorithm.addRule(
+      If(scf_algorithm == "DM",  
          Enable(m_ui.pseudo_canonical), 
          Disable(m_ui.pseudo_canonical) 
       )
    );
-   node->addRule(
-      If(*node == S("DIIS_DM") || *node == S("DIIS_GDM"),  
-         Enable(m_ui.diis_max_cycles)
-         + Enable(m_ui.diis_switch_thresh), 
-         Disable(m_ui.diis_max_cycles) 
-         + Disable(m_ui.diis_switch_thresh) 
+   scf_algorithm.addRule(
+      If(scf_algorithm == "DIIS_DM" || scf_algorithm == "DIIS_GDM",  
+         Enable(m_ui.diis_max_cycles)  + Enable(m_ui.diis_switch_thresh), 
+         Disable(m_ui.diis_max_cycles) + Disable(m_ui.diis_switch_thresh) 
       )
    );
-   node->addRule(
-      If(*node == S("RCA") || *node == S("RCA_DIIS"),  
-         Enable(m_ui.rca_print) 
-         + Enable(m_ui.rca_max_cycles),
-         Disable(m_ui.rca_print) 
-         + Disable(m_ui.rca_max_cycles) 
+   scf_algorithm.addRule(
+      If(scf_algorithm == "RCA" || scf_algorithm == "RCA_DIIS",  
+         Enable(m_ui.rca_print)  + Enable(m_ui.rca_max_cycles),
+         Disable(m_ui.rca_print) + Disable(m_ui.rca_max_cycles) 
+         
       )
    );
-   node->addRule(
-      If(*node == S("RCA_DIIS"),  
+   scf_algorithm.addRule(
+      If(scf_algorithm == "RCA_DIIS",  
          Enable(m_ui.rca_switch_thresh), 
          Disable(m_ui.rca_switch_thresh)
       )
    );
 
 
-   // Advanced -> DFT
+   // Advanced -> SCF Control -> Print Options
+   QtNode& qui_print_orbitals(reg.get("QUI_PRINT_ORBITALS"));
+   QtNode& print_orbitals(reg.get("PRINT_ORBITALS"));
+   qui_print_orbitals.addRule(
+      If(qui_print_orbitals == QtTrue,
+         Enable(m_ui.print_orbitals) 
+          + Enable(m_ui.label_print_orbitals) + print_orbitals.shouldBe("5"),
+         Disable(m_ui.print_orbitals) + Disable(m_ui.label_print_orbitals)
+      )
+   );
 
-   node = &reg.get("DFT_D");
-   node->addRule(
-      If(*node == S("Chai Head-Gordon"),
+
+   // Advanced -> HFPT
+   QtNode& hfpt(reg.get("HFPT"));
+   QtNode& hfpt_basis(reg.get("HFPT_BASIS"));
+   hfpt_basis.addRule(
+      If(hfpt_basis == "None",
+         hfpt.shouldBe(QtFalse) 
+          + Disable(m_ui.dfpt_exchange)
+          + Disable(m_ui.label_dfpt_exchange)
+          + Disable(m_ui.dfpt_xc_grid)
+          + Disable(m_ui.label_dfpt_xc_grid),
+         hfpt.shouldBe(QtTrue)
+          + Enable(m_ui.dfpt_exchange)
+          + Enable(m_ui.label_dfpt_exchange)
+          + Enable(m_ui.dfpt_xc_grid)
+          + Enable(m_ui.label_dfpt_xc_grid)
+      ) 
+   );
+
+
+
+   // Advanced -> SCF Control -> PAO
+   QtNode& pao_method(reg.get("PAO_METHOD"));
+   pao_method.addRule(
+      If(pao_method == "PAO", 
+         Disable(m_ui.epao_iterate)
+         + Disable(m_ui.epao_weights),
+         Enable(m_ui.epao_iterate) 
+         + Enable(m_ui.epao_weights) 
+      )
+   );
+
+
+   // Advanced -> DFT
+   QtNode& dft_d(reg.get("DFT_D"));
+   dft_d.addRule(
+      If(dft_d == "Chai Head-Gordon",
          Enable(m_ui.dft_d_a),
          Disable(m_ui.dft_d_a)
       )
    );
 
+   QtNode& mrxc(reg.get("MRXC"));
+   mrxc.addRule(
+      If(mrxc == QtTrue,
+         Enable(m_ui.groupBox_mrxc), 
+         Disable(m_ui.groupBox_mrxc)
+      )
+   );
+
+/*
    node = &reg.get("INCDFT");
    node->addRule(
       If(*node == QtFalse,  
@@ -469,9 +795,9 @@ void InputDialog::initializeQuiLogic()
          + Disable(m_ui.cdft_thresh) 
       )
    );
+*/
 
    // Advanced -> DFT -> Dispersion Correction
-   QtNode& dft_d(reg.get("DFT_D"));
    dft_d.addRule(
       If (dft_d == "DFT-D3", 
          Enable(m_ui.groupBox_dft_d),
@@ -493,10 +819,10 @@ void InputDialog::initializeQuiLogic()
          Disable(m_ui.dftvdw_alpha1)           + Disable(m_ui.dftvdw_alpha2) +
          Disable(m_ui.label_dftvdw_alpha1)     + Disable(m_ui.label_dftvdw_alpha2),
 
-         Enable(m_ui.dftvdw_method)     + Enable(m_ui.dftvdw_print) +
-         Enable(m_ui.dftvdw_mol1natoms) + Enable(m_ui.dftvdw_kai) +
-         Enable(m_ui.label_dftvdw_method)     + Enable(m_ui.label_dftvdw_print) +
-         Enable(m_ui.label_dftvdw_mol1natoms) + Enable(m_ui.label_dftvdw_kai)
+         Enable(m_ui.dftvdw_method)            + Enable(m_ui.dftvdw_print) +
+         Enable(m_ui.dftvdw_mol1natoms)        + Enable(m_ui.dftvdw_kai) +
+         Enable(m_ui.label_dftvdw_method)      + Enable(m_ui.label_dftvdw_print) +
+         Enable(m_ui.label_dftvdw_mol1natoms)  + Enable(m_ui.label_dftvdw_kai)
       )
    );
 
@@ -516,28 +842,9 @@ void InputDialog::initializeQuiLogic()
 
 
 
-
-   // Advanced -> SCF Control -> Print Options
-   node = &reg.get("QUI_PRINT_ORBITALS");
-   node2 = &reg.get("PRINT_ORBITALS");
-   node->addRule(
-      If(*node == QtTrue,
-         Enable(m_ui.print_orbitals) + Enable(m_ui.label_print_orbitals) + node2->shouldBe("5"),
-         Disable(m_ui.print_orbitals) + Disable(m_ui.label_print_orbitals)
-      )
-   );
-
-
-   // Advanced -> SCF Control -> PAO
-   node = &reg.get("PAO_METHOD");
-   node->addRule(
-      If(*node == S("PAO"), 
-         Disable(m_ui.epao_iterate)
-         + Disable(m_ui.epao_weights),
-         Enable(m_ui.epao_iterate) 
-         + Enable(m_ui.epao_weights) 
-      )
-   );
+   QtNode* node;
+   QtNode* node2;
+   typedef QString S;
 
 
    // Advanced -> Wavefunction Analysis -> Plots
@@ -564,29 +871,6 @@ void InputDialog::initializeQuiLogic()
    );
 
 
-   // Advanced -> Wavefunction Analysis -> Intracules
-/*
-   node = &reg.get("INTRACULE");
-   node->addRule(
-      If(*node == QtTrue,
-         Enable(m_ui.intracule_method)
-         + Enable(m_ui.intracule_grid)
-         + Enable(m_ui.intracule_j_series_limit)
-         + Enable(m_ui.intracule_i_series_limit)
-         + Enable(m_ui.intracule_wigner_series_limit)
-         + Enable(m_ui.intracule_conserve_memory),
-
-         Disable(m_ui.intracule_method)
-         + Disable(m_ui.intracule_grid)
-         + Disable(m_ui.intracule_j_series_limit)
-         + Disable(m_ui.intracule_i_series_limit)
-         + Disable(m_ui.intracule_wigner_series_limit)
-         + Disable(m_ui.intracule_conserve_memory) 
-      )
-   );
-*/
-
-
    // Advanced -> Large Molecule Methods -> CFMM
    node = &reg.get("GRAIN");
    node->addRule(
@@ -597,6 +881,15 @@ void InputDialog::initializeQuiLogic()
          + Enable(m_ui.lin_k) 
       )
    );
+
+   QtNode& integral_2e_opr(reg.get("INTEGRAL_2E_OPR"));
+   qui_use_case.addRule(
+      If(qui_use_case == QtTrue,
+         integral_2e_opr.shouldBe("-1"),
+         integral_2e_opr.shouldBe("-2")
+      )
+   );
+
    // These are around the other way as the default is cfmm on
    node = &reg.get("QUI_CFMM");
    node->addRule(
@@ -631,16 +924,6 @@ void InputDialog::initializeQuiLogic()
          + Disable(m_ui.ftc_class_thresh_order) 
          + Disable(m_ui.ftc_class_thresh_mult) 
       )
-   );
-
-
-   // Advanced -> Large Molecule Methods -> CASE
-   node = &reg.get("INTEGRAL_2E_OPR");
-   node->addRule(
-     If(*node == QtTrue, 
-        Enable(m_ui.omega), 
-        Disable(m_ui.omega) 
-     )
    );
 
 
@@ -695,75 +978,62 @@ void InputDialog::initializeQuiLogic()
    );
 
 
-   // Advanced -> Correlated Methods -> Coupled-Cluster
-   /*node = &reg.get("CC_PROPERTIES");
-   node->addRule(
-      If(*node == QtTrue,
-         Enable(m_ui.cc_two_particle_properties)
-         + Enable(m_ui.cc_amplitude_response)
-         + Enable(m_ui.cc_full_response), 
-         Disable(m_ui.cc_two_particle_properties)
-         + Disable(m_ui.cc_amplitude_response)
-         + Disable(m_ui.cc_full_response)
-      ) 
-   );
-
-   node = &reg.get("CC_MP2NO_GUESS");
-   node->addRule(
-      If(*node == QtTrue,
-         Enable(m_ui.cc_mp2no_grad) + Enable(m_ui.threads), 
-         Disable(m_ui.cc_mp2no_grad) + Disable(m_ui.threads)
-      ) 
-   );*/
-
-
-   // Advanced -> Correlated Methods -> Coupled-Cluster -> Convergence
-   /*node = &reg.get("CC_DIIS");
-   node->addRule(
-      If(*node == S("Switch"),
-         Enable(m_ui.cc_diis12_switch), 
-         Disable(m_ui.cc_diis12_switch)
-      ) 
-   );*/
-
-
-   // Advanced -> Correlated Methods -> Active Space
-   node = &reg.get("CC_RESTART");
-   node->addRule(
-      If(*node == QtTrue,
-         Enable(m_ui.cc_restart_no_scf), 
-         Disable(m_ui.cc_restart_no_scf)
-      ) 
-   );
-
 
    // Advanced -> Excited States -> CIS
-   node = &reg.get("CIS_GUESS_DISK");
-   node->addRule(
-      If(*node == QtTrue,
-         Enable(m_ui.cis_guess_disk_type), 
-         Disable(m_ui.cis_guess_disk_type) 
+   QtNode& qui_cis_guess(reg.get("QUI_CIS_GUESS"));
+   QtNode& cis_guess_disk(reg.get("CIS_GUESS_DISK"));
+   QtNode& cis_guess_disk_type(reg.get("CIS_GUESS_DISK_TYPE"));
+
+   qui_cis_guess.addRule(
+      If(qui_cis_guess == "New Guess", 
+         cis_guess_disk.shouldBe(QtFalse) 
+          + Disable(m_ui.cis_guess_disk) + Disable(m_ui.cis_guess_disk_type),
+         cis_guess_disk.shouldBe(QtTrue)
+          + Enable(m_ui.cis_guess_disk) + Enable(m_ui.cis_guess_disk_type)
       )
+   );
+
+   qui_cis_guess.addRule(
+      If(qui_cis_guess == "Read Singlets", cis_guess_disk_type.shouldBe("2"))
+   );
+
+   qui_cis_guess.addRule(
+      If(qui_cis_guess == "Read Triplets", cis_guess_disk_type.shouldBe("0"))
+   );
+
+   qui_cis_guess.addRule(
+      If(qui_cis_guess == "Read Singlets & Triplets", cis_guess_disk_type.shouldBe("1"))
+   );
+
+
+   // Advanced -> Excited States -> ROKS
+   QtNode& roks(reg.get("ROKS"));
+   roks.addRule(
+      If(roks == QtTrue, 
+         Enable(m_ui.roks_level_shift) + unrestricted.shouldBe(QtFalse), 
+         Disable(m_ui.roks_level_shift)
+      ) 
    );
 
 
    // Advanced -> Excited States -> TD DFT
-   node = &reg.get("CIS_RAS");
-   node->addRule(
-      If(*node == QtTrue, 
-         Enable(m_ui.cis_ras_type)
-         + Enable(m_ui.cis_ras_cutoff_occupied)
-         + Enable(m_ui.cis_ras_cutoff_virtual)
+   QtNode& cis_ras(reg.get("CIS_RAS"));
+   cis_ras.addRule(
+      If(cis_ras == QtTrue, 
+         Enable(m_ui.cis_ras_type)               + Enable(m_ui.label_cis_ras_type)
+         + Enable(m_ui.cis_ras_cutoff_occupied)  + Enable(m_ui.label_cis_ras_cutoff_occupied)
+         + Enable(m_ui.cis_ras_cutoff_virtual)   + Enable(m_ui.label_cis_ras_cutoff_virtual)
          + Enable(m_ui.cis_ras_print),
-         Disable(m_ui.cis_ras_type) 
-         + Disable(m_ui.cis_ras_cutoff_occupied) 
-         + Disable(m_ui.cis_ras_cutoff_virtual) 
-         + Disable(m_ui.cis_ras_print) 
+         Disable(m_ui.cis_ras_type)              + Disable(m_ui.label_cis_ras_type)
+         + Disable(m_ui.cis_ras_cutoff_occupied) + Disable(m_ui.label_cis_ras_cutoff_occupied)
+         + Disable(m_ui.cis_ras_cutoff_virtual)  + Disable(m_ui.label_cis_ras_cutoff_virtual)
+         + Disable(m_ui.cis_ras_print)
       )
    );
 
 
    // Advanced -> Excited States -> EOM -> Properties
+
  /*  node = &reg.get("CC_EOM_PROPERTIES");
    node->addRule(
       If(*node == QtTrue, 

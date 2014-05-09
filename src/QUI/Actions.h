@@ -12,6 +12,7 @@
 
 
 #include <QWidget>
+#include <QLabel>
 #include <QSpinBox>
 #include "Logic.h"
 
@@ -25,10 +26,20 @@ inline Action Disable(QWidget* widget)
    return boost::bind(&QWidget::setEnabled, widget, false);
 }
 
-
 inline Action Enable(QWidget* widget) 
 {
    return boost::bind(&QWidget::setEnabled, widget, true);
+}
+
+
+inline Action Hide(QWidget* widget) 
+{
+   return boost::bind(&QWidget::hide, widget);
+}
+
+inline Action Show(QWidget* widget) 
+{
+   return boost::bind(&QWidget::show, widget);
 }
 
 
@@ -36,6 +47,13 @@ inline Action SetValue(QSpinBox* widget, int value )
 {
    return boost::bind(&QSpinBox::setValue, widget, value);
 }
+
+
+inline Action SetLabel(QLabel* label, QString const& text) 
+{
+   return boost::bind(&QLabel::setText, label, text);
+}
+
 
 
 void RemoveToolBoxPages(QToolBox* toolBox, QStringList const& pageNames);

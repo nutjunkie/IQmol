@@ -66,7 +66,7 @@ namespace Data {
                 AtomicNumber,
                 NmrShiftIsotropic,      NmrShiftRelative,       Mass, 
                 MultipoleExpansion,     MullikenCharge,         MultipoleDerivedCharge, 
-                AtomicCharge,           GasteigerCharge, 
+                AtomicCharge,           GasteigerCharge,        ChelpgCharge,
                 SpinDensity,            VdwRadius,              MultipoleExpansionList,
                 NmrReference,           NmrReferenceList
                /*---------------------  *---------------------  *--------------------- */

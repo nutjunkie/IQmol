@@ -1884,6 +1884,9 @@ QList<double> Molecule::atomicCharges(Data::Type::ID type)
       case Data::Type::MultipoleDerivedCharge:
          charges = atomicCharges<Data::MultipoleDerivedCharge>();
          break;
+      case Data::Type::ChelpgCharge:
+         charges = atomicCharges<Data::ChelpgCharge>();
+         break;
       case Data::Type::AtomicNumber:
          charges = atomicCharges<Data::AtomicNumber>();
          break;
@@ -2242,6 +2245,19 @@ void Molecule::initProperties()
       m_properties 
         << new PointChargePotential(Data::Type::MultipoleDerivedCharge, "ESP (MDC)", this);
    }
+
+   // ChelpG
+   if (m_currentGeometry->hasProperty<Data::ChelpgCharge>()) {
+      action = menu->addAction("CHELPG");
+      action->setCheckable(true);
+      action->setData(Data::Type::ChelpgCharge);
+      chargeTypes->addAction(action);
+      connect(action, SIGNAL(triggered()), this, SLOT(updateAtomicCharges()));
+      m_properties 
+        << new PointChargePotential(Data::Type::MultipoleDerivedCharge, "ESP (CHELPG)", this);
+   }
+
+
 
    if (m_currentGeometry->hasProperty<Data::MultipoleExpansionList>()) {
       Data::MultipoleExpansionList& dma(

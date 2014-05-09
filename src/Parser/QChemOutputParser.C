@@ -176,6 +176,10 @@ bool QChemOutput::parse(TextStream& textStream)
          textStream.skipLine(3);
          readCharges(textStream, currentGeometry, "Mulliken");
 
+      }else if (line.contains("Ground-State ChElPG Net Atomic Charges")) {
+         textStream.skipLine(3);
+         readCharges(textStream, currentGeometry, "CHELPG");
+ 
       }else if (line.contains("Stewart Net Atomic Charges")) {
          textStream.skipLine(3);
          readCharges(textStream, currentGeometry, "Stewart");
@@ -684,6 +688,8 @@ void QChemOutput::readCharges(TextStream& textStream, Data::Geometry* geometry,
       }
    }else if (label == "Stewart") {
       allOk = geometry->setAtomicProperty<Data::MultipoleDerivedCharge>(charges);
+   }else if (label == "CHELPG") {
+      allOk = geometry->setAtomicProperty<Data::ChelpgCharge>(charges);
    }else {
       m_errors.append("Unknown charge type");
    }
