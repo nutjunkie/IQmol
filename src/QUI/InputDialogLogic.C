@@ -669,6 +669,16 @@ void InputDialog::initializeQuiLogic()
    qui_eom_ip.addRule(rule);   qui_eom_ea.addRule(rule);
 
 
+   job_type.addRule(
+      If(job_type == "Geometry"    || job_type == "Reaction Path"    ||
+         job_type == "Frequencies" || job_type == "Transition State" ||
+         job_type == "Forces", 
+         Enable(m_ui.cc_state_to_opt)  + Enable(m_ui.label_cc_state_to_opt), 
+         Disable(m_ui.cc_state_to_opt) + Disable(m_ui.label_cc_state_to_opt) 
+      )
+   );
+
+
 
 
 

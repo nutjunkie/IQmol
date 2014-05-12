@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>860</width>
-    <height>878</height>
+    <width>843</width>
+    <height>812</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -447,7 +447,7 @@ QToolButton:checked {
               <bool>true</bool>
              </property>
              <property name="currentIndex">
-              <number>4</number>
+              <number>3</number>
              </property>
              <property name="tabSpacing">
               <number>-1</number>
@@ -457,8 +457,8 @@ QToolButton:checked {
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>437</width>
-                <height>138</height>
+                <width>420</width>
+                <height>72</height>
                </rect>
               </property>
               <attribute name="label">
@@ -512,8 +512,8 @@ QToolButton:checked {
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>437</width>
-                <height>138</height>
+                <width>420</width>
+                <height>72</height>
                </rect>
               </property>
               <attribute name="label">
@@ -571,8 +571,8 @@ QToolButton:checked {
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>437</width>
-                <height>138</height>
+                <width>420</width>
+                <height>72</height>
                </rect>
               </property>
               <attribute name="label">
@@ -767,15 +767,15 @@ QToolButton:checked {
               <property name="geometry">
                <rect>
                 <x>0</x>
-                <y>0</y>
-                <width>437</width>
-                <height>138</height>
+                <y>-40</y>
+                <width>421</width>
+                <height>177</height>
                </rect>
               </property>
               <attribute name="label">
                <string>EOM</string>
               </attribute>
-              <layout class="QVBoxLayout" name="verticalLayout_18">
+              <layout class="QVBoxLayout" name="verticalLayout_6">
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_6">
                  <item>
@@ -829,28 +829,18 @@ QToolButton:checked {
                 </layout>
                </item>
                <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_7">
-                 <item>
+                <layout class="QGridLayout" name="gridLayout_7">
+                 <item row="0" column="0">
                   <widget class="QLabel" name="label_eom1">
                    <property name="text">
                     <string>Singlets</string>
                    </property>
                   </widget>
                  </item>
-                 <item>
+                 <item row="0" column="1">
                   <widget class="QLineEdit" name="qui_eom_states1"/>
                  </item>
-                 <item>
-                  <widget class="QLabel" name="label_eom2">
-                   <property name="text">
-                    <string>Triplets</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="qui_eom_states2"/>
-                 </item>
-                 <item>
+                 <item row="0" column="4">
                   <spacer name="horizontalSpacer_16">
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
@@ -862,6 +852,66 @@ QToolButton:checked {
                     </size>
                    </property>
                   </spacer>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_eom2">
+                   <property name="text">
+                    <string>Triplets</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QLineEdit" name="qui_eom_states2"/>
+                 </item>
+                 <item row="0" column="2">
+                  <widget class="QLabel" name="label_cc_state_to_opt">
+                   <property name="text">
+                    <string>State to optimize</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="3">
+                  <widget class="QLineEdit" name="cc_state_to_opt">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>105</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="sizeIncrement">
+                    <size>
+                     <width>0</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0" colspan="2">
+                  <widget class="QCheckBox" name="cc_eom_properties">
+                   <property name="text">
+                    <string>Excited State Properties</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="2" colspan="2">
+                  <widget class="QCheckBox" name="cc_eom_transition_properties">
+                   <property name="text">
+                    <string>Transition Properties</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="2" colspan="3">
+                  <widget class="QCheckBox" name="eom_ref_prop_te">
+                   <property name="text">
+                    <string>2 Electron Transition Properties</string>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
@@ -1015,8 +1065,8 @@ QToolButton:checked {
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>437</width>
-                <height>138</height>
+                <width>420</width>
+                <height>72</height>
                </rect>
               </property>
               <attribute name="label">
@@ -1179,8 +1229,8 @@ QToolButton:checked {
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>437</width>
-                <height>138</height>
+                <width>405</width>
+                <height>84</height>
                </rect>
               </property>
               <attribute name="label">
@@ -1241,7 +1291,7 @@ QToolButton:checked {
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>422</width>
+                <width>407</width>
                 <height>159</height>
                </rect>
               </property>
@@ -1383,8 +1433,8 @@ QToolButton:checked {
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>437</width>
-                <height>138</height>
+                <width>423</width>
+                <height>108</height>
                </rect>
               </property>
               <attribute name="label">
@@ -1596,11 +1646,6 @@ QToolButton:checked {
             </property>
             <item>
              <property name="text">
-              <string>Properties</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
               <string>Surface Crossing</string>
              </property>
             </item>
@@ -1699,7 +1744,7 @@ QToolButton:checked {
            <enum>QFrame::Sunken</enum>
           </property>
           <property name="currentIndex">
-           <number>17</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="AdvancedSCFControl">
            <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -3759,6 +3804,16 @@ QToolButton:checked {
           <widget class="QWidget" name="AdvancedEOMStates">
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
+             <widget class="QLabel" name="label_38">
+              <property name="text">
+               <string>This panel is never displayed, it 
+just forms a container for the 
+various EOM state specification 
+widgets.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QLineEdit" name="ee_states"/>
             </item>
             <item>
@@ -3809,86 +3864,6 @@ QToolButton:checked {
                <size>
                 <width>20</width>
                 <height>281</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="AdvancedProperties">
-           <layout class="QVBoxLayout" name="verticalLayout_20">
-            <item>
-             <widget class="QGroupBox" name="groupBox_18">
-              <property name="title">
-               <string>EOM Properties</string>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_7">
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_10">
-                 <item>
-                  <widget class="QLabel" name="label_220">
-                   <property name="text">
-                    <string>State to optimize</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="cc_state_to_opt">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>105</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="sizeIncrement">
-                    <size>
-                     <width>0</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="cc_eom_properties">
-                 <property name="text">
-                  <string>Excited State Properties</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="cc_eom_transition_properties">
-                 <property name="text">
-                  <string>Transition Properties</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="eom_ref_prop_te">
-                 <property name="text">
-                  <string>2 Electron Transition Properties</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <spacer name="verticalSpacer_4">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>263</height>
                </size>
               </property>
              </spacer>
@@ -6247,7 +6222,7 @@ Eventually this should go.</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>860</width>
+     <width>843</width>
      <height>22</height>
     </rect>
    </property>
