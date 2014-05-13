@@ -232,6 +232,13 @@ void SurfaceAnimatorDialog::computeIsovalueAnimation()
    bool isSigned(true);
    bool simplifyMesh(m_dialog.simplifyMesh->isChecked());
 
+
+   QProgressDialog progressDialog("Calculating surfaces", "Cancel", 0, nFrames, this);
+   progressDialog.setWindowModality(Qt::WindowModal);
+
+   int totalProgress(0);
+   progressDialog.setValue(totalProgress);
+
    for (int i = 0; i < nFrames; ++i) {
        if (surface) surface->setCheckState(Qt::Unchecked);
 
@@ -245,6 +252,10 @@ void SurfaceAnimatorDialog::computeIsovalueAnimation()
           frames.append(new Animator::Combo::Data(geom, surface));
        }
        isovalue1 += dIso;
+
+       ++totalProgress;
+       progressDialog.setValue(totalProgress);
+       if (progressDialog.wasCanceled()) return;
    }
 
    m_animator = new Animator::Combo(m_molecule, frames, nFrames, m_speed);
