@@ -1,7 +1,8 @@
 CONFIG += no_keywords release
 QT     += xml opengl
 
-QMAKE_CXXFLAGS += -O0 -g
+QMAKE_CXXFLAGS += -O2 -g
+#QMAKE_CXXFLAGS += -O0 -g
 
 macx {
    # OpenBabel

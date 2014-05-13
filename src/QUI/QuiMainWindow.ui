@@ -447,7 +447,7 @@ QToolButton:checked {
               <bool>true</bool>
              </property>
              <property name="currentIndex">
-              <number>3</number>
+              <number>4</number>
              </property>
              <property name="tabSpacing">
               <number>-1</number>
@@ -767,9 +767,9 @@ QToolButton:checked {
               <property name="geometry">
                <rect>
                 <x>0</x>
-                <y>-40</y>
-                <width>421</width>
-                <height>177</height>
+                <y>0</y>
+                <width>405</width>
+                <height>165</height>
                </rect>
               </property>
               <attribute name="label">
@@ -840,7 +840,7 @@ QToolButton:checked {
                  <item row="0" column="1">
                   <widget class="QLineEdit" name="qui_eom_states1"/>
                  </item>
-                 <item row="0" column="4">
+                 <item row="0" column="3">
                   <spacer name="horizontalSpacer_16">
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
@@ -863,50 +863,54 @@ QToolButton:checked {
                  <item row="1" column="1">
                   <widget class="QLineEdit" name="qui_eom_states2"/>
                  </item>
-                 <item row="0" column="2">
-                  <widget class="QLabel" name="label_cc_state_to_opt">
-                   <property name="text">
-                    <string>State to optimize</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="3">
-                  <widget class="QLineEdit" name="cc_state_to_opt">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>105</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="sizeIncrement">
-                    <size>
-                     <width>0</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                  </widget>
-                 </item>
                  <item row="2" column="0" colspan="2">
+                  <layout class="QHBoxLayout" name="horizontalLayout_7">
+                   <item>
+                    <widget class="QLabel" name="label_cc_state_to_opt">
+                     <property name="text">
+                      <string>State to optimize</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="cc_state_to_opt">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>105</width>
+                       <height>16777215</height>
+                      </size>
+                     </property>
+                     <property name="sizeIncrement">
+                      <size>
+                       <width>0</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item row="0" column="2">
                   <widget class="QCheckBox" name="cc_eom_properties">
                    <property name="text">
                     <string>Excited State Properties</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="2" column="2" colspan="2">
+                 <item row="1" column="2">
                   <widget class="QCheckBox" name="cc_eom_transition_properties">
                    <property name="text">
                     <string>Transition Properties</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="3" column="2" colspan="3">
+                 <item row="2" column="2">
                   <widget class="QCheckBox" name="eom_ref_prop_te">
                    <property name="text">
                     <string>2 Electron Transition Properties</string>

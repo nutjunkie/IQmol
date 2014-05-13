@@ -56,15 +56,15 @@ bool isPostHF()
    OptionRegister& reg(OptionRegister::instance());
    QtNode& correlation(reg.get("CORRELATION"));
    QString value(correlation.getValue().toUpper());
-   return (value == "MP2")     || (value == "MP3")       || (value == "MP4")      ||  
-          (value == "MP4SDQ")  || (value == "LOCAL_MP2") || (value == "RIMP2")    ||  
-          (value == "SOSMP2")  || (value == "MOSMP2")    || (value == "RILMP2")   ||  
-          (value == "CCD")     || (value == "CCD(2)")    || (value == "CCSD")     ||  
-          (value == "CCSD(T)") || (value == "CCSD(2)")   || (value == "QCCD")     ||  
-          (value == "VQCCD")   || (value == "QCISD")     || (value == "QCISD(T)") ||
-          (value == "OD")      || (value == "OD(T)")     || (value == "OD(2)")    ||  
-          (value == "VOD")     || (value == "VOD(2)")    || (value == "CIS(D)")   ||  
-          (value == "RCIS(D)") || (value == "SOSCIS(D)") || (value == "SOSCIS(D0)");
+   return (value == "MP2")       || (value == "MP3")        || (value == "MP4")      ||  
+          (value == "MP4SDQ")    || (value == "LOCAL_MP2")  || (value == "RI-MP2")    ||  
+          (value == "SOSMP2")    || (value == "MOSMP2")     || (value == "RILMP2")   ||  
+          (value == "CCD")       || (value == "CCD(2)")     || (value == "CCSD")     ||  
+          (value == "CCSD(T)")   || (value == "CCSD(2)")    || (value == "QCCD")     ||  
+          (value == "VQCCD")     || (value == "QCISD")      || (value == "QCISD(T)") ||
+          (value == "OD")        || (value == "OD(T)")      || (value == "OD(2)")    ||  
+          (value == "VOD")       || (value == "VOD(2)")     || (value == "CIS(D)")   ||  
+          (value == "RI-CIS(D)") || (value == "SOS-CIS(D)") || (value == "SOS-CIS(D0)");
 }
 
 
@@ -110,9 +110,9 @@ bool requiresAuxBasis()
    QtNode& correlation(reg.get("CORRELATION"));
    QString value(correlation.getValue().toUpper());
 
-   bool tf((value == "RIMP2")     ||  (value == "SOSMP2")     || 
-           (value == "MOSMP2")    ||  (value == "RICIS(D)")   ||
-           (value == "SOSCIS(D)") ||  (value == "SOSCIS(D0)") ||
+   bool tf((value == "RI-MP2")     ||  (value == "SOSMP2")     || 
+           (value == "MOSMP2")    ||  (value == "RI-CIS(D)")   ||
+           (value == "SOS-CIS(D)") ||  (value == "SOS-CIS(D0)") ||
            (value == "CCD")       ||  (value == "CCD(2)")     ||
            (value == "CCSD")      ||  (value == "CCSD(T)")    ||
            (value == "CCSD(2)")   ||  (value == "CCSD(dT)")   ||
@@ -525,9 +525,9 @@ void InputDialog::initializeQuiLogic()
    method.addRule(
       If(method == "CIS"       || 
          method == "TD-DFT"    || 
-         method == "RICIS(D)"  || 
-         method == "SOSCIS(D)" || 
-         method == "SOSCIS(D0)", cis_n_roots.shouldBeAtLeast("1"))
+         method == "RI-CIS(D)"  || 
+         method == "SOS-CIS(D)" || 
+         method == "SOS-CIS(D0)", cis_n_roots.shouldBeAtLeast("1"))
    );
 
    spin_flip_xcis.addRule(

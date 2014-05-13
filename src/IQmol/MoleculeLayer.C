@@ -139,8 +139,8 @@ Molecule::Molecule(QObject* parent) : Base(DefaultMoleculeName, parent),
 #warning "################################";
 #warning "# !!! TURN OFF FOR RELEASE !!! #";
 #warning "################################";
-   connect(newAction("Dump Data"), SIGNAL(triggered()), 
-      this, SLOT(dumpData()));
+//   connect(newAction("Dump Data"), SIGNAL(triggered()), 
+//      this, SLOT(dumpData()));
 
    initProperties();
 

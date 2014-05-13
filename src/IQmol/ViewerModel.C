@@ -394,7 +394,7 @@ void ViewerModel::toggleAxes()
 void ViewerModel::updateVisibleObjects()
 {
    if (!m_updateEnabled) return;
-   QLOG_TRACE() << "Updating visible objects";
+   //QLOG_TRACE() << "Updating visible objects";
    // We don't want nested objects as Fragments should appear as one object in
    // the Viewer.  This means the Fragment is respnsible for drawing its children
    m_visibleObjects = findLayers<Layer::GLObject>(Layer::Children | Layer::Visible | 
