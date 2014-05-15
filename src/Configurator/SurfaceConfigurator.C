@@ -60,7 +60,7 @@ void Surface::sync()
 
    if (m_surface.hasProperty()) {
       m_gradientColors = m_surface.colors();
-      m_surfaceConfigurator.scaleButton->setEnabled(true);
+      m_surfaceConfigurator.scaleButton->setEnabled(m_surface.propertyIsSigned());
    }
 
    double area(m_surface.area());
@@ -137,7 +137,8 @@ void Surface::on_propertyCombo_currentIndexChanged(int)
       m_surfaceConfigurator.negativeLabel->setVisible(true);
       m_surfaceConfigurator.negativeColorButton->setVisible(false);
       m_surfaceConfigurator.swapColorsButton->setEnabled(false);
-      m_surfaceConfigurator.scaleButton->setEnabled(true);
+
+      m_surfaceConfigurator.scaleButton->setEnabled(m_surface.propertyIsSigned());
 
       QList<Layer::Molecule*> parents(m_surface.findLayers<Layer::Molecule>(Layer::Parents));
 

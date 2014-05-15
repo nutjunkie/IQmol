@@ -57,6 +57,7 @@ namespace Data {
          void setVisibility(bool const tf) { m_isVisible = tf; }
 
          bool hasProperty() const;
+         bool propertyIsSigned() const;
          bool isSigned() const { return m_isSigned; }
          QString const& description() const { return m_description; }
          void setDescription(QString const& description) { m_description = description; }

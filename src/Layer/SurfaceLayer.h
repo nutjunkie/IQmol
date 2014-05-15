@@ -78,6 +78,7 @@ namespace IQmol {
             void clearPropertyData();
             bool isSigned() const { return m_surface.isSigned(); }
             bool hasProperty() const { return m_surface.hasProperty(); }
+            bool propertyIsSigned() const { return m_surface.propertyIsSigned(); }
             bool isVdW() const;
             void getPropertyRange(double& min, double& max) const;
             void setDrawMode(DrawMode const mode) { m_drawMode = mode; }

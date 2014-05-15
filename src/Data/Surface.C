@@ -91,6 +91,12 @@ void Surface::clearSurfaceProperty()
 }
 
 
+bool Surface::propertyIsSigned() const
+{
+   return (hasProperty() && m_min < 0 && m_max > 0);
+}
+
+
 void Surface::getPropertyRange(double& min, double& max) const
 {
    min = m_min;

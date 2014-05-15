@@ -40,7 +40,8 @@ ProgressDialog::ProgressDialog(QString const& title, Task& task)
 void ProgressDialog::closeAndDelete()
 {
    close();
-   deleteLater();
+   // This causes a crash on Windows
+   //deleteLater();
 }
 
 } // end namespace IQmol
