@@ -22,7 +22,6 @@
 
 #include "Preferences.h"
 #include "PreferencesBrowser.h"
-#include "ShaderLibrary.h"
 #include <QApplication>
 #include <QFileDialog>
 #include <QColorDialog>
@@ -40,7 +39,6 @@ namespace Preferences {
 
 static QString s_organization = "iqmol.org";
 static QString s_application  = "IQmol";
-static int s_maxRecentFiles = 10;
 
 // On Windows the QSettings 'source' does not get updated when creating a new
 // QSettings object, which means settings only get updated when IQmol is

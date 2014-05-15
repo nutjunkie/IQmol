@@ -28,6 +28,7 @@
 #include <QFileInfo>
 #include <QMutexLocker>
 #include <QInputDialog>
+#include <QRegExpValidator>
 
 #ifdef WIN32
 #include <winsock2.h>

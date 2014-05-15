@@ -29,17 +29,13 @@
 namespace IQmol {
 namespace Data {
 
-   /// Template class representing a list of Data object pointers.  Note that
-   /// on destruction the List detetes the contained objects.  To avoid this the
-   /// objects should be taken using the QList::take*() functions.
+   /// Template class representing a list of Data object pointers.  
    template <class T>
    class List : public Base, public QList<T*> {
 
       friend class boost::serialization::access;
 
       public:
-         ~List() { destroy(); }
-
          const static Type::ID TypeID;
          Type::ID typeID() const { return TypeID; }
 
@@ -64,10 +60,13 @@ namespace Data {
       protected:
          void destroy() 
          {
+/*          Deletion on destruction leads to rather counter-intuitive behaviour
+
             for (int i = 0; i < this->size(); ++i) {
                 delete this->at(i);
             }
             this->clear();
+*/
          }
 
          void serializeList(InputArchive& ar, unsigned int const version = 0) 

@@ -124,6 +124,8 @@ void MultipoleExpansion::dump() const
 }
 
 
+/* gcc on Windows doesn't like this
+
 template<>
 void MultipoleExpansionList::dump() const
 {
@@ -146,5 +148,6 @@ void MultipoleExpansionList::dump() const
    }
    qDebug() << "   Dipole:" << x << y << z;
 }
+*/
 
 } } // end namespace IQmol::Data

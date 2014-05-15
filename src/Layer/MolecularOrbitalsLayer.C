@@ -451,6 +451,7 @@ bool MolecularOrbitals::processGridQueue(GridQueue const& gridQueue)
              return false;
           }
        }
+       grids.clear();
    }
 
    return true;

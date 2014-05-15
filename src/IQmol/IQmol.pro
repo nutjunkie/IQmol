@@ -8,7 +8,7 @@ LIBS        += $$BUILD_DIR/libQui.a \
                $$BUILD_DIR/libLayer.a \
                $$BUILD_DIR/libConfigurator.a \
                $$BUILD_DIR/libUtil.a
-INCLUDEPATH += ../Util ../Data ../Parser ../Qui ../Layer ../Configurator
+INCLUDEPATH += . ../Util ../Data ../Parser ../Qui ../Layer ../Configurator
 INCLUDEPATH += $$BUILD_DIR/Qui   # Required for the ui_QuiMainWindow.h header
 
 macx:FORMS       += $$PWD/PeriodicTableMac.ui
@@ -193,6 +193,7 @@ HEADERS += \
 
 FORMS += \
    $$PWD/AboutDialog.ui \
+   $$PWD/BoundingBoxDialog.ui \
    $$PWD/FragmentTable.ui \
    $$PWD/GetVaultKeyDialog.ui \
    $$PWD/GradientDialog.ui \
