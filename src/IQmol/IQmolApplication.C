@@ -180,6 +180,9 @@ bool IQmolApplication::event(QEvent* event)
 
 void IQmolApplication::maybeQuit()
 {
+   QApplication::quit();  // no maybe about it, the rest is just annoying
+   return;
+
    disconnect(this, SIGNAL(lastWindowClosed()), this, SLOT(maybeQuit()));
 
    QPixmap pixmap;
