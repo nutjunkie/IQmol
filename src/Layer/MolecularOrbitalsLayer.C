@@ -63,6 +63,8 @@ MolecularOrbitals::MolecularOrbitals(Data::MolecularOrbitals& molecularOrbitals)
    connect(newAction("Edit Bounding Box"), SIGNAL(triggered()),
       this, SLOT(editBoundingBox()));
 
+   setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+
    m_configurator.sync();
    setConfigurator(&m_configurator);
 
