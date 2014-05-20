@@ -172,7 +172,7 @@ void GridData::combine(double const a, double const b, GridData const& B)
           for (unsigned j = 0; j < ny; ++j) {
               double z(m_origin.z);
               for (unsigned k = 0; k < nz; ++k) {
-                  m_data[i][j][k] = a*m_data[i][j][k] + b*B(x, y, z);
+                  m_data[i][j][k] = a*m_data[i][j][k] + b*B.interpolate(x, y, z);
                   z += m_delta.z;
               }
               y += m_delta.y;
@@ -221,7 +221,7 @@ GridData& GridData::operator-=(GridData const& that)
 }
 
 
-double GridData::operator()(double const x, double const y, double const z, bool) const
+double GridData::interpolate(double const x, double const y, double const z) const
 {
    double value(0.0);
 

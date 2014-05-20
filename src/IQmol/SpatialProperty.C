@@ -295,8 +295,7 @@ GridBased::GridBased(QString const& type, Data::GridData const& grid) : SpatialP
 
 double GridBased::evaluate(double const x, double const y, double const z) const
 {
-   bool ambiguousWeirdnessFUBAR(true);
-   return m_grid(x, y, z, ambiguousWeirdnessFUBAR);
+   return m_grid.interpolate(x, y, z);
 }
 
 } // end namespace IQmol

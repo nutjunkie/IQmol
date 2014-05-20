@@ -43,7 +43,7 @@ ColorGrid::ColorGrid(Data::GridData* grid, Gradient::Function const& gradient)
 
 QColor ColorGrid::operator()(double const x, double const y, double const z) const
 {
-   double value((*m_grid)(x, y, z, true));
+   double value(m_grid->interpolate(x, y, z));
    value = (value - m_min) / (m_max-m_min);
    return m_gradient.colorAt(value);
 }

@@ -87,16 +87,15 @@ namespace Data {
 		 /// Performs a tri-linear interpolation of the grid data at each of 
 		 /// the 8 nearest grid points about (x,y,z). Returns 0 outside the 
          /// range of the grid
-
-         // This is very weird.  A 3-argument version of this causes the ISO C++
-         // ambiguous error with the overloaded unsigned version above.  We add
-         // the extra argument only to resolve the abiguity.
-         double operator()(double const x, double const y, double const z, bool) const;
+         double interpolate(double const x, double const y, double const z) const;
 
 		 /// Performs a tri-linear interpolation of the gradient grid data at each
 		 /// of the 8 nearest grid points about (x,y,z). Returns (0,0,0) outside 
          /// the range of the grid
          qglviewer::Vec normal(double const x, double const y, double const z) const;
+
+         // computes this = a*this + b*B
+         void combine(double const a, double const b, GridData const& B);
 
          void serialize(InputArchive& ar, unsigned const version = 0) 
          {
@@ -112,9 +111,6 @@ namespace Data {
 
       private:
          void copy(GridData const&);
-
-         // computes this = a*this + b*B
-         void combine(double const a, double const b, GridData const& B);
 
          template <class Archive>
          void privateSerialize(Archive& ar, unsigned const) 

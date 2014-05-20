@@ -279,40 +279,31 @@ void SurfaceAnimatorDialog::computeMultiGridAnimation()
    QListWidgetItem* item(fileList->item(0));
    Layer::CubeData* cube(QVariantPointer<Layer::CubeData>::toPointer(item->data(Qt::UserRole)));
 
-   Data::CubeData* A = new Data::CubeData(cube->cubeData());
-   Data::CubeData* B(0);
-
-   Data::SurfaceType surfaceType(Data::SurfaceType::CubeData);
-   Data::GridSize size(A->size());
-   Data::GridData dAB(size, surfaceType);
-   Data::GridData   t(size, surfaceType);
-
    Animator::Combo::DataList frames;
    Layer::Surface* surface;
-
    QString label;
 
+   int totalProgress(0);
    int totalSurfaces((m_referenceFrames-1)*interpolationFrames);
    QProgressDialog progressDialog("Calculating surfaces", "Cancel", 0, 
       totalSurfaces, this);
    progressDialog.setWindowModality(Qt::WindowModal);
-
-   int totalProgress(0);
    progressDialog.setValue(totalProgress);
+
+   Data::CubeData* A(new Data::CubeData(cube->cubeData()));
+   Data::CubeData* B(0);
 
    // loop over grids
    for (int i = 1; i < m_referenceFrames; ++i) {
-       if (progressDialog.wasCanceled()) return;
+       if (progressDialog.wasCanceled()) {
+          delete A;
+          return;
+       }
 
        Data::Geometry const& geomA(cube->cubeData().geometry());
        item = fileList->item(i);
        cube = QVariantPointer<Layer::CubeData>::toPointer(item->data(Qt::UserRole));
        Data::Geometry const& geomB(cube->cubeData().geometry());
-
-//qDebug() << "first geom";
-//geomA.dump();
-//qDebug() << "second geom";
-//geomB.dump();
 
        // Geometry displacements
        QList<Vec> displacements;
@@ -322,10 +313,11 @@ void SurfaceAnimatorDialog::computeMultiGridAnimation()
        }
 
        // Grid displacements
-       B    = new Data::CubeData(cube->cubeData());
-       t    = (*A);
-       dAB  = (*B);
-       dAB -= t;
+       B = new Data::CubeData(cube->cubeData());
+
+       Data::GridData dAB(*A);
+       Data::GridData   t(*A);
+       dAB.combine(-1.0, 1.0, *B);
 
        surface = calculateSurface(dAB, isovalue);
        surface->setText("Difference Surface");
@@ -351,10 +343,16 @@ void SurfaceAnimatorDialog::computeMultiGridAnimation()
 
            ++totalProgress;
            progressDialog.setValue(totalProgress);
-           if (progressDialog.wasCanceled()) return;
+           if (progressDialog.wasCanceled()) {
+              delete A;
+              delete B;
+              return;
+           }
 
            t += dAB;  // increment the interpolation grid
        }
+
+       delete A;
        A = B;
    }
 
@@ -368,7 +366,6 @@ void SurfaceAnimatorDialog::computeMultiGridAnimation()
    connect(m_animator, SIGNAL(finished()), this, SLOT(animationStopped()));
    m_dialog.playbackBox->setEnabled(true); 
 
-   delete A;
    delete B;
 }
 
@@ -389,14 +386,15 @@ Layer::Surface* SurfaceAnimatorDialog::calculateSurface(Data::GridData const& gr
    mc.generateMesh( isovalue, surfaceData->meshPositive());
    mc.generateMesh(-isovalue, surfaceData->meshNegative());
 
-   double delta(Data::GridSize::stepSize(surfaceInfo.quality()));
+   qglviewer::Vec d(grid.delta());
+   double delta((d.x+d.y+d.z)/3.0);
 
    if (surfaceInfo.simplifyMesh()) {
       MeshDecimator posdec(surfaceData->meshPositive());
       if (!posdec.decimate(delta)) {
          QLOG_ERROR() << "Mesh decimation failed:" << posdec.error();
       }
-      MeshDecimator negdec(surfaceData->meshPositive());
+      MeshDecimator negdec(surfaceData->meshNegative());
       if (!negdec.decimate(delta)) {
          QLOG_ERROR() << "Mesh decimation failed:" << negdec.error();
       }
