@@ -174,7 +174,7 @@ class InputDialog : public QMainWindow {
       void setControls(Job* job);
       void resetControls();
       void initializeMenus();
-      void initializeControls();
+      bool initializeControls();
       void initializeQuiLogic();
       void initializeToolBoxOptions();
 

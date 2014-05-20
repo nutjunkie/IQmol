@@ -50,6 +50,12 @@ static QMap<QString, QVariant> s_preferencesCache;
 Browser::Browser(QWidget* parent) : QDialog(parent) 
 {
    m_preferencesBrowser.setupUi(this);
+   init();
+}
+
+
+void Browser::init()
+{
    // These are the options we allow the user to edit in the Browser.  If you
    // add another option here, then you also need to update the
    // Browser::on_okButtonClicked function below.
@@ -79,7 +85,6 @@ Browser::Browser(QWidget* parent) : QDialog(parent)
 
 void Browser::on_buttonBox_accepted()  
 {
-   FragmentDirectory(m_preferencesBrowser.fragmentDirectoryLineEdit->text());
    LoggingEnabled(m_preferencesBrowser.loggingEnabledCheckBox->checkState() == Qt::Checked);
    bool logFileHidden(m_preferencesBrowser.logFileHiddenCheckBox->checkState() == Qt::Checked);
    LogFileHidden(logFileHidden);
@@ -101,8 +106,16 @@ void Browser::on_buttonBox_accepted()
 
    LogFilePath(logFile.filePath());
    m_preferencesBrowser.logFileLineEdit->setText(logFile.filePath());
+   
+   // Don't overwrite the default locations unless the user has changed them
+   QString oldLocation(QChemDatabaseFilePath());
+   QString newLocation(m_preferencesBrowser.qchemDatabaseFileLineEdit->text());
+   if (oldLocation != newLocation) QChemDatabaseFilePath(newLocation);
+   
+   oldLocation = FragmentDirectory();
+   newLocation = m_preferencesBrowser.fragmentDirectoryLineEdit->text();
+   if (oldLocation != newLocation) FragmentDirectory(newLocation);
 
-   QChemDatabaseFilePath(m_preferencesBrowser.qchemDatabaseFileLineEdit->text());
    DefaultForceField(m_preferencesBrowser.forceFieldCombo->currentText());
    UndoLimit(m_preferencesBrowser.undoLimit->value());
    LabelFontSize(m_preferencesBrowser.labelFontSize->value());
@@ -127,6 +140,13 @@ void Browser::on_browseQChemDatabaseFileButton_clicked(bool)
 {
    bool mustExist(true);
    setFilePath(m_preferencesBrowser.qchemDatabaseFileLineEdit, mustExist);
+}
+
+
+void Browser::on_resetButton_clicked(bool)
+{
+   ResetBrowserPreferences();
+   init();
 }
 
 

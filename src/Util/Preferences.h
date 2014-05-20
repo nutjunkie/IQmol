@@ -40,6 +40,8 @@
 namespace IQmol {
 namespace Preferences {
 
+   void ResetBrowserPreferences();
+
    QSize ViewerWindowSize();
    void   ViewerWindowSize(QSize const&);
    

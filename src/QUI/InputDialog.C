@@ -97,7 +97,12 @@ bool InputDialog::init()
    initializeToolBoxOptions();
 
    initializeQuiLogic();
-   initializeControls();
+   if (!initializeControls()) {
+      QString msg("QChem option database load failed\n");
+      msg += "Database may be out of date, check location in the Preferences.";
+      QMsgBox::warning(0, "IQmol", msg);
+      return false;
+   }
 
    resetInput();
 
@@ -912,13 +917,13 @@ void InputDialog::on_qui_multiplicity_valueChanged(int value)
 // a similar way.  What this means is that this function should be the only one
 // that has the implementation case switch logic and also the only one that needs
 // to perform dynamic casts on the controls.
-void InputDialog::initializeControls() 
+bool InputDialog::initializeControls() 
 {
    QList<QWidget*> controls(findChildren<QWidget*>());
    QWidget* control;
    QString name, value;
    Option opt;
-  
+
    for (int i = 0; i < controls.count(); ++i) {
        control = controls[i];
        name = control->objectName().toUpper();
@@ -932,42 +937,42 @@ void InputDialog::initializeControls()
 
              case Option::Impl_Combo: {
                 QComboBox* combo = qobject_cast<QComboBox*>(control);
-                Q_ASSERT(combo);
+                if (!combo) return false;
                 initializeControl(opt, combo);
              }
              break;
 
              case Option::Impl_Check: {
                 QCheckBox* check = qobject_cast<QCheckBox*>(control);
-                Q_ASSERT(check);
+                if (!check) return false;
                 initializeControl(opt, check);
              }
              break;
  
              case Option::Impl_Text: {
                 QLineEdit* edit = qobject_cast<QLineEdit*>(control);
-                Q_ASSERT(edit);
+                if (!edit) return false;
                 initializeControl(opt, edit);
              }
              break;
  
              case Option::Impl_Spin: {
                 QSpinBox* spin = qobject_cast<QSpinBox*>(control);
-                Q_ASSERT(spin);
+                if (!spin) return false;
                 initializeControl(opt, spin);
              }
              break;
  
              case Option::Impl_DSpin: {
                 QDoubleSpinBox* dspin = qobject_cast<QDoubleSpinBox*>(control);
-                Q_ASSERT(dspin);
+                if (!dspin) return false;
                 initializeControl(opt, dspin);
              }
              break;
  
              case Option::Impl_Radio: {
                 QRadioButton* radio = qobject_cast<QRadioButton*>(control);
-                Q_ASSERT(radio);
+                if (!radio) return false;
                 initializeControl(opt, radio);
              }
              break;
@@ -984,6 +989,7 @@ void InputDialog::initializeControls()
           if (m_reg.exists(name)) m_reg.get(name).setValue(opt.getDefaultValue());
        }
     }
+    return true;
 }
 
 

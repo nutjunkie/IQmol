@@ -47,12 +47,14 @@ namespace Preferences {
          void on_browseFragmentDirectoryButton_clicked(bool);
          void on_browseQChemDatabaseFileButton_clicked(bool);
          void on_browseLogFileButton_clicked(bool);
+         void on_resetButton_clicked(bool);
 
       private:
          Ui::PreferencesBrowser m_preferencesBrowser;
 
          void setPath(QLineEdit* edit);
          void setFilePath(QLineEdit* edit, bool const mustExist = false);
+         void init();
    };
 
 } } // end namespace IQmol::Preferences

@@ -66,6 +66,26 @@ template <class T> QMap<QString,T> GetMap(QString const& name);
 template <class T> void            SetMap(QString const& name, QMap<QString,T> const& map);
 
 
+void ResetBrowserPreferences()
+{
+   // We only reset the preferences that show in the Preferences Browser
+   QStringList options;
+   options << "DefaultForceField"
+           << "UndoLimit"
+           << "LabelFontSize"
+           << "FragmentDirectory"
+           << "QChemDatabaseFilePath"
+           << "LogFilePath"
+           << "LogFileHidden"
+           << "LoggingEnabled";
+
+   QSettings settings(QSettings::UserScope, s_organization, s_application);
+   for (int i = 0; i < options.size(); ++i) {
+       s_preferencesCache.remove(options[i]);
+       settings.remove(options[i]);
+   }
+}
+
 
 // Size of the InputDialog window
 QSize MainWindowSize() 
