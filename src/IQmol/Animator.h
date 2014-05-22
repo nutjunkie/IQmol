@@ -185,11 +185,12 @@ namespace Animator {
          typedef QList<Data*> DataList;
 
          Combo(Layer::Molecule*, DataList const& frames, int const interpolationFrames, 
-            double const speed, bool const bounce = false);
+            double const speed);
          ~Combo();
            
          void update(double const time, double const amplitude);
-         void setBounceMode(bool bounce) { m_bounce = bounce; }
+         void setBounceMode(bool bounce);
+         void setLoopMode(bool loop);
          void stepForward();
          void stepBack();
          void reset();
@@ -201,10 +202,11 @@ namespace Animator {
          Layer::Molecule* m_molecule;
          DataList m_frames;
          bool m_bounce;
+         bool m_loop;
          int  m_interpolationFrames;
+         int  m_referenceFrames;
          int  m_currentIndex;
    };
-
 
 
 }

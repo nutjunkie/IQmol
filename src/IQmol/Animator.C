@@ -25,8 +25,6 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
-#include <QDebug>
-
 
 using namespace qglviewer;
 
@@ -149,13 +147,18 @@ void Path::update(double const time, double const amplitude)
 }
 
 
+
 // --------------- Combo ---------------
 
 Combo::Combo(Layer::Molecule* molecule, DataList const& frames, int const interpolationFrames, 
-   double const speed, bool const bounce) : Base(1.0, speed, Ramp), m_molecule(molecule),
-   m_frames(frames), m_bounce(bounce), m_interpolationFrames(interpolationFrames), 
+   double const speed) : Base(1.0, speed, Ramp), m_molecule(molecule), m_frames(frames), 
+   m_bounce(false), m_loop(false), m_interpolationFrames(interpolationFrames), 
    m_currentIndex(-1)
 { 
+   m_referenceFrames = 1 + (frames.size()-1)/(m_interpolationFrames+1);
+   int nCycles(m_bounce ? 2*m_referenceFrames-1 : m_referenceFrames-1);
+   setCycles(nCycles);
+
    DataList::iterator iter;
    for (iter = m_frames.begin(); iter != m_frames.end(); ++iter) {
        (*iter)->m_surface->setCheckState(Qt::Unchecked);
@@ -178,7 +181,6 @@ Combo::~Combo()
 void Combo::reset()
 {
    Base::reset();
-   //setCurrentIndex(0);
 }
 
 
@@ -194,6 +196,24 @@ void Combo::setCurrentIndex(int const n)
    m_currentIndex = n;
 }
            
+
+void Combo::setLoopMode(bool loop)
+{
+   m_loop = loop;
+   int nCycles(-1);
+   if (!m_loop) nCycles = m_bounce ? 2*m_referenceFrames-1 : m_referenceFrames-1;
+   setCycles(nCycles);
+}
+
+
+void Combo::setBounceMode(bool bounce) 
+{ 
+   m_bounce = bounce; 
+   int nCycles(-1);
+   if (!m_loop) nCycles = m_bounce ? 2*m_referenceFrames-1 : m_referenceFrames-1;
+   setCycles(nCycles);
+}
+
 
 void Combo::stepForward()
 {
@@ -212,7 +232,7 @@ void Combo::update(double const time, double const amplitude)
    Q_UNUSED(amplitude);
 
    int n(m_frames.size());
-   int index(time*m_interpolationFrames);
+   int index(time*(m_interpolationFrames+1));
    index = m_bounce ? (index % (2*n)) : (index % n);
    if (index >= n) index = 2*n - index - 1;
 

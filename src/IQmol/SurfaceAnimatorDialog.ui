@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>378</width>
+    <width>407</width>
     <height>646</height>
    </rect>
   </property>
@@ -123,7 +123,7 @@ QToolTip {
         <item>
          <widget class="QSpinBox" name="interpolationFrames">
           <property name="minimum">
-           <number>1</number>
+           <number>0</number>
           </property>
           <property name="maximum">
            <number>99</number>
@@ -145,6 +145,26 @@ QToolTip {
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QToolButton" name="reverseButton">
+          <property name="toolTip">
+           <string>Reverse file list order</string>
+          </property>
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="IQmol.qrc">
+            <normaloff>:/resources/icons/Up-down.png</normaloff>:/resources/icons/Up-down.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>24</width>
+            <height>24</height>
+           </size>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QToolButton" name="upButton">

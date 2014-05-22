@@ -55,6 +55,7 @@ namespace IQmol {
          void progress(double);
 
       private Q_SLOTS:
+         void on_reverseButton_clicked(bool);
          void on_upButton_clicked(bool);
          void on_downButton_clicked(bool);
          void on_negativeColorButton_clicked(bool);
@@ -95,11 +96,10 @@ namespace IQmol {
          double m_alpha;
 
          int  m_referenceFrames;
-         bool m_loop;
-         bool m_bounce;
          bool m_updateBonds;
          Animator::Combo* m_animator;
          bool m_surfaceCalculationCanceled;
+         Qt::SortOrder m_sortOrder;
    };
 
 } // end namespace IQmol

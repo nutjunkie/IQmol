@@ -1823,7 +1823,7 @@ void Molecule::reperceiveBonds(bool postCmd)
        for (int j = i+1; j < nHydrogens; ++j) {
            Atom* h2(hydrogens[j]);
            if (Atom::distance(h1, h2) < hydrogenBondLength) {
-              qDebug() << "Found H2 bond" << Atom::distance(h1, h2);
+              //qDebug() << "Found H2 bond" << Atom::distance(h1, h2);
               // Check if the two hydrogens are already bonded
               if (h2Bonds.contains(qMakePair(h1, h2)) || h2Bonds.contains(qMakePair(h2, h1))) {
               }else {

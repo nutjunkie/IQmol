@@ -43,8 +43,8 @@ using namespace qglviewer;
 namespace IQmol {
 
 SurfaceAnimatorDialog::SurfaceAnimatorDialog(Layer::Molecule* molecule) : 
-   QDialog(QApplication::activeWindow()), m_molecule(molecule), m_loop(false), 
-   m_bounce(false), m_updateBonds(false), m_animator(0)
+   QDialog(QApplication::activeWindow()), m_molecule(molecule), m_updateBonds(false), 
+   m_animator(0), m_sortOrder(Qt::DescendingOrder)
 {
    m_dialog.setupUi(this);
    m_colorPositive = Preferences::PositiveSurfaceColor(); 
@@ -94,6 +94,18 @@ void SurfaceAnimatorDialog::update()
 }
 
 
+void SurfaceAnimatorDialog::on_reverseButton_clicked(bool)
+{
+   QListWidget* fileList(m_dialog.fileList);
+   if (m_sortOrder == Qt::AscendingOrder) {
+      m_sortOrder = Qt::DescendingOrder;
+   }else {
+      m_sortOrder = Qt::AscendingOrder;
+   }
+   fileList->sortItems(m_sortOrder);
+}
+
+
 void SurfaceAnimatorDialog::on_upButton_clicked(bool)
 {
    QListWidget* fileList(m_dialog.fileList);
@@ -122,6 +134,8 @@ void SurfaceAnimatorDialog::on_calculateButton_clicked(bool)
 {
    if (m_animator) {
       on_playButton_clicked(false);
+      m_dialog.loopButton->setChecked(false);
+      m_dialog.bounceButton->setChecked(false);
       delete m_animator;
       m_animator = 0;
    }
@@ -213,10 +227,11 @@ void SurfaceAnimatorDialog::computeIsovalueAnimation()
    QListWidgetItem* item(fileList->item(0));
    if (!item) return;
 
-   int    nFrames(m_dialog.interpolationFrames->value());
+   int    interpolationFrames(m_dialog.interpolationFrames->value());
+   int    nFrames(2+interpolationFrames);
    double isovalue1(m_dialog.isovalue->value());
    double isovalue2(m_dialog.isovalue2->value());
-   double dIso((isovalue2-isovalue1)/nFrames);
+   double dIso((isovalue2-isovalue1)/(nFrames-1));
 
    Layer::CubeData* cube;
    cube = QVariantPointer<Layer::CubeData>::toPointer(item->data(Qt::UserRole));
@@ -255,12 +270,15 @@ void SurfaceAnimatorDialog::computeIsovalueAnimation()
 
        ++totalProgress;
        progressDialog.setValue(totalProgress);
+       QApplication::processEvents();
        if (progressDialog.wasCanceled()) return;
    }
 
-   m_animator = new Animator::Combo(m_molecule, frames, nFrames, m_speed);
+   m_animator = new Animator::Combo(m_molecule, frames, interpolationFrames, m_speed);
    connect(m_animator, SIGNAL(finished()), this, SLOT(animationStopped()));
    m_dialog.playbackBox->setEnabled(true); 
+   m_animator->setLoopMode(m_dialog.loopButton->isChecked());
+   m_animator->setBounceMode(m_dialog.bounceButton->isChecked());
 }
 
 
@@ -274,7 +292,7 @@ void SurfaceAnimatorDialog::computeMultiGridAnimation()
 
    int interpolationFrames(m_dialog.interpolationFrames->value());
    double isovalue(m_dialog.isovalue->value());
-   double delta = 1.0/interpolationFrames;
+   double delta = 1.0/(interpolationFrames+1);
 
    QListWidgetItem* item(fileList->item(0));
    Layer::CubeData* cube(QVariantPointer<Layer::CubeData>::toPointer(item->data(Qt::UserRole)));
@@ -284,7 +302,7 @@ void SurfaceAnimatorDialog::computeMultiGridAnimation()
    QString label;
 
    int totalProgress(0);
-   int totalSurfaces((m_referenceFrames-1)*interpolationFrames);
+   int totalSurfaces(m_referenceFrames + (m_referenceFrames-1)*interpolationFrames);
    QProgressDialog progressDialog("Calculating surfaces", "Cancel", 0, 
       totalSurfaces, this);
    progressDialog.setWindowModality(Qt::WindowModal);
@@ -326,10 +344,10 @@ void SurfaceAnimatorDialog::computeMultiGridAnimation()
        dAB *= delta;
 
        // loop over interpolation Frames
-       for (int j = 0; j < interpolationFrames; ++j) {
+       for (int j = 0; j <= interpolationFrames; ++j) {
            Data::Geometry geomT;
            for (unsigned a = 0; a < geomA.nAtoms(); ++a) {
-               double step = (double)j/(double)interpolationFrames;
+               double step = (double)j/(double)(interpolationFrames+1);
                Vec d(geomA.position(a) + step*displacements[a]);
                geomT.append(geomA.atomicNumber(a), d);
            }
@@ -343,6 +361,7 @@ void SurfaceAnimatorDialog::computeMultiGridAnimation()
 
            ++totalProgress;
            progressDialog.setValue(totalProgress);
+           QApplication::processEvents();
            if (progressDialog.wasCanceled()) {
               delete A;
               delete B;
@@ -365,6 +384,8 @@ void SurfaceAnimatorDialog::computeMultiGridAnimation()
    m_animator = new Animator::Combo(m_molecule, frames, interpolationFrames, m_speed);
    connect(m_animator, SIGNAL(finished()), this, SLOT(animationStopped()));
    m_dialog.playbackBox->setEnabled(true); 
+   m_animator->setLoopMode(m_dialog.loopButton->isChecked());
+   m_animator->setBounceMode(m_dialog.bounceButton->isChecked());
 
    delete B;
 }
@@ -451,17 +472,13 @@ void SurfaceAnimatorDialog::on_speedSlider_valueChanged(int value)
 
 void SurfaceAnimatorDialog::on_bounceButton_clicked(bool bounce)
 {
-   m_bounce = bounce;
-   if (m_animator) m_animator->setBounceMode(m_bounce);
+   if (m_animator) m_animator->setBounceMode(bounce);
 }
 
 
 void SurfaceAnimatorDialog::on_loopButton_clicked(bool loop)
 {
-   m_loop = loop;
-   int cycles(m_loop ? -1.0 : m_referenceFrames);
-   if (m_bounce) cycles *= 2;
-   if (m_animator) m_animator->setCycles(cycles);
+   if (m_animator) m_animator->setLoopMode(loop);
 }
 
 
