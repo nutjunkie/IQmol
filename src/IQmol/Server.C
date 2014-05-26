@@ -661,19 +661,19 @@ void Server::updateProcesses()
 
 void Server::queryFinished()
 {
-   ServerTask::Query* task = qobject_cast<ServerTask::Query*>(sender());
-   if (!task) return;
+   ServerTask::Query* query(qobject_cast<ServerTask::Query*>(sender()));
+   if (!query) return;
 
-   Process* process(task->process());
+   Process* process(query->process());
    Process::Status oldStatus(process->status());
-   Process::Status newStatus(task->newStatus());
-   task->deleteLater();
+   Process::Status newStatus(query->newStatus());
 
    // Check for any error and bail cos, really, we don't know what's going on
-   QString msg(task->errorMessage());
+   QString msg(query->errorMessage());
    if (!msg.isEmpty()) {
       process->setComment(msg);
       process->setStatus(Process::Unknown);
+      query->deleteLater();
       return;
    }
 
@@ -689,6 +689,7 @@ void Server::queryFinished()
             task->start();
          }
          removeFromWatchList(process);
+         query->deleteLater();
          return;
       }else if (newStatus == Process::Queued    || 
                 newStatus == Process::Running   || 
@@ -703,6 +704,7 @@ void Server::queryFinished()
    }else {
       removeFromWatchList(process);
    }
+   query->deleteLater();
 }
 
 
@@ -723,7 +725,6 @@ void Server::cleanUpFinished()
    if (task->time() > 0) {
       process->resetTimer(task->time());
    }
-   
 }
 
 
