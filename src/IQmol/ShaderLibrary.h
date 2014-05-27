@@ -36,6 +36,13 @@
 #include "QGLViewer/vec.h"
 #include <QDebug>
 
+#ifdef Q_WS_WIN32
+#undef IQMOL_SHADERS
+#else
+#define IQMOL_SHADERS
+#endif
+
+
 
 class QGLFramebufferObject;
 class mat4x4;
@@ -98,6 +105,7 @@ namespace IQmol {
          bool setUniformVariable(QString const& shaderName, QString const& variable, T 
             const& value)
          {
+#ifdef IQMOL_SHADERS
             if (!s_shaders.contains(shaderName)) {
                qDebug() << "Shader not found:" << shaderName;
                return false;
@@ -114,6 +122,9 @@ namespace IQmol {
             }
             setUniformVariable(program, location, value);
             return true;
+#else
+            return false;
+#endif
          }
 
 

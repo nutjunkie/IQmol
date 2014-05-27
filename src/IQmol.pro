@@ -24,3 +24,5 @@ SUBDIRS  = Util \
            IQmol \
 
 #          Parser/test \
+
+win23:SUBDIRS += OpenBabel \

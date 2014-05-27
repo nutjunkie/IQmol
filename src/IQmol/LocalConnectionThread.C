@@ -56,9 +56,9 @@ void Exec::run()
    QString command(arguments.takeFirst());
    QFileInfo cmd(command);
 
-   if (cmd.exists()) {
-      qDebug() << "Executing command" << command << "with args:" << arguments;
+   qDebug() << "Executing command" << command << "with args:" << arguments;
 
+   if (cmd.exists()) {
       QProcess process;
       process.setWorkingDirectory(cmd.absolutePath());
       process.start(cmd.fileName(), arguments);

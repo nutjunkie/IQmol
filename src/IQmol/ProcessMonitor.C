@@ -830,7 +830,10 @@ void ProcessMonitor::processFinished()
       msg += " has finished.";
       if (jobInfo->localFilesExist()) {
          resultsAvailable(jobInfo);
+#ifndef Q_WS_WIN23
+         // more Windows weirdness.  This causes a crash
          QMsgBox::information(this, "IQmol", msg);
+#endif
       }else {
          msg += "\nCopy results from server?";
          if (QMsgBox::question(this, "IQmol", msg) == QMessageBox::Ok) {

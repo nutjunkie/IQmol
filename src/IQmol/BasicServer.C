@@ -179,10 +179,12 @@ Process::Status BasicServer::parseQueryString(QString const& query, Process* pro
    Process::Status status(Process::Unknown);
 
    QString id(process->id());
-   id = " " + id + " ";
+   id = "\\b" + id + "\\b";
+   QRegExp rx(id);
+
    QStringList::iterator line;
    for (line = lines.begin(); line != lines.end(); ++line) {
-       if ((*line).contains(id)) {
+       if ((*line).contains(rx)) {
        //if ((*line).contains(m_server->executableName()) && (*line).contains(id)) {
           QString time((*line).split(QRegExp("\\s+"), QString::SkipEmptyParts).last());
           //process->resetTimer(Timer::toSeconds(time));

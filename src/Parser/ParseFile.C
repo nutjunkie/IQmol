@@ -77,9 +77,11 @@ void ParseFile::setFilePaths(QString const& filePath)
 //  ---
 
       QStringList::iterator iter;
+#ifndef Q_WS_WIN
       for (iter = m_filePaths.begin(); iter != m_filePaths.end(); ++iter) {
           (*iter).prepend(m_filePath + "/");
       }
+#endif
    }else {
       m_filePaths.append(filePath);
    }

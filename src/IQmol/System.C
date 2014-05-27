@@ -79,9 +79,9 @@ QString QueryCommand()
    if (!tasklist.exists()) return QString("Error: tasklist.exe not found");
 
    QString spid("\"PID eq ${JOB_ID}\"");
-   QString sname("\"IMAGENAME eq ${EXE_NAME}\"");
+   //QString sname("\"IMAGENAME eq ${EXE_NAME}\"");
    QStringList args;
-   args << "/v" << "/fo list" << "/fi " + spid << "/fi " + sname;
+   args << "/v" << "/fo list" << "/fi " + spid << "/fi ";
    cmd = tasklist.filePath() + " " + args.join(" ");
 #else
    cmd = "/bin/ps xc -S -o command=,pid=,time= ${JOB_ID}";

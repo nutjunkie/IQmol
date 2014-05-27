@@ -223,9 +223,13 @@ bool Process::getLocalSaveDirectory()
 
       QFileDialog dialog(0, "Save As", dirPath);
       dialog.selectFile(dirName);
+
+
+	  // The following may need to be switched depending on which version of
+	  // the Qt libraries are being used.
       dialog.setOption(QFileDialog::ShowDirsOnly, true);
-      // dialog.setFileMode(QFileDialog::DirectoryOnly);
       dialog.setFileMode(QFileDialog::Directory);
+      // dialog.setFileMode(QFileDialog::DirectoryOnly);
 
       if (dialog.exec() == QDialog::Rejected) return false;
 

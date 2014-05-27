@@ -101,13 +101,15 @@ Surface* CubeData::calculateSurface(Data::SurfaceInfo const& surfaceInfo)
    }
    
    Layer::Surface* surfaceLayer(new Layer::Surface(*surfaceData));
-   
-   // Get the frame from the parent molecule in case it has been reoriented.
-   surfaceLayer->setFrame(m_molecule->getReferenceFrame());
-
    surfaceLayer->setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable |
       Qt::ItemIsEnabled | Qt::ItemIsEditable);
-   if (m_molecule) connect(surfaceLayer, SIGNAL(updated()), m_molecule, SIGNAL(softUpdate()));
+
+   // Get the frame from the parent molecule in case it has been reoriented.
+   if (m_molecule) {
+      connect(surfaceLayer, SIGNAL(updated()), m_molecule, SIGNAL(softUpdate()));
+      surfaceLayer->setFrame(m_molecule->getReferenceFrame());
+   }
+
    appendRow(surfaceLayer);
    surfaceLayer->setCheckState(Qt::Checked);
 

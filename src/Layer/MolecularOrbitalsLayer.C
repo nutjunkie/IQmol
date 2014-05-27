@@ -312,16 +312,16 @@ qDebug() << "Grid already exists";
    }
 
    // Third, calculate requested surfaces
-   QProgressDialog progressDialog("Calculating Surfaces", "Cancel", 0, 
-      m_surfaceInfoQueue.count(), QApplication::activeWindow());
+   QProgressDialog* progressDialog(new QProgressDialog("Calculating Surfaces", 
+      "Cancel", 0, m_surfaceInfoQueue.count()));
+      
    int progress(0);
-   progressDialog.setValue(progress);
-   progressDialog.setWindowModality(Qt::WindowModal);
-   progressDialog.show();
+   progressDialog->setValue(progress);
+   progressDialog->setWindowModality(Qt::WindowModal);
+   progressDialog->show();
 
    Qt::CheckState checked(Qt::Checked);
    for (iter = m_surfaceInfoQueue.begin(); iter != m_surfaceInfoQueue.end(); ++iter) {
-qDebug() << "Calculating Surface:" << (*iter).toString();
        Data::Surface* surfaceData(generateSurface(*iter));
 
        if (surfaceData) {
@@ -344,9 +344,14 @@ qDebug() << "Calculating Surface:" << (*iter).toString();
        }
 
        ++progress;
-       progressDialog.setValue(progress);
-       if (progressDialog.wasCanceled()) break;
+       progressDialog->setValue(progress);
+       if (progressDialog->wasCanceled()) break;
    }
+
+#ifndef Q_WS_WIN32
+   // Deleting this under Windows causes a crash, go figure.
+   delete progressDialog;
+#endif
 
    clearSurfaceQueue();
    updated(); 
@@ -552,13 +557,14 @@ qDebug() << "Computing grid" << (*iter)->surfaceType().toString() ;
    Vec delta(g0->delta());
    Vec origin(g0->origin());
 
-   QProgressDialog progressDialog("Calculating orbital grid data", "Cancel", 0, 
-       nx, QApplication::activeWindow());
+   QProgressDialog* progressDialog(new QProgressDialog("Calculating orbital grid data", 
+       "Cancel", 0, nx));
+       
    int progress(0);
 
-   progressDialog.setValue(progress);
-   progressDialog.setWindowModality(Qt::WindowModal);
-   progressDialog.show();
+   progressDialog->setValue(progress);
+   progressDialog->setWindowModality(Qt::WindowModal);
+   progressDialog->show();
 
    double  x, y, z;
    double* values;
@@ -599,8 +605,14 @@ qDebug() << "Computing grid" << (*iter)->surfaceType().toString() ;
        }
 
        ++progress;
-       progressDialog.setValue(progress);
-       if (progressDialog.wasCanceled()) return false;
+       progressDialog->setValue(progress);
+       if (progressDialog->wasCanceled()) {
+          delete [] tmp;
+#ifndef Q_WS_WIN32
+          delete progressDialog;
+#endif
+          return false;
+       }
    }
 
    delete [] tmp;

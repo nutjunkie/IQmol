@@ -36,7 +36,10 @@ bool IQmol::parseFile(QString const& filePath)
 
    if (ifs.is_open()) {
       boost::iostreams::filtering_istream filter; 
+#ifndef Q_WS_WIN32
+      // Can't get this working on Windows
       filter.push(boost::iostreams::gzip_decompressor());
+#endif
       filter.push(ifs);
       Data::InputArchive inputArchive(filter);
       m_dataBank.serialize(inputArchive);
@@ -57,7 +60,10 @@ bool IQmol::save(QString const& filePath, Data::Bank& data)
    std::ofstream ofs(filePath.toStdString().data(), std::ios_base::binary);
    if (ofs.is_open()) {
       boost::iostreams::filtering_ostream filter;
+#ifndef Q_WS_WIN32
+      // Can't get this working on Windows
       filter.push(boost::iostreams::gzip_compressor());
+#endif
       filter.push(ofs);
       boost::archive::text_oarchive outputArchive(filter);
       data.serialize(outputArchive, 0);

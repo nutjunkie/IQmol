@@ -74,33 +74,33 @@ void ShaderLibrary::init()
    const GLubyte* vendor   = glGetString(GL_VENDOR);
    const GLubyte* renderer = glGetString(GL_RENDERER);
    const GLubyte* version  = glGetString(GL_VERSION);
-   const GLubyte* shading  = glGetString(GL_SHADING_LANGUAGE_VERSION);
 
    QLOG_INFO() << "OpenGL version " << QString((char*)version);
    QLOG_INFO() << "Vendor   " << QString((char*)vendor);
    QLOG_INFO() << "Renderer " << QString((char*)renderer);
+
+#ifdef IQMOL_SHADERS
+   const GLubyte* shading  = glGetString(GL_SHADING_LANGUAGE_VERSION);
    QLOG_INFO() << "GLSL     " << QString((char*)shading);
+#endif
 }
 
 
-void ShaderLibrary::destroy()
+bool ShaderLibrary::setMaterialParameters(QVariantMap const& map) 
 {
-   if (s_rotationTextureId) glDeleteTextures(1, &s_rotationTextureId);
+   double specular = map.contains("Shininess") ? 
+       map.value("Shininess").toDouble() : 0.9;
 
-   QMap<QString, unsigned>::iterator iter;
-   for (iter = s_shaders.begin(); iter != s_shaders.end(); ++iter) {
-       if (iter.value() != 0) glDeleteProgram(iter.value());
-   }
+   GLfloat mat_specular[] = {specular, specular, specular, 1.0};
+   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
 
-   // These seem to cause a crash 
-   //if (s_normalBuffer) delete s_normalBuffer;
-   //if (s_filterBuffer) delete s_filterBuffer;
-}
+   double shininess = map.contains("Highlights") ? 
+       map.value("Highlights").toDouble() : 0.5;
 
+   glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 100.0*(1.0-shininess));
+   s_currentMaterial = map;
 
-ShaderLibrary::~ShaderLibrary()
-{
-   delete s_rotationTextureData;
+   return true;
 }
 
 
@@ -108,34 +108,13 @@ bool ShaderLibrary::bindShader(QString const& shader)
 {
    bool okay(false);
    if (s_shaders.contains(shader)) {
+#ifdef IQMOL_SHADERS
       glUseProgram(s_shaders.value(shader));
+#endif
       s_currentShader = shader;
       okay = true;
    }
    return okay;
-}
-
-
-bool ShaderLibrary::resume()
-{
-   return bindShader(s_currentShader);
-}
-
-
-bool ShaderLibrary::suspend()
-{
-   glUseProgram(0);
-   return true;
-}
-
-
-void ShaderLibrary::loadPreferences()
-{
-    QString defaultShader(Preferences::DefaultShader());
-    if (defaultShader.isEmpty()) defaultShader = NoShader;
-    QVariantMap defaultShaderParameters(Preferences::DefaultShaderParameters());
-    setUniformVariables(defaultShader, defaultShaderParameters);
-    bindShader(defaultShader);
 }
 
 
@@ -147,6 +126,7 @@ void ShaderLibrary::loadAllShaders()
    defaultParameters.insert("Highlights", QVariant(0.5));
    setUniformVariables(NoShader, defaultParameters);
 
+#ifdef IQMOL_SHADERS
    QDir dir(Preferences::ShaderDirectory());
    if (!dir.exists() || !dir.isReadable()) {
       QLOG_WARN() << "Could not access shader directory: " + dir.path();
@@ -176,7 +156,93 @@ void ShaderLibrary::loadAllShaders()
           }
        }
    }
+#endif
 }
+
+
+void ShaderLibrary::loadPreferences()
+{
+    QString defaultShader(Preferences::DefaultShader());
+    if (defaultShader.isEmpty()) defaultShader = NoShader;
+    QVariantMap defaultShaderParameters(Preferences::DefaultShaderParameters());
+    setUniformVariables(defaultShader, defaultShaderParameters);
+    bindShader(defaultShader);
+}
+
+
+
+
+#ifndef IQMOL_SHADERS
+
+// Define stubs
+void ShaderLibrary::destroy() { }
+
+bool ShaderLibrary::suspend() { return true; }
+bool ShaderLibrary::resume() { return true; }
+
+void ShaderLibrary::bindNormalMap(GLfloat near0, GLfloat far0) { }
+void ShaderLibrary::releaseNormalMap() { }
+void ShaderLibrary::generateFilters() { }
+void ShaderLibrary::bindTextures(QString const& shader) { }
+void ShaderLibrary::releaseTextures() { }
+void ShaderLibrary::clearFrameBuffers() { }
+
+void ShaderLibrary::resizeScreenBuffers(QSize const&, double*) { }
+
+bool ShaderLibrary::setUniformVariables(QString const&, QVariantMap const& map) 
+{
+   return setMaterialParameters(map);
+}
+
+
+void ShaderLibrary::setFilterVariables(QVariantMap const& map) { }
+
+QVariantMap ShaderLibrary::uniformUserVariableList(QString const&)
+{
+   return QVariantMap();
+}
+
+
+#else  // IQMOL_SHADERS
+
+
+void ShaderLibrary::destroy()
+{
+   if (s_rotationTextureId) glDeleteTextures(1, &s_rotationTextureId);
+
+   QMap<QString, unsigned>::iterator iter;
+   for (iter = s_shaders.begin(); iter != s_shaders.end(); ++iter) {
+       if (iter.value() != 0) glDeleteProgram(iter.value());
+   }
+
+   // These seem to cause a crash 
+   //if (s_normalBuffer) delete s_normalBuffer;
+   //if (s_filterBuffer) delete s_filterBuffer;
+
+}
+
+
+ShaderLibrary::~ShaderLibrary()
+{
+   delete s_rotationTextureData;
+}
+
+
+
+bool ShaderLibrary::resume()
+{
+   return bindShader(s_currentShader);
+}
+
+
+bool ShaderLibrary::suspend()
+{
+   glUseProgram(0);
+   return true;
+}
+
+
+
 
 
 QVariantMap ShaderLibrary::uniformUserVariableList(QString const& shaderName)
@@ -385,19 +451,6 @@ QVariantMap ShaderLibrary::parseUniformVariables(QString const& shaderPath)
 */
 }
 
-
-bool ShaderLibrary::setMaterialParameters(QVariantMap const& map) 
-{
-   double specular = map.contains("Shininess") ? map.value("Shininess").toDouble() : 0.9;
-   GLfloat mat_specular[] = {specular, specular, specular, 1.0};
-   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
-
-   double shininess = map.contains("Highlights") ? map.value("Highlights").toDouble() : 0.5;
-   glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 100.0*(1.0-shininess));
-   s_currentMaterial = map;
-
-   return true;
-}
 
 
 bool ShaderLibrary::setTextureVariable(QString const& shader, QString const& variable, 
@@ -800,5 +853,6 @@ void ShaderLibrary::clearFrameBuffers()
    s_filterBuffer->release();
 }
 
+#endif  // IQMOL_SHADERS
 
 } // end namespace IQmol

@@ -76,7 +76,7 @@ Layer::List Factory::toLayers(Data::Base& data)
    Layer::List layers;
 
    qDebug() << "Layer::Factory converting" << Data::Type::toString(data.typeID());
-   data.dump();
+   //data.dump();
 
    try {
 
@@ -84,19 +84,19 @@ Layer::List Factory::toLayers(Data::Base& data)
    
          case Data::Type::Bank: {
             Data::Bank& bank(dynamic_cast<Data::Bank&>(data));
-            layers.append(convert(bank));
+            layers << convert(bank);
          } break;
 
          case Data::Type::GeometryList: {
             Data::GeometryList& 
                geometryList(dynamic_cast<Data::GeometryList&>(data));
-            layers.append(convert(geometryList));
+            layers << convert(geometryList);
          } break;
 
          case Data::Type::Geometry: {
             Data::Geometry& 
                geometry(dynamic_cast<Data::Geometry&>(data));
-            layers.append(convert(geometry));
+            layers << convert(geometry);
          } break;
 
          case Data::Type::MolecularOrbitals: {
@@ -113,7 +113,7 @@ Layer::List Factory::toLayers(Data::Base& data)
 
          case Data::Type::FileList: {
             Data::FileList& fileList(dynamic_cast<Data::FileList&>(data));
-            layers.append(convert(fileList));
+            layers << convert(fileList);
          } break;
 
          case Data::Type::GridData: {
@@ -136,7 +136,7 @@ Layer::List Factory::toLayers(Data::Base& data)
          case Data::Type::EfpFragmentList: {
             Data::EfpFragmentList& 
                efpList(dynamic_cast<Data::EfpFragmentList&>(data));
-            layers.append(convert(efpList));
+            layers << convert(efpList);
          } break;
 
          case Data::Type::Mesh: {
@@ -234,7 +234,7 @@ List Factory::convert(Data::GeometryList& geometryList)
    unsigned nGeometries(geometryList.size());
 
    if (nGeometries > 0) {
-      list.append( convert( *(geometryList.first()) ) );  // Atom and Bond lists
+      list <<  convert(*(geometryList.first()));  // Atom and Bond lists
    }
 
    if (nGeometries > 1) {

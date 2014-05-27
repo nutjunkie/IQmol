@@ -248,11 +248,12 @@ void SurfaceAnimatorDialog::computeIsovalueAnimation()
    bool simplifyMesh(m_dialog.simplifyMesh->isChecked());
 
 
-   QProgressDialog progressDialog("Calculating surfaces", "Cancel", 0, nFrames, this);
-   progressDialog.setWindowModality(Qt::WindowModal);
+   QProgressDialog* progressDialog(new QProgressDialog("Calculating surfaces", "Cancel", 0, 
+      nFrames));
+   progressDialog->setWindowModality(Qt::WindowModal);
 
    int totalProgress(0);
-   progressDialog.setValue(totalProgress);
+   progressDialog->setValue(totalProgress);
 
    for (int i = 0; i < nFrames; ++i) {
        if (surface) surface->setCheckState(Qt::Unchecked);
@@ -269,9 +270,14 @@ void SurfaceAnimatorDialog::computeIsovalueAnimation()
        isovalue1 += dIso;
 
        ++totalProgress;
-       progressDialog.setValue(totalProgress);
+       progressDialog->setValue(totalProgress);
        QApplication::processEvents();
-       if (progressDialog.wasCanceled()) return;
+       if (progressDialog->wasCanceled()) {
+#ifndef Q_WS_WIN32
+          delete progressDialog;
+#endif
+          return;
+       }
    }
 
    m_animator = new Animator::Combo(m_molecule, frames, interpolationFrames, m_speed);
@@ -279,6 +285,9 @@ void SurfaceAnimatorDialog::computeIsovalueAnimation()
    m_dialog.playbackBox->setEnabled(true); 
    m_animator->setLoopMode(m_dialog.loopButton->isChecked());
    m_animator->setBounceMode(m_dialog.bounceButton->isChecked());
+#ifndef Q_WS_WIN32
+   delete progressDialog;
+#endif
 }
 
 

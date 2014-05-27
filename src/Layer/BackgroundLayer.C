@@ -55,6 +55,7 @@ void Background::drawGradient()
 {
 //   const float eps = 1.0e-6; 
 
+/*
    glEnable(GL_LIGHTING);
    glDisable(GL_DEPTH_TEST);
    glShadeModel(GL_SMOOTH); 
@@ -88,6 +89,7 @@ void Background::drawGradient()
 
    glEnable(GL_DEPTH_TEST);
    //glEnable(GL_LIGHTING);
+*/
 }
 
 } } // end namespace IQmol::Layer
