@@ -1,0 +1,77 @@
+                  Welcome to Q-Chem
+     A Quantum Leap Into The Future Of Chemistry
+
+ Y. Shao, L. Fusti-Molnar, Y. Jung, J. Kussmann, C. Ochsenfeld,
+ S. T. Brown, A. T. B. Gilbert, L. V. Slipchenko,S. V. Levchenko,
+ D. P. O'Neill, R. A. DiStasio Jr., R. C. Lochan, T. Wang,
+ G. J. O. Beran, N. A. Besley, J. M. Herbert, C. Y. Lin,
+ T. Van Voorhis, S. H. Chien, A. Sodt, R. P. Steele, 
+ V. A. Rassolov, P. E. Maslen, P. P. Korambath, R. D. Adamson,
+ B. Austin, J. Baker, E. F. C. Byrd, H. Dachsel, R. J. Doerksen,
+ A. Dreuw, B. D. Dunietz, A. D. Dutoi, T. R. Furlani,
+ S. R. Gwaltney, A. Heyden, S. Hirata, C.-P. Hsu, G. Kedziora,
+ R. Z. Khaliullin, P. Klunzinger, A. M. Lee, M. S. Lee, W. Liang,
+ I. Lotan, N. Nair, B. Peters, E. I. Proynov, P. A. Pieniazek, 
+ Y. M. Rhee, J. Ritchie, E. Rosta, C. D. Sherrill, 
+ A. C. Simmonett, J. E. Subotnik, H. L. Woodcock III,
+ W. Zhang, A. T. Bell, A. K. Chakraborty, D. M. Chipman,
+ F. J. Keil, A. Warshel, W. J. Hehre, H. F. Schaefer III,
+ J. Kong, A. I. Krylov, P. M. W. Gill, M. Head-Gordon,
+
+ Additional authors for Version 3.1: 
+ Z. Gan, Y. Zhao, N. E. Schultz, D. Truhlar, E. Epifanovsky and M. Oana.
+
+ Additional authors for Version 3.2: 
+ R. Baer, B. R. Brooks, D. Casanova, J.-D. Chai, C.-L. Cheng, 
+ C. Cramer, D. Crittenden, A. Ghysels, G. Hawkins, E. G. Hohenstein, 
+ C. Kelley, W. Kurlancheek, D. Liotard, E. Livshits, P. Manohar, 
+ A. Marenich, D. Neuhauser, R. Olson, M. A. Rohrdanz, K. S. Thanthiriwatte, 
+ A. J. W. Thom, V. Vanovschi, C. F. Williams, Q. Wu and Z.-Q. You. 
+
+ Additional authors for Version 4.0: 
+ A. Aspuru-Guzik, C. Chang, R. G. Edgar, E. Sundstrom, J. Parkhill, K. Lawler,
+ M. Gordon, M. Schmidt, N. Shenvi, D. Lambrecht, M. Goldey, R. Olivares-Amaya,
+ Y. Bernard, L. Vogt, M. Watson, J. Liu, S. Yeganeh, B. Kaduk, O. Vydrov, X. Xu, 
+ I. Kaliman, K. Khistyaev, N. Russ, I.Y. Zhang, W.A. Goddard III, F. Liu, R. King ,
+ A. Landau, M. Wormit, A. Dreuw, M. Diedenhofen, A. Klamt, A.W. Lange, D. Ghosh,
+ D. Kosenkov, T. Kus, A. Landau, D. Zuev, J. Deng, S.P. Mao, Y.C. Su, D. Small,
+ L. D. Jacobson
+ 
+ Q-Chem, Version 4.0.1, Q-Chem, Inc., Pittsburgh, PA (2007).
+
+
+ MAC (Intel) OSX Version 4.1.0.1 
+
+ Q-chem begins on Wed May  7 13:45:02 2014  
+
+chemsrv2.anu.edu.au
+Host: 0
+
+     Scratch files written to /scratch/atg/local/qchem75607//
+ Jan2214 |usr|local|qchem|17Jun13 -1
+ Using version located at /usr/local/qchem/17Jun13/qchem/bin/qchem
+
+Problem with processed rem input line:
+HIRSHFLED TRUE
+
+ Q-Chem fatal error occurred in module /usr/local/qchem/17Jun13/qchem/qparser/read_rem.C, line 288:
+
+ Illegal rem input in read_rem
+
+ Wed May  7 13:45:02 2014
+Reading symbols for shared libraries .......... done
+Attaching to program: `/usr/local/qchem/17Jun13/qchem/exe/qcprog.exe', process 75633.
+Reading symbols for shared libraries +++++++++........... done
+0x97283099 in wait4 ()
+(gdb) #0  0x97283099 in wait4 ()
+#1  0x97280be4 in system$UNIX2003 ()
+#2  0x0892543b in QTraceback ()
+#3  0x08923650 in QKill_ori ()
+#4  0x08923693 in QKill ()
+#5  0x0891ebd6 in QCrashLoc ()
+#6  0x089029d8 in read_rem ()
+#7  0x088edf90 in ParseQInput ()
+#8  0x000510d8 in ParseTextInput ()
+#9  0x000513ec in ProgMan ()
+#10 0x0004df70 in main ()
+(gdb) Detaching from program: `/usr/local/qchem/17Jun13/qchem/exe/qcprog.exe', process 75633 thread 0x807.
