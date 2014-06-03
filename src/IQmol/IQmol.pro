@@ -1,5 +1,6 @@
 CONFIG += main
 TARGET  = IQmol
+
 include(../common.pri)
 
 LIBS        += $$BUILD_DIR/libQui.a \
@@ -8,6 +9,10 @@ LIBS        += $$BUILD_DIR/libQui.a \
                $$BUILD_DIR/libLayer.a \
                $$BUILD_DIR/libConfigurator.a \
                $$BUILD_DIR/libUtil.a
+
+# Windows requires this
+# include(../common.pri)
+
 INCLUDEPATH += . ../Util ../Data ../Parser ../Qui ../Layer ../Configurator
 INCLUDEPATH += $$BUILD_DIR/Qui   # Required for the ui_QuiMainWindow.h header
 

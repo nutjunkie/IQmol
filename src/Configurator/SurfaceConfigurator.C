@@ -138,8 +138,6 @@ void Surface::on_propertyCombo_currentIndexChanged(int)
       m_surfaceConfigurator.negativeColorButton->setVisible(false);
       m_surfaceConfigurator.swapColorsButton->setEnabled(false);
 
-      m_surfaceConfigurator.scaleButton->setEnabled(m_surface.propertyIsSigned());
-
       QList<Layer::Molecule*> parents(m_surface.findLayers<Layer::Molecule>(Layer::Parents));
 
       if (parents.isEmpty()) {
@@ -148,6 +146,8 @@ void Surface::on_propertyCombo_currentIndexChanged(int)
          m_surface.setColors(m_gradientColors);
          m_surface.computePropertyData(parents.first()->getPropertyEvaluator(type));
       }
+
+      m_surfaceConfigurator.scaleButton->setEnabled(m_surface.propertyIsSigned());
 
       updateScale();
    }

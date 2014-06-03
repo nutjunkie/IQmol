@@ -53,6 +53,7 @@ namespace Configurator {
          void on_cartesianButton_clicked(bool);
          void on_totalButton_clicked(bool);
          void on_stepButton_clicked(bool);
+         void on_okButton_clicked(bool);
    
       private:
          Ui::AxesMeshConfigurator m_meshConfigurator;

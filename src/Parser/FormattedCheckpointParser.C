@@ -320,7 +320,10 @@ Data::ShellList* FormattedCheckpoint::makeShellList(ShellData const& shellData,
 
           default:
              delete shellList;
-             m_errors.append("Unknown Shell type found");
+             QString msg("Unknown Shell type found at position ");
+             msg += QString::number(shell);
+             msg += ", type: "+ QString::number(shellData.shellTypes.at(shell));
+             m_errors.append(msg);
              return 0;
              break;
        }

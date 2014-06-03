@@ -106,4 +106,9 @@ void AxesMesh::on_stepButton_clicked(bool tf)
    m_mesh.updated();
 }
 
+void AxesMesh::on_okButton_clicked(bool)
+{
+   accept();
+}
+
 } } // end namespace IQmol::Layer

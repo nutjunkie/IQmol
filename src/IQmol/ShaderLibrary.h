@@ -100,6 +100,8 @@ namespace IQmol {
          bool filtersAvailable() { return m_filtersAvailable; };
          bool filtersActive() { return m_filtersActive; };
 
+         void loadAllShaders();
+
          // This does not filter for NoShader
          template <class T>
          bool setUniformVariable(QString const& shaderName, QString const& variable, T 
@@ -147,7 +149,6 @@ namespace IQmol {
          bool m_filtersActive;
 
          void init();
-         void loadAllShaders();
          void loadPreferences();
          unsigned createProgram(QString const& vertexPath, QString const& fragmentPath);
          unsigned loadShader(QString const& path, unsigned const mode);

@@ -175,7 +175,7 @@ List Factory::convert(Data::Bank& bank)
    if (!bank.isEmpty()){
       Data::Bank::iterator iter;
       for (iter = bank.begin(); iter != bank.end(); ++iter) {
-          list.append(toLayers(**iter));
+          list << toLayers(**iter);
       }
    }
 
