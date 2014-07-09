@@ -29,6 +29,7 @@
 #include "EfpFragmentLayer.h"
 #include "Preferences.h"
 #include "ManipulatedFrameSetConstraint.h"
+#include "QGLViewer/manipulatedFrame.h"
 #include <QStandardItem>
 #include <QDropEvent>
 #include <QtDebug>

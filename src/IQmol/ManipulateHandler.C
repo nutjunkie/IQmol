@@ -21,6 +21,7 @@
 ********************************************************************************/
 
 #include "Viewer.h"
+#include "QGLViewer/manipulatedFrame.h"
 
 
 namespace IQmol {
