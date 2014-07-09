@@ -1,0 +1,37 @@
+# Installation of IQmol v2.3.0 from source on
+# Ubuntu 14.04 Trusty Tahr
+# Oliver Stueker
+
+# clone git repo:
+git clone https://github.com/nutjunkie/IQmol.git IQmol
+
+# As the Anaconda Python distribution brings it's own qmake, moc, uic etc.,
+# I had to remove it from my path.
+export PATH="${HOME}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+# install OpenMesh
+wget http://www.openmesh.org/media/Releases/3.1/OpenMesh-3.1.tar.gz
+tar -xzf OpenMesh-3.1.tar.gz
+mkdir -p OpenMesh-3.1/build
+cd       OpenMesh-3.1/build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make -j 4
+sudo make install
+
+# create build directory
+mkdir -p IQmol/build
+cd       IQmol/build
+
+# install dependencies
+sudo apt-get install libgl-dev libgles2-mesa-dev
+sudo apt-get install gfortran
+sudo apt-get install qt4-default libqt4-dev qt4-qmlviewer qt4-dev-tools 
+sudo apt-get install qt-assistant-compat qt4-doc-html qt4-qtconfig 
+sudo apt-get install libqt4-core libqt4-dev libqt4-gui
+sudo apt-get install libboost-all-dev libssl-dev libssh-dev libssh2-1 libssh2-1-dev
+sudo apt-get install openbabel openbabel-gui libopenbabel4 libopenbabel-dev
+sudo apt-get install libqglviewer2 libqglviewer-dev libqglviewer-dev
+
+# run cmake
+cmake .. -DCMAKE_INSTALL_PREFIX=${HOME}/.local/IQmol
+make install

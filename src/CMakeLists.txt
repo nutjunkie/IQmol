@@ -130,7 +130,7 @@ set(IQmol_SOURCES
     IQmol/SpatialProperty.C
     IQmol/Spline.C
     IQmol/SshFileDialog.C
-    IQmol/SurfaceAnimatorDialog..C
+    IQmol/SurfaceAnimatorDialog.C
     IQmol/SurfaceAnimatorDialog.C
     IQmol/SymmetryToleranceDialog.C
     IQmol/System.C
