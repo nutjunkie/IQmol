@@ -26,7 +26,6 @@ HEADERS += \
    $$PWD/QtNode.h \
    $$PWD/Register.h \
    $$PWD/RemSection.h \
-#  $$PWD/ReadInput.h \
 
 SOURCES += \
    $$PWD/Actions.C \

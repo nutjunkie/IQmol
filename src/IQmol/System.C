@@ -178,7 +178,11 @@ unsigned int ExecutablePid(QString const& processName, QProcess const& parent)
           
 		  // return the PID for the spawning script in case there are multiple
 		  // jobs in the input file
+#ifdef Q_WS_WIN
+          if (ancestry.size() > 1) return ancestry[0];
+#else
           if (ancestry.size() > 1) return ancestry[1];
+#endif
           return *iter;
        }
    }
