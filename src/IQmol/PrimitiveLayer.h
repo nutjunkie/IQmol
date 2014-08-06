@@ -24,7 +24,7 @@
 
 #include "GLObjectLayer.h"
 
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
 #include <OpenGL/glu.h>
 #else 
 #include <GL/glu.h>

@@ -36,7 +36,6 @@ class Molecule : public QObject, public OpenBabel::OBMol {
    public:
       Molecule();
 
-//      bool loadFromFile(QFileInfo const& fileInfo);
       bool setCoordinates(QString const& data);
 
       QString formatForQui(Coordinates::ID const& type);

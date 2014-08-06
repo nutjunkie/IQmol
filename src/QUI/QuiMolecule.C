@@ -37,63 +37,6 @@ Molecule::Molecule() {
 }
 
 
-/*
-
-
-//! The following should be able to read the molecule from any file format
-//! supported by OpenBabel.  Returns true if molecular data was successfully
-//! loaded.
-bool Molecule::loadFromFile(QFileInfo const& info) {
-   QString name(info.filePath());
-
-   //qDebug() << "Attempting to load molecule from " << name;
-   //qDebug() << name.toLatin1().data();
-   //qDebug() << "----  File Contents ---";
-   //qDebug() << ReadFileToString(info);
-   //qDebug() << "-----------------------";
-
-   OBConversion conv;
-   OBFormat *inFormat = conv.FormatFromExt(QFile::encodeName(name).data() );
-
-   if ((!inFormat) || (!conv.SetInFormat(inFormat))) {
-      QString msg("Could not determine the format of file \n");
-      msg += info.filePath() + "\n";
-      msg += "Please check it contains valid molecule data and ";
-      msg += "has the correct file extension.";
-      QMessageBox::warning(0, "Error Reading Molecule", msg);
-      return false;
-   }
-
-   std::ifstream ifs;
-   ifs.open( info.filePath().toLatin1().data() );
-
-   if (!ifs) {
-      QString msg("Could not open file for reading:\n");
-      msg += info.filePath() + "\n";
-      msg += "Please check the file exists and is readable.";
-      QMessageBox::warning(0, "Error Reading Molecule", msg);
-      return false;
-   }
-
-   Clear();
-   m_readFlag = false;
-
-   if (!conv.Read(this, &ifs)) {  
-      QString msg("Could not read molecule data from file:\n");
-      msg += info.filePath() + "\n";
-      msg += "Please check it contains valid molecule data and ";
-      msg += "has the correct file extension.";
-      QMessageBox::warning(0, "Error Reading Molecule", msg);
-      return false;
-   }
-
-   ifs.close();
-   return true;
-}
-*/
-
-
-
 //! This function assumes that the molecule data is coming from a QChem
 //! $molecule section and is therefore in either XYZ or z-matrix format 
 //! or is the token 'read'.  The $keywords should have been removed.

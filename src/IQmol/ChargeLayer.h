@@ -26,8 +26,8 @@
 
 
 class QFontMetrics;
-class QGLViewer;;
-class QColor;;
+class QGLViewer;
+class QColor;
 
 namespace IQmol {
 namespace Layer {

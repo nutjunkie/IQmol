@@ -55,7 +55,6 @@ namespace Layer {
       public:
          Frequencies(Data::Frequencies const&);
 
-         //void load(OpenBabel::OBVibrationData const&);
          void fromData(Data::Frequencies const&);
 
          void setMolecule(Molecule*);
@@ -64,6 +63,7 @@ namespace Layer {
          void setPlay() { setPlay(m_play); }
          void setSpeed(double const speed);
          void setScale(double const scale);
+
 
       Q_SIGNALS:
          void pushAnimators(AnimatorList const&);

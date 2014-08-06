@@ -44,7 +44,7 @@ bool initOpenBabel()
    dir.cdUp();  
    QString path(dir.absolutePath());
 
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
    // Assumed directory structure: IQmol.app/Contents/MacOS/IQmol
    QApplication::addLibraryPath(path + "/Frameworks");
    QApplication::addLibraryPath(path + "/PlugIns");

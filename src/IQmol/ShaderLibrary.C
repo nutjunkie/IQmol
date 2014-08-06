@@ -147,6 +147,7 @@ void ShaderLibrary::loadAllShaders()
              name = name.replace("_", " ");
              program = createProgram(vertex.filePath(), fragment.filePath());          
              if (program > 0) {
+                m_shadersInitialized = true;
                 QLOG_DEBUG() << "Shader compilation successful:" << name;
                 s_shaders.insert(name, program);
                 QVariantMap uniforms(parseUniformVariables(vertex.filePath()));
@@ -156,6 +157,7 @@ void ShaderLibrary::loadAllShaders()
           }
        }
    }
+   // loadPreferences();
 #endif
 }
 

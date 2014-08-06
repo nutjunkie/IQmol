@@ -44,6 +44,7 @@ namespace Configurator{
 
       public:
          explicit Surface(Layer::Surface&);
+         void setArea(double const);
 
       public Q_SLOTS:
          void sync();

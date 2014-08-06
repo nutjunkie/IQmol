@@ -85,7 +85,7 @@ if (0) {
    QString title;
 
    if (m_flags & Movie) {
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
       fileInfo.setFile(fileInfo.dir(), "movie.mov");
       title = "Save movie as";
       filter = "QuickTime Movie (*.mov)";
@@ -221,7 +221,7 @@ QPixmap::grabWindow(widget->winId());
 
 void Snapshot::makeMovie()
 {
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
 qDebug() << "Making movies";
 
    QDir dir(QApplication::applicationDirPath());

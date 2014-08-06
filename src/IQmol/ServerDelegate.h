@@ -25,7 +25,7 @@
 #include "Server.h"
 #include "LocalHost.h"
 #include "RemoteHost.h"
-#include "WebHost.h"
+//#include "WebHost.h"
 #include "ServerTask.h"
 #include "Process.h"
 #include <QObject>
@@ -59,7 +59,8 @@ namespace IQmol {
                   m_hostDelegate = new RemoteHost(m_server);
                   break;
                case Server::Web:
-                  m_hostDelegate = new WebHost(m_server);
+                  qDebug() << "WARNING: WebHost delegate ignored";
+                  //m_hostDelegate = new WebHost(m_server);
                   break;
             }
          }

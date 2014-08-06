@@ -32,6 +32,9 @@
 #include "QMsgBox.h"
 #include "JobInfo.h"
 #include "QVariantPointer.h"
+#include "CartesianCoordinatesParser.h"
+#include "TextStream.h"
+#include "ParseJobFiles.h"
 #include "SymmetryToleranceDialog.h"
 #include <QStringList>
 #include <QStandardItem>
@@ -39,10 +42,8 @@
 #include <QUrl>
 #include <QDir>
 #include <QClipboard>
+#include <QMimeData>
 #include <cmath>
-#include "CartesianCoordinatesParser.h"
-#include "TextStream.h"
-#include "ParseJobFiles.h"
 
 #include <QtDebug>
 

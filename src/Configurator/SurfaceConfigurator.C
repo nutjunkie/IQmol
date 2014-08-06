@@ -265,6 +265,12 @@ void Surface::setNegativeColor(QColor const& color)
 }
 
 
+void Surface::setArea(double const area)
+{
+   m_surfaceConfigurator.areaLabel->setText(QString::number(area, 'f', 3));
+}
+
+
 void Surface::on_transparencySlider_valueChanged(int value)
 {
    m_surface.setAlpha(value/100.0);

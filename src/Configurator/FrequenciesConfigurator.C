@@ -37,7 +37,11 @@ Frequencies::Frequencies(Layer::Frequencies& frequencies) : m_frequencies(freque
    m_frequenciesConfigurator.setupUi(this);
 
    m_frequenciesConfigurator.frequencyTable->horizontalHeader()
+#if QT_VERSION >= 0x050000
+     ->setSectionResizeMode(QHeaderView::Stretch);
+#else
       ->setResizeMode(QHeaderView::Stretch);
+#endif
 
    connect(this, SIGNAL(update()), &m_frequencies, SIGNAL(update()));
 
@@ -60,6 +64,7 @@ void Frequencies::load()
    for (iter = modes.begin(); iter != modes.end(); ++iter) {
        frequency = new QTableWidgetItem( (*iter)->text() );
        frequency->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
+
        intensity = new QTableWidgetItem(QString::number((*iter)->intensity(), 'f', 3));
 
        frequency->setData(Qt::UserRole, QVariantPointer<Layer::Mode>::toQVariant(*iter));

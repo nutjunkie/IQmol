@@ -25,7 +25,7 @@
 #include "BasicServer.h"
 #include "PBSServer.h"
 #include "SGEServer.h"
-#include "HttpServer.h"
+//#include "HttpServer.h"
 #include "System.h"
 #include "QsLog.h"
 #include "QMsgBox.h"
@@ -91,6 +91,7 @@ Server::~Server()
 void Server::setDelegate(Host const host, Type const type)
 {
    if (m_serverDelegate) delete m_serverDelegate;
+   m_serverDelegate = 0;
 
    switch (type) {
       case Basic:
@@ -103,7 +104,8 @@ void Server::setDelegate(Host const host, Type const type)
          m_serverDelegate = new SGEServer(this, m_delegateDefaults);
          break;
       case HTTP:
-         m_serverDelegate = new HttpServer(this, m_delegateDefaults);
+         qDebug() << "WARNING: HttpServer being ignored";
+         //m_serverDelegate = new HttpServer(this, m_delegateDefaults);
          break;
    }
 

@@ -219,7 +219,7 @@ QString QChemDatabaseFilePath()
    if (value.isNull()) {
       QDir dir(QApplication::applicationDirPath());
       dir.cdUp();
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
       dir.cd("Resources");
 #else
       dir.cd("bin");

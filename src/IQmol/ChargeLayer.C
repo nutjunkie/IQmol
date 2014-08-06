@@ -26,6 +26,7 @@
 
 #include <QColor>
 #include <cmath>
+#include <OpenGL.h>
 //#include <GLUT/glut.h>
 
 #include <QtDebug>

@@ -26,8 +26,6 @@
 #include "GeometryListConfigurator.h"
 #include <QHeaderView>
 
-#include <QDebug>
-
 
 using namespace qglviewer;
 
@@ -38,7 +36,11 @@ namespace Configurator {
 GeometryList::GeometryList(Layer::GeometryList& geometryList) : m_geometryList(geometryList)
 {
    m_configurator.setupUi(this);
+#if QT_VERSION >= 0x050000
+   m_configurator.energyTable->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+#else
    m_configurator.energyTable->verticalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+#endif
 }
 
 
@@ -124,7 +126,6 @@ void GeometryList::on_speedSlider_valueChanged(int value)
 
 void GeometryList::on_energyTable_itemSelectionChanged()
 {
-qDebug()<<"GeometryList::on_energyTable_itemSelectionChanged() called";
    QList<QTableWidgetItem*> selection = m_configurator.energyTable->selectedItems();
    if (!selection.isEmpty()) {
       int row(selection.first()->row());

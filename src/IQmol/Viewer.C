@@ -35,6 +35,7 @@
 #include <QtDebug>
 #include <QUrl>
 #include <QGLFramebufferObject>
+#include <QMimeData>
 #include <cmath>
 
 
@@ -164,6 +165,11 @@ void Viewer::draw()
    m_objects = m_viewerModel.getVisibleObjects();
    m_selectedObjects = m_viewerModel.getSelectedObjects();
    ShaderLibrary& library(ShaderLibrary::instance());
+
+   // This should not go here, but I can't figure out where to load the shaders
+   // on Mavericks.  The framebuffers are not propery initialized by the time
+   // init() is called and so the loading fails there.
+   if (!library.shadersInitialized()) library.loadAllShaders();
 
    if (!library.filtersActive() || animationIsStarted()) return fastDraw();
    qDebug() << "Filters are on in drawNew";

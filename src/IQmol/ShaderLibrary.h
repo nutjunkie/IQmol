@@ -88,19 +88,18 @@ namespace IQmol {
          void bindTextures(QString const& shader);
          void releaseTextures();
          void clearFrameBuffers();
+         void loadAllShaders();
          
          QVariantMap uniformUserVariableList(QString const& shaderName);
          bool setUniformVariables(QString const& shaderName, QVariantMap const& map);
          bool setTextureVariable(QString const& shader, QString const& name, Texture const&);
 
          void setFilterVariables(QVariantMap const& map);
-
          void setFiltersAvailable(bool tf) { m_filtersAvailable = tf; };
 
          bool filtersAvailable() { return m_filtersAvailable; };
          bool filtersActive() { return m_filtersActive; };
-
-         void loadAllShaders();
+         bool shadersInitialized() const { return m_shadersInitialized; }
 
          // This does not filter for NoShader
          template <class T>
@@ -147,6 +146,7 @@ namespace IQmol {
 
          bool m_filtersAvailable;
          bool m_filtersActive;
+         bool m_shadersInitialized;
 
          void init();
          void loadPreferences();
@@ -167,7 +167,8 @@ namespace IQmol {
          void setUniformVariable(GLuint program, GLint location, GLFloatArray const& value);
          void setUniformVariable(GLuint program, GLint location, mat4x4 const& value);
 
-         ShaderLibrary() : m_filtersAvailable(false), m_filtersActive(false) { }
+         ShaderLibrary() : m_filtersAvailable(false), m_filtersActive(false),
+            m_shadersInitialized(false) { }
          explicit ShaderLibrary(ShaderLibrary const&) { }
          ~ShaderLibrary();
    };
