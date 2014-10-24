@@ -3,7 +3,7 @@
 #  This is the main IQmol project file.  To use this file type one of
 #  the following commands:
 #
-#     OS X:     qmake -spec macx-g++ -macx -o Makefile IQmol.pro
+#     OS X:     qmake -spec macx-g++ -o Makefile IQmol.pro
 #     Linux:    qmake -unix -o Makefile IQmol.pro
 #     Windows:  qmake.exe -win32 -o Makefile IQmol.pro
 #
@@ -18,10 +18,14 @@ TEMPLATE = subdirs
 SUBDIRS  = Util \
            Data \
            Qui \
-           Configurator \
            Parser \
+           Network \
+           Process \
+           Yaml \
+           Old \
+           Configurator \
            Layer \
-           IQmol \
+           Main \
 
 #          Parser/test \
 

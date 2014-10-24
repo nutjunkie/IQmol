@@ -23,7 +23,6 @@
 ********************************************************************************/
 
 #include "Exception.h"
-#include <libssh2.h>
 
 
 namespace IQmol {
@@ -31,19 +30,25 @@ namespace Network {
 
    class AuthenticationError : public IQmol::Exception {
       public:
-         InvalidAddress() : Exception("Authentication error") { }
-   }
-
-   class InvalidAddress : public IQmol::Exception {
-      public:
-         InvalidAddress() : Exception("Host not found") { }
-   }
-
-   class Timeout : public IQmol::Exception {
-      public:
-         Timeout() : Exception("Connection timed out") { }
+         AuthenticationError() : Exception("Authentication error") { }
    };
 
-} } // end namespace IQmol::SecureConnection
+   class AuthenticationCancelled : public IQmol::Exception {
+      public:
+         AuthenticationCancelled() : Exception("Authentication cancelled") { }
+   };
+
+   class InvalidHostname : public IQmol::Exception {
+      public:
+         InvalidHostname(QString const& hostname) : 
+            Exception(QString("Hostname ") + hostname + " invalid") { }
+   };
+
+   class NetworkTimeout : public IQmol::Exception {
+      public:
+         NetworkTimeout() : Exception("Connection timeout") { }
+   };
+
+} } // end namespace IQmol::Network
 
 #endif

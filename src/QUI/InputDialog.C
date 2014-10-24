@@ -138,7 +138,7 @@ void InputDialog::initializeToolBoxOptions()
       widget->hide();
       m_ui.toolBoxOptions->removeItem(0);
       m_toolBoxOptions.insert(name, widget);
-      qDebug() << "Saving widget" << name << widget;
+      //qDebug() << "Saving widget" << name << widget;
    }
 }
 

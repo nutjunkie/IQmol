@@ -2,13 +2,16 @@ LIB = Layer
 CONFIG += lib
 include(../common.pri)
 
-INCLUDEPATH += ../Data ../Util ../IQmol ../Configurator ../Parser
-INCLUDEPATH += $$BUILD_DIR/IQmol
+INCLUDEPATH += ../Data ../Util ../Old ../Configurator ../Parser
+#INCLUDEPATH += $$BUILD_DIR/IQmol
 
 SOURCES = \
+   $$PWD/AtomLayer.C \
    $$PWD/AxesLayer.C \
    $$PWD/AxesMeshLayer.C \
    $$PWD/BackgroundLayer.C \
+   $$PWD/BondLayer.C \
+   $$PWD/ChargeLayer.C \
    $$PWD/ConstraintLayer.C \
    $$PWD/ContainerLayer.C \
    $$PWD/CubeDataLayer.C \
@@ -23,19 +26,26 @@ SOURCES = \
    $$PWD/InfoLayer.C \
    $$PWD/Layer.C \
    $$PWD/LayerFactory.C \
+   $$PWD/MoleculeLayer.C \
    $$PWD/MolecularOrbitalsLayer.C \
-   $$PWD/SurfaceLayer.C
+   $$PWD/PrimitiveLayer.C \
+   $$PWD/SurfaceLayer.C \
+
 
 HEADERS = \
+   $$PWD/AtomLayer.h \
    $$PWD/AxesLayer.h \
    $$PWD/AxesMeshLayer.h \
    $$PWD/BackgroundLayer.h \
+   $$PWD/BondLayer.h \
+   $$PWD/ChargeLayer.h \
    $$PWD/ConstraintLayer.h \
    $$PWD/ContainerLayer.h \
    $$PWD/CubeDataLayer.h \
    $$PWD/DipoleLayer.h \
    $$PWD/GeometryLayer.h \
    $$PWD/GeometryListLayer.h \
+   $$PWD/GlobalLayer.h \
    $$PWD/EfpFragmentLayer.h \
    $$PWD/EfpFragmentListLayer.h \
    $$PWD/FileLayer.h \
@@ -45,5 +55,9 @@ HEADERS = \
    $$PWD/InfoLayer.h \
    $$PWD/Layer.h \
    $$PWD/LayerFactory.h \
+   $$PWD/MoleculeLayer.h \
    $$PWD/MolecularOrbitalsLayer.h \
-   $$PWD/SurfaceLayer.h
+   $$PWD/PrimitiveLayer.h \
+   $$PWD/SurfaceLayer.h \
+
+

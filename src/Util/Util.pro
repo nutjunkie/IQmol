@@ -4,6 +4,8 @@ include(../common.pri)
 
 SOURCES = \
    $$PWD/Align.C \
+   $$PWD/ColorGradient.C \
+   $$PWD/ColorGradientdialog.C \
    $$PWD/EulerAngles.C \
    $$PWD/Function.C \
    $$PWD/Matrix.C \
@@ -15,8 +17,11 @@ SOURCES = \
 
 HEADERS = \
    $$PWD/Align.h \
+   $$PWD/ColorGradient.h \
+   $$PWD/ColorGradientdialog.h \
    $$PWD/Constants.h \
    $$PWD/EulerAngles.h \
+   $$PWD/Exception.h \
    $$PWD/Function.h \
    $$PWD/Matrix.h \
    $$PWD/Numerical.h \
@@ -27,6 +32,8 @@ HEADERS = \
    $$PWD/SetButtonColor.h \
    $$PWD/Task.h \
 
+FORMS += \
+   $$PWD/ColorGradientDialog.ui \
 
 # QMsgBox
 SOURCES += \

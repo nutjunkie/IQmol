@@ -25,9 +25,27 @@
 #include <climits> // for UINT_MAX
 #include <QString>
 
+#ifdef WIN32
+#define in_addr_t uint32_t
+#else
+#include <netinet/in.h>
+#endif
+
+
 namespace IQmol {
 namespace Network {
 
+   enum Error { NoError, Initialization, Timeout, Unknown };
+   QString ToString(Error const& error);
+
+   /// Returns INADDR_NONE if there is a problem with the name lookup
+   in_addr_t HostLookup(QString const& hostname);
+
+   /// Performs a synchonous test on the network to determine if we are
+   /// connected or not.
+   bool TestNetworkConnection();
+
+/*
    static const unsigned Unlimited = UINT_MAX;
 
    enum Authentication { None = 0, 
@@ -125,6 +143,7 @@ namespace Network {
       if (s.contains("Web",    Qt::CaseInsensitive))  return Web ;
       return Basic;
    }
+*/
 
 
 } } // end namespace IQmol::Network

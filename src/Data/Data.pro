@@ -2,7 +2,7 @@ LIB = Data
 CONFIG += lib
 include(../common.pri)
 
-INCLUDEPATH += ../Util ../Parser
+INCLUDEPATH += ../Util ../Parser ../Yaml
 
 SOURCES = \
    $$PWD/Atom.C \
@@ -32,7 +32,8 @@ SOURCES = \
    $$PWD/Surface.C \
    $$PWD/SurfaceInfo.C \
    $$PWD/SurfaceType.C \
-   $$PWD/VibrationalMode.C
+   $$PWD/VibrationalMode.C \
+   $$PWD/YamlNode.C
 
 HEADERS = \
    $$PWD/Atom.h \
@@ -67,4 +68,5 @@ HEADERS = \
    $$PWD/Surface.h \
    $$PWD/SurfaceInfo.h \
    $$PWD/SurfaceType.h \
-   $$PWD/VibrationalMode.h
+   $$PWD/VibrationalMode.h \
+   $$PWD/YamlNode.h

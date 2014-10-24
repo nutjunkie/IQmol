@@ -2,8 +2,8 @@ LIB = Configurator
 CONFIG += lib
 include(../common.pri)
 
-INCLUDEPATH += ../Layer ../Data ../Util ../IQmol
-INCLUDEPATH += $$BUILD_DIR/IQmol
+INCLUDEPATH += ../Layer ../Data ../Util ../Old
+#INCLUDEPATH += $$BUILD_DIR/IQmol
 
 SOURCES = \
    $$PWD/AxesMeshConfigurator.C \
@@ -16,6 +16,7 @@ SOURCES = \
    $$PWD/FrequenciesConfigurator.C \
    $$PWD/GeometryListConfigurator.C \
    $$PWD/InfoConfigurator.C \
+   $$PWD/MoleculeConfigurator.C \
    $$PWD/MolecularOrbitalsConfigurator.C \
    $$PWD/SurfaceConfigurator.C
 
@@ -31,6 +32,7 @@ HEADERS = \
    $$PWD/FrequenciesConfigurator.h \
    $$PWD/GeometryListConfigurator.h \
    $$PWD/InfoConfigurator.h \
+   $$PWD/MoleculeConfigurator.h \
    $$PWD/MolecularOrbitalsConfigurator.h \
    $$PWD/SurfaceConfigurator.h
 
@@ -44,6 +46,7 @@ FORMS = \
    $$PWD/FrequenciesConfigurator.ui \
    $$PWD/GeometryListConfigurator.ui \
    $$PWD/InfoConfigurator.ui \
+   $$PWD/MoleculeConfigurator.ui \
    $$PWD/MolecularOrbitalsConfigurator.ui \
    $$PWD/ScalarConstraintConfigurator.ui \
    $$PWD/SurfaceConfigurator.ui \

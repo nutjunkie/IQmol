@@ -77,7 +77,19 @@ void ResetBrowserPreferences()
            << "QChemDatabaseFilePath"
            << "LogFilePath"
            << "LogFileHidden"
-           << "LoggingEnabled";
+           << "LoggingEnabled"
+           // And a few others
+           << "MainWindowSize"
+           << "QuiWindowSize"
+           << "ShowModelView"
+           << "ShaderDirectory"
+           << "DefaultShader"
+           << "DefaultShaderParameters"
+           << "BackgroundColor"
+           << "ForegroundColor"
+           << "CurrentProcessList"
+           << "FileDisplayWindowSize"
+;
 
    QSettings settings(QSettings::UserScope, s_organization, s_application);
    for (int i = 0; i < options.size(); ++i) {
@@ -636,6 +648,23 @@ void ServerList(QVariantList const& servers)
 
 // ---------
 
+QVariantList ServerConfigurationList()
+{
+   QVariant value(Get("ServerConfigurationList"));
+   QVariantList list;
+   if (!value.isNull()) list = value.toList();
+   return list;
+}
+
+void ServerConfigurationList(QVariantList const& servers)
+{
+   SetList("ServerConfigurationList", servers);
+}
+
+
+// ---------
+
+
 
 QVariantList CurrentProcessList()
 {
@@ -658,7 +687,7 @@ void CurrentProcessList(QVariantList const& processList)
 // Size of the InputDialog window
 QSize QuiWindowSize() {
    QVariant value(Get("QuiWindowSize"));
-   return value.isNull() ? QSize(960,570) : value.value<QSize>();
+   return value.isNull() ? QSize(480,520) : value.value<QSize>();
 }
 
 void QuiWindowSize(QSize const& size) {

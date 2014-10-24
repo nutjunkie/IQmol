@@ -35,6 +35,7 @@
 #include "ExternalChargesParser.h"
 #include "FormattedCheckpointParser.h"
 #include "OpenBabelParser.h"
+#include "YamlParser.h"
 
 #include <QFileInfo>
 #include <QDir>
@@ -92,9 +93,12 @@ void ParseFile::run()
 {
    Data::FileList* fileList = new Data::FileList();
 
+   bool addToFileList(true);
    QStringList::const_iterator file;
    for (file = m_filePaths.begin(); file != m_filePaths.end(); ++file) {
-       if (parse(*file)) fileList->append(new Data::File(*file));
+       if (parse(*file, addToFileList)) {
+          if (addToFileList) fileList->append(new Data::File(*file));
+       }
    }
 
    if (fileList->isEmpty()) {
@@ -105,9 +109,10 @@ void ParseFile::run()
 }
 
 
-bool ParseFile::parse(QString const& filePath)
+bool ParseFile::parse(QString const& filePath, bool& addToFileList)
 {
    QFileInfo fileInfo(filePath);
+   addToFileList = true;
    
    if (!fileInfo.exists()) {
       QString msg("File not found: ");
@@ -138,17 +143,14 @@ bool ParseFile::parse(QString const& filePath)
    }
 
    if (extension == "in"  || extension == "qcin"  || extension == "inp") {
-      QLOG_INFO() << "Using QChemInput parser";
       parser = new QChemInput;
    }
 
    if (extension == "out"  || extension == "qcout") {
-      QLOG_INFO() << "Using QChemOutput parser";
       parser = new QChemOutput;
    }
 
    if (extension == "iqmol" || extension == "iqm") {
-      QLOG_DEBUG() << "Using IQmol parser";
       parser = new IQmol;
    }
 
@@ -161,7 +163,6 @@ bool ParseFile::parse(QString const& filePath)
    }
 
    if (extension == "fchk" || extension == "fck" || extension == "fch") {
-      QLOG_DEBUG() << "Using FormattedCheckpoint parser";
       parser = new FormattedCheckpoint;
    }
 
@@ -170,6 +171,13 @@ bool ParseFile::parse(QString const& filePath)
       QLOG_DEBUG() << "Using Mesh parser";
       parser = new Mesh;
    }
+
+   if (extension == "yaml" || extension == "cfg") {
+      addToFileList = false;
+      QLOG_DEBUG() << "Using Yaml parser";
+      parser = new Yaml;
+   }
+ 
    
    if (!parser && OpenBabel::formatSupported(extension)) {
       // Only if we do not have a custom parser do we let Open Babel at it

@@ -68,8 +68,9 @@ namespace Data {
                 MultipoleExpansion,     MullikenCharge,         MultipoleDerivedCharge, 
                 AtomicCharge,           GasteigerCharge,        ChelpgCharge,
                 SpinDensity,            VdwRadius,              MultipoleExpansionList,
-                NmrReference,           NmrReferenceList
+                NmrReference,           NmrReferenceList,
                /*---------------------  *---------------------  *--------------------- */
+                YamlNode
       };
 
       QString toString(ID const);

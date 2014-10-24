@@ -388,7 +388,7 @@ GLuint Surface::compile(Data::Mesh const& mesh)
 
          double min, max, property;
          getPropertyRange(min, max);
-         Gradient::Function gradient(m_surface.colors(), min, max);
+         ColorGradient::Function gradient(m_surface.colors(), min, max);
          QColor color;
 
          glBegin(GL_TRIANGLES);

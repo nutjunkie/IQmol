@@ -92,6 +92,8 @@ bool OpenBabel::parseFile(QString const& filePath)
 
 bool OpenBabel::parse(TextStream& stream)
 {
+   // This is a bit hacky as we rely on the file 
+   // extension to determine if we can parse or not
    QFileInfo info(m_filePath);
    QString extension(info.suffix());
 
@@ -125,7 +127,8 @@ bool OpenBabel::parse(TextStream& stream)
    }else {
       m_errors.append("File format error");
    }
-qDebug() << "Just Testing";
+
+   // catch?
 
    return m_errors.isEmpty();
 }

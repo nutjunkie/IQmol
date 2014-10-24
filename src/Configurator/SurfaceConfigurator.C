@@ -25,7 +25,7 @@
 #include "SurfaceConfigurator.h"
 #include "SurfaceLayer.h"
 #include "MoleculeLayer.h"
-#include <openbabel/mol.h>
+#include <openbabel/mol.h>  // for etab
 #include <QColorDialog>
 
 
@@ -201,9 +201,9 @@ void Surface::on_swapColorsButton_clicked(bool)
 }
    
 
-Gradient::ColorList Surface::atomColorGradient(unsigned const maxAtomicNumber)
+ColorGradient::ColorList Surface::atomColorGradient(unsigned const maxAtomicNumber)
 {
-   Gradient::ColorList atomColors;
+   ColorGradient::ColorList atomColors;
    QColor color;
    for (unsigned int Z = 1; Z <= maxAtomicNumber; ++Z) {
        std::vector<double> rgb(OpenBabel::etab.GetRGB(Z));
@@ -233,7 +233,7 @@ void Surface::editGradientColors(bool)
 void Surface::setPositiveColor(QList<QColor> const& colors)
 {
    QString bg("background-color: ");
-   bg += Gradient::ToString(colors);
+   bg += ColorGradient::ToString(colors);
    m_surfaceConfigurator.positiveColorButton->setStyleSheet(bg);
    m_surface.setColors(colors);
 }

@@ -44,6 +44,7 @@
 #include "MultipoleExpansion.h"
 #include "MolecularOrbitals.h"
 #include "PointCharge.h"
+#include "YamlNode.h"
 #include "PointGroup.h"
 #include "RemSectionData.h"
 
@@ -141,8 +142,9 @@ Base* Factory::create(Type::ID const id)
       case Type::SurfaceInfo:             data = new SurfaceInfo();             break;
       case Type::SurfaceInfoList:         data = new SurfaceInfoList();         break;
       case Type::SurfaceType:             data = new SurfaceType();             break;
+//    case Type::NmrReference:            data = new NmrReference();            break;
 
-      case Type::NmrReference:            data = new NmrReference();            break;
+      case Type::YamlNode:                data = new YamlNode();                break;
 
    default: 
       qDebug() << "TypeID:" << id;

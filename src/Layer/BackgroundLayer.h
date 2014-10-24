@@ -51,6 +51,7 @@ namespace Layer {
 
       private:
          void drawGradient();
+         void drawCircleGradient();
          Configurator::Background m_configurator;
    };
 

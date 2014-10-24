@@ -41,7 +41,7 @@ namespace Data {
 	  friend class boost::serialization::access;
 
 	  public: 
-         Bank() : m_deleteContents(true)  { }
+         Bank() : m_deleteContents(true) { }
          ~Bank();
          Type::ID typeID() const { return Type::Bank; }
 
@@ -61,6 +61,15 @@ namespace Data {
             T* t(0);
             for (int i = 0; i < size(); ++i) {
                 if ( (t = dynamic_cast<T*>(value(i))) ) list.append(t);
+            }
+            return list;
+         }
+
+         template <class T>
+         QList<T*> takeData() {
+            QList<T*> list(findData<T>());
+            for (int i = 0; i < list.size(); ++i) {
+                removeAll(list[i]);
             }
             return list;
          }

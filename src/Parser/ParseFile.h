@@ -70,7 +70,7 @@ namespace Parser {
          void setFilePaths(QString const&);
 
          /// Parses a file, returning false only if the file doesn't exist.
-         bool parse(QString const& filePath);
+         bool parse(QString const& filePath, bool& addToFileList);
 
          /// Convenience function that runs a sub-parser over the file.
          void runParser(Base* parser, QString const& filePath);

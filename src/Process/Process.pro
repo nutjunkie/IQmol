@@ -1,0 +1,31 @@
+LIB = Process
+CONFIG += lib
+include(../common.pri)
+
+INCLUDEPATH += ../Util ../Yaml ../Data  ../Parser ../Network
+
+SOURCES = \
+   $$PWD/QueueOptionsDialog.C \
+   $$PWD/Server2.C \
+   $$PWD/ServerConfiguration.C \
+   $$PWD/ServerConfigurationDialog.C \
+   $$PWD/ServerConfigurationListDialog.C \
+   $$PWD/ServerRegistry2.C \
+   $$PWD/SshFileDialog.C \
+   $$PWD/SystemDependent.C \
+
+HEADERS = \
+   $$PWD/QueueOptionsDialog.h \
+   $$PWD/Server2.h \
+   $$PWD/ServerConfiguration.h \
+   $$PWD/ServerConfigurationDialog.h \
+   $$PWD/ServerConfigurationListDialog.h \
+   $$PWD/ServerRegistry2.h \
+   $$PWD/SshFileDialog.h \
+   $$PWD/SystemDependent.h \
+
+FORMS = \
+   $$PWD/QueueOptionsDialog.ui \
+   $$PWD/ServerConfigurationDialog.ui \
+   $$PWD/ServerConfigurationListDialog.ui \
+   $$PWD/SshFileDialog.ui \

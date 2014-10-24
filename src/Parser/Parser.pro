@@ -2,7 +2,7 @@ LIB     = Parser
 CONFIG += lib
 include(../common.pri)
 
-INCLUDEPATH += ../Util ../Data
+INCLUDEPATH += ../Util ../Data ../Yaml
 
 SOURCES += \
    $$PWD/Parser.C \
@@ -19,6 +19,7 @@ SOURCES += \
    $$PWD/QChemOutputParser.C \
    $$PWD/QChemPlotParser.C \
    $$PWD/XyzParser.C \
+   $$PWD/YamlParser.C \
    $$PWD/ZMatrixCoordinatesParser.C
 
 HEADERS += \
@@ -37,4 +38,5 @@ HEADERS += \
    $$PWD/QChemPlotParser.h \
    $$PWD/TextStream.h \
    $$PWD/XyzParser.h \
+   $$PWD/YamlParser.h \
    $$PWD/ZMatrixCoordinatesParser.h

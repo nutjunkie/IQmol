@@ -126,8 +126,11 @@ namespace Preferences {
 
    /// These are probably not what you want.  User the static member functions
    /// of the Server class to get an actual list of Servers.
-   QVariantList ServerList();
-   void ServerList(QVariantList const&);
+   QVariantList ServerList();  // deprecate
+   void ServerList(QVariantList const&);  // deprecate
+
+   QVariantList ServerConfigurationList();
+   void ServerConfigurationList(QVariantList const&);
 
    QMap<QString,QString> PasswordVaultContents();
    void PasswordVaultContents(QMap<QString,QString> const&);

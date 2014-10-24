@@ -1,40 +1,94 @@
 CONFIG += no_keywords
-QT     += xml opengl
+QT     += xml opengl gui network
 
-QMAKE_CXXFLAGS += -O2 -g
-#QMAKE_CXXFLAGS += -O0 -g
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets 
+greaterThan(QT_MAJOR_VERSION, 4): CONFIG += home
+lessThan(QT_MAJOR_VERSION, 5): CONFIG += work
+
+#QMAKE_CXXFLAGS += -O2 -g
+QMAKE_CXXFLAGS += -O0 -g
 
 macx {
    CONFIG += release
 
+   # QGLViewer
+   INCLUDEPATH += $(DEV)/libQGLViewer-2.5.3
+   LIBS        += $(DEV)/libQGLViewer-2.5.3/QGLViewer/libQGLViewer.a
+
+   # gfortran
+   LIBS += -L$(DEV)/extlib/lib -lgfortran 
+
+   # OpenMesh
+   INCLUDEPATH += $(DEV)/OpenMesh-2.4/src
+   LIBS        += $(DEV)/OpenMesh-2.4/build/Build/lib/OpenMesh/libOpenMeshCored.a
+   LIBS        += $(DEV)/OpenMesh-2.4/build/Build/lib/OpenMesh/libOpenMeshToolsd.a
+
+   # SSH2
+   # work
+   #INCLUDEPATH += $(DEV)/extlib/include/libssh2
+   #LIBS        += -L$(DEV)/extlib/lib/libssh2/ -lssh2 -lcrypto
+   # home
+   #INCLUDEPATH += $(DEV)/libssh2-1.4.3/include
+   #LIBS        += $(DEV)/libssh2-1.4.3/src/.libs/libssh2.a
+
+   #libcrypto
+   # work
+   #LIBS += -lcrypto
+   # home
+   #LIBS += $(DEV)/extlib/lib/libcrypto.a
+
+   # Boost
+   # work
+   #INCLUDEPATH += $(DEV)/boost_1_56_0/build/include
+   #LIBS        += $(DEV)/boost_1_56_0/build/lib/libboost_iostreams.a
+   #LIBS        += $(DEV)/boost_1_56_0/build/lib/libboost_serialization.a
+   #LIBS        += $(DEV)/boost_1_56_0/build/lib/libboost_exception.a
+   # home
+   #INCLUDEPATH  += $(DEV)/extlib/include
+   #LIBS         += $(DEV)/extlib/lib/libboost_iostreams.a \
+   #                $(DEV)/extlib/lib/libboost_serialization.a \
+   #                $(DEV)/extlib/lib/libboost_exception.a
+
    # OpenBabel
    INCLUDEPATH += /usr/local/include/openbabel-2.0
    LIBS        += -L/usr/local/lib -lopenbabel
-   #INCLUDEPATH += $(DEV)/extlib/include
-   #LIBS        += -L$(DEV)/extlib/lib -lopenbabel
-   
-   # Boost
-   INCLUDEPATH += $(DEV)/Boost/include
-   LIBS        += -L$(DEV)/Boost/lib -lboost_iostreams -lboost_serialization
-   
-   # QGLViewer
-   INCLUDEPATH += /Library/Frameworks/QGLViewer.framework/Headers
-   LIBS        += -framework QGLViewer
 
-   # OpenMesh
-   INCLUDEPATH += /Users/agilbert/Development/OpenMesh-2.4/src
-   LIBS        += -L/Users/agilbert/Development/OpenMesh-2.4/build/Build/lib/OpenMesh
-   LIBS        += -lOpenMeshCored -lOpenMeshToolsd
-
-   # SSH2
-   INCLUDEPATH += $(DEV)/extlib/include
-   LIBS        += -L$(DEV)/extlib/lib
-   
-   INCLUDEPATH += /usr/local/include
-
+   # Misc
+   LIBS += -L/usr/X11/lib
    LIBS += -framework GLUT
-   LIBS += -L/usr/local/lib -lssl -lssh2 -lcrypto -lz   
-   LIBS += -L/usr/local/gfortran/lib -lgfortran 
+   LIBS += -L/usr/local/lib -lssl -lz
+}
+
+
+home {
+   # SSH2
+   INCLUDEPATH += $(DEV)/libssh2-1.4.3/include
+   LIBS        += $(DEV)/libssh2-1.4.3/src/.libs/libssh2.a
+
+   #libcrypto
+   LIBS += $(DEV)/extlib/lib/libcrypto.a
+
+   # Boost
+   INCLUDEPATH  += $(DEV)/extlib/include
+   LIBS         += $(DEV)/extlib/lib/libboost_iostreams.a \
+                   $(DEV)/extlib/lib/libboost_serialization.a \
+                   $(DEV)/extlib/lib/libboost_exception.a
+}
+
+
+work {
+   # SSH2
+   INCLUDEPATH += $(DEV)/extlib/include/libssh2
+   LIBS        += -L$(DEV)/extlib/lib/libssh2/ -lssh2 -lcrypto
+
+   #libcrypto
+   LIBS += -lcrypto
+
+   # Boost
+   INCLUDEPATH += $(DEV)/boost_1_56_0/build/include
+   LIBS        += $(DEV)/boost_1_56_0/build/lib/libboost_iostreams.a
+   LIBS        += $(DEV)/boost_1_56_0/build/lib/libboost_serialization.a
+   LIBS        += $(DEV)/boost_1_56_0/build/lib/libboost_exception.a
 }
 
 

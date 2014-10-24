@@ -42,6 +42,7 @@ namespace Configurator {
 
       public:
          enum { Orbital, Density, SpinDiffDensity, SpinOnlyDensity };
+
          explicit MolecularOrbitals(Layer::MolecularOrbitals&);
          ~MolecularOrbitals() { }
 

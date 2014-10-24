@@ -37,9 +37,7 @@ namespace Parser {
    class Mesh;
 }
 
-
 namespace Layer {
-   class Mesh; // <-deprecate
    class Surface;
 }
 
@@ -59,9 +57,7 @@ namespace Data {
       friend class boost::serialization::access;
       friend class IQmol::Parser::Mesh;
       friend class IQmol::MeshDecimator;
-
-      friend class IQmol::Layer::Surface; // deprecate
-      friend class IQmol::Layer::Mesh;    // deprecate
+      friend class IQmol::Layer::Surface;
 
     public:
          typedef OMMesh::VertexHandle Vertex;
@@ -139,12 +135,9 @@ namespace Data {
          void dump() const;
 
       protected:
-		 // These are used in Layer::Mesh and are required to access the faces,
-		 // so face iterators are also required before they can be removed.
-         // deprecate
-         OMMesh const& data() const { return m_omMesh; } 
-         OMMesh& data() { return m_omMesh; } 
-    
+          OMMesh const& data() const { return m_omMesh; } 
+          OMMesh& data() { return m_omMesh; } 
+
       private:
 		 /// Specifies the format that the mesh is stored in the archive.
          static std::string const s_archiveFormat;
