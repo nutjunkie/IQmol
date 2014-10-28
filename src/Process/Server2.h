@@ -23,8 +23,14 @@
 ********************************************************************************/
 
 #include "ServerConfiguration.h"
+#include "Connection.h"
 
 namespace IQmol {
+
+namespace Network {
+   class Connection;
+}
+
 namespace Process2 {
 
    class Server {
@@ -38,16 +44,19 @@ namespace Process2 {
 
          QStringList tableFields() const;
 
+         void open();
+
       protected:
          Server(ServerConfiguration const&);
          Server();
-         ~Server() { }
+         ~Server();
 
          // this will probably have to be move up, or pass-through functions created
          ServerConfiguration& configuration() { return m_configuration; }
 
       private:
-        ServerConfiguration m_configuration;
+        ServerConfiguration  m_configuration;
+        Network::Connection* m_connection;
    };
 
 } } // end namespace IQmol::Process

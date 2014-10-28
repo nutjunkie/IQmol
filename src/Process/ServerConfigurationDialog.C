@@ -61,6 +61,8 @@ void ServerConfigurationDialog::init()
 
    // Not pretty, the ordering of these is linked to the enum in Network/SshConnection.h
    m_dialog.authentication->addItem(
+      ServerConfiguration::toString(Network::SshConnection::None)); 
+   m_dialog.authentication->addItem(
       ServerConfiguration::toString(Network::SshConnection::Agent)); 
    m_dialog.authentication->addItem(
       ServerConfiguration::toString(Network::SshConnection::HostBased)); 

@@ -14,6 +14,7 @@ SOURCES = \
    $$PWD/ScanDirectory.C \
    $$PWD/SetButtonColor.C \
    $$PWD/Task.C \
+   $$PWD/Timer.C \
 
 HEADERS = \
    $$PWD/Align.h \
@@ -31,9 +32,12 @@ HEADERS = \
    $$PWD/ScanDirectory.h \
    $$PWD/SetButtonColor.h \
    $$PWD/Task.h \
+   $$PWD/Timer.h \
 
 FORMS += \
    $$PWD/ColorGradientDialog.ui \
+
+
 
 # QMsgBox
 SOURCES += \

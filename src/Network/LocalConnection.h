@@ -39,10 +39,11 @@ namespace Network {
 
          void open();
          void close();
+         void authenticate(AuthenticationT const, QString const& username);
 
-         Reply* execute(QString const& command, unsigned const timeout = TIMEOUT);
-         Reply* sendFile(QString const& command, unsigned const timeout = TIMEOUT);
-         Reply* receiveFile(QString const& command, unsigned const timeout = TIMEOUT);
+         Reply* execute(QString const& command);
+         Reply* getFile(QString const& sourcePath, QString const& destinationPath);
+         Reply* putFile(QString const& sourcePath, QString const& destinationPath);
    };
 
 } } // end namespace IQmol::Network

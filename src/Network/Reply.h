@@ -37,24 +37,32 @@ namespace Network {
       public:
          enum Status { Waiting, Running, Finished, Error, Interrupted, TimedOut };
 
-         Reply() : m_status(Waiting), m_interrupt(false) { }
+         Reply() : m_status(Waiting), m_interrupt(false) { 
+            connect(this, SIGNAL(startSignal()), this, SLOT(run()));
+         }
          virtual ~Reply() { }
 
          QString message() const { return m_message; }
          Status status() const { return m_status; }
-         virtual void start() = 0;
+         void start() { startSignal(); }
 
       public Q_SLOTS:
          void interrupt() { m_interrupt = true; }
 
       Q_SIGNALS:
+         void startSignal();
          void updateAvailable();
+         /// Issued when the request has finished, check the status to see
+         /// if it completed or if an error occured
          void finished();
 
+      protected Q_SLOTS:
+         virtual void run() = 0;
+
       protected:
-          Status  m_status;
-          QString m_message;
-          bool    m_interrupt;
+         Status  m_status;
+         QString m_message;
+         bool    m_interrupt;
    };
 
 } } // end namespace IQmol::Network

@@ -39,6 +39,9 @@ namespace Network {
       public:
          enum Status { Closed, Opened, Authenticated };
 
+         enum AuthenticationT { None, Agent, HostBased, KeyboardInteractive, Password,
+            PublicKey };
+
          Connection(QString const& hostname, int const port) : QObject(), m_hostname(hostname),
             m_port(port), m_status(Closed), m_timeout(10000) { }  // 10s default
          
@@ -46,6 +49,10 @@ namespace Network {
 
          virtual void open() = 0;
          virtual void close() = 0;
+
+         virtual void authenticate(AuthenticationT const, QString const& /*userName*/) {
+            m_status = Authenticated; 
+         }
 
          virtual Reply* execute(QString const& command) = 0;
          virtual Reply* getFile(QString const& sourcePath, QString const& destinationPath) = 0;

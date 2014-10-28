@@ -110,7 +110,7 @@ Process::Status SGEServer::parseQueryString(QString const& query, Process* proce
          for (int i = 1; i < tokens.size(); ++i) {
              if (rx.indexIn(tokens[i]) >=0) {
                 qDebug() << "RegExp matched:" << rx.cap(1);
-                process->resetTimer(Timer::toSeconds(rx.cap(1)));
+                process->resetTimer(Util::Timer::toSeconds(rx.cap(1)));
                 break;
              }
          }

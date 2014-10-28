@@ -39,26 +39,22 @@ namespace Network {
       Q_OBJECT
 
       public:
-         // We take ownership of the QNetworkReply pointer
-         HttpReply(HttpConnection* connection);
+         HttpReply(HttpConnection*);
          virtual ~HttpReply();
 
-         void start() { run(); }
-
       protected:
-         virtual void run() = 0;
          HttpConnection* m_connection;
          unsigned m_timeout;
-         QNetworkReply* m_networkReply;
+         QNetworkReply* m_networkReply;  // We take ownership of this
          QTimer m_timer;
          bool m_https;
        
       protected Q_SLOTS:
-          void finishedSlot();
-          void errorSlot(QNetworkReply::NetworkError);
+         void finishedSlot();
+         void errorSlot(QNetworkReply::NetworkError);
 
       private Q_SLOTS:
-          void timeout();
+         void timeout();
    };
 
 
@@ -70,7 +66,7 @@ namespace Network {
          HttpGet(HttpConnection*, QString const& sourcePath);
          HttpGet(HttpConnection*, QString const& sourcePath, QString const& destinationPath);
 
-      protected:
+      protected Q_SLOTS:
          void run();
 
       private Q_SLOTS:
@@ -80,8 +76,8 @@ namespace Network {
 
       private:
          void setSourceUrl(QString const& sourcePath);
-         QUrl    m_sourceUrl;
-         QFile*  m_file;
+         QUrl   m_sourceUrl;
+         QFile* m_file;
    };
 
 

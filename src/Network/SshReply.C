@@ -32,17 +32,16 @@ namespace Network {
 
 SshReply::SshReply(SshConnection* connection) : m_connection(connection)
 { 
-   connect(this, SIGNAL(startSignal()), this, SLOT(runSlot()));
 }
 
 
-void SshReply::runSlot()
+void SshReply::run()
 {
    // We catch exceptions here as we expect the Reply to be running
    // on a Connection thread.
    try {
       m_status = Running;
-      run();
+      runDelegate();
       m_status = m_interrupt ? Interrupted : Finished;
    }catch (NetworkTimeout& ex) {
       m_status  = TimedOut;
@@ -57,7 +56,7 @@ void SshReply::runSlot()
 
 // -------------- SshTest ----------------
 
-void SshTest::run() 
+void SshTest::runDelegate() 
 {
    for (int i = 0; i < 10; ++i) {
       QLOG_TRACE() << "Running thread" << m_id << i;
@@ -69,7 +68,7 @@ void SshTest::run()
 
 // -------------- SshExecute ----------------
 
-void SshExecute::run()
+void SshExecute::runDelegate()
 {
    QLOG_TRACE() << "SshExecute" << m_command;
    QString error;
@@ -157,7 +156,7 @@ void SshExecute::run()
 
 // -------------- SshPutFile ----------------
 
-void SshPutFile::run()
+void SshPutFile::runDelegate()
 {
    QLOG_TRACE() << "SshPutFile:" << m_sourcePath << "->" << m_destinationPath;
 
@@ -237,7 +236,7 @@ void SshPutFile::run()
 
 // -------------- SshGetFile ----------------
 
-void SshGetFile::run()
+void SshGetFile::runDelegate()
 {
    QLOG_TRACE() << "SshGetFile " << m_destinationPath << "<-" << m_sourcePath;
 

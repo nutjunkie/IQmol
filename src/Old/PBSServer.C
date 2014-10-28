@@ -109,7 +109,7 @@ Process::Status PBSServer::parseQueryString(QString const& query, Process* proce
 
        if ((*iter).contains("resources_used.walltime =")) {
           QString time((*iter).split(QRegExp("\\s+"), QString::SkipEmptyParts).last());
-          process->resetTimer(Timer::toSeconds(time));
+          process->resetTimer(Util::Timer::toSeconds(time));
        }else if ((*iter).contains("comment =")) {
           process->setComment((*iter).remove("comment = ").trimmed());
        }

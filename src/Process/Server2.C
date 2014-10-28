@@ -21,16 +21,27 @@
 ********************************************************************************/
 
 #include "Server2.h"
+#include "LocalConnection.h"
+#include "SshConnection.h"
+#include "HttpConnection.h"
+#include "QsLog.h"
 #include <QDebug>
 
 
 namespace IQmol {
 namespace Process2 {
 
-Server::Server(ServerConfiguration const& configuration) : m_configuration(configuration)
+Server::Server(ServerConfiguration const& configuration) : m_configuration(configuration),
+   m_connection(0)
 {
    qDebug() << "Constructing a New Server with configuration";
    m_configuration.dump();
+}
+
+
+Server::~Server()
+{
+   if (m_connection) delete m_connection;
 }
 
 
@@ -46,11 +57,50 @@ QStringList Server::tableFields() const
    fields.append(m_configuration.name());
    fields.append(m_configuration.value(ServerConfiguration::HostAddress).toString());
    fields.append(ServerConfiguration::toString(m_configuration.connection()));
-   //fields.append(m_configuration.value(ServerConfiguration::UserName).toString());
-   fields.append(m_configuration.value(ServerConfiguration::Submit).toString());
+   fields.append(m_configuration.value(ServerConfiguration::UserName).toString());
+   //fields.append(m_configuration.value(ServerConfiguration::Submit).toString());
 
    return fields;
 }
 
+
+void Server::open()
+{
+   if (!m_connection) {
+      QVariant address(m_configuration.value(ServerConfiguration::HostAddress));
+      int port(m_configuration.port());
+
+      switch (m_configuration.connection()) {
+         case ServerConfiguration::Local:
+            m_connection = new Network::LocalConnection();
+            break;
+         case ServerConfiguration::SSH:
+            m_connection = new Network::SshConnection(address.toString(), port);
+            break;
+         case ServerConfiguration::HTTP:
+         case ServerConfiguration::HTTPS:
+            m_connection = new Network::HttpConnection(address.toString(), port);
+            break;
+      }
+   }
+
+   if (m_connection->status() == Network::Connection::Closed) {
+      m_connection->open();
+   }
+
+   if (m_connection->status() == Network::Connection::Opened) {
+      Network::Connection::AuthenticationT authentication(m_configuration.authentication());
+      QVariant userName(m_configuration.value(ServerConfiguration::UserName));
+      m_connection->authenticate(authentication, userName.toString());
+   }
+
+   if (m_connection->status() != Network::Connection::Authenticated) {
+      QLOG_WARN() << "Server::open() failed to connect";
+      m_connection->close();
+      delete m_connection;
+      m_connection = 0;
+      return;
+   }
+}
 
 } } // end namespace IQmol::Process

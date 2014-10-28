@@ -7,7 +7,7 @@
  *  \date November 2008
  */
 
-#include "Job.h"
+#include "QCJob.h"
 #include "OptionDatabase.h"
 #include "Option.h"
 #include "RemSection.h"

@@ -35,20 +35,15 @@ namespace Network {
       Q_OBJECT
 
       public:
-         SshReply(SshConnection* connection);
+         SshReply(SshConnection*);
          virtual ~SshReply() { }
 
-         void start() { startSignal(); }
-
-      Q_SIGNALS:
-         void startSignal();
+      protected Q_SLOTS:
+         void run();
 
       protected:
-         virtual void run() = 0;
+         virtual void runDelegate() = 0;
          SshConnection* m_connection;
-
-      private Q_SLOTS:
-         void runSlot();
    };
 
 
@@ -61,7 +56,7 @@ namespace Network {
             SshReply(connection), m_id(id) { }
 
       protected:
-         void run();
+         void runDelegate();
 
       private:
          QString m_id;
@@ -77,7 +72,7 @@ namespace Network {
             SshReply(connection), m_command(command) { }
 
       protected:
-         void run();
+         void runDelegate();
 
       private:
          QString m_command;
@@ -97,7 +92,7 @@ namespace Network {
          void copyProgress();
 
       protected:
-         void run();
+         void runDelegate();
 
       private:
          QString m_sourcePath;
@@ -118,7 +113,7 @@ namespace Network {
          void copyProgress();
 
       protected:
-         void run();
+         void runDelegate();
 
       private:
          QString m_sourcePath;

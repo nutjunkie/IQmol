@@ -63,7 +63,6 @@ SOURCES += \
    $$PWD/SpatialProperty.C \
    $$PWD/SurfaceAnimatorDialog.C \
    $$PWD/SymmetryToleranceDialog.C \
-   $$PWD/Timer.C \
    $$PWD/UndoCommands.C \
    $$PWD/Viewer.C \
    $$PWD/ViewerModel.C \
@@ -126,7 +125,6 @@ HEADERS += \
    $$PWD/SurfaceAnimatorDialog.h \
    $$PWD/SymmetryToleranceDialog.h \
    $$PWD/Threaded.h \
-   $$PWD/Timer.h \
    $$PWD/UndoCommands.h \
    $$PWD/Viewer.h \
    $$PWD/ViewerModel.h \

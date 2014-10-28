@@ -57,7 +57,8 @@ QFontMetrics Viewer::s_labelFontMetrics(Viewer::s_labelFont);
 
 
 //! Window set up is done here
-Viewer::Viewer(ViewerModel& model, QWidget* parent) : QGLViewer(parent), 
+Viewer::Viewer(ViewerModel& model, QWidget* parent) : 
+   QGLViewer(QGLFormat(QGL::SampleBuffers), parent), 
    m_viewerModel(model), 
    m_selectionHighlighting(true),
    m_labelType(Layer::Atom::None),
@@ -213,6 +214,17 @@ void Viewer::draw()
    if (m_currentHandler->selectionMode() != Handler::None) {
       drawSelectionRectangle(m_selectHandler.region());
    }
+
+   // Post draw stuff really
+   float color[4];
+   color[0] = foregroundColor().red()   / 255.0;
+   color[1] = foregroundColor().green() / 255.0;
+   color[2] = foregroundColor().blue()  / 255.0;
+   color[3] = 1.0;
+   glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
+   glDisable(GL_LIGHTING);
+   glDisable(GL_DEPTH_TEST);
+
    displayGeometricParameter(m_selectedObjects);
 }
 
@@ -221,6 +233,7 @@ void Viewer::fastDraw()
 {
    if (m_blockUpdate) return;
 
+//qDebug() << "Fast draw called";
    makeCurrent();
    Layer::GLObject::SetCameraPosition(camera()->position());
 
@@ -232,16 +245,28 @@ void Viewer::fastDraw()
    library.resume();
    drawGlobals();
    drawObjects(m_objects);
-   drawSelected(m_selectedObjects);
    drawObjects(m_currentBuildHandler->buildObjects());
 
-   // suspend the shader for writing text
+   // suspend the shader for writing text and highlighting
    library.suspend();
+   drawSelected(m_selectedObjects);
 
    if (m_labelType != Layer::Atom::None) drawLabels(m_objects);
    if (m_currentHandler->selectionMode() != Handler::None) {
       drawSelectionRectangle(m_selectHandler.region());
    }
+
+   // Post draw stuff really
+qglColor(foregroundColor());
+   float color[4];
+   color[0] = foregroundColor().red()   / 255.0;
+   color[1] = foregroundColor().green() / 255.0;
+   color[2] = foregroundColor().blue()  / 255.0;
+   color[3] = 1.0;
+   glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
+   glDisable(GL_LIGHTING);
+   //glDisable(GL_DEPTH_TEST);
+
    displayGeometricParameter(m_selectedObjects);
 }
 
@@ -413,6 +438,7 @@ void Viewer::drawSelected(GLObjectList const& objects)
    glDisable(GL_STENCIL_TEST);
    glDisable(GL_BLEND);
    glEnable(GL_LIGHTING);
+qDebug() << "Finished Draw selected";
 }
 
 
@@ -524,10 +550,13 @@ void Viewer::displayGeometricParameter(GLObjectList const& selection)
          break;
 
       default:
+         return;
          break;
    }
 
-   displayMessage(msg); 
+
+   drawText(10, height()-10, msg);
+   //displayMessage(msg); 
 }
 
 
@@ -1045,14 +1074,11 @@ GLObjectList Viewer::startManipulation(QMouseEvent* event)
 }
 
 
-
-// --------------- Save Snapshot ---------------
 void Viewer::saveSnapshot()
 { 
    QGLViewer::saveSnapshot(false); 
    //Snapshot snap(this);
    //snap.capture();
 }
-
 
 } // end namespace IQmol

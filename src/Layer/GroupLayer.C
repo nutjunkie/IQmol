@@ -154,21 +154,22 @@ PrimitiveList Group::ungroup()
 
    AtomList::iterator atom;
    for (atom = m_atoms.begin(); atom != m_atoms.end(); ++atom) {
-       m_atoms.removeAll(*atom);
        Vec pos((*atom)->getPosition());
        (*atom)->setReferenceFrame(0);
        (*atom)->setPosition(pos);
        (*atom)->orphanLayer();
        primitives.append(*atom);
    }
+   m_atoms.clear();
 
    BondList::iterator bond;
    for (bond = m_bonds.begin(); bond != m_bonds.end(); ++bond) {
-       m_bonds.removeAll(*bond);
        (*bond)->setReferenceFrame(0);
        (*bond)->orphanLayer();
        primitives.append(*bond);
    }
+
+   m_bonds.clear();
 
    return primitives;
 }

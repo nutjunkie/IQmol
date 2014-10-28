@@ -1,5 +1,5 @@
-#ifndef IQMOL_TIMER_H
-#define IQMOL_TIMER_H
+#ifndef IQMOL_UTIL_TIMER_H
+#define IQMOL_UTIL_TIMER_H
 /*******************************************************************************
        
   Copyright (C) 2011-2013 Andrew Gilbert
@@ -27,6 +27,7 @@
 
 
 namespace IQmol {
+namespace Util {
 
    /// Low resolution (second) Timer class that measures time periods over a day.
    class Timer : public QObject {
@@ -63,7 +64,6 @@ namespace IQmol {
          QTimer  m_dayTimer;
    };
 
-} // end namespace IQmol
-
+} } // end namespace IQmol::Util
 
 #endif

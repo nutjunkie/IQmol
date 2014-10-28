@@ -50,6 +50,7 @@ void HttpConnection::open()
 }
 
 
+
 HttpConnection::~HttpConnection()
 {
    close();
@@ -80,7 +81,7 @@ Reply* HttpConnection::putFile(QString const& sourcePath, QString const& destina
 {
    // souce Path is local and may need to be loaded into a buffer
    // destination path will be a URL waiting to accept the text
-QLOG_WARN() << "Returning bogus sendFile HttpGet response";
+   QLOG_WARN() << "Returning bogus sendFile HttpGet response";
    HttpGet* reply(new HttpGet(this, sourcePath, destinationPath));
    reply->start();
    return reply;

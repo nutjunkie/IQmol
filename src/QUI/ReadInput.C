@@ -23,7 +23,7 @@
 #include <QRegExp>
 #include <QMessageBox>
 
-#include "Job.h"
+#include "QCJob.h"
 #include "Qui.h" 
 #include "RemSection.h"
 #include "MoleculeSection.h"

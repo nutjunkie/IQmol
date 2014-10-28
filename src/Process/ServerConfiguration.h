@@ -36,7 +36,7 @@ namespace Process2 {
    class ServerConfiguration {
 
       friend class ServerConfigurationDialog;
-      typedef Network::SshConnection::AuthenticationT AuthenticationT;
+      typedef Network::Connection::AuthenticationT AuthenticationT;
 
       public:
          enum FieldT { ServerName = 0, Connection, QueueSystem, HostAddress, Port,

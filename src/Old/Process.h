@@ -115,7 +115,8 @@ namespace IQmol {
          Status   m_status;
          QString  m_submitTime;
          unsigned m_runTime;
-         Timer    m_timer;
+
+         Util::Timer m_timer;
          Status   m_preCopyStatus;
          int      m_copyProgress; // block count
          int      m_copyTarget;   // target block count (kb blocks)

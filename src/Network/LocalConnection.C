@@ -21,28 +21,55 @@
 ********************************************************************************/
 
 #include "LocalConnection.h"
+#include "LocalReply.h"
 
 
 namespace IQmol {
 namespace Network {
 
+LocalConnection::LocalConnection() : Connection("localhost", 0)
+{
+}
+
+
+LocalConnection::~LocalConnection()
+{
+}
+
+
+void LocalConnection::open()
+{
+   m_status = Connection::Opened;
+}
+
+
+void LocalConnection::close()
+{
+   m_status = Connection::Closed;
+}
+
+
+void LocalConnection::authenticate(AuthenticationT const, QString const& /*username*/)
+{
+   m_status = Connection::Authenticated;
+}
+
             
-Reply* LocalConnection::execute(QString const& command, unsigned const timeout = TIMEOUT)
+Reply* LocalConnection::execute(QString const& command)
 {
-   return LocalReply();
+   return new LocalExecute(this, command);
 }
 
 
-Reply* LocalConnection::sendFile(QString const& command, unsigned const timeout = TIMEOUT)
+Reply* LocalConnection::getFile(QString const& sourcePath, QString const& destinationPath)
 {
-   return LocalReply();
+   return new LocalCopy(this, sourcePath, destinationPath);
 }
 
 
-Reply* LocalConnection::receiveFile(QString const& command, unsigned const timeout = TIMEOUT)
+Reply* LocalConnection::putFile(QString const& sourcePath, QString const& destinationPath)
 {
-   return LocalReply();
+   return new LocalCopy(this, sourcePath, destinationPath);
 }
-
 
 } } // end namespace IQmol::Network

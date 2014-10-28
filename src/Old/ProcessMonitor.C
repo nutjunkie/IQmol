@@ -520,7 +520,7 @@ void ProcessMonitor::processKilled()
    }
 
    QString errorMessage(task->errorMessage());
-   Process* process(task->process());
+   Process* process(task->getProcess());
    task->deleteLater();
 
    if (errorMessage.isEmpty()) {
@@ -579,7 +579,7 @@ qDebug() << "ProcessMonitor::resultsCopied called";
    }
 
    QString errorMessage(task->errorMessage());
-   Process* process(task->process());
+   Process* process(task->getProcess());
    task->deleteLater();
 
    if (errorMessage.isEmpty()) {

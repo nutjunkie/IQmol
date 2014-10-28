@@ -670,7 +670,7 @@ void Server::queryFinished()
    ServerTask::Query* query(qobject_cast<ServerTask::Query*>(sender()));
    if (!query) return;
 
-   Process* process(query->process());
+   Process* process(query->getProcess());
    Process::Status oldStatus(process->status());
    Process::Status newStatus(query->newStatus());
 
@@ -726,7 +726,7 @@ void Server::cleanUpFinished()
    if (!task) return;
 
    QString err(task->runTimeError());
-   Process* process(task->process());
+   Process* process(task->getProcess());
    if (err.isEmpty()) {
       process->setStatus(Process::Finished);
    }else {

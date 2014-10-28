@@ -26,6 +26,7 @@
 
 
 namespace IQmol {
+namespace Util {
 
 const unsigned SecondsInDay = 24*60*60;
 const unsigned MilliSecondsInDay = SecondsInDay * 1000;
@@ -125,4 +126,4 @@ QString Timer::formatTime(unsigned const seconds)
    return QTime(hours, mins, secs).toString("h:mm:ss");
 }
 
-} // end namespace IQmol
+} } // end namespace IQmol::Util

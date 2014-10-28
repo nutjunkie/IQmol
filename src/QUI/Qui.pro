@@ -11,7 +11,6 @@ HEADERS += \
    $$PWD/ExternalChargesSection.h \
    $$PWD/GeometryConstraint.h \
    $$PWD/InputDialog.h \
-   $$PWD/Job.h \
    $$PWD/KeywordSection.h \
    $$PWD/LJParametersSection.h \
    $$PWD/MoleculeSection.h \
@@ -21,6 +20,7 @@ HEADERS += \
    $$PWD/OptionDatabaseForm.h \
    $$PWD/OptionEditors.h \
    $$PWD/OptSection.h \
+   $$PWD/QCJob.h \
    $$PWD/Qui.h \
    $$PWD/QuiMolecule.h \
    $$PWD/QtNode.h \
@@ -33,7 +33,6 @@ SOURCES += \
    $$PWD/GeometryConstraint.C \
    $$PWD/InputDialog.C \
    $$PWD/InputDialogLogic.C \
-   $$PWD/Job.C \
    $$PWD/KeywordSection.C \
    $$PWD/LJParametersSection.C \
    $$PWD/MoleculeSection.C \
@@ -42,6 +41,7 @@ SOURCES += \
    $$PWD/OptionDatabaseForm.C \
    $$PWD/OptionEditors.C \
    $$PWD/OptSection.C \
+   $$PWD/QCJob.C \
    $$PWD/Qui.C \
    $$PWD/QuiMolecule.C \
    $$PWD/RemSection.C \

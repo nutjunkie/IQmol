@@ -30,38 +30,28 @@ namespace Network {
 
    class LocalConnection;
 
-   class SshReply : public Reply {
+   class LocalReply : public Reply {
 
       Q_OBJECT
 
       public:
-         LocalReply(LocalConnection* connection, unsigned timeout);
-         virtual ~SshReply() { }
-
-         void start() { startSignal(); }
-
-      Q_SIGNALS:
-         void startSignal();
+         LocalReply(LocalConnection* connection) : m_connection(connection) { }
+         virtual ~LocalReply() { }
 
       protected:
-         virtual void run() = 0;
          LocalConnection* m_connection;
-         unsigned m_timeout;
-
-      private Q_SLOTS:
-         void runSlot();
    };
 
 
-   class SshExecute : public SshReply {
+   class LocalExecute : public LocalReply {
 
       Q_OBJECT
 
       public:
-         SshExecute(SshConnection* connection, QString const& command, unsigned const timeout) :
-            SshReply(connection, timeout), m_command(command) { }
+         LocalExecute(LocalConnection* connection, QString const& command) :
+            LocalReply(connection), m_command(command) { }
 
-      protected:
+      protected Q_SLOT:
          void run();
 
       private:
@@ -69,42 +59,16 @@ namespace Network {
    };
 
 
-   class SshSendFile : public SshReply {
+   class LocalCopy : public LocalReply {
 
       Q_OBJECT
 
       public:
-         SshSendFile(SshConnection* connection, QString const& sourcePath, 
-            QString const& destinationPath, unsigned const timeout) : 
-            SshReply(connection, timeout), m_sourcePath(sourcePath),    
-            m_destinationPath(destinationPath) { }
+         LocalCopy(LocalConnection* connection, QString const& sourcePath, 
+            QString const& destinationPath) : LocalReply(connection), 
+            m_sourcePath(sourcePath), m_destinationPath(destinationPath) { }
 
-      Q_SIGNALS:
-         void copyProgress();
-
-      protected:
-         void run();
-
-      private:
-         QString m_sourcePath;
-         QString m_destinationPath;
-   };
-
-
-   class SshReceiveFile : public SshReply {
-
-      Q_OBJECT
-
-      public:
-         SshReceiveFile(SshConnection* connection, QString const& sourcePath, 
-            QString const& destinationPath, unsigned const timeout) : 
-            SshReply(connection, timeout), m_sourcePath(sourcePath),    
-            m_destinationPath(destinationPath) { }
-
-      Q_SIGNALS:
-         void copyProgress();
-
-      protected:
+      protected Q_SLOT:
          void run();
 
       private:

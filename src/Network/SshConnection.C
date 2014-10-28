@@ -80,6 +80,7 @@ void SshConnection::open()
 void SshConnection::close()
 {
    if (m_status == Connection::Closed) return;
+   m_status = Connection::Closed;
 
    QLOG_TRACE() << "Closing connection to" << m_hostname;
    killAgent();
@@ -116,8 +117,6 @@ void SshConnection::close()
       m_thread.wait();
    }
    QLOG_TRACE() << "Connection thread shut down";
-
-   m_status = Connection::Closed;
 }
 
 
@@ -257,6 +256,9 @@ void SshConnection::authenticate(AuthenticationT const authentication, QString c
    rc = LIBSSH2_ERROR_METHOD_NOT_SUPPORTED;
 
    switch (authentication) {
+
+      case None:
+         break;
 
       case Agent:
          rc = connectAgent();
@@ -635,7 +637,6 @@ Reply* SshConnection::execute(QString const& command)
 
 
 Reply* SshConnection::putFile(QString const& sourcePath, QString const& destinationPath) 
-   
 {
    SshReply* reply(new SshPutFile(this, sourcePath, destinationPath));
    start(reply);

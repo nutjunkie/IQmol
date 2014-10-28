@@ -34,8 +34,9 @@ HttpReply::HttpReply(HttpConnection* connection) : m_connection(connection), m_n
    m_timeout = m_connection->timeout();
    m_timer.setInterval(m_timeout);
    m_timer.setSingleShot(true);
-   connect(&m_timer, SIGNAL(timeout()), this, SLOT(timeout()));
+
    connect(this, SIGNAL(finished()), &m_timer, SLOT(stop()));
+   connect(&m_timer, SIGNAL(timeout()), this, SLOT(timeout()));
 }
 
 

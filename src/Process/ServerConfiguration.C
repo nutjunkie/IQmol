@@ -275,6 +275,7 @@ qDebug() << "Setting defaults for " << toString(connection);
       case Local:
          m_configuration.insert(Port, 0);
          m_configuration.insert(HostAddress, "localhost");
+         m_configuration.insert(Authentication, Network::Connection::None);
          break;
 
       case SSH:
@@ -288,12 +289,14 @@ qDebug() << "Setting defaults for " << toString(connection);
          m_configuration.insert(Port, 80);
          m_configuration.insert(HostAddress, "iqmol.q-chem.com");
          m_configuration.insert(WorkingDirectory, "(unused)");
+         m_configuration.insert(Authentication, Network::Connection::None);
          break;
 
       case HTTPS:
          m_configuration.insert(Port, 443);
          m_configuration.insert(HostAddress, "iqmol.q-chem.com");
          m_configuration.insert(WorkingDirectory, "(unused)");
+         m_configuration.insert(Authentication, Network::Connection::None);
          break;
    }
 }

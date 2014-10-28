@@ -464,7 +464,7 @@ void BasicSubmit::runRemote()
        if ((*iter).contains(exeName)) {
           QStringList tokens((*iter).split(QRegExp("\\s+"), QString::SkipEmptyParts));
           if (tokens.size() == 3) {
-             int t(Timer::toSeconds(tokens[2]));
+             int t(Util::Timer::toSeconds(tokens[2]));
              if (t >= 0 && t < tmin) {
                 tmin = t;
                 found = true;
@@ -658,7 +658,7 @@ void CleanUp::run()
    QString pbs(grep("elapsed time", errFile.filePath()));
    if (!pbs.isEmpty()) {
       QStringList tokens(pbs.split(QRegExp("\\s+"), QString::SkipEmptyParts));
-      m_time = Timer::toSeconds(tokens.last());
+      m_time = Util::Timer::toSeconds(tokens.last());
       qDebug() << "Time updated from PBS file" << m_time;
    }
 

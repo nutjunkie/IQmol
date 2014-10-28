@@ -141,7 +141,7 @@ namespace ServerTask {
       Q_OBJECT
       public:
          ProcessTask(Server* server, Process* process) : Base(server), m_process(process) { }
-         Process* process() const { return m_process; }
+         Process* getProcess() const { return m_process; }
       protected:
          Process* m_process;
    };

@@ -41,7 +41,7 @@ namespace Network {
       friend class HttpGet;
 
       public:
-         HttpConnection(QString const& hostname, int const port = 80);
+         HttpConnection(QString const& hostAddress, int const port = 80);
          ~HttpConnection();
 
          void setSecure(bool secure) { m_secure = secure; }
