@@ -23,7 +23,7 @@
 ********************************************************************************/
 
 #include "Timer.h"
-#include "JobInfo.h"
+#include "QChemJobInfo.h"
 #include <QStringList>
 
 
@@ -32,11 +32,16 @@ class QProcess;
 namespace IQmol {
 namespace Process2 {
 
-   /// The Job class is used to interface beteen the ProcessMonitor 
+   class JobMonitor;
+
+   /// The Job class is used to interface beteen the JobMonitor 
    /// and the Servers.  
    class Job : public QObject {
 
       Q_OBJECT
+
+      friend class JobMonitor;
+      friend class Server;
 
       public:
          enum Status { NotRunning = 0, Queued, Running, Suspended, Killed,  
@@ -44,6 +49,40 @@ namespace Process2 {
 
          static QString toString(Status const& status);
 
+		 /// This is the message that is displayed in the status
+		 /// column of the JobMonitor.
+         QString const& message() const { return m_message; }
+
+         Status status() const { return m_status; }
+         bool isActive() const;
+
+         /// This is an external handle for the process, either a
+         /// PID or PBS/SGE job number.
+         QString const& jobId()      const { return m_jobId; }
+         QString const& jobName()    const { return m_jobName; }
+         QString const& serverName() const { return m_serverName; }
+         QString const& submitTime() const { return m_submitTime; }
+
+         bool localFilesExist() const { return false; }
+
+         /// The run time in seconds.  Use Util::Timer::formatTime() 
+         /// to turn it into hh:mm:ss
+         unsigned runTime() const;
+
+         /// This function substitutes the ${VARIABLES} with the values
+         /// appropriate for the job.
+         virtual QString substituteMacros(QString const& string) { return string; }
+
+         /// This function needs to parse whatever is returned by the 
+         /// query command and update the status accordingly
+         virtual void parseQueryOutput(QString const&);
+
+      Q_SIGNALS:
+         void updated();
+
+      protected:
+         /// Job construction should only be done via the JobMonitor, 
+         /// hence we protect the constructor and destructor.
          Job(QString const& jobName = QString(), QString const& serverName = QString());
 
 		 /// Note that deleting a Job will not result in the termination 
@@ -51,45 +90,38 @@ namespace Process2 {
          /// after IQmol has terminated.
          ~Job();
 
-		 /// Converts the process into a form suitable 
-		 /// for writing to the Preferences.
+		 /// Converts the job information into a form suitable 
+		 /// for writing to the Preferences...
          virtual QVariant toQVariant() const;
-         bool fromQVariant();
 
-		 /// Set the message that is displayed in the tooltip in the status
-		 /// column of the ProcessMonitor.
-         void setMessage(QString const& message) { m_message = message; }
-         QString const& message() const { return m_message; }
+         /// ...and back again
+         bool fromQVariant(QVariant const&);
 
          void setStatus(Status const status);
-         Status status() const { return m_status; }
-         virtual QString statusString const;
 
-         /// This is an external handle for the process, either a
-         /// PID or PBS/SGE job number.
+         //void setJobName(QString const& jobName) { m_jobName = jobName; }
+         //void setServerName(QString const& serverName) { m_serverName = serverName; }
+
          void setJobId(QString const& id) { m_jobId = id; }
-         QString const& jobId() const { return m_jobId; }
 
-		 /// The Job timer runs independently of the actual process and so
+		 /// The Job timer runs independantly of the actual process and so
 		 /// may get out of sync if, for example, the process is suspended. 
          /// This function can be used to set the timer to the actual run 
 		 /// time when it is known.
          void resetTimer(unsigned const seconds);
-         unsigned runTime() const;
 
-      Q_SIGNALS:
-         void updated();
 
-      protected:
+      private:
          QString  m_jobName;
          QString  m_serverName;
-         QString  m_submitTime;
          Status   m_status;
          QString  m_message;
+         QString  m_submitTime;
          QString  m_jobId;
-         unsigned m_runTime; 
-  
+
          Util::Timer m_timer;
+
+         QChemJobInfo m_jobInfo;
    };
 
    typedef QList<Job*> JobList;

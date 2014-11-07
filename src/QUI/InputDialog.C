@@ -26,7 +26,7 @@
 #include "ExternalChargesSection.h"
 #include "GeometryConstraint.h"
 #include "KeywordSection.h"
-#include "Job.h"
+#include "QCJob.h"
 #include "JobInfo.h"
 #include "LJParametersSection.h"
 #include "Option.h"

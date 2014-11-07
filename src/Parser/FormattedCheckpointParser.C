@@ -52,6 +52,8 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       key = key.trimmed();
       QString tmp(line.mid(43, 37));
 
+      qDebug() << "Parsing key: >" << key << "<";
+
       QStringList list(TextStream::tokenize(tmp));
 
       if (key == "Number of alpha electrons") {            // This should only appear once
@@ -123,21 +125,31 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          total.setValue(energy, Data::Energy::Hartree);
 
       }else if (key == "Alpha MO coefficients") {
+   qDebug() << "Reading Alpha MO coefficients";
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          moData.alphaCoefficients = readDoubleArray(textStream, n);
 
       }else if (key == "Beta MO coefficients") {
+   qDebug() << "Reading beta MO coefficients";
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          moData.betaCoefficients = readDoubleArray(textStream, n);
+qDebug() << "Reading beta MO coefficients" << moData.betaCoefficients.size();
+
+      }else if (key.contains("Beta MO coefficients")) {
 
       }else if (key == "Alpha Orbital Energies") {
+   qDebug() << "Reading Alpha Orbital Energies";
+   qDebug() << list;
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          moData.alphaEnergies = readDoubleArray(textStream, n);
 
       }else if (key == "Beta Orbital Energies") {
+qDebug() << "Reading Beta Orbital Energies";
+qDebug() << list;
+
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok || !geometry) goto error;
          moData.betaEnergies = readDoubleArray(textStream, n);

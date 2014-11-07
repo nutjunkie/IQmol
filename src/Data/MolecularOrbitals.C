@@ -38,6 +38,13 @@ MolecularOrbitals::MolecularOrbitals(unsigned const nAlpha, unsigned const nBeta
    m_nOrbitals = m_alphaEnergies.size();
    m_nBasis    = alphaCoefficients.size()/m_nOrbitals;
 
+qDebug() << " :: " << m_nOrbitals;
+qDebug() << " :: " << m_nBasis;
+qDebug() << " :: " << alphaCoefficients.size();
+qDebug() << " :: " << alphaEnergies.size();
+qDebug() << " :: " << betaCoefficients.size();
+qDebug() << " :: " << betaEnergies.size();
+
    if (alphaCoefficients.size() != (int)m_nOrbitals*(int)m_nBasis ||
        betaCoefficients.size()  != (int)m_nOrbitals*(int)m_nBasis) {
       m_nOrbitals = 0;
@@ -68,12 +75,21 @@ MolecularOrbitals::MolecularOrbitals(unsigned const nAlpha, unsigned const nBeta
 bool MolecularOrbitals::consistent() const
 {
 qDebug() << "MOs: checking consistency";
+qDebug() << "orbitals" << m_nOrbitals;
+qDebug() << "N alpha " << m_nAlpha;
+qDebug() << "N beta  " << m_nBeta;
+
    bool ok(true);
    ok = ok && m_nOrbitals > 0;
+qDebug() << ok;
    ok = ok && m_nAlpha <= m_nOrbitals;
+qDebug() << ok;
    ok = ok && m_nBeta  <= m_nOrbitals;
+qDebug() << ok;
    ok = ok && m_alphaEnergies.size() == (int)m_nOrbitals;
+qDebug() << ok;
    ok = ok && m_betaEnergies.size()  == (int)m_nOrbitals;
+qDebug() << ok;
 
    unsigned nBasis(0);
    ShellList::const_iterator iter;

@@ -151,6 +151,10 @@ namespace Preferences {
    QString SSHPrivateIdentityFile();
    void SSHPrivateIdentityFile(QString const&);
 
+   QList<QVariant> JobMonitorList();
+   void JobMonitorList(QList<QVariant> const&);
+
+   // Deprecate
    QList<QVariant> CurrentProcessList();
    void CurrentProcessList(QList<QVariant> const&);
 

@@ -88,6 +88,7 @@ void ResetBrowserPreferences()
            << "BackgroundColor"
            << "ForegroundColor"
            << "CurrentProcessList"
+           << "JobMonitorList"
            << "FileDisplayWindowSize"
 ;
 
@@ -665,6 +666,22 @@ void ServerConfigurationList(QVariantList const& servers)
 // ---------
 
 
+QVariantList JobMonitorList()
+{
+   QVariant value(Get("JobMonitorList"));
+   QVariantList list;
+   if (!value.isNull()) list = value.toList();
+   return list;
+}
+
+void JobMonitorList(QVariantList const& jobList)
+{
+   SetList("JobMonitorList", jobList);
+}
+
+
+// ---------
+
 
 QVariantList CurrentProcessList()
 {
@@ -681,7 +698,6 @@ void CurrentProcessList(QVariantList const& processList)
 
 
 // ---------
-
 
 
 // Size of the InputDialog window

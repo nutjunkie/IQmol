@@ -50,8 +50,10 @@ namespace Network {
          virtual void open() = 0;
          virtual void close() = 0;
 
-         virtual void authenticate(AuthenticationT const, QString const& /*userName*/) {
-            m_status = Authenticated; 
+         virtual void authenticate(AuthenticationT const, QString const& /*userName*/) = 0;
+
+         virtual QString obtainCookie() {
+            return QString();
          }
 
          virtual Reply* execute(QString const& command) = 0;
@@ -65,6 +67,8 @@ namespace Network {
          Status status() const { return m_status; }
          QString const& hostname() const { return m_hostname; }
          int port() const { return m_port; }
+
+         bool isConnected() const { return m_status == Authenticated; }
 
 
       Q_SIGNALS:

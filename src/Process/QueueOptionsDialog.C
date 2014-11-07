@@ -34,27 +34,27 @@ QueueOptionsDialog::QueueOptionsDialog(ServerConfiguration* configuration, QWidg
    m_dialog.setupUi(this);
 
    m_dialog.submit->setText(
-      m_configuration->value(ServerConfiguration::Submit).toString());
+      m_configuration->value(ServerConfiguration::Submit));
 
    m_dialog.query->setText(
-      m_configuration->value(ServerConfiguration::Query).toString());
+      m_configuration->value(ServerConfiguration::Query));
 
    m_dialog.queueInfo->setText(
-      m_configuration->value(ServerConfiguration::QueueInfo).toString());
+      m_configuration->value(ServerConfiguration::QueueInfo));
 
    m_dialog.kill->setText(
-      m_configuration->value(ServerConfiguration::Kill).toString());
+      m_configuration->value(ServerConfiguration::Kill));
 
    ServerConfiguration::QueueSystemT queue(m_configuration->queueSystem());
 
    m_dialog.runFileTemplate->setText(
-      m_configuration->value(ServerConfiguration::RunFileTemplate).toString());
+      m_configuration->value(ServerConfiguration::RunFileTemplate));
 
    m_dialog.updateInterval->setValue(
-      m_configuration->value(ServerConfiguration::UpdateInterval).toInt());
+      m_configuration->updateInterval());
 
    if (queue == ServerConfiguration::Web) {
-      m_dialog.queueInfoLabel->setText("File List");
+      m_dialog.queueInfoLabel->setText("Download");
       m_dialog.runFileGroupBox->setEnabled(false);
    }
 
@@ -98,12 +98,6 @@ void QueueOptionsDialog::copyToServer()
 
    m_configuration->setValue(ServerConfiguration::JobLimit,
       m_dialog.jobLimit->value());
-
-qDebug() << "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv";
-qDebug() << "Configuration accepted in QueueOptionsDialog";
-m_configuration->dump();
-qDebug() << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
-
 
    accept();
 }

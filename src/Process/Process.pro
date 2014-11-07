@@ -5,6 +5,9 @@ include(../common.pri)
 INCLUDEPATH += ../Util ../Yaml ../Data  ../Parser ../Network
 
 SOURCES = \
+   $$PWD/Job.C \
+   $$PWD/JobMonitor.C \
+   $$PWD/QChemJobInfo.C \
    $$PWD/QueueOptionsDialog.C \
    $$PWD/Server2.C \
    $$PWD/ServerConfiguration.C \
@@ -15,6 +18,9 @@ SOURCES = \
    $$PWD/SystemDependent.C \
 
 HEADERS = \
+   $$PWD/Job.h \
+   $$PWD/JobMonitor.h \
+   $$PWD/QChemJobInfo.h \
    $$PWD/QueueOptionsDialog.h \
    $$PWD/Server2.h \
    $$PWD/ServerConfiguration.h \
@@ -25,6 +31,7 @@ HEADERS = \
    $$PWD/SystemDependent.h \
 
 FORMS = \
+   $$PWD/JobMonitor.ui \
    $$PWD/QueueOptionsDialog.ui \
    $$PWD/ServerConfigurationDialog.ui \
    $$PWD/ServerConfigurationListDialog.ui \

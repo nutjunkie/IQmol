@@ -66,6 +66,7 @@ namespace Process2 {
          void updateAllowedQueueSystems(bool httpOnly);
 
          bool m_tested;
+         bool m_blockUpdate;
 
          Ui::ServerConfigurationDialog m_dialog;
 

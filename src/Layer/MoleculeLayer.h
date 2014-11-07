@@ -281,7 +281,6 @@ namespace IQmol {
             void dumpData() { m_bank.dump(); }
             void setAtomicCharges(Data::Type::ID type);
             void updateAtomicCharges();
-
    
          private:
             static bool s_autoDetectSymmetry;

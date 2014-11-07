@@ -39,6 +39,7 @@ namespace Network {
 
       friend class HttpPageRequest;
       friend class HttpGet;
+      friend class HttpPost;
 
       public:
          HttpConnection(QString const& hostAddress, int const port = 80);
@@ -49,11 +50,15 @@ namespace Network {
 
          void open();
          void close();
+         void authenticate(AuthenticationT const, QString const& cooke);
+         QString obtainCookie();
 
          Reply* execute(QString const& query);
          Reply* putFile(QString const& sourcePath, QString const& destinationPath);
          Reply* getFile(QString const& sourcePath, QString const& destinationPath);
          Reply* get(QString const& query) { return execute(query); }
+        
+         Reply* post(QString const& path, QStringList const&);
 
       protected:
          QNetworkAccessManager* m_networkAccessManager;

@@ -46,6 +46,9 @@ namespace Process2 {
          /// Config is not const as the name can change if it already exists
          Server* addServer(ServerConfiguration&);
 
+         /// Attempts to connect the given list of Servers
+         void connectServers(QStringList const&);
+
 		 /// Checks if the named Server exists in the ServerRegistry and, if
 		 /// so, returns the correponding pointer.  If not, it returns null.
          Server* find(QString const& serverName) const;
@@ -65,6 +68,8 @@ namespace Process2 {
 		 /// Moves the Server down the list.  This is useful as the first Server
 		 /// is considered to be the default.
          void moveDown(QString const& serverName);
+
+         static void save() { s_instance->saveToPreferences(); }
 
 
       private:

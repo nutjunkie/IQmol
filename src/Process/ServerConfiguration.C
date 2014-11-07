@@ -35,24 +35,7 @@ void ServerConfiguration::dump() const
    for (int i = 0; i < MaxFieldT; ++i) {
        FieldT field(static_cast<FieldT>(i));
        QString name(toString(field));
-       QString val;
-
-       switch (field) {
-          case Authentication:
-             val = toString(authentication());
-             break;
-          case QueueSystem:
-             val = toString(queueSystem());
-             break;
-          case Connection:
-             val = toString(connection());
-             break;
-          default:
-             val = value(field).toString();
-             break;
-       }
-       
-       qDebug() << "    " << name << "=>" << val;
+       qDebug() << "    " << name << "=>" << value(field);
    }
 }
 
@@ -75,6 +58,7 @@ QString ServerConfiguration::toString(FieldT const field)
       case UpdateInterval:    s = "Update Interval";    break;
       case JobLimit:          s = "Job Limit";          break;
       case RunFileTemplate:   s = "Run File Template";  break;
+      case Cookie:            s = "Cookie";             break;
       case MaxFieldT:         s = "";                   break;
    }
    return s;
@@ -111,6 +95,7 @@ QString ServerConfiguration::toString(AuthenticationT const authentication)
 {
    QString s;
    switch (authentication) {
+     case Network::SshConnection::None:                s = "None";                     break;
      case Network::SshConnection::Agent:               s = "SSH Agent";                break;
      case Network::SshConnection::PublicKey:           s = "SSH Public Key";           break;
      case Network::SshConnection::HostBased:           s = "SSH Host Based";           break;
@@ -139,6 +124,7 @@ ServerConfiguration::FieldT ServerConfiguration::toFieldT(QString const& field)
    if (field.contains("interval",   Qt::CaseInsensitive))  return UpdateInterval;
    if (field.contains("limit",      Qt::CaseInsensitive))  return JobLimit;
    if (field.contains("template",   Qt::CaseInsensitive))  return RunFileTemplate;
+   if (field.contains("cookie",     Qt::CaseInsensitive))  return Cookie;
 
    return MaxFieldT;
 }
@@ -183,8 +169,8 @@ ServerConfiguration::AuthenticationT ServerConfiguration::toAuthenticationT(
 
 ServerConfiguration::ServerConfiguration()
 {
-   setDefaults(Local);
-   setDefaults(Basic);
+   setDefaults(HTTP);
+   setDefaults(Web);
 }
 
 
@@ -194,18 +180,17 @@ ServerConfiguration::ServerConfiguration(ServerConfiguration const& that)
 }
 
 
-void ServerConfiguration::copy(ServerConfiguration const& that)
-{
-   m_configuration = that.m_configuration;
-}
-
-
 ServerConfiguration& ServerConfiguration::operator=(ServerConfiguration const& that)
 {
    if (this != &that) copy(that);
    return *this;
 }
 
+
+void ServerConfiguration::copy(ServerConfiguration const& that)
+{
+   m_configuration = that.m_configuration;
+}
 
 
 ServerConfiguration::ServerConfiguration(QVariant const& qvar)
@@ -220,24 +205,48 @@ ServerConfiguration::ServerConfiguration(YAML::Node const& node)
 }
 
 
-QVariant ServerConfiguration::value(FieldT const field) const
+QString ServerConfiguration::value(FieldT const field) const
 {
    if (!m_configuration.contains(field)) {
       QLOG_WARN() << "Server configuration field not found" << toString(field);
    }
-   return m_configuration.value(field);
+
+   QString s;
+
+   switch (field) {
+      
+      case Authentication:
+         s = toString(authentication());
+         break;
+
+      case QueueSystem:
+         s = toString(queueSystem());
+         break;
+
+      case Connection:
+         s = toString(connection());
+         break;
+
+      case Port:
+         s = QString::number(port());
+         break;
+
+      case UpdateInterval:
+         s = QString::number(updateInterval());
+         break;
+
+      default:
+         s = m_configuration.value(field).toString();
+         break;
+   }
+
+   return s;
 }
 
 
 void ServerConfiguration::setValue(FieldT const field, QVariant const& value)
 {
    m_configuration.insert(field, value);
-}
-
-
-QString ServerConfiguration::name() const
-{
-   return m_configuration.value(ServerName).toString();
 }
 
 
@@ -265,6 +274,12 @@ int ServerConfiguration::port() const
 }
 
 
+int ServerConfiguration::updateInterval() const
+{
+   return m_configuration.value(UpdateInterval).toInt();
+}
+
+
 void ServerConfiguration::setDefaults(ConnectionT const connection)
 {
 qDebug() << "Setting defaults for " << toString(connection);
@@ -286,8 +301,10 @@ qDebug() << "Setting defaults for " << toString(connection);
          break;
 
       case HTTP:
+         m_configuration.insert(ServerName, "QChem");
          m_configuration.insert(Port, 80);
          m_configuration.insert(HostAddress, "iqmol.q-chem.com");
+         m_configuration.insert(UserName, "guest");
          m_configuration.insert(WorkingDirectory, "(unused)");
          m_configuration.insert(Authentication, Network::Connection::None);
          break;
@@ -378,10 +395,11 @@ qDebug() << "Setting defaults for " << toString(queueSystem);
       } break;
 
       case Web: {
-         m_configuration.insert(Kill, "GET /delete?jobid=${JOB_ID}");
-         m_configuration.insert(Query, "GET /status?jobid=${JOB_ID}");
-         m_configuration.insert(Submit, "GET ");
-         m_configuration.insert(QueueInfo, "GET /list?jobid=${JOB_ID}");
+         m_configuration.insert(Kill,      "GET  /delete?cookie=${COOKIE}&jobid=${JOB_ID}");
+         m_configuration.insert(Query,     "GET  /status?cookie=${COOKIE}&jobid=${JOB_ID}");
+         m_configuration.insert(Submit,    "POST /submit?cookie=${COOKIE}");
+         m_configuration.insert(QueueInfo, 
+            "GET  /download?jobid=cookie=${COOKIE}&${JOB_ID}&file=${FILE_NAME}");
          m_configuration.insert(RunFileTemplate, "(unused)");
       } break;
    }

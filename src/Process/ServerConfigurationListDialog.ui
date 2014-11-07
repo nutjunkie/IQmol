@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>501</width>
-    <height>302</height>
+    <width>583</width>
+    <height>304</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -121,7 +121,7 @@ QToolTip {
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../IQmol/IQmol.qrc">
+          <iconset resource="../Main/IQmol.qrc">
            <normaloff>:/resources/icons/Add.png</normaloff>:/resources/icons/Add.png</iconset>
          </property>
          <property name="iconSize">
@@ -141,7 +141,7 @@ QToolTip {
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../IQmol/IQmol.qrc">
+          <iconset resource="../Main/IQmol.qrc">
            <normaloff>:/resources/icons/Configure.png</normaloff>:/resources/icons/Configure.png</iconset>
          </property>
          <property name="iconSize">
@@ -161,7 +161,7 @@ QToolTip {
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../IQmol/IQmol.qrc">
+          <iconset resource="../Main/IQmol.qrc">
            <normaloff>:/resources/icons/Remove.png</normaloff>:/resources/icons/Remove.png</iconset>
          </property>
          <property name="iconSize">
@@ -181,7 +181,7 @@ QToolTip {
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../IQmol/IQmol.qrc">
+          <iconset resource="../Main/IQmol.qrc">
            <normaloff>:/resources/icons/Up.png</normaloff>:/resources/icons/Up.png</iconset>
          </property>
          <property name="iconSize">
@@ -201,7 +201,7 @@ QToolTip {
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../IQmol/IQmol.qrc">
+          <iconset resource="../Main/IQmol.qrc">
            <normaloff>:/resources/icons/Down.png</normaloff>:/resources/icons/Down.png</iconset>
          </property>
          <property name="iconSize">
@@ -256,7 +256,7 @@ QToolTip {
   </layout>
  </widget>
  <resources>
-  <include location="../IQmol/IQmol.qrc"/>
+  <include location="../Main/IQmol.qrc"/>
  </resources>
  <connections>
   <connection>

@@ -20,27 +20,19 @@
    
 ********************************************************************************/
 
-#include "Process.h"
-#include "QMsgBox.h"
+#include "Job.h"
 #include "QsLog.h"
-#include "FileLayer.h"
-#include "Preferences.h"
-#include "Server.h"
-#include "ServerRegistry.h"
-#include <QFileDialog>
-#include <QDir>
-#include <QFileInfo>
-#include <QProcess>
+#include <QVariant>
 
 
 namespace IQmol {
 namespace Process2 {
 
-QString Process::toString(Status const& state) 
+QString Job::toString(Status const& status) 
 {
    QString s;
 
-   switch (state) {
+   switch (status) {
       case NotRunning:  s = "Not Running";  break;
       case Queued:      s = "Queued";       break;
       case Running:     s = "Running";      break;
@@ -64,13 +56,13 @@ Job::Job(QString const& jobName, QString const& serverName) : m_jobName(jobName)
 Job::~Job()
 {
   // Let the server know we don't exist any more.
-qDebug() << "Let the server know we are finished";
-   //Server* server = ServerRegistry::instance().get(serverName());
-   //if (server) server->removeFromWatchList(this);
+  qDebug() << "Let the server know we are finished";
+  //Server* server = ServerRegistry::instance().get(serverName());
+  //if (server) server->removeFromWatchList(this);
 }
 
 
-QVariant Process::toQVariant()
+QVariant Job::toQVariant() const
 {
    QVariantMap map;
 
@@ -114,67 +106,14 @@ bool Job::fromQVariant(QVariant const& qvar)
    }
 
    if (map.contains("RunTime")) {
-      m_runTime = map.value("RunTime").toString(); 
+      resetTimer(map.value("RunTime").toUInt()); 
    }
 
    return true;
 }
 
 
-
-Process* Process::deserialize(QVariant const& qvariant)
-{
-   QList<QVariant> list(qvariant.toList());
-   bool ok = (list.size() == 6)            &&
-           //list[0] is the JobInfo which we test separately
-             list[1].canConvert<int>()     &&
-             list[2].canConvert<QString>() &&
-             list[3].canConvert<QString>() &&
-             list[4].canConvert<QString>() &&
-             list[5].canConvert<QString>();
-
-   if (!ok) {
-      QLOG_ERROR() << "Process deserialization error: Invalid format";
-      return 0;
-   }
-
-   JobInfo* jobInfo(JobInfo::deserialize(list[0]));
-   if (!jobInfo) {
-      QLOG_ERROR() << "Process deserialization error: Invalid JobInfo";
-      return 0;
-   }
-
-   int s(list[1].toInt(&ok));
-   Status status;
-   if (0 <= s && s <= Unknown) {
-      status = (Status)s; 
-   }else {
-      QLOG_ERROR() << "Process deserialization error: Invalid status";
-      return 0;
-   }
-
-   // Now that the JobInfo has loaded, check we have a valid server
-   QString serverName(jobInfo->get(JobInfo::ServerName));
-   Server* server = ServerRegistry::instance().get(serverName);
-   if (!server) {
-      QLOG_ERROR() << "Process deserialization error: Server " << serverName << " not found ";
-      return 0;
-   }
-
-   Process* process = new Process(jobInfo);
-   process->m_comment    = list[2].toString();
-   process->m_id         = list[3].toString();
-   process->m_submitTime = list[4].toString();
-   process->m_runTime    = list[5].toUInt();
-   process->m_status     = status;
-
-   process->m_timer.reset(process->m_runTime);
-
-   return process;
-}
-
-
-void Process::resetTimer(int const seconds)
+void Job::resetTimer(unsigned const seconds)
 { 
    m_timer.reset(seconds); 
 }
@@ -182,40 +121,13 @@ void Process::resetTimer(int const seconds)
 
 unsigned Job::runTime() const 
 { 
-   if (m_runTime) return m_runTime;
    return m_timer.time(); 
 }
 
 
-QStringList Process::monitorItems() const 
+void Job::parseQueryOutput(QString const&)
 {
-   QString status;
-   QStringList items;
-   items << name() << serverName() << m_submitTime;
-   items <<  m_timer.toString();
-   status = toString(m_status);
-   if (m_status == Copying) {
-      status += ": " + QString::number(int(100.0*m_copyProgress/m_copyTarget)) +"%";
-   }
-   items << status;
-   if (!m_comment.isEmpty()) items << m_comment;
-   return items;
-}
-
-
-void Process::setPID(unsigned int const pid)
-{
-   m_id = QString::number(pid);
-   updated();
-}
-
-
-unsigned int Process::getPID() const
-{
-   bool ok;
-   unsigned int pid(m_id.toUInt(&ok));
-   if (!ok) pid = 0;
-   return pid;
+   qDebug() << "Need to parse query string";
 }
 
 
@@ -226,42 +138,76 @@ void Job::setStatus(Status const status)
 
    switch (m_status) {
       case NotRunning:
+         m_message = toString(NotRunning);
          break;
 
       case Queued:
+         m_message = toString(Queued);
          m_submitTime = QTime::currentTime().toString("h:mm:ss");
          break;
 
       case Running:
+         m_message = toString(Running);
          m_timer.start();
          break;
 
       case Suspended:
+         m_message = toString(Suspended);
          m_timer.stop();
          break;
 
       case Killed:
+         m_message = toString(Killed);
          m_timer.stop();
          break;
 
       case Error:
+         m_message = toString(Error);
          m_timer.stop();
          break;
 
       case Finished:
+         m_message = toString(Finished);
          m_timer.stop();
          break;
 
       case Copying:
+         m_message = toString(Copying);
          QLOG_ERROR() << "Process::setStatus called while Copying";
          break;
 
       case Unknown:
+         m_message = toString(Copying);
          m_timer.stop();
          break;
    }
 
    updated();
+}
+
+
+bool Job::isActive() const
+{
+   bool active(true);
+
+   switch (m_status) {
+      case NotRunning:
+      case Queued:
+      case Running:
+      case Suspended:
+      case Unknown:
+         active = true;
+         break;
+
+      case Killed:
+      case Error:
+      case Finished:
+      case Copying:
+         active = false;
+         break;
+   }
+
+   return active;
 }
 
 } } // end namespaces IQmol::Process

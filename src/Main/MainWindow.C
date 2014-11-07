@@ -23,6 +23,8 @@
 #include "MainWindow.h"
 #include "ServerListDialog.h"  //deprecate
 #include "ServerConfigurationListDialog.h"
+#include "ProcessMonitor.h"  // deprecate
+#include "JobMonitor.h"
 #include "QMsgBox.h"
 #include "Animator.h"
 #include "Preferences.h"
@@ -668,14 +670,21 @@ void MainWindow::createMenus()
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), this, SLOT(editServers()));
 
-      name = "Edit New Servers";
-      action = menu->addAction(name);
-      connect(action, SIGNAL(triggered()), this, SLOT(editNewServers()));
-
       name = "Remove All Processes";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), 
          &(ProcessMonitor::instance()), SLOT(clearProcessList()));
+
+      menu->addSeparator();
+
+      name = "New Job Monitor";
+      action = menu->addAction(name);
+      connect(action, SIGNAL(triggered()), this, SLOT(showJobMonitor()));
+      //action->setShortcut(Qt::CTRL + Qt::Key_J );
+
+      name = "Edit New Servers";
+      action = menu->addAction(name);
+      connect(action, SIGNAL(triggered()), this, SLOT(editNewServers()));
 
 
    // ----- Help Menu -----
@@ -701,8 +710,6 @@ void MainWindow::editNewServers()
 }
 
 
-
-
 void MainWindow::showLogMessages()
 { 
    if (m_logMessageDialog.isActive()) {
@@ -710,6 +717,12 @@ void MainWindow::showLogMessages()
    }else {
       m_logMessageDialog.display(); 
    }
+}
+
+
+void MainWindow::showJobMonitor() { 
+   Process2::JobMonitor::instance().show(); 
+   Process2::JobMonitor::instance().raise();
 }
 
 

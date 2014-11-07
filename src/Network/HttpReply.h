@@ -25,6 +25,7 @@
 #include "Reply.h"
 #include "HttpConnection.h"
 #include <QNetworkReply>
+#include <QStringList>
 #include <QTimer>
 
 
@@ -42,19 +43,29 @@ namespace Network {
          HttpReply(HttpConnection*);
          virtual ~HttpReply();
 
+         QString header(QString const& headerName);
+
       protected:
          HttpConnection* m_connection;
          unsigned m_timeout;
          QNetworkReply* m_networkReply;  // We take ownership of this
          QTimer m_timer;
          bool m_https;
+         // This takes care of all the http:// crap
+         void setUrl(QString const& path = QString()); 
+         QUrl m_url;
        
       protected Q_SLOTS:
+         void readToString();
          void finishedSlot();
          void errorSlot(QNetworkReply::NetworkError);
+         void dumpHeader();
 
       private Q_SLOTS:
          void timeout();
+
+      private:
+         QString headerAsString();
    };
 
 
@@ -70,16 +81,28 @@ namespace Network {
          void run();
 
       private Q_SLOTS:
-          void readToString();
-          void readToFile();
-          void closeFile();
+         void readToFile();
+         void closeFile();
 
       private:
-         void setSourceUrl(QString const& sourcePath);
-         QUrl   m_sourceUrl;
          QFile* m_file;
    };
 
+
+   class HttpPost : public HttpReply {
+
+      Q_OBJECT
+
+      public:
+         HttpPost(HttpConnection*, QString const& path, QStringList const& postData);
+
+      protected Q_SLOTS:
+         void run();
+
+      private:
+         QStringList m_postData;
+         
+   };
 
 } } // end namespace IQmol::Network
 

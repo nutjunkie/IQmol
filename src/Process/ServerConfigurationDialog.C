@@ -38,12 +38,15 @@ namespace IQmol {
 namespace Process2 {
 
 ServerConfigurationDialog::ServerConfigurationDialog(ServerConfiguration& configuration, 
-   QWidget* parent) : QDialog(parent), m_tested(false), m_originalConfiguration(configuration)
+   QWidget* parent) : QDialog(parent), m_tested(false), m_blockUpdate(false),
+   m_originalConfiguration(configuration)
 {
    m_dialog.setupUi(this);
    init();
    m_currentConfiguration = new ServerConfiguration(m_originalConfiguration);
+   m_blockUpdate = true;
    copyFrom(m_originalConfiguration);
+   m_blockUpdate = false;
 
    connect(m_dialog.buttonBox, SIGNAL(accepted()), this, SLOT(verify()));
 }
@@ -99,12 +102,14 @@ void ServerConfigurationDialog::on_localRadioButton_toggled(bool tf)
 {
    if (!tf) return;
 
-   m_currentConfiguration->setDefaults(ServerConfiguration::Local);
-   copyFrom(*m_currentConfiguration);
-
    m_dialog.remoteHostGroupBox->setEnabled(false);
    m_dialog.configureConnectionButton->setEnabled(false);
    updateAllowedQueueSystems(false);
+
+   if (m_blockUpdate) return;
+
+   m_currentConfiguration->setDefaults(ServerConfiguration::Local);
+   copyFrom(*m_currentConfiguration);
 }
 
 
@@ -112,15 +117,17 @@ void ServerConfigurationDialog::on_sshRadioButton_toggled(bool tf)
 {
    if (!tf) return;
 
-   m_currentConfiguration->setDefaults(ServerConfiguration::SSH);
-   copyFrom(*m_currentConfiguration);
-
    m_dialog.remoteHostGroupBox->setEnabled(true);
    m_dialog.configureConnectionButton->setEnabled(true);
    m_dialog.authentication->setEnabled(true);
    m_dialog.userName->setEnabled(true);
    m_dialog.workingDirectory->setEnabled(true);
    updateAllowedQueueSystems(false);
+
+   if (m_blockUpdate) return;
+
+   m_currentConfiguration->setDefaults(ServerConfiguration::SSH);
+   copyFrom(*m_currentConfiguration);
 }
 
 
@@ -128,15 +135,17 @@ void ServerConfigurationDialog::on_httpRadioButton_toggled(bool tf)
 {
    if (!tf) return;
 
-   m_currentConfiguration->setDefaults(ServerConfiguration::HTTP);
-   copyFrom(*m_currentConfiguration);
-
    m_dialog.remoteHostGroupBox->setEnabled(true);
    m_dialog.configureConnectionButton->setEnabled(false);
    m_dialog.authentication->setEnabled(false);
    m_dialog.userName->setEnabled(false);
    m_dialog.workingDirectory->setEnabled(false);
    updateAllowedQueueSystems(true);
+
+   if (m_blockUpdate) return;
+
+   m_currentConfiguration->setDefaults(ServerConfiguration::HTTP);
+   copyFrom(*m_currentConfiguration);
 }
 
 
@@ -144,15 +153,17 @@ void ServerConfigurationDialog::on_httpsRadioButton_toggled(bool tf)
 {
    if (!tf) return;
 
-   m_currentConfiguration->setDefaults(ServerConfiguration::HTTPS);
-   copyFrom(*m_currentConfiguration);
-
    m_dialog.remoteHostGroupBox->setEnabled(true);
    m_dialog.configureConnectionButton->setEnabled(false);
    m_dialog.authentication->setEnabled(false);
    m_dialog.userName->setEnabled(false);
    m_dialog.workingDirectory->setEnabled(false);
    updateAllowedQueueSystems(true);
+
+   if (m_blockUpdate) return;
+
+   m_currentConfiguration->setDefaults(ServerConfiguration::HTTPS);
+   copyFrom(*m_currentConfiguration);
 }
 
 
@@ -173,6 +184,7 @@ void ServerConfigurationDialog::on_configureQueueButton_clicked(bool)
 
 void ServerConfigurationDialog::on_queueSystem_currentIndexChanged(QString const& queue)
 {
+  if (m_blockUpdate) return;
   m_currentConfiguration->setDefaults(ServerConfiguration::toQueueSystemT(queue));
 }
 
@@ -196,16 +208,14 @@ void ServerConfigurationDialog::copyFrom(ServerConfiguration const& config)
          break;
    }
 
-qDebug() << "in copyfrom";
-config.dump();
-   m_dialog.serverName->setText(config.name());
-   m_dialog.hostAddress->setText(config.value(ServerConfiguration::HostAddress).toString());
-   m_dialog.port->setValue(config.value(ServerConfiguration::Port).toInt());
+   m_dialog.serverName->setText(config.value(ServerConfiguration::ServerName));
+   m_dialog.hostAddress->setText(config.value(ServerConfiguration::HostAddress));
+   m_dialog.port->setValue(config.port());
    m_dialog.authentication->setCurrentIndex(config.authentication());
-   m_dialog.userName->setText(config.value(ServerConfiguration::UserName).toString());
+   m_dialog.userName->setText(config.value(ServerConfiguration::UserName));
 
    m_dialog.workingDirectory->setText(
-      config.value(ServerConfiguration::WorkingDirectory).toString());
+      config.value(ServerConfiguration::WorkingDirectory));
 
    m_tested = false;
 }
@@ -268,10 +278,6 @@ qDebug() << "Setting connection to HTTP";
    config->setValue(ServerConfiguration::WorkingDirectory,
       m_dialog.workingDirectory->text());
 
-  qDebug() << "---------------------------------------------------";
-  config->dump();
-  qDebug() << "---------------------------------------------------";
-
    return true;
 }
 
@@ -315,8 +321,8 @@ bool ServerConfigurationDialog::testSshConnection(ServerConfiguration const& con
    bool okay(false);
 
    try {
-      QString hostAddress(configuration.value(ServerConfiguration::HostAddress).toString());
-      QString userName(configuration.value(ServerConfiguration::UserName).toString());
+      QString hostAddress(configuration.value(ServerConfiguration::HostAddress));
+      QString userName(configuration.value(ServerConfiguration::UserName));
       Network::SshConnection::AuthenticationT authentication(configuration.authentication());
 
       int port(configuration.port());
@@ -363,7 +369,7 @@ bool ServerConfigurationDialog::testHttpConnection(ServerConfiguration const& co
    bool okay(false);
 
    try {
-      QString hostAddress(configuration.value(ServerConfiguration::HostAddress).toString());
+      QString hostAddress(configuration.value(ServerConfiguration::HostAddress));
       int port(configuration.port());
 
       Network::HttpConnection http(hostAddress, port);
@@ -398,64 +404,6 @@ bool ServerConfigurationDialog::testHttpConnection(ServerConfiguration const& co
 }
 
 
-/*
-   if (m_task) {
-      QMsgBox::information(this, "IQmol", "Connection test in progress");
-      return;
-   }
-
-   m_tested = false;
-   if (!copyToServer(m_tmpServer)) return;
-   copyToServer(m_server);
-
-   try {
-      //qDebug() << "Is server connected?" << m_server->isConnected();
-      if (m_server->connectServer()) {
-         m_task = m_server->testConfiguration();
-         connect(m_task, SIGNAL(finished()), this, SLOT(configurationTested()));
-         qDebug() << "Starting Test thread";
-         m_task->start();
-      }else {
-         throw Server::Exception("Failed to connect to server");
-      }
-   } catch (std::exception& err) {
-      QString msg("Problem connecting to server:\n");
-      msg += err.what();
-      QMsgBox::warning(this, "IQmol", msg);
-   }
-*/
-
-
-/*
-void ServerConfigurationDialog::configurationTested()
-{
-   if (m_task) {
-      QString errorMessage(m_task->errorMessage());
-      QString message;
-
-      if (errorMessage.isEmpty()) {
-         message = "Connection successful";
-         QMsgBox::information(this, "IQmol", message);
-         m_tested = true;
-      }else {
-         message ="Problem connecting to server:\n"; 
-         message += errorMessage;
-         m_closeAfterTest = false;
-         QMsgBox::warning(this, "IQmol", message);
-      }
-
-      m_task->deleteLater();
-      m_task = 0;
-   }
-
-   if (m_closeAfterTest) {
-      m_accepted = true;
-      accept();
-   }
-}
-*/
-
-
 void ServerConfigurationDialog::verify()
 {
    if (!copyTo(m_currentConfiguration)) return;
@@ -469,7 +417,6 @@ void ServerConfigurationDialog::verify()
    }
 
    m_originalConfiguration = *m_currentConfiguration;
-   //copyTo(&m_originalConfiguration);
 
    accept();
 }
@@ -498,7 +445,9 @@ void ServerConfigurationDialog::on_loadButton_clicked(bool)
       if (yaml.first()) {
          yaml.first()->dump();
          ServerConfiguration config(*(yaml.first()));
+         m_blockUpdate = true;
          copyFrom(config);
+         m_blockUpdate = false;
       }
 
    } catch (YAML::Exception& err) {

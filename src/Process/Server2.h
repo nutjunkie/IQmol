@@ -24,39 +24,75 @@
 
 #include "ServerConfiguration.h"
 #include "Connection.h"
+#include "Job.h"
+#include <QMap>
 
 namespace IQmol {
 
 namespace Network {
    class Connection;
+   class Reply;
 }
 
 namespace Process2 {
 
-   class Server {
+   class Server : public QObject {
+
+      Q_OBJECT
 
       friend class ServerRegistry;
       friend class ServerConfigurationListDialog;
 
       public:
-         ServerConfiguration const& configuration() const { return m_configuration; }
          QString name() const;
-
          QStringList tableFields() const;
 
-         void open();
+         bool open();
+         bool isLocal() const { 
+            return m_configuration.connection() == ServerConfiguration::Local; 
+         }
+
+		 // these should be void, the connections should be done internally to
+		 // the server and the job updated when the request returns
+         virtual void test();
+         virtual void setup(Job*);
+         virtual void submit(Job*);
+         virtual void query(Job*);
+         virtual void kill(Job*);
+         virtual void copy(Job*);
+
+         void watchJob(Job*);
+         void unwatchJob(Job*);
+         void setUpdateInterval(int const seconds);
 
       protected:
          Server(ServerConfiguration const&);
          Server();
          ~Server();
 
-         // this will probably have to be move up, or pass-through functions created
          ServerConfiguration& configuration() { return m_configuration; }
 
+      private Q_SLOTS:
+         void queryAllJobs();
+
+         void testFinished();
+         void registerFinished();
+         void setupFinished();
+         void submitFinished();
+         void queryFinished();
+         void killFinished();
+         void copyFinished();
+
       private:
+        QString substituteMacros(QString const&);
         ServerConfiguration  m_configuration;
         Network::Connection* m_connection;
+
+        // The Server class watches jobs, but is not responsible for them.
+        QList<Job*> m_watchedJobs;
+        QMap<Network::Reply*, Job*> m_activeRequests;
+
+        QTimer m_updateTimer;
    };
 
 } } // end namespace IQmol::Process

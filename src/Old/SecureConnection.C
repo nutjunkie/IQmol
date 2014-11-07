@@ -22,7 +22,7 @@
 
 #include "SecureConnection.h"
 #include "SecureConnectionException.h"
-#include "PasswordVault.h"
+//#include "PasswordVault.h"
 #include "Preferences.h"
 #include "QsLog.h"
 #include <QFileInfo>

@@ -27,10 +27,10 @@
 #include "HelpBrowser.h"
 #include "AboutDialog.h"
 #include "PreferencesBrowser.h"
-#include "ProcessMonitor.h"
 #include "ViewerModel.h"
 #include "ViewerModelView.h"
 #include "LogMessageDialog.h"
+
 #include <QItemSelectionModel>
 #include <QSortFilterProxyModel>
 #include <QMainWindow>
@@ -88,7 +88,8 @@ namespace IQmol {
          void showPreferences() { m_preferencesBrowser.show(); }
          void showLogMessages();
          void showQChemUI();
-         void showProcessMonitor();
+         void showProcessMonitor();  // deprecate
+         void showJobMonitor();
          void testInternetConnection();
 
          void newViewer();

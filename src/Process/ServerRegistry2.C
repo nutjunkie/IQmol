@@ -24,6 +24,7 @@
 #include "Preferences.h"
 #include "Server2.h"
 #include "QMsgBox.h"
+#include "QsLog.h"
 #include <exception>
 #include <cstdlib>
 #include <QDebug>
@@ -61,21 +62,33 @@ QStringList ServerRegistry::availableServers() const
 
 Server* ServerRegistry::addServer(ServerConfiguration& config)
 {
-   QString name(config.name());
+   QString name(config.value(ServerConfiguration::ServerName));
    int count(0);
 
    while (find(name)) {
       ++count;
-      name = config.name() + "_" + QString(count);
+      name = config.value(ServerConfiguration::ServerName) + "_" + QString(count);
    }
 
    config.setValue(ServerConfiguration::ServerName, name);
 
    Server* server(new Server(config));
    s_servers.append(server);
-   saveToPreferences();
+   save();
 
    return server;
+}
+
+
+void ServerRegistry::connectServers(QStringList const& servers)
+{
+   QStringList::const_iterator iter;
+   for (iter = servers.begin(); iter != servers.end(); ++iter) {
+       Server* server(find(*iter));
+       if (server) {
+          server->open();
+       }
+   }
 }
 
 
@@ -91,6 +104,7 @@ void ServerRegistry::remove(QString const& serverName)
 {
    int index(indexOf(serverName));
    if (index >= 0) s_deletedServers.append(s_servers.takeAt(index));
+   save();
 }
 
 
@@ -98,6 +112,7 @@ void ServerRegistry::remove(Server* server)
 {
    int index(s_servers.indexOf(server));
    if (index >= 0) s_deletedServers.append(s_servers.takeAt(index));
+   save();
 }
 
 
@@ -106,6 +121,7 @@ void ServerRegistry::moveUp(QString const& serverName)
 {
    int index(indexOf(serverName));
    if (index > 0) s_servers.swap(index, index-1);
+   save();
 }
 
 
@@ -113,6 +129,7 @@ void ServerRegistry::moveDown(QString const& serverName)
 {
    int index(indexOf(serverName));
    if (index < s_servers.size() -1) s_servers.swap(index, index+1);
+   save();
 }
 
 
@@ -139,15 +156,18 @@ void ServerRegistry::destroy()
 
 void ServerRegistry::loadFromPreferences()
 {
-   Server* server;
    QVariantList list(Preferences::ServerConfigurationList());
    QVariantList::iterator iter;
 
    try {
       for (iter = list.begin(); iter != list.end(); ++iter) {
-          server = new Server(ServerConfiguration(*iter));
-          s_servers.append(server);
+          s_servers.append(new Server(ServerConfiguration(*iter)));
       }
+
+      if (s_servers.isEmpty()) {
+         s_servers.append(new Server(ServerConfiguration()));
+      }
+
    } catch (std::exception& err) {
       QString msg("Problem loading servers from Preferences file:\n");
       msg += err.what();
@@ -159,6 +179,7 @@ void ServerRegistry::loadFromPreferences()
 
 void ServerRegistry::saveToPreferences()
 {
+qDebug() << "Server save happeingin now";
    QVariantList list;
    QList<Server*>::const_iterator iter;
    for (iter = s_servers.begin(); iter != s_servers.end(); ++iter) {

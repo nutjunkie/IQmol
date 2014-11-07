@@ -43,7 +43,7 @@ namespace Process2 {
                        Authentication, UserName, WorkingDirectory,
                        Submit, Query, QueueInfo, Kill,
                        UpdateInterval, JobLimit, 
-                       RunFileTemplate, MaxFieldT };
+                       RunFileTemplate, Cookie, MaxFieldT };
 
          enum ConnectionT { Local, SSH, HTTP, HTTPS };
 
@@ -66,14 +66,18 @@ namespace Process2 {
          explicit ServerConfiguration(YAML::Node const&);
          explicit ServerConfiguration(QVariant const&);
 
-         QVariant value(FieldT const) const;
+         QString value(FieldT const) const;
          void setValue(FieldT const, QVariant const& value);
 
-         QString name() const;
          ConnectionT connection() const;
          QueueSystemT queueSystem() const;
          AuthenticationT authentication() const;
          int port() const;
+         int updateInterval() const;
+
+         bool isWebBased() const {
+            return (connection() == HTTP || connection() == HTTPS);
+         }
 
 		 // These are to facilitate saving the configuration in the user Preferences.
          QVariant toQVariant() const;
@@ -81,7 +85,6 @@ namespace Process2 {
          void dump() const;
 
          ServerConfiguration& operator=(ServerConfiguration const& that);
-
 
       protected:
          void setDefaults(ConnectionT const);

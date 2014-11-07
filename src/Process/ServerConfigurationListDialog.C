@@ -26,6 +26,7 @@
 #include "ServerConfigurationDialog.h"
 #include "QMsgBox.h"
 #include <QHeaderView>
+#include <QDebug>
 
 
 namespace IQmol {
@@ -35,11 +36,19 @@ ServerConfigurationListDialog::ServerConfigurationListDialog(QWidget* parent) : 
 {
    m_dialog.setupUi(this);
    QTableWidget* table(m_dialog.serverListTable);
+
 #if QT_VERSION >= 0x050000
-   table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+   table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
 #else
-   table->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+   table->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
 #endif
+
+   table->horizontalHeader()->setStretchLastSection(true);
+   table->setColumnWidth(0,100);
+   table->setColumnWidth(1,200);
+   table->setColumnWidth(2, 70);
+   table->setColumnWidth(3,100);
+
    updateServerTable();
 }
 
@@ -88,6 +97,10 @@ void ServerConfigurationListDialog::on_serverListTable_cellDoubleClicked(int row
 
    editServerConfiguration(server->configuration());
    updateServerTable();
+
+qDebug() << "****************************************";
+server->configuration().dump();
+qDebug() << "****************************************";
 }
 
 
@@ -95,7 +108,6 @@ bool ServerConfigurationListDialog::editServerConfiguration(ServerConfiguration&
 {
    // Note the scoping of the dialog is important here.  The dtor needs to be
    // called before updateServerTable is called.
-
    ServerConfigurationDialog dialog(config, this);
    dialog.setWindowModality(Qt::WindowModal);
    return (dialog.exec() == QDialog::Accepted);
@@ -120,6 +132,11 @@ void ServerConfigurationListDialog::on_removeServerButton_clicked(bool)
 
 void ServerConfigurationListDialog::on_configureServerButton_clicked(bool)
 {
+   QStringList list;
+   list << "QChem";
+   ServerRegistry::instance().connectServers(list);
+return;
+   
    QList<QTableWidgetItem*> selected(m_dialog.serverListTable->selectedItems());
    if (!selected.isEmpty()) {
       int row(selected[0]->row());

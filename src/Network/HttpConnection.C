@@ -25,6 +25,7 @@
 #include "Exception.h"
 #include "QsLog.h"
 #include <QUrl>
+#include <QEventLoop>
 #include <QNetworkAccessManager>
 
 
@@ -37,23 +38,18 @@ HttpConnection::HttpConnection(QString const& hostname, int const port) :
 }
 
 
-void HttpConnection::open()
-{
-   // IF Secure
-
-   m_networkAccessManager = new QNetworkAccessManager(this);
-   if (!m_networkAccessManager) throw Exception("HTTP open connection failed");
-   m_status = Opened;
-   // Currently we don't support HTTP authentication, 
-   // so we just push the status along.
-   m_status = Authenticated;
-}
-
-
-
 HttpConnection::~HttpConnection()
 {
    close();
+}
+
+
+void HttpConnection::open()
+{
+   // If m_secure
+   m_networkAccessManager = new QNetworkAccessManager(this);
+   if (!m_networkAccessManager) throw Exception("HTTP open connection failed");
+   m_status = Opened;
 }
 
 
@@ -66,6 +62,33 @@ void HttpConnection::close()
    }
    
    m_status = Connection::Closed;
+}
+
+
+void HttpConnection::authenticate(AuthenticationT const, QString const&)
+{
+  m_status = Connection::Authenticated;
+}
+
+
+QString HttpConnection::obtainCookie()
+{
+   QString cookie;
+   qDebug() << "Obtaining cookie from HTTP server";
+   Reply* reply(execute("register"));
+   QEventLoop loop;
+   connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+   reply->start();
+   loop.exec();
+
+   if (reply->status() == Reply::Finished) {
+      QLOG_DEBUG() << "=============================";
+      QLOG_DEBUG() << reply->message();
+      QLOG_DEBUG() << "=============================";
+   }
+
+   reply->deleteLater();
+   return cookie;
 }
 
 
@@ -91,6 +114,14 @@ Reply* HttpConnection::putFile(QString const& sourcePath, QString const& destina
 Reply* HttpConnection::getFile(QString const& sourcePath, QString const& destinationPath)
 {
    HttpGet* reply(new HttpGet(this, sourcePath, destinationPath));
+   reply->start();
+   return reply;
+}
+
+
+Reply* HttpConnection::post(QString const& path, QStringList const& postData)
+{
+   HttpPost* reply(new HttpPost(this, path, postData));
    reply->start();
    return reply;
 }

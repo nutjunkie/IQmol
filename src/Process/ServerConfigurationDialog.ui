@@ -114,7 +114,9 @@ QToolTip {
 
 Use PBS or SGE if there is a queue system on the server.  
 You will be prompted for additional resource limits when 
-submitting a job.</string>
+submitting a job.
+
+Use Web for HTTP/HTTPS servers</string>
          </property>
          <item>
           <property name="text">
@@ -439,7 +441,7 @@ submitting a job.</string>
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources>
-  <include location="../IQmol/IQmol.qrc"/>
+  <include location="../Main/IQmol.qrc"/>
  </resources>
  <connections>
   <connection>
