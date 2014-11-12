@@ -23,6 +23,7 @@
 #include "ServerConfiguration.h"
 #include "QsLog.h"
 #include "SystemDependent.h"
+#include <QDir>
 
 
 namespace IQmol {
@@ -95,12 +96,12 @@ QString ServerConfiguration::toString(AuthenticationT const authentication)
 {
    QString s;
    switch (authentication) {
-     case Network::SshConnection::None:                s = "None";                     break;
-     case Network::SshConnection::Agent:               s = "SSH Agent";                break;
-     case Network::SshConnection::PublicKey:           s = "SSH Public Key";           break;
-     case Network::SshConnection::HostBased:           s = "SSH Host Based";           break;
-     case Network::SshConnection::KeyboardInteractive: s = "SSH Keyboard Interactive"; break;
-     case Network::SshConnection::Password:            s = "SSH Password Prompt";      break;
+     case Network::Connection::None:                s = "None";                     break;
+     case Network::Connection::Agent:               s = "SSH Agent";                break;
+     case Network::Connection::HostBased:           s = "SSH Host Based";           break;
+     case Network::Connection::KeyboardInteractive: s = "SSH Keyboard Interactive"; break;
+     case Network::Connection::Password:            s = "SSH Password Prompt";      break;
+     case Network::Connection::PublicKey:           s = "SSH Public Key";           break;
    }
    return s;
 }
@@ -155,15 +156,15 @@ ServerConfiguration::AuthenticationT ServerConfiguration::toAuthenticationT(
    QString const& authentication)
 {
    if (authentication.contains("agent",       Qt::CaseInsensitive))  
-      return Network::SshConnection::Agent;
+      return Network::Connection::Agent;
    if (authentication.contains("public",      Qt::CaseInsensitive))  
-      return Network::SshConnection::PublicKey;
+      return Network::Connection::PublicKey;
    if (authentication.contains("host",        Qt::CaseInsensitive))  
-      return Network::SshConnection::HostBased;
+      return Network::Connection::HostBased;
    if (authentication.contains("interactive", Qt::CaseInsensitive))  
-      return Network::SshConnection::KeyboardInteractive;
+      return Network::Connection::KeyboardInteractive;
 
-   return Network::SshConnection::Password; // default
+   return Network::Connection::Password; // default
 }
 
 
@@ -291,13 +292,14 @@ qDebug() << "Setting defaults for " << toString(connection);
          m_configuration.insert(Port, 0);
          m_configuration.insert(HostAddress, "localhost");
          m_configuration.insert(Authentication, Network::Connection::None);
+         m_configuration.insert(WorkingDirectory, QDir::homePath());
          break;
 
       case SSH:
          m_configuration.insert(Port, 22);
-         m_configuration.insert(Authentication, Network::SshConnection::Password);
+         m_configuration.insert(Authentication, Network::Connection::Password);
          m_configuration.insert(UserName, QString(qgetenv("USER")));
-         m_configuration.insert(WorkingDirectory, "~/");
+         m_configuration.insert(WorkingDirectory, "");
          break;
 
       case HTTP:
@@ -556,17 +558,17 @@ void ServerConfiguration::fromQVariantMapLegacy(QVariantMap const& map)
       //                       Vault, Prompt   };
       int auth(map.value("Authentication").toInt(&ok));
       if (ok) { 
-         AuthenticationT authentication(Network::SshConnection::Password);
+         AuthenticationT authentication(Network::Connection::Password);
 
          switch (auth) { 
             // Note None, and Vault are no longer supported, so we default to Password
-            case 0:  authentication = Network::SshConnection::Password;             break; 
-            case 1:  authentication = Network::SshConnection::Agent;                break;
-            case 2:  authentication = Network::SshConnection::PublicKey;            break;
-            case 3:  authentication = Network::SshConnection::HostBased;            break;
-            case 4:  authentication = Network::SshConnection::KeyboardInteractive;  break;
-            case 5:  authentication = Network::SshConnection::Password;             break;
-            case 6:  authentication = Network::SshConnection::Password;             break;
+            case 0:  authentication = Network::Connection::Password;             break; 
+            case 1:  authentication = Network::Connection::Agent;                break;
+            case 2:  authentication = Network::Connection::PublicKey;            break;
+            case 3:  authentication = Network::Connection::HostBased;            break;
+            case 4:  authentication = Network::Connection::KeyboardInteractive;  break;
+            case 5:  authentication = Network::Connection::Password;             break;
+            case 6:  authentication = Network::Connection::Password;             break;
          }
          m_configuration.insert(Authentication, authentication);
       }                

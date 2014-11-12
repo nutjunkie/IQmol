@@ -65,6 +65,9 @@ namespace Process2 {
 
          QString get(Field const field) const;
 
+         QString getRemoteFilePath(Field const) const;
+         QString getLocalFilePath(Field const) const;
+
          QStringList outputFiles() const;
 
          int getCharge() const { return m_charge; }

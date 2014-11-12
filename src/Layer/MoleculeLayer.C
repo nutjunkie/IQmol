@@ -22,7 +22,8 @@
 
 #include "QsLog.h"
 #include "QMsgBox.h"
-#include "JobInfo.h"
+#include "JobInfo.h"   // deprecate
+#include "QChemJobInfo.h" 
 #include "AtomLayer.h"
 #include "BondLayer.h"
 #include "Preferences.h"
@@ -95,7 +96,7 @@ Molecule::Molecule(QObject* parent) : Base(DefaultMoleculeName, parent),
    m_reperceiveBondsForAnimation(false),
    m_configurator(*this), 
    m_surfaceAnimator(this), 
-   m_jobInfo(0),
+   m_jobInfo(0),   //deprecate
    m_info(this), 
    m_atomList(this, "Atoms"), 
    m_bondList(this, "Bonds"), 
@@ -1488,6 +1489,38 @@ JobInfo* Molecule::jobInfo()
 
    connect(m_jobInfo, SIGNAL(updated()), this, SLOT(jobInfoChanged()));
    return m_jobInfo;
+}
+
+
+Process2::QChemJobInfo Molecule::qchemJobInfo()
+{
+   Process2::QChemJobInfo jobInfo;
+
+   jobInfo.set(Process2::QChemJobInfo::Charge,          totalCharge());
+   jobInfo.set(Process2::QChemJobInfo::Multiplicity,    multiplicity());
+   jobInfo.set(Process2::QChemJobInfo::Coordinates,     coordinatesAsString());
+   jobInfo.set(Process2::QChemJobInfo::Constraints,     constraintsAsString());
+   jobInfo.set(Process2::QChemJobInfo::ScanCoordinates, scanCoordinatesAsString());
+   jobInfo.set(Process2::QChemJobInfo::EfpFragments,    efpFragmentsAsString());
+   jobInfo.set(Process2::QChemJobInfo::EfpParameters,   efpParametersAsString());
+
+   AtomList atomList(findLayers<Atom>(Children | Visible));
+   if (atomList.isEmpty()) jobInfo.setEfpOnlyJob(true);
+
+   QString name;
+
+   if (m_inputFile.filePath().isEmpty()) {
+      QFileInfo fileInfo(Preferences::LastFileAccessed());
+      jobInfo.set(Process2::QChemJobInfo::LocalWorkingDirectory, fileInfo.path());
+      jobInfo.set(Process2::QChemJobInfo::BaseName, text());
+   }else {
+      jobInfo.set(Process2::QChemJobInfo::LocalWorkingDirectory, m_inputFile.path());
+      jobInfo.set(Process2::QChemJobInfo::BaseName, m_inputFile.completeBaseName());
+      name =  + "/" + m_inputFile.completeBaseName() + ".inp";
+   }
+
+   //connect(m_jobInfo, SIGNAL(updated()), this, SLOT(jobInfoChanged()));
+   return jobInfo;
 }
 
 

@@ -25,6 +25,7 @@
 #include "Exception.h"
 #include "QsLog.h"
 #include <QUrl>
+#include <QFile>
 #include <QEventLoop>
 #include <QNetworkAccessManager>
 
@@ -75,16 +76,18 @@ QString HttpConnection::obtainCookie()
 {
    QString cookie;
    qDebug() << "Obtaining cookie from HTTP server";
-   Reply* reply(execute("register"));
    QEventLoop loop;
+   Reply* reply(execute("register"));
    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
-   reply->start();
    loop.exec();
 
    if (reply->status() == Reply::Finished) {
-      QLOG_DEBUG() << "=============================";
-      QLOG_DEBUG() << reply->message();
-      QLOG_DEBUG() << "=============================";
+      QString msg(reply->message());
+      QRegExp rx("Qchemserv-Cookie::([0-9a-fA-F]+)");
+      if (msg.contains("Qchemserv-Status::OK") && rx.indexIn(msg,0) != -1) {
+         cookie = rx.cap(1);
+      }
+      qDebug() << "Returning cookie:" << cookie;
    }
 
    reply->deleteLater();
@@ -102,15 +105,21 @@ Reply* HttpConnection::execute(QString const& query)
 
 Reply* HttpConnection::putFile(QString const& sourcePath, QString const& destinationPath)
 {
-   // souce Path is local and may need to be loaded into a buffer
-   // destination path will be a URL waiting to accept the text
-   QLOG_WARN() << "Returning bogus sendFile HttpGet response";
-   HttpGet* reply(new HttpGet(this, sourcePath, destinationPath));
+   qDebug() << "Should be catching exceptions"; 
+   QFile file(sourcePath);
+   QByteArray buffer;
+
+   if (file.open(QIODevice::ReadOnly)) {
+      buffer = file.readAll();
+      file.close();
+   }
+   
+   HttpPost* reply(new HttpPost(this, destinationPath, QString(buffer)));
    reply->start();
    return reply;
 }
-             
 
+             
 Reply* HttpConnection::getFile(QString const& sourcePath, QString const& destinationPath)
 {
    HttpGet* reply(new HttpGet(this, sourcePath, destinationPath));
@@ -119,7 +128,7 @@ Reply* HttpConnection::getFile(QString const& sourcePath, QString const& destina
 }
 
 
-Reply* HttpConnection::post(QString const& path, QStringList const& postData)
+Reply* HttpConnection::post(QString const& path, QString const& postData)
 {
    HttpPost* reply(new HttpPost(this, path, postData));
    reply->start();

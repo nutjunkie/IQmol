@@ -15,6 +15,7 @@ SOURCES = \
    $$PWD/SetButtonColor.C \
    $$PWD/Task.C \
    $$PWD/Timer.C \
+   $$PWD/WriteToTemporaryFile.C \
 
 HEADERS = \
    $$PWD/Align.h \
@@ -33,6 +34,7 @@ HEADERS = \
    $$PWD/SetButtonColor.h \
    $$PWD/Task.h \
    $$PWD/Timer.h \
+   $$PWD/WriteToTemporaryFile.h \
 
 FORMS += \
    $$PWD/ColorGradientDialog.ui \

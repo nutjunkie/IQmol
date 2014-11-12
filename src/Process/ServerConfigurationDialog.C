@@ -62,19 +62,19 @@ void ServerConfigurationDialog::init()
 {
    m_dialog.authentication->clear(); 
 
-   // Not pretty, the ordering of these is linked to the enum in Network/SshConnection.h
+   // Not pretty, the ordering of these is linked to the enum in Network/Connection.h
    m_dialog.authentication->addItem(
-      ServerConfiguration::toString(Network::SshConnection::None)); 
+      ServerConfiguration::toString(Network::Connection::None)); 
    m_dialog.authentication->addItem(
-      ServerConfiguration::toString(Network::SshConnection::Agent)); 
+      ServerConfiguration::toString(Network::Connection::Agent)); 
    m_dialog.authentication->addItem(
-      ServerConfiguration::toString(Network::SshConnection::HostBased)); 
+      ServerConfiguration::toString(Network::Connection::HostBased)); 
    m_dialog.authentication->addItem(
-      ServerConfiguration::toString(Network::SshConnection::KeyboardInteractive)); 
+      ServerConfiguration::toString(Network::Connection::KeyboardInteractive)); 
    m_dialog.authentication->addItem(
-      ServerConfiguration::toString(Network::SshConnection::Password)); 
+      ServerConfiguration::toString(Network::Connection::Password)); 
    m_dialog.authentication->addItem(
-      ServerConfiguration::toString(Network::SshConnection::PublicKey)); 
+      ServerConfiguration::toString(Network::Connection::PublicKey)); 
 }
 
 
@@ -323,7 +323,7 @@ bool ServerConfigurationDialog::testSshConnection(ServerConfiguration const& con
    try {
       QString hostAddress(configuration.value(ServerConfiguration::HostAddress));
       QString userName(configuration.value(ServerConfiguration::UserName));
-      Network::SshConnection::AuthenticationT authentication(configuration.authentication());
+      Network::Connection::AuthenticationT authentication(configuration.authentication());
 
       int port(configuration.port());
 

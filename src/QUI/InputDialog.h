@@ -22,12 +22,14 @@
          
 ********************************************************************************/
 
-#include <QFileInfo>
-#include <QStatusBar>
 #include "Logic.h"
 #include "OptionRegister.h"
 #include "OptionDatabase.h"
 #include "ui_QuiMainWindow.h"
+#include "QChemJobInfo.h"
+
+#include <QFileInfo>
+#include <QStatusBar>
 
 class QResizeEvent;
 class QStackedWidget;
@@ -35,12 +37,12 @@ class QFont;
 
 
 namespace IQmol {
-   class JobInfo;
+   class JobInfo;  // deprecate
 }
 
-namespace Ui {
-   class MainWindow;
-}
+//namespace Ui {
+//   class MainWindow;
+//}
 
 
 namespace Qui {
@@ -54,8 +56,6 @@ template<class K, class T> class Register;
 
 typedef boost::function<void(QString const&)> Update;
 typedef QList<Job*> JobList;
-
-//using Process::Monitored;
 
 
 /// \brief This is the main class for the QChem input file generator.  If you
@@ -75,7 +75,9 @@ class InputDialog : public QMainWindow {
 
 	  /// The JobInfo object encapsulates the communication 
 	  /// between the QUI and IQmol.
-      void setJobInfo(IQmol::JobInfo* jobInfo);
+      void setJobInfo(IQmol::JobInfo* jobInfo);  // deprecate
+
+      void setQChemJobInfo(IQmol::Process2::QChemJobInfo const&);
 
       /// Allows the update of the servers in the server ComboBox
       void setServerList(QStringList const& servers);
@@ -84,7 +86,8 @@ class InputDialog : public QMainWindow {
       void showMessage(QString const& msg);
 
    Q_SIGNALS:
-      void submitJobRequest(IQmol::JobInfo*);
+      void submitJobRequest(IQmol::JobInfo*);  // deprecate
+      void submitJobRequest(IQmol::Process2::QChemJobInfo&);
 
 
    private Q_SLOTS:
@@ -145,7 +148,9 @@ class InputDialog : public QMainWindow {
    private:
       // ---------- Data ----------
       Ui::MainWindow  m_ui;
-      IQmol::JobInfo* m_jobInfo;
+      IQmol::JobInfo* m_jobInfo;  // deprecate
+      IQmol::Process2::QChemJobInfo m_qchemJobInfo;
+
       OptionDatabase& m_db;
       OptionRegister& m_reg;
       bool m_taint;
@@ -163,7 +168,6 @@ class InputDialog : public QMainWindow {
       // ---------- Functions ----------
 
       void finalizeJob(Job*);
-
       void addJobToList(Job*);
       void removeJobFromList(Job*);
       void deleteAllJobs(bool const prompt = true);

@@ -47,18 +47,18 @@ QString Job::toString(Status const& status)
 }
 
 
-Job::Job(QString const& jobName, QString const& serverName) : m_jobName(jobName),
-   m_serverName(serverName), m_status(NotRunning)
+Job::Job(QChemJobInfo const& qchemJobInfo) : m_qchemJobInfo(qchemJobInfo)
 {
+   m_jobName    = m_qchemJobInfo.get(QChemJobInfo::BaseName);
+   m_serverName = m_qchemJobInfo.get(QChemJobInfo::ServerName);
+   m_status     = NotRunning;
 }
 
 
 Job::~Job()
 {
   // Let the server know we don't exist any more.
-  qDebug() << "Let the server know we are finished";
-  //Server* server = ServerRegistry::instance().get(serverName());
-  //if (server) server->removeFromWatchList(this);
+  deleted(this);
 }
 
 
@@ -125,6 +125,14 @@ unsigned Job::runTime() const
 }
 
 
+QString Job::substituteMacros(QString const& input) const
+{
+   QString output(input);
+   output.replace("${JOB_ID}", m_jobId);
+   return output;
+}
+
+
 void Job::parseQueryOutput(QString const&)
 {
    qDebug() << "Need to parse query string";
@@ -139,50 +147,59 @@ void Job::setStatus(Status const status)
    switch (m_status) {
       case NotRunning:
          m_message = toString(NotRunning);
+         updated();
          break;
 
       case Queued:
          m_message = toString(Queued);
          m_submitTime = QTime::currentTime().toString("h:mm:ss");
+         updated();
          break;
 
       case Running:
          m_message = toString(Running);
          m_timer.start();
+         updated();
          break;
 
       case Suspended:
          m_message = toString(Suspended);
          m_timer.stop();
+         updated();
          break;
 
       case Killed:
          m_message = toString(Killed);
          m_timer.stop();
+         updated();
+         finished();
          break;
 
       case Error:
          m_message = toString(Error);
          m_timer.stop();
+         updated();
+         finished();
          break;
 
       case Finished:
          m_message = toString(Finished);
          m_timer.stop();
+         updated();
+         finished();
          break;
 
       case Copying:
          m_message = toString(Copying);
-         QLOG_ERROR() << "Process::setStatus called while Copying";
+         updated();
          break;
 
       case Unknown:
          m_message = toString(Copying);
          m_timer.stop();
+         updated();
          break;
    }
-
-   updated();
 }
 
 

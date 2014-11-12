@@ -49,11 +49,23 @@ HttpReply::~HttpReply()
 
 void HttpReply::finishedSlot()
 {
-   if (m_message.isEmpty()) {
-      m_message = headerAsString(); 
+   QString status(headerValue("Qchemserv-Status"));
+
+   if (status.contains("OK")) {
+      if (m_status != Error) m_status = m_interrupt ? Interrupted : Finished;
+      if (m_message.isEmpty()) {
+         QLOG_TRACE() << "HttpReply message empty, returning header";
+         m_message = headerAsString(); 
+      }
+   }else if (status.contains("ERROR")) {
+      m_status  = Error;
+      m_message = headerValue("Qchemserv-Error");
+   }else  {
+      m_status  = Error;
+      m_message = "QChem server temporarily unavailable";
    }
 
-   if (m_status != Error) m_status = m_interrupt ? Interrupted : Finished;
+qDebug() << "Sending HttpReply finished SIGNAL";
    finished();
 }
 
@@ -69,8 +81,7 @@ void HttpReply::errorSlot(QNetworkReply::NetworkError /*error*/)
 void HttpReply::readToString()
 {
    qint64 size(m_networkReply->bytesAvailable());
-   //m_message += m_networkReply->read(size);
-   m_message += QString(m_networkReply->readAll());
+   m_message += m_networkReply->read(size);
    qDebug() << "Reading" << size << " bytes to message:" << m_message;
 }
 
@@ -86,7 +97,6 @@ void HttpReply::timeout()
 
 void HttpReply::setUrl(QString const& path)
 {
-  // this should be moved up to the inheritance tree
  /*
    m_url.setScheme("http");
    m_url.setHost(m_hostname);
@@ -101,11 +111,11 @@ void HttpReply::setUrl(QString const& path)
    if (!path.isEmpty()) url += "/" + path;
 
    m_url.setUrl(url);
-   qDebug() << "URL in HttpPost ctor" <<  m_url;
+   qDebug() << "Setting URL to" <<  m_url;
 }
 
 
-QString HttpReply::header(QString const& headerName)
+QString HttpReply::headerValue(QString const& headerName)
 {
    QByteArray data(headerName.toLatin1());
    QString header;
@@ -219,7 +229,7 @@ void HttpGet::readToFile()
 // --------- HttpPost ---------
 
 HttpPost::HttpPost(HttpConnection* connection, QString const& path,  
-   QStringList const& postData) : HttpReply(connection), m_postData(postData)
+   QString const& postData) : HttpReply(connection), m_postData(postData)
 {
    setUrl(path);
 }
@@ -240,7 +250,7 @@ void HttpPost::run()
    request.setUrl(m_url);
    request.setHeader(QNetworkRequest::ContentTypeHeader, "text/plain; charset=UTF-8");
 
-   QByteArray data(m_postData.join("\n").toLatin1());
+   QByteArray data(m_postData.toLatin1());
 
 qDebug() << "POST:" << data;
 

@@ -28,6 +28,7 @@
 #include "Preferences.h"
 #include <QInputDialog>
 #include <QFileInfo>
+#include <QEventLoop>
 
 #ifdef WIN32
 #include <winsock2.h>
@@ -242,7 +243,7 @@ void SshConnection::authenticate(AuthenticationT const authentication, QString c
    while ((rc = libssh2_session_handshake(m_session, m_socket)) == LIBSSH2_ERROR_EAGAIN);
 
    if (rc) {
-      QString msg("Failed to establish a valid SSH session");
+      QString msg("Failed to establish a valid SSH session ");
       throw Exception(msg + lastSessionError());
    }
 
@@ -620,11 +621,52 @@ void SshConnection::start(SshReply* reply)
 }
 
 
+// for debugging
 Reply* SshConnection::test(QString const& id)
 {
    SshReply* reply(new SshTest(this, id));
    start(reply);
    return reply;
+}
+
+
+bool SshConnection::exists(QString const& filePath)
+{
+   QString cmd("/bin/test -e ");
+   cmd += filePath;
+   cmd += " && echo EXISTS";
+
+   SshReply* reply(new SshExecute(this, cmd));
+   QEventLoop loop;
+
+   QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+   start(reply);
+   loop.exec();
+
+   bool ok(reply->status() == Reply::Finished && reply->message().contains("EXISTS"));
+   reply->deleteLater();
+
+   return ok;
+}
+
+
+bool SshConnection::makeDirectory(QString const& path)
+{
+   QString cmd("/bin/mkdir -p ");
+   cmd += path;
+   cmd += " && echo SUCCESS";
+
+   SshReply* reply(new SshExecute(this, cmd));
+   QEventLoop loop;
+
+   QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+   start(reply);
+   loop.exec();
+
+   bool ok(reply->status() == Reply::Finished && reply->message().contains("SUCCESS"));
+   reply->deleteLater();
+
+   return ok;
 }
 
 

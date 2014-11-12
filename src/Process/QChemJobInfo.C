@@ -120,6 +120,26 @@ void QChemJobInfo::set(Field const field, int const& value)
 }
 
 
+// Obviously this will return rubbish if a non-file field is specified
+QString QChemJobInfo::getLocalFilePath(Field const field) const
+{
+   QString path(get(LocalWorkingDirectory));
+   if (!path.endsWith("/")) path += "/";
+   path += get(field);
+   return path;
+}
+
+
+// Obviously this will return rubbish if a non-file field is specified
+QString QChemJobInfo::getRemoteFilePath(Field const field) const
+{
+   QString path(get(RemoteWorkingDirectory));
+   if (!path.endsWith("/")) path += "/";
+   path += get(field);
+   return path;
+}
+
+
 QString QChemJobInfo::get(Field const field) const
 { 
    QString value;
@@ -171,14 +191,14 @@ QStringList QChemJobInfo::outputFiles() const
 void QChemJobInfo::dump() const
 {
    QLOG_DEBUG() << "QChemJobInfo info:";
-   QLOG_DEBUG() << "   BaseName              " << get(QChemJobInfo::BaseName);
-   QLOG_DEBUG() << "   InputFileName         " << get(QChemJobInfo::InputFileName);
-   QLOG_DEBUG() << "   OutputFileName        " << get(QChemJobInfo::OutputFileName);
-   QLOG_DEBUG() << "   AuxFileName           " << get(QChemJobInfo::AuxFileName);
-   QLOG_DEBUG() << "   RunFileName           " << get(QChemJobInfo::RunFileName);
-   QLOG_DEBUG() << "   ServerNmae            " << get(QChemJobInfo::ServerName);
-   QLOG_DEBUG() << "   LocalWorkingDirectory " << get(QChemJobInfo::LocalWorkingDirectory);
-   QLOG_DEBUG() << "   RemoteWorkingDirectory" << get(QChemJobInfo::RemoteWorkingDirectory);
+   QLOG_DEBUG() << "   BaseName              " << get(BaseName);
+   QLOG_DEBUG() << "   InputFileName         " << get(InputFileName);
+   QLOG_DEBUG() << "   OutputFileName        " << get(OutputFileName);
+   QLOG_DEBUG() << "   AuxFileName           " << get(AuxFileName);
+   QLOG_DEBUG() << "   RunFileName           " << get(RunFileName);
+   QLOG_DEBUG() << "   ServerName            " << get(ServerName);
+   QLOG_DEBUG() << "   LocalWorkingDirectory " << get(LocalWorkingDirectory);
+   QLOG_DEBUG() << "   RemoteWorkingDirectory" << get(RemoteWorkingDirectory);
 }
 
 void QChemJobInfo::copy(QChemJobInfo const& that)

@@ -48,43 +48,60 @@ namespace Process2 {
          QStringList tableFields() const;
 
          bool open();
+
          bool isLocal() const { 
-            return m_configuration.connection() == ServerConfiguration::Local; 
+            return m_configuration.isLocal();
          }
 
-		 // these should be void, the connections should be done internally to
-		 // the server and the job updated when the request returns
-         virtual void test();
-         virtual void setup(Job*);
-         virtual void submit(Job*);
-         virtual void query(Job*);
-         virtual void kill(Job*);
-         virtual void copy(Job*);
+         bool isWebBased() const { 
+            return m_configuration.isWebBased();
+         }
+
+         //ServerConfiguration const& configuration() const { return m_configuration; }
+         ServerConfiguration& configuration() { return m_configuration; }
+
+         // Unthreaded test for the existance of a directory on the server
+         bool exists(QString const& directoryPath);
+
+         // Unthreaded mkdir command
+         bool makeDirectory(QString const& directoryPath);
+
+         void submit(Job*);
+
+         void query(Job*);
+         void kill(Job*);
+         void copy(Job*);
 
          void watchJob(Job*);
-         void unwatchJob(Job*);
          void setUpdateInterval(int const seconds);
+
+      public Q_SLOTS:
+         void unwatchJob(Job*);
+
+      Q_SIGNALS:
+         void jobSubmissionSuccessful(Job*);
+         void jobSubmissionFailed(Job*);
 
       protected:
          Server(ServerConfiguration const&);
          Server();
          ~Server();
 
-         ServerConfiguration& configuration() { return m_configuration; }
 
       private Q_SLOTS:
-         void queryAllJobs();
+         void copyRunFile();
+         void queueJob();
 
-         void testFinished();
-         void registerFinished();
-         void setupFinished();
          void submitFinished();
          void queryFinished();
          void killFinished();
          void copyFinished();
 
+         void queryAllJobs();
+
       private:
         QString substituteMacros(QString const&);
+
         ServerConfiguration  m_configuration;
         Network::Connection* m_connection;
 

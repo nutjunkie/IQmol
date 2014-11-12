@@ -52,6 +52,7 @@ namespace Process2 {
 		 /// This is the message that is displayed in the status
 		 /// column of the JobMonitor.
          QString const& message() const { return m_message; }
+         void setMessage(QString const& message) { m_message = message; }
 
          Status status() const { return m_status; }
          bool isActive() const;
@@ -71,19 +72,24 @@ namespace Process2 {
 
          /// This function substitutes the ${VARIABLES} with the values
          /// appropriate for the job.
-         virtual QString substituteMacros(QString const& string) { return string; }
+         QString substituteMacros(QString const& string) const;
 
          /// This function needs to parse whatever is returned by the 
          /// query command and update the status accordingly
          virtual void parseQueryOutput(QString const&);
 
+         QChemJobInfo& jobInfo() { return m_qchemJobInfo; }
+
       Q_SIGNALS:
          void updated();
+         void finished();
+         void deleted(Job*);
 
       protected:
          /// Job construction should only be done via the JobMonitor, 
          /// hence we protect the constructor and destructor.
-         Job(QString const& jobName = QString(), QString const& serverName = QString());
+         Job() { }
+         Job(QChemJobInfo const&);
 
 		 /// Note that deleting a Job will not result in the termination 
 		 /// of the process.  This allows jobs to continue running even 
@@ -110,8 +116,12 @@ namespace Process2 {
 		 /// time when it is known.
          void resetTimer(unsigned const seconds);
 
+         //QChemJobInfo& infoObject() { return m_jobInfo; }
+
 
       private:
+         QChemJobInfo m_qchemJobInfo;
+
          QString  m_jobName;
          QString  m_serverName;
          Status   m_status;
@@ -120,8 +130,6 @@ namespace Process2 {
          QString  m_jobId;
 
          Util::Timer m_timer;
-
-         QChemJobInfo m_jobInfo;
    };
 
    typedef QList<Job*> JobList;

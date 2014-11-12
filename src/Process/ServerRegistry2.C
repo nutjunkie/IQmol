@@ -67,7 +67,7 @@ Server* ServerRegistry::addServer(ServerConfiguration& config)
 
    while (find(name)) {
       ++count;
-      name = config.value(ServerConfiguration::ServerName) + "_" + QString(count);
+      name = config.value(ServerConfiguration::ServerName) + "_" + QString::number(count);
    }
 
    config.setValue(ServerConfiguration::ServerName, name);
@@ -86,6 +86,7 @@ void ServerRegistry::connectServers(QStringList const& servers)
    for (iter = servers.begin(); iter != servers.end(); ++iter) {
        Server* server(find(*iter));
        if (server) {
+qDebug() << "opening server" << server->name();
           server->open();
        }
    }
@@ -179,7 +180,7 @@ void ServerRegistry::loadFromPreferences()
 
 void ServerRegistry::saveToPreferences()
 {
-qDebug() << "Server save happeingin now";
+qDebug() << "Saving ServerRegistry contents to file";
    QVariantList list;
    QList<Server*>::const_iterator iter;
    for (iter = s_servers.begin(); iter != s_servers.end(); ++iter) {

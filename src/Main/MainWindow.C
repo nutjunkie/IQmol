@@ -21,15 +21,18 @@
 ********************************************************************************/
 
 #include "MainWindow.h"
+
 #include "ServerListDialog.h"  //deprecate
-#include "ServerConfigurationListDialog.h"
 #include "ProcessMonitor.h"  // deprecate
+#include "ServerRegistry.h"   // deprecate
+#include "ServerConfigurationListDialog.h"
 #include "JobMonitor.h"
+#include "ServerRegistry2.h" 
+
 #include "QMsgBox.h"
 #include "Animator.h"
 #include "Preferences.h"
 #include "JobInfo.h"
-#include "ServerRegistry.h"
 #include "ShaderDialog.h"
 #include "Network.h"
 #include "QUI/InputDialog.h"
@@ -39,14 +42,12 @@
 #include <QMenuBar>
 #include <QFileDialog>
 #include <QtDebug>
-
 #include "Bank.h"
 #include "Geometry.h"
 #include "AtomicProperty.h"
 #include "Atom.h"
 #include "QGLViewer/vec.h"
 #include <fstream>
-
 
 
 namespace IQmol {
@@ -651,7 +652,7 @@ void MainWindow::createMenus()
 
       name = "Q-Chem Setup";
       action = menu->addAction(name);
-      connect(action, SIGNAL(triggered()), this, SLOT(showQChemUI()));
+      connect(action, SIGNAL(triggered()), this, SLOT(showQChemUIold()));
       action->setShortcut(Qt::CTRL + Qt::Key_U );
       m_qchemSetupAction = action;
 
@@ -676,6 +677,13 @@ void MainWindow::createMenus()
          &(ProcessMonitor::instance()), SLOT(clearProcessList()));
 
       menu->addSeparator();
+
+      name = "New Q-Chem Setup";
+      action = menu->addAction(name);
+      connect(action, SIGNAL(triggered()), this, SLOT(showQChemUI()));
+      //action->setShortcut(Qt::CTRL + Qt::Key_U );
+      //m_qchemSetupAction = action;
+
 
       name = "New Job Monitor";
       action = menu->addAction(name);
@@ -909,7 +917,7 @@ void MainWindow::fullScreen()
 }
 
 
-void MainWindow::showQChemUI() 
+void MainWindow::showQChemUIold() 
 {
    if (!m_quiInputDialog) {
       m_quiInputDialog = new Qui::InputDialog(this);
@@ -920,12 +928,15 @@ void MainWindow::showQChemUI()
          return;
       }
 
+      // deprecate
       connect(m_quiInputDialog, SIGNAL(submitJobRequest(IQmol::JobInfo*)),
          &(ProcessMonitor::instance()), SLOT(submitJob(IQmol::JobInfo*)));
 
+      // deprecate
       connect(&(ProcessMonitor::instance()), SIGNAL(jobAccepted()),
          m_quiInputDialog, SLOT(close()));
 
+      // deprecate
       connect(&(ProcessMonitor::instance()), SIGNAL(postStatusMessage(QString const&)),
          m_quiInputDialog, SLOT(showMessage(QString const&)));
    }
@@ -947,5 +958,45 @@ void MainWindow::showQChemUI()
    m_viewer.setActiveViewerMode(Viewer::Manipulate);
 }
 
+
+void MainWindow::showQChemUI() 
+{
+   if (!m_quiInputDialog) {
+      m_quiInputDialog = new Qui::InputDialog(this);
+      if (!m_quiInputDialog->init()) {
+         m_qchemSetupAction->setEnabled(false);
+         delete m_quiInputDialog;
+         m_quiInputDialog = 0;
+         return;
+      }
+
+      connect(m_quiInputDialog, SIGNAL(submitJobRequest(IQmol::Process2::QChemJobInfo&)),
+         &(IQmol::Process2::JobMonitor::instance()), 
+            SLOT(submitJob(IQmol::Process2::QChemJobInfo&)));
+ 
+      connect(&(Process2::JobMonitor::instance()), SIGNAL(jobAccepted()),
+         m_quiInputDialog, SLOT(close()));
+
+      connect(&(Process2::JobMonitor::instance()), SIGNAL(postUpdateMessage(QString const&)),
+         m_quiInputDialog, SLOT(showMessage(QString const&)));
+   }
+
+   Layer::Molecule* mol(m_viewerModel.activeMolecule());
+   if (!mol) return;
+   
+   Process2::QChemJobInfo jobInfo(mol->qchemJobInfo());
+   m_quiInputDialog->setQChemJobInfo(jobInfo);
+
+   // (Re-)Load the servers here in case the user has made any modifications
+   QStringList serverList(Process2::ServerRegistry::instance().availableServers());
+   if (serverList.isEmpty()) serverList.append("(none)");
+   m_quiInputDialog->setServerList(serverList);
+
+   m_quiInputDialog->showMessage("");
+   m_quiInputDialog->setWindowModality(Qt::WindowModal);
+   m_quiInputDialog->show();
+
+   m_viewer.setActiveViewerMode(Viewer::Manipulate);
+}
 
 } // end namespace IQmol

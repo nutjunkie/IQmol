@@ -43,7 +43,7 @@ namespace Network {
          HttpReply(HttpConnection*);
          virtual ~HttpReply();
 
-         QString header(QString const& headerName);
+         QString headerValue(QString const& headerName);
 
       protected:
          HttpConnection* m_connection;
@@ -94,13 +94,13 @@ namespace Network {
       Q_OBJECT
 
       public:
-         HttpPost(HttpConnection*, QString const& path, QStringList const& postData);
+         HttpPost(HttpConnection*, QString const& path, QString const& postData);
 
       protected Q_SLOTS:
          void run();
 
       private:
-         QStringList m_postData;
+         QString m_postData;
          
    };
 

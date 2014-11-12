@@ -27,6 +27,8 @@
 #include "LocalConnection.h"
 #include "SshConnection.h"
 #include "HttpConnection.h"
+#include "WriteToTemporaryFile.h"
+#include "JobMonitor.h"
 #include "QsLog.h"
 #include <QDebug>
 
@@ -70,6 +72,9 @@ QStringList Server::tableFields() const
 
 bool Server::open()
 {
+   if (m_connection && 
+       m_connection->status() == Network::Connection::Authenticated) return true;
+
    if (!m_connection) {
       QVariant address(m_configuration.value(ServerConfiguration::HostAddress));
       int port(m_configuration.port());
@@ -102,12 +107,19 @@ bool Server::open()
       QString cookie(m_configuration.value(ServerConfiguration::Cookie));
       if (cookie.isEmpty()) {
          cookie = m_connection->obtainCookie();
+         if (cookie.isEmpty()) return false;
          m_configuration.setValue(ServerConfiguration::Cookie, cookie);
          ServerRegistry::save();
       }
    }
 
    if (m_connection->status() == Network::Connection::Authenticated) {
+      connect(this, SIGNAL(jobSubmissionSuccessful(Job*)), 
+         &(JobMonitor::instance()), SLOT(jobSubmissionSuccessful(Job*)));
+
+      connect(this, SIGNAL(jobSubmissionFailed(Job*)), 
+         &(JobMonitor::instance()), SLOT(jobSubmissionFailed(Job*)));
+
       if (!m_watchedJobs.isEmpty()) m_updateTimer.start();
       return true;
    }
@@ -121,8 +133,29 @@ bool Server::open()
 }
 
 
+bool Server::exists(QString const& filePath)
+{
+   if (!m_connection) {
+      QLOG_WARN() << "Server::exists() called on invalid connection";
+      return false;
+   }
+   return m_connection->exists(filePath);
+}
+
+
+bool Server::makeDirectory(QString const& filePath)
+{
+   if (!m_connection) {
+      QLOG_WARN() << "Server::makeDirectory() called on invalid connection";
+      return false;
+   }
+   return m_connection->makeDirectory(filePath);
+}
+
+
 void Server::queryAllJobs()
 {
+qDebug() << "QueryAllJobs called()";
    if (!m_connection || !m_connection->isConnected()) {
       m_updateTimer.stop();
       return;
@@ -139,139 +172,145 @@ void Server::queryAllJobs()
 }
 
 
-// ---------- Test ----------
-void Server::test()
-{
-   if (m_configuration.isWebBased()) {
-      if (m_configuration.value(ServerConfiguration::Cookie).isEmpty()) {
-qDebug() << "Resistering HTTP server";
-         Network::Reply* reply(m_connection->execute("register"));
-         connect(reply, SIGNAL(finished()), this, SLOT(testFinished()));
-         reply->start();
-      }
-   } 
-   // Check qchem set up
-}
-
-
-void Server::testFinished()
-{
-}
-
-
-void Server::registerFinished()
-{
-   Network::Reply* reply(qobject_cast<Network::Reply*>(sender()));
-   if (!reply) {
-      QLOG_ERROR() << "Server Error: invalid reply";
-      return;
-   }
-
-   if (reply->status() != Network::Reply::Finished) {
-      QLOG_WARN() << "Reply finshed with status" << reply->status();
-      QLOG_WARN() << "                 Message:" << reply->message();
-      return;
-   }
-
-   // parse registration id
-qDebug() << "===========================";
-qDebug() << "=== Register finished  ====";
-   reply->message();
-qDebug() << "===========================";
-
-   QString cookie;
-
-   m_configuration.setValue(ServerConfiguration::Cookie, cookie);
-   ServerRegistry::save();
-
-   reply->deleteLater();
-}
-
-
-// ---------- Setup ----------
-void Server::setup(Job* job)
-{
-   QString query(m_configuration.value(ServerConfiguration::Query));
-   query = substituteMacros(query);
-   query = job->substituteMacros(query);
-
-   Network::Reply* reply(m_connection->execute(query));
-   connect(reply, SIGNAL(finished()), this, SLOT(queryFinished()));
-   m_activeRequests.insert(reply, job);
-   reply->start();
-
-
-// make directories for ssh 
-}
-
-
-void Server::setupFinished()
-{
-}
-
-
 // ---------- Submit ----------
 void Server::submit(Job* job)
 {
-   if (!open()) {
-      QLOG_ERROR() << "Server Error: submit called on disconnected server - "
-         << m_configuration.value(ServerConfiguration::ServerName);
-      return;
-   }
-   if (m_watchedJobs.contains(job)) {
-      QLOG_ERROR() << "Server Error: submit called existing job";
-      return;
-   }
-
    QList<Network::Reply*> keys(m_activeRequests.keys(job));
-   if (!keys.isEmpty()) {
-      QLOG_WARN() << "Server Error: submit called on busy job";
-      return;  
+
+   if (!job) throw Exception("Submit called with null job");
+   if (!open()) throw Exception("Unable to connect to server");
+   if (m_watchedJobs.contains(job)) throw Exception("Attempt to submit duplicate job");
+   if (!keys.isEmpty()) throw Exception("Attempt to submit busy job");
+
+   qDebug() << "Request to submit job " << job->jobName();
+
+   QString contents(job->jobInfo().get(QChemJobInfo::InputString));
+   QString fileName(Util::WriteToTemporaryFile(contents));
+   qDebug() << "Input file contents written to" << fileName;
+
+   // In the case of an HTTP server, we can simply POST the contents of the
+   // input file and we're done.  Other servers need the run file and a 
+   // separate submission step.
+   if (isWebBased()) {
+      QString submit(m_configuration.value(ServerConfiguration::Submit));
+      submit = substituteMacros(submit);
+      qDebug() << "Copying http input file to" << submit;
+      Network::Reply* reply(m_connection->putFile(fileName, submit));
+      connect(reply, SIGNAL(finished()), this, SLOT(submitFinished()));
+      m_activeRequests.insert(reply, job);
+   }else {
+      QString destination(job->jobInfo().getRemoteFilePath(QChemJobInfo::InputFileName));
+      Network::Reply* reply(m_connection->putFile(fileName, destination));
+      connect(reply, SIGNAL(finished()), this, SLOT(copyRunFile()));
+      m_activeRequests.insert(reply, job);
    }
+}
 
 
-   QString query(m_configuration.value(ServerConfiguration::Query));
-   query = substituteMacros(query);
-   query = job->substituteMacros(query);
+void Server::copyRunFile()
+{
+   Network::Reply* reply(qobject_cast<Network::Reply*>(sender()));
 
-   Network::Reply* reply(m_connection->execute(query));
-   connect(reply, SIGNAL(finished()), this, SLOT(queryFinished()));
-   m_activeRequests.insert(reply, job);
-   reply->start();
+   if (reply && m_activeRequests.contains(reply)) {
+      Job* job(m_activeRequests.value(reply));
+      m_activeRequests.remove(reply);
+      reply->deleteLater();
+
+      if (reply->status() != Network::Reply::Finished) {
+         job->setStatus(Job::Error);
+         job->setMessage(reply->message());
+         jobSubmissionFailed(job);
+         return;
+      }
+
+      QString fileContents(m_configuration.value(ServerConfiguration::RunFileTemplate));
+      fileContents = substituteMacros(fileContents);
+      fileContents = job->substituteMacros(fileContents);
+      QString fileName(Util::WriteToTemporaryFile(fileContents));
+
+      qDebug() << "Run   file contents written to" << fileName;
+
+      QString destination(job->jobInfo().getRemoteFilePath(QChemJobInfo::RunFileName));
+      reply = m_connection->putFile(fileName, destination);
+      connect(reply, SIGNAL(finished()), this, SLOT(queueJob()));
+      m_activeRequests.insert(reply, job);
+
+   }else {
+      QLOG_ERROR() << "Server Error: invalid reply";
+      if (reply) reply->deleteLater();
+      return;
+   }
+}
+
+
+void Server::queueJob()
+{
+   Network::Reply* reply(qobject_cast<Network::Reply*>(sender()));
+
+   if (reply && m_activeRequests.contains(reply)) {
+      Job* job(m_activeRequests.value(reply));
+      m_activeRequests.remove(reply);
+      reply->deleteLater();
+
+      if (reply->status() != Network::Reply::Finished) {
+         job->setStatus(Job::Error);
+         job->setMessage(reply->message());
+qDebug() << "Server::queueJob() sending signal";
+         jobSubmissionFailed(job);
+         return;
+      }
+
+      QString submit(m_configuration.value(ServerConfiguration::Submit));
+      submit = substituteMacros(submit);
+      submit = job->substituteMacros(submit);
+
+      qDebug() << "Executing submit command:     " << submit;
+
+      reply = m_connection->execute(submit);
+      connect(reply, SIGNAL(finished()), this, SLOT(submitFinished()));
+      m_activeRequests.insert(reply, job);
+
+   }else {
+      QLOG_ERROR() << "Server Error: invalid reply";
+      if (reply) reply->deleteLater();
+      return;
+   }
 }
 
 
 void Server::submitFinished()
 {
+qDebug() << "Server submitFinished SLOT called";
    Network::Reply* reply(qobject_cast<Network::Reply*>(sender()));
-   if (!reply) {
-      QLOG_ERROR() << "Server Error: invalid reply";
-      return;
-   }
 
-   if (!m_activeRequests.contains(reply)) {
-      QLOG_WARN() << "Server Error: submit called on busy job";
+   if (reply && m_activeRequests.contains(reply)) {
+      Job* job(m_activeRequests.value(reply));
+      m_activeRequests.remove(reply);
+      reply->deleteLater();
+
+      if (reply->status() != Network::Reply::Finished) {
+         job->setStatus(Job::Error);
+         job->setMessage(reply->message());
+qDebug() << "Server::submitFinished() sending signal";
+         jobSubmissionFailed(job);
+         return;
+      }
+
+      // need to get the id
+      qDebug() << "-------------------------------------------";
+      qDebug() << "Submit returned" << reply->message();
+      qDebug() << "-------------------------------------------";
+      job->parseQueryOutput(reply->message());
+
+      job->setStatus(Job::Queued);
+      watchJob(job);
+      jobSubmissionSuccessful(job);
+
+   }else {
+      QLOG_ERROR() << "Server Error: invalid reply";
       if (reply) reply->deleteLater();
       return;
    }
-
-   if (reply->status() == Network::Reply::Finished) {
-      Job* job(m_activeRequests.value(reply));
-
-      if (m_watchedJobs.contains(job)) {
-         job->parseQueryOutput(reply->message());
-         job->updated();
-      }
-   watchJob(job);
-
-   }else {
-      QLOG_WARN() << "Reply finshed with status" << reply->status();
-      QLOG_WARN() << "  Message:" << reply->message();
-   }
-
-   m_activeRequests.remove(reply);
-   reply->deleteLater();
-
 }
 
 
@@ -289,6 +328,11 @@ void Server::query(Job* job)
    QString query(m_configuration.value(ServerConfiguration::Query));
    query = substituteMacros(query);
    query = job->substituteMacros(query);
+
+   qDebug() << "Query string:" << query;
+   qDebug() << "taking a pass on the query";
+   m_updateTimer.stop();
+return;
 
    Network::Reply* reply(m_connection->execute(query));
    connect(reply, SIGNAL(finished()), this, SLOT(queryFinished()));
@@ -351,6 +395,10 @@ void Server::copyFinished()
 QString Server::substituteMacros(QString const& input)
 {
    QString output(input);
+   output.remove("POST");
+   output.remove("GET");
+   output = output.trimmed();
+   
    output.replace("${COOKIE}", m_configuration.value(ServerConfiguration::Cookie));
    return output;
 }
@@ -372,9 +420,13 @@ void Server::unwatchJob(Job* job)
 void Server::watchJob(Job* job)
 {
    if (job) {
-      if (!m_watchedJobs.contains(job)) m_watchedJobs.append(job); 
+      if (!m_watchedJobs.contains(job)) {
+         m_watchedJobs.append(job); 
+         connect(job, SIGNAL(deleted(Job*)), this, SLOT(unwatchJob(Job*)));
+      }
       if (m_connection && m_connection->isConnected()) m_updateTimer.start();
    }
 }
+
 
 } } // end namespace IQmol::Process

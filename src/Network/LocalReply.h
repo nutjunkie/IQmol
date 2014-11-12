@@ -76,7 +76,6 @@ namespace Network {
          QString m_destinationPath;
    };
 
-
 } } // end namespace IQmol::Network
 
 #endif

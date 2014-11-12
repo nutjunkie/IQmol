@@ -22,13 +22,16 @@
 
 #include "JobMonitor.h"
 #include "Job.h"
+#include "QChemJobInfo.h"
 #include "Server2.h"
 #include "ServerRegistry2.h"
 #include "Preferences.h"
+#include "NetworkException.h"
 #include "QMsgBox.h"
 #include "QsLog.h"
 
 #include <QCloseEvent>
+#include <QInputDialog>
 #include <QShowEvent>
 #include <QHeaderView>
 #include <QDebug>
@@ -116,7 +119,7 @@ void JobMonitor::initializeMenus()
       connect(action, SIGNAL(triggered()), this, SLOT(reconnectServers()));
 
       action = menu->addAction(tr("Remove All Processes"));
-      connect(action, SIGNAL(triggered()), this, SLOT(clearJobTable()));
+      connect(action, SIGNAL(triggered()), this, SLOT(clearAllJobs()));
 
       action = menu->addAction(tr("Close"));
       connect(action, SIGNAL(triggered()), this, SLOT(close()));
@@ -139,16 +142,120 @@ void JobMonitor::closeEvent(QCloseEvent* event)
 }
 
 
-Job& JobMonitor::newJob(QString const& jobName, QString const& serverName)
+void JobMonitor::submitJob(QChemJobInfo& qchemJobInfo)
 {
-   Job* job(new Job(jobName, serverName));
+   Job* job(0);
+   try {
+      qDebug() << "***** Job submitted to new JobMonitor *****";
+      qchemJobInfo.dump();
+
+      QString serverName(qchemJobInfo.get(QChemJobInfo::ServerName));
+      Server* server = ServerRegistry::instance().find(serverName);
+
+      if (!server) {
+         QString msg("Invalid server: ");
+         msg += serverName;
+         QMsgBox::warning(this, "IQmol", msg);
+         return;
+      }
+
+      postUpdateMessage("Connecting to server...");
+
+      if (!server->open()) {
+         QString msg("Failed to connect to server ");
+         msg += serverName;
+         QMsgBox::warning(this, "IQmol", msg);
+         return;
+      }
+
+      if (!server->isWebBased()) {
+         postUpdateMessage("Determining working directory");
+
+         QString msg("Working directory");
+         if (!server->isLocal()) msg += " on " + serverName;
+
+         QString dirPath(qchemJobInfo.get(QChemJobInfo::RemoteWorkingDirectory));
+         if (dirPath.isEmpty()) {
+            ServerConfiguration const& config(server->configuration());
+            dirPath = config.value(ServerConfiguration::WorkingDirectory);
+            if (!dirPath.endsWith("/")) dirPath += "/";
+            dirPath += qchemJobInfo.get(QChemJobInfo::BaseName);
+         }
+
+         bool exists(false);
+
+         do {
+            dirPath = getWorkingDirectory(msg, dirPath);
+qDebug() << "Directory in submitJob:" << dirPath;
+            if (dirPath.isEmpty()) return;
+            exists = server->exists(dirPath);
+            QString s("Directory " + dirPath + " exists.  Overwrite?");
+            if (exists && QMsgBox::question(this, "IQmol", s) == QMessageBox::Ok) {
+               exists = false;
+            }
+         } while (exists);
+
+         if (!server->makeDirectory(dirPath)) {
+            QString msg("Failed to create working directory ");
+            msg += dirPath;
+            QMsgBox::warning(this, "IQmol", msg);
+            return;
+         }
+
+         qchemJobInfo.set(QChemJobInfo::RemoteWorkingDirectory, dirPath);
+      }
+
+      postUpdateMessage("Submitting job");
+
+      job = new Job(qchemJobInfo);
+      server->submit(job);
+      jobAccepted();  // Closes the QUI window
+
+   }catch (Network::AuthenticationError& err) {
+      if (job) s_deletedJobs.append(job);
+      postUpdateMessage("");
+      QMsgBox::warning(0, "IQmol", "Invalid username or password");
+
+   }catch (Exception& err) {
+      if (job) s_deletedJobs.append(job);
+      postUpdateMessage("");
+      QMsgBox::warning(0, "IQmol", err.what());
+   }
+}
+
+
+void JobMonitor::jobSubmissionSuccessful(Job* job)
+{
    addToTable(job);
-   return *job;
+}
+
+
+void JobMonitor::jobSubmissionFailed(Job* job)
+{
+   if (!job) return;
+   QString msg("Job submission failed:\n");
+   msg += job->message();
+   QMsgBox::warning(this, "IQmol", msg);
+   if (job) s_deletedJobs.append(job);
+}
+
+
+QString JobMonitor::getWorkingDirectory(QString const& msg, QString const& suggestion)
+{
+   bool okPushed(false);
+   QString dirName(suggestion);
+   dirName = QInputDialog::getText(this, "IQmol", msg, QLineEdit::Normal, dirName, &okPushed);
+   if (!okPushed) return QString();
+
+   while (dirName.endsWith("/"))  { dirName.chop(1); }
+   while (dirName.endsWith("\\")) { dirName.chop(1); }
+   return dirName; 
 }
 
 
 void JobMonitor::addToTable(Job* job) 
 {
+   if (!job) return;
    QTableWidget* table(m_ui.processTable);
    int row(table->rowCount());
    table->setRowCount(row+1);
@@ -171,14 +278,12 @@ void JobMonitor::addToTable(Job* job)
    s_jobMap.insert(job, table->item(row,0));
 
    connect(job, SIGNAL(updated()),  this, SLOT(jobUpdated()));
-   connect(job, SIGNAL(finished()), this, SLOT(jobFinished()));
    saveJobListToPreferences();
 }
 
 
 void JobMonitor::saveJobListToPreferences() const
 {
-   QLOG_DEBUG() << "Saving jobs to preferences file";
    JobList jobs(s_jobMap.keys());
    JobList::iterator iter;
    QVariantList list;
@@ -463,6 +568,32 @@ Job* JobMonitor::getSelectedJob(QTableWidgetItem* item)
    JobList list(s_jobMap.keys(item));
 
    return list.isEmpty() ? 0 : list.first();  // and only
+}
+
+
+void JobMonitor::jobFinished()
+{
+   Job* job = qobject_cast<Job*>(sender());
+   if (job) {
+      switch (job->status()) {
+         case Job::Finished:
+            QMsgBox::question(this, "IQmol", "Job finished, copy results?");
+            break;
+         case Job::Error:
+            QMsgBox::warning(this, "IQmol", "Job finished with error");
+            break;
+         default:
+            QMsgBox::warning(this, "IQmol", "Job finished with funny status");
+            break;
+      }
+   }
+}
+
+
+void JobMonitor::jobUpdated()
+{
+   Job* job = qobject_cast<Job*>(sender());
+   if (job) reloadJob(job);
 }
 
 

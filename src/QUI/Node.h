@@ -142,8 +142,8 @@ class Node : public NodeBase {
       virtual void emitSignals() { }
 
       // Don't copy nodes as the logic gets messed up
-      Node(Node const& that) { }
-      Node const& operator=(Node const& that) {  }
+      Node(Node const&) { }
+      Node const& operator=(Node const&) {  }
 };
 
 } // end namespace Qui

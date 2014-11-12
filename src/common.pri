@@ -9,7 +9,7 @@ lessThan(QT_MAJOR_VERSION, 5): CONFIG += work
 QMAKE_CXXFLAGS += -O0 -g
 
 macx {
-   CONFIG += release
+   //CONFIG += release
 
    # QGLViewer
    INCLUDEPATH += $(DEV)/libQGLViewer-2.5.3

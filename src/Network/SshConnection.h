@@ -45,14 +45,14 @@ namespace Network {
       friend class SshGetFile;
 
       public:
-         //enum AuthenticationT { Agent, HostBased, KeyboardInteractive, Password, PublicKey };
-
          SshConnection(QString const& hostname, int const port = 22);
          ~SshConnection();
 
          void open();
          void close();
          void authenticate(AuthenticationT const, QString const& username);
+         bool exists(QString const& filePath);
+         bool makeDirectory(QString const& path);
 
          Reply* execute(QString const& command);
          Reply* getFile(QString const& sourcePath, QString const& destinationPath);

@@ -75,7 +75,7 @@ bool TestNetworkConnection()
             << "  basis     6-31G"
             << "$end";
 
-      reply = http.post("submit", input);
+      reply = http.post("submit", input.join("\n"));
 
 
       QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
@@ -142,10 +142,6 @@ bool TestNetworkConnection()
 
       delete reply;
 
-
-
-      return okay;
-
       SshConnection raijin("raijin.nci.org.au");
       raijin.open();
       raijin.authenticate(SshConnection::Password, "atg509");
@@ -163,31 +159,31 @@ bool TestNetworkConnection()
       }
       delete reply;
 
-      reply = raijin.getFile("/home/509/atg509/Test.vert", "fci.f");
+      reply = raijin.getFile("/home/509/atg509/Test.vert", "Test.vert");
       QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
       loop.exec();
 
       okay = (reply->status() == Reply::Finished);
       if (okay) {
-         QLOG_DEBUG() << "----------------------------";
+         QLOG_DEBUG() << "------ GET File ------------";
          QLOG_DEBUG() << reply->message();
          QLOG_DEBUG() << "----------------------------";
       }
       delete reply;
 
-      reply = raijin.putFile("/Users/agilbert/testcopy1", "testcopy4");
+      reply = raijin.putFile("/Users/agilbert/testcopy1", "testcopy5");
       QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
       loop.exec();
 
       okay = (reply->status() == Reply::Finished);
       if (okay) {
-         QLOG_DEBUG() << "----------------------------";
+         QLOG_DEBUG() << "------- PUT File -----------";
          QLOG_DEBUG() << reply->message();
          QLOG_DEBUG() << "----------------------------";
       }
       delete reply;
-/*
-*/
+
+      return okay;
 
       SshConnection chemmac11("chemmac11");
       chemmac11.open();

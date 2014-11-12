@@ -95,8 +95,10 @@ void ServerConfigurationListDialog::on_serverListTable_cellDoubleClicked(int row
    Server* server(ServerRegistry::instance().find(item->text()));
    if (!server) return;
 
-   editServerConfiguration(server->configuration());
-   updateServerTable();
+   if (editServerConfiguration(server->configuration()) ) {
+      updateServerTable();
+      ServerRegistry::save();
+   }
 
 qDebug() << "****************************************";
 server->configuration().dump();
@@ -132,11 +134,6 @@ void ServerConfigurationListDialog::on_removeServerButton_clicked(bool)
 
 void ServerConfigurationListDialog::on_configureServerButton_clicked(bool)
 {
-   QStringList list;
-   list << "QChem";
-   ServerRegistry::instance().connectServers(list);
-return;
-   
    QList<QTableWidgetItem*> selected(m_dialog.serverListTable->selectedItems());
    if (!selected.isEmpty()) {
       int row(selected[0]->row());

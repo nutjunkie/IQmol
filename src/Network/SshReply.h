@@ -72,6 +72,7 @@ namespace Network {
             SshReply(connection), m_command(command) { }
 
       protected:
+         void setCommand(QString const& command) { m_command = command; }
          void runDelegate();
 
       private:

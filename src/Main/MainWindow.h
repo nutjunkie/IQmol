@@ -87,6 +87,7 @@ namespace IQmol {
          void showAbout() { m_aboutDialog.show(); }
          void showPreferences() { m_preferencesBrowser.show(); }
          void showLogMessages();
+         void showQChemUIold();
          void showQChemUI();
          void showProcessMonitor();  // deprecate
          void showJobMonitor();

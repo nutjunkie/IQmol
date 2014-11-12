@@ -79,6 +79,10 @@ namespace Process2 {
             return (connection() == HTTP || connection() == HTTPS);
          }
 
+         bool isLocal() const {
+            return connection() == Local;
+         }
+
 		 // These are to facilitate saving the configuration in the user Preferences.
          QVariant toQVariant() const;
          void fromQVariant(QVariant const&);

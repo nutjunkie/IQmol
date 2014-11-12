@@ -1,5 +1,5 @@
-#ifndef IQMOL_MOLECULELAYER_H
-#define IQMOL_MOLECULELAYER_H
+#ifndef IQMOL_LAYER_MOLECULE_H
+#define IQMOL_LAYER_MOLECULE_H
 /*******************************************************************************
        
   Copyright (C) 2011-2013 Andrew Gilbert
@@ -53,6 +53,10 @@ namespace OpenBabel {
 
 namespace IQmol {
 
+   namespace Process2 {
+      class  QChemJobInfo;
+   }
+
    namespace Command {
       class AppendData;
       class RemoveData;
@@ -74,7 +78,7 @@ namespace IQmol {
    class SpatialProperty;
    class PointChargePotential;
    class NearestNuclearCharge;
-   class JobInfo;
+   class JobInfo;  //deprecate
 
    namespace Layer {
 
@@ -135,8 +139,9 @@ namespace IQmol {
             /// Creates a new JobInfo object and sends it out into the ether.
             /// This really needs to be a smart pointer because we don't delete
             /// as it may be being used by a Process or Server.  One day...
-            JobInfo* jobInfo();
-            bool jobInfoMatch(JobInfo const* jobInfo);
+            JobInfo* jobInfo();   //deprecate
+            bool jobInfoMatch(JobInfo const* jobInfo);   //deprecate
+            Process2::QChemJobInfo qchemJobInfo();
    
             /// Attempts to determine the best axis for the functional group when
             /// converting an atom to a functional group (click on atom event)
@@ -237,7 +242,6 @@ namespace IQmol {
             void reperceiveBondsForAnimation() { 
                if (m_reperceiveBondsForAnimation) reperceiveBonds(false);
             }
-
    
             /// Passes the remove signal on so that the ViewerModel can deal with it
             void removeMolecule() { removeMolecule(this); }
@@ -277,7 +281,8 @@ namespace IQmol {
          private Q_SLOTS:
             /// This is the mechanism by which the QUI can communicate changes back
             /// to the Molecule.  Currently this is the charge and multiplicity.
-            void jobInfoChanged();
+            void jobInfoChanged();  //deprecate
+
             void dumpData() { m_bank.dump(); }
             void setAtomicCharges(Data::Type::ID type);
             void updateAtomicCharges();
@@ -386,9 +391,9 @@ namespace IQmol {
             IQmol::SurfaceAnimatorDialog  m_surfaceAnimator;
             
             // This is the last JobInfo we created
-            JobInfo* m_jobInfo;
+            JobInfo* m_jobInfo;  //deprecate
    
-            Layer::Info m_info;
+            Layer::Info      m_info;
             Layer::Container m_atomList;
             Layer::Container m_bondList;
             Layer::Container m_chargesList;

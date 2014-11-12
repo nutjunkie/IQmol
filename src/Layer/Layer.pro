@@ -2,7 +2,7 @@ LIB = Layer
 CONFIG += lib
 include(../common.pri)
 
-INCLUDEPATH += ../Data ../Util ../Old ../Configurator ../Parser
+INCLUDEPATH += ../Data ../Util ../Old ../Configurator ../Parser ../Process
 #INCLUDEPATH += $$BUILD_DIR/IQmol
 
 SOURCES = \

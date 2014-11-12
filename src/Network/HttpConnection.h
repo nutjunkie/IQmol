@@ -51,6 +51,9 @@ namespace Network {
          void open();
          void close();
          void authenticate(AuthenticationT const, QString const& cooke);
+         bool exists(QString const& /*filePath*/) { return false; } // unused
+         bool makeDirectory(QString const& /*filePath*/) { return true; }  // unused
+
          QString obtainCookie();
 
          Reply* execute(QString const& query);
@@ -58,7 +61,7 @@ namespace Network {
          Reply* getFile(QString const& sourcePath, QString const& destinationPath);
          Reply* get(QString const& query) { return execute(query); }
         
-         Reply* post(QString const& path, QStringList const&);
+         Reply* post(QString const& path, QString const&);
 
       protected:
          QNetworkAccessManager* m_networkAccessManager;

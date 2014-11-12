@@ -22,6 +22,8 @@
 
 #include "LocalConnection.h"
 #include "LocalReply.h"
+#include <QFileInfo>
+#include <QDir>
 
 
 namespace IQmol {
@@ -52,6 +54,36 @@ void LocalConnection::close()
 void LocalConnection::authenticate(AuthenticationT const, QString const& /*username*/)
 {
    m_status = Connection::Authenticated;
+}
+
+
+bool LocalConnection::exists(QString const& filePath)
+{
+   QFileInfo info(filePath);
+   return info.exists();
+}
+
+
+bool LocalConnection::makeDirectory(QString const& path)
+{
+   QFileInfo info(path);
+
+   if (!info.exists()) {
+      QDir dir(QDir::root());
+      return dir.mkpath(path);
+   }
+
+   if (!info.isDir()) {
+      QDir dir(info.dir());
+      QString fileName(info.fileName());
+      qDebug() << "about to remove file " << fileName << " from directory " << dir.path();
+      // remove file
+      dir.remove(fileName);
+      dir = QDir::root();
+      return dir.mkpath(path);
+   }
+
+   return info.isWritable();
 }
 
             

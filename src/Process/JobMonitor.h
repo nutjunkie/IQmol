@@ -33,6 +33,7 @@ namespace IQmol {
 namespace Process2 {
 
    class Job;
+   class QChemJobInfo;
 
    /// The JobMonitor handles the submission and monitoring of external 
    /// calculations such as Q-Chem jobs.  Note that the JobMonitor takes 
@@ -45,11 +46,18 @@ namespace Process2 {
       public:
          static JobMonitor& instance();
 
-         Job& newJob(QString const& jobName, QString const& serverName);
+      public Q_SLOTS:
+         // Namespace qualification is required as we call this from QUI
+         void submitJob(IQmol::Process2::QChemJobInfo&);
+         void jobSubmissionSuccessful(Job*);
+         void jobSubmissionFailed(Job*);
 
       Q_SIGNALS:
          /// This signal is emitted only when a job has finished successfully.
          void resultsAvailable(Job&);
+         void jobAccepted();
+
+         void postUpdateMessage(QString const&);
 
       protected:
          void closeEvent(QCloseEvent* event);
@@ -58,11 +66,11 @@ namespace Process2 {
       private Q_SLOTS:
          void on_clearListButton_clicked(bool);
 
+
 		 /// Used to remove all jobs listed in the monitor.  This is triggered
 		 /// by a MainWindow menu action and may be useful there are rogue
 		 /// processes on the list which are causing problems and need to be
 		 /// removed.
-
          void clearAllJobs();
 
 		 /// This is really a pseudo-update to the entries in the monitor, it
@@ -72,9 +80,8 @@ namespace Process2 {
          void updateTable();
 
          void reconnectServers();
- 
-//         void processUpdated();
-//         void processFinished();
+         void jobUpdated();
+         void jobFinished();
 
          // Context menu actions
          void contextMenu(QPoint const& position);
@@ -93,6 +100,8 @@ namespace Process2 {
          void addToTable(Job*);
          void reloadJob(Job* job);
          void initializeMenus();
+
+         QString getWorkingDirectory(QString const& message, QString const& suggestion);
 
          Job* getSelectedJob(QTableWidgetItem* item = 0);
 

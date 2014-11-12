@@ -51,15 +51,16 @@ namespace Network {
          virtual void close() = 0;
 
          virtual void authenticate(AuthenticationT const, QString const& /*userName*/) = 0;
-
-         virtual QString obtainCookie() {
-            return QString();
-         }
+         virtual bool exists(QString const& filePath) = 0;
+         virtual bool makeDirectory(QString const& filePath) = 0;
 
          virtual Reply* execute(QString const& command) = 0;
          virtual Reply* getFile(QString const& sourcePath, QString const& destinationPath) = 0;
          virtual Reply* putFile(QString const& sourcePath, QString const& destinationPath) = 0;
-            
+
+         virtual QString obtainCookie() {
+            return QString();
+         }
 
          void setTimeout(unsigned timeout) { m_timeout = timeout; }
          unsigned timeout() const { return m_timeout; }
