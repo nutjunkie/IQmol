@@ -41,7 +41,7 @@ namespace Network {
    class InvalidHostname : public IQmol::Exception {
       public:
          InvalidHostname(QString const& hostname) : 
-            Exception(QString("Hostname ") + hostname + " invalid") { }
+            Exception(QString("Hostname ") + hostname + " invalid\nCheck internet connection") { }
    };
 
    class NetworkTimeout : public IQmol::Exception {

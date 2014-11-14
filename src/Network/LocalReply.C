@@ -21,7 +21,9 @@
 ********************************************************************************/
 
 #include "LocalReply.h"
+#include "LocalConnection.h"
 #include <QFileInfo>
+#include <QProcess>
 #include <QDir>
 
 
@@ -30,7 +32,48 @@ namespace Network {
 
 void LocalExecute::run()
 {
-   qDebug() << "Should be doing someting locally";
+   m_status = Running;
+   QStringList arguments;
+   QStringList list(m_command.split("\"", QString::SkipEmptyParts));
+
+   for (int i = 0; i < list.size(); ++i) {
+       if (i % 2 == 0) {
+          arguments << list[i].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+       }else {
+          arguments << list[i];
+       }   
+   }   
+
+   if (arguments.isEmpty()) {
+      m_status  = Error;
+      m_message = "Cannot execute null command";
+      return;
+   }   
+
+   // We assume the first token is the command
+   QString command(arguments.takeFirst());
+   QFileInfo cmd(command);
+
+   qDebug() << "Executing command" << command << "with args:" << arguments;
+
+   if (cmd.exists()) {
+      QProcess process;
+      process.setWorkingDirectory(cmd.absolutePath());
+      process.start(cmd.fileName(), arguments);
+
+      if (process.waitForFinished(m_connection->timeout())) {
+         m_message = process.readAllStandardOutput();
+         m_status  = Finished;
+      }else {
+         process.kill();
+         m_status  = TimedOut;
+         m_message = "Timeout on command return: " + command;
+      }   
+
+   }else {
+      m_status  = Error;
+      m_message = "Command not found: " + command;
+   }   
 }
 
 

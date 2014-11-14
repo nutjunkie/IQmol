@@ -51,8 +51,10 @@ namespace Network {
          void open();
          void close();
          void authenticate(AuthenticationT const, QString const& cooke);
-         bool exists(QString const& /*filePath*/) { return false; } // unused
-         bool makeDirectory(QString const& /*filePath*/) { return true; }  // unused
+
+         bool blockingExecute(QString const&, QString*) { return false; } // unused
+         bool exists(QString const& ) { return false; }         // unused
+         bool makeDirectory(QString const&) { return true; }    // unused
 
          QString obtainCookie();
 

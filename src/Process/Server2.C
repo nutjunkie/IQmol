@@ -135,11 +135,19 @@ bool Server::open()
 
 bool Server::exists(QString const& filePath)
 {
-   if (!m_connection) {
-      QLOG_WARN() << "Server::exists() called on invalid connection";
-      return false;
-   }
+   if (!m_connection) throw Exception("Invalid connection");
    return m_connection->exists(filePath);
+}
+
+
+QString Server::queueInfo()
+{
+   if (!m_connection) throw Exception("Invalid connection");
+   QString cmd(m_configuration.value(ServerConfiguration::QueueInfo));
+   cmd = substituteMacros(cmd);
+   QString info;
+   m_connection->blockingExecute(cmd, &info);
+   return info;
 }
 
 
@@ -391,7 +399,6 @@ void Server::copyFinished()
 // --------------------------
 
 
-// This will be a null operation for all but HTTP(S) servers
 QString Server::substituteMacros(QString const& input)
 {
    QString output(input);
@@ -399,7 +406,9 @@ QString Server::substituteMacros(QString const& input)
    output.remove("GET");
    output = output.trimmed();
    
-   output.replace("${COOKIE}", m_configuration.value(ServerConfiguration::Cookie));
+   output.replace("${COOKIE}",     m_configuration.value(ServerConfiguration::Cookie));
+   output.replace("${USERNAME}",   m_configuration.value(ServerConfiguration::UserName));
+   output.replace("${SERVERNAME}", m_configuration.value(ServerConfiguration::ServerName));
    return output;
 }
 

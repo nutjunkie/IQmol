@@ -33,6 +33,7 @@ namespace IQmol {
 namespace Process2 {
 
    class Job;
+   class Server;
    class QChemJobInfo;
 
    /// The JobMonitor handles the submission and monitoring of external 
@@ -65,7 +66,6 @@ namespace Process2 {
 
       private Q_SLOTS:
          void on_clearListButton_clicked(bool);
-
 
 		 /// Used to remove all jobs listed in the monitor.  This is triggered
 		 /// by a MainWindow menu action and may be useful there are rogue
@@ -101,8 +101,10 @@ namespace Process2 {
          void reloadJob(Job* job);
          void initializeMenus();
 
-         QString getWorkingDirectory(QString const& message, QString const& suggestion);
+         bool getQueueResources(Server*, QChemJobInfo&);
+         bool getWorkingDirectory(Server*, QChemJobInfo&);
 
+         QString getWorkingDirectory(QString const& message, QString const& suggestion);
          Job* getSelectedJob(QTableWidgetItem* item = 0);
 
 		 /// Clears the jobs from the monitor and their servers.  If
@@ -119,7 +121,7 @@ namespace Process2 {
 
          Ui::JobMonitor m_ui;
          QTimer m_updateTimer;
-
+         
 /*
 
       private Q_SLOTS:

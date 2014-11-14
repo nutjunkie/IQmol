@@ -57,6 +57,10 @@ namespace Process2 {
             return m_configuration.isWebBased();
          }
 
+         bool needsResourceLimits() const { 
+            return m_configuration.needsResourceLimits();
+         }
+
          //ServerConfiguration const& configuration() const { return m_configuration; }
          ServerConfiguration& configuration() { return m_configuration; }
 
@@ -65,6 +69,9 @@ namespace Process2 {
 
          // Unthreaded mkdir command
          bool makeDirectory(QString const& directoryPath);
+
+         // Unthreaded command to get queue information
+         QString queueInfo();
 
          void submit(Job*);
 

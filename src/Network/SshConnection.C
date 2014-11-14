@@ -603,14 +603,6 @@ bool SshConnection::waitSocket()
 }
 
 
-void SshConnection::callRedundant()
-{
-   QLOG_TRACE() << "Redundant call made";
-   sleep(5);
-   QLOG_TRACE() << "Redundant call finished";
-}
-
-
 void SshConnection::start(SshReply* reply)
 {
    reply->moveToThread(&m_thread);
@@ -621,30 +613,15 @@ void SshConnection::start(SshReply* reply)
 }
 
 
-// for debugging
-Reply* SshConnection::test(QString const& id)
-{
-   SshReply* reply(new SshTest(this, id));
-   start(reply);
-   return reply;
-}
-
-
 bool SshConnection::exists(QString const& filePath)
 {
    QString cmd("/bin/test -e ");
    cmd += filePath;
-   cmd += " && echo EXISTS";
+   cmd += " && echo SUCCESS";
 
-   SshReply* reply(new SshExecute(this, cmd));
-   QEventLoop loop;
-
-   QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
-   start(reply);
-   loop.exec();
-
-   bool ok(reply->status() == Reply::Finished && reply->message().contains("EXISTS"));
-   reply->deleteLater();
+   QString msg;
+   bool ok(blockingExecute(cmd, &msg));
+   ok = ok && msg.contains("SUCCESS");
 
    return ok;
 }
@@ -656,14 +633,27 @@ bool SshConnection::makeDirectory(QString const& path)
    cmd += path;
    cmd += " && echo SUCCESS";
 
+   QString msg;
+   bool ok(blockingExecute(cmd, &msg));
+   ok = ok && msg.contains("SUCCESS");
+
+   return ok;
+}
+
+
+bool SshConnection::blockingExecute(QString const& command, QString* message)
+{
+   QString cmd(command);
+
    SshReply* reply(new SshExecute(this, cmd));
    QEventLoop loop;
 
-   QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+   connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
    start(reply);
    loop.exec();
-
-   bool ok(reply->status() == Reply::Finished && reply->message().contains("SUCCESS"));
+             
+   bool ok(reply->status() == Reply::Finished);
+   if (message) *message = reply->message();
    reply->deleteLater();
 
    return ok;
@@ -691,6 +681,23 @@ Reply* SshConnection::getFile(QString const& sourcePath, QString const& destinat
    SshReply* reply(new SshGetFile(this, sourcePath, destinationPath));
    start(reply);
    return reply;
+}
+
+
+// for debugging
+Reply* SshConnection::test(QString const& id)
+{
+   SshReply* reply(new SshTest(this, id));
+   start(reply);
+   return reply;
+}
+
+
+void SshConnection::callRedundant()
+{
+   QLOG_TRACE() << "Redundant call made";
+   sleep(5);
+   QLOG_TRACE() << "Redundant call finished";
 }
 
 } } // end namespace IQmol::Network

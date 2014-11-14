@@ -524,8 +524,8 @@ bool MolecularOrbitals::computeOrbitalGrids(Data::GridDataList& grids)
    Data::GridDataList::iterator iter;
 
    for (iter = grids.begin(); iter != grids.end(); ++iter) {
-qDebug() << "Computing grid" << (*iter)->surfaceType().toString() ;
-(*iter)->size().dump();
+       QLOG_DEBUG() << "Computing grid" << (*iter)->surfaceType().toString() ;
+       (*iter)->size().dump();
        if ( ((*iter)->size() != g0->size()) ) {
           QLOG_ERROR() << "Different sized grids found in molecular orbitals calculator";
           return false;
@@ -581,19 +581,19 @@ qDebug() << "Computing grid" << (*iter)->surfaceType().toString() ;
                Vec gridPoint(x,y,z);
 
                for (unsigned orb = 0; orb < nOrb; ++orb) tmp[orb] = 0.0;
-               unsigned count(0);
+               unsigned offset(0);
 
                //-----------------------------------------------------
                for (shell = shells.begin(); shell != shells.end(); ++shell) {
                    if ( (values = (*shell)->evaluate(gridPoint)) ) {
                       for (unsigned s = 0; s < (*shell)->nBasis(); ++s) {
                           for (unsigned orb = 0; orb < nOrb; ++orb) {
-                              tmp[orb] += (*coefficients)(orbitals[orb], count) * values[s];
+                              tmp[orb] += (*coefficients)(orbitals[orb], offset) * values[s];
                           }
-                          ++count;
+                          ++offset;
                       }
                    }else {
-                      count += (*shell)->nBasis();
+                      offset += (*shell)->nBasis();
                    }
                }
 
@@ -757,8 +757,6 @@ bool MolecularOrbitals::computeDensityGrids(Data::GridData*& alpha, Data::GridDa
        progressDialog.setValue(progress);
        if (progressDialog.wasCanceled()) return false;
    }
-
-   // qDebug() << "End of calculation" << nPoints << count << progress;
 
    double t = time.elapsed() / 1000.0;
    QLOG_INFO() << "Time to compute density grid data:" << t << "seconds";

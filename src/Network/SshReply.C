@@ -83,7 +83,7 @@ void SshExecute::runDelegate()
    while ( (channel = libssh2_channel_open_session(session)) == 0 &&
            libssh2_session_last_error(session, 0, 0, 0) == LIBSSH2_ERROR_EAGAIN) {
       if (m_interrupt) return;
-      m_connection->waitSocket();
+      if (m_connection->waitSocket()) throw NetworkTimeout();
    }
 
    if (channel == 0) {

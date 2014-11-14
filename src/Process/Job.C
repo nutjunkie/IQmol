@@ -129,6 +129,20 @@ QString Job::substituteMacros(QString const& input) const
 {
    QString output(input);
    output.replace("${JOB_ID}", m_jobId);
+
+   output.replace("${JOB_NAME}", m_qchemJobInfo.get(QChemJobInfo::BaseName));
+   output.replace("${QUEUE}",    m_qchemJobInfo.get(QChemJobInfo::Queue));
+   output.replace("${WALLTIME}", m_qchemJobInfo.get(QChemJobInfo::Walltime));
+   output.replace("${MEMORY}",   m_qchemJobInfo.get(QChemJobInfo::Memory));
+   output.replace("${JOBFS}",    m_qchemJobInfo.get(QChemJobInfo::Scratch));
+   output.replace("${SCRATCH}",  m_qchemJobInfo.get(QChemJobInfo::Scratch));
+   output.replace("${NCPUS}",    m_qchemJobInfo.get(QChemJobInfo::Ncpus));
+
+   if (output.contains("${")) {
+      QLOG_WARN() << "Unmatched macros found in string:";
+      QLOG_WARN() << input;
+   }
+
    return output;
 }
 

@@ -22,6 +22,7 @@
 
 ********************************************************************************/
 
+#include <QStringList>
 #include <QTextStream>
 #include <stdexcept>
 

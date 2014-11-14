@@ -23,6 +23,8 @@
 #include "JobMonitor.h"
 #include "Job.h"
 #include "QChemJobInfo.h"
+#include "QueueResources.h"
+#include "QueueResourcesDialog.h"
 #include "Server2.h"
 #include "ServerRegistry2.h"
 #include "Preferences.h"
@@ -34,6 +36,7 @@
 #include <QInputDialog>
 #include <QShowEvent>
 #include <QHeaderView>
+#include <QDir>
 #include <QDebug>
 
 
@@ -150,7 +153,7 @@ void JobMonitor::submitJob(QChemJobInfo& qchemJobInfo)
       qchemJobInfo.dump();
 
       QString serverName(qchemJobInfo.get(QChemJobInfo::ServerName));
-      Server* server = ServerRegistry::instance().find(serverName);
+      Server* server(ServerRegistry::instance().find(serverName));
 
       if (!server) {
          QString msg("Invalid server: ");
@@ -162,47 +165,27 @@ void JobMonitor::submitJob(QChemJobInfo& qchemJobInfo)
       postUpdateMessage("Connecting to server...");
 
       if (!server->open()) {
-         QString msg("Failed to connect to server ");
+         QString msg("Failed to open connection to server ");
          msg += serverName;
          QMsgBox::warning(this, "IQmol", msg);
+         postUpdateMessage("");
          return;
       }
 
       if (!server->isWebBased()) {
-         postUpdateMessage("Determining working directory");
-
-         QString msg("Working directory");
-         if (!server->isLocal()) msg += " on " + serverName;
-
-         QString dirPath(qchemJobInfo.get(QChemJobInfo::RemoteWorkingDirectory));
-         if (dirPath.isEmpty()) {
-            ServerConfiguration const& config(server->configuration());
-            dirPath = config.value(ServerConfiguration::WorkingDirectory);
-            if (!dirPath.endsWith("/")) dirPath += "/";
-            dirPath += qchemJobInfo.get(QChemJobInfo::BaseName);
-         }
-
-         bool exists(false);
-
-         do {
-            dirPath = getWorkingDirectory(msg, dirPath);
-qDebug() << "Directory in submitJob:" << dirPath;
-            if (dirPath.isEmpty()) return;
-            exists = server->exists(dirPath);
-            QString s("Directory " + dirPath + " exists.  Overwrite?");
-            if (exists && QMsgBox::question(this, "IQmol", s) == QMessageBox::Ok) {
-               exists = false;
-            }
-         } while (exists);
-
-         if (!server->makeDirectory(dirPath)) {
-            QString msg("Failed to create working directory ");
-            msg += dirPath;
-            QMsgBox::warning(this, "IQmol", msg);
+         postUpdateMessage("Determining working directory...");
+         if (!getWorkingDirectory(server, qchemJobInfo)) {
+            postUpdateMessage("");
             return;
          }
 
-         qchemJobInfo.set(QChemJobInfo::RemoteWorkingDirectory, dirPath);
+         if (server->needsResourceLimits()) {
+            postUpdateMessage("Obtaining queue information...");
+            if (!getQueueResources(server, qchemJobInfo)) {
+               postUpdateMessage("");
+               return;
+            }
+         }
       }
 
       postUpdateMessage("Submitting job");
@@ -211,15 +194,18 @@ qDebug() << "Directory in submitJob:" << dirPath;
       server->submit(job);
       jobAccepted();  // Closes the QUI window
 
+   }catch (Network::AuthenticationCancelled& err) {
+      if (job) s_deletedJobs.append(job);
+
    }catch (Network::AuthenticationError& err) {
       if (job) s_deletedJobs.append(job);
       postUpdateMessage("");
-      QMsgBox::warning(0, "IQmol", "Invalid username or password");
+      QMsgBox::warning(this, "IQmol", "Invalid username or password");
 
    }catch (Exception& err) {
       if (job) s_deletedJobs.append(job);
       postUpdateMessage("");
-      QMsgBox::warning(0, "IQmol", err.what());
+      QMsgBox::warning(this, "IQmol", err.what());
    }
 }
 
@@ -244,12 +230,83 @@ QString JobMonitor::getWorkingDirectory(QString const& msg, QString const& sugge
 {
    bool okPushed(false);
    QString dirName(suggestion);
-   dirName = QInputDialog::getText(this, "IQmol", msg, QLineEdit::Normal, dirName, &okPushed);
+   dirName = QInputDialog::getText(0, "IQmol", msg, QLineEdit::Normal, dirName, &okPushed);
    if (!okPushed) return QString();
 
    while (dirName.endsWith("/"))  { dirName.chop(1); }
    while (dirName.endsWith("\\")) { dirName.chop(1); }
    return dirName; 
+}
+
+
+bool JobMonitor::getWorkingDirectory(Server* server, QChemJobInfo& qchemJobInfo)
+{
+   ServerConfiguration configuration(server->configuration());
+   QString dirPath(configuration.value(ServerConfiguration::WorkingDirectory));
+   dirPath += "/" + qchemJobInfo.get(QChemJobInfo::BaseName);
+
+   // clean the path
+   QDir dir(dirPath);
+   dirPath = dir.path();
+   
+   bool exists(false);
+   QString msg("Working directory");
+   if (!server->isLocal()) msg += " on " + server->name();
+
+   do {
+      dirPath = getWorkingDirectory(msg, dirPath);
+qDebug() << "Directory in submitJob:" << dirPath;
+      if (dirPath.isEmpty()) return false;
+      exists = server->exists(dirPath);
+      QString s("Directory " + dirPath + " exists.  Overwrite?");
+      if (exists && QMsgBox::question(this, "IQmol", s) == QMessageBox::Ok) exists = false;
+   } while (exists);
+
+   if (!server->makeDirectory(dirPath)) {
+      QString msg("Failed to create working directory ");
+      msg += dirPath;
+      QMsgBox::warning(this, "IQmol", msg);
+      return false;
+   }
+
+   qchemJobInfo.set(QChemJobInfo::RemoteWorkingDirectory, dirPath);
+   if (server->isLocal()) {
+      qchemJobInfo.set(QChemJobInfo::LocalWorkingDirectory, dirPath);
+   }
+
+   return true;
+}
+
+
+bool JobMonitor::getQueueResources(Server* server, QChemJobInfo& qchemJobInfo)
+{
+   ServerConfiguration configuration(server->configuration());
+   QVariant qvar(configuration.value(ServerConfiguration::QueueResources));
+   QueueResourcesList list(qvar);
+
+   if (list.isEmpty()) {
+      QString info(server->queueInfo());
+      ServerConfiguration::QueueSystemT queueSystem(configuration.queueSystem());
+      if (queueSystem == ServerConfiguration::PBS) {
+         list.fromPbsQueueInfoString(info);
+      }else if (queueSystem == ServerConfiguration::SGE) {
+          list.fromSgeQueueInfoString(info);
+      }
+   }
+
+   postUpdateMessage("Setting job resources");
+   QueueResourcesDialog dialog(list, this);
+   if (dialog.exec() == QDialog::Rejected) return false;
+   configuration.setValue(ServerConfiguration::QueueResources,list.toQVariant());
+   ServerRegistry::save();
+
+   qchemJobInfo.set(QChemJobInfo::Queue,    dialog.queue());
+   qchemJobInfo.set(QChemJobInfo::Walltime, dialog.walltime());
+   qchemJobInfo.set(QChemJobInfo::Memory,   dialog.memory());
+   qchemJobInfo.set(QChemJobInfo::Scratch,  dialog.scratch());
+   qchemJobInfo.set(QChemJobInfo::Ncpus,    dialog.ncpus());
+
+   return true;
 }
 
 
@@ -433,7 +490,14 @@ void JobMonitor::contextMenu(QPoint const& pos)
    if (status == Job::Copying) return;
 
    QMenu *menu = new QMenu(this);
-   QAction* kill   = menu->addAction(tr("Kill Job"),         this, SLOT(killJob()));
+   QAction* kill;
+
+   if (status == Job::Queued) {
+      kill = menu->addAction(tr("Delete Job From Queue"), this, SLOT(killJob()));
+   }else {
+      kill = menu->addAction(tr("Kill Job"),         this, SLOT(killJob()));
+   }
+
    QAction* remove = menu->addAction(tr("Remove Process"),   this, SLOT(removeJob()));
    QAction* query  = menu->addAction(tr("Query Process"),    this, SLOT(queryJob()));
    QAction* view   = menu->addAction(tr("View Output File"), job,  SLOT(viewOutput()));
@@ -469,19 +533,19 @@ void JobMonitor::contextMenu(QPoint const& pos)
          break;
 
       case Job::Killed:
-         view->setEnabled(true);
+//         view->setEnabled(true);
          remove->setEnabled(true);
          copy->setEnabled(true);
          break;
 
       case Job::Error:
-         view->setEnabled(true);
+//         view->setEnabled(true);
          remove->setEnabled(true);
          copy->setEnabled(true);
          break;
 
       case Job::Finished:
-         view->setEnabled(true);
+ //        view->setEnabled(true);
          remove->setEnabled(true);
          copy->setEnabled(true);
          break;

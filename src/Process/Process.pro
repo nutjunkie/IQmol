@@ -9,6 +9,8 @@ SOURCES = \
    $$PWD/JobMonitor.C \
    $$PWD/QChemJobInfo.C \
    $$PWD/QueueOptionsDialog.C \
+   $$PWD/QueueResources.C \
+   $$PWD/QueueResourcesDialog.C \
    $$PWD/Server2.C \
    $$PWD/ServerConfiguration.C \
    $$PWD/ServerConfigurationDialog.C \
@@ -22,6 +24,8 @@ HEADERS = \
    $$PWD/JobMonitor.h \
    $$PWD/QChemJobInfo.h \
    $$PWD/QueueOptionsDialog.h \
+   $$PWD/QueueResources.h \
+   $$PWD/QueueResourcesDialog.h \
    $$PWD/Server2.h \
    $$PWD/ServerConfiguration.h \
    $$PWD/ServerConfigurationDialog.h \
@@ -33,6 +37,7 @@ HEADERS = \
 FORMS = \
    $$PWD/JobMonitor.ui \
    $$PWD/QueueOptionsDialog.ui \
+   $$PWD/QueueResourcesDialog.ui \
    $$PWD/ServerConfigurationDialog.ui \
    $$PWD/ServerConfigurationListDialog.ui \
    $$PWD/SshFileDialog.ui \

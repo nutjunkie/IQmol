@@ -27,7 +27,6 @@
 #include "SshConnection.h"
 
 
-
 namespace IQmol {
 namespace Process2 {
 
@@ -43,7 +42,7 @@ namespace Process2 {
                        Authentication, UserName, WorkingDirectory,
                        Submit, Query, QueueInfo, Kill,
                        UpdateInterval, JobLimit, 
-                       RunFileTemplate, Cookie, MaxFieldT };
+                       RunFileTemplate, Cookie, QueueResources, MaxFieldT };
 
          enum ConnectionT { Local, SSH, HTTP, HTTPS };
 
@@ -81,6 +80,10 @@ namespace Process2 {
 
          bool isLocal() const {
             return connection() == Local;
+         }
+
+         bool needsResourceLimits() const {
+            return (queueSystem() == PBS || queueSystem() == SGE);
          }
 
 		 // These are to facilitate saving the configuration in the user Preferences.

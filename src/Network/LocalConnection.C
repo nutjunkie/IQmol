@@ -57,6 +57,15 @@ void LocalConnection::authenticate(AuthenticationT const, QString const& /*usern
 }
 
 
+bool LocalConnection::blockingExecute(QString const& command, QString* message)
+{
+   LocalReply* reply(new LocalExecute(this, command));
+   reply->start();
+   if (message) *message = reply->message();
+   return (reply->status() == Reply::Finished);
+}
+
+
 bool LocalConnection::exists(QString const& filePath)
 {
    QFileInfo info(filePath);
@@ -89,19 +98,25 @@ bool LocalConnection::makeDirectory(QString const& path)
             
 Reply* LocalConnection::execute(QString const& command)
 {
-   return new LocalExecute(this, command);
+   LocalReply* reply(new LocalExecute(this, command));
+   reply->start();
+   return reply;
 }
 
 
 Reply* LocalConnection::getFile(QString const& sourcePath, QString const& destinationPath)
 {
-   return new LocalCopy(this, sourcePath, destinationPath);
+   LocalReply* reply(new LocalCopy(this, sourcePath, destinationPath));
+   reply->start();
+   return reply;
 }
 
 
 Reply* LocalConnection::putFile(QString const& sourcePath, QString const& destinationPath)
 {
-   return new LocalCopy(this, sourcePath, destinationPath);
+   LocalReply* reply(new LocalCopy(this, sourcePath, destinationPath));
+   reply->start();
+   return reply;
 }
 
 } } // end namespace IQmol::Network

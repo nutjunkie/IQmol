@@ -267,6 +267,7 @@ qDebug() << "Setting connection to HTTP";
 
    config->setValue(ServerConfiguration::HostAddress, 
       m_dialog.hostAddress->text());
+
    config->setValue(ServerConfiguration::Port, 
       m_dialog.port->value());
 
@@ -275,8 +276,12 @@ qDebug() << "Setting connection to HTTP";
 
    config->setValue(ServerConfiguration::UserName, 
       m_dialog.userName->text());
-   config->setValue(ServerConfiguration::WorkingDirectory,
-      m_dialog.workingDirectory->text());
+
+   QString dirPath(m_dialog.workingDirectory->text());
+   while (dirPath.endsWith("/")) { dirPath.chop(1); }
+   while (dirPath.endsWith("\\")) { dirPath.chop(1); }
+   
+   config->setValue(ServerConfiguration::WorkingDirectory, dirPath);
 
    return true;
 }

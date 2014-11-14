@@ -49,8 +49,9 @@ namespace Network {
 
          virtual void open() = 0;
          virtual void close() = 0;
-
          virtual void authenticate(AuthenticationT const, QString const& /*userName*/) = 0;
+
+         virtual bool blockingExecute(QString const& command, QString*) = 0;
          virtual bool exists(QString const& filePath) = 0;
          virtual bool makeDirectory(QString const& filePath) = 0;
 

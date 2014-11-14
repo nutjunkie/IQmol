@@ -60,6 +60,7 @@ QString ServerConfiguration::toString(FieldT const field)
       case JobLimit:          s = "Job Limit";          break;
       case RunFileTemplate:   s = "Run File Template";  break;
       case Cookie:            s = "Cookie";             break;
+      case QueueResources:    s = "Queue Resources";    break;
       case MaxFieldT:         s = "";                   break;
    }
    return s;
@@ -125,6 +126,7 @@ ServerConfiguration::FieldT ServerConfiguration::toFieldT(QString const& field)
    if (field.contains("interval",   Qt::CaseInsensitive))  return UpdateInterval;
    if (field.contains("limit",      Qt::CaseInsensitive))  return JobLimit;
    if (field.contains("template",   Qt::CaseInsensitive))  return RunFileTemplate;
+   if (field.contains("resources",  Qt::CaseInsensitive))  return RunFileTemplate;
    if (field.contains("cookie",     Qt::CaseInsensitive))  return Cookie;
 
    return MaxFieldT;

@@ -81,6 +81,8 @@ QString HttpConnection::obtainCookie()
    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
    loop.exec();
 
+   if (reply->status() == Reply::TimedOut) throw NetworkTimeout();
+
    if (reply->status() == Reply::Finished) {
       QString msg(reply->message());
       QRegExp rx("Qchemserv-Cookie::([0-9a-fA-F]+)");

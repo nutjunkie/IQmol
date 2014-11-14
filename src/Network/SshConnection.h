@@ -51,6 +51,8 @@ namespace Network {
          void open();
          void close();
          void authenticate(AuthenticationT const, QString const& username);
+
+         bool blockingExecute(QString const& command, QString* message = 0);
          bool exists(QString const& filePath);
          bool makeDirectory(QString const& path);
 
