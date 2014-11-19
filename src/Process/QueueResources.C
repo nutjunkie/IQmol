@@ -28,8 +28,6 @@
 namespace IQmol {
 namespace Process2 {
 
-
-
 QVariant QueueResources::toQVariant() const
 {
    QVariantList list;
@@ -90,21 +88,19 @@ QueueResourcesList::~QueueResourcesList()
 }
 
 
-QVariant QueueResourcesList::toQVariant() const
+QVariantList QueueResourcesList::toQVariantList() const
 {
    QVariantList list;
    QueueResourcesList::const_iterator iter;
    for (iter = begin(); iter != end(); ++iter) {
        list.append((*iter)->toQVariant());
    }
-   return QVariant(list);
+   return list;
 }
 
 
-void QueueResourcesList::fromQVariant(QVariant const& qvar)
+void QueueResourcesList::fromQVariantList(QVariantList const& list)
 {
-   QVariantList list(qvar.toList());
-
    QVariantList::const_iterator iter;
    for (iter = list.begin(); iter != list.end(); ++iter) {
        QueueResources* queue(new QueueResources());

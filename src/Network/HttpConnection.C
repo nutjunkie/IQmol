@@ -85,7 +85,7 @@ QString HttpConnection::obtainCookie()
 
    if (reply->status() == Reply::Finished) {
       QString msg(reply->message());
-      QRegExp rx("Qchemserv-Cookie::([0-9a-fA-F]+)");
+      QRegExp rx("Qchemserv-Cookie::([0-9a-zA-Z\\-_]+)");
       if (msg.contains("Qchemserv-Status::OK") && rx.indexIn(msg,0) != -1) {
          cookie = rx.cap(1);
       }
@@ -117,6 +117,14 @@ Reply* HttpConnection::putFile(QString const& sourcePath, QString const& destina
    }
    
    HttpPost* reply(new HttpPost(this, destinationPath, QString(buffer)));
+   reply->start();
+   return reply;
+}
+
+
+Reply* HttpConnection::getFiles(QStringList const& fileList, QString const& destinationPath)
+{
+   HttpGetFiles* reply(new HttpGetFiles(this, fileList, destinationPath));
    reply->start();
    return reply;
 }

@@ -2,7 +2,7 @@ LIB = Process
 CONFIG += lib
 include(../common.pri)
 
-INCLUDEPATH += ../Util ../Yaml ../Data  ../Parser ../Network
+INCLUDEPATH += ../Util ../Yaml ../Data  ../Parser ../Network ../Layer ../Configurator
 
 SOURCES = \
    $$PWD/Job.C \

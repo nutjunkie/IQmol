@@ -39,16 +39,19 @@ namespace IQmol {
             AddStar    = 0x004   // Adds a star to the molecule in the Model View
          };
 
+         ParseJobFiles(QString const& filePath, QString const& filter, void* moleculePointer);
          ParseJobFiles(QString const& filePath);
          ParseJobFiles(JobInfo const& jobInfo);
 
          void setFlags(unsigned flags) { m_flags = flags; }
          unsigned flags() const { return m_flags; }
          JobInfo const* jobInfo() const { return m_jobInfo; }
+         void* moleculePointer() const { return m_moleculePointer; }
 
       private:
          unsigned m_flags;
          JobInfo const* m_jobInfo;
+         void* m_moleculePointer;
    };
 
 } // end namespace IQmol

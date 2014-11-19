@@ -49,6 +49,11 @@ HttpReply::~HttpReply()
 
 void HttpReply::finishedSlot()
 {
+   dumpHeader();
+qDebug() << "HttpReply finished Slot called"; 
+qDebug() << "-------------------------------------------------------------";
+qDebug() << m_message;
+qDebug() << "-------------------------------------------------------------";
    QString status(headerValue("Qchemserv-Status"));
 
    if (status.contains("OK")) {
@@ -65,7 +70,6 @@ void HttpReply::finishedSlot()
       m_message = "QChem server temporarily unavailable";
    }
 
-qDebug() << "Sending HttpReply finished SIGNAL";
    finished();
 }
 
@@ -105,10 +109,12 @@ void HttpReply::setUrl(QString const& path)
 
    int port(m_connection->port());
 
-   QString url = m_https ? "https://" : "http://";
-   url += m_connection->hostname();
-   if (port != 80) url += ":" + QString::number(port);
-   if (!path.isEmpty()) url += "/" + path;
+   QString url(path);
+   url.prepend("/");
+   if (port != 80) url.prepend(":" + QString::number(port));
+   url.prepend(m_connection->hostname());
+   url.replace("//", "/");
+   url.prepend(m_https ? "https://" : "http://");
 
    m_url.setUrl(url);
    qDebug() << "Setting URL to" <<  m_url;
@@ -180,6 +186,7 @@ HttpGet::HttpGet(HttpConnection* connection,  QString const& sourcePath,
 
 void HttpGet::closeFile()
 {
+    m_file->flush();
     m_file->close();
     delete m_file;
 }
@@ -197,7 +204,7 @@ void HttpGet::run()
    m_status = Running;
    QNetworkRequest request;
    request.setUrl(m_url);
-   qDebug() << "Retrieving:" << m_url;
+   QLOG_DEBUG() << "Retrieving:" << m_url;
 
    m_networkReply = m_connection->m_networkAccessManager->get(request);
 
@@ -210,7 +217,6 @@ void HttpGet::run()
       connect(m_networkReply, SIGNAL(readyRead()), this, SLOT(readToString()));
    }
 
-   connect(m_networkReply, SIGNAL(finished()),  this, SLOT(dumpHeader()) );
    connect(m_networkReply, SIGNAL(finished()),  this, SLOT(finishedSlot()) );
    connect(m_networkReply, SIGNAL(error(QNetworkReply::NetworkError)),
           this, SLOT(errorSlot(QNetworkReply::NetworkError)));
@@ -222,7 +228,64 @@ void HttpGet::run()
 void HttpGet::readToFile()
 {
    qint64 size(m_networkReply->bytesAvailable());
+   qDebug() << "Reading " << size << " bytes";
+   copyProgress();
    m_file->write(m_networkReply->read(size));
+}
+
+
+// --------- HttpGetFiles---------
+
+HttpGetFiles::HttpGetFiles(HttpConnection* connection, QStringList const& fileList, 
+   QString const& destinationPath) : HttpReply(connection), m_fileList(fileList), 
+   m_destinationPath(destinationPath), m_allOk(true)
+{
+}
+
+
+void HttpGetFiles::run()
+{
+   QRegExp rx("file=(.*)");
+   m_status = Running;
+
+   QStringList::iterator iter;
+   for (iter = m_fileList.begin(); iter != m_fileList.end(); ++iter) {
+       QString source(*iter);
+       if (rx.indexIn(source, 0) != -1) {
+          QString destination(m_destinationPath);
+          destination += "/" + rx.cap(1);
+          HttpGet* reply(new HttpGet(m_connection, source, destination));
+          m_replies.append(reply);
+          connect(reply, SIGNAL(finished()), this, SLOT(replyFinished()));
+          connect(reply, SIGNAL(copyProgress()), this, SLOT(copyProgress()));
+       }
+   }
+
+   QList<HttpGet*> replies(m_replies);
+   QList<HttpGet*>::iterator reply;
+   for (reply = replies.begin(); reply != replies.end(); ++reply) {
+       (*reply)->run();
+   }
+}
+
+
+void HttpGetFiles::replyFinished()
+{
+   HttpGet* reply(qobject_cast<HttpGet*>(sender()));
+   m_replies.removeAll(reply);
+   m_allOk = m_allOk && reply->status() == Finished;
+   reply->deleteLater();
+
+   if (m_replies.isEmpty()) {
+
+      if (m_allOk) {
+         m_status = m_interrupt ? Interrupted : Finished;
+      }else {
+         m_status = Error;
+      }
+
+      finished();
+   }
 }
 
 
@@ -266,7 +329,6 @@ qDebug() << "POST:" << data;
    connect(m_networkReply, SIGNAL(readyRead()), &m_timer, SLOT(start()));
    connect(m_networkReply, SIGNAL(readyRead()), this, SLOT(readToString()));
    connect(m_networkReply, SIGNAL(finished()),  this, SLOT(finishedSlot()) );
-   connect(m_networkReply, SIGNAL(finished()),  this, SLOT(dumpHeader()) );
    connect(m_networkReply, SIGNAL(error(QNetworkReply::NetworkError)),
           this, SLOT(errorSlot(QNetworkReply::NetworkError)));
 

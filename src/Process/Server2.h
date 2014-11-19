@@ -47,7 +47,8 @@ namespace Process2 {
          QString name() const;
          QStringList tableFields() const;
 
-         bool open();
+         void open();
+         void closeConnection();
 
          bool isLocal() const { 
             return m_configuration.isLocal();
@@ -70,54 +71,65 @@ namespace Process2 {
          // Unthreaded mkdir command
          bool makeDirectory(QString const& directoryPath);
 
+         // Unthreaded rmdir command
+         bool removeDirectory(QString const& directoryPath);
+
          // Unthreaded command to get queue information
          QString queueInfo();
 
          void submit(Job*);
-
          void query(Job*);
          void kill(Job*);
-         void copy(Job*);
+         void copyResults(Job*);
 
-         void watchJob(Job*);
          void setUpdateInterval(int const seconds);
+         void stopUpdates()  { m_updateTimer.stop(); }
+         void startUpdates() { m_updateTimer.start(); }
 
       public Q_SLOTS:
+         void watchJob(Job*);
          void unwatchJob(Job*);
-
-      Q_SIGNALS:
-         void jobSubmissionSuccessful(Job*);
-         void jobSubmissionFailed(Job*);
 
       protected:
          Server(ServerConfiguration const&);
          Server();
          ~Server();
 
-
       private Q_SLOTS:
          void copyRunFile();
          void queueJob();
-
+         void listFinished();
          void submitFinished();
          void queryFinished();
          void killFinished();
-         void copyFinished();
-
+         void copyResultsFinished();
          void queryAllJobs();
 
       private:
-        QString substituteMacros(QString const&);
+         QString substituteMacros(QString const&);
+         bool parseSubmitMessage(Job* job, QString const& message);
+         bool parseQueryMessage(Job* job, QString const& message);
+         QStringList parseListMessage(Job* job, QString const& message); 
 
-        ServerConfiguration  m_configuration;
-        Network::Connection* m_connection;
+         ServerConfiguration  m_configuration;
+         Network::Connection* m_connection;
 
-        // The Server class watches jobs, but is not responsible for them.
-        QList<Job*> m_watchedJobs;
-        QMap<Network::Reply*, Job*> m_activeRequests;
+         // The Server class watches jobs, but is not responsible for them.
+         QList<Job*> m_watchedJobs;
+         QMap<Network::Reply*, Job*> m_activeRequests;
 
-        QTimer m_updateTimer;
+         QTimer m_updateTimer;
    };
+
+
+   class BlockServerUpdates {
+      public:
+         BlockServerUpdates(Server* server) : m_server(server) { m_server->stopUpdates(); }
+         ~BlockServerUpdates() { m_server->startUpdates(); }
+      private:
+         Server* m_server;
+   };
+
 
 } } // end namespace IQmol::Process
 

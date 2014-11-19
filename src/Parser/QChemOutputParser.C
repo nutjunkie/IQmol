@@ -34,6 +34,8 @@
 #include "MultipoleExpansion.h"
 #include "EfpFragment.h"
 #include "Constants.h"
+#include <QRegExp>
+#include <QFile>
 
 #include <QtDebug>
 
@@ -43,10 +45,34 @@ using qglviewer::Vec;
 namespace IQmol {
 namespace Parser {
 
+QStringList QChemOutput::parseForErrors(QString const& filePath)
+{
+   QStringList errors;
+
+   QFile file(filePath);
+   if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      TextStream textStream(&file);
+      errors = parseForErrors(textStream);
+      file.close();
+   }else {
+      errors.append("Unable to open file");
+   }
+
+   return errors;
+}
+
+   
 QStringList QChemOutput::parseForErrors(TextStream& textStream)
 {
-   QString line;
+
    QStringList errors;
+   QString line;
+
+   int nJobs(0);
+   int nNiceEndings(0);
+   double time(0.0);
+
+   QRegExp rx("Total job time:(.+)s\\(wall\\)");
 
    while (!textStream.atEnd()) {
       line = textStream.readLine();
@@ -55,8 +81,25 @@ QStringList QChemOutput::parseForErrors(TextStream& textStream)
          line = textStream.readLine().trimmed();
          if (line.isEmpty()) line = "Fatal error occured at end of output file";
          errors.append(line);
+      }else if (line.contains("User input")) {
+         ++nJobs;
+      }else if (line.contains("Have a nice day")) {
+         ++nNiceEndings;
+      }else if (rx.indexIn(line) != -1) {
+         bool ok(false);
+         double t(rx.cap(1).toDouble(&ok));
+         if (ok) time += t;
       }
    }
+
+   if (nNiceEndings < nJobs) {
+      nJobs -= nNiceEndings;
+      errors.append(QString::number(nJobs) + " Job(s) failed");
+   }
+
+   int t(time);
+   if (t == 0) t = 1;
+   errors.append("Time: " + QString::number(t));
 
    return errors;
 }

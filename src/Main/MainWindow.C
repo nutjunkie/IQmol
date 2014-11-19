@@ -214,6 +214,10 @@ void MainWindow::createConnections()
    connect(&(ProcessMonitor::instance()), SIGNAL(resultsAvailable(JobInfo*)),
        &m_viewerModel, SLOT(open(JobInfo*)));
 
+   connect(&(Process2::JobMonitor::instance()), 
+       SIGNAL(resultsAvailable(QString const&, QString const&, void*)),
+       &m_viewerModel, SLOT(open(QString const&, QString const&, void*)));
+
 
    // Viewer
    connect(&m_viewer, SIGNAL(openFileFromDrop(QString const&)),
@@ -551,9 +555,6 @@ void MainWindow::createMenus()
          m_labelActions << action;
 
 
-
-
-
    // ----- Build Menu -----
    menu = menuBar()->addMenu("Build");
 
@@ -650,6 +651,7 @@ void MainWindow::createMenus()
    // ----- Calculation Menu -----
    menu = menuBar()->addMenu("Calculation");
 
+/*
       name = "Q-Chem Setup";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), this, SLOT(showQChemUIold()));
@@ -663,10 +665,6 @@ void MainWindow::createMenus()
 
       menu->addSeparator();
 
-      name = "Test Internet Connection";
-      action = menu->addAction(name);
-      connect(action, SIGNAL(triggered()), this, SLOT(testInternetConnection()));
-
       name = "Edit Servers";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), this, SLOT(editServers()));
@@ -677,22 +675,25 @@ void MainWindow::createMenus()
          &(ProcessMonitor::instance()), SLOT(clearProcessList()));
 
       menu->addSeparator();
-
-      name = "New Q-Chem Setup";
+*/
+      name = "Q-Chem Setup";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), this, SLOT(showQChemUI()));
-      //action->setShortcut(Qt::CTRL + Qt::Key_U );
-      //m_qchemSetupAction = action;
+      action->setShortcut(Qt::CTRL + Qt::Key_U );
+      m_qchemSetupAction = action;
 
-
-      name = "New Job Monitor";
+      name = "Job Monitor";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), this, SLOT(showJobMonitor()));
-      //action->setShortcut(Qt::CTRL + Qt::Key_J );
+      action->setShortcut(Qt::CTRL + Qt::Key_J );
 
-      name = "Edit New Servers";
+      name = "Edit Servers";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), this, SLOT(editNewServers()));
+
+      //name = "Test Internet Connection";
+      //action = menu->addAction(name);
+      //connect(action, SIGNAL(triggered()), this, SLOT(testInternetConnection()));
 
 
    // ----- Help Menu -----
@@ -971,8 +972,7 @@ void MainWindow::showQChemUI()
       }
 
       connect(m_quiInputDialog, SIGNAL(submitJobRequest(IQmol::Process2::QChemJobInfo&)),
-         &(IQmol::Process2::JobMonitor::instance()), 
-            SLOT(submitJob(IQmol::Process2::QChemJobInfo&)));
+         this, SLOT(submitJob(IQmol::Process2::QChemJobInfo&)));
  
       connect(&(Process2::JobMonitor::instance()), SIGNAL(jobAccepted()),
          m_quiInputDialog, SLOT(close()));
@@ -998,5 +998,15 @@ void MainWindow::showQChemUI()
 
    m_viewer.setActiveViewerMode(Viewer::Manipulate);
 }
+
+
+void MainWindow::submitJob(IQmol::Process2::QChemJobInfo& qchemJobInfo)
+{
+   Process2::JobMonitor::instance().submitJob(qchemJobInfo);
+   Layer::Molecule* mol(m_viewerModel.activeMolecule());
+   if (!mol) return;
+   mol->qchemJobInfoChanged(qchemJobInfo);
+}
+
 
 } // end namespace IQmol

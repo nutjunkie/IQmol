@@ -24,6 +24,7 @@
 #include "SshConnection.h"
 #include "Exception.h"
 #include "QsLog.h"
+#include <QFileInfo>
 
 
 namespace IQmol {
@@ -51,6 +52,13 @@ void SshReply::run()
       m_message = ex.what();
    }
    finished();
+}
+
+
+QString SshReply::subEnv(QString const& command)
+{
+   QString cmd(command);
+   return cmd.replace("~", "$HOME");
 }
 
 
@@ -277,6 +285,7 @@ void SshGetFile::runDelegate()
    char    buffer[1024];
    off_t   got(0);
 
+/*
    QLOG_DEBUG() << "File info" << fileInfo.st_dev     << "   " << sizeof(dev_t);
    QLOG_DEBUG() << "File info" << fileInfo.st_ino     << "   " << sizeof(ino_t);
    QLOG_DEBUG() << "File info" << fileInfo.st_mode    << "   " << sizeof(mode_t);
@@ -287,6 +296,7 @@ void SshGetFile::runDelegate()
    QLOG_DEBUG() << "File info" << fileInfo.st_size    << "   " << sizeof(off_t);
    QLOG_DEBUG() << "File info" << fileInfo.st_blksize << "   " << sizeof(blksize_t);
    QLOG_DEBUG() << "File info" << fileInfo.st_blocks  << "   " << sizeof(blkcnt_t);
+*/
 
    QString error;
    unsigned fileSize(fileInfo.st_size);
@@ -316,6 +326,7 @@ void SshGetFile::runDelegate()
 
        got += bc;
 
+qDebug() << "Sending copyProgress()";
        copyProgress();
       //qDebug() << "sleeping 1"; sleep(1);
    }
@@ -332,6 +343,24 @@ void SshGetFile::runDelegate()
 
       if (!m_interrupt && !error.isEmpty()) throw Exception(error);
 }
-           
 
+
+// -------------- SshGetFiles ----------------
+
+void SshGetFiles::runDelegate()
+{
+   QStringList::iterator iter;
+   for (iter = m_fileList.begin(); iter != m_fileList.end(); ++iter) {
+       QString source(*iter);
+       QFileInfo info(source);
+       QString destination(m_destinationDirectory);
+       destination += "/" + info.fileName();
+
+       SshGetFile get(m_connection, source, destination);
+       get.runDelegate();
+   }
+   finished();
+}
+
+           
 } } // end namespace IQmol::Network

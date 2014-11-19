@@ -32,26 +32,27 @@
 namespace IQmol {
 namespace Process2 {
 
-QueueResourcesDialog::QueueResourcesDialog(QueueResourcesList& queueResourcesList, 
+QueueResourcesDialog::QueueResourcesDialog(QueueResourcesList* queueResourcesList, 
    QWidget* parent) : QDialog(parent), m_queueResourcesList(queueResourcesList), 
    m_timeValidator(this)
 {
    m_dialog.setupUi(this);
    m_dialog.queue->clear();
 
-   if (m_queueResourcesList.isEmpty()) {
+   if (m_queueResourcesList->isEmpty()) {
       QMsgBox::warning(this, "IQmol", "No queues found on server");
       close();
       return;
    }
 
-   for (int i = 0; i < m_queueResourcesList.size(); ++i) {
-       QString name(m_queueResourcesList[i]->m_name);
+   for (int i = 0; i < m_queueResourcesList->size(); ++i) {
+       QString name((*m_queueResourcesList)[i]->m_name);
        m_dialog.queue->addItem(name);
    }
 
    m_dialog.queue->setCurrentIndex(0);
    connect(m_dialog.buttonBox, SIGNAL(accepted()), this, SLOT(verify()));
+   connect(m_dialog.buttonBox, SIGNAL(rejected()), this, SLOT(close()));
 
    QString sixty("(?:[0-5][0-9])");
    m_timeValidator.setRegExp(QRegExp("^\\d+:" + sixty + ":" + sixty));
@@ -72,7 +73,7 @@ void QueueResourcesDialog::verify()
       return;
    }
 
-   QueueResources* currentQueue(m_queueResourcesList[m_dialog.queue->currentIndex()]);
+   QueueResources* currentQueue((*m_queueResourcesList)[m_dialog.queue->currentIndex()]);
    QStringList requestedTime(time.split(":", QString::SkipEmptyParts));
 
    time = currentQueue->m_maxWallTime;
@@ -108,24 +109,22 @@ void QueueResourcesDialog::verify()
       return;
    }
 
-   if (m_dialog.saveAsDefaults->checkState() == Qt::Checked) {
-      saveAsDefaults();
-   }
-
+   saveAsDefaults();
    accept();
 }
 
 
 void QueueResourcesDialog::saveAsDefaults()
 {
+   qDebug() << "Saving QueueResource defaults";
    int index(m_dialog.queue->currentIndex());
-   if (0 <= index && index < m_queueResourcesList.size()) {
-       QueueResources* queue(m_queueResourcesList[index]);
+   if (0 <= index && index < m_queueResourcesList->size()) {
+       QueueResources* queue((*m_queueResourcesList)[index]);
        if (index != 0) {
           // rearrage the queues so the default appears 
           // first next time the list is loaded.
-          m_queueResourcesList.removeAt(index);
-          m_queueResourcesList.prepend(queue);
+          m_queueResourcesList->removeAt(index);
+          m_queueResourcesList->prepend(queue);
        }
 
        queue->m_defaultWallTime = m_dialog.walltime->text();
@@ -141,8 +140,8 @@ void QueueResourcesDialog::saveAsDefaults()
 
 void QueueResourcesDialog::on_queue_currentIndexChanged(int index)
 {
-   if (0 <= index && index < m_queueResourcesList.size()) {
-      setQueueResources(m_queueResourcesList[index]);
+   if (0 <= index && index < m_queueResourcesList->size()) {
+      setQueueResources((*m_queueResourcesList)[index]);
    }
 }
 

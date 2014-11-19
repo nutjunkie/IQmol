@@ -28,9 +28,9 @@ namespace IQmol {
 namespace Process2 {
 
 
-QVariant QChemJobInfo::serialize()
+QVariantList QChemJobInfo::toQVariantList() const
 {
-   QList<QVariant> list;
+   QVariantList list;
    list << QVariant(m_data[BaseName]);
    list << QVariant(m_data[ServerName]);
    list << QVariant(m_data[LocalWorkingDirectory]);
@@ -40,15 +40,13 @@ QVariant QChemJobInfo::serialize()
    list << QVariant(m_multiplicity);
    list << QVariant(m_localFilesExist);
 
-   return QVariant(list);
+   return list;
 }
 
 
-QChemJobInfo* QChemJobInfo::deserialize(QVariant const& qvariant)
+bool QChemJobInfo::fromQVariantList(QVariantList const& list)
 {
-
-   QList<QVariant> list(qvariant.toList());
-   bool ok = (list.size() == 8) &&
+   bool ok = (list.size() == 8)            &&
              list[0].canConvert<QString>() &&
              list[1].canConvert<QString>() &&
              list[2].canConvert<QString>() &&
@@ -58,23 +56,18 @@ QChemJobInfo* QChemJobInfo::deserialize(QVariant const& qvariant)
              list[5].canConvert<int>()     &&
              list[7].canConvert<bool>();
 
-   if (!ok) {
-      QLOG_ERROR() << "Failed to deserialize cached QChemJobInfo";
-      return 0;
+   if (ok) {
+      m_data.insert(BaseName,              list[0].toString());
+      m_data.insert(ServerName,            list[1].toString());
+      m_data.insert(LocalWorkingDirectory, list[2].toString());
+      m_data.insert(RemoteWorkingDirectory,list[3].toString());
+      m_data.insert(InputString,           list[4].toString());
+      m_charge          = list[5].toInt();
+      m_multiplicity    = list[6].toInt();
+      m_localFilesExist = list[7].toBool();
    }
 
-   QChemJobInfo* jobInfo = new QChemJobInfo();
-
-   jobInfo->m_data[BaseName]               = list[0].toString();
-   jobInfo->m_data[ServerName]             = list[1].toString();
-   jobInfo->m_data[LocalWorkingDirectory]  = list[2].toString();
-   jobInfo->m_data[RemoteWorkingDirectory] = list[3].toString();
-   jobInfo->m_data[InputString]            = list[4].toString();
-   jobInfo->m_charge                       = list[5].toInt(&ok);
-   jobInfo->m_multiplicity                 = list[6].toInt(&ok);
-   jobInfo->m_localFilesExist              = list[7].toBool();
-
-   return jobInfo;
+   return ok;
 }
 
 
@@ -209,6 +202,7 @@ void QChemJobInfo::copy(QChemJobInfo const& that)
    m_localFilesExist   = that.m_localFilesExist;
    m_promptOnOverwrite = that.m_promptOnOverwrite;
    m_efpOnlyJob        = that.m_efpOnlyJob;
+   m_moleculePointer   = that.m_moleculePointer;
 }
 
 } } // end namespace IQmol::Process

@@ -46,6 +46,9 @@ namespace Process2 {
          /// Config is not const as the name can change if it already exists
          Server* addServer(ServerConfiguration&);
 
+         /// Closes all server connections, mainly for debugging
+         void closeAllConnections();
+
          /// Attempts to connect the given list of Servers
          void connectServers(QStringList const&);
 

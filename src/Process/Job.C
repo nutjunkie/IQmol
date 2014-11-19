@@ -66,13 +66,14 @@ QVariant Job::toQVariant() const
 {
    QVariantMap map;
 
-   map.insert("JobName",    m_jobName);  
-   map.insert("ServerName", m_serverName);  
-   map.insert("Message",    m_message);  
-   map.insert("JobId",      m_jobId);  
-   map.insert("SubmitTime", m_submitTime);  
-   map.insert("RunTime",    runTime());  
-   map.insert("Status",     (int)m_status);  
+   map.insert("JobName",      m_jobName);  
+   map.insert("ServerName",   m_serverName);  
+   map.insert("Message",      m_message);  
+   map.insert("JobId",        m_jobId);  
+   map.insert("SubmitTime",   m_submitTime);  
+   map.insert("RunTime",      runTime());  
+   map.insert("Status",       (int)m_status);  
+   map.insert("QChemJobInfo", m_qchemJobInfo.toQVariantList());
 
    return QVariant(map);
 }
@@ -109,6 +110,12 @@ bool Job::fromQVariant(QVariant const& qvar)
       resetTimer(map.value("RunTime").toUInt()); 
    }
 
+   if (map.contains("QChemJobInfo")) {
+      if (!m_qchemJobInfo.fromQVariantList(map.value("QChemJobInfo").toList())) {
+         QLOG_WARN() << "Faild to convert QChemJobInfo from serialized Job";
+      }
+   }
+
    return true;
 }
 
@@ -128,7 +135,8 @@ unsigned Job::runTime() const
 QString Job::substituteMacros(QString const& input) const
 {
    QString output(input);
-   output.replace("${JOB_ID}", m_jobId);
+   output.replace("${JOB_ID}",   m_jobId);
+   output.replace("${JOB_DIR}",  m_qchemJobInfo.get(QChemJobInfo::RemoteWorkingDirectory));
 
    output.replace("${JOB_NAME}", m_qchemJobInfo.get(QChemJobInfo::BaseName));
    output.replace("${QUEUE}",    m_qchemJobInfo.get(QChemJobInfo::Queue));
@@ -153,67 +161,68 @@ void Job::parseQueryOutput(QString const&)
 }
 
 
-void Job::setStatus(Status const status)
+void Job::copyProgress()
 {
-   if (m_status == status) return;
+   m_copyProgress += ".";
+   if (m_copyProgress == "Copying....") m_copyProgress = "Copying";
+qDebug() << "CopyProgress string:" << m_copyProgress;
+   updated();
+}
+
+
+void Job::setStatus(Status const status, QString const& message)
+{
+   if (m_status == status) {
+      if (!message.isEmpty()) m_message = message;
+      updated();
+      return;
+   }
    m_status = status;
 
    switch (m_status) {
       case NotRunning:
-         m_message = toString(NotRunning);
-         updated();
+         m_message = "Job has not yet started";
          break;
 
       case Queued:
-         m_message = toString(Queued);
+         m_message = "Job ID: " + jobId();
          m_submitTime = QTime::currentTime().toString("h:mm:ss");
-         updated();
          break;
 
       case Running:
-         m_message = toString(Running);
          m_timer.start();
-         updated();
          break;
 
       case Suspended:
-         m_message = toString(Suspended);
          m_timer.stop();
-         updated();
          break;
 
       case Killed:
-         m_message = toString(Killed);
          m_timer.stop();
-         updated();
-         finished();
          break;
 
       case Error:
-         m_message = toString(Error);
          m_timer.stop();
-         updated();
-         finished();
+         error();
          break;
 
       case Finished:
-         m_message = toString(Finished);
          m_timer.stop();
-         updated();
          finished();
          break;
 
       case Copying:
-         m_message = toString(Copying);
-         updated();
+         m_copyProgress = "Copying";
          break;
 
       case Unknown:
-         m_message = toString(Copying);
          m_timer.stop();
-         updated();
          break;
    }
+
+   if (!message.isEmpty()) m_message = message;
+   qDebug() << "Setting Job status to" << toString(m_status) << m_message;
+   updated();
 }
 
 
@@ -227,18 +236,23 @@ bool Job::isActive() const
       case Running:
       case Suspended:
       case Unknown:
+      case Copying:
          active = true;
          break;
 
       case Killed:
       case Error:
       case Finished:
-      case Copying:
          active = false;
          break;
    }
 
    return active;
+}
+
+bool Job::localFilesExist() const 
+{ 
+   return m_qchemJobInfo.localFilesExist();
 }
 
 } } // end namespaces IQmol::Process

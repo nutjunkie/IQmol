@@ -61,6 +61,7 @@ QString ServerConfiguration::toString(FieldT const field)
       case RunFileTemplate:   s = "Run File Template";  break;
       case Cookie:            s = "Cookie";             break;
       case QueueResources:    s = "Queue Resources";    break;
+      case JobFileList:       s = "Job File List";      break;
       case MaxFieldT:         s = "";                   break;
    }
    return s;
@@ -126,7 +127,8 @@ ServerConfiguration::FieldT ServerConfiguration::toFieldT(QString const& field)
    if (field.contains("interval",   Qt::CaseInsensitive))  return UpdateInterval;
    if (field.contains("limit",      Qt::CaseInsensitive))  return JobLimit;
    if (field.contains("template",   Qt::CaseInsensitive))  return RunFileTemplate;
-   if (field.contains("resources",  Qt::CaseInsensitive))  return RunFileTemplate;
+   if (field.contains("resources",  Qt::CaseInsensitive))  return QueueResources;
+   if (field.contains("list",       Qt::CaseInsensitive))  return JobFileList;
    if (field.contains("cookie",     Qt::CaseInsensitive))  return Cookie;
 
    return MaxFieldT;
@@ -282,6 +284,11 @@ int ServerConfiguration::updateInterval() const
    return m_configuration.value(UpdateInterval).toInt();
 }
 
+QVariantList ServerConfiguration::queueResourcesList() const
+{
+   return m_configuration.value(QueueResources).toList();
+}
+
 
 void ServerConfiguration::setDefaults(ConnectionT const connection)
 {
@@ -326,7 +333,7 @@ qDebug() << "Setting defaults for " << toString(connection);
 void ServerConfiguration::setDefaults(QueueSystemT const queueSystem)
 {
 qDebug() << "Setting defaults for " << toString(queueSystem);
-   m_configuration.insert(UpdateInterval, 10);
+   m_configuration.insert(UpdateInterval, 20);
    m_configuration.insert(QueueSystem, queueSystem);
 
    switch (queueSystem) {
@@ -339,24 +346,26 @@ qDebug() << "Setting defaults for " << toString(queueSystem);
          m_configuration.insert(QueueInfo,   "(unused)");
          m_configuration.insert(RunFileTemplate, System::TemplateForRunFile(local));
          m_configuration.insert(JobLimit, 1024);
+         m_configuration.insert(JobFileList, "find ${JOB_DIR} -type f");
       } break;
 
       case PBS: {
          m_configuration.insert(Kill, "qdel ${JOB_ID}");
-         m_configuration.insert(Query, "qstat -f ${JOB_ID}");
-         m_configuration.insert(Submit, "qsub ${JOB_NAME}.run");
+         m_configuration.insert(Query, "qstat -xf ${JOB_ID}");
+         m_configuration.insert(Submit, "cd ${JOB_DIR} && qsub ${JOB_NAME}.run");
          m_configuration.insert(QueueInfo, "qstat -fQ");
+         m_configuration.insert(JobFileList, "find ${JOB_DIR} -type f");
     
          QStringList runFile;
          runFile << "#!/bin/csh"
                  << "#PBS -q ${QUEUE}"
                  << "#PBS -l walltime=${WALLTIME}"
-                 << "#PBS -l vmem=${MEMORY}Mb"
+                 << "#PBS -l mem=${MEMORY}Mb"
                  << "#PBS -l jobfs=${SCRATCH}Mb"
                  << "#PBS -l ncpus=${NCPUS}"
                  << "#PBS -j oe"
                  << "#PBS -o ${JOB_NAME}.err"
-                 << "#PBS -wd"
+                 << "#PBS -l wd"
                  << ""
                  << "setenv QC /usr/local/qchem"
                  << "setenv QCAUX $QC/aux"
@@ -373,8 +382,9 @@ qDebug() << "Setting defaults for " << toString(queueSystem);
          m_configuration.insert(Kill, "qdel ${JOB_ID}");
          // This is annoying, but SGE qstat -j doesn't give us the status.
          m_configuration.insert(Query, "qstat && qstat -j ${JOB_ID}");
-         m_configuration.insert(Submit, "qsub ${JOB_NAME}.run");
+         m_configuration.insert(Submit, "cd ${JOB_DIR} && qsub ${JOB_NAME}.run");
          m_configuration.insert(QueueInfo, "qstat -g c");
+         m_configuration.insert(JobFileList, "find ${JOB_DIR} -type f");
    
          QStringList runFile;
          runFile << "#!/bin/csh"
@@ -403,8 +413,9 @@ qDebug() << "Setting defaults for " << toString(queueSystem);
          m_configuration.insert(Query,     "GET  /status?cookie=${COOKIE}&jobid=${JOB_ID}");
          m_configuration.insert(Submit,    "POST /submit?cookie=${COOKIE}");
          m_configuration.insert(QueueInfo, 
-            "GET  /download?jobid=cookie=${COOKIE}&${JOB_ID}&file=${FILE_NAME}");
+            "GET  /download?cookie=${COOKIE}&jobid=${JOB_ID}&file=${FILE_NAME}");
          m_configuration.insert(RunFileTemplate, "(unused)");
+         m_configuration.insert(JobFileList, "GET /list?cookie=${COOKIE}&jobid=${JOB_ID}");
       } break;
    }
 }

@@ -5,8 +5,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 greaterThan(QT_MAJOR_VERSION, 4): CONFIG += home
 lessThan(QT_MAJOR_VERSION, 5): CONFIG += work
 
-#QMAKE_CXXFLAGS += -O2 -g
-QMAKE_CXXFLAGS += -O0 -g
+QMAKE_CXXFLAGS += -O2 -g
+#QMAKE_CXXFLAGS += -O0 -g
 
 macx {
    //CONFIG += release

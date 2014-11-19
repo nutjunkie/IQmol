@@ -55,7 +55,7 @@ namespace Process2 {
 
       Q_SIGNALS:
          /// This signal is emitted only when a job has finished successfully.
-         void resultsAvailable(Job&);
+         void resultsAvailable(QString const& path, QString const& filter, void* molPtr);
          void jobAccepted();
 
          void postUpdateMessage(QString const&);
@@ -66,12 +66,13 @@ namespace Process2 {
 
       private Q_SLOTS:
          void on_clearListButton_clicked(bool);
+         void on_processTable_cellDoubleClicked(int, int);
 
 		 /// Used to remove all jobs listed in the monitor.  This is triggered
 		 /// by a MainWindow menu action and may be useful there are rogue
 		 /// processes on the list which are causing problems and need to be
 		 /// removed.
-         void clearAllJobs();
+         void removeAllJobs();
 
 		 /// This is really a pseudo-update to the entries in the monitor, it
          /// simply grabs the values that are cached in the Job objects.  The
@@ -79,9 +80,14 @@ namespace Process2 {
          /// allows network requests to be minimized.  
          void updateTable();
 
+         /// This should be called when a job has completed, and the result
+         /// files are located locally. 
+         void cleanUp(Job*);
+
          void reconnectServers();
          void jobUpdated();
          void jobFinished();
+         void jobError();
 
          // Context menu actions
          void contextMenu(QPoint const& position);
@@ -89,23 +95,31 @@ namespace Process2 {
          void removeJob();
          void queryJob();
          void copyResults();
+         void viewOutput();
+         void openResults();
 
       private:
          static QMap<Job*, QTableWidgetItem*> s_jobMap;
          static QList<Job*> s_deletedJobs;
 
+         void initializeMenus();
          void saveJobListToPreferences() const;
          void loadJobListFromPreferences();
 
          void addToTable(Job*);
          void reloadJob(Job* job);
-         void initializeMenus();
+         void removeJob(Job*);
+         void queryJob(Job* job);
+         void copyResults(Job* job);
+         void viewOutput(Job* job);
+         void openResults(Job* job);
 
          bool getQueueResources(Server*, QChemJobInfo&);
-         bool getWorkingDirectory(Server*, QChemJobInfo&);
-
-         QString getWorkingDirectory(QString const& message, QString const& suggestion);
          Job* getSelectedJob(QTableWidgetItem* item = 0);
+
+         bool getRemoteWorkingDirectory(Server*, QChemJobInfo&);
+         bool getRemoteWorkingDirectory(Server*, QString& suggestion);
+         bool getLocalWorkingDirectory(QString& suggestion);
 
 		 /// Clears the jobs from the monitor and their servers.  If
 		 /// finishedOnly then only the processes that have status 
@@ -121,24 +135,6 @@ namespace Process2 {
 
          Ui::JobMonitor m_ui;
          QTimer m_updateTimer;
-         
-/*
-
-      private Q_SLOTS:
-         void on_processTable_cellDoubleClicked(int row, int col);
-
-      private:
-		 // Clears all the processes from the monitor and their servers.  If
-		 // finishedOnly then only the processes that have status Finished, 
-         // Killed or Error are removed.
-
-         void copyResults(Process*);
-         void queryProcess(Process*);
-
-         void updateRow(int const row, QStringList const& items);
-
-
-*/
    };
 
 } } // end namespace IQmol::Process

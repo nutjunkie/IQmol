@@ -413,6 +413,7 @@ void ServerConfigurationDialog::verify()
 {
    if (!copyTo(m_currentConfiguration)) return;
 
+/* don't bother with the testing at the moment, it is just annoying
    if (!m_tested && !m_dialog.localRadioButton->isChecked()) {
       QString msg("Would you like to try connecting to the server?");
       if (QMsgBox::question(this, "IQmol", msg,
@@ -420,6 +421,7 @@ void ServerConfigurationDialog::verify()
          if (!testConnection()) return;
       }
    }
+*/
 
    m_originalConfiguration = *m_currentConfiguration;
 

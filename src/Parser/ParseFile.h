@@ -49,11 +49,13 @@ namespace Parser {
          /// Constructs a ParseFile object for the given path.  Note that no
          /// parsing actually takes place untilt the start() member function
          /// (inherited from Task) is called.
-         ParseFile(QString const& filePath);
+         ParseFile(QString const& filePath, QString const& filter = QString());
 
 		 /// Returns the file path passed to the constructor (either an actual
 		 /// file or directory).
          QString filePath() { return m_filePath; }
+
+         QString name() { return m_name; } 
 
 		 /// Returns the composite data found in the file(s).
          Data::Bank& data() { return m_dataBank; } 
@@ -65,9 +67,10 @@ namespace Parser {
          void run();
 
       private:
-         /// Create a list of files paths to parse.  In the case of a 
-         /// directory this may correspond to more than one file.
-         void setFilePaths(QString const&);
+         /// searches a directory for all the files matching filter, if
+         /// specified, otherwise uses the directory name to determine
+         /// what files to parse.
+         void parseDirectory(QString const& path, QString const& filter);
 
          /// Parses a file, returning false only if the file doesn't exist.
          bool parse(QString const& filePath, bool& addToFileList);
@@ -75,6 +78,7 @@ namespace Parser {
          /// Convenience function that runs a sub-parser over the file.
          void runParser(Base* parser, QString const& filePath);
 
+         QString     m_name;
          QString     m_filePath;
          Data::Bank  m_dataBank;
          QStringList m_filePaths;

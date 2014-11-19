@@ -237,6 +237,7 @@ void Viewer::fastDraw()
    makeCurrent();
    Layer::GLObject::SetCameraPosition(camera()->position());
 
+   glEnable(GL_LIGHTING);
    glShadeModel(GL_SMOOTH);
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -438,7 +439,6 @@ void Viewer::drawSelected(GLObjectList const& objects)
    glDisable(GL_STENCIL_TEST);
    glDisable(GL_BLEND);
    glEnable(GL_LIGHTING);
-qDebug() << "Finished Draw selected";
 }
 
 

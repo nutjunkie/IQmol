@@ -1,7 +1,7 @@
 /*******************************************************************************
 
-  Copyright (C) 2011-13 Andrew Gilbert
- 
+  Copyright (C) 2011-2013 Andrew Gilbert
+
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
 
@@ -16,35 +16,37 @@
   details.
 
   You should have received a copy of the GNU General Public License along
-  with IQmol.  If not, see <http://www.gnu.org/licenses/>.  
+  with IQmol.  If not, see <http://www.gnu.org/licenses/>.
 
 ********************************************************************************/
 
-#include "ParseJobFiles.h"
+#include "RemoveDirectory.h"
+#include "QMsgBox.h"
+#include <QDir>
+#include <QFileInfo>
 
 
 namespace IQmol {
+namespace Util {
 
-ParseJobFiles::ParseJobFiles(QString const& filePath) : Parser::ParseFile(filePath),  
-   m_jobInfo(0), m_moleculePointer(0)
+bool RemoveDirectory(QString const& dirName)
 {
-   m_flags = MakeActive;
+   bool result = true;
+   QDir dir(dirName);
+
+   if (dir.exists(dirName)) {
+      Q_FOREACH(QFileInfo info, dir.entryInfoList(QDir::NoDotAndDotDot |
+         QDir::System | QDir::Hidden | QDir::AllDirs | QDir::Files, QDir::DirsFirst)) {
+         if (info.isDir()) {
+            result = RemoveDirectory(info.absoluteFilePath());
+         }else {
+            result = QFile::remove(info.absoluteFilePath());
+         }
+         if (!result) return result;
+     }
+     result = dir.rmdir(dirName);
+   }
+   return result;
 }
 
-
-ParseJobFiles::ParseJobFiles(QString const& filePath, QString const& filter, 
-   void* moleculePointer) : Parser::ParseFile(filePath, filter),  m_jobInfo(0), 
-   m_moleculePointer(moleculePointer)
-{
-   m_flags = Overwrite | AddStar;
-}
-
-
-ParseJobFiles::ParseJobFiles(JobInfo const& jobInfo) : 
-   Parser::ParseFile(jobInfo.get(JobInfo::LocalWorkingDirectory)), m_jobInfo(&jobInfo), 
-   m_moleculePointer(0) 
-{
-   m_flags = Overwrite | AddStar;
-}
-
-} // end namespace IQmol
+} }  // end namespace IQmol::Util

@@ -41,8 +41,9 @@ namespace Process2 {
          enum FieldT { ServerName = 0, Connection, QueueSystem, HostAddress, Port,
                        Authentication, UserName, WorkingDirectory,
                        Submit, Query, QueueInfo, Kill,
-                       UpdateInterval, JobLimit, 
-                       RunFileTemplate, Cookie, QueueResources, MaxFieldT };
+                       UpdateInterval, JobLimit, RunFileTemplate, Cookie, 
+                       QueueResources, JobFileList, MaxFieldT };
+                       
 
          enum ConnectionT { Local, SSH, HTTP, HTTPS };
 
@@ -73,6 +74,7 @@ namespace Process2 {
          AuthenticationT authentication() const;
          int port() const;
          int updateInterval() const;
+         QVariantList queueResourcesList() const;
 
          bool isWebBased() const {
             return (connection() == HTTP || connection() == HTTPS);

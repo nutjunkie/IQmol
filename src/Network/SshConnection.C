@@ -80,17 +80,17 @@ void SshConnection::open()
 
 void SshConnection::close()
 {
+   // No logging as the Logger may not exist on shutdown
    if (m_status == Connection::Closed) return;
-   m_status = Connection::Closed;
 
-   QLOG_TRACE() << "Closing connection to" << m_hostname;
+   //QLOG_TRACE() << "Closing connection to" << m_hostname;
    killAgent();
 
    if (m_session) {
       libssh2_session_disconnect(m_session, "Normal Shutdown, Thank you for playing");
       libssh2_session_free(m_session);
       m_session = 0;
-      QLOG_TRACE() << "  Session closed";
+      //QLOG_TRACE() << "  Session closed";
    }
 
    if (m_socket) {
@@ -100,24 +100,23 @@ void SshConnection::close()
       ::close(m_socket);
 #endif
       m_socket = 0;
-      QLOG_TRACE() << "  Socket closed";
+      //QLOG_TRACE() << "  Socket closed";
    }
 
    --s_numberOfConnections;
    if (s_numberOfConnections == 0) {
-      QLOG_TRACE() << "Calling libssh2_exit()";
+      //QLOG_TRACE() << "Calling libssh2_exit()";
       libssh2_exit();
 #ifdef WIN32
       WSACleanup();
 #endif
    }
 
-   QLOG_TRACE() << "Shutting down connection thread";
-   if (m_thread.isRunning()) {
-      m_thread.quit();
-      m_thread.wait();
-   }
-   QLOG_TRACE() << "Connection thread shut down";
+  // QLOG_TRACE() << "Shutting down connection thread";
+   m_thread.quit();
+   m_thread.wait();
+   //QLOG_TRACE() << "Connection thread shut down";
+   m_status = Connection::Closed;
 }
 
 
@@ -446,6 +445,7 @@ int SshConnection::connectPassword()
    QLOG_TRACE() << "SshConnection::connectPassword" << m_username;
    QString msg("Password for ");
    msg += m_username;
+   msg += "@" + m_hostname;
 
    int rc(LIBSSH2_ERROR_AUTHENTICATION_FAILED);
 
@@ -615,7 +615,7 @@ void SshConnection::start(SshReply* reply)
 
 bool SshConnection::exists(QString const& filePath)
 {
-   QString cmd("/bin/test -e ");
+   QString cmd("test -e ");
    cmd += filePath;
    cmd += " && echo SUCCESS";
 
@@ -629,7 +629,21 @@ bool SshConnection::exists(QString const& filePath)
 
 bool SshConnection::makeDirectory(QString const& path)
 {
-   QString cmd("/bin/mkdir -p ");
+   QString cmd("mkdir -p ");
+   cmd += path;
+   cmd += " && echo SUCCESS";
+
+   QString msg;
+   bool ok(blockingExecute(cmd, &msg));
+   ok = ok && msg.contains("SUCCESS");
+
+   return ok;
+}
+
+
+bool SshConnection::removeDirectory(QString const& path)
+{
+   QString cmd("rm -fr ");
    cmd += path;
    cmd += " && echo SUCCESS";
 
@@ -679,6 +693,14 @@ Reply* SshConnection::putFile(QString const& sourcePath, QString const& destinat
 Reply* SshConnection::getFile(QString const& sourcePath, QString const& destinationPath) 
 {
    SshReply* reply(new SshGetFile(this, sourcePath, destinationPath));
+   start(reply);
+   return reply;
+}
+
+
+Reply* SshConnection::getFiles(QStringList const& fileList, QString const& destinationPath)
+{
+   SshReply* reply(new SshGetFiles(this, fileList, destinationPath));
    start(reply);
    return reply;
 }

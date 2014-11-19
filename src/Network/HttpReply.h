@@ -73,6 +73,8 @@ namespace Network {
 
       Q_OBJECT
 
+      friend class HttpGetFiles;
+
       public:
          HttpGet(HttpConnection*, QString const& sourcePath);
          HttpGet(HttpConnection*, QString const& sourcePath, QString const& destinationPath);
@@ -87,6 +89,29 @@ namespace Network {
       private:
          QFile* m_file;
    };
+
+
+   class HttpGetFiles : public HttpReply {
+
+      Q_OBJECT
+
+      public:
+         HttpGetFiles(HttpConnection*, QStringList const& fileList, 
+            QString const& destinationPath);
+
+      protected Q_SLOTS:
+         void run();
+
+      private Q_SLOTS:
+         void replyFinished();
+
+      private:
+         QStringList m_fileList;
+         QString m_destinationPath;
+         QList<HttpGet*> m_replies;
+         bool m_allOk;
+   };
+
 
 
    class HttpPost : public HttpReply {

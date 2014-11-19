@@ -28,6 +28,7 @@
 #include "SshConnection.h"
 #include "HttpConnection.h"
 #include "WriteToTemporaryFile.h"
+#include "TextStream.h"
 #include "JobMonitor.h"
 #include "QsLog.h"
 #include <QDebug>
@@ -65,15 +66,24 @@ QStringList Server::tableFields() const
    fields.append(m_configuration.value(ServerConfiguration::HostAddress));
    fields.append(m_configuration.value(ServerConfiguration::Connection));
    fields.append(m_configuration.value(ServerConfiguration::UserName));
-
    return fields;
 }
 
 
-bool Server::open()
+void Server::closeConnection()
 {
-   if (m_connection && 
-       m_connection->status() == Network::Connection::Authenticated) return true;
+   if (m_connection) {
+      delete m_connection;
+      m_connection = 0;
+   }
+}
+
+
+void Server::open()
+{
+   if (m_connection && m_connection->status() == Network::Connection::Authenticated) return;
+
+   QLOG_TRACE() << "Opening server" << name();
 
    if (!m_connection) {
       QVariant address(m_configuration.value(ServerConfiguration::HostAddress));
@@ -107,42 +117,37 @@ bool Server::open()
       QString cookie(m_configuration.value(ServerConfiguration::Cookie));
       if (cookie.isEmpty()) {
          cookie = m_connection->obtainCookie();
-         if (cookie.isEmpty()) return false;
+         if (cookie.isEmpty()) throw Exception("HTTP authentication failed");
          m_configuration.setValue(ServerConfiguration::Cookie, cookie);
          ServerRegistry::save();
       }
    }
 
    if (m_connection->status() == Network::Connection::Authenticated) {
-      connect(this, SIGNAL(jobSubmissionSuccessful(Job*)), 
-         &(JobMonitor::instance()), SLOT(jobSubmissionSuccessful(Job*)));
-
-      connect(this, SIGNAL(jobSubmissionFailed(Job*)), 
-         &(JobMonitor::instance()), SLOT(jobSubmissionFailed(Job*)));
-
-      if (!m_watchedJobs.isEmpty()) m_updateTimer.start();
-      return true;
+      if (!m_watchedJobs.isEmpty()) {
+         queryAllJobs();
+         startUpdates();
+      }
+      return;
    }
 
-   QLOG_ERROR() << "Server::open() failed to open connection to server"
-               << m_configuration.value(ServerConfiguration::ServerName);
-   m_connection->close();
    delete m_connection;
    m_connection = 0;
-   return false;
+
+   throw Exception(QString("Failed to connect to server ") + name());
 }
 
 
 bool Server::exists(QString const& filePath)
 {
-   if (!m_connection) throw Exception("Invalid connection");
+   open();
    return m_connection->exists(filePath);
 }
 
 
 QString Server::queueInfo()
 {
-   if (!m_connection) throw Exception("Invalid connection");
+   open();
    QString cmd(m_configuration.value(ServerConfiguration::QueueInfo));
    cmd = substituteMacros(cmd);
    QString info;
@@ -151,27 +156,33 @@ QString Server::queueInfo()
 }
 
 
-bool Server::makeDirectory(QString const& filePath)
+bool Server::removeDirectory(QString const& path)
 {
-   if (!m_connection) {
-      QLOG_WARN() << "Server::makeDirectory() called on invalid connection";
-      return false;
-   }
-   return m_connection->makeDirectory(filePath);
+   open();
+   return m_connection->removeDirectory(path);
+}
+
+
+bool Server::makeDirectory(QString const& path)
+{
+   open();
+   return m_connection->makeDirectory(path);
 }
 
 
 void Server::queryAllJobs()
 {
-qDebug() << "QueryAllJobs called()";
-   if (!m_connection || !m_connection->isConnected()) {
-      m_updateTimer.stop();
-      return;
-   }
-
+   qDebug() << "QueryAllJobs called()";
    // This is a bit of a hack, update this here in case the user
    // has modified the server while running.
    setUpdateInterval(m_configuration.updateInterval());
+
+   if (m_watchedJobs.isEmpty()) {
+      stopUpdates(); 
+      return;
+   }
+
+   open();
 
    QList<Job*>::iterator iter;
    for (iter = m_watchedJobs.begin(); iter != m_watchedJobs.end(); ++iter) {
@@ -186,11 +197,11 @@ void Server::submit(Job* job)
    QList<Network::Reply*> keys(m_activeRequests.keys(job));
 
    if (!job) throw Exception("Submit called with null job");
-   if (!open()) throw Exception("Unable to connect to server");
    if (m_watchedJobs.contains(job)) throw Exception("Attempt to submit duplicate job");
    if (!keys.isEmpty()) throw Exception("Attempt to submit busy job");
 
    qDebug() << "Request to submit job " << job->jobName();
+   open();
 
    QString contents(job->jobInfo().get(QChemJobInfo::InputString));
    QString fileName(Util::WriteToTemporaryFile(contents));
@@ -223,17 +234,21 @@ void Server::copyRunFile()
       Job* job(m_activeRequests.value(reply));
       m_activeRequests.remove(reply);
       reply->deleteLater();
+      if (!job) {
+         QLOG_WARN() << "Invalid Job pointer";
+         return;
+      }
 
       if (reply->status() != Network::Reply::Finished) {
-         job->setStatus(Job::Error);
-         job->setMessage(reply->message());
-         jobSubmissionFailed(job);
+         job->setStatus(Job::Error, reply->message());
+         JobMonitor::instance().jobSubmissionFailed(job);
          return;
       }
 
       QString fileContents(m_configuration.value(ServerConfiguration::RunFileTemplate));
       fileContents = substituteMacros(fileContents);
       fileContents = job->substituteMacros(fileContents);
+      fileContents += "\n";
       QString fileName(Util::WriteToTemporaryFile(fileContents));
 
       qDebug() << "Run   file contents written to" << fileName;
@@ -246,7 +261,6 @@ void Server::copyRunFile()
    }else {
       QLOG_ERROR() << "Server Error: invalid reply";
       if (reply) reply->deleteLater();
-      return;
    }
 }
 
@@ -259,12 +273,14 @@ void Server::queueJob()
       Job* job(m_activeRequests.value(reply));
       m_activeRequests.remove(reply);
       reply->deleteLater();
+      if (!job) {
+         QLOG_WARN() << "Invalid Job pointer";
+         return;
+      }
 
       if (reply->status() != Network::Reply::Finished) {
-         job->setStatus(Job::Error);
-         job->setMessage(reply->message());
-qDebug() << "Server::queueJob() sending signal";
-         jobSubmissionFailed(job);
+         job->setStatus(Job::Error, reply->message());
+         JobMonitor::instance().jobSubmissionFailed(job);
          return;
       }
 
@@ -272,7 +288,7 @@ qDebug() << "Server::queueJob() sending signal";
       submit = substituteMacros(submit);
       submit = job->substituteMacros(submit);
 
-      qDebug() << "Executing submit command:     " << submit;
+      QLOG_DEBUG() << "Executing submit command:     " << submit;
 
       reply = m_connection->execute(submit);
       connect(reply, SIGNAL(finished()), this, SLOT(submitFinished()));
@@ -281,123 +297,416 @@ qDebug() << "Server::queueJob() sending signal";
    }else {
       QLOG_ERROR() << "Server Error: invalid reply";
       if (reply) reply->deleteLater();
-      return;
    }
 }
 
 
 void Server::submitFinished()
 {
-qDebug() << "Server submitFinished SLOT called";
    Network::Reply* reply(qobject_cast<Network::Reply*>(sender()));
 
    if (reply && m_activeRequests.contains(reply)) {
       Job* job(m_activeRequests.value(reply));
       m_activeRequests.remove(reply);
       reply->deleteLater();
-
-      if (reply->status() != Network::Reply::Finished) {
-         job->setStatus(Job::Error);
-         job->setMessage(reply->message());
-qDebug() << "Server::submitFinished() sending signal";
-         jobSubmissionFailed(job);
+      if (!job) {
+         QLOG_WARN() << "Invalid Job pointer";
          return;
       }
 
-      // need to get the id
-      qDebug() << "-------------------------------------------";
-      qDebug() << "Submit returned" << reply->message();
-      qDebug() << "-------------------------------------------";
-      job->parseQueryOutput(reply->message());
-
-      job->setStatus(Job::Queued);
-      watchJob(job);
-      jobSubmissionSuccessful(job);
+      if (reply->status() == Network::Reply::Finished && 
+         parseSubmitMessage(job, reply->message())) {
+         job->setStatus(Job::Queued);
+         JobMonitor::instance().jobSubmissionSuccessful(job);
+         watchJob(job);
+      }else {
+         job->setStatus(Job::Error, reply->message());
+         JobMonitor::instance().jobSubmissionFailed(job);
+         return;
+      }
 
    }else {
       QLOG_ERROR() << "Server Error: invalid reply";
       if (reply) reply->deleteLater();
-      return;
    }
+}
+
+
+// This should be delegated
+bool Server::parseSubmitMessage(Job* job, QString const& message)
+{
+   qDebug() << "-------------------------------------------";
+   qDebug() << "Submit returned" << message;
+   qDebug() << "-------------------------------------------";
+
+   bool ok(false);
+
+   switch (m_configuration.queueSystem()) {
+      case ServerConfiguration::PBS: {
+         // A successful submission returns a single token containing the job ID
+         QStringList tokens(message.split(QRegExp("\\s+"), QString::SkipEmptyParts));
+         if (tokens.size() == 1) {
+             job->setJobId(tokens.first());
+             QLOG_DEBUG() << "PBS job submitted with id" << job->jobId();
+             ok = true;
+          }
+      } break;
+         
+      case ServerConfiguration::Web: {
+         QRegExp rx("Qchemserv-Jobid::([0-9a-zA-Z\\-_]+)");
+         if (message.contains("Qchemserv-Status::OK") && rx.indexIn(message,0) != -1) {
+             job->setJobId(rx.cap(1));
+             ok = true;
+          }
+      } break;
+
+      case ServerConfiguration::SGE: {
+         // A successful submission returns a string like:
+         //   Your job 2834 ("test.sh") has been submitted
+         QStringList tokens(message.split(QRegExp("\\s+"), QString::SkipEmptyParts));
+         if (message.contains("has been submitted")) {
+            int id(tokens[2].toInt(&ok));
+            if (ok) job->setJobId(QString::number(id));
+         }
+      } break;
+
+      default:
+         qDebug() << "Need to parse submit message for server type "
+                  << ServerConfiguration::toString(m_configuration.queueSystem());
+         break;
+   }
+
+   return ok;
 }
 
 
 // ---------- Query ----------
 void Server::query(Job* job)
 {
-   //if (!check(job, "Query")) return;
-
    QList<Network::Reply*> keys(m_activeRequests.keys(job));
+
+   if (!job) throw Exception("Query called on invalid job");
    if (!keys.isEmpty()) {
-      QLOG_WARN() << "Prior request exists for job";
-      return;  
+      QLOG_DEBUG() << "Query on busy job";
+      return;
    }
+
+   open();
 
    QString query(m_configuration.value(ServerConfiguration::Query));
    query = substituteMacros(query);
    query = job->substituteMacros(query);
 
    qDebug() << "Query string:" << query;
-   qDebug() << "taking a pass on the query";
-   m_updateTimer.stop();
-return;
 
    Network::Reply* reply(m_connection->execute(query));
    connect(reply, SIGNAL(finished()), this, SLOT(queryFinished()));
    m_activeRequests.insert(reply, job);
-   reply->start();
 }
 
 
 void Server::queryFinished()
 {
    Network::Reply* reply(qobject_cast<Network::Reply*>(sender()));
-   if (!m_activeRequests.contains(reply)) {
-      if (reply) reply->deleteLater();
-      return;
-   }
 
-   if (reply->status() == Network::Reply::Finished) {
+   if (reply && m_activeRequests.contains(reply)) {
       Job* job(m_activeRequests.value(reply));
-
-      if (m_watchedJobs.contains(job)) {
-         job->parseQueryOutput(reply->message());
-         job->updated();
+      m_activeRequests.remove(reply);
+      if (!job) {
+         QLOG_WARN() << "Invalid Job pointer";
+         return;
       }
 
-   }else {
-      QLOG_WARN() << "Reply finshed with status" << reply->status();
-      QLOG_WARN() << "  Message:" << reply->message();
-   }
+      if (reply->status() != Network::Reply::Finished || 
+         !parseQueryMessage(job, reply->message())) {
+         job->setStatus(Job::Unknown, reply->message());
+      }
 
-   m_activeRequests.remove(reply);
-   reply->deleteLater();
+      reply->deleteLater();
+
+   }else {
+      QLOG_ERROR() << "Server Error: invalid query reply";
+      if (reply) reply->deleteLater();
+   }
 }
 
 
+// This should be delegated
+bool Server::parseQueryMessage(Job* job, QString const& message)
+{  
+   //qDebug() << "-------------------------------------------";
+   //qDebug() << "Query returned" << message;
+   //qDebug() << "-------------------------------------------";
+
+   bool ok(false);
+   Job::Status status(Job::Unknown);
+   QString statusMessage;
+
+   switch (m_configuration.queueSystem()) {
+
+      case ServerConfiguration::PBS: {
+
+         if (message.isEmpty()) {
+            // assume finished, but need to check for errors
+            status = Job::Finished;
+            ok = true;
+         }else {
+
+            QStringList lines(message.split(QRegExp("\\n"), QString::SkipEmptyParts));
+            QStringList tokens;
+            QStringList::iterator iter;
+
+            for (iter = lines.begin(); iter != lines.end(); ++iter) {
+                //job_state = R
+                if ((*iter).contains("job_state =")) {
+                   tokens = (*iter).split(QRegExp("\\s+"), QString::SkipEmptyParts);
+                   if (tokens.size() >= 3) {
+                      if (tokens[2] == "R" || tokens[2] == "E") {
+                         status = Job::Running;
+                      }else if (tokens[2] == "S" || tokens[2] == "H") {
+                         status = Job::Suspended;
+                      }else if (tokens[2] == "Q" || tokens[2] == "W") {
+                         status = Job::Queued;
+                      }else if (tokens[2] == "F") {
+                         status = Job::Finished;
+                      }
+                      ok = true;
+                   }
+                }
+
+                if ((*iter).contains("resources_used.walltime =")) {
+                   QString time((*iter).split(QRegExp("\\s+"), QString::SkipEmptyParts).last());
+                   job->resetTimer(Util::Timer::toSeconds(time));
+                }else if ((*iter).contains("comment =")) {
+                   statusMessage = (*iter).remove("comment = ").trimmed();
+                }
+            }
+         }
+      } break;
+         
+      case ServerConfiguration::Web: {
+         QRegExp rx("Qchemserv-Jobstatus::([A-Z]+)");
+         if (message.contains("Qchemserv-Status::OK") && rx.indexIn(message,0) != -1) {
+            QString rv(rx.cap(1));
+            if (rv == "DONE")    status = Job::Finished;
+            if (rv == "RUNNING") status = Job::Running;
+            if (rv == "QUEUED")  status = Job::Queued;
+            if (rv == "ERROR")   status = Job::Error;
+            ok = true;
+          }
+      } break;
+
+      case ServerConfiguration::SGE: {
+         if (message.isEmpty() || message.contains("not exist")) {
+            status = Job::Finished;
+         }else {
+            int nTokens;
+            QString input(message);
+            QStringList tokens;
+            Parser::TextStream textStream(&input);
+
+            while (!textStream.atEnd()) {
+               tokens = textStream.nextLineAsTokens();
+               nTokens = tokens.size();
+
+               if (nTokens >= 5 && tokens.first().contains(job->jobId())) {
+                  QString s(tokens[4]);
+                  if (s.contains("q", Qt::CaseSensitive)) {
+                     status = Job::Queued;
+                  }else if (s.contains("s", Qt::CaseInsensitive)) {
+                     status = Job::Suspended;
+                  }else if (s.contains("r", Qt::CaseSensitive)) {
+                     status = Job::Running;
+                  }
+                  ok = true;
+               }else if (nTokens > 1 && 
+                  tokens.first().contains("usage"), Qt::CaseInsensitive) {
+                  QRegExp rx("cpu=([\\d:]+)");
+                  for (int i = 1; i < tokens.size(); ++i) {
+                      if (rx.indexIn(tokens[i]) >= 0) {
+                         qDebug() << "RegExp matched:" << rx.cap(1);
+                         job->resetTimer(Util::Timer::toSeconds(rx.cap(1)));
+                      }
+                  }
+               }
+            }
+         }
+      } break;
+
+      default:
+         QLOG_ERROR() << "Need to parse submit message for server type "
+                      << ServerConfiguration::toString(m_configuration.queueSystem());
+         break;
+   }
+
+   QLOG_TRACE() << "parseQueryMessage setting status to " << Job::toString(status) << ok;
+   job->setStatus(status, statusMessage); 
+   if (!job->isActive()) unwatchJob(job);
+
+   return ok;
+}
+
+
+
 // ---------- kill ----------
-void Server::kill(Job*)
+void Server::kill(Job* job)
 {
+   QList<Network::Reply*> keys(m_activeRequests.keys(job));
+
+   if (!job) throw Exception("Query called on invalid job");
+   if (!keys.isEmpty()) throw Exception("Job busy");
+
+   open();
+
+   QString kill(m_configuration.value(ServerConfiguration::Kill));
+   kill = substituteMacros(kill);
+   kill = job->substituteMacros(kill);
+
+   qDebug() << "Kill string:" << kill;
+
+   Network::Reply* reply(m_connection->execute(kill));
+   connect(reply, SIGNAL(finished()), this, SLOT(killFinished()));
+   m_activeRequests.insert(reply, job);
 }
 
 
 void Server::killFinished()
 {
+   Network::Reply* reply(qobject_cast<Network::Reply*>(sender()));
+
+   if (reply && m_activeRequests.contains(reply)) {
+      Job* job(m_activeRequests.value(reply));
+      m_activeRequests.remove(reply);
+      if (!job) {
+         QLOG_WARN() << "Invalid Job pointer";
+         return;
+      }
+
+      unwatchJob(job);
+      job->setStatus(Job::Killed, reply->message());
+      reply->deleteLater();
+
+   }else {
+      QLOG_ERROR() << "Server Error: invalid kill reply";
+      if (reply) reply->deleteLater();
+   }
 }
+
 
 
 // ---------- Copy ----------
-void Server::copy(Job*)
+void Server::copyResults(Job* job)
 {
+   if (isLocal()) return;
+
+   QList<Network::Reply*> keys(m_activeRequests.keys(job));
+
+   if (!job) throw Exception("Invalid job");
+   if (!keys.isEmpty()) throw  "Job busy";
+
+   open();
+
+   QString listCmd(m_configuration.value(ServerConfiguration::JobFileList));
+   listCmd = substituteMacros(listCmd);
+   listCmd = job->substituteMacros(listCmd);
+   qDebug() << "list File command :" << listCmd;
+
+   job->setStatus(Job::Copying);
+   Network::Reply* reply(m_connection->execute(listCmd));
+   connect(reply, SIGNAL(finished()), this, SLOT(listFinished()));
+qDebug() << "CONNECTION made";
+   connect(reply, SIGNAL(copyProgress()), job, SLOT(copyProgress()));
+   m_activeRequests.insert(reply, job);
 }
 
 
-void Server::copyFinished()
+void Server::listFinished()
 {
+   Network::Reply* reply(qobject_cast<Network::Reply*>(sender()));
+
+   if (reply && m_activeRequests.contains(reply)) {
+      Job* job(m_activeRequests.value(reply));
+      m_activeRequests.remove(reply);
+      if (!job) {
+         QLOG_WARN() << "Invalid Job pointer";
+         return;
+      }
+
+      if (reply->status() != Network::Reply::Finished) {
+         job->setStatus(Job::Error, "Copy failed");
+         return;
+      }
+
+      reply->deleteLater();
+      QStringList fileList(parseListMessage(job, reply->message()));
+      QString destination(job->jobInfo().get(QChemJobInfo::LocalWorkingDirectory));
+      reply = m_connection->getFiles(fileList, destination);
+      connect(reply, SIGNAL(finished()), this, SLOT(copyResultsFinished()));
+      m_activeRequests.insert(reply, job);
+
+   }else {
+      QLOG_ERROR() << "Server Error: invalid query reply";
+      if (reply) reply->deleteLater();
+   }
 }
+
+
+QStringList Server::parseListMessage(Job* job, QString const& message)
+{
+   QStringList tokens(message.split("\n"));
+   QStringList list;
+
+   for (int i = 0; i < tokens.size(); ++i) {
+       QString file(tokens[i]);
+       if (!file.isEmpty() && file != "pathtable") list << file;
+   }
+
+   if (m_configuration.isWebBased()) {
+      QString download(m_configuration.value(ServerConfiguration::QueueInfo));
+      download = substituteMacros(download);
+      download = job->substituteMacros(download);
+
+      for (int i = 0; i < list.size(); ++i) {
+          QString tmp(download);
+          list[i] = tmp.replace("${FILE_NAME}", list[i]);
+      }
+   }
+
+   return list;
+}
+
+
+void Server::copyResultsFinished()
+{
+   Network::Reply* reply(qobject_cast<Network::Reply*>(sender()));
+
+   if (reply && m_activeRequests.contains(reply)) {
+      Job* job(m_activeRequests.value(reply));
+      m_activeRequests.remove(reply);
+      if (!job) {
+         QLOG_WARN() << "Invalid Job pointer";
+         return;
+      }
+
+      if (reply->status() != Network::Reply::Finished) {
+         job->setStatus(Job::Error, "Copy failed");
+         return;
+      }
+
+      QString msg("Results in: ");
+      msg += job->jobInfo().get(QChemJobInfo::LocalWorkingDirectory);
+      job->jobInfo().localFilesExist(true);
+      job->setStatus(Job::Finished, msg);
+      reply->deleteLater();
+
+   }else {
+      QLOG_ERROR() << "Server Error: invalid query reply";
+      if (reply) reply->deleteLater();
+   }
+}
+
 
 // --------------------------
-
 
 QString Server::substituteMacros(QString const& input)
 {
@@ -421,8 +730,8 @@ void Server::setUpdateInterval(int const seconds)
 
 void Server::unwatchJob(Job* job)
 {
-   if (!m_watchedJobs.contains(job)) m_watchedJobs.removeAll(job); 
-   if (m_watchedJobs.isEmpty()) m_updateTimer.stop();
+   if (m_watchedJobs.contains(job)) m_watchedJobs.removeAll(job); 
+   if (m_watchedJobs.isEmpty()) stopUpdates();
 }
 
 
@@ -433,9 +742,8 @@ void Server::watchJob(Job* job)
          m_watchedJobs.append(job); 
          connect(job, SIGNAL(deleted(Job*)), this, SLOT(unwatchJob(Job*)));
       }
-      if (m_connection && m_connection->isConnected()) m_updateTimer.start();
+      if (m_connection && m_connection->isConnected()) startUpdates();
    }
 }
-
 
 } } // end namespace IQmol::Process

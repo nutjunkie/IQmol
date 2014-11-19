@@ -45,47 +45,76 @@ namespace IQmol {
 namespace Parser {
 
 
-ParseFile::ParseFile(QString const& filePath)
+ParseFile::ParseFile(QString const& filePath, QString const& filter)
 {
-   setFilePaths(filePath);
+   m_filePath = filePath;
+   QFileInfo info(filePath);
+
+   if (info.isDir()) {
+      parseDirectory(filePath, filter);
+   }else {
+      m_name = info.completeBaseName();
+      m_filePaths.append(filePath);
+   }
 }
 
 
-void ParseFile::setFilePaths(QString const& filePath)
+void ParseFile::parseDirectory(QString const& filePath, QString const& filter)
 {
-   QFileInfo info(filePath);
-   m_filePath = filePath;
+   QDir dir(filePath);
 
-   if (info.isDir()) {
-      QDir dir(filePath);
-
-      QStringList list;
+   QStringList list;
+   if (filter.isEmpty()) {
+      m_name = dir.dirName();
       list << dir.dirName() + ".*";
-      dir.setNameFilters(list);
-
-      QDir::Filters filters(QDir::Files | QDir::Readable);
-      m_filePaths << dir.entryList(filters);
-
-//  ---
-    // This is a hack to ensure the .out file gets read before the other files
-    qDebug() << "Reversing directory file order";
-
-    QStringList filePaths;
-    for (int i = 0; i < m_filePaths.size(); ++i) {
-        filePaths.prepend(m_filePaths[i]);
-    }
-    m_filePaths = filePaths;
-//  ---
-
-      QStringList::iterator iter;
-#ifndef Q_WS_WIN
-      for (iter = m_filePaths.begin(); iter != m_filePaths.end(); ++iter) {
-          (*iter).prepend(m_filePath + "/");
-      }
-#endif
    }else {
-      m_filePaths.append(filePath);
+      m_name = filter;
+      list << filter + ".*";
    }
+   dir.setNameFilters(list);
+
+   QDir::Filters filters(QDir::Files | QDir::Readable);
+   m_filePaths << dir.entryList(filters);
+
+   if (m_filePaths.isEmpty()) {
+      // look for the first output file
+      list.clear();
+      list << "*.out";
+      dir.setNameFilters(list);
+      m_filePaths << dir.entryList(filters);
+      if (m_filePaths.isEmpty()) return;
+
+      QFileInfo info(m_filePaths.first());
+      m_name = info.completeBaseName();
+      m_filePaths.clear();
+      list.clear();
+      
+      list << m_name + ".*";
+      dir.setNameFilters(list);
+      m_filePaths << dir.entryList(filters);
+      if (m_filePaths.isEmpty()) return;
+   }
+
+   //qDebug() << "FilePath: " << m_filePath;
+   //qDebug() << "FilePaths:" << m_filePaths;
+
+//  ---
+   // This is a hack to ensure the .out file gets read before the other files
+   //qDebug() << "Reversing directory file order";
+
+   QStringList filePaths;
+   for (int i = 0; i < m_filePaths.size(); ++i) {
+       filePaths.prepend(m_filePaths[i]);
+   }
+   m_filePaths = filePaths;
+//  ---
+
+   QStringList::iterator iter;
+#ifndef Q_WS_WIN
+   for (iter = m_filePaths.begin(); iter != m_filePaths.end(); ++iter) {
+       (*iter).prepend(m_filePath + "/");
+   }
+#endif
 }
 
 
@@ -186,7 +215,7 @@ bool ParseFile::parse(QString const& filePath, bool& addToFileList)
    }
 
    if (!parser) {
-      QLOG_WARN() << "Failed to find parser for file:" << filePath << extension;
+      QLOG_WARN() << "Failed to find parser for file:" << filePath << " extension " << extension;
       return false;
    }
 

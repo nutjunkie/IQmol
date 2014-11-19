@@ -84,13 +84,16 @@ namespace Process2 {
          QueueResourcesList(QueueResourcesList const& list) 
           : QList<QueueResources*>() { copy(list); }
 
-         QueueResourcesList(QVariant const& qvar)
-          : QList<QueueResources*>() { fromQVariant(qvar); }
+         explicit QueueResourcesList(QVariant const& qvar)
+          : QList<QueueResources*>() { fromQVariantList(qvar.toList()); }
+
+         explicit QueueResourcesList(QVariantList const& qvar)
+          : QList<QueueResources*>() { fromQVariantList(qvar); }
 
          ~QueueResourcesList();
 
-         QVariant toQVariant() const;
-         void fromQVariant(QVariant const&);
+         QVariantList toQVariantList() const;
+         void fromQVariantList(QVariantList const&);
 
          void fromPbsQueueInfoString(QString const&);
          void fromSgeQueueInfoString(QString const&);

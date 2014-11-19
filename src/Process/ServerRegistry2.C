@@ -24,10 +24,7 @@
 #include "Preferences.h"
 #include "Server2.h"
 #include "QMsgBox.h"
-#include "QsLog.h"
-#include <exception>
-#include <cstdlib>
-#include <QDebug>
+#include "Exception.h"
 
 
 namespace IQmol {
@@ -42,6 +39,7 @@ ServerRegistry& ServerRegistry::instance()
 {
    if (s_instance == 0) {
       s_instance = new ServerRegistry();
+
       loadFromPreferences();
       atexit(ServerRegistry::destroy);
    }
@@ -80,13 +78,21 @@ Server* ServerRegistry::addServer(ServerConfiguration& config)
 }
 
 
+void ServerRegistry::closeAllConnections()
+{
+   QList<Server*>::iterator iter;
+   for (iter = s_servers.begin(); iter != s_servers.end(); ++iter) {
+       (*iter)->closeConnection();
+   }
+}
+
+
 void ServerRegistry::connectServers(QStringList const& servers)
 {
    QStringList::const_iterator iter;
    for (iter = servers.begin(); iter != servers.end(); ++iter) {
        Server* server(find(*iter));
        if (server) {
-qDebug() << "opening server" << server->name();
           server->open();
        }
    }
@@ -115,7 +121,6 @@ void ServerRegistry::remove(Server* server)
    if (index >= 0) s_deletedServers.append(s_servers.takeAt(index));
    save();
 }
-
 
 
 void ServerRegistry::moveUp(QString const& serverName)
@@ -165,27 +170,22 @@ void ServerRegistry::loadFromPreferences()
           s_servers.append(new Server(ServerConfiguration(*iter)));
       }
 
-      if (s_servers.isEmpty()) {
-         s_servers.append(new Server(ServerConfiguration()));
-      }
+      // Default iqmol.q-chem.com server
+      if (s_servers.isEmpty()) s_servers.append(new Server(ServerConfiguration()));
 
-   } catch (std::exception& err) {
+   } catch (Exception& ex) {
       QString msg("Problem loading servers from Preferences file:\n");
-      msg += err.what();
+      msg += ex.what();
       QMsgBox::warning(0, "IQmol", msg);
-      return;
    }
 }
 
 
 void ServerRegistry::saveToPreferences()
 {
-qDebug() << "Saving ServerRegistry contents to file";
    QVariantList list;
    QList<Server*>::const_iterator iter;
    for (iter = s_servers.begin(); iter != s_servers.end(); ++iter) {
-qDebug() << "Saving configuration";
-(*iter)->configuration().dump();
        list.append((*iter)->configuration().toQVariant());
    }
    Preferences::ServerConfigurationList(list);

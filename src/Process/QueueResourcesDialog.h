@@ -37,7 +37,7 @@ namespace Process2 {
       Q_OBJECT
 
       public: 
-         QueueResourcesDialog(QueueResourcesList&, QWidget* parent = 0);
+         QueueResourcesDialog(QueueResourcesList*, QWidget* parent = 0);
 
          QString queue()    const { return m_dialog.queue->currentText(); }
          QString walltime() const { return m_dialog.walltime->text(); }
@@ -53,7 +53,7 @@ namespace Process2 {
          void setQueueResources(QueueResources*);
          void saveAsDefaults();
          Ui::QueueResourcesDialog m_dialog;
-         QueueResourcesList m_queueResourcesList;
+         QueueResourcesList* m_queueResourcesList;
          QRegExpValidator m_timeValidator;
    };
 

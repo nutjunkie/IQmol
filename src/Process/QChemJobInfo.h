@@ -48,7 +48,7 @@ namespace Process2 {
             Queue, Walltime, Memory, Scratch, Ncpus };
             
          QChemJobInfo() : m_charge(0), m_multiplicity(1), m_localFilesExist(false),
-           m_promptOnOverwrite(true), m_efpOnlyJob(false) { }
+           m_promptOnOverwrite(true), m_efpOnlyJob(false), m_moleculePointer(0) { }
 
          QChemJobInfo(QChemJobInfo const& that) { copy(that); }
 
@@ -57,8 +57,8 @@ namespace Process2 {
          /// Process has been submitted which means we have finished with the input
          /// generator.  This obviates the need to serialize the Coordinates and 
          /// Constraints fields which are currently only requred by the input generator.
-         QVariant serialize();
-         static QChemJobInfo* deserialize(QVariant const&);
+         QVariantList toQVariantList() const;
+         bool fromQVariantList(QVariantList const&);
 
          void set(Field const field, QString const& value);
          void set(Field const field, int const& value);
@@ -88,6 +88,9 @@ namespace Process2 {
             if (this != &that) copy(that); return *this;
          }
 
+         void  setMoleculePointer(void* moleculePointer) { m_moleculePointer = moleculePointer; }
+         void* moleculePointer() const { return m_moleculePointer; }
+
       private:
          void copy(QChemJobInfo const&);
          /// Generic object to hold the data
@@ -97,6 +100,9 @@ namespace Process2 {
          bool m_localFilesExist;
          bool m_promptOnOverwrite;
          bool m_efpOnlyJob;
+
+         void* m_moleculePointer;
+
    };
 
 } } // end namespace IQmol::Process

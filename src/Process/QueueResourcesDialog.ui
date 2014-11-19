@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>278</width>
-    <height>253</height>
+    <width>280</width>
+    <height>229</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -259,17 +259,6 @@ in the run file template</string>
     </layout>
    </item>
    <item>
-    <widget class="QCheckBox" name="saveAsDefaults">
-     <property name="toolTip">
-      <string>This will save the current values
-as the default for this server</string>
-     </property>
-     <property name="text">
-      <string>Save As Defaults</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -282,26 +271,13 @@ as the default for this server</string>
   </layout>
  </widget>
  <tabstops>
-  <tabstop>queue</tabstop>
   <tabstop>buttonBox</tabstop>
+  <tabstop>queue</tabstop>
+  <tabstop>walltime</tabstop>
+  <tabstop>memory</tabstop>
+  <tabstop>scratch</tabstop>
+  <tabstop>ncpus</tabstop>
  </tabstops>
  <resources/>
- <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
-   <receiver>QueueResouresDialog</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>286</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

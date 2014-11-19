@@ -54,14 +54,16 @@ namespace Network {
          virtual bool blockingExecute(QString const& command, QString*) = 0;
          virtual bool exists(QString const& filePath) = 0;
          virtual bool makeDirectory(QString const& filePath) = 0;
-
-         virtual Reply* execute(QString const& command) = 0;
-         virtual Reply* getFile(QString const& sourcePath, QString const& destinationPath) = 0;
-         virtual Reply* putFile(QString const& sourcePath, QString const& destinationPath) = 0;
+         virtual bool removeDirectory(QString const& filePath) = 0;
 
          virtual QString obtainCookie() {
             return QString();
          }
+
+         virtual Reply* execute(QString const& command) = 0;
+         virtual Reply* getFile(QString const& sourcePath, QString const& destinationPath) = 0;
+         virtual Reply* putFile(QString const& sourcePath, QString const& destinationPath) = 0;
+         virtual Reply* getFiles(QStringList const& fileList, QString const& destinationPath) = 0;
 
          void setTimeout(unsigned timeout) { m_timeout = timeout; }
          unsigned timeout() const { return m_timeout; }
@@ -71,7 +73,6 @@ namespace Network {
          int port() const { return m_port; }
 
          bool isConnected() const { return m_status == Authenticated; }
-
 
       Q_SIGNALS:
          void closing();

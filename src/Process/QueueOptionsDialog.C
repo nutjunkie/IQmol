@@ -42,6 +42,9 @@ QueueOptionsDialog::QueueOptionsDialog(ServerConfiguration* configuration, QWidg
    m_dialog.queueInfo->setText(
       m_configuration->value(ServerConfiguration::QueueInfo));
 
+   m_dialog.jobFileList->setText(
+      m_configuration->value(ServerConfiguration::JobFileList));
+
    m_dialog.kill->setText(
       m_configuration->value(ServerConfiguration::Kill));
 
@@ -84,11 +87,14 @@ void QueueOptionsDialog::copyToServer()
    m_configuration->setValue(ServerConfiguration::Query,
       m_dialog.query->text());
 
-   m_configuration->setValue(ServerConfiguration::QueueInfo,
-      m_dialog.queueInfo->text());
-
    m_configuration->setValue(ServerConfiguration::Kill,
       m_dialog.kill->text());
+
+   m_configuration->setValue(ServerConfiguration::JobFileList,
+      m_dialog.jobFileList->text());
+
+   m_configuration->setValue(ServerConfiguration::QueueInfo,
+      m_dialog.queueInfo->text());
 
    m_configuration->setValue(ServerConfiguration::RunFileTemplate,
       m_dialog.runFileTemplate->toPlainText());

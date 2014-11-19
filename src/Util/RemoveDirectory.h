@@ -1,7 +1,9 @@
+#ifndef IQMOL_UTIL_REMOVEDIRECTORY_H
+#define IQMOL_UTIL_REMOVEDIRECTORY_H
 /*******************************************************************************
 
-  Copyright (C) 2011-13 Andrew Gilbert
- 
+  Copyright (C) 2011-2013 Andrew Gilbert
+
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
 
@@ -16,35 +18,18 @@
   details.
 
   You should have received a copy of the GNU General Public License along
-  with IQmol.  If not, see <http://www.gnu.org/licenses/>.  
+  with IQmol.  If not, see <http://www.gnu.org/licenses/>.
 
 ********************************************************************************/
 
-#include "ParseJobFiles.h"
-
+#include <QString>
 
 namespace IQmol {
+namespace Util {
 
-ParseJobFiles::ParseJobFiles(QString const& filePath) : Parser::ParseFile(filePath),  
-   m_jobInfo(0), m_moleculePointer(0)
-{
-   m_flags = MakeActive;
-}
+/// Recursivly removes a directory and its contents
+bool RemoveDirectory(QString const& dirName);
 
+} }  // end namespace IQmol::Util
 
-ParseJobFiles::ParseJobFiles(QString const& filePath, QString const& filter, 
-   void* moleculePointer) : Parser::ParseFile(filePath, filter),  m_jobInfo(0), 
-   m_moleculePointer(moleculePointer)
-{
-   m_flags = Overwrite | AddStar;
-}
-
-
-ParseJobFiles::ParseJobFiles(JobInfo const& jobInfo) : 
-   Parser::ParseFile(jobInfo.get(JobInfo::LocalWorkingDirectory)), m_jobInfo(&jobInfo), 
-   m_moleculePointer(0) 
-{
-   m_flags = Overwrite | AddStar;
-}
-
-} // end namespace IQmol
+#endif

@@ -37,13 +37,6 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="queueInfoLabel">
-        <property name="text">
-         <string>Queue Info</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
@@ -51,14 +44,31 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QLineEdit" name="queueInfo"/>
-      </item>
       <item row="0" column="1">
        <widget class="QLineEdit" name="submit"/>
       </item>
       <item row="3" column="1">
        <widget class="QLineEdit" name="kill"/>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="queueInfoLabel">
+        <property name="text">
+         <string>Queue Info</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QLineEdit" name="queueInfo"/>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Job File List</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="jobFileList"/>
       </item>
      </layout>
     </widget>
@@ -76,7 +86,7 @@
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Lucida Grande'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
@@ -163,8 +173,8 @@ Note this is ignored on PBS servers.</string>
   <tabstop>buttonBox</tabstop>
   <tabstop>submit</tabstop>
   <tabstop>query</tabstop>
-  <tabstop>queueInfo</tabstop>
   <tabstop>kill</tabstop>
+  <tabstop>runFileTemplate</tabstop>
   <tabstop>updateInterval</tabstop>
   <tabstop>jobLimit</tabstop>
  </tabstops>

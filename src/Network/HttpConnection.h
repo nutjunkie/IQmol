@@ -53,16 +53,18 @@ namespace Network {
          void authenticate(AuthenticationT const, QString const& cooke);
 
          bool blockingExecute(QString const&, QString*) { return false; } // unused
-         bool exists(QString const& ) { return false; }         // unused
-         bool makeDirectory(QString const&) { return true; }    // unused
+         bool exists(QString const& ) { return false; }         // setup, not used
+         bool makeDirectory(QString const&) { return true; }    // setup, not used
+         bool removeDirectory(QString const&) { return true; }  // setup, not used
 
          QString obtainCookie();
 
          Reply* execute(QString const& query);
          Reply* putFile(QString const& sourcePath, QString const& destinationPath);
          Reply* getFile(QString const& sourcePath, QString const& destinationPath);
+         Reply* getFiles(QStringList const& fileList, QString const& destinationPath);
+
          Reply* get(QString const& query) { return execute(query); }
-        
          Reply* post(QString const& path, QString const&);
 
       protected:

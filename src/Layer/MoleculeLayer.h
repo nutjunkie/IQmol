@@ -142,6 +142,7 @@ namespace IQmol {
             JobInfo* jobInfo();   //deprecate
             bool jobInfoMatch(JobInfo const* jobInfo);   //deprecate
             Process2::QChemJobInfo qchemJobInfo();
+            void qchemJobInfoChanged(Process2::QChemJobInfo const&);
    
             /// Attempts to determine the best axis for the functional group when
             /// converting an atom to a functional group (click on atom event)
@@ -225,6 +226,7 @@ namespace IQmol {
             }
 
             unsigned maxAtomicNumber() { return m_maxAtomicNumber; }
+
    
    
          public Q_SLOTS:

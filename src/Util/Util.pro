@@ -11,6 +11,7 @@ SOURCES = \
    $$PWD/Matrix.C \
    $$PWD/Preferences.C \
    $$PWD/qcprot.C \
+   $$PWD/RemoveDirectory.C \
    $$PWD/ScanDirectory.C \
    $$PWD/SetButtonColor.C \
    $$PWD/Task.C \
@@ -30,6 +31,7 @@ HEADERS = \
    $$PWD/OpenGL.h \
    $$PWD/Preferences.h \
    $$PWD/qcprot.h \
+   $$PWD/RemoveDirectory.h \
    $$PWD/ScanDirectory.h \
    $$PWD/SetButtonColor.h \
    $$PWD/Task.h \

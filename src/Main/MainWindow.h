@@ -92,6 +92,7 @@ namespace IQmol {
          void showProcessMonitor();  // deprecate
          void showJobMonitor();
          void testInternetConnection();
+         void submitJob(IQmol::Process2::QChemJobInfo&);
 
          void newViewer();
          void fullScreen();
@@ -111,7 +112,6 @@ namespace IQmol {
          void editNewServers();
          void configureAppearance();
          void clearRecentFilesMenu();
-
 
       private:
          void createMenus();

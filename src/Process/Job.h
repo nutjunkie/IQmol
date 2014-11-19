@@ -52,7 +52,7 @@ namespace Process2 {
 		 /// This is the message that is displayed in the status
 		 /// column of the JobMonitor.
          QString const& message() const { return m_message; }
-         void setMessage(QString const& message) { m_message = message; }
+         //void setMessage(QString const& message) { m_message = message; }
 
          Status status() const { return m_status; }
          bool isActive() const;
@@ -64,7 +64,7 @@ namespace Process2 {
          QString const& serverName() const { return m_serverName; }
          QString const& submitTime() const { return m_submitTime; }
 
-         bool localFilesExist() const { return false; }
+         bool localFilesExist() const;
 
          /// The run time in seconds.  Use Util::Timer::formatTime() 
          /// to turn it into hh:mm:ss
@@ -80,9 +80,13 @@ namespace Process2 {
 
          QChemJobInfo& jobInfo() { return m_qchemJobInfo; }
 
+      public Q_SLOTS:
+         void copyProgress();
+
       Q_SIGNALS:
          void updated();
          void finished();
+         void error();
          void deleted(Job*);
 
       protected:
@@ -103,7 +107,7 @@ namespace Process2 {
          /// ...and back again
          bool fromQVariant(QVariant const&);
 
-         void setStatus(Status const status);
+         void setStatus(Status const status, QString const& message = QString());
 
          //void setJobName(QString const& jobName) { m_jobName = jobName; }
          //void setServerName(QString const& serverName) { m_serverName = serverName; }
@@ -118,6 +122,7 @@ namespace Process2 {
 
          //QChemJobInfo& infoObject() { return m_jobInfo; }
 
+         QString const& copyProgressString() const { return m_copyProgress; }
 
       private:
          QChemJobInfo m_qchemJobInfo;
@@ -130,6 +135,8 @@ namespace Process2 {
          QString  m_jobId;
 
          Util::Timer m_timer;
+
+         QString m_copyProgress;
    };
 
    typedef QList<Job*> JobList;

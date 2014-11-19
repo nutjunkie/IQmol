@@ -22,6 +22,8 @@
 
 #include "IQmolApplication.h"
 #include "MainWindow.h"
+#include "JobMonitor.h"
+#include "ServerRegistry2.h"
 #include "QMsgBox.h"
 #include "QsLog.h"
 #include <QDir>
@@ -137,6 +139,9 @@ void IQmolApplication::open(QString const& file)
    mw->raise();
    mw->initViewer();
 
+   // Create the instance of the JobMonitor
+   Process2::JobMonitor::instance();
+
    static bool connected(false);
    if (!connected) {
 //      connect(this, SIGNAL(lastWindowClosed()), this, SLOT(maybeQuit()));
@@ -181,6 +186,8 @@ bool IQmolApplication::event(QEvent* event)
 
 void IQmolApplication::maybeQuit()
 {
+   Process2::ServerRegistry::instance().closeAllConnections();
+
    QApplication::quit();  // no maybe about it, the rest is just annoying
    return;
 

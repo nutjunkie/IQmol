@@ -22,6 +22,7 @@
 
 #include "LocalConnection.h"
 #include "LocalReply.h"
+#include "RemoveDirectory.h"
 #include <QFileInfo>
 #include <QDir>
 
@@ -95,6 +96,12 @@ bool LocalConnection::makeDirectory(QString const& path)
    return info.isWritable();
 }
 
+
+bool LocalConnection::removeDirectory(QString const& dirName)
+{
+   return Util::RemoveDirectory(dirName);
+}
+
             
 Reply* LocalConnection::execute(QString const& command)
 {
@@ -103,6 +110,12 @@ Reply* LocalConnection::execute(QString const& command)
    return reply;
 }
 
+
+Reply* LocalConnection::getFiles(QStringList const& fileList, QString const& destinationPath)
+{
+   qDebug() << "Warning, LocalConnection::getFiles not implemented";
+   return 0;
+}
 
 Reply* LocalConnection::getFile(QString const& sourcePath, QString const& destinationPath)
 {

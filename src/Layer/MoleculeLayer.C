@@ -1449,12 +1449,14 @@ Charge* Molecule::createCharge(double const Q, Vec const& position)
 }
 
 
+// deprecate
 bool Molecule::jobInfoMatch(JobInfo const* jobInfo) 
 { 
    return jobInfo == m_jobInfo; 
 }
 
 
+// deprecate
 JobInfo* Molecule::jobInfo()
 {
    if (m_jobInfo) disconnect(m_jobInfo, SIGNAL(updated()), this, SLOT(jobInfoChanged()));
@@ -1519,7 +1521,7 @@ Process2::QChemJobInfo Molecule::qchemJobInfo()
       name =  + "/" + m_inputFile.completeBaseName() + ".inp";
    }
 
-   //connect(m_jobInfo, SIGNAL(updated()), this, SLOT(jobInfoChanged()));
+   jobInfo.setMoleculePointer(this);
    return jobInfo;
 }
 
@@ -1531,6 +1533,14 @@ void Molecule::jobInfoChanged()
       m_info.setCharge(m_jobInfo->getCharge());
       m_info.setMultiplicity(m_jobInfo->getMultiplicity());
    }
+}
+
+
+void Molecule::qchemJobInfoChanged(Process2::QChemJobInfo const& qchemJobInfo)
+{ 
+   setText(qchemJobInfo.get(Process2::QChemJobInfo::BaseName)); 
+   m_info.setCharge(qchemJobInfo.getCharge());
+   m_info.setMultiplicity(qchemJobInfo.getMultiplicity());
 }
 
 

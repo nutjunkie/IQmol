@@ -55,6 +55,7 @@ namespace Network {
          /// Issued when the request has finished, check the status to see
          /// if it completed or if an error occured
          void finished();
+         void copyProgress();
 
       protected Q_SLOTS:
          virtual void run() = 0;

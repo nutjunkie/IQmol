@@ -117,6 +117,7 @@ namespace IQmol {
          //bool open(QString const& fileName);     // deprecate
          //void openCalculationResults(JobInfo*);  // deprecate
 
+         void open(QString const& fileName, QString const& filter,  void* moleculePointer);
          void open(QString const& fileName);
          void fileOpenFinished();
          void open(JobInfo*);
@@ -128,7 +129,8 @@ namespace IQmol {
          void sceneRadiusChanged(double const);
          void displayMessage(QString const&);
          void postCommand(QUndoCommand*);
-         void selectionChanged(QItemSelection const& items, QItemSelectionModel::SelectionFlags);
+         void selectionChanged(QItemSelection const& items, 
+                 QItemSelectionModel::SelectionFlags);
          void select(QModelIndex const& item, QItemSelectionModel::SelectionFlags);
          void clearSelection();
          void changeActiveViewerMode(Viewer::Mode const);

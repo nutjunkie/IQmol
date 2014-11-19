@@ -149,6 +149,24 @@ void ViewerModel::open(QString const& filePath)
 }
 
 
+void ViewerModel::open(QString const& filePath, QString const& filter, void* moleculePointer)
+{
+   QString path(filePath);
+   while (path.endsWith("/")) {
+       path.chop(1);
+   }
+#ifdef Q_WS_WIN
+   // Not sure where this is getting added, but it causes problems on Windows, obviously
+   while (path.startsWith("/")) {
+       path.remove(0,1);
+   }
+#endif
+   ParseJobFiles* parser = new ParseJobFiles(path, filter, moleculePointer);
+   connect(parser, SIGNAL(finished()), this, SLOT(fileOpenFinished()));
+   parser->start();
+}
+
+
 void ViewerModel::open(JobInfo* jobInfo)
 {
    if (!jobInfo) return;
@@ -219,8 +237,7 @@ void ViewerModel::processParsedData(ParseJobFiles* parser)
    Data::Bank& bank(parser->data());
    if (bank.isEmpty()) return;
 
-   QFileInfo info(parser->filePath());
-   QString name(info.completeBaseName());
+   QString name(parser->name());
 
    // Determine if we need to replace an existing Molecule in the Model View.
    bool overwrite(parser->flags()  & ParseJobFiles::Overwrite);
@@ -239,15 +256,16 @@ void ViewerModel::processParsedData(ParseJobFiles* parser)
 
    // If we have a valid JobInfo, then we look for the Molecule that created it.
    JobInfo const* jobInfo(parser->jobInfo());
+   void* moleculePointer(parser->moleculePointer());
 
-   if (overwrite && jobInfo) {
+   if (overwrite && (jobInfo || moleculePointer)) {
       for (int row = 0; row < root->rowCount(); ++row) {
           child = root->child(row);
           if (child->text() == name) {
              Layer::Base* base = QVariantPointer<Layer::Base>::toPointer(child->data());
              Layer::Molecule* mol = qobject_cast<Layer::Molecule*>(base);
 
-             if (mol && mol->jobInfoMatch(jobInfo)) {
+             if (mol && (mol->jobInfoMatch(jobInfo) || mol == moleculePointer)) {
                 molecule->setCheckState(mol->checkState());
                 // makeActive = makeActive || (mol->checkState() == Qt::Checked);
                 // This may result in a memory leak, but we need the Molecule

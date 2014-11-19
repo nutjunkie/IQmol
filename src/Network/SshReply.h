@@ -23,6 +23,7 @@
 ********************************************************************************/
 
 #include "Reply.h"
+#include <QStringList>
 
 
 namespace IQmol {
@@ -42,6 +43,7 @@ namespace Network {
          void run();
 
       protected:
+         static QString subEnv(QString const& command);
          virtual void runDelegate() = 0;
          SshConnection* m_connection;
    };
@@ -69,10 +71,10 @@ namespace Network {
 
       public:
          SshExecute(SshConnection* connection, QString const& command) : 
-            SshReply(connection), m_command(command) { }
+            SshReply(connection), m_command(subEnv(command)) { }
 
       protected:
-         void setCommand(QString const& command) { m_command = command; }
+         void setCommand(QString const& command) { m_command = subEnv(command); }
          void runDelegate();
 
       private:
@@ -87,10 +89,7 @@ namespace Network {
       public:
          SshPutFile(SshConnection* connection, QString const& sourcePath, 
             QString const& destinationPath) : SshReply(connection), 
-            m_sourcePath(sourcePath), m_destinationPath(destinationPath) { }
-
-      Q_SIGNALS:
-         void copyProgress();
+            m_sourcePath(subEnv(sourcePath)), m_destinationPath(subEnv(destinationPath)) { }
 
       protected:
          void runDelegate();
@@ -105,13 +104,12 @@ namespace Network {
 
       Q_OBJECT
 
+      friend class SshGetFiles;
+
       public:
          SshGetFile(SshConnection* connection, QString const& sourcePath, 
             QString const& destinationPath) : SshReply(connection), 
-            m_sourcePath(sourcePath), m_destinationPath(destinationPath) { }
-
-      Q_SIGNALS:
-         void copyProgress();
+            m_sourcePath(subEnv(sourcePath)), m_destinationPath(subEnv(destinationPath)) { }
 
       protected:
          void runDelegate();
@@ -119,6 +117,24 @@ namespace Network {
       private:
          QString m_sourcePath;
          QString m_destinationPath;
+   };
+
+
+   class SshGetFiles : public SshReply {
+
+      Q_OBJECT
+
+      public:
+         SshGetFiles(SshConnection* connection, QStringList const& fileList, 
+            QString const& destinationDirectory) : SshReply(connection), 
+            m_fileList(fileList), m_destinationDirectory(destinationDirectory) { }
+
+      protected:
+         void runDelegate();
+
+      private:
+         QStringList m_fileList;
+         QString m_destinationDirectory;
    };
 
 } } // end namespace IQmol::Network

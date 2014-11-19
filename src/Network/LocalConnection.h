@@ -44,10 +44,12 @@ namespace Network {
          bool blockingExecute(QString const& command, QString* message = 0);
          bool exists(QString const& filePath);
          bool makeDirectory(QString const& path);
+         bool removeDirectory(QString const& path);
 
          Reply* execute(QString const& command);
          Reply* getFile(QString const& sourcePath, QString const& destinationPath);
          Reply* putFile(QString const& sourcePath, QString const& destinationPath);
+         Reply* getFiles(QStringList const& fileList, QString const& destinationPath);
    };
 
 } } // end namespace IQmol::Network

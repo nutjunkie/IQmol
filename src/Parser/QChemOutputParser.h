@@ -33,9 +33,13 @@ namespace Parser {
 
       public:
          bool parse(TextStream&);
-         QStringList parseForErrors(TextStream&);
+
+         static QStringList parseForErrors(QString const& filePath);
+         // move to private when LocalConnectionThread is deprecated
+         static QStringList parseForErrors(TextStream&);
 
       private:
+
          Data::Geometry* readStandardCoordinates(TextStream&);
          void readStandardCoordinates(TextStream&, Data::Geometry*);
          void readCharges(TextStream&, Data::Geometry*, QString const& label);
