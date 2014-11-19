@@ -186,20 +186,18 @@ void JobMonitor::loadJobListFromPreferences()
              if (job->isActive()) {
                 Server* server = ServerRegistry::instance().find(job->serverName());
                 if (server) {
-                 server->watchJob(job);
-                 if (server->isLocal()) {
-                    server->open();
-                    server->query(job);
-                 }else {
-                    remoteJobsActive = true;
-                 }
-                 }else {
-                    QLOG_WARN() << "Unable to find server for existing job";
-                 }
-                 qDebug() << "Setting Job status to unknown";
-                 job->setStatus(Job::Unknown);
+                   server->watchJob(job);
+                   if (server->isLocal()) {
+                      server->open();
+                      server->query(job);
+                   }else {
+                      remoteJobsActive = true;
+                   }
+                }else {
+                   QLOG_WARN() << "Unable to find server for existing job";
+                }
+                job->setStatus(Job::Unknown);
              }
-
           }else {
              delete job;
              job = 0;
@@ -263,7 +261,6 @@ void JobMonitor::reconnectServers()
 void JobMonitor::submitJob(QChemJobInfo& qchemJobInfo)
 {
    Job* job(0);
-   qDebug() << "***** Job submitted to new JobMonitor *****";
    qchemJobInfo.dump();
 
    try {
@@ -640,7 +637,6 @@ void JobMonitor::reloadJob(Job* job)
 void JobMonitor::jobUpdated()
 {
    Job* job(qobject_cast<Job*>(sender()));
-   qDebug() << "jobUpdate called for Job" << job;
    reloadJob(job);
    saveJobListToPreferences();
 }
@@ -939,14 +935,34 @@ void JobMonitor::cleanUp(Job* job)
    QChemJobInfo& qchemJobInfo(job->jobInfo());
 
    // Rename Http files
-   if (dir.exists("input"))
-       dir.rename("input", qchemJobInfo.get(QChemJobInfo::InputFileName));
-   if (dir.exists("output"))
-       dir.rename("output", qchemJobInfo.get(QChemJobInfo::OutputFileName));
-   if (dir.exists("input.FChk"))
-       dir.rename("input.FChk", qchemJobInfo.get(QChemJobInfo::AuxFileName));
-   if (dir.exists("Test.FChk"))
-       dir.rename("Test.FChk", qchemJobInfo.get(QChemJobInfo::AuxFileName));
+   QString oldName("input"); 
+   if (dir.exists(oldName)) {
+      QString newName(qchemJobInfo.get(QChemJobInfo::InputFileName));
+      if (dir.exists(newName)) dir.remove(newName);
+      dir.rename(oldName, newName);
+   }
+
+   oldName = "output";
+   if (dir.exists(oldName)) {
+      QString newName(qchemJobInfo.get(QChemJobInfo::OutputFileName));
+      if (dir.exists(newName)) dir.remove(newName);
+      dir.rename(oldName, newName);
+   }
+
+   oldName = "input.FChk";
+   if (dir.exists(oldName)) {
+      QString newName(qchemJobInfo.get(QChemJobInfo::AuxFileName));
+      if (dir.exists(newName)) dir.remove(newName);
+      dir.rename(oldName, newName);
+   }
+
+   oldName = "Test.FChk";
+   if (dir.exists(oldName)) {
+      QString newName(qchemJobInfo.get(QChemJobInfo::AuxFileName));
+      if (dir.exists(newName)) dir.remove(newName);
+      dir.rename(oldName, newName);
+   }
+
    if (dir.exists("pathtable")) dir.remove("pathtable");
 
    // Check for errors and update the run time
@@ -959,13 +975,12 @@ void JobMonitor::cleanUp(Job* job)
       bool ok(false);
       unsigned t(time.toUInt(&ok));
       if (ok) {
-qDebug() << "Setting time to " << t;
          job->resetTimer(t);
          reloadJob(job);
       }
    }
 
-   qDebug() << "Errors in file:" << errors;
+   QLOG_DEBUG() << "Errors in file:" << errors;
 
    if (!errors.isEmpty()) {
       job->setStatus(Job::Error, errors.join("\n")); 

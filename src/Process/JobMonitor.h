@@ -121,6 +121,8 @@ namespace Process2 {
          bool getRemoteWorkingDirectory(Server*, QString& suggestion);
          bool getLocalWorkingDirectory(QString& suggestion);
 
+         bool renameFile(QString const& oldName, QString const& newName);
+
 		 /// Clears the jobs from the monitor and their servers.  If
 		 /// finishedOnly then only the processes that have status 
          void clearJobTable(bool const finishedOnly);
