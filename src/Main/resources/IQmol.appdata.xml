@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2014 Andrew Gilbert <andrew.gilbert@anu.edu.au> -->
+<component type="desktop">
+ <id>IQmol.desktop</id>
+ <metadata_license>CC0-1.0</metadata_license>
+ <project_license>GPL-3.0</project_license>
+ <name>IQmol</name>
+ <summary>A molecular builder and visualization package</summary>
+ <description>
+  <p>
+   IQmol is a free open-source molecular editor and visualization package. It
+   offers a range of features including a molecular editor, surface generation
+   (orbitals and densities) and animations (vibrational modes and reaction pathways).
+  </p>
+  <p>
+   IQmol is written using the Qt libraries which enables it to run on a range of
+   platforms including OS X, Windows and Linux.
+  </p>
+  <p>
+   It has been integrated with the Q-Chem quantum chemistry package and offers an
+   intuitive environment to set up, run, and analyse Q-Chem calculations. However, it
+   can also read and display a variety of file formats, including the widely
+   available formatted checkpoint file. 
+  </p>
+ </description>
+ <screenshots>
+  <screenshot type="default">
+   <image width="1600" height="900">
+    https://alexpl.fedorapeople.org/AppData/IQmol/screens/IQmol_01.png
+   </image>
+  </screenshot>
+  <screenshot>
+   <image width="1600" height="900">
+    https://alexpl.fedorapeople.org/AppData/IQmol/screens/IQmol_02.png
+   </image>
+  </screenshot>
+  <screenshot>
+   <image width="1600" height="900">
+    https://alexpl.fedorapeople.org/AppData/IQmol/screens/IQmol_03.png
+   </image>
+  </screenshot>
+ </screenshots>
+ <url type="homepage">http://iqmol.org</url>
+ <updatecontact>andrew.gilbert@anu.edu.au</updatecontact>
+</component>
