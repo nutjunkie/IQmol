@@ -10,6 +10,7 @@
 
 #include "Preferences.h"
 
+#include <cstdlib>
 #include <QString>
 #include <QDebug>
 #include <QVariant>
