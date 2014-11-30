@@ -130,7 +130,6 @@ set(IQmol_SOURCES
     IQmol/SpatialProperty.C
     IQmol/Spline.C
     IQmol/SshFileDialog.C
-    IQmol/SurfaceAnimatorDialog..C
     IQmol/SurfaceAnimatorDialog.C
     IQmol/SymmetryToleranceDialog.C
     IQmol/System.C
@@ -250,6 +249,7 @@ set(IQmol_Data_SOURCES
     Data/Mesh.C
     Data/MolecularOrbitals.C
     Data/MultipoleExpansion.C
+    Data/NmrReference.C
     Data/PointCharge.C
     Data/RemSectionData.C
     Data/Shell.C
