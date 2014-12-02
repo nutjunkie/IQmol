@@ -279,7 +279,7 @@ void JobMonitor::submitJob(QChemJobInfo& qchemJobInfo)
       postUpdateMessage("Connecting to server...");
       server->open();
 
-      if (!getRemoteWorkingDirectory(server, qchemJobInfo)) {
+      if (!getWorkingDirectory(server, qchemJobInfo)) {
          postUpdateMessage("");
          return;
       }
@@ -314,21 +314,23 @@ void JobMonitor::submitJob(QChemJobInfo& qchemJobInfo)
 }
 
 
-bool JobMonitor::getRemoteWorkingDirectory(Server* server, QChemJobInfo& qchemJobInfo)
+bool JobMonitor::getWorkingDirectory(Server* server, QChemJobInfo& qchemJobInfo)
 {
    QString dirPath;
 
-   if (server->isWebBased()) {
-      postUpdateMessage("Obtaining job name");
-      dirPath = qchemJobInfo.get(QChemJobInfo::BaseName);
-   }else {
-      postUpdateMessage("Determining working directory...");
-      ServerConfiguration configuration(server->configuration());
-      dirPath  = configuration.value(ServerConfiguration::WorkingDirectory);
+   postUpdateMessage("Determining working directory...");
+
+   if (server->isLocal()) {
+      dirPath = Preferences::LastFileAccessed();
+      QFileInfo info(dirPath);
+      if (info.isFile()) dirPath = info.path();
       dirPath += "/" + qchemJobInfo.get(QChemJobInfo::BaseName);
+      if (!getLocalWorkingDirectory(dirPath)) return false;
+   }else {
+      dirPath = qchemJobInfo.get(QChemJobInfo::BaseName);
+      if (!getRemoteWorkingDirectory(server, dirPath)) return false;
    }
 
-   if (!getRemoteWorkingDirectory(server, dirPath)) return false;
    QDir dir(dirPath);
 
    qchemJobInfo.set(QChemJobInfo::BaseName, dir.dirName());
@@ -341,51 +343,52 @@ bool JobMonitor::getRemoteWorkingDirectory(Server* server, QChemJobInfo& qchemJo
 }
 
 
-bool JobMonitor::getRemoteWorkingDirectory(Server* server, QString& dirPath)
+bool JobMonitor::getRemoteWorkingDirectory(Server* server, QString& name)
 {
    QString message;
+   QString path;
+
    if (server->isWebBased()) {
+      postUpdateMessage("Obtaining job name");
       message = "Job name:";
    }else {
-      message = "Working directory";
-      if (!server->isLocal()) message += " on " + server->name();
-      message += ":";
+      message = "Working directory on " + server->name() +":";
+      path = server->configuration().value(ServerConfiguration::WorkingDirectory);
+      path += "/";
    }
 
-   // clean the path
-   QDir dir(dirPath);
-   dirPath = dir.path();
-   
+   QString pathName(path + name);
    bool exists(false);
 
    do {
       bool okPushed(false);
-      dirPath = QInputDialog::getText(0, "IQmol", message, QLineEdit::Normal, 
-         dirPath, &okPushed);
+      name = QInputDialog::getText(0, "IQmol", message, QLineEdit::Normal, 
+         name, &okPushed);
 
-      if (!okPushed || dirPath.isEmpty()) return false;
-      while (dirPath.endsWith("/"))  { dirPath.chop(1); }
-      while (dirPath.endsWith("\\")) { dirPath.chop(1); }
+      while (name.endsWith("/"))  { name.chop(1); }
+      while (name.endsWith("\\")) { name.chop(1); }
+
+      if (!okPushed || name.isEmpty()) return false;
+
+      pathName = path + name;
 
       // clean the path
-      dir.setPath(dirPath);
-      dirPath = dir.path();
+      QDir dir(pathName);
+      pathName = dir.path();
 
-      exists = server->exists(dirPath);
-      QString s("Directory " + dirPath + " exists.  Overwrite?");
-      if (exists && 
-         QMsgBox::question(QApplication::activeWindow(), "IQmol", s) == QMessageBox::Ok) {
-          //if (!server->removeDirectory(dirPath)) {
-          //   throw Exception("Failed to remove directory on server");
-          //}
-          exists = false;
+      exists = server->exists(pathName);
+      QString msg("Directory " + name + " exists.  Overwrite?");
+      if (exists && QMsgBox::question(QApplication::activeWindow(), "IQmol", msg) == 
+         QMessageBox::Ok) {
+         exists = false;
        }
    } while (exists);
 
-   if (!server->makeDirectory(dirPath)) {
+   if (!server->makeDirectory(pathName)) {
       throw Exception("Failed to create directory on server");
    }
    
+   name = pathName;
    return true;
 }
 
@@ -571,7 +574,7 @@ void JobMonitor::on_clearListButton_clicked(bool)
 void JobMonitor::removeAllJobs()
 {
    QString msg("Remove all jobs from the list?\n\n");
-   msg += "This will stop the monitoring of the jobs, but not stop running processes";
+   msg += "This will stop monitoring of all jobs, but will not kill running processes";
    if (QMsgBox::question(this, "IQmol", msg) == QMessageBox::Cancel) return;
 
    bool statusCheck(false);
@@ -936,29 +939,34 @@ void JobMonitor::cleanUp(Job* job)
 
    // Rename Http files
    QString oldName("input"); 
+   QString newName(qchemJobInfo.get(QChemJobInfo::InputFileName));
    if (dir.exists(oldName)) {
-      QString newName(qchemJobInfo.get(QChemJobInfo::InputFileName));
       if (dir.exists(newName)) dir.remove(newName);
       dir.rename(oldName, newName);
    }
 
    oldName = "output";
+   newName = qchemJobInfo.get(QChemJobInfo::OutputFileName);
    if (dir.exists(oldName)) {
-      QString newName(qchemJobInfo.get(QChemJobInfo::OutputFileName));
       if (dir.exists(newName)) dir.remove(newName);
       dir.rename(oldName, newName);
    }
 
    oldName = "input.FChk";
+   newName = qchemJobInfo.get(QChemJobInfo::AuxFileName);
    if (dir.exists(oldName)) {
-      QString newName(qchemJobInfo.get(QChemJobInfo::AuxFileName));
+      if (dir.exists(newName)) dir.remove(newName);
+      dir.rename(oldName, newName);
+   }
+
+   oldName = qchemJobInfo.get(QChemJobInfo::InputFileName) + ".fchk";
+   if (dir.exists(oldName)) {
       if (dir.exists(newName)) dir.remove(newName);
       dir.rename(oldName, newName);
    }
 
    oldName = "Test.FChk";
    if (dir.exists(oldName)) {
-      QString newName(qchemJobInfo.get(QChemJobInfo::AuxFileName));
       if (dir.exists(newName)) dir.remove(newName);
       dir.rename(oldName, newName);
    }

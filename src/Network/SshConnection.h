@@ -27,7 +27,6 @@
 
 #include "Connection.h"
 #include <libssh2.h>
-#include <QThread>
 
 
 namespace IQmol {
@@ -63,6 +62,8 @@ namespace Network {
          Reply* getFiles(QStringList const& fileList, QString const& destinationPath);
 
          bool waitSocket();  // returns true on timeout
+
+         void start(Reply*);
             
          // for debugging
          Reply* test(QString const& id);
@@ -78,7 +79,6 @@ namespace Network {
          int m_socket;
          LIBSSH2_AGENT* m_agent;
          QString m_username;
-         QThread m_thread;
 
          void init();
          void openSocket(unsigned const timeout);
@@ -93,8 +93,6 @@ namespace Network {
          int connectPassword();
 
          QString getPasswordFromUser(QString const& message);
-         void start(SshReply*);
-
          QString lastError();
          QString getPrivateKeyFile();
          QString getPublicKeyFile();

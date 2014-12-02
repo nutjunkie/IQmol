@@ -194,13 +194,13 @@ void Server::queryAllJobs()
 // ---------- Submit ----------
 void Server::submit(Job* job)
 {
+   qDebug() << "Request to submit job " << job->jobName();
    QList<Network::Reply*> keys(m_activeRequests.keys(job));
 
    if (!job) throw Exception("Submit called with null job");
    if (m_watchedJobs.contains(job)) throw Exception("Attempt to submit duplicate job");
    if (!keys.isEmpty()) throw Exception("Attempt to submit busy job");
 
-   qDebug() << "Request to submit job " << job->jobName();
    open();
 
    QString contents(job->jobInfo().get(QChemJobInfo::InputString));
@@ -217,17 +217,20 @@ void Server::submit(Job* job)
       Network::Reply* reply(m_connection->putFile(fileName, submit));
       connect(reply, SIGNAL(finished()), this, SLOT(submitFinished()));
       m_activeRequests.insert(reply, job);
+      reply->start();
    }else {
       QString destination(job->jobInfo().getRemoteFilePath(QChemJobInfo::InputFileName));
       Network::Reply* reply(m_connection->putFile(fileName, destination));
       connect(reply, SIGNAL(finished()), this, SLOT(copyRunFile()));
       m_activeRequests.insert(reply, job);
+      reply->start();
    }
 }
 
 
 void Server::copyRunFile()
 {
+qDebug() << "copyRunFile() called";
    Network::Reply* reply(qobject_cast<Network::Reply*>(sender()));
 
    if (reply && m_activeRequests.contains(reply)) {
@@ -257,6 +260,7 @@ void Server::copyRunFile()
       reply = m_connection->putFile(fileName, destination);
       connect(reply, SIGNAL(finished()), this, SLOT(queueJob()));
       m_activeRequests.insert(reply, job);
+      reply->start();
 
    }else {
       QLOG_ERROR() << "Server Error: invalid reply";
@@ -267,6 +271,7 @@ void Server::copyRunFile()
 
 void Server::queueJob()
 {
+qDebug() << "queueJob() called";
    Network::Reply* reply(qobject_cast<Network::Reply*>(sender()));
 
    if (reply && m_activeRequests.contains(reply)) {
@@ -293,6 +298,7 @@ void Server::queueJob()
       reply = m_connection->execute(submit);
       connect(reply, SIGNAL(finished()), this, SLOT(submitFinished()));
       m_activeRequests.insert(reply, job);
+      reply->start();
 
    }else {
       QLOG_ERROR() << "Server Error: invalid reply";
@@ -303,6 +309,7 @@ void Server::queueJob()
 
 void Server::submitFinished()
 {
+qDebug() << "submitFinished() called";
    Network::Reply* reply(qobject_cast<Network::Reply*>(sender()));
 
    if (reply && m_activeRequests.contains(reply)) {
@@ -370,6 +377,18 @@ bool Server::parseSubmitMessage(Job* job, QString const& message)
          }
       } break;
 
+      case ServerConfiguration::Basic: {
+         qDebug() << "Need to correctly parse submit message for server type "
+                  << ServerConfiguration::toString(m_configuration.queueSystem());
+         // A successful submission returns a string like:
+         //   [1] 9539 $QC/exe/qcprog.exe .aaaa.inp.9539.qcin.1 $QCSCRATCH/local/qchem953
+         QStringList tokens(message.split(QRegExp("\\s+"), QString::SkipEmptyParts));
+         if (tokens.size() >= 2) {
+            int id(tokens[1].toInt(&ok));
+            if (ok) job->setJobId(QString::number(id));
+         }
+      } break;
+
       default:
          qDebug() << "Need to parse submit message for server type "
                   << ServerConfiguration::toString(m_configuration.queueSystem());
@@ -402,6 +421,7 @@ void Server::query(Job* job)
    Network::Reply* reply(m_connection->execute(query));
    connect(reply, SIGNAL(finished()), this, SLOT(queryFinished()));
    m_activeRequests.insert(reply, job);
+   reply->start();
 }
 
 
@@ -474,7 +494,7 @@ bool Server::parseQueryMessage(Job* job, QString const& message)
                    }
                 }
 
-                if ((*iter).contains("resources_used.walltime =")) {
+                if ((*iter).contains("resources_used.cput")) {
                    QString time((*iter).split(QRegExp("\\s+"), QString::SkipEmptyParts).last());
                    job->resetTimer(Util::Timer::toSeconds(time));
                 }else if ((*iter).contains("comment =")) {
@@ -533,15 +553,28 @@ bool Server::parseQueryMessage(Job* job, QString const& message)
          }
       } break;
 
+      case ServerConfiguration::Basic: {
+         if (message.isEmpty()) {
+            status = Job::Finished;
+         }else {
+            status = Job::Running;
+         }
+         ok = true;
+      } break;
+
+
       default:
-         QLOG_ERROR() << "Need to parse submit message for server type "
+         QLOG_ERROR() << "Need to parse query message for server type "
                       << ServerConfiguration::toString(m_configuration.queueSystem());
          break;
    }
 
    QLOG_TRACE() << "parseQueryMessage setting status to " << Job::toString(status) << ok;
    job->setStatus(status, statusMessage); 
-   if (!job->isActive()) unwatchJob(job);
+   if (!job->isActive()) {
+      unwatchJob(job);
+      if (isLocal()) job->jobInfo().localFilesExist(true);
+   }
 
    return ok;
 }
@@ -567,6 +600,7 @@ void Server::kill(Job* job)
    Network::Reply* reply(m_connection->execute(kill));
    connect(reply, SIGNAL(finished()), this, SLOT(killFinished()));
    m_activeRequests.insert(reply, job);
+   reply->start();
 }
 
 
@@ -614,9 +648,9 @@ void Server::copyResults(Job* job)
    job->setStatus(Job::Copying);
    Network::Reply* reply(m_connection->execute(listCmd));
    connect(reply, SIGNAL(finished()), this, SLOT(listFinished()));
-qDebug() << "CONNECTION made";
    connect(reply, SIGNAL(copyProgress()), job, SLOT(copyProgress()));
    m_activeRequests.insert(reply, job);
+   reply->start();
 }
 
 
@@ -643,6 +677,7 @@ void Server::listFinished()
       reply = m_connection->getFiles(fileList, destination);
       connect(reply, SIGNAL(finished()), this, SLOT(copyResultsFinished()));
       m_activeRequests.insert(reply, job);
+      reply->start();
 
    }else {
       QLOG_ERROR() << "Server Error: invalid query reply";

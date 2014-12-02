@@ -129,7 +129,7 @@ QString SubmitCommand(bool const local)
 
 QString TemplateForRunFile(bool const local)
 {
-   QString cmd("#! /bin/csh\nsource ~/.cshrc\nqchem ${JOB_NAME}.inp ${JOB_NAME}.out");
+   QString cmd("#! /bin/csh\nsource ~/.cshrc\nqchem ${JOB_NAME}.inp ${JOB_NAME}.out &");
    if (local) {
 #ifdef Q_WS_WIN
       cmd = "(unused)";

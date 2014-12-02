@@ -24,6 +24,7 @@
 #include "LocalReply.h"
 #include "RemoveDirectory.h"
 #include <QFileInfo>
+#include <QEventLoop>
 #include <QDir>
 
 
@@ -37,6 +38,7 @@ LocalConnection::LocalConnection() : Connection("localhost", 0)
 
 LocalConnection::~LocalConnection()
 {
+   killThread();
 }
 
 
@@ -60,10 +62,20 @@ void LocalConnection::authenticate(AuthenticationT const, QString const& /*usern
 
 bool LocalConnection::blockingExecute(QString const& command, QString* message)
 {
+qDebug() << "LocalConnection::blockingExecute called, may not work";
    LocalReply* reply(new LocalExecute(this, command));
    reply->start();
+
+   //QEventLoop loop;
+   //connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+   //start(reply);
+   //loop.exec();
+
+   bool ok(reply->status() == Reply::Finished);
    if (message) *message = reply->message();
-   return (reply->status() == Reply::Finished);
+   reply->deleteLater();
+
+   return ok;
 }
 
 
@@ -83,6 +95,9 @@ bool LocalConnection::makeDirectory(QString const& path)
       return dir.mkpath(path);
    }
 
+   // We assume we have already confirmed with the user that an existing
+   // file can be overwritten.  If the user selects an existing directory
+   // then we just write the files into it without removing anything.
    if (!info.isDir()) {
       QDir dir(info.dir());
       QString fileName(info.fileName());
@@ -97,16 +112,17 @@ bool LocalConnection::makeDirectory(QString const& path)
 }
 
 
-bool LocalConnection::removeDirectory(QString const& dirName)
+bool LocalConnection::removeDirectory(QString const& /* dirName */)
 {
-   return Util::RemoveDirectory(dirName);
+   // this is too risky
+   //return Util::RemoveDirectory(dirName);
+   return false;
 }
 
             
 Reply* LocalConnection::execute(QString const& command)
 {
    LocalReply* reply(new LocalExecute(this, command));
-   reply->start();
    return reply;
 }
 
@@ -120,7 +136,6 @@ Reply* LocalConnection::getFiles(QStringList const& fileList, QString const& des
 Reply* LocalConnection::getFile(QString const& sourcePath, QString const& destinationPath)
 {
    LocalReply* reply(new LocalCopy(this, sourcePath, destinationPath));
-   reply->start();
    return reply;
 }
 
@@ -128,7 +143,6 @@ Reply* LocalConnection::getFile(QString const& sourcePath, QString const& destin
 Reply* LocalConnection::putFile(QString const& sourcePath, QString const& destinationPath)
 {
    LocalReply* reply(new LocalCopy(this, sourcePath, destinationPath));
-   reply->start();
    return reply;
 }
 

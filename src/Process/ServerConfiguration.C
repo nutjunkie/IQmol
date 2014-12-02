@@ -298,13 +298,17 @@ qDebug() << "Setting defaults for " << toString(connection);
    switch (connection) {
 
       case Local:
+         m_configuration.insert(ServerName, "Local");
          m_configuration.insert(Port, 0);
          m_configuration.insert(HostAddress, "localhost");
          m_configuration.insert(Authentication, Network::Connection::None);
+         m_configuration.insert(UserName, QString(qgetenv("USER")));
          m_configuration.insert(WorkingDirectory, QDir::homePath());
+         m_configuration.insert(WorkingDirectory, "(unused)");
          break;
 
       case SSH:
+         m_configuration.insert(ServerName, "Server");
          m_configuration.insert(Port, 22);
          m_configuration.insert(Authentication, Network::Connection::Password);
          m_configuration.insert(UserName, QString(qgetenv("USER")));

@@ -23,6 +23,8 @@
 ********************************************************************************/
 
 #include "Reply.h"
+#include <QProcess>
+#include <QTimer>
 
 
 namespace IQmol {
@@ -48,14 +50,21 @@ namespace Network {
       Q_OBJECT
 
       public:
-         LocalExecute(LocalConnection* connection, QString const& command) :
-            LocalReply(connection), m_command(command) { }
+         LocalExecute(LocalConnection* connection, QString const& command);
+         ~LocalExecute();
 
-      protected Q_SLOT:
+      protected Q_SLOTS:
          void run();
 
+      private Q_SLOTS:
+         void runFinished(int exitCode, QProcess::ExitStatus);
+         void runError(QProcess::ProcessError);
+         void timeout();
+
       private:
-         QString m_command;
+         QString  m_command;
+         QProcess m_process;
+         QTimer   m_timer;
    };
 
 

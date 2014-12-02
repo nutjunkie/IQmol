@@ -23,6 +23,7 @@
 ********************************************************************************/
 
 #include <QObject>
+#include <QThread>
 
 #define TIMEOUT 10000
 
@@ -83,8 +84,12 @@ namespace Network {
          Status   m_status;
          unsigned m_timeout;
 
+         void thread(Reply*);
+         void killThread();
+
       private:
          explicit Connection(Connection const&) : QObject() { }
+         QThread  m_thread;
    };
 
 } } // end namespace IQmol::Network

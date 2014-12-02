@@ -112,10 +112,7 @@ void SshConnection::close()
 #endif
    }
 
-  // QLOG_TRACE() << "Shutting down connection thread";
-   m_thread.quit();
-   m_thread.wait();
-   //QLOG_TRACE() << "Connection thread shut down";
+   killThread();
    m_status = Connection::Closed;
 }
 
@@ -603,16 +600,6 @@ bool SshConnection::waitSocket()
 }
 
 
-void SshConnection::start(SshReply* reply)
-{
-   reply->moveToThread(&m_thread);
-   connect(&m_thread, SIGNAL(finished()), reply, SLOT(interrupt()));
-   connect(&m_thread, SIGNAL(finished()), reply, SLOT(deleteLater()));
-   if (!m_thread.isRunning()) m_thread.start();
-   reply->start();
-}
-
-
 bool SshConnection::exists(QString const& filePath)
 {
    QString cmd("test -e ");
@@ -660,11 +647,12 @@ bool SshConnection::blockingExecute(QString const& command, QString* message)
    QString cmd(command);
 
    SshReply* reply(new SshExecute(this, cmd));
-   QEventLoop loop;
+   reply->start();
 
-   connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
-   start(reply);
-   loop.exec();
+   //QEventLoop loop;
+   //connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+   //thread(reply);
+   //loop.exec();
              
    bool ok(reply->status() == Reply::Finished);
    if (message) *message = reply->message();
@@ -677,7 +665,7 @@ bool SshConnection::blockingExecute(QString const& command, QString* message)
 Reply* SshConnection::execute(QString const& command)
 {
    SshReply* reply(new SshExecute(this, command));
-   start(reply);
+   thread(reply);
    return reply;
 }
 
@@ -685,7 +673,7 @@ Reply* SshConnection::execute(QString const& command)
 Reply* SshConnection::putFile(QString const& sourcePath, QString const& destinationPath) 
 {
    SshReply* reply(new SshPutFile(this, sourcePath, destinationPath));
-   start(reply);
+   thread(reply);
    return reply;
 }
 
@@ -693,7 +681,7 @@ Reply* SshConnection::putFile(QString const& sourcePath, QString const& destinat
 Reply* SshConnection::getFile(QString const& sourcePath, QString const& destinationPath) 
 {
    SshReply* reply(new SshGetFile(this, sourcePath, destinationPath));
-   start(reply);
+   thread(reply);
    return reply;
 }
 
@@ -701,7 +689,7 @@ Reply* SshConnection::getFile(QString const& sourcePath, QString const& destinat
 Reply* SshConnection::getFiles(QStringList const& fileList, QString const& destinationPath)
 {
    SshReply* reply(new SshGetFiles(this, fileList, destinationPath));
-   start(reply);
+   thread(reply);
    return reply;
 }
 
@@ -710,7 +698,7 @@ Reply* SshConnection::getFiles(QStringList const& fileList, QString const& desti
 Reply* SshConnection::test(QString const& id)
 {
    SshReply* reply(new SshTest(this, id));
-   start(reply);
+   thread(reply);
    return reply;
 }
 

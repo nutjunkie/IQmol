@@ -100,7 +100,6 @@ QString HttpConnection::obtainCookie()
 Reply* HttpConnection::execute(QString const& query)
 {
    HttpGet* reply(new HttpGet(this, query));
-   reply->start();
    return reply;
 }
 
@@ -117,7 +116,6 @@ Reply* HttpConnection::putFile(QString const& sourcePath, QString const& destina
    }
    
    HttpPost* reply(new HttpPost(this, destinationPath, QString(buffer)));
-   reply->start();
    return reply;
 }
 
@@ -125,7 +123,6 @@ Reply* HttpConnection::putFile(QString const& sourcePath, QString const& destina
 Reply* HttpConnection::getFiles(QStringList const& fileList, QString const& destinationPath)
 {
    HttpGetFiles* reply(new HttpGetFiles(this, fileList, destinationPath));
-   reply->start();
    return reply;
 }
 
@@ -133,7 +130,6 @@ Reply* HttpConnection::getFiles(QStringList const& fileList, QString const& dest
 Reply* HttpConnection::getFile(QString const& sourcePath, QString const& destinationPath)
 {
    HttpGet* reply(new HttpGet(this, sourcePath, destinationPath));
-   reply->start();
    return reply;
 }
 
@@ -141,7 +137,6 @@ Reply* HttpConnection::getFile(QString const& sourcePath, QString const& destina
 Reply* HttpConnection::post(QString const& path, QString const& postData)
 {
    HttpPost* reply(new HttpPost(this, path, postData));
-   reply->start();
    return reply;
 }
 

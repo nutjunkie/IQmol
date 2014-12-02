@@ -5,6 +5,7 @@ include(../common.pri)
 INCLUDEPATH += ../Util
 
 SOURCES = \
+   $$PWD/Connection.C \
    $$PWD/HttpConnection.C \
    $$PWD/HttpReply.C \
    $$PWD/LocalConnection.C \

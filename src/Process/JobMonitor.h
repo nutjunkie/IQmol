@@ -117,7 +117,7 @@ namespace Process2 {
          bool getQueueResources(Server*, QChemJobInfo&);
          Job* getSelectedJob(QTableWidgetItem* item = 0);
 
-         bool getRemoteWorkingDirectory(Server*, QChemJobInfo&);
+         bool getWorkingDirectory(Server*, QChemJobInfo&);
          bool getRemoteWorkingDirectory(Server*, QString& suggestion);
          bool getLocalWorkingDirectory(QString& suggestion);
 
