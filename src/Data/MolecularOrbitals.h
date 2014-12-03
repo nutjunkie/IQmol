@@ -129,8 +129,6 @@ namespace Data {
          SurfaceList m_surfaceList;
    };
 
-   typedef Data::List<Data::MolecularOrbitals> MolecularOrbitalsList;
-
 } } // end namespace IQmol::Data
 
 #endif

@@ -46,6 +46,17 @@ Base::~Base()
 }
 
 
+void Base::setMolecule(Molecule* molecule)
+{
+   m_molecule = molecule;
+   QList<Base*> children(findLayers<Base>());
+   QList<Base*>::iterator iter;
+   for (iter = children.begin(); iter != children.end(); ++iter) {
+       (*iter)->setMolecule(molecule);
+   }
+}
+
+
 void Base::appendLayer(Base* child)
 {
    child->setPersistentParent(this);

@@ -21,6 +21,7 @@
 ********************************************************************************/
 
 #include "FormattedCheckpointParser.h"
+#include "MolecularOrbitalsList.h"
 #include "DipoleMoment.h"
 #include "GeometryList.h"
 #include "TextStream.h"
@@ -36,7 +37,8 @@ namespace Parser {
 
 bool FormattedCheckpoint::parse(TextStream& textStream)
 {
-   Data::GeometryList* geometryList = new Data::GeometryList;
+   Data::GeometryList* geometryList(new Data::GeometryList);
+   Data::MolecularOrbitalsList* molecularOrbitalsList(new Data::MolecularOrbitalsList);
    Data::Geometry* geometry(0);
 
    bool ok(true);
@@ -68,6 +70,15 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          geomData.atomicNumbers = readUnsignedArray(textStream, n);
 
       }else if (key == "Current cartesian coordinates") { // This triggers a new geometry
+
+         if (geometry) {
+            // We are on a subsequent geometry, so we should have everything we need to
+            // create the MOs for the previous one.
+            Data::MolecularOrbitals* mos(makeMolecularOrbitals(moData, shellData, *geometry)); 
+            //if (mos) m_dataBank.append(mos);
+            if (mos) molecularOrbitalsList->append(mos);
+         }
+
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          geomData.coordinates = readDoubleArray(textStream, n);
@@ -123,42 +134,26 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          total.setValue(energy, Data::Energy::Hartree);
 
       }else if (key == "Alpha MO coefficients") {
-   qDebug() << "Reading Alpha MO coefficients";
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          moData.alphaCoefficients = readDoubleArray(textStream, n);
+         moData.betaCoefficients  = moData.alphaCoefficients;
 
       }else if (key == "Beta MO coefficients") {
-   qDebug() << "Reading beta MO coefficients";
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          moData.betaCoefficients = readDoubleArray(textStream, n);
-qDebug() << "Reading beta MO coefficients" << moData.betaCoefficients.size();
-
-      }else if (key.contains("Beta MO coefficients")) {
 
       }else if (key == "Alpha Orbital Energies") {
-   qDebug() << "Reading Alpha Orbital Energies";
-   qDebug() << list;
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          moData.alphaEnergies = readDoubleArray(textStream, n);
+         moData.betaEnergies  = moData.alphaEnergies;
 
       }else if (key == "Beta Orbital Energies") {
-qDebug() << "Reading Beta Orbital Energies";
-qDebug() << list;
-
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok || !geometry) goto error;
          moData.betaEnergies = readDoubleArray(textStream, n);
-         // We now have everything to make the MOs
-         Data::MolecularOrbitals* mos(makeMolecularOrbitals(moData, shellData, *geometry)); 
-         if (!mos) {
-            delete geometryList;
-            return false;
-         }
-         // geometry->appendProperty(mos);
-         m_dataBank.append(mos);
 
       }else if (key == "Dipole_Data") {
          unsigned n(list.at(2).toUInt(&ok));
@@ -179,12 +174,27 @@ qDebug() << "Reading Hessian information";
 
    }
 
+   if (geometry) {
+      Data::MolecularOrbitals* mos(makeMolecularOrbitals(moData, shellData, *geometry)); 
+      //if (mos) m_dataBank.append(mos);
+      if (mos) molecularOrbitalsList->append(mos);
+   }
+
    if (geometryList) {
       if (geometryList->isEmpty()) {
          delete geometryList;
       }else {
          geometryList->setDefaultIndex(-1);
          m_dataBank.append(geometryList);
+      }
+   }
+
+   if (molecularOrbitalsList) {
+      if (molecularOrbitalsList->isEmpty()) {
+         delete molecularOrbitalsList;
+      }else {
+         molecularOrbitalsList->setDefaultIndex(-1);
+         m_dataBank.append(molecularOrbitalsList);
       }
    }
    
@@ -196,6 +206,7 @@ qDebug() << "Reading Hessian information";
       m_errors.append(msg);
 
    delete geometryList;
+   delete molecularOrbitalsList;
 
    return false;
 }

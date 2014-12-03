@@ -88,15 +88,18 @@ Layer::List Factory::toLayers(Data::Base& data)
          } break;
 
          case Data::Type::GeometryList: {
-            Data::GeometryList& 
-               geometryList(dynamic_cast<Data::GeometryList&>(data));
-            layers << convert(geometryList);
+            Data::GeometryList& list(dynamic_cast<Data::GeometryList&>(data));
+            layers << convert(list);
          } break;
 
          case Data::Type::Geometry: {
-            Data::Geometry& 
-               geometry(dynamic_cast<Data::Geometry&>(data));
+            Data::Geometry& geometry(dynamic_cast<Data::Geometry&>(data));
             layers << convert(geometry);
+         } break;
+
+         case Data::Type::MolecularOrbitalsList: {
+            Data::MolecularOrbitalsList& list(dynamic_cast<Data::MolecularOrbitalsList&>(data));
+            layers << convert(list);
          } break;
 
          case Data::Type::MolecularOrbitals: {
@@ -222,6 +225,29 @@ List Factory::convert(Data::Geometry& geometry)
        Bond* bond(new Bond(begin, end));
        bond->setOrder(obBond->GetBondOrder());
        bonds->appendLayer(bond);
+   }
+
+   return list;
+}
+
+
+List Factory::convert(Data::MolecularOrbitalsList& molecularOrbitalsList)
+{
+   List list;
+   unsigned nDataSets(molecularOrbitalsList.size());
+
+   if (nDataSets == 1) {
+      Data::MolecularOrbitals* mos(molecularOrbitalsList.first()); 
+      if (mos) list.append(new MolecularOrbitals(*mos));
+   }else if (nDataSets > 1) {
+      Base* base(new Base("Molecular Orbitals"));
+      list.append(base);
+      base->setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+      base->setCheckState(Qt::Checked);
+      Data::MolecularOrbitalsList::iterator iter;
+      for (iter = molecularOrbitalsList.begin(); iter != molecularOrbitalsList.end(); ++iter) {
+          base->appendLayer(new MolecularOrbitals(**iter));
+      }
    }
 
    return list;

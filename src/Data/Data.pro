@@ -24,6 +24,7 @@ SOURCES = \
    $$PWD/Hessian.C \
    $$PWD/Mesh.C \
    $$PWD/MolecularOrbitals.C \
+   $$PWD/MolecularOrbitalsList.C \
    $$PWD/MultipoleExpansion.C \
    $$PWD/NmrReference.C \
    $$PWD/PointCharge.C \
@@ -58,6 +59,7 @@ HEADERS = \
    $$PWD/Hessian.h \
    $$PWD/Mesh.h \
    $$PWD/MolecularOrbitals.h \
+   $$PWD/MolecularOrbitalsList.h \
    $$PWD/MultipoleExpansion.h \
    $$PWD/NmrReference.h \
    $$PWD/PointCharge.h \

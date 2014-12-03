@@ -43,6 +43,7 @@
 #include "SurfaceType.h"
 #include "MultipoleExpansion.h"
 #include "MolecularOrbitals.h"
+#include "MolecularOrbitalsList.h"
 #include "PointCharge.h"
 #include "YamlNode.h"
 #include "PointGroup.h"

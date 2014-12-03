@@ -362,8 +362,7 @@ bool JobMonitor::getRemoteWorkingDirectory(Server* server, QString& name)
 
    do {
       bool okPushed(false);
-      name = QInputDialog::getText(0, "IQmol", message, QLineEdit::Normal, 
-         name, &okPushed);
+      name = QInputDialog::getText(0, "IQmol", message, QLineEdit::Normal, name, &okPushed);
 
       while (name.endsWith("/"))  { name.chop(1); }
       while (name.endsWith("\\")) { name.chop(1); }

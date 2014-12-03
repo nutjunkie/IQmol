@@ -523,7 +523,6 @@ void ViewerModel::selectionChanged(QItemSelection const& selected,
              setDefaultGeometry = true;
           }
        }
-
    }
 
    list = selected.indexes();
@@ -545,6 +544,8 @@ void ViewerModel::selectionChanged(QItemSelection const& selected,
           base = QVariantPointer<Layer::Base>::toPointer(parent->data());
           if ( (geometryList2 = qobject_cast<Layer::GeometryList*>(base)) ) {
              geometryList2->setCurrentGeometry(geometry->row());
+             // ------- also select the corresponding MOs --------
+             // ---------------------------------------------------
           }
           if (geometryList2 == geometryList1) setDefaultGeometry = false;
        }

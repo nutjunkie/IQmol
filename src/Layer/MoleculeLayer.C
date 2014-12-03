@@ -43,14 +43,14 @@
 #include "ProgressDialog.h"
 #include "ConstraintLayer.h"
 #include "MultipoleExpansion.h"
-#include "MolecularOrbitalsLayer.h"
+//#include "MolecularOrbitalsLayer.h"
 
 #include "GridEvaluator.h"
 #include "GridData.h"
 #include "AtomicProperty.h"
 #include "Geometry.h"
 #include "GeometryList.h"
-#include "MolecularOrbitals.h"
+//#include "MolecularOrbitals.h"
 #include "Frequencies.h"
 #include "Bank.h"
 #include "File.h"
@@ -273,7 +273,6 @@ void Molecule::appendData(Layer::List& list)
    reindexAtomsAndBonds();
    autoDetectSymmetry();
 }
-
 
 
 bool Molecule::save(bool prompt)

@@ -95,7 +95,9 @@ namespace Layer {
 		 // QStandardItem to the Layer.
          virtual void setCheckStatus(Qt::CheckState const) { }
 
-         virtual void setMolecule(Molecule* molecule) { m_molecule = molecule; }
+         virtual void setMolecule(Molecule* molecule);
+         Molecule* molecule() const { return m_molecule; }
+        
 
          template <class T>
          QList<T*> findLayers(unsigned int flags = (Nested | Children))
@@ -147,7 +149,6 @@ namespace Layer {
          /// Signals sent when this Layer has been added to its parent. 
          void adopted();
 
-
       public Q_SLOTS:
          virtual void configure() { if (m_configurator) m_configurator->display(); }
          virtual void closeConfigurator() { if (m_configurator) m_configurator->close(); }
@@ -160,17 +161,14 @@ namespace Layer {
          /// on a Layer that hasn't been appended yet, it will need to be called.
          void setPersistentParent(Base* parent);
 
-
       protected:
          Molecule* m_molecule;
          void setConfigurator(Configurator::Base* configurator) {
             m_configurator = configurator; 
          }
 
-
       private Q_SLOTS:
          void persistentParentDeleted() { m_persistentParent = 0; }
-
 
       private:
 		 /// Removes this Layer from the Model but does not delete it.  The

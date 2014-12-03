@@ -25,6 +25,7 @@
 #include "Layer.h"
 #include "Geometry.h"
 #include "GeometryList.h"
+#include "MolecularOrbitalsList.h"
 #include "File.h"
 #include "EfpFragment.h"
 
@@ -53,6 +54,7 @@ namespace Layer {
          Layer::List convert(Data::Geometry&);
          Layer::List convert(Data::FileList&);
          Layer::List convert(Data::GeometryList&);
+         Layer::List convert(Data::MolecularOrbitalsList&);
          Layer::List convert(Data::EfpFragmentList&);
 
          static void destroy();
