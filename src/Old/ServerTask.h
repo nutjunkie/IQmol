@@ -24,7 +24,7 @@
 
 #include "Threaded.h"
 #include "HostDelegate.h"
-#include "Process.h"
+#include "QCProcess.h"
 
 
 namespace IQmol {

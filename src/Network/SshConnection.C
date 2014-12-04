@@ -34,7 +34,8 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <windows.h>
-#define in_addr_t u_long
+#define  in_addr_t u_long
+//#define  errno WSAGetLastError()
 #else
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -162,7 +163,6 @@ void SshConnection::openSocket(unsigned const timeout)
 
 #ifdef WIN32
    if (rc == SOCKET_ERROR) rc = -1;
-   int errno(WSAGetLastError());
    int ok(WSAEWOULDBLOCK);
 #else
    int ok(EINPROGRESS);
@@ -186,9 +186,6 @@ void SshConnection::openSocket(unsigned const timeout)
 
          rc = select(m_socket+1, NULL, &myset, NULL, &tv);
 
-#ifdef WIN32
-         errno = WSAGetLastError();
-#endif
          if (rc == 0) {
             throw NetworkTimeout();
 
@@ -201,7 +198,11 @@ void SshConnection::openSocket(unsigned const timeout)
             socklen_t lon(sizeof(int));
             int errorStatus;
             
+#ifdef WIN32
+            if (getsockopt(m_socket, SOL_SOCKET, SO_ERROR, (char*)(&errorStatus), &lon) < 0) {
+#else
             if (getsockopt(m_socket, SOL_SOCKET, SO_ERROR, (void*)(&errorStatus), &lon) < 0) {
+#endif
                QString msg("Error check on socket: ");
                throw Exception(msg + lastError());
             }
@@ -532,7 +533,8 @@ void SshConnection::setNonBlocking()
 {
 #ifdef WIN32
    unsigned long arg(0);
-   if ( (int ret = ioctlsocket(m_socket, FIONBIO, &arg)) == SOCKET_ERROR) {
+   int ret(0);
+   if ( (ret = ioctlsocket(m_socket, FIONBIO, &arg)) == SOCKET_ERROR) {
       throw Exception("Failed to set non-blocking on socket.\n");
    }
 #else
@@ -552,7 +554,8 @@ void SshConnection::setBlocking()
 {
 #ifdef WIN32
    unsigned long arg(1);
-   if ( (int ret = ioctlsocket(m_socket, FIONBIO, &arg)) == SOCKET_ERROR) {
+   int ret(0);
+   if ( (ret = ioctlsocket(m_socket, FIONBIO, &arg)) == SOCKET_ERROR) {
       throw Exception("Failed to set blocking on socket.\n");
    }
 #else
@@ -706,7 +709,7 @@ Reply* SshConnection::test(QString const& id)
 void SshConnection::callRedundant()
 {
    QLOG_TRACE() << "Redundant call made";
-   sleep(5);
+   //sleep(5);
    QLOG_TRACE() << "Redundant call finished";
 }
 

@@ -137,7 +137,7 @@ void ViewerModel::open(QString const& filePath)
    while (path.endsWith("/")) {
        path.chop(1);
    }
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
    // Not sure where this is getting added, but it causes problems on Windows, obviously
    while (path.startsWith("/")) {
        path.remove(0,1);
@@ -155,7 +155,7 @@ void ViewerModel::open(QString const& filePath, QString const& filter, void* mol
    while (path.endsWith("/")) {
        path.chop(1);
    }
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
    // Not sure where this is getting added, but it causes problems on Windows, obviously
    while (path.startsWith("/")) {
        path.remove(0,1);

@@ -25,8 +25,7 @@ SUBDIRS  = Util \
            Old \
            Configurator \
            Layer \
-           Main \
 
-#          Parser/test \
+win32:SUBDIRS += OpenBabel \
 
-win23:SUBDIRS += OpenBabel \
+SUBDIRS += Main \

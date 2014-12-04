@@ -68,7 +68,11 @@ void SshTest::runDelegate()
 {
    for (int i = 0; i < 10; ++i) {
       QLOG_TRACE() << "Running thread" << m_id << i;
+#ifdef WIN32
+      Sleep(2000);
+#else
       sleep(2);
+#endif
       if (m_interrupt) break;
    }
 }
@@ -280,10 +284,6 @@ void SshGetFile::runDelegate()
       throw Exception(msg + m_connection->lastSessionError());
    }
 
-   // If the buffer size changes, anything connected to the copyProgress will
-   // need updating as it assumes Kbyte increments.
-   char    buffer[1024];
-   off_t   got(0);
 
 /*
    QLOG_DEBUG() << "File info" << fileInfo.st_dev     << "   " << sizeof(dev_t);
@@ -298,8 +298,12 @@ void SshGetFile::runDelegate()
    QLOG_DEBUG() << "File info" << fileInfo.st_blocks  << "   " << sizeof(blkcnt_t);
 */
 
+   // If the buffer size changes, anything connected to the copyProgress will
+   // need updating as it assumes Kbyte increments.
+   char buffer[1024];
    QString error;
    unsigned fileSize(fileInfo.st_size);
+   unsigned got(0);
    QLOG_TRACE() <<  "Preparing to receive" << fileSize << "bytes";
 
    if (fileSize == 0) {

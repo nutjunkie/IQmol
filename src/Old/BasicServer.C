@@ -70,7 +70,7 @@ qDebug() << "Testing BasicServer configuration";
    file  = m_server->workingDirectory();
    if (!file.isEmpty()) test->addFileTest(file, flags);
    
-#ifndef Q_WS_WIN
+#ifndef Q_OS_WIN32
 //   flags = HostDelegate::Executable;
 //   file  = m_server->qchemEnvironment() + "/exe/" + m_server->executableName();
 //   test->addFileTest(file, flags);

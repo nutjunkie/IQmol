@@ -2,13 +2,13 @@ CONFIG += no_keywords
 QT     += xml opengl gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets 
-greaterThan(QT_MAJOR_VERSION, 4): CONFIG += home
-lessThan(QT_MAJOR_VERSION, 5): CONFIG += work
 
 QMAKE_CXXFLAGS += -O2 -g
 #QMAKE_CXXFLAGS += -O0 -g
 
 macx {
+   greaterThan(QT_MAJOR_VERSION, 4): CONFIG += home
+   lessThan(QT_MAJOR_VERSION, 5):    CONFIG += work
    //CONFIG += release
 
    # QGLViewer
@@ -23,31 +23,6 @@ macx {
    LIBS        += $(DEV)/OpenMesh-2.4/build/Build/lib/OpenMesh/libOpenMeshCored.a
    LIBS        += $(DEV)/OpenMesh-2.4/build/Build/lib/OpenMesh/libOpenMeshToolsd.a
 
-   # SSH2
-   # work
-   #INCLUDEPATH += $(DEV)/extlib/include/libssh2
-   #LIBS        += -L$(DEV)/extlib/lib/libssh2/ -lssh2 -lcrypto
-   # home
-   #INCLUDEPATH += $(DEV)/libssh2-1.4.3/include
-   #LIBS        += $(DEV)/libssh2-1.4.3/src/.libs/libssh2.a
-
-   #libcrypto
-   # work
-   #LIBS += -lcrypto
-   # home
-   #LIBS += $(DEV)/extlib/lib/libcrypto.a
-
-   # Boost
-   # work
-   #INCLUDEPATH += $(DEV)/boost_1_56_0/build/include
-   #LIBS        += $(DEV)/boost_1_56_0/build/lib/libboost_iostreams.a
-   #LIBS        += $(DEV)/boost_1_56_0/build/lib/libboost_serialization.a
-   #LIBS        += $(DEV)/boost_1_56_0/build/lib/libboost_exception.a
-   # home
-   #INCLUDEPATH  += $(DEV)/extlib/include
-   #LIBS         += $(DEV)/extlib/lib/libboost_iostreams.a \
-   #                $(DEV)/extlib/lib/libboost_serialization.a \
-   #                $(DEV)/extlib/lib/libboost_exception.a
 
    # OpenBabel
    INCLUDEPATH += /usr/local/include/openbabel-2.0
@@ -92,6 +67,29 @@ work {
 }
 
 
+win32 {
+   INCLUDEPATH += C:\Qt\Qt5.3.0\Tools\mingw482_32\i686-w64-mingw32\include\c++\i686-w64-mingw32
+
+   # QGLViewer
+   INCLUDEPATH += /Users/agilbert/Development/extlib/include
+   LIBS        += /Users/agilbert/Development/extlib/lib/libQGLViewer2.a
+
+   # Boost
+   INCLUDEPATH += /Users/agilbert/Development/boost_1_54_0
+   LIBS        += /Users/agilbert/Development/boost_1_54_0/stage/lib/libboost_serialization-mgw48-mt-1_54.a
+   LIBS        += /Users/agilbert/Development/boost_1_54_0/stage/lib/libboost_iostreams-mgw48-mt-1_54.a
+
+   # gfortran
+   LIBS += C:\MinGW\lib\gcc\mingw32\4.8.1\libgfortran.a
+
+   # OpenBabel
+   LIBS += -L/Users/agilbert/Development/extlib/lib -l openbabel
+
+   # OpenMesh
+   INCLUDEPATH += /Users/agilbert/Development/OpenMesh-2.4/src
+}
+
+
 win23 {
    CONFIG += debug exceptions rtti
 
@@ -110,8 +108,8 @@ win23 {
    LIBS += -L"C:\Program Files\gfortran\bin" -lgfortran-3 -lgcc_s_dw2-1
    #LIBS +=  C:\Users\qchem\Documents\extlib\lib\libboost_serialization.a
    #LIBS +=  C:\Users\qchem\Documents\extlib\lib\libboost_iostreams.a
-   LIBS += C:\Users\qchem\Documents\boost_1_51_0\stage\lib\libboost_serialization-mgw34-mt-1_51.a
-   LIBS += C:\Users\qchem\Documents\boost_1_51_0\stage\lib\libboost_iostreams-mgw34-mt-1_51.a
+   LIBS += C:\Users\qchem\Documents\boost_1_51_0\stage\lib\libboost_serialization-mgw34-mt-1_54.a
+   LIBS += C:\Users\qchem\Documents\boost_1_51_0\stage\lib\libboost_iostreams-mgw34-mt-1_54.a
    LIBS += -lz
 
    ICON = \

@@ -22,11 +22,10 @@
    
 ********************************************************************************/
 
-#include <climits> // for UINT_MAX
 #include <QString>
 
 #ifdef WIN32
-#define in_addr_t uint32_t
+#define in_addr_t u_long
 #else
 #include <netinet/in.h>
 #endif
@@ -44,106 +43,6 @@ namespace Network {
    /// Performs a synchonous test on the network to determine if we are
    /// connected or not.
    bool TestNetworkConnection();
-
-/*
-   static const unsigned Unlimited = UINT_MAX;
-
-   enum Authentication { None = 0, 
-                         Agent, 
-                         PublicKey, 
-                         HostBased,
-                         KeyboardInteractive,  
-                         Prompt,  
-                         Cookie  };
-
-
-   QString ToString(Authentication const& authentication) 
-   {
-      QString s;
-
-      switch (authentication) {
-         case None:                 s = "None";                  break;
-         case Agent:                s = "Agent";                 break;
-         case PublicKey:            s = "Public Key";            break;
-         case HostBased::           s = "Host Based";            break;
-         case KeyboardInteractive:  s = "Keyboard Interactive";  break;
-         case Prompt:               s = "Prompt";                break;
-         case Cookie:               s = "Cookie";                break;
-      }
-
-      return s;
-   }
-
-
-   Authentication AuthenticationFromString(QString const& s)
-   {
-      if (s.contains("Agent",    Qt::CaseInsensitive))  return Agent;
-      if (s.contains("Public",   Qt::CaseInsensitive))  return PublicKey;
-      if (s.contains("Host",     Qt::CaseInsensitive))  return HostBased;
-      if (s.contains("Keyboard", Qt::CaseInsensitive))  return KeyboardInteractive;
-      if (s.contains("Prompt",   Qt::CaseInsensitive))  return Prompt;
-      if (s.contains("Cookie",   Qt::CaseInsensitive))  return Cookie;
-      return None;
-   }
-
-
-   enum Protocol { Local = 0, 
-                   SSH, 
-                   HTTP  };
-
-
-   QString ToString(Protocol const& protocol)
-   {
-      QString s;
-
-      switch (protocol) {
-         case Local:  s = "Local";  break;
-         case SSH:    s = "SSH";    break;
-         case HTTP:   s = "HTTP";   break;
-      }
-
-      return s;
-   }
-
-
-   Protocol ProtocolFromString(QString const& s) 
-   {
-      if (s.contains("SSH",   Qt::CaseInsensitive))  return SSH;
-      if (s.contains("HTTP",  Qt::CaseInsensitive))  return HTTP;
-      return Local;
-   }
-
-
-   enum QueueSystem { Basic = 0,
-                      PBS, 
-                      SGE, 
-                      Web  };
-
-
-   QString ToString(QueueSystem const& queueSystem)
-   {
-      QString s;
-
-      switch (queueSystem) {
-         case Basic:  s = "Basic";  break;
-         case PBS:    s = "PBS";    break;
-         case SGE:    s = "SGE";    break;
-         case Web:    s = "Web";    break;
-      }
-
-      return s;
-   }
-
-
-   QueueSystemFromString(QString const& s) 
-   {
-      if (s.contains("Basic",  Qt::CaseInsensitive))  return Basic;
-      if (s.contains("PBS",    Qt::CaseInsensitive))  return PBS;
-      if (s.contains("SGE",    Qt::CaseInsensitive))  return SGE ;
-      if (s.contains("Web",    Qt::CaseInsensitive))  return Web ;
-      return Basic;
-   }
-*/
 
 
 } } // end namespace IQmol::Network

@@ -110,7 +110,7 @@ void ParseFile::parseDirectory(QString const& filePath, QString const& filter)
 //  ---
 
    QStringList::iterator iter;
-#ifndef Q_WS_WIN
+#ifndef Q_OS_WIN32
    for (iter = m_filePaths.begin(); iter != m_filePaths.end(); ++iter) {
        (*iter).prepend(m_filePath + "/");
    }

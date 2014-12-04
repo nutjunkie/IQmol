@@ -40,7 +40,7 @@ SOURCES += \
    $$PWD/MeshDecimator.C \
    $$PWD/PBSServer.C \
    $$PWD/ParseJobFiles.C \
-   $$PWD/Process.C \
+   $$PWD/QCProcess.C \
    $$PWD/ProcessMonitor.C \
    $$PWD/ProgressDialog.C \
    $$PWD/ReindexAtomsHandler.C \
@@ -100,7 +100,7 @@ HEADERS += \
    $$PWD/MeshDecimator.h \
    $$PWD/PBSServer.h \
    $$PWD/ParseJobFiles.h \
-   $$PWD/Process.h \
+   $$PWD/QCProcess.h \
    $$PWD/ProcessMonitor.h \
    $$PWD/ProgressDialog.h \
    $$PWD/ReindexAtomsHandler.h \

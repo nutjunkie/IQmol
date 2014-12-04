@@ -29,6 +29,7 @@
 #include "NetworkException.h"
 #include <QEventLoop>
 #include <QRegExpValidator>
+#include "Network.h"
 
 #ifdef WIN32
 #include <winsock2.h>

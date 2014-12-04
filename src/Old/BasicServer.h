@@ -23,7 +23,7 @@
 ********************************************************************************/
 
 #include "ServerDelegate.h"
-#include "Process.h"
+#include "QCProcess.h"
 #include <QVariant>
 #include <QQueue>
 

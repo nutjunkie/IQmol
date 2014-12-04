@@ -23,7 +23,7 @@
 ********************************************************************************/
 
 #include "QsLog.h"
-#include "Process.h"
+#include "QCProcess.h"
 #include <QObject>
 #include <QString>
 #include <QTimer>

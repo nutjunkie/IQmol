@@ -39,7 +39,7 @@
 #include "QsLogDest.h"
 #include "Lebedev.h"
 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
 #include <windows.h>
 #endif
 
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
 
        logger.addDestination(fileDestination.get());
        logger.addDestination(debugDestination.get());
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
        if (IQmol::Preferences::LogFileHidden()) {
           int fileHidden(0x2);  // Where is FILE_ATTRIBUTE_HIDDEN defined?
           WCHAR* fnam = (WCHAR*)logFile.constData();

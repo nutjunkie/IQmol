@@ -24,7 +24,7 @@
 
 #include "ServerDelegate.h"
 #include "ServerQueue.h"
-#include "Process.h"
+#include "QCProcess.h"
 
 
 namespace IQmol {

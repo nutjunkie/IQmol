@@ -54,7 +54,7 @@ ServerOptionsDialog::ServerOptionsDialog(QWidget* parent, Server* server) : QDia
       m_dialog.killCommand->setEnabled(false);
    }else if (m_server->type() == Server::Basic) {
       m_dialog.queueInfo->setEnabled(false);
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
       if (m_server->host() == Server::Local) m_dialog.runFileTemplate->setEnabled(false);
 #endif
    }

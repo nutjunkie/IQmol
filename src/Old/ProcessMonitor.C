@@ -21,7 +21,7 @@
 ********************************************************************************/
 
 #include "ProcessMonitor.h"
-#include "Process.h"
+#include "QCProcess.h"
 #include "JobInfo.h"
 #include "Server.h"
 #include "ServerRegistry.h"
@@ -830,7 +830,7 @@ void ProcessMonitor::processFinished()
       msg += " has finished.";
       if (jobInfo->localFilesExist()) {
          resultsAvailable(jobInfo);
-#ifndef Q_WS_WIN
+#ifndef Q_OS_WIN32
          // more Windows weirdness.  This causes a crash
          QMsgBox::information(this, "IQmol", msg);
 #endif

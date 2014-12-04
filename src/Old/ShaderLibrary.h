@@ -36,7 +36,7 @@
 #include "QGLViewer/vec.h"
 #include <QDebug>
 
-#ifdef Q_WS_WIN32
+#ifdef Q_OS_WIN32
 #undef IQMOL_SHADERS
 #else
 #define IQMOL_SHADERS

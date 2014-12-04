@@ -70,7 +70,7 @@ QueueOptionsDialog::QueueOptionsDialog(ServerConfiguration* configuration, QWidg
    }
 
 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
       m_dialog.runFileGroupBox->setEnabled(
          m_configuration->connection() != ServerConfiguration::Local);
 #endif

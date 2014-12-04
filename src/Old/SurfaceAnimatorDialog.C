@@ -273,7 +273,7 @@ void SurfaceAnimatorDialog::computeIsovalueAnimation()
        progressDialog->setValue(totalProgress);
        QApplication::processEvents();
        if (progressDialog->wasCanceled()) {
-#ifndef Q_WS_WIN32
+#ifndef Q_OS_WIN32
           delete progressDialog;
 #endif
           return;
@@ -285,7 +285,7 @@ void SurfaceAnimatorDialog::computeIsovalueAnimation()
    m_dialog.playbackBox->setEnabled(true); 
    m_animator->setLoopMode(m_dialog.loopButton->isChecked());
    m_animator->setBounceMode(m_dialog.bounceButton->isChecked());
-#ifndef Q_WS_WIN32
+#ifndef Q_OS_WIN32
    delete progressDialog;
 #endif
 }

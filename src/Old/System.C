@@ -28,7 +28,7 @@
 #include <QMap>
 #include <QtDebug>
 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
 #include <windows.h>
 #endif
 
@@ -77,7 +77,7 @@ QString QueryCommand(bool const local)
 
    if (local) {
       // The command only changes for Windows boxes 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
       QFileInfo tasklist("/Windows/System32/tasklist.exe");
       if (tasklist.exists()) {
          QString spid("\"PID eq ${JOB_ID}\"");
@@ -99,7 +99,7 @@ QString KillCommand(bool const local)
 {
    QString cmd("/bin/kill -TERM ${JOB_ID}");
    if (local) {
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
       QFileInfo taskkill("/Windows/System32/taskkill.exe");
       QFileInfo tskill("/Windows/System32/tskill.exe");
       if (taskkill.exists()) {       // Vista
@@ -119,7 +119,7 @@ QString SubmitCommand(bool const local)
 {
    QString cmd("./${JOB_NAME}.run");
    if (local) {
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
       cmd = "${QC}/qcenv_s.bat ${JOB_NAME}.inp ${JOB_NAME}.out";
 #endif
    }
@@ -131,7 +131,7 @@ QString RunFileTemplate(bool const local)
 {
    QString cmd("#! /bin/csh\nsource ~/.cshrc\nqchem ${JOB_NAME}.inp ${JOB_NAME}.out");
    if (local) {
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
       cmd = "(unused)";
 #endif
    }
@@ -143,7 +143,7 @@ QString ExecutableName(bool const local)
 {
    QString cmd("qchem.exe");
    if (local) {
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
       cmd = "qchem_s.exe";
 #endif
    }
@@ -182,7 +182,7 @@ unsigned int ExecutablePid(QString const& processName, QProcess const& parent)
           
 		  // return the PID for the spawning script in case there are multiple
 		  // jobs in the input file
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
           if (ancestry.size() > 1) return ancestry[0];
 #else
           if (ancestry.size() > 1) return ancestry[1];
@@ -197,7 +197,7 @@ unsigned int ExecutablePid(QString const& processName, QProcess const& parent)
 
 int ProcessID(QProcess const& process)
 {
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
    _PROCESS_INFORMATION* pi(process.pid());
    if (pi) {
       return pi->dwProcessId;
@@ -215,7 +215,7 @@ QList<unsigned int> GetMatchingProcessIds(QString const& pattern)
    QList<unsigned int> pids;
    QStringList args;
 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
    QString cmd("/Windows/System32/tasklist.exe");
 #else
    QString cmd("/bin/ps");
@@ -240,7 +240,7 @@ qDebug() << "MATCHED!" << processes[i];
 
 QList<unsigned int> GetParentProcessChain(unsigned int const pid) 
 {
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
   return QList<unsigned int>::fromStdList(GetPIDs::getpids(pid));
 #else
    QList<unsigned int> ancestry;

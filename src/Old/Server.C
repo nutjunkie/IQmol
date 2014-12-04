@@ -679,7 +679,7 @@ void Server::queryFinished()
    if (!msg.isEmpty()) {
       process->setComment(msg);
       process->setStatus(Process::Unknown);
-#ifndef Q_WS_WIN32
+#ifndef Q_OS_WIN32
       query->deleteLater();
 #endif
       return;
@@ -697,7 +697,7 @@ void Server::queryFinished()
             task->start();
          }
          removeFromWatchList(process);
-#ifndef Q_WS_WIN32
+#ifndef Q_OS_WIN32
          query->deleteLater();
 #endif
          return;
@@ -714,7 +714,7 @@ void Server::queryFinished()
    }else {
       removeFromWatchList(process);
    }
-#ifndef Q_WS_WIN32
+#ifndef Q_OS_WIN32
    query->deleteLater();
 #endif
 }

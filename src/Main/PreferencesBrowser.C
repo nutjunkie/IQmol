@@ -90,7 +90,7 @@ void Browser::on_buttonBox_accepted()
    LogFileHidden(logFileHidden);
 
    QFileInfo logFile(m_preferencesBrowser.logFileLineEdit->text());
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
    // On Windows the file hidden attribute is set when the log 
    // file is opened in main.C
 #else

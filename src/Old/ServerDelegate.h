@@ -27,7 +27,7 @@
 #include "RemoteHost.h"
 //#include "WebHost.h"
 #include "ServerTask.h"
-#include "Process.h"
+#include "QCProcess.h"
 #include <QObject>
 
 

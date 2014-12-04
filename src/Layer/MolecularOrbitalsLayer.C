@@ -348,7 +348,7 @@ qDebug() << "Grid already exists";
        if (progressDialog->wasCanceled()) break;
    }
 
-#ifndef Q_WS_WIN32
+#ifndef Q_OS_WIN32
    // Deleting this under Windows causes a crash, go figure.
    delete progressDialog;
 #endif
@@ -608,7 +608,7 @@ bool MolecularOrbitals::computeOrbitalGrids(Data::GridDataList& grids)
        progressDialog->setValue(progress);
        if (progressDialog->wasCanceled()) {
           delete [] tmp;
-#ifndef Q_WS_WIN32
+#ifndef Q_OS_WIN32
           delete progressDialog;
 #endif
           return false;

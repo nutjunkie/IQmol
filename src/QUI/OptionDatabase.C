@@ -38,7 +38,7 @@ bool OptionDatabase::s_okay;
 OptionDatabase& OptionDatabase::instance() {
    if (s_instance == 0) {
       s_instance = new OptionDatabase();
-#ifdef Q_WS_X11
+#ifdef Q_OS_LINUX
       atexit(OptionDatabase::destroy);
 #else
       std::atexit(OptionDatabase::destroy);

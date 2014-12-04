@@ -22,7 +22,7 @@
 
 #include "RemoteHost.h"
 #include "SecureConnectionThread.h"
-#include "Process.h"
+#include "QCProcess.h"
 #include "QsLog.h"
 #include "QMsgBox.h"
 #include <QFileInfo>

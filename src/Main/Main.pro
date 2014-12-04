@@ -15,7 +15,7 @@ LIBS += $$BUILD_DIR/libQui.a \
         $$BUILD_DIR/libUtil.a
 
 # Windows requires this
-# include(../common.pri)
+win32: include(../common.pri)
 
 INCLUDEPATH += . ../Util ../Data ../Parser ../Qui ../Layer \
                 ../Configurator ../Network ../Yaml ../Process ../Old
@@ -25,7 +25,8 @@ macx:FORMS       += $$PWD/PeriodicTableMac.ui
 win32:FORMS      += $$PWD/PeriodicTable.ui
 unix:!macx:FORMS += $$PWD/PeriodicTable.ui
 
-OBJECTS += $(DEV)/extlib/obj/symmol.o
+!win32:OBJECTS += $(DEV)/extlib/obj/symmol.o
+win32:OBJECTS += $$PWD/symmol.o
 
 SOURCES += \
    $$PWD/FragmentTable.C \

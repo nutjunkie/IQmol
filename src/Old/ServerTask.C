@@ -32,7 +32,7 @@
 #include <QFileInfo>
 #include <QProcess>
 #include <QDir>
-#ifndef Q_WS_WIN
+#ifndef Q_OS_WIN32
 #include <unistd.h>
 #endif
  
@@ -386,7 +386,7 @@ void SetupHttp::run()
 bool Submit::createSubmissionScript(Process* process)
 {
    // We don't create a submission file for Windows
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
    if (m_server->host() == Server::Local) return true;
 #endif
 
@@ -524,7 +524,7 @@ void BasicSubmit::runLocal()
    // give the exe a chance to fire up.
    unsigned int pid(0);
    for (int i = 0; i < 7; ++i) {
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
        Sleep(1000); 
 #else
        sleep(1); 
