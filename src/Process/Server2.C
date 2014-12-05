@@ -81,7 +81,8 @@ void Server::closeConnection()
 
 void Server::open()
 {
-   if (m_connection && m_connection->status() == Network::Connection::Authenticated) return;
+   if (m_connection && 
+       m_connection->status() == Network::Connection::Authenticated) return;
 
    QLOG_TRACE() << "Opening server" << name();
 
@@ -108,18 +109,17 @@ void Server::open()
    }
 
    if (m_connection->status() == Network::Connection::Opened) {
-      Network::Connection::AuthenticationT authentication(m_configuration.authentication());
-      QVariant userName(m_configuration.value(ServerConfiguration::UserName));
-      m_connection->authenticate(authentication, userName.toString());
-   }
+      Network::Connection::AuthenticationT 
+         authentication(m_configuration.authentication());
 
-   if (m_configuration.isWebBased()) {
-      QString cookie(m_configuration.value(ServerConfiguration::Cookie));
-      if (cookie.isEmpty()) {
-         cookie = m_connection->obtainCookie();
-         if (cookie.isEmpty()) throw Exception("HTTP authentication failed");
+      if (m_configuration.isWebBased()) {
+         QString cookie(m_configuration.value(ServerConfiguration::Cookie));
+         m_connection->authenticate(authentication, cookie);
          m_configuration.setValue(ServerConfiguration::Cookie, cookie);
          ServerRegistry::save();
+      }else {
+         QString userName(m_configuration.value(ServerConfiguration::UserName));
+         m_connection->authenticate(authentication, userName);
       }
    }
 

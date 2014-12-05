@@ -26,7 +26,7 @@
 #include "yaml-cpp/eventhandler.h"
 #include "TextStream.h"
 #include "QsLog.h"
-#include "QFile.h"
+#include <QFile>
 
 #include <fstream>
 #include <iostream>

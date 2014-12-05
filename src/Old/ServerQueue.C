@@ -38,7 +38,7 @@ int ServerQueue::parseResource(QString& r)
       Mb = r.remove("mb").toInt(&ok);
    }
 
-   if (!ok) QLOG_DEBUG() << "Failed to parse:" << r;
+   if (!ok) { QLOG_DEBUG() << "Failed to parse:" << r; }
 
    return Mb;
 }

@@ -20,11 +20,11 @@ SUBDIRS  = Util \
            Qui \
            Parser \
            Network \
-           Process \
            Yaml \
-           Old \
            Configurator \
            Layer \
+           Old \
+           Process \
 
 win32:SUBDIRS += OpenBabel \
 
