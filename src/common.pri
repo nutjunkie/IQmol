@@ -96,6 +96,8 @@ unix {
 
    # gfortran
    LIBS        += /usr/lib/gcc/x86_64-linux-gnu/4.6/libgfortran.a
+
+   QMAKE_LFLAGS += '-Wl,-rpath,\'\$$ORIGIN/../lib\'' 
 }
 
 
