@@ -1,3 +1,7 @@
 This is IQmol, a molecular builder and visualization package written by Andrew
-Gilbert using the Qt libraries.  For a list of the features and the most up-to-date
-instructions for compiling, please visit the website:  http://iqmol.org
+Gilbert.  IQmol is able to build molecules, set up and submit input for Q-Chem
+calculations, and analyse the output.  Analyses include display of molecular
+surfaces (densites, molecular orbitals) and animations of frequencies and
+reaction pathways.
+
+For an up-to-date list of features please visit the website:  http://qmol.org
