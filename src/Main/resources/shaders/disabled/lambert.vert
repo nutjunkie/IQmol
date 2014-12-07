@@ -1,16 +1,25 @@
-// Copyright (C) 2007 Dave Griffiths
-// Fluxus Shader Library
-// ---------------------
-// Lambertian Shading Model
-// Simple diffuse only shader
+#version 120
 
-uniform vec3 LightPos;
-varying vec3 N;
-varying vec3 L;
+// BEGIN UNIFORM
+uniform float user_Saturation;            // 0.7
+uniform float user_Ambient;               // 0.2
+uniform bool  user_Enhance_Surface_Edges; // 1
+// END UNIFORM
+
+varying vec4 color;
+varying vec3 normal;
+varying vec3 viewDirection;
+
 
 void main()
-{    
-    N = normalize(gl_NormalMatrix*gl_Normal);
-	L = vec3(gl_ModelViewMatrix*(vec4(LightPos,1)-gl_Vertex));
-    gl_Position = ftransform();
+{
+   const vec3 one = vec3(1.0, 1.0, 1.0);
+
+   gl_Position = gl_ModelViewProjectionMatrix*gl_Vertex;
+   
+   vec4 vertexPosition = gl_ModelViewMatrix*gl_Vertex;
+   viewDirection = -normalize(vertexPosition.xyz);
+
+   color  = vec4(user_Saturation*gl_Color.rgb + (1.0-user_Saturation)*one, gl_Color.a);
+   normal = normalize(gl_NormalMatrix*gl_Normal);
 }

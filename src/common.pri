@@ -112,12 +112,9 @@ win23 {
    LIBS += C:\Users\qchem\Documents\boost_1_51_0\stage\lib\libboost_iostreams-mgw34-mt-1_54.a
    LIBS += -lz
 
-   ICON = \
-       "C:\Users\qchem\Documents\IQmol\IQmol-master\src\IQmol\resources\IQmol.ico"
-   RC_FILE += \
-      "C:\Users\qchem\Documents\IQmol\IQmol-master\src\IQmol\resources\windows.rc"
+   ICON = "C:\Users\qchem\Documents\IQmol\IQmol-master\src\IQmol\resources\IQmol.ico"
+   RC_FILE += "C:\Users\qchem\Documents\IQmol\IQmol-master\src\IQmol\resources\windows.rc"
 }
-
 
 
 
