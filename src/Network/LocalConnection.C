@@ -54,7 +54,7 @@ void LocalConnection::close()
 }
 
 
-void LocalConnection::authenticate(AuthenticationT const, QString const& /*username*/)
+void LocalConnection::authenticate(AuthenticationT const, QString& /*username*/)
 {
    m_status = Connection::Authenticated;
 }

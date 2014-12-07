@@ -35,7 +35,7 @@
 #include "JobInfo.h"
 #include "ShaderDialog.h"
 #include "Network.h"
-#include "QUI/InputDialog.h"
+#include "Qui/InputDialog.h"
 #include <QResizeEvent>
 #include <QDropEvent>
 #include <QVBoxLayout>

@@ -145,7 +145,9 @@ bool TestNetworkConnection()
 
       SshConnection raijin("raijin.nci.org.au");
       raijin.open();
-      raijin.authenticate(SshConnection::Password, "atg509");
+      
+      QString name("atg509");
+      raijin.authenticate(SshConnection::Password, name);
       QLOG_TRACE() << "Authentication successful";
 
       reply = raijin.execute("ls");
@@ -188,7 +190,7 @@ bool TestNetworkConnection()
 
       SshConnection chemmac11("chemmac11");
       chemmac11.open();
-      chemmac11.authenticate(SshConnection::KeyboardInteractive, "agilbert");
+      chemmac11.authenticate(SshConnection::KeyboardInteractive, name);
 
       reply = chemmac11.execute("ls");
       QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));

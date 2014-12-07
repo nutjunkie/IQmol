@@ -3,8 +3,8 @@ CONFIG += lib
 include(../common.pri)
 
 INCLUDEPATH += . ../Util ../Data ../Parser ../Qui ../Layer \
-                ../Configurator ../Network ../Yaml ../Process
-INCLUDEPATH += ../Process $$BUILD_DIR/Qui   # Required for the ui_QuiMainWindow.h header
+                ../Configurator ../Network ../Yaml ../Process 
+INCLUDEPATH +=  $$BUILD_DIR/Qui   # Required for the ui_QuiMainWindow.h header
 
 SOURCES += $$PWD/gl2ps.C 
 HADERS  += $$PWD/gl2ps.h 
@@ -64,9 +64,6 @@ SOURCES += \
    $$PWD/SurfaceAnimatorDialog.C \
    $$PWD/SymmetryToleranceDialog.C \
    $$PWD/UndoCommands.C \
-   $$PWD/Viewer.C \
-   $$PWD/ViewerModel.C \
-   $$PWD/ViewerModelView.C \
 
 
 HEADERS += \
@@ -126,9 +123,6 @@ HEADERS += \
    $$PWD/SymmetryToleranceDialog.h \
    $$PWD/Threaded.h \
    $$PWD/UndoCommands.h \
-   $$PWD/Viewer.h \
-   $$PWD/ViewerModel.h \
-   $$PWD/ViewerModelView.h \
 
 FORMS += \
    $$PWD/BoundingBoxDialog.ui \

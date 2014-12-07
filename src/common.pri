@@ -67,7 +67,43 @@ work {
 }
 
 
+unix {
+   # QGLViewer
+   INCLUDEPATH += $(DEV)/libQGLViewer-2.6.0
+   LIBS        += $(DEV)/libQGLViewer-2.6.0/QGLViewer/libQGLViewer.a
+
+   # Boost
+   INCLUDEPATH += $(DEV)/boost_1_57_0
+#  LIBS        += $(DEV)/boost_1_57_0/stage/lib/libboost_iostreams.a
+   LIBS        += $(DEV)/boost_1_57_0/stage/lib/libboost_serialization.a
+   LIBS        += $(DEV)/boost_1_57_0/stage/lib/libboost_exception.a
+   
+   # OpenMesh
+   INCLUDEPATH += $(DEV)/OpenMesh-3.2/src
+   LIBS        += $(DEV)/OpenMesh-3.2/build/Build/lib/OpenMesh/libOpenMeshCored.a
+   LIBS        += $(DEV)/OpenMesh-3.2/build/Build/lib/OpenMesh/libOpenMeshToolsd.a
+
+   # OpenBabel
+   INCLUDEPATH += $(DEV)/openbabel-2.3.2/include
+   LIBS        += -L$(DEV)/openbabel-2.3.2/build/lib -lopenbabel
+
+   # SSH2
+   INCLUDEPATH += $(DEV)/libssh2-1.4.3/include
+   LIBS        += $(DEV)/extlib/lib/libssh2.a
+
+   # libcrypto
+   LIBS += $(DEV)/extlib/lib/libcrypto.a
+
+   # gfortran
+   LIBS        += /usr/lib/gcc/x86_64-linux-gnu/4.6/libgfortran.a
+
+   QMAKE_LFLAGS += '-Wl,-rpath,\'\$$ORIGIN/../lib\'' 
+}
+
+
 win32 {
+   CONFIG += debug exceptions rtti
+
    INCLUDEPATH += C:\Qt\Qt5.3.0\Tools\mingw482_32\i686-w64-mingw32\include\c++\i686-w64-mingw32
 
    # QGLViewer
@@ -90,8 +126,8 @@ win32 {
 }
 
 
-win23 {
-   CONFIG += debug exceptions rtti
+# this is rubbish and will be removed
+false {
 
    INCLUDEPATH += "C:\Users\qchem\Documents\extlib\include"
    INCLUDEPATH += "C:\Users\qchem\Documents\IQmol\src"

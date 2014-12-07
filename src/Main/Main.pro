@@ -1,21 +1,23 @@
 CONFIG += main
 TARGET  = IQmol
 
-include(../common.pri)
+# This is redefined in common.pri, but for linux we need to worry about the
+# ordering of the libraries.
+
+BUILD_DIR  = $$PWD/../../build
 
 LIBS += $$BUILD_DIR/libQui.a \
+        $$BUILD_DIR/libLayer.a \
+        $$BUILD_DIR/libOld.a \
         $$BUILD_DIR/libParser.a \
         $$BUILD_DIR/libData.a \
-        $$BUILD_DIR/libLayer.a \
         $$BUILD_DIR/libConfigurator.a \
+        $$BUILD_DIR/libProcess.a \
         $$BUILD_DIR/libNetwork.a \
         $$BUILD_DIR/libYaml.a \
-        $$BUILD_DIR/libOld.a \
-        $$BUILD_DIR/libProcess.a \
         $$BUILD_DIR/libUtil.a
 
-# Windows requires this
-win32: include(../common.pri)
+include(../common.pri)
 
 INCLUDEPATH += . ../Util ../Data ../Parser ../Qui ../Layer \
                 ../Configurator ../Network ../Yaml ../Process ../Old
@@ -37,6 +39,9 @@ SOURCES += \
    $$PWD/PreferencesBrowser.C \
    $$PWD/ToolBar.C \
    $$PWD/main.C \
+   $$PWD/Viewer.C \
+   $$PWD/ViewerModel.C \
+   $$PWD/ViewerModelView.C \
 
 HEADERS += \
    $$PWD/AboutDialog.h \
@@ -47,6 +52,9 @@ HEADERS += \
    $$PWD/PeriodicTable.h \
    $$PWD/PreferencesBrowser.h \
    $$PWD/ToolBar.h \
+   $$PWD/Viewer.h \
+   $$PWD/ViewerModel.h \
+   $$PWD/ViewerModelView.h \
 
 FORMS += \
    $$PWD/AboutDialog.ui \

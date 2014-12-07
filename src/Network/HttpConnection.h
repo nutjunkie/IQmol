@@ -50,14 +50,13 @@ namespace Network {
 
          void open();
          void close();
-         void authenticate(AuthenticationT const, QString const& cooke);
+         void authenticate(AuthenticationT const, QString& cooke);
 
          bool blockingExecute(QString const&, QString*) { return false; } // unused
          bool exists(QString const& ) { return false; }         // setup, not used
          bool makeDirectory(QString const&) { return true; }    // setup, not used
          bool removeDirectory(QString const&) { return true; }  // setup, not used
 
-         QString obtainCookie();
 
          Reply* execute(QString const& query);
          Reply* putFile(QString const& sourcePath, QString const& destinationPath);
@@ -70,6 +69,9 @@ namespace Network {
       protected:
          QNetworkAccessManager* m_networkAccessManager;
          bool m_secure; 
+
+      private:
+         QString obtainCookie();
    };
 
 } } // end namespace IQmol::Network

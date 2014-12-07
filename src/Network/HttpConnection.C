@@ -62,13 +62,14 @@ void HttpConnection::close()
       m_networkAccessManager = 0;
    }
    
-   m_status = Connection::Closed;
+   m_status = Closed;
 }
 
 
-void HttpConnection::authenticate(AuthenticationT const, QString const&)
+void HttpConnection::authenticate(AuthenticationT const, QString& cookie)
 {
-  m_status = Connection::Authenticated;
+  if ( cookie.isEmpty()) cookie = obtainCookie();
+  if (!cookie.isEmpty()) m_status = Authenticated;
 }
 
 
@@ -79,6 +80,7 @@ QString HttpConnection::obtainCookie()
    QEventLoop loop;
    Reply* reply(execute("register"));
    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+   reply->start();
    loop.exec();
 
    if (reply->status() == Reply::TimedOut) throw NetworkTimeout();

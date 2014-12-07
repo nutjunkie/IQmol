@@ -101,6 +101,7 @@ QString toString(ID const id)
 
       case NmrReference:           s = "Data::NmrReference";           break;
       case NmrReferenceList:       s = "Data::NmrReferenceList";       break;
+      case YamlNode:               s = "Data::YamlNode";               break;
    }
 
    return s;

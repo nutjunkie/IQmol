@@ -39,7 +39,7 @@ namespace Network {
 
          void open();
          void close();
-         void authenticate(AuthenticationT const, QString const& username);
+         void authenticate(AuthenticationT const, QString& username);
 
          bool blockingExecute(QString const& command, QString* message = 0);
          bool exists(QString const& filePath);

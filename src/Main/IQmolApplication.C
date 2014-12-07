@@ -74,10 +74,6 @@ void IQmolApplication::initOpenBabel()
    QApplication::addLibraryPath(path + "/lib/plugins");
 #endif
 
-#ifdef Q_OS_LINUX
-   return;
-#endif
-
    QString env(qgetenv("BABEL_LIBDIR"));
    if (env.isEmpty()) {
       env = path + "/lib/openbabel";

@@ -224,7 +224,7 @@ void SshConnection::openSocket(unsigned const timeout)
 
 // Returns true if the username and password are valid, false otherwise.
 // throws on any other error.
-void SshConnection::authenticate(AuthenticationT const authentication, QString const& username)
+void SshConnection::authenticate(AuthenticationT const authentication, QString& username)
 {
    m_username = username;
 
