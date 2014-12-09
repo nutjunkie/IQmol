@@ -67,7 +67,7 @@ work {
 }
 
 
-unix {
+unix!macx {
    # QGLViewer
    INCLUDEPATH += $(DEV)/libQGLViewer-2.6.0
    LIBS        += $(DEV)/libQGLViewer-2.6.0/QGLViewer/libQGLViewer.a
