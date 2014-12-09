@@ -97,7 +97,7 @@ QString QueryCommand(bool const local)
 
 QString KillCommand(bool const local)
 {
-   QString cmd("/bin/kill -TERM ${JOB_ID}");
+   QString cmd("/bin/kill -TERM -${JOB_ID}");
    if (local) {
 #ifdef Q_OS_WIN32
       QFileInfo taskkill("/Windows/System32/taskkill.exe");
