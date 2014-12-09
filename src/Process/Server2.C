@@ -207,6 +207,8 @@ void Server::submit(Job* job)
    QString fileName(Util::WriteToTemporaryFile(contents));
    qDebug() << "Input file contents written to" << fileName;
 
+   if (isLocal()) job->jobInfo().localFilesExist(true);
+
    // In the case of an HTTP server, we can simply POST the contents of the
    // input file and we're done.  Other servers need the run file and a 
    // separate submission step.
@@ -571,10 +573,7 @@ bool Server::parseQueryMessage(Job* job, QString const& message)
 
    QLOG_TRACE() << "parseQueryMessage setting status to " << Job::toString(status) << ok;
    job->setStatus(status, statusMessage); 
-   if (!job->isActive()) {
-      unwatchJob(job);
-      if (isLocal()) job->jobInfo().localFilesExist(true);
-   }
+   if (!job->isActive())  unwatchJob(job);
 
    return ok;
 }

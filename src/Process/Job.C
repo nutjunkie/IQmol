@@ -250,6 +250,7 @@ bool Job::isActive() const
    return active;
 }
 
+
 bool Job::localFilesExist() const 
 { 
    return m_qchemJobInfo.localFilesExist();

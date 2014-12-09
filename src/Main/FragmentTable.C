@@ -24,7 +24,7 @@
 #include "Preferences.h"
 #include <QHeaderView>
 
-#include <QDebug>
+#include "QsLog.h"
 
 namespace IQmol {
 
@@ -64,6 +64,13 @@ FragmentTable::~FragmentTable()
 void FragmentTable::loadFragments()
 {
    QDir dir(Preferences::FragmentDirectory());
+
+   if (!dir.exists()) {
+      Preferences::FragmentDirectory("");
+      dir = Preferences::FragmentDirectory();
+      QLOG_INFO() << "Resetting Fragment directory location" << dir;
+   }
+
    if (!dir.exists() || !dir.exists("EFP") || !dir.exists("Molecules") || 
        !dir.exists("Functional_Groups") ) {
       setFragmentImage(":resources/unhappy.png");
@@ -126,7 +133,7 @@ QList<QTreeWidgetItem*> FragmentTable::loadFragments(QDir const& dir, QTreeWidge
           if (info.exists()) {
               item->setData(0, s_imageRole, info.filePath());
           }else {
-              qDebug() << "Image file not found:" << info.filePath();
+              QLOG_DEBUG() << "Image file not found:" << info.filePath();
           }
        }
    }

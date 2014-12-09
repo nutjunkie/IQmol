@@ -229,7 +229,7 @@ QString QChemDatabaseFilePath()
    QVariant value(Get("QChemDatabaseFilePath"));
    QString databaseFilePath;
 
-   if (value.isNull()) {
+   if (value.isNull() || value.toString().isEmpty()) {
       QDir dir(QApplication::applicationDirPath());
       dir.cdUp();
 #ifdef Q_OS_MAC
@@ -330,7 +330,7 @@ QString FragmentDirectory()
    QString fragDir;
    QVariant value(Get("FragmentDirectory"));
 
-   if (value.isNull()) {
+   if (value.isNull() || value.toString().isEmpty()) {
       QDir dir(QApplication::applicationDirPath());
       dir.cdUp();
       dir.cd("share/fragments");

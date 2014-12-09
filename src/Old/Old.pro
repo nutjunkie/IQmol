@@ -3,7 +3,7 @@ CONFIG += lib
 include(../common.pri)
 
 INCLUDEPATH += . ../Util ../Data ../Parser ../Qui ../Layer \
-                ../Configurator ../Network ../Yaml ../Process 
+                ../Configurator ../Network ../Yaml ../Process ../Main
 INCLUDEPATH +=  $$BUILD_DIR/Qui   # Required for the ui_QuiMainWindow.h header
 
 SOURCES += $$PWD/gl2ps.C 

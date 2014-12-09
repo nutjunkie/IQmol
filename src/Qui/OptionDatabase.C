@@ -13,6 +13,7 @@
 #include <QString>
 #include <QDebug>
 #include <QVariant>
+#include <QFileInfo>
 #include <QSqlField>
 #include <QSqlQuery>
 #include <QSqlDriver>
@@ -60,6 +61,25 @@ OptionDatabase::OptionDatabase() {
    QString dbFilename(Preferences::QChemDatabaseFilePath());
 
    QLOG_INFO() << "QChem option database file set to: " << dbFilename;
+
+   QFileInfo info(dbFilename);
+   if (!info.exists()) {
+      Preferences::QChemDatabaseFilePath(""); // hack to reset
+      dbFilename = Preferences::QChemDatabaseFilePath();
+      QLOG_INFO() << "Resetting QChem option database location" << dbFilename;
+   }
+
+   info.setFile(dbFilename);
+
+   if (!info.exists()) {
+      QString msg("Could not open option database file: ");
+      msg += dbFilename;
+      msg += "\n\nFile not found\n";
+      QMsgBox::critical(0, "IQmol", msg);
+      return;
+   }
+
+
    db.setDatabaseName(dbFilename);
    
    if (db.open()) {
