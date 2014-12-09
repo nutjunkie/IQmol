@@ -55,7 +55,8 @@ namespace Process2 {
          //void setMessage(QString const& message) { m_message = message; }
 
          Status status() const { return m_status; }
-         bool isActive() const;
+         bool isActive() const { return isActive(m_status); }
+         static bool isActive(Status const);
 
          /// This is an external handle for the process, either a
          /// PID or PBS/SGE job number.

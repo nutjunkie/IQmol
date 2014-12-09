@@ -226,11 +226,11 @@ void Job::setStatus(Status const status, QString const& message)
 }
 
 
-bool Job::isActive() const
+bool Job::isActive(Status const status)
 {
    bool active(true);
 
-   switch (m_status) {
+   switch (status) {
       case NotRunning:
       case Queued:
       case Running:

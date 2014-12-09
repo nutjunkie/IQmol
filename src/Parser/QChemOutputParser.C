@@ -94,7 +94,11 @@ QStringList QChemOutput::parseForErrors(TextStream& textStream)
 
    if (nNiceEndings < nJobs) {
       nJobs -= nNiceEndings;
-      errors.append(QString::number(nJobs) + " Job(s) failed");
+      if (nJobs == 1) {
+        errors.append("1 Job failed");
+      }else {
+        errors.append(QString::number(nJobs) + " Jobs failed");
+      }
    }
 
    int t(time);

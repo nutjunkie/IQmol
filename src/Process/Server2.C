@@ -448,7 +448,6 @@ void Server::queryFinished()
 
    }else {
       QLOG_ERROR() << "Server Error: invalid query reply";
-      if (reply) reply->deleteLater();
    }
 }
 
@@ -572,8 +571,8 @@ bool Server::parseQueryMessage(Job* job, QString const& message)
    }
 
    QLOG_TRACE() << "parseQueryMessage setting status to " << Job::toString(status) << ok;
+   if (!Job::isActive(status)) unwatchJob(job);
    job->setStatus(status, statusMessage); 
-   if (!job->isActive())  unwatchJob(job);
 
    return ok;
 }
@@ -587,6 +586,10 @@ void Server::kill(Job* job)
 
    if (!job) throw Exception("Query called on invalid job");
    if (!keys.isEmpty()) throw Exception("Job busy");
+
+   if (isLocal()) {
+      //we currently 
+   }
 
    open();
 
