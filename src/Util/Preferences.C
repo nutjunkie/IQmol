@@ -235,7 +235,7 @@ QString QChemDatabaseFilePath()
 #ifdef Q_OS_MAC
       dir.cd("Resources");
 #else
-      dir.cd("bin");
+      dir.cd("share");
 #endif
       databaseFilePath = dir.absolutePath() + "/qchem_option.db";
    }else {

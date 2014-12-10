@@ -74,6 +74,19 @@ int main(int argc, char *argv[]) {
     QLOG_INFO() << "---------- Session Started ----------";
     QLOG_INFO() << "IQmol Version: " << IQMOL_VERSION;
 
+#ifdef Q_OS_LINUX
+    QString env(qgetenv("QT_PLUGIN_PATH"));
+    if (env.isEmpty()) {
+       QDir dir(QApplication::applicationDirPath());
+       dir.cdUp();  
+       QString path(dir.absolutePath());
+       env = path + "/lib/plugins";
+       qputenv("QT_PLUGIN_PATH", env.toLatin1());
+       QLOG_INFO() << "Setting QT_PLUGIN_PATH = " << env;
+    }else {
+       QLOG_INFO() << "QT_PLUGIN path already set: " << env;
+    }
+#endif
 
     QStringList args(QCoreApplication::arguments());
     args.removeFirst();
