@@ -266,7 +266,7 @@ qDebug() << "copyRunFile() called";
 
    }else {
       QLOG_ERROR() << "Server Error: invalid reply";
-      if (reply) reply->deleteLater();
+      //if (reply) reply->deleteLater();
    }
 }
 
@@ -304,7 +304,7 @@ qDebug() << "queueJob() called";
 
    }else {
       QLOG_ERROR() << "Server Error: invalid reply";
-      if (reply) reply->deleteLater();
+      //if (reply) reply->deleteLater();
    }
 }
 
@@ -336,7 +336,7 @@ qDebug() << "submitFinished() called";
 
    }else {
       QLOG_ERROR() << "Server Error: invalid reply";
-      if (reply) reply->deleteLater();
+      //if (reply) reply->deleteLater();
    }
 }
 
@@ -624,7 +624,7 @@ void Server::killFinished()
 
    }else {
       QLOG_ERROR() << "Server Error: invalid kill reply";
-      if (reply) reply->deleteLater();
+      //if (reply) reply->deleteLater();
    }
 }
 
@@ -738,7 +738,7 @@ void Server::copyResultsFinished()
 
    }else {
       QLOG_ERROR() << "Server Error: invalid query reply";
-      if (reply) reply->deleteLater();
+      //if (reply) reply->deleteLater();
    }
 }
 

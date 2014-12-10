@@ -22,6 +22,7 @@
 
 #include "LocalReply.h"
 #include "LocalConnection.h"
+#include "QsLog.h"
 #include <QFileInfo>
 #include <QProcess>
 #include <QDir>
@@ -82,7 +83,7 @@ void LocalExecute::run()
       return;
    }
 
-   qDebug() << "Executing command" << command << "with args:" << arguments;
+   QLOG_DEBUG() << "Executing command" << command << "with args:" << arguments;
 
    if (!cmd.isExecutable()) {
       QFile file(command);
@@ -140,7 +141,6 @@ void LocalExecute::runFinished(int /* exitCode */, QProcess::ExitStatus status)
          m_status  = Error;
          break;
    }
-qDebug() << "runFinished called" << m_message;
 
    finished();
 }

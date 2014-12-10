@@ -81,7 +81,7 @@ QStringList QChemOutput::parseForErrors(TextStream& textStream)
          line = textStream.readLine().trimmed();
          if (line.isEmpty()) line = "Fatal error occured at end of output file";
          errors.append(line);
-      }else if (line.contains("User input")) {
+      }else if (line.contains("Welcome to Q-Chem")) {
          ++nJobs;
       }else if (line.contains("Have a nice day")) {
          ++nNiceEndings;
@@ -95,7 +95,7 @@ QStringList QChemOutput::parseForErrors(TextStream& textStream)
    if (nNiceEndings < nJobs) {
       nJobs -= nNiceEndings;
       if (nJobs == 1) {
-        errors.append("1 Job failed");
+        errors.append("Job failed");
       }else {
         errors.append(QString::number(nJobs) + " Jobs failed");
       }
