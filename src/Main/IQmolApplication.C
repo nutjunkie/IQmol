@@ -54,6 +54,7 @@ void IQmolApplication::showSplash()
     QPixmap pixmap(":resources/splash.png");
     m_splashScreen = new QSplashScreen(pixmap);
     m_splashScreen->show();
+    processEvents();
 }
 
 
