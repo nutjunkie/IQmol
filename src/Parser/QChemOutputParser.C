@@ -74,22 +74,39 @@ QStringList QChemOutput::parseForErrors(TextStream& textStream)
 
    QRegExp rx("Total job time:(.+)s\\(wall\\)");
 
+   QString error;
+
    while (!textStream.atEnd()) {
       line = textStream.readLine();
+
       if (line.contains("Q-Chem fatal error")) {
          textStream.skipLine();  // blank line
-         line = textStream.readLine().trimmed();
-         if (line.isEmpty()) line = "Fatal error occured at end of output file";
-         errors.append(line);
+         error = textStream.readLine().trimmed();
+         if (error.isEmpty()) error = "Fatal error occured at end of output file";
+
+      }else if (line.contains("Time limit has been exceeded")) {
+         error = "Time limit has been exceeded";
+
       }else if (line.contains("Welcome to Q-Chem")) {
+         if (!error.isEmpty()) {
+            errors.append(error);
+         }
+         error.clear();
          ++nJobs;
+
       }else if (line.contains("Have a nice day")) {
          ++nNiceEndings;
+
       }else if (rx.indexIn(line) != -1) {
          bool ok(false);
          double t(rx.cap(1).toDouble(&ok));
          if (ok) time += t;
       }
+   }
+
+   if (!error.isEmpty()) {
+      qDebug() << "Appending error:" << error;
+      errors.append(error);
    }
 
    if (nNiceEndings < nJobs) {
@@ -136,6 +153,10 @@ bool QChemOutput::parse(TextStream& textStream)
          QString msg("Q-Chem fatal error line: ");
          msg += QString::number(textStream.lineNumber());
          m_errors.append(msg + "\n" + textStream.nextLine());
+
+      }else if (line.contains("Time limit has been exceeded")) {
+         if (!m_errors.isEmpty()) m_errors.removeLast();
+         m_errors.append("Time limit has been exceeded");
 
       }else if (line.contains("User input:") && !line.contains(" of ")) {
          textStream.skipLine();
