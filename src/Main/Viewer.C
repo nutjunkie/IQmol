@@ -554,9 +554,8 @@ void Viewer::displayGeometricParameter(GLObjectList const& selection)
          break;
    }
 
-
+   displayMessage(""); 
    drawText(10, height()-10, msg);
-   //displayMessage(msg); 
 }
 
 
@@ -873,6 +872,10 @@ void Viewer::keyPressEvent(QKeyEvent *e)
       case s_buildKey:
          m_currentHandler = m_currentBuildHandler;
          setCursor(m_currentHandler->cursorType());
+         e->accept();
+         break;
+      case Qt::Key_A:
+         m_viewerModel.toggleAxes(); 
          e->accept();
          break;
    }
