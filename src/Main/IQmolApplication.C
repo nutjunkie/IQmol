@@ -31,6 +31,7 @@
 #include <QLibrary>
 #include <QMessageBox>
 #include <QFileOpenEvent>
+#include <QSplashScreen>
 
 #include <QThread>
 #include <QThreadPool>
@@ -40,12 +41,31 @@
 namespace IQmol {
 
 IQmolApplication::IQmolApplication(int &argc, char **argv )
-  : QApplication(argc, argv)
+  : QApplication(argc, argv), m_splashScreen(0)
 {
    setOrganizationDomain("iqmol.org");
    setApplicationName("IQmol");
    // Can't log anything yet as the logger hasn't been initialized
 }
+
+
+void IQmolApplication::showSplash()
+{  
+    QPixmap pixmap(":resources/splash.png");
+    m_splashScreen = new QSplashScreen(pixmap);
+    m_splashScreen->show();
+}
+
+
+void IQmolApplication::hideSplash()
+{  
+    if (m_splashScreen) {
+       m_splashScreen->close();
+       delete m_splashScreen;
+       m_splashScreen = 0;
+    }
+}
+
 
 
 void IQmolApplication::queueOpenFiles(QStringList const& files)
@@ -131,6 +151,7 @@ void IQmolApplication::open(QString const& file)
 
    QFileInfo info(file);
    if (info.exists()) mw->open(file);
+   hideSplash();
    mw->show();
    mw->raise();
    mw->initViewer();

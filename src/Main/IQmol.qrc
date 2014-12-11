@@ -50,6 +50,7 @@
     <file>resources/cursors/translate_selection.png</file>
     <file>resources/cursors/zoom.png</file>
     <file>resources/unhappy.png</file>
+    <file>resources/splash.png</file>
   </qresource>
 
   <qresource prefix="/" >

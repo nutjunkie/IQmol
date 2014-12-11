@@ -37,7 +37,6 @@
 #include <QDir>
 #include "QsLog.h"
 #include "QsLogDest.h"
-#include "Lebedev.h"
 
 #ifdef Q_OS_WIN32
 #include <windows.h>
@@ -46,6 +45,8 @@
 int main(int argc, char *argv[]) {
     IQmol::IQmolApplication iqmol(argc, argv);
     Q_INIT_RESOURCE(IQmol);
+
+    iqmol.showSplash();
 
     // Setup logging;
     QsLogging::Logger& logger = QsLogging::Logger::instance();

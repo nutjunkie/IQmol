@@ -481,9 +481,9 @@ void ShaderLibrary::setFilterVariables(QVariantMap const& map)
    }
 
    // Ambient Occlusion parameters
-   if (ao) {
-      setUniformVariables("Filters", map);
-   }
+   //if (ao) {
+   //   setUniformVariables("Filters", map);
+   //}
 }
    
 
@@ -634,8 +634,8 @@ void ShaderLibrary::resizeScreenBuffers(QSize const& windowSize, double* project
    projectionBiasInverse = projectionInverse * BiasMatrixInverse();
 
    QSizeF size(width/s_rotationTextureSize, height/s_rotationTextureSize);
-   setUniformVariable("Filters", "Scale_xy", size);
-   setUniformVariable("Filters", "ProjectionInverse", projectionBiasInverse);
+   //setUniformVariable("Filters", "Scale_xy", size);
+   //setUniformVariable("Filters", "ProjectionInverse", projectionBiasInverse);
 }
 
 
@@ -659,7 +659,7 @@ void ShaderLibrary::initializeTextures()
    array.size = nSamples;
    array.ptr  = angles;
 
-   setUniformVariable("Filters", "SamplingVectors", array);
+   //setUniformVariable("Filters", "SamplingVectors", array);
    delete angles;
 
 
@@ -691,7 +691,7 @@ void ShaderLibrary::initializeTextures()
    texture.size = QSize(n, n);
    texture.slot = RotationTexture;
    texture.data = s_rotationTextureData;
-   setTextureVariable("Filters", "RotationTexture", texture);
+   //setTextureVariable("Filters", "RotationTexture", texture);
 }
 
 
@@ -722,12 +722,12 @@ void ShaderLibrary::generateFilters()
    texture.slot = NormalBuffer;
    texture.data = 0;
  
-   setTextureVariable("Filters", "NormalMap", texture);
+   //setTextureVariable("Filters", "NormalMap", texture);
 
    s_filterBuffer->bind();
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-   bindShader("Filters");
+   //bindShader("Filters");
 
 
 
@@ -736,24 +736,13 @@ void ShaderLibrary::generateFilters()
    texture.size = size;
    texture.slot = (Texture_t)0;
    texture.data = 0;
-   setTextureVariable("Filters", "NormalMap", texture);
+   //setTextureVariable("Filters", "NormalMap", texture);
 
    texture.id   = s_rotationTextureId;
    texture.size = QSize(s_rotationTextureSize, s_rotationTextureSize);
    texture.slot = (Texture_t)1;
    texture.data = s_rotationTextureData;
    setTextureVariable("Filters", "RotationTexture", texture);
-
-
-
-
-
-
-
-
-
-
-
 
 
 

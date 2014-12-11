@@ -235,7 +235,7 @@ void HttpGet::run()
 void HttpGet::readToFile()
 {
    qint64 size(m_networkReply->bytesAvailable());
-   qDebug() << "Reading " << size << " bytes";
+   //qDebug() << "Reading " << size << " bytes";
    copyProgress();
    m_file->write(m_networkReply->read(size));
 }

@@ -27,6 +27,7 @@
 
 
 class QStringList;
+class QSplashScreen;
 
 namespace IQmol {
 
@@ -38,6 +39,8 @@ namespace IQmol {
       public:
          IQmolApplication(int &argc, char** argv);
          void queueOpenFiles(QStringList const& files);
+         void showSplash();
+         void hideSplash();
 
       protected:
          bool event(QEvent*);
@@ -48,6 +51,7 @@ namespace IQmol {
 
       private:
          void initOpenBabel();
+         QSplashScreen* m_splashScreen;
    };
 
 
