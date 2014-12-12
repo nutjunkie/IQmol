@@ -23,7 +23,7 @@
    <string>Edit Server</string>
   </property>
   <property name="styleSheet">
-   <string>QToolButton {
+   <string notr="true">QToolButton {
    color: #333;
    background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, 
           stop: 0 #fff,
@@ -66,12 +66,14 @@ QToolButton:checked {
           stop: 1 #fff);
 }
 
-QToolTip {
-   border: 2px solid darkkhaki;
-   padding: 2px;
-   border-radius: 3px;
-   opacity: 500;
-   font-size: 10px;
+ QToolTip {
+    border: 2px solid darkkhaki;
+    padding: 2px;
+    border-radius: 3px;
+    opacity: 500;
+    font-size: 12px;
+    color: #000;
+    background-color: #EEE;
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">

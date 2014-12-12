@@ -63,7 +63,7 @@ QToolTip {
    padding: 2px;
    border-radius: 3px;
    opacity: 500;
-   font-size: 10px;
+   font-size: 12px;
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">

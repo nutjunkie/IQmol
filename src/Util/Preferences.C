@@ -104,7 +104,7 @@ void ResetBrowserPreferences()
 QSize MainWindowSize() 
 {
    QVariant value(Get("MainWindowSize"));
-   return value.isNull() ? QSize(800,600) : value.value<QSize>();
+   return value.isNull() ? QSize(950,650) : value.value<QSize>();
 }
 
 void MainWindowSize(QSize const& size) 
@@ -705,7 +705,7 @@ void CurrentProcessList(QVariantList const& processList)
 // Size of the InputDialog window
 QSize QuiWindowSize() {
    QVariant value(Get("QuiWindowSize"));
-   return value.isNull() ? QSize(480,520) : value.value<QSize>();
+   return value.isNull() ? QSize(950,550) : value.value<QSize>();
 }
 
 void QuiWindowSize(QSize const& size) {
@@ -727,7 +727,7 @@ void FileDisplayWindowSize(QSize const& size) {
 // Font for the InputDialog previewText display
 QFont PreviewFont() {
    QVariant value(Get("PreviewTextFont"));
-   return value.isNull() ? QFont("Courier New") : value.value<QFont>();
+   return value.isNull() ? QFont("Courier New", 10) : value.value<QFont>();
 }
 
 void PreviewFont(QFont const& font) {
@@ -738,7 +738,7 @@ void PreviewFont(QFont const& font) {
 // Font for displaying the output files.
 QFont FileDisplayFont() {
    QVariant value(Get("FileDisplayFont"));
-   return value.isNull() ? QFont("Courier New") : value.value<QFont>();
+   return value.isNull() ? QFont("Courier New", 10) : value.value<QFont>();
 }
 
 void FileDisplayFont(QFont const& font) {
