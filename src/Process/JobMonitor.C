@@ -953,19 +953,25 @@ void JobMonitor::cleanUp(Job* job)
 
    oldName = "input.FChk";
    newName = qchemJobInfo.get(QChemJobInfo::AuxFileName);
-   if (dir.exists(oldName)) {
+   if (dir.exists(oldName) && oldName != newName) {
+      if (dir.exists(newName)) dir.remove(newName);
+      dir.rename(oldName, newName);
+   }
+
+   oldName = "input.fchk";
+   if (dir.exists(oldName) && oldName != newName) {
       if (dir.exists(newName)) dir.remove(newName);
       dir.rename(oldName, newName);
    }
 
    oldName = qchemJobInfo.get(QChemJobInfo::InputFileName) + ".fchk";
-   if (dir.exists(oldName)) {
+   if (dir.exists(oldName) && oldName != newName) {
       if (dir.exists(newName)) dir.remove(newName);
       dir.rename(oldName, newName);
    }
 
    oldName = "Test.FChk";
-   if (dir.exists(oldName)) {
+   if (dir.exists(oldName) && oldName != newName) {
       if (dir.exists(newName)) dir.remove(newName);
       dir.rename(oldName, newName);
    }
