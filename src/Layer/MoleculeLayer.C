@@ -55,6 +55,8 @@
 #include "Bank.h"
 #include "File.h"
 #include "DipoleMoment.h"
+#include "PointGroup.h"
+#include "Energy.h"
 #include "Constants.h"
 #include "LayerFactory.h"
 #include "SurfaceInfo.h"
@@ -1377,6 +1379,29 @@ void Molecule::setGeometry(IQmol::Data::Geometry& geometry)
    centerOfNuclearChargeAvailable(centerOfNuclearCharge());
 
    initProperties();
+
+   if (geometry.hasProperty<Data::TotalEnergy>()) {
+      Data::TotalEnergy const& energy(geometry.getProperty<Data::TotalEnergy>());
+      // This needs cleaning up
+      Data::Energy::Units units(energy.units());
+      switch (units) {
+         case Data::Energy::Hartree: 
+            energyAvailable(energy.value(), Info::Hartree); 
+            break;
+         case Data::Energy::KJMol: 
+            energyAvailable(energy.value(), Info::KJMol); 
+            break;
+         case Data::Energy::KCalMol: 
+            energyAvailable(energy.value(), Info::KCalMol); 
+            break;
+         default:
+            break;
+      }
+   }
+
+   if (geometry.hasProperty<Data::PointGroup>()) {
+      pointGroupAvailable(geometry.getProperty<Data::PointGroup>().value());
+   }
 
    if (geometry.hasProperty<Data::DipoleMoment>()) {
       Data::DipoleMoment const& dipole(geometry.getProperty<Data::DipoleMoment>());

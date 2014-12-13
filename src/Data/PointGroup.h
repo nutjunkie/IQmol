@@ -39,6 +39,7 @@ namespace Data {
          PointGroup(QString const& pointGroup = "C1") : m_pointGroup(pointGroup) { }
 
          void setValue(QString const& pointGroup) { m_pointGroup = pointGroup; }
+         QString value() const { return m_pointGroup; }
 
          void serialize(InputArchive& ar, unsigned int const version = 0) {
             Q_UNUSED(version);

@@ -23,6 +23,7 @@
 #include "GeometryListLayer.h"
 #include "GeometryLayer.h"
 #include "Geometry.h"
+#include "Energy.h"
 #include "GeometryList.h"
 #include "InfoLayer.h"
 #include "AtomLayer.h"
@@ -45,7 +46,10 @@ GeometryList::GeometryList(Data::GeometryList const& geometryList)
 
    Data::GeometryList::const_iterator iter;
    for (iter = m_geometryList.begin(); iter != m_geometryList.end(); ++iter) {
-       appendRow(new Layer::Geometry(*const_cast<Data::Geometry*>(*iter)));
+       Data::Geometry* geometry(const_cast<Data::Geometry*>(*iter));
+   Data::Energy& energy(geometry->getProperty<Data::TotalEnergy>());
+       qDebug() << "Geometry has energy = " << energy.value();
+       appendRow(new Layer::Geometry(*geometry));
    }
 
    m_configurator.load();

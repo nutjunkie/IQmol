@@ -142,11 +142,13 @@ bool QChemOutput::parse(TextStream& textStream)
       line = textStream.nextLine();
 
       if (line.contains("Welcome to Q-Chem")) {
+/*
          if (geometryList && !geometryList->isEmpty()) {
             m_dataBank.append(geometryList);
             geometryList = 0;
             currentGeometry = 0;
          }
+*/
 
       }else if (line.contains("Q-Chem fatal error occurred in module")) {
          textStream.skipLine();
@@ -180,11 +182,13 @@ bool QChemOutput::parse(TextStream& textStream)
             if (!firstGeometry) firstGeometry = geometry;
 
             if (!geometryList) {
+qDebug() << "Creating new geometry list";
                geometryList = new Data::GeometryList;
                currentGeometry = 0;
             }
 
             if (geometry->sameAtoms(*firstGeometry)) {
+qDebug() << "Appending geometry to list";
                geometryList->append(geometry);
                currentGeometry = geometry;
             }else if (geometryList->isEmpty()) {
@@ -202,7 +206,7 @@ bool QChemOutput::parse(TextStream& textStream)
 
       }else if (line.contains("Molecular Point Group")) {
          tokens = TextStream::tokenize(line);
-         if (tokens.size() >= 3 && currentGeometry) {
+         if (tokens.size() > 3 && currentGeometry) {
             Data::PointGroup& pg = currentGeometry->getProperty<Data::PointGroup>();
             pg.setValue(tokens[3]);
          }
@@ -217,6 +221,7 @@ bool QChemOutput::parse(TextStream& textStream)
                scf.setValue(energy, Data::Energy::Hartree);
                Data::TotalEnergy& total = currentGeometry->getProperty<Data::TotalEnergy>();
                total.setValue(energy, Data::Energy::Hartree);
+qDebug() << "Setting total energy to" << total.value();
             }
          }
 
