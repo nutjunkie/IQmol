@@ -134,6 +134,7 @@ bool QChemOutput::parse(TextStream& textStream)
    Data::Geometry* firstGeometry(0);
    Data::Geometry* currentGeometry(0);
    Data::GeometryList* geometryList(0);
+   Data::GeometryList* scanGeometries(0);
 
    QStringList tokens;
    QString line;
@@ -201,6 +202,21 @@ bool QChemOutput::parse(TextStream& textStream)
             m_errors.append(msg + QString::number(textStream.lineNumber()));
             break;
          }
+
+      }else if (line.contains("PES scan, value:")) {
+         tokens = TextStream::tokenize(line);
+         if (tokens.size() > 5 && currentGeometry) {
+            bool ok(false);
+            double energy(tokens[5].toDouble(&ok));
+            if (ok) {
+               if (!scanGeometries) scanGeometries = new Data::GeometryList("Scan Geometries");
+               Data::Geometry* geom(new Data::Geometry(*currentGeometry));
+               Data::TotalEnergy& total = geom->getProperty<Data::TotalEnergy>();
+               total.setValue(energy, Data::Energy::Hartree);
+               scanGeometries->append(geom);
+            }
+         }
+     
 
       }else if (line.contains("Molecular Point Group")) {
          tokens = TextStream::tokenize(line);
@@ -288,6 +304,14 @@ qDebug() << "Setting total energy to" << total.value();
       }else {
          geometryList->setDefaultIndex(-1);
          m_dataBank.append(geometryList);
+      }
+   }
+
+   if (scanGeometries) {
+      if (scanGeometries->isEmpty()) {
+         delete scanGeometries;
+      }else {
+         m_dataBank.append(scanGeometries);
       }
    }
 

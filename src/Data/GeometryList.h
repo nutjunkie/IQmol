@@ -31,13 +31,16 @@ namespace Data {
    class GeometryList : public Data::List<Data::Geometry> {
       public:
 
-         GeometryList() : m_defaultIndex(0) { }
+         GeometryList(QString const& label = "Geometries") : m_defaultIndex(0), m_label(label) { }
 
 		 /// Sets which geometry should be considered the default geometry in a
 		 /// list.  An index of -1 corresponds to the final geometry.
          void setDefaultIndex(int index);
 
          unsigned defaultIndex() const { return m_defaultIndex; }
+
+         void setLabel(QString const& label) { m_label = label; } 
+         QString label() const { return m_label;}
 
          virtual void serialize(InputArchive& ar, unsigned int const version = 0) 
          {
@@ -55,6 +58,7 @@ namespace Data {
 
       private:
          unsigned m_defaultIndex; 
+         QString m_label;
    };
 
 } } // end namespace IQmol::Data

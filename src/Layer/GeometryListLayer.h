@@ -38,7 +38,7 @@ namespace Layer {
       friend class Configurator::GeometryList;
 
       public:
-         GeometryList(Data::GeometryList const&);
+         GeometryList(Data::GeometryList const&, QString const& label = "Geometries");
          ~GeometryList();
          void setMolecule(Molecule*);
 

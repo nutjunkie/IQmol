@@ -38,8 +38,8 @@ using namespace qglviewer;
 namespace IQmol {
 namespace Layer {
 
-GeometryList::GeometryList(Data::GeometryList const& geometryList)
- : Base("Geometries"), m_configurator(*this), m_geometryList(geometryList),
+GeometryList::GeometryList(Data::GeometryList const& geometryList, QString const& label)
+ : Base(geometryList.label()), m_configurator(*this), m_geometryList(geometryList),
    m_speed(0.125), m_reperceiveBonds(false), m_bounce(false), m_loop(false)
 {
    m_defaultIndex = m_geometryList.defaultIndex();
@@ -83,7 +83,7 @@ void GeometryList::setMolecule(Molecule* molecule)
 
 void GeometryList::setCurrentGeometry(unsigned const index)
 {
-qDebug() << "Layer::GeometryList::setCurrentGeometry with index" << index;
+//qDebug() << "Layer::GeometryList::setCurrentGeometry with index" << index;
    if (!m_molecule || index >= (unsigned)m_geometryList.size()) return;
 
    Base* ptr(QVariantPointer<Base>::toPointer(child(index)->data()));
