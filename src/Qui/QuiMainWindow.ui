@@ -13,6 +13,17 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"> QToolTip {
+    border: 2px solid darkkhaki;
+    padding: 2px;
+    border-radius: 3px;
+    opacity: 500;
+    font-size: 12px;
+    color: #000;
+    background-color: #EEE;
+}</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout_24">
     <item>
@@ -304,7 +315,6 @@ QToolButton:pressed {
    border-color: #222;
 }
 
-
 QToolButton:checked {
    border-color: #b00;
 }</string>
@@ -450,7 +460,7 @@ QToolButton:checked {
                <number>3</number>
               </property>
               <property name="tabSpacing">
-               <number>-1</number>
+               <number>6</number>
               </property>
               <widget class="QWidget" name="pageAuxiliaryBasis">
                <property name="geometry">

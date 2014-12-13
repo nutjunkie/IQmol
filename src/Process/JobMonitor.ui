@@ -13,6 +13,17 @@
   <property name="windowTitle">
    <string>Job Monitor</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"> QToolTip {
+    border: 2px solid darkkhaki;
+    padding: 2px;
+    border-radius: 3px;
+    opacity: 500;
+    font-size: 12px;
+    color: #000;
+    background-color: #EEE;
+}</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
@@ -113,7 +124,7 @@
      <x>0</x>
      <y>0</y>
      <width>566</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>

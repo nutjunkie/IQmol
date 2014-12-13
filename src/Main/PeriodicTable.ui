@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>PeriodicTable</class>
- <widget class="QFrame" name="PeriodicTable" >
-  <property name="geometry" >
+ <widget class="QFrame" name="PeriodicTable">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,23 +10,23 @@
     <height>263</height>
    </rect>
   </property>
-  <property name="sizePolicy" >
-   <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="minimumSize" >
+  <property name="minimumSize">
    <size>
     <width>310</width>
     <height>200</height>
    </size>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Periodic Table</string>
   </property>
-  <property name="styleSheet" >
-   <string notr="true" >QPushButton {
+  <property name="styleSheet">
+   <string notr="true">QPushButton {
    border-width: 2px;
    border-color: #777;
    border-style: solid;
@@ -61,43 +62,45 @@ QToolButton {
 }
 
 QToolTip {
-   border: 2px solid darkkhaki;
-   padding: 2px;
-   border-radius: 3px;
-   opacity: 200;
-   font-size: 10px;
+    border: 2px solid darkkhaki;
+    padding: 2px;
+    border-radius: 3px;
+    opacity: 500;
+    font-size: 1@px;
+    color: #000;
+    background-color: #EEE;
 }</string>
   </property>
-  <property name="frameShape" >
+  <property name="frameShape">
    <enum>QFrame::StyledPanel</enum>
   </property>
-  <property name="frameShadow" >
+  <property name="frameShadow">
    <enum>QFrame::Raised</enum>
   </property>
-  <layout class="QGridLayout" name="gridLayout" >
-   <property name="spacing" >
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="spacing">
     <number>2</number>
    </property>
-   <item row="0" column="0" >
-    <widget class="QPushButton" name="element_1" >
-     <property name="minimumSize" >
+   <item row="0" column="0">
+    <widget class="QPushButton" name="element_1">
+     <property name="minimumSize">
       <size>
        <width>0</width>
        <height>0</height>
       </size>
      </property>
-     <property name="font" >
+     <property name="font">
       <font>
        <pointsize>8</pointsize>
       </font>
      </property>
-     <property name="styleSheet" >
-      <string notr="true" />
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>H</string>
      </property>
-     <property name="iconSize" >
+     <property name="iconSize">
       <size>
        <width>24</width>
        <height>24</height>
@@ -105,738 +108,738 @@ QToolTip {
      </property>
     </widget>
    </item>
-   <item row="0" column="17" >
-    <widget class="QPushButton" name="element_2" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="0" column="17">
+    <widget class="QPushButton" name="element_2">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>He</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" >
-    <widget class="QPushButton" name="element_3" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="1" column="0">
+    <widget class="QPushButton" name="element_3">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Li</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="1" >
-    <widget class="QPushButton" name="element_4" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="1" column="1">
+    <widget class="QPushButton" name="element_4">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Be</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="12" >
-    <widget class="QPushButton" name="element_5" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="1" column="12">
+    <widget class="QPushButton" name="element_5">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>B</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="13" >
-    <widget class="QPushButton" name="element_6" >
-     <property name="toolTip" >
+   <item row="1" column="13">
+    <widget class="QPushButton" name="element_6">
+     <property name="toolTip">
       <string>Carbon</string>
      </property>
-     <property name="styleSheet" >
-      <string notr="true" />
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>C</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="14" >
-    <widget class="QPushButton" name="element_7" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="1" column="14">
+    <widget class="QPushButton" name="element_7">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>N</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="15" >
-    <widget class="QPushButton" name="element_8" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="1" column="15">
+    <widget class="QPushButton" name="element_8">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>O</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="16" >
-    <widget class="QPushButton" name="element_9" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="1" column="16">
+    <widget class="QPushButton" name="element_9">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>F</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="17" >
-    <widget class="QPushButton" name="element_10" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="1" column="17">
+    <widget class="QPushButton" name="element_10">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Ne</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="0" >
-    <widget class="QPushButton" name="element_11" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="2" column="0">
+    <widget class="QPushButton" name="element_11">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Na</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="1" >
-    <widget class="QPushButton" name="element_12" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="2" column="1">
+    <widget class="QPushButton" name="element_12">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Mg</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="12" >
-    <widget class="QPushButton" name="element_13" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="2" column="12">
+    <widget class="QPushButton" name="element_13">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Al</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="13" >
-    <widget class="QPushButton" name="element_14" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="2" column="13">
+    <widget class="QPushButton" name="element_14">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Si</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="14" >
-    <widget class="QPushButton" name="element_15" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="2" column="14">
+    <widget class="QPushButton" name="element_15">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>P</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="15" >
-    <widget class="QPushButton" name="element_16" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="2" column="15">
+    <widget class="QPushButton" name="element_16">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>S</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="16" >
-    <widget class="QPushButton" name="element_17" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="2" column="16">
+    <widget class="QPushButton" name="element_17">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Cl</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="17" >
-    <widget class="QPushButton" name="element_18" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="2" column="17">
+    <widget class="QPushButton" name="element_18">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Ar</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="0" >
-    <widget class="QPushButton" name="element_19" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="3" column="0">
+    <widget class="QPushButton" name="element_19">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>K</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="1" >
-    <widget class="QPushButton" name="element_20" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="3" column="1">
+    <widget class="QPushButton" name="element_20">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Ca</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="2" >
-    <widget class="QPushButton" name="element_21" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="3" column="2">
+    <widget class="QPushButton" name="element_21">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Sc</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="3" >
-    <widget class="QPushButton" name="element_22" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="3" column="3">
+    <widget class="QPushButton" name="element_22">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Ti</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="4" >
-    <widget class="QPushButton" name="element_23" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="3" column="4">
+    <widget class="QPushButton" name="element_23">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>V</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="5" >
-    <widget class="QPushButton" name="element_24" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="3" column="5">
+    <widget class="QPushButton" name="element_24">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Cr</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="6" >
-    <widget class="QPushButton" name="element_25" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="3" column="6">
+    <widget class="QPushButton" name="element_25">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Mn</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="7" >
-    <widget class="QPushButton" name="element_26" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="3" column="7">
+    <widget class="QPushButton" name="element_26">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Fe</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="8" >
-    <widget class="QPushButton" name="element_27" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="3" column="8">
+    <widget class="QPushButton" name="element_27">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Co</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="9" >
-    <widget class="QPushButton" name="element_28" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="3" column="9">
+    <widget class="QPushButton" name="element_28">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Ni</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="10" >
-    <widget class="QPushButton" name="element_29" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="3" column="10">
+    <widget class="QPushButton" name="element_29">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Cu</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="11" >
-    <widget class="QPushButton" name="element_30" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="3" column="11">
+    <widget class="QPushButton" name="element_30">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Zn</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="12" >
-    <widget class="QPushButton" name="element_31" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="3" column="12">
+    <widget class="QPushButton" name="element_31">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Ga</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="13" >
-    <widget class="QPushButton" name="element_32" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="3" column="13">
+    <widget class="QPushButton" name="element_32">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Ge</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="14" >
-    <widget class="QPushButton" name="element_33" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="3" column="14">
+    <widget class="QPushButton" name="element_33">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>As</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="15" >
-    <widget class="QPushButton" name="element_34" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="3" column="15">
+    <widget class="QPushButton" name="element_34">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Se</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="16" >
-    <widget class="QPushButton" name="element_35" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="3" column="16">
+    <widget class="QPushButton" name="element_35">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Br</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="17" >
-    <widget class="QPushButton" name="element_36" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="3" column="17">
+    <widget class="QPushButton" name="element_36">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Kr</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="0" >
-    <widget class="QPushButton" name="element_37" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="4" column="0">
+    <widget class="QPushButton" name="element_37">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Rb</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="1" >
-    <widget class="QPushButton" name="element_38" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="4" column="1">
+    <widget class="QPushButton" name="element_38">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Sr</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="2" >
-    <widget class="QPushButton" name="element_39" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="4" column="2">
+    <widget class="QPushButton" name="element_39">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Y</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="3" >
-    <widget class="QPushButton" name="element_40" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="4" column="3">
+    <widget class="QPushButton" name="element_40">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Zr</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="4" >
-    <widget class="QPushButton" name="element_41" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="4" column="4">
+    <widget class="QPushButton" name="element_41">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Nb</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="5" >
-    <widget class="QPushButton" name="element_42" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="4" column="5">
+    <widget class="QPushButton" name="element_42">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Mo</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="6" >
-    <widget class="QPushButton" name="element_43" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="4" column="6">
+    <widget class="QPushButton" name="element_43">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Tc</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="7" >
-    <widget class="QPushButton" name="element_44" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="4" column="7">
+    <widget class="QPushButton" name="element_44">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Ru</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="8" >
-    <widget class="QPushButton" name="element_45" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="4" column="8">
+    <widget class="QPushButton" name="element_45">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Rh</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="9" >
-    <widget class="QPushButton" name="element_46" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="4" column="9">
+    <widget class="QPushButton" name="element_46">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Pd</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="10" >
-    <widget class="QPushButton" name="element_47" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="4" column="10">
+    <widget class="QPushButton" name="element_47">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Ag</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="11" >
-    <widget class="QPushButton" name="element_48" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="4" column="11">
+    <widget class="QPushButton" name="element_48">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Cd</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="12" >
-    <widget class="QPushButton" name="element_49" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="4" column="12">
+    <widget class="QPushButton" name="element_49">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>In</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="13" >
-    <widget class="QPushButton" name="element_50" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="4" column="13">
+    <widget class="QPushButton" name="element_50">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Sn</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="14" >
-    <widget class="QPushButton" name="element_51" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="4" column="14">
+    <widget class="QPushButton" name="element_51">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Sb</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="15" >
-    <widget class="QPushButton" name="element_52" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="4" column="15">
+    <widget class="QPushButton" name="element_52">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Te</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="16" >
-    <widget class="QPushButton" name="element_53" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="4" column="16">
+    <widget class="QPushButton" name="element_53">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>I</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="17" >
-    <widget class="QPushButton" name="element_54" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="4" column="17">
+    <widget class="QPushButton" name="element_54">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Xe</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="0" >
-    <widget class="QPushButton" name="element_55" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="5" column="0">
+    <widget class="QPushButton" name="element_55">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Cs</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="1" >
-    <widget class="QPushButton" name="element_56" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="5" column="1">
+    <widget class="QPushButton" name="element_56">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Ba</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="3" >
-    <widget class="QPushButton" name="element_72" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="5" column="3">
+    <widget class="QPushButton" name="element_72">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Hf</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="4" >
-    <widget class="QPushButton" name="element_73" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="5" column="4">
+    <widget class="QPushButton" name="element_73">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Ta</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="5" >
-    <widget class="QPushButton" name="element_74" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="5" column="5">
+    <widget class="QPushButton" name="element_74">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>W</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="6" >
-    <widget class="QPushButton" name="element_75" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="5" column="6">
+    <widget class="QPushButton" name="element_75">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Re</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="7" >
-    <widget class="QPushButton" name="element_76" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="5" column="7">
+    <widget class="QPushButton" name="element_76">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Os</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="8" >
-    <widget class="QPushButton" name="element_77" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="5" column="8">
+    <widget class="QPushButton" name="element_77">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Ir</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="9" >
-    <widget class="QPushButton" name="element_78" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="5" column="9">
+    <widget class="QPushButton" name="element_78">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Pt</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="10" >
-    <widget class="QPushButton" name="element_79" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="5" column="10">
+    <widget class="QPushButton" name="element_79">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Au</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="11" >
-    <widget class="QPushButton" name="element_80" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="5" column="11">
+    <widget class="QPushButton" name="element_80">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Hg</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="12" >
-    <widget class="QPushButton" name="element_81" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="5" column="12">
+    <widget class="QPushButton" name="element_81">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Tl</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="13" >
-    <widget class="QPushButton" name="element_82" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="5" column="13">
+    <widget class="QPushButton" name="element_82">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Pb</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="14" >
-    <widget class="QPushButton" name="element_83" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="5" column="14">
+    <widget class="QPushButton" name="element_83">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Bi</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="15" >
-    <widget class="QPushButton" name="element_84" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="5" column="15">
+    <widget class="QPushButton" name="element_84">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Po</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="16" >
-    <widget class="QPushButton" name="element_85" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="5" column="16">
+    <widget class="QPushButton" name="element_85">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>At</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="17" >
-    <widget class="QPushButton" name="element_86" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="5" column="17">
+    <widget class="QPushButton" name="element_86">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Rn</string>
      </property>
     </widget>
    </item>
-   <item row="6" column="0" >
-    <widget class="QPushButton" name="element_87" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="6" column="0">
+    <widget class="QPushButton" name="element_87">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Fr</string>
      </property>
     </widget>
    </item>
-   <item row="6" column="1" >
-    <widget class="QPushButton" name="element_88" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="6" column="1">
+    <widget class="QPushButton" name="element_88">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Ra</string>
      </property>
     </widget>
    </item>
-   <item row="7" column="2" >
-    <spacer name="verticalSpacer" >
-     <property name="orientation" >
+   <item row="7" column="2">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeType" >
+     <property name="sizeType">
       <enum>QSizePolicy::Fixed</enum>
      </property>
-     <property name="sizeHint" stdset="0" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
        <height>5</height>
@@ -844,302 +847,302 @@ QToolTip {
      </property>
     </spacer>
    </item>
-   <item row="8" column="2" >
-    <widget class="QPushButton" name="element_57" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="8" column="2">
+    <widget class="QPushButton" name="element_57">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>La</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="3" >
-    <widget class="QPushButton" name="element_58" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="8" column="3">
+    <widget class="QPushButton" name="element_58">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Ce</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="4" >
-    <widget class="QPushButton" name="element_59" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="8" column="4">
+    <widget class="QPushButton" name="element_59">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Pr</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="5" >
-    <widget class="QPushButton" name="element_60" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="8" column="5">
+    <widget class="QPushButton" name="element_60">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Nd</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="6" >
-    <widget class="QPushButton" name="element_61" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="8" column="6">
+    <widget class="QPushButton" name="element_61">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Pm</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="7" >
-    <widget class="QPushButton" name="element_62" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="8" column="7">
+    <widget class="QPushButton" name="element_62">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Sm</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="8" >
-    <widget class="QPushButton" name="element_63" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="8" column="8">
+    <widget class="QPushButton" name="element_63">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Eu</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="9" >
-    <widget class="QPushButton" name="element_64" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="8" column="9">
+    <widget class="QPushButton" name="element_64">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Gd</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="10" >
-    <widget class="QPushButton" name="element_65" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="8" column="10">
+    <widget class="QPushButton" name="element_65">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Tb</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="11" >
-    <widget class="QPushButton" name="element_66" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="8" column="11">
+    <widget class="QPushButton" name="element_66">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Dy</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="12" >
-    <widget class="QPushButton" name="element_67" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="8" column="12">
+    <widget class="QPushButton" name="element_67">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Ho</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="13" >
-    <widget class="QPushButton" name="element_68" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="8" column="13">
+    <widget class="QPushButton" name="element_68">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Er</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="14" >
-    <widget class="QPushButton" name="element_69" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="8" column="14">
+    <widget class="QPushButton" name="element_69">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Tm</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="15" >
-    <widget class="QPushButton" name="element_70" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="8" column="15">
+    <widget class="QPushButton" name="element_70">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Yb</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="16" >
-    <widget class="QPushButton" name="element_71" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="8" column="16">
+    <widget class="QPushButton" name="element_71">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Lu</string>
      </property>
     </widget>
    </item>
-   <item row="9" column="2" >
-    <widget class="QPushButton" name="element_89" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="9" column="2">
+    <widget class="QPushButton" name="element_89">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Ac</string>
      </property>
     </widget>
    </item>
-   <item row="9" column="3" >
-    <widget class="QPushButton" name="element_90" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="9" column="3">
+    <widget class="QPushButton" name="element_90">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Th</string>
      </property>
     </widget>
    </item>
-   <item row="9" column="4" >
-    <widget class="QPushButton" name="element_91" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="9" column="4">
+    <widget class="QPushButton" name="element_91">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Pa</string>
      </property>
     </widget>
    </item>
-   <item row="9" column="5" >
-    <widget class="QPushButton" name="element_92" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="9" column="5">
+    <widget class="QPushButton" name="element_92">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>U</string>
      </property>
     </widget>
    </item>
-   <item row="9" column="6" >
-    <widget class="QPushButton" name="element_93" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="9" column="6">
+    <widget class="QPushButton" name="element_93">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Np</string>
      </property>
     </widget>
    </item>
-   <item row="9" column="7" >
-    <widget class="QPushButton" name="element_94" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="9" column="7">
+    <widget class="QPushButton" name="element_94">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Pu</string>
      </property>
     </widget>
    </item>
-   <item row="9" column="8" >
-    <widget class="QPushButton" name="element_95" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="9" column="8">
+    <widget class="QPushButton" name="element_95">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Am</string>
      </property>
     </widget>
    </item>
-   <item row="9" column="9" >
-    <widget class="QPushButton" name="element_96" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="9" column="9">
+    <widget class="QPushButton" name="element_96">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Cm</string>
      </property>
     </widget>
    </item>
-   <item row="9" column="10" >
-    <widget class="QPushButton" name="element_97" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="9" column="10">
+    <widget class="QPushButton" name="element_97">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Bk</string>
      </property>
     </widget>
    </item>
-   <item row="9" column="11" >
-    <widget class="QPushButton" name="element_98" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="9" column="11">
+    <widget class="QPushButton" name="element_98">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Cf</string>
      </property>
     </widget>
    </item>
-   <item row="9" column="12" >
-    <widget class="QPushButton" name="element_99" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="9" column="12">
+    <widget class="QPushButton" name="element_99">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Es</string>
      </property>
     </widget>
    </item>
-   <item row="9" column="13" >
-    <widget class="QPushButton" name="element_100" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="9" column="13">
+    <widget class="QPushButton" name="element_100">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Fm</string>
      </property>
     </widget>
    </item>
-   <item row="9" column="14" >
-    <widget class="QPushButton" name="element_101" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="9" column="14">
+    <widget class="QPushButton" name="element_101">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Md</string>
      </property>
     </widget>
    </item>
-   <item row="9" column="15" >
-    <widget class="QPushButton" name="element_102" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="9" column="15">
+    <widget class="QPushButton" name="element_102">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>No</string>
      </property>
     </widget>
    </item>
-   <item row="9" column="16" >
-    <widget class="QPushButton" name="element_103" >
-     <property name="styleSheet" >
-      <string notr="true" />
+   <item row="9" column="16">
+    <widget class="QPushButton" name="element_103">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Lr</string>
      </property>
     </widget>
