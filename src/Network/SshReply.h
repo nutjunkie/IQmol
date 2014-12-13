@@ -108,11 +108,13 @@ namespace Network {
 
       public:
          SshGetFile(SshConnection* connection, QString const& sourcePath, 
-            QString const& destinationPath) : SshReply(connection), 
+            QString const& destinationPath) : SshReply(connection), m_getFilesInterrupt(false),
             m_sourcePath(subEnv(sourcePath)), m_destinationPath(subEnv(destinationPath)) { }
 
       protected:
          void runDelegate();
+         void runDelegate(bool& getFilesInterrupt);
+         bool m_getFilesInterrupt;
 
       private:
          QString m_sourcePath;

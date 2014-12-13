@@ -97,6 +97,17 @@ void HttpReply::readToString()
 }
 
 
+void HttpReply::interrupt()
+{
+   m_interrupt = true;
+   QLOG_TRACE() << "HttpReply interrupted" << m_connection->hostname();
+   m_networkReply->abort();
+   m_status = Interrupted;
+   interrupted();
+   finished();
+}
+
+
 void HttpReply::timeout()
 {
    QLOG_TRACE() << "HttpReply timeout" << m_connection->hostname();
@@ -263,6 +274,7 @@ void HttpGetFiles::run()
           destination += "/" + rx.cap(1);
           HttpGet* reply(new HttpGet(m_connection, source, destination));
           m_replies.append(reply);
+          connect(this, SIGNAL(interrupted()), this, SLOT(interrupt()));
           connect(reply, SIGNAL(finished()), this, SLOT(replyFinished()));
           connect(reply, SIGNAL(copyProgress()), this, SLOT(copyProgress()));
        }

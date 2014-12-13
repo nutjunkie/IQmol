@@ -25,6 +25,7 @@
 #include "QsLog.h"
 #include "NetworkException.h"
 #include <QObject>
+#include <QDebug>
 
 
 namespace IQmol {
@@ -47,7 +48,7 @@ namespace Network {
          void start() { startSignal(); }
 
       public Q_SLOTS:
-         void interrupt() { m_interrupt = true; }
+         void interrupt() { m_interrupt = true; qDebug() << "interrupt received" << m_interrupt; }
 
       Q_SIGNALS:
          void startSignal();

@@ -255,6 +255,10 @@ qDebug() << "Setting total energy to" << total.value();
          tokens = TextStream::tokenize(line);
          if (tokens.size() == 5) setTotalEnergy(tokens[4], currentGeometry);
 
+      }else if (line.contains("TRIM MP2           total energy  =")) {
+         tokens = TextStream::tokenize(line);
+         if (tokens.size() == 6) setTotalEnergy(tokens[5], currentGeometry);
+
       }else if (line.contains("EMP4                   =")) {
          tokens = TextStream::tokenize(line);
          if (tokens.size() == 3) setTotalEnergy(tokens[2], currentGeometry);

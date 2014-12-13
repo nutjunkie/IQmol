@@ -737,7 +737,29 @@ void Server::copyResultsFinished()
       reply->deleteLater();
 
    }else {
-      QLOG_ERROR() << "Server Error: invalid query reply";
+      QLOG_ERROR() << "Server Error: invalid copy reply";
+      //if (reply) reply->deleteLater();
+   }
+}
+
+
+void Server::cancelCopy(Job* job)
+{
+   if (!job) {
+      QLOG_WARN() << "Invalid Job pointer";
+      return;
+   }
+
+   Network::Reply* reply(m_activeRequests.key(job));
+
+   if (reply && m_activeRequests.contains(reply)) {
+      m_activeRequests.remove(reply);
+      job->setStatus(Job::Error, "Copy canceled");
+qDebug() << "Sending interrupt to copy reply" << reply;
+      reply->interrupt();
+      //reply->deleteLater();
+   }else {
+      QLOG_ERROR() << "Server Error: invalid copy reply";
       //if (reply) reply->deleteLater();
    }
 }

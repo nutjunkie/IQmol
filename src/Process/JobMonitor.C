@@ -693,13 +693,22 @@ void JobMonitor::contextMenu(QPoint const& pos)
    Job* job(getSelectedJob(item));
    if (!job) return;
 
-   Job::Status status(job->status());
-   if (status == Job::Copying) return;
-
    QMenu *menu = new QMenu(this);
-   QString tmp((status == Job::Queued) ? tr("Delete Job From Queue") : tr("Kill Job"));
+   QAction* kill;
+   Job::Status status(job->status());
 
-   QAction* kill   = menu->addAction(tmp,                            this, SLOT(killJob()));
+   switch (status) {
+      case Job::Queued:   
+         kill = menu->addAction("Delete Job From Queue", this, SLOT(killJob()));
+         break;
+      case Job::Copying:   
+         kill = menu->addAction("Cancel Copy", this, SLOT(cancelCopy()));
+         break;
+      default:
+         kill = menu->addAction("Kill Job", this, SLOT(killJob()));
+         break;
+   }
+
    QAction* remove = menu->addAction(tr("Remove Job"),               this, SLOT(removeJob()));
    QAction* query  = menu->addAction(tr("Query Job"),                this, SLOT(queryJob()));
    QAction* view   = menu->addAction(tr("View Output File"),         this, SLOT(viewOutput()));
@@ -752,6 +761,7 @@ void JobMonitor::contextMenu(QPoint const& pos)
          break;
 
       case Job::Copying:
+         kill->setEnabled(true);
          break;
    }
 
@@ -802,6 +812,26 @@ void JobMonitor::on_processTable_cellDoubleClicked(int, int)
       default:
          queryJob(job);
          break;
+   }
+}
+
+
+void JobMonitor::cancelCopy()
+{
+   Job* job(getSelectedJob());
+   if (!job) return;
+
+   Job::Status status(job->status());
+   if (status != Job::Copying) {
+      QLOG_DEBUG() << "Cancel copy called on non-copy job";
+      return;
+   }
+
+   try {
+      Server* server = ServerRegistry::instance().find(job->serverName());
+      if (server) server->cancelCopy(job);
+   } catch (Exception& ex) {
+      QMsgBox::warning(this, "IQmol", ex.what());
    }
 }
 

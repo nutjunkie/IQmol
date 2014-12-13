@@ -91,6 +91,7 @@ namespace Process2 {
 
          // Context menu actions
          void contextMenu(QPoint const& position);
+         void cancelCopy();
          void killJob();
          void removeJob();
          void queryJob();

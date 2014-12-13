@@ -89,6 +89,7 @@ namespace Process2 {
       public Q_SLOTS:
          void watchJob(Job*);
          void unwatchJob(Job*);
+         void cancelCopy(Job*);
 
       protected:
          Server(ServerConfiguration const&);
@@ -104,6 +105,7 @@ namespace Process2 {
          void killFinished();
          void copyResultsFinished();
          void queryAllJobs();
+
 
       private:
          QString substituteMacros(QString const&);

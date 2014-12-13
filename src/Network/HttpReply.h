@@ -45,6 +45,12 @@ namespace Network {
 
          QString headerValue(QString const& headerName);
 
+      public Q_SLOTS:
+         void interrupt();
+
+      Q_SIGNALS:
+         void interrupted();
+
       protected:
          HttpConnection* m_connection;
          unsigned m_timeout;
