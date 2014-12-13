@@ -942,10 +942,10 @@ void InputDialog::initializeQuiLogic()
    node->addRule(
      If(*node == QtTrue, 
         Enable(m_ui.qmmm_charges)
-        + Enable(m_ui.qmmm_print)
+ //     + Enable(m_ui.qmmm_print)
         + Enable(m_ui.link_atom_projection),
         Disable(m_ui.qmmm_charges)
-        + Disable(m_ui.qmmm_print)
+ //     + Disable(m_ui.qmmm_print)
         + Disable(m_ui.link_atom_projection)
      )
    );
@@ -1206,6 +1206,15 @@ void InputDialog::initializeQuiLogic()
          boost::bind(&InputDialog::printSection, this, "isotopes", false)
       )
    );
+
+   node = &reg.get("QUI_SECTION_SWAP_OCCUPIED_VIRTUAL");
+   node->addRule(
+      If (*node == QtTrue,
+         boost::bind(&InputDialog::printSection, this, "swap_occupied_virtual", true),
+         boost::bind(&InputDialog::printSection, this, "swap_occupied_virtual", false)
+      )
+   );
+ 
   
    job_type.addRule(
       If (job_type == "Geometry" || job_type == "Reaction Path" ||

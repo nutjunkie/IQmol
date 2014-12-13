@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>845</width>
+    <width>846</width>
     <height>585</height>
    </rect>
   </property>
@@ -313,7 +313,7 @@ QToolButton:checked {
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="../IQmol/IQmol.qrc">
+                  <iconset resource="../Main/IQmol.qrc">
                    <normaloff>:/resources/icons/Add.png</normaloff>:/resources/icons/Add.png</iconset>
                  </property>
                 </widget>
@@ -364,7 +364,7 @@ QToolButton:checked {
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="../IQmol/IQmol.qrc">
+                  <iconset resource="../Main/IQmol.qrc">
                    <normaloff>:/resources/icons/Remove.png</normaloff>:/resources/icons/Remove.png</iconset>
                  </property>
                 </widget>
@@ -436,8 +436,8 @@ QToolButton:checked {
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>431</width>
-             <height>485</height>
+             <width>448</width>
+             <height>414</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -457,8 +457,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>407</width>
-                 <height>76</height>
+                 <width>197</width>
+                 <height>60</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -512,8 +512,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>407</width>
-                 <height>76</height>
+                 <width>166</width>
+                 <height>60</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -571,8 +571,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>407</width>
-                 <height>76</height>
+                 <width>173</width>
+                 <height>60</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -626,8 +626,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>438</width>
-                 <height>171</height>
+                 <width>425</width>
+                 <height>166</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -768,8 +768,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>402</width>
-                 <height>165</height>
+                 <width>381</width>
+                 <height>162</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -939,8 +939,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>471</width>
-                 <height>167</height>
+                 <width>469</width>
+                 <height>163</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1069,8 +1069,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>407</width>
-                 <height>76</height>
+                 <width>345</width>
+                 <height>64</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1134,8 +1134,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>423</width>
-                 <height>151</height>
+                 <width>426</width>
+                 <height>146</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1233,8 +1233,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>392</width>
-                 <height>84</height>
+                 <width>202</width>
+                 <height>83</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1295,8 +1295,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>407</width>
-                 <height>159</height>
+                 <width>402</width>
+                 <height>155</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1438,7 +1438,7 @@ QToolButton:checked {
                  <x>0</x>
                  <y>0</y>
                  <width>423</width>
-                 <height>108</height>
+                 <height>105</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1864,6 +1864,20 @@ QToolButton:checked {
              <widget class="QCheckBox" name="direct_scf">
               <property name="text">
                <string>Direct SCF</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="Line" name="line_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="qui_section_swap_occupied_virtual">
+              <property name="text">
+               <string>Swap Orbitals</string>
               </property>
              </widget>
             </item>
@@ -5021,13 +5035,6 @@ widgets.</string>
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="qmmm_print">
-              <property name="text">
-               <string>Increase Printout</string>
-              </property>
-             </widget>
-            </item>
-            <item>
              <widget class="QCheckBox" name="qmmm_charges">
               <property name="text">
                <string>Print Charges</string>
@@ -6231,7 +6238,7 @@ Eventually this should go.</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>845</width>
+     <width>846</width>
      <height>22</height>
     </rect>
    </property>
@@ -6346,7 +6353,6 @@ Eventually this should go.</string>
   <tabstop>aimd_fock_extrapolation_order</tabstop>
   <tabstop>aimd_fock_extrapolation_points</tabstop>
   <tabstop>qmmm</tabstop>
-  <tabstop>qmmm_print</tabstop>
   <tabstop>qmmm_charges</tabstop>
   <tabstop>readChargesButton</tabstop>
   <tabstop>qui_frozen_core</tabstop>
@@ -6414,7 +6420,7 @@ Eventually this should go.</string>
   <tabstop>pcm_print</tabstop>
  </tabstops>
  <resources>
-  <include location="../IQmol/IQmol.qrc"/>
+  <include location="../Main/IQmol.qrc"/>
  </resources>
  <connections>
   <connection>
