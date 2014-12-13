@@ -128,7 +128,8 @@ bool requiresAuxBasis()
 
    QtNode& method(reg.get("METHOD"));
    value = method.getValue().toUpper();
-   tf = tf || (value == "RI-CIS(D)") || (value == "SOS-CIS(D)") || (value == "SOS-CIS(D0)");
+   tf = tf || (value == "RI-CIS(D)") || (value == "SOS-CIS(D)") || (value == "RI-MP2") 
+           || (value == "SOS-CIS(D0)");
 
    return tf;
 }
