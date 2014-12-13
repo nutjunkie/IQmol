@@ -75,7 +75,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
             // We are on a subsequent geometry, so we should have everything we need to
             // create the MOs for the previous one.
             Data::MolecularOrbitals* mos(makeMolecularOrbitals(moData, shellData, *geometry)); 
-            //if (mos) m_dataBank.append(mos);
+            clear(moData);
             if (mos) molecularOrbitalsList->append(mos);
          }
 
@@ -147,6 +147,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       }else if (key == "Alpha Orbital Energies") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
+qDebug() << "Reading in alpha energies" << n;
          moData.alphaEnergies = readDoubleArray(textStream, n);
          moData.betaEnergies  = moData.alphaEnergies;
 
@@ -176,7 +177,6 @@ qDebug() << "Reading Hessian information";
 
    if (geometry) {
       Data::MolecularOrbitals* mos(makeMolecularOrbitals(moData, shellData, *geometry)); 
-      //if (mos) m_dataBank.append(mos);
       if (mos) molecularOrbitalsList->append(mos);
    }
 
@@ -209,6 +209,15 @@ qDebug() << "Reading Hessian information";
    delete molecularOrbitalsList;
 
    return false;
+}
+
+
+void FormattedCheckpoint::clear(MoData& moData)
+{
+   moData.alphaCoefficients.clear();
+   moData.betaCoefficients.clear();
+   moData.alphaEnergies.clear();
+   moData.betaEnergies.clear();
 }
 
 
@@ -260,6 +269,9 @@ bool FormattedCheckpoint::dataAreConsistent(ShellData const& shellData, unsigned
 Data::MolecularOrbitals* FormattedCheckpoint::makeMolecularOrbitals(MoData const& moData, 
    ShellData const& shellData, Data::Geometry const& geometry)
 {
+   // This needs fixing.  Newer versions of QChem only print the orbitals for the
+   // final geometry, so the first ones are just for the geometries
+   if (moData.alphaEnergies.isEmpty()) return 0;
    Data::ShellList* shellList = makeShellList(shellData, geometry);
    if (!shellList) return 0;
    Data::MolecularOrbitals* mos = new Data::MolecularOrbitals(

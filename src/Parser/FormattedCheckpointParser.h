@@ -60,6 +60,8 @@ namespace Parser {
             QList<double> betaEnergies;
          };
 
+         void clear(MoData&);
+
          QList<int> readIntegerArray(TextStream&, unsigned nTokens);
          QList<double> readDoubleArray(TextStream&, unsigned nTokens);
          QList<unsigned> readUnsignedArray(TextStream&, unsigned nTokens);

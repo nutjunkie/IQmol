@@ -182,13 +182,11 @@ bool QChemOutput::parse(TextStream& textStream)
             if (!firstGeometry) firstGeometry = geometry;
 
             if (!geometryList) {
-qDebug() << "Creating new geometry list";
                geometryList = new Data::GeometryList;
                currentGeometry = 0;
             }
 
             if (geometry->sameAtoms(*firstGeometry)) {
-qDebug() << "Appending geometry to list";
                geometryList->append(geometry);
                currentGeometry = geometry;
             }else if (geometryList->isEmpty()) {

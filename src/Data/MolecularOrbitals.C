@@ -33,8 +33,6 @@ MolecularOrbitals::MolecularOrbitals(unsigned const nAlpha, unsigned const nBeta
    ShellList const& shells) : m_nAlpha(nAlpha), m_nBeta(nBeta), 
    m_alphaEnergies(alphaEnergies), m_betaEnergies(betaEnergies), m_shellList(shells)
 {
-   m_nOrbitals = m_alphaEnergies.size();
-   m_nBasis    = alphaCoefficients.size()/m_nOrbitals;
 
 /*
 qDebug() << " :: " << m_nOrbitals;
@@ -44,6 +42,10 @@ qDebug() << " :: " << alphaEnergies.size();
 qDebug() << " :: " << betaCoefficients.size();
 qDebug() << " :: " << betaEnergies.size();
 */
+
+   m_nOrbitals = m_alphaEnergies.size();
+   if (m_nOrbitals == 0) return;
+   m_nBasis    = alphaCoefficients.size()/m_nOrbitals;
 
    if (alphaCoefficients.size() != (int)m_nOrbitals*(int)m_nBasis ||
        betaCoefficients.size()  != (int)m_nOrbitals*(int)m_nBasis) {
