@@ -161,11 +161,21 @@ void Job::parseQueryOutput(QString const&)
 }
 
 
+/*
 void Job::copyProgress()
 {
    m_copyProgress += ".";
    if (m_copyProgress == "Copying....") m_copyProgress = "Copying";
 qDebug() << "CopyProgress string:" << m_copyProgress;
+   updated();
+}
+*/
+
+
+void Job::copyProgress(double fraction)
+{
+   int pc(100*fraction);
+   m_copyProgress = "Copying (" + QString::number(pc) + "%)";
    updated();
 }
 

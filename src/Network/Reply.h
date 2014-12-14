@@ -57,6 +57,7 @@ namespace Network {
          /// if it completed or if an error occured
          void finished();
          void copyProgress();
+         void copyProgress(double);
 
       protected Q_SLOTS:
          virtual void run() = 0;

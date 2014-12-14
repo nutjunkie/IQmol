@@ -650,7 +650,6 @@ void Server::copyResults(Job* job)
    job->setStatus(Job::Copying);
    Network::Reply* reply(m_connection->execute(listCmd));
    connect(reply, SIGNAL(finished()), this, SLOT(listFinished()));
-   connect(reply, SIGNAL(copyProgress()), job, SLOT(copyProgress()));
    m_activeRequests.insert(reply, job);
    reply->start();
 }
@@ -677,6 +676,7 @@ void Server::listFinished()
       QStringList fileList(parseListMessage(job, reply->message()));
       QString destination(job->jobInfo().get(QChemJobInfo::LocalWorkingDirectory));
       reply = m_connection->getFiles(fileList, destination);
+      connect(reply, SIGNAL(copyProgress(double)), job, SLOT(copyProgress(double)));
       connect(reply, SIGNAL(finished()), this, SLOT(copyResultsFinished()));
       m_activeRequests.insert(reply, job);
       reply->start();

@@ -248,6 +248,13 @@ void SshPutFile::runDelegate()
 
 // -------------- SshGetFile ----------------
 // HACK, needs cleaning up
+void SshGetFile::runDelegate()
+{
+   bool parentInterrupt(false);
+   runDelegate(parentInterrupt);
+}
+
+
 void SshGetFile::runDelegate(bool& getFilesInterrupt)
 {
    QLOG_TRACE() << "SshGetFile " << m_destinationPath << "<-" << m_sourcePath;
@@ -283,7 +290,6 @@ void SshGetFile::runDelegate(bool& getFilesInterrupt)
       fclose(localFileHandle);
       throw Exception(msg + m_connection->lastSessionError());
    }
-
 
 /*
    QLOG_DEBUG() << "File info" << fileInfo.st_dev     << "   " << sizeof(dev_t);
@@ -330,9 +336,11 @@ void SshGetFile::runDelegate(bool& getFilesInterrupt)
 
        got += bc;
 
-       qDebug() << "CopyProgress" << m_interrupt << this;
-       copyProgress();
-      //qDebug() << "sleeping 1"; sleep(1);
+       //copyProgress();
+       double frac(double(got)/double(fileSize));
+       copyProgress(frac);
+       // qDebug() << "CopyProgress" << m_interrupt << frac;
+        //qDebug() << "sleeping 1"; sleep(1);
    }
 
    cleanup:
@@ -348,106 +356,6 @@ void SshGetFile::runDelegate(bool& getFilesInterrupt)
       if (!m_interrupt && !error.isEmpty()) throw Exception(error);
 }
 
-
-void SshGetFile::runDelegate()
-{
-   QLOG_TRACE() << "SshGetFile " << m_destinationPath << "<-" << m_sourcePath;
-
-   // Check we can write to the local file first
-   QByteArray destination(m_destinationPath.toLocal8Bit());
-   FILE* localFileHandle(fopen(destination.data(), "wb"));
-
-   if (!localFileHandle) {
-      QString msg("Could not open file for writing: ");
-      throw Exception(msg + m_destinationPath);
-   }
-
-   // Set blocking, which apparently is required.
-   LIBSSH2_SESSION* session(m_connection->m_session);
-   libssh2_session_set_blocking(session, 1);
-
-   QByteArray source(m_sourcePath.toLocal8Bit());
-   LIBSSH2_CHANNEL* channel(0);
-   struct stat fileInfo;
-
-   while ( (channel = libssh2_scp_recv(session, source.data(), &fileInfo)) == 0 &&
-           libssh2_session_last_error(session, 0, 0, 0) == LIBSSH2_ERROR_EAGAIN) {
-      if (m_interrupt) {
-         fclose(localFileHandle);
-         return;
-      }
-      m_connection->waitSocket();
-   }
-
-   if (channel == 0) {
-      QString msg("Failed to open receive channel:\n");
-      fclose(localFileHandle);
-      throw Exception(msg + m_connection->lastSessionError());
-   }
-
-
-/*
-   QLOG_DEBUG() << "File info" << fileInfo.st_dev     << "   " << sizeof(dev_t);
-   QLOG_DEBUG() << "File info" << fileInfo.st_ino     << "   " << sizeof(ino_t);
-   QLOG_DEBUG() << "File info" << fileInfo.st_mode    << "   " << sizeof(mode_t);
-   QLOG_DEBUG() << "File info" << fileInfo.st_nlink   << "   " << sizeof(nlink_t);
-   QLOG_DEBUG() << "File info" << fileInfo.st_uid     << "   " << sizeof(uid_t);
-   QLOG_DEBUG() << "File info" << fileInfo.st_gid     << "   " << sizeof(gid_t);
-   QLOG_DEBUG() << "File info" << fileInfo.st_rdev    << "   " << sizeof(dev_t);
-   QLOG_DEBUG() << "File info" << fileInfo.st_size    << "   " << sizeof(off_t);
-   QLOG_DEBUG() << "File info" << fileInfo.st_blksize << "   " << sizeof(blksize_t);
-   QLOG_DEBUG() << "File info" << fileInfo.st_blocks  << "   " << sizeof(blkcnt_t);
-*/
-
-   // If the buffer size changes, anything connected to the copyProgress will
-   // need updating as it assumes Kbyte increments.
-   char buffer[1024];
-   QString error;
-   unsigned fileSize(fileInfo.st_size);
-   unsigned got(0);
-   QLOG_TRACE() <<  "Preparing to receive" << fileSize << "bytes";
-
-   if (fileSize == 0) {
-      error  = "Unable to stat file on server: " + m_sourcePath + "\n";
-      error += "Check file exists and firewall permits incoming connections";
-      goto cleanup;
-   }
-
-   while ((got < fileSize) && !m_interrupt) {
-       int amount(sizeof(buffer));
-       if ((fileInfo.st_size - got) < amount) {
-          amount = fileInfo.st_size - got;
-       }
-
-       int bc(libssh2_channel_read(channel, buffer, amount));
-
-       if (bc > 0) {
-          fwrite(buffer, 1, bc, localFileHandle);
-       }else if (bc < 0) {
-          error  = "Error reading from channel";
-          error += m_connection->lastSessionError();
-          break;
-       }
-
-       got += bc;
-
-       qDebug() << "CopyProgress" << m_interrupt << this;
-       copyProgress();
-      //qDebug() << "sleeping 1"; sleep(1);
-   }
-
-   cleanup:
-      QLOG_TRACE() <<  "Closing receive channel";
-      fclose(localFileHandle);
-      libssh2_channel_send_eof(channel);
-      // This seems to cause a hang sometimes
-      // libssh2_channel_wait_eof(channel);
-      libssh2_channel_wait_closed(channel);
-      libssh2_channel_free(channel);
-      QLOG_TRACE() <<  "Channel closed";
-
-      if (!m_interrupt && !error.isEmpty()) throw Exception(error);
-}
 
 
 // -------------- SshGetFiles ----------------
@@ -463,8 +371,9 @@ void SshGetFiles::runDelegate()
        destination += "/" + info.fileName();
 
        SshGetFile get(m_connection, source, destination);
+//       connect(&get, SIGNAL(copyProgress()), this, SIGNAL(copyProgress()));
+       connect(&get, SIGNAL(copyProgress(double)), this, SIGNAL(copyProgress(double)));
        get.runDelegate(m_interrupt);
-       
    }
    finished();
 }

@@ -82,7 +82,8 @@ namespace Process2 {
          QChemJobInfo& jobInfo() { return m_qchemJobInfo; }
 
       public Q_SLOTS:
-         void copyProgress();
+         //void copyProgress();
+         void copyProgress(double);
 
       Q_SIGNALS:
          void updated();

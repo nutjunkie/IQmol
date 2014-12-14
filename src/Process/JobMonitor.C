@@ -94,10 +94,10 @@ JobMonitor::JobMonitor(QWidget* parent) : QMainWindow(parent)
 
    // Alter table spacings
    table->setColumnWidth(0,140);
-   table->setColumnWidth(1,100);
+   table->setColumnWidth(1, 80);
    table->setColumnWidth(2,100);
    table->setColumnWidth(3,100);
-   table->setColumnWidth(4,100);
+   table->setColumnWidth(4,120);
 
    initializeMenus();
    table->verticalHeader()->setDefaultSectionSize(fontMetrics().lineSpacing() + 5);
