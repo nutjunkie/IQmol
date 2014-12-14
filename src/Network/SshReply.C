@@ -371,7 +371,7 @@ void SshGetFiles::runDelegate()
        destination += "/" + info.fileName();
 
        SshGetFile get(m_connection, source, destination);
-//       connect(&get, SIGNAL(copyProgress()), this, SIGNAL(copyProgress()));
+       connect(&get, SIGNAL(copyProgress()), this, SIGNAL(copyProgress()));
        connect(&get, SIGNAL(copyProgress(double)), this, SIGNAL(copyProgress(double)));
        get.runDelegate(m_interrupt);
    }
