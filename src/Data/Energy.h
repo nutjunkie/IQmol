@@ -38,6 +38,9 @@ namespace Data {
             m_units(units) { }
 
          Type::ID typeID() const { return Type::Energy; }
+
+         QString label() const { return m_label; }
+         void setLabel(QString const& label) { m_label = label; }
          
          /// Returns the raw value of the energy in the current units
          double value() const { return m_value; }
@@ -75,13 +78,15 @@ namespace Data {
          void privateSerialize(Archive& ar, unsigned const /* version */) {
             ar & m_value;
             ar & m_units;
+            ar & m_label;
          }
 
          // Returns the conversion factor from Hartree
          double conversion(Units const) const;
 
-         double m_value;
-         Units  m_units;
+         double  m_value;
+         Units   m_units;
+         QString m_label;
    };
 
 

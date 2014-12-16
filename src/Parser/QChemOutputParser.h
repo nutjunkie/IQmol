@@ -49,7 +49,7 @@ namespace Parser {
          void readVibrationalModes(TextStream&);
          void readEffectiveRegion(TextStream&);
          void readDMA(TextStream&, Data::Geometry*);
-         void setTotalEnergy(QString const&, Data::Geometry*);
+         void setTotalEnergy(QString const&, Data::Geometry*, QString const& label);
    };
 
 } } // end namespace IQmol::Parser

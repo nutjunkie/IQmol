@@ -35,6 +35,7 @@ namespace Layer {
 Geometry::Geometry(Data::Geometry& geometry) : m_geometry(geometry)
 {
    setText(QString::number(energy(),'f', 6));
+   setToolTip(label());
    setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 }
 
@@ -43,6 +44,13 @@ double Geometry::energy() const
 {
    Data::Energy& energy(m_geometry.getProperty<Data::TotalEnergy>());
    return energy.value();
+}
+
+
+QString Geometry::label() const
+{
+   Data::Energy& energy(m_geometry.getProperty<Data::TotalEnergy>());
+   return energy.label();
 }
 
 

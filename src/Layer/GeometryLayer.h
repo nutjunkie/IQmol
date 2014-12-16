@@ -44,6 +44,7 @@ namespace Layer {
          qglviewer::Vec dipole() const;
          unsigned nAtoms() const;
          double energy() const;
+         QString label() const;
 
          qglviewer::Vec atomicPosition(unsigned i) const;
          double atomicCharge(unsigned i) const;

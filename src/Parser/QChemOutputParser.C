@@ -239,29 +239,37 @@ qDebug() << "Setting total energy to" << total.value();
             }
          }
 
-      }else if (line.contains("MP2         total energy =")) {
-         tokens = TextStream::tokenize(line);
-         if (tokens.size() == 6) setTotalEnergy(tokens[4], currentGeometry);
-
       }else if (line.contains("RIMP2         total energy")) {
          tokens = TextStream::tokenize(line);
-         if (tokens.size() == 6) setTotalEnergy(tokens[4], currentGeometry);
+         if (tokens.size() >= 5) setTotalEnergy(tokens[4], currentGeometry, "RIMP2");
 
-      }else if (line.contains("CCSD total energy          =")) {
+      }else if (line.contains("Total SOS-MP2 energy")) {
          tokens = TextStream::tokenize(line);
-         if (tokens.size() == 5) setTotalEnergy(tokens[4], currentGeometry);
+         if (tokens.size() >= 5) setTotalEnergy(tokens[4], currentGeometry, "SOS-MP2");
 
-      }else if (line.contains("CCD total energy           =")) {
+      }else if (line.contains("Total MOS-MP2 energy")) {
          tokens = TextStream::tokenize(line);
-         if (tokens.size() == 5) setTotalEnergy(tokens[4], currentGeometry);
+         if (tokens.size() >= 5) setTotalEnergy(tokens[4], currentGeometry, "MOS-MP2");
 
       }else if (line.contains("TRIM MP2           total energy  =")) {
          tokens = TextStream::tokenize(line);
-         if (tokens.size() == 6) setTotalEnergy(tokens[5], currentGeometry);
+         if (tokens.size() >= 6) setTotalEnergy(tokens[5], currentGeometry, "TRIM-MP2");
+
+      }else if (line.contains("MP2         total energy")) {
+         tokens = TextStream::tokenize(line);
+         if (tokens.size() >= 5) setTotalEnergy(tokens[4], currentGeometry, "MP2");
+
+      }else if (line.contains("CCSD total energy          =")) {
+         tokens = TextStream::tokenize(line);
+         if (tokens.size() == 5) setTotalEnergy(tokens[4], currentGeometry, "CCSD");
+
+      }else if (line.contains("CCD total energy           =")) {
+         tokens = TextStream::tokenize(line);
+         if (tokens.size() == 5) setTotalEnergy(tokens[4], currentGeometry, "CC");
 
       }else if (line.contains("EMP4                   =")) {
          tokens = TextStream::tokenize(line);
-         if (tokens.size() == 3) setTotalEnergy(tokens[2], currentGeometry);
+         if (tokens.size() == 3) setTotalEnergy(tokens[2], currentGeometry, "MP4");
 
       }else if (line.contains("Ground-State Mulliken Net Atomic Charges")) {
          textStream.skipLine(3);
@@ -422,7 +430,8 @@ void QChemOutput::readDMA(TextStream& textStream, Data::Geometry* geometry)
 }
 
 
-void QChemOutput::setTotalEnergy(QString const& field, Data::Geometry* geometry)
+void QChemOutput::setTotalEnergy(QString const& field, Data::Geometry* geometry, 
+   QString const& label)
 {
    if (!geometry) return;
 
@@ -431,6 +440,7 @@ void QChemOutput::setTotalEnergy(QString const& field, Data::Geometry* geometry)
    if (!ok) return;
    Data::TotalEnergy& data(geometry->getProperty<Data::TotalEnergy>());
    data.setValue(energy, Data::Energy::Hartree);
+   data.setLabel(label + " energy");
 }
 
 
