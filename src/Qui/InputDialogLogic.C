@@ -129,7 +129,7 @@ bool requiresAuxBasis()
    QtNode& method(reg.get("METHOD"));
    value = method.getValue().toUpper();
    tf = tf || (value == "RI-CIS(D)") || (value == "SOS-CIS(D)") || (value == "RI-MP2") 
-           || (value == "SOS-CIS(D0)");
+           || (value == "SOS-CIS(D0)" || (value == "SOSMP2") );
 
    return tf;
 }
@@ -141,7 +141,7 @@ bool requiresOmega()
    QtNode& correlation(reg.get("CORRELATION"));
    QString value(correlation.getValue().toUpper());
 
-   bool tf((value == "SOSMP2") || (value == "MOSMP2"));
+   bool tf(value == "MOSMP2");
 
    QtNode& exchange(reg.get("EXCHANGE"));
    value = exchange.getValue().toUpper();
