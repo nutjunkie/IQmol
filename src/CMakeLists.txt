@@ -575,23 +575,34 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(Configurator Data Layer Main Network Old Parser Process Util Yaml Yaml/yaml-cpp)
 
+add_library(Configurator ${IQmol_Configurator_SOURCES})
+add_library(Data ${IQmol_Data_SOURCES})
+add_library(Layer ${IQmol_Layer_SOURCES})
+add_library(Network ${IQmol_Network_SOURCES})
+add_library(Old ${IQmol_Old_SOURCES})
+add_library(Parser ${IQmol_Parser_SOURCES})
+add_library(Process ${IQmol_Process_SOURCES})
+add_library(Util ${IQmol_Util_SOURCES})
+add_library(QUI ${IQmol_QUI_SOURCES})
+add_library(Yaml ${IQmol_Yaml_SOURCES})
+
 add_executable(IQmol
-    ${IQmol_Configurator_SOURCES}
-    ${IQmol_Data_SOURCES}
-    ${IQmol_Layer_SOURCES}
     ${IQmol_Main_SOURCES}
-    ${IQmol_Network_SOURCES}
-    ${IQmol_Old_SOURCES}
-    ${IQmol_Parser_SOURCES}
-    ${IQmol_Process_SOURCES}
-    ${IQmol_Util_SOURCES}
-    ${IQmol_QUI_SOURCES}
-    ${IQmol_Yaml_SOURCES}
     ${IQmol_HEADERS_MOC} ${IQmol_QUI_HEADERS_MOC}
     ${IQmol_FORMS_HEADERS} ${IQmol_QUI_FORMS_HEADERS}
     ${IQmol_RESOURCES_RCC}
 )
 target_link_libraries(IQmol
+    Configurator
+    Data
+    Layer
+    Network
+    Old
+    Parser
+    Process
+    Util
+    QUI
+    Yaml
     ${OPENBABEL2_LIBRARIES}
     ${OPENMESH_LIBRARIES}
     ${QGLVIEWER_LIBRARIES}
