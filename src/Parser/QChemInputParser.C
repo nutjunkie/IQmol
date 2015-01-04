@@ -54,7 +54,7 @@ bool QChemInput::parse(TextStream& textStream)
          readMoleculeSection(textStream);
 
       }else if (line.contains("$efp_params", Qt::CaseInsensitive)) {
-         readEfpParamsSection(textStream);
+         //readEfpParamsSection(textStream);
 
       }else if (line.contains("$efp_fragments", Qt::CaseInsensitive)) {
          readEfpFragmentSection(textStream);

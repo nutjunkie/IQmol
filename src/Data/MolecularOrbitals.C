@@ -34,18 +34,19 @@ MolecularOrbitals::MolecularOrbitals(unsigned const nAlpha, unsigned const nBeta
    m_alphaEnergies(alphaEnergies), m_betaEnergies(betaEnergies), m_shellList(shells)
 {
 
-/*
-qDebug() << " :: " << m_nOrbitals;
-qDebug() << " :: " << m_nBasis;
-qDebug() << " :: " << alphaCoefficients.size();
-qDebug() << " :: " << alphaEnergies.size();
-qDebug() << " :: " << betaCoefficients.size();
-qDebug() << " :: " << betaEnergies.size();
-*/
 
    m_nOrbitals = m_alphaEnergies.size();
+qDebug() << "Number of alpha electrons :: " << m_nAlpha;
+qDebug() << "Number of beta  electrons :: " << m_nBeta;
+qDebug() << "Number of orbitals        :: " << m_nOrbitals;
    if (m_nOrbitals == 0) return;
    m_nBasis    = alphaCoefficients.size()/m_nOrbitals;
+qDebug() << "Number of basis functions :: " << m_nBasis;
+qDebug() << "Alpha MO coefficient size :: " << alphaCoefficients.size();
+qDebug() << "Alpha MO energies    size :: " << alphaEnergies.size();
+qDebug() << "Beta  MO coefficient size :: " << betaCoefficients.size();
+qDebug() << "Beta  MO energies    size :: " << betaEnergies.size();
+
 
    if (alphaCoefficients.size() != (int)m_nOrbitals*(int)m_nBasis ||
        betaCoefficients.size()  != (int)m_nOrbitals*(int)m_nBasis) {
