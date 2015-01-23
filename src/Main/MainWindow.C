@@ -665,17 +665,17 @@ void MainWindow::createMenus()
 
       menu->addSeparator();
 
-      name = "Edit Servers";
-      action = menu->addAction(name);
-      connect(action, SIGNAL(triggered()), this, SLOT(editServers()));
-
       name = "Remove All Processes";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), 
          &(ProcessMonitor::instance()), SLOT(clearProcessList()));
+      name = "Edit Old Servers";
+      action = menu->addAction(name);
+      connect(action, SIGNAL(triggered()), this, SLOT(editServers()));
 
       menu->addSeparator();
 */
+
       name = "Q-Chem Setup";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), this, SLOT(showQChemUI()));

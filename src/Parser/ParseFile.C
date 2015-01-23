@@ -95,8 +95,8 @@ void ParseFile::parseDirectory(QString const& filePath, QString const& filter)
       if (m_filePaths.isEmpty()) return;
    }
 
-   //qDebug() << "FilePath: " << m_filePath;
-   //qDebug() << "FilePaths:" << m_filePaths;
+   qDebug() << "FilePath: " << m_filePath;
+   qDebug() << "FilePaths:" << m_filePaths;
 
 //  ---
    // This is a hack to ensure the .out file gets read before the other files
@@ -110,11 +110,9 @@ void ParseFile::parseDirectory(QString const& filePath, QString const& filter)
 //  ---
 
    QStringList::iterator iter;
-#ifndef Q_OS_WIN32
    for (iter = m_filePaths.begin(); iter != m_filePaths.end(); ++iter) {
        (*iter).prepend(m_filePath + "/");
    }
-#endif
 }
 
 
@@ -125,8 +123,10 @@ void ParseFile::run()
    bool addToFileList(true);
    QStringList::const_iterator file;
    for (file = m_filePaths.begin(); file != m_filePaths.end(); ++file) {
-       if (parse(*file, addToFileList)) {
-          if (addToFileList) fileList->append(new Data::File(*file));
+       QString fileName(*file);
+       qDebug() << "Calling parse on" << fileName;
+       if (parse(fileName, addToFileList)) {
+          if (addToFileList) fileList->append(new Data::File(fileName));
        }
    }
 
@@ -140,6 +140,7 @@ void ParseFile::run()
 
 bool ParseFile::parse(QString const& filePath, bool& addToFileList)
 {
+qDebug() << "About to parse file" << filePath;
    QFileInfo fileInfo(filePath);
    addToFileList = true;
    

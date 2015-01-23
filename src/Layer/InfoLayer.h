@@ -63,9 +63,6 @@ namespace Layer {
          void setDipole(qglviewer::Vec const& dipole, bool const estimated = false);
          void setPointGroup(QString const& pointGroup);
 
-      Q_SIGNALS:
-         void updated(); 
-
       protected:
          unsigned int numberOfElectrons() const;
          unsigned int numberOfAlphaElectrons() const;

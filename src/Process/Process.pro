@@ -41,3 +41,5 @@ FORMS = \
    $$PWD/ServerConfigurationDialog.ui \
    $$PWD/ServerConfigurationListDialog.ui \
    $$PWD/SshFileDialog.ui \
+
+win32:SOURCES += $$PWD/getpids.C
