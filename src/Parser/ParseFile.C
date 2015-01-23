@@ -95,8 +95,8 @@ void ParseFile::parseDirectory(QString const& filePath, QString const& filter)
       if (m_filePaths.isEmpty()) return;
    }
 
-   //qDebug() << "FilePath: " << m_filePath;
-   //qDebug() << "FilePaths:" << m_filePaths;
+   qDebug() << "FilePath: " << m_filePath;
+   qDebug() << "FilePaths:" << m_filePaths;
 
 //  ---
    // This is a hack to ensure the .out file gets read before the other files

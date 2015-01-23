@@ -21,6 +21,7 @@ SUBDIRS  = Util \
            Parser \
            Network \
            Yaml \
+#           Plot \
            Configurator \
            Layer \
            Old \

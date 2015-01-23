@@ -1,7 +1,7 @@
 CONFIG += no_keywords
 QT     += xml opengl gui network
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets 
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 QMAKE_CXXFLAGS += -O2 -g
 #QMAKE_CXXFLAGS += -O0 -g
