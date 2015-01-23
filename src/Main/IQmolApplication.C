@@ -62,8 +62,8 @@ void IQmolApplication::hideSplash()
 {  
     if (m_splashScreen) {
        m_splashScreen->close();
-       delete m_splashScreen;
-       m_splashScreen = 0;
+       //delete m_splashScreen;
+       //m_splashScreen = 0;
     }
 }
 
@@ -113,26 +113,6 @@ void IQmolApplication::initOpenBabel()
       QLOG_INFO() << "BABEL_DATADIR already set: " << env;
    }
 
-return;
-#ifdef Q_OS_WIN
-   QLibrary openBabel("libopenbabel.dll");
-#else
-   QLibrary openBabel("openbabel");
-#endif
-
-   if (!openBabel.load()) {
-      QString msg("Could not load library ");
-      msg += openBabel.fileName();
-
-      QLOG_ERROR() << msg << " " << openBabel.errorString();
-      QLOG_ERROR() << "Library Paths:";
-      QLOG_ERROR() << libraryPaths();
-
-      msg += "\n\nPlease ensure the OpenBabel libraries have been installed correctly";
-      QMsgBox::critical(0, "IQmol", msg);
-      QApplication::quit();
-      return;
-   }
 }
 
 

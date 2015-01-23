@@ -22,11 +22,9 @@ SUBDIRS  = Util \
            Network \
            Yaml \
 #           Plot \
+           Process \
+           Old \
            Configurator \
            Layer \
-           Old \
-           Process \
-
-win32:SUBDIRS += OpenBabel \
 
 SUBDIRS += Main \

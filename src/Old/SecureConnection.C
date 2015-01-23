@@ -86,17 +86,20 @@ Connection::Connection(QString const& hostname, QString const& username, int con
 #ifdef WIN32
       WSADATA wsadata;
       int res = WSAStartup(MAKEWORD(2,0), &wsadata);
+qDebug() << "Windows specific SSH setup";
       if (res != NO_ERROR) {
          QString msg("WSAStartup failed to initialize: error ");
          msg += QString::number(res);
          throw Exception(msg);
       }
 #endif
+qDebug() << "Calling libssh2_init()";
       int code(libssh2_init(0));
       if (code != 0) throw Exception("Failed to initialize secure connection");
    }else {
       ++NumberOfConnections;
    }
+qDebug() << "Connection created";
 }
 
 
@@ -377,16 +380,20 @@ void Connection::connectSocket()
 
 bool Connection::connect(Authentication const authentication, QString const& password)
 {
+qDebug() << "Connecting Socket";
    connectSocket();
+qDebug() << "Socket Connected";
 
    // Create a session instance
    m_session = libssh2_session_init();
+qDebug() << "Session initialized";
    if (!m_session) throw Exception("Session initialization failed");
 
    // This trades welcome banners, exchange keys,
    // and sets up crypto, compression, and MAC layers
    int rc(0);
    while ((rc = libssh2_session_handshake(m_session, m_socket)) == LIBSSH2_ERROR_EAGAIN);
+qDebug() << "Handshake created";
 
    if (rc) throw Exception(m_session, "Failed to establish a valid session");
 
@@ -532,6 +539,7 @@ bool Connection::connectKeyboardInteractive()
 bool Connection::connectPassword(QString const& password)
 {
    int rc;
+qDebug() << "Connecting with password";
    while ((rc = libssh2_userauth_password(m_session, m_username.toLatin1().data(), 
       password.toLatin1().data())) == LIBSSH2_ERROR_EAGAIN);
    if (rc != 0) {
