@@ -64,7 +64,8 @@ bool isPostHF()
           (value == "VQCCD")     || (value == "QCISD")      || (value == "QCISD(T)") ||
           (value == "OD")        || (value == "OD(T)")      || (value == "OD(2)")    ||  
           (value == "VOD")       || (value == "VOD(2)")     || (value == "CIS(D)")   ||  
-          (value == "RI-CIS(D)") || (value == "SOS-CIS(D)") || (value == "SOS-CIS(D0)");
+          (value == "RI-CIS(D)") || (value == "SOS-CIS(D)") || (value == "SOS-CIS(D0)") ||
+           value.contains("ADC");
 }
 
 
@@ -160,6 +161,29 @@ bool requiresOmega()
    return tf;
 }
 
+
+bool isADC()
+{
+    OptionRegister& reg(OptionRegister::instance());
+    QtNode& method(reg.get("METHOD"));
+    QString value(method.getValue().toUpper());
+    QLOG_WARN() << "Method: " << value;
+    return value.contains("ADC");
+}
+
+
+bool isADCandCS()
+{
+    QLOG_WARN() << "CS";
+    return isADC() && closedShell();
+}
+
+
+bool isADCandOS()
+{
+    QLOG_WARN() << "OS";
+    return isADC() && !closedShell();
+}
 
 
 /**********************************************************************
@@ -345,7 +369,28 @@ void InputDialog::initializeQuiLogic()
       )
    );
  
+   s = "ADC";
+   method.addRule(
+      If(isADC,
+         AddPage(m_ui.toolBoxOptions, m_toolBoxOptions.value(s), s),
+         RemovePage(m_ui.toolBoxOptions, s)
+      )
+   );
 
+   method.addRule(
+      If(isADC,
+         Disable(m_ui.adc_prop_cd) + Disable(m_ui.adc_prop_soc)
+      )
+   );
+//   method.addRule(If(isADC, Disable(m_ui.adc_prop_cd) + Disable(m_ui.adc_prop_soc)));
+
+
+   method.addRule(
+         If(method == "ADC(2)" || method == "SOS-ADC(2)",
+         Enable(m_ui.adc_do_diis),
+         Disable(m_ui.adc_do_diis)
+      )
+   );
 
    // SCF Control
    QtNode& unrestricted(reg.get("UNRESTRICTED"));
@@ -679,10 +724,50 @@ void InputDialog::initializeQuiLogic()
       )
    );
 
+   // Setup -> ADC
+   QtNode& qui_adc_es1(reg.get("QUI_ADC_STATES1"));
+   QtNode& qui_adc_es2(reg.get("QUI_ADC_STATES2"));
 
+   rule = If(isADCandCS, Show(m_ui.label_adc2) + Show(m_ui.qui_adc_states2));
 
+   method.addRule(rule);
+   multiplicity.addRule(rule);
 
+   rule = If(isADCandOS, Hide(m_ui.label_adc2) + Hide(m_ui.qui_adc_states2));
 
+   method.addRule(rule);
+   multiplicity.addRule(rule);
+
+   rule = If(isADCandCS,
+       Enable(m_ui.ee_singlets) + Enable(m_ui.ee_triplets) + Disable(m_ui.ee_states)
+       + SetLabel(m_ui.label_adc1, "Singlets") + SetLabel(m_ui.label_adc2, "Triplets")
+       + ee_singlets.makeSameAs(qui_adc_es1) + ee_triplets.makeSameAs(qui_adc_es2));
+
+   method.addRule(rule);
+   multiplicity.addRule(rule);
+   qui_adc_es1.addRule(rule);
+   qui_adc_es2.addRule(rule);
+
+   rule = If(isADCandOS,
+       Disable(m_ui.ee_singlets) + Disable(m_ui.ee_triplets) + Enable(m_ui.ee_states)
+       + SetLabel(m_ui.label_adc1, "States")
+       + ee_states.makeSameAs(qui_adc_es1));
+
+   method.addRule(rule);
+   multiplicity.addRule(rule);
+   qui_adc_es1.addRule(rule);
+
+   QtNode& qui_do_diis(reg.get("ADC_DO_DIIS"));
+   QtNode& qui_adc_prop_tpa(reg.get("ADC_PROP_TPA"));
+//   QtNode& qui_adc_prop_soc(reg.get("ADC_PROP_TPA"));
+//   QtNode& qui_adc_prop_cd(reg.get("ADC_PROP_TPA"));
+
+   qui_do_diis.addRule(
+       If(qui_do_diis == QtTrue || qui_adc_prop_tpa == QtTrue,
+          Enable(m_ui.adc_diis),
+          Disable(m_ui.adc_diis)
+       )
+   );
 
    // ----- A D V A N C E D   O P T I O N S   P A N E L -----
 
