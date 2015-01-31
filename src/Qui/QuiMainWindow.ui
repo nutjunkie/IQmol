@@ -1000,10 +1000,51 @@ QToolButton:checked {
                       </property>
                      </spacer>
                     </item>
+                    <item row="3" column="0">
+                     <widget class="QLabel" name="label_adc_core">
+                      <property name="text">
+                       <string>Core Orbitals</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="3" column="2">
+                     <layout class="QHBoxLayout" name="adc_core_layout">
+                      <item>
+                       <widget class="QSpinBox" name="qui_adc_core"/>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_24">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                     </layout>
+                    </item>
                    </layout>
                   </item>
                   <item>
                    <layout class="QGridLayout" name="gridLayoutADC2">
+                    <item row="0" column="0">
+                     <widget class="QCheckBox" name="adc_do_diis">
+                      <property name="text">
+                       <string>Use DIIS</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="1">
+                     <widget class="QCheckBox" name="adc_prop_es2es">
+                      <property name="text">
+                       <string>State-to-State Properties</string>
+                      </property>
+                     </widget>
+                    </item>
                     <item row="2" column="0">
                      <widget class="QCheckBox" name="adc_prop_tpa">
                       <property name="text">
@@ -1018,17 +1059,17 @@ QToolButton:checked {
                       </property>
                      </widget>
                     </item>
-                    <item row="1" column="1">
-                     <widget class="QCheckBox" name="adc_prop_es2es">
+                    <item row="3" column="1">
+                     <widget class="QCheckBox" name="adc_prop_soc">
                       <property name="text">
-                       <string>State-to-State Properties</string>
+                       <string>Spin-Orbit Coupling</string>
                       </property>
                      </widget>
                     </item>
-                    <item row="0" column="0">
-                     <widget class="QCheckBox" name="adc_do_diis">
+                    <item row="2" column="1">
+                     <widget class="QCheckBox" name="adc_ecorr">
                       <property name="text">
-                       <string>Use DIIS</string>
+                       <string>Energy Corrections</string>
                       </property>
                      </widget>
                     </item>
@@ -1036,20 +1077,6 @@ QToolButton:checked {
                      <widget class="QCheckBox" name="adc_prop_cd">
                       <property name="text">
                        <string>Circular Dichroism</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="3" column="1">
-                     <widget class="QCheckBox" name="adc_ecorr">
-                      <property name="text">
-                       <string>Energy Corrections</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="2" column="1">
-                     <widget class="QCheckBox" name="adc_prop_soc">
-                      <property name="text">
-                       <string>Spin-Orbit Coupling</string>
                       </property>
                      </widget>
                     </item>

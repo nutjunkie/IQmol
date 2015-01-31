@@ -167,21 +167,26 @@ bool isADC()
     OptionRegister& reg(OptionRegister::instance());
     QtNode& method(reg.get("METHOD"));
     QString value(method.getValue().toUpper());
-    QLOG_WARN() << "Method: " << value;
     return value.contains("ADC");
 }
 
 
+bool isCVS_ADC()
+{
+    OptionRegister& reg(OptionRegister::instance());
+    QtNode& method(reg.get("METHOD"));
+    QString value(method.getValue().toUpper());
+    return value.contains("CVS-ADC");
+}
+
 bool isADCandCS()
 {
-    QLOG_WARN() << "CS";
     return isADC() && closedShell();
 }
 
 
 bool isADCandOS()
 {
-    QLOG_WARN() << "OS";
     return isADC() && !closedShell();
 }
 
@@ -382,14 +387,19 @@ void InputDialog::initializeQuiLogic()
          Disable(m_ui.adc_prop_cd) + Disable(m_ui.adc_prop_soc)
       )
    );
-//   method.addRule(If(isADC, Disable(m_ui.adc_prop_cd) + Disable(m_ui.adc_prop_soc)));
-
 
    method.addRule(
          If(method == "ADC(2)" || method == "SOS-ADC(2)",
          Enable(m_ui.adc_do_diis),
          Disable(m_ui.adc_do_diis)
       )
+   );
+
+   method.addRule(
+       If(isCVS_ADC,
+          Show(m_ui.qui_adc_core) + Show(m_ui.label_adc_core),
+          Hide(m_ui.qui_adc_core) + Hide(m_ui.label_adc_core)
+       )
    );
 
    // SCF Control
@@ -759,8 +769,8 @@ void InputDialog::initializeQuiLogic()
 
    QtNode& qui_do_diis(reg.get("ADC_DO_DIIS"));
    QtNode& qui_adc_prop_tpa(reg.get("ADC_PROP_TPA"));
-//   QtNode& qui_adc_prop_soc(reg.get("ADC_PROP_TPA"));
-//   QtNode& qui_adc_prop_cd(reg.get("ADC_PROP_TPA"));
+//   QtNode& qui_adc_prop_soc(reg.get("ADC_PROP_SOC"));
+//   QtNode& qui_adc_prop_cd(reg.get("ADC_PROP_CD"));
 
    qui_do_diis.addRule(
        If(qui_do_diis == QtTrue || qui_adc_prop_tpa == QtTrue,
@@ -768,6 +778,10 @@ void InputDialog::initializeQuiLogic()
           Disable(m_ui.adc_diis)
        )
    );
+
+   QtNode& qui_adc_core(reg.get("QUI_ADC_CORE"));
+   QtNode& cc_rest_occ(reg.get("CC_REST_OCC"));
+   qui_adc_core.addRule(If(isCVS_ADC, cc_rest_occ.makeSameAs(qui_adc_core)));
 
    // ----- A D V A N C E D   O P T I O N S   P A N E L -----
 
