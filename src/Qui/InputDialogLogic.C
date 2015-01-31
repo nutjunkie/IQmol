@@ -779,8 +779,13 @@ void InputDialog::initializeQuiLogic()
        )
    );
 
+   method.addRule(If(isADC, Enable(m_ui.adc_ecorr)));
+   method.addRule(If(isCVS_ADC, Disable(m_ui.adc_ecorr)));
+   method.addRule(If(method == "SOS-ADC(2)" || method == "SOS-ADC(2)-x", Disable(m_ui.adc_ecorr)));
+
    QtNode& qui_adc_core(reg.get("QUI_ADC_CORE"));
    QtNode& cc_rest_occ(reg.get("CC_REST_OCC"));
+
    qui_adc_core.addRule(If(isCVS_ADC, cc_rest_occ.makeSameAs(qui_adc_core)));
 
    // ----- A D V A N C E D   O P T I O N S   P A N E L -----
