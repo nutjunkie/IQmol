@@ -41,9 +41,6 @@ namespace Layer {
          explicit EfpFragmentList(Layer::Base* parent);
          void appendLayer(EfpFragment*);
 
-      Q_SIGNALS:
-         void updated();
-
       protected:
          void setAtomScale(double const scale);
          void setBondScale(double const scale);

@@ -48,8 +48,7 @@ GeometryList::GeometryList(Data::GeometryList const& geometryList, QString const
    for (iter = m_geometryList.begin(); iter != m_geometryList.end(); ++iter) {
        Data::Geometry* geometry(const_cast<Data::Geometry*>(*iter));
        if (geometry) {
-          Data::Energy& energy(geometry->getProperty<Data::TotalEnergy>());
-         appendRow(new Layer::Geometry(*geometry));
+          appendRow(new Layer::Geometry(*geometry));
        }
    }
 
