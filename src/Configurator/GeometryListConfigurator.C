@@ -26,6 +26,8 @@
 #include "GeometryListConfigurator.h"
 #include <QHeaderView>
 
+#include "qcustomplot.h"
+
 
 using namespace qglviewer;
 
@@ -33,7 +35,8 @@ namespace IQmol {
 namespace Configurator {
 
 
-GeometryList::GeometryList(Layer::GeometryList& geometryList) : m_geometryList(geometryList)
+GeometryList::GeometryList(Layer::GeometryList& geometryList) : m_geometryList(geometryList),
+   m_customPlot(0)
 {
    m_configurator.setupUi(this);
 #if QT_VERSION >= 0x050000
@@ -41,6 +44,32 @@ GeometryList::GeometryList(Layer::GeometryList& geometryList) : m_geometryList(g
 #else
    m_configurator.energyTable->verticalHeader()->setResizeMode(QHeaderView::ResizeToContents);
 #endif
+
+   m_customPlot = new QCustomPlot();
+
+   m_customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+   m_customPlot->xAxis->setSelectableParts(QCPAxis::spNone);
+   m_customPlot->xAxis->setLabel("Geometry");
+   m_customPlot->yAxis->setLabel("Energy");
+   
+   QFrame* frame(m_configurator.plotFrame);
+   QVBoxLayout* layout(new QVBoxLayout());
+   frame->setLayout(layout);
+   layout->addWidget(m_customPlot);
+   
+   m_pen.setColor(Qt::blue);
+   m_pen.setStyle(Qt::SolidLine);
+   m_pen.setWidthF(1);
+   
+   m_selectPen.setColor(Qt::red);
+   m_selectPen.setStyle(Qt::SolidLine);
+   m_selectPen.setWidthF(3);
+}
+
+
+GeometryList::~GeometryList()
+{
+   if (m_customPlot) delete m_customPlot;
 }
 
 
@@ -53,14 +82,6 @@ void GeometryList::load()
 
    QTableWidgetItem* energy;
 
-   int row(0);
-   QList<Layer::Geometry*>::iterator iter;
-   for (iter = geometries.begin(); iter != geometries.end(); ++iter, ++row) {
-       energy = new QTableWidgetItem( (*iter)->text() );
-       energy->setTextAlignment(Qt::AlignCenter|Qt::AlignVCenter);
-       table->setItem(row, 0, energy);
-   }
-
    if (geometries.size() < 2) {
       m_configurator.playButton->setEnabled(false);
       m_configurator.forwardButton->setEnabled(false);
@@ -69,7 +90,88 @@ void GeometryList::load()
       m_configurator.updateBondsButton->setEnabled(false);
       m_configurator.speedSlider->setEnabled(false);
       m_configurator.speedLabel->setEnabled(false);
+      return;      
    }
+
+
+   int row(0);
+   QList<Layer::Geometry*>::iterator iter;
+   for (iter = geometries.begin(); iter != geometries.end(); ++iter, ++row) {
+       energy = new QTableWidgetItem( (*iter)->text() );
+       energy->setTextAlignment(Qt::AlignCenter|Qt::AlignVCenter);
+       table->setItem(row, 0, energy);
+       double e((*iter)->energy());
+       m_rawData.append(qMakePair(row, e));
+   }
+   plotEnergies();
+}
+
+
+void GeometryList::plotEnergies()
+{
+   m_customPlot->clearGraphs();
+
+   double max(m_rawData.first().second), min(m_rawData.first().second);
+   QVector<double> xx(m_rawData.size()), yy(m_rawData.size());
+
+   for (int i = 0; i < m_rawData.size(); ++i) {
+       xx[i] = m_rawData[i].first;
+       yy[i] = m_rawData[i].second;
+       min = std::min(min, yy[i]);
+       max = std::max(max, yy[i]);
+   }
+
+   QCPGraph* graph(m_customPlot->addGraph());
+   graph->setData(xx, yy);
+   graph->setPen(m_pen);
+   graph->setSelectable(false);
+   graph->setLineStyle(QCPGraph::lsLine);
+
+   QVector<double> x(1), y(1);
+   for (int geom = 0; geom < m_rawData.size(); ++geom) {
+       x[0] = m_rawData[geom].first;
+       y[0] = m_rawData[geom].second;
+
+       QCPGraph* graph(m_customPlot->addGraph());
+       graph->setData(x, y);
+       graph->setName(QString::number(geom));
+       graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle));
+       graph->setPen(m_pen);
+       graph->setSelectedPen(m_selectPen);
+       connect(graph, SIGNAL(selectionChanged(bool)), this, SLOT(plotSelectionChanged(bool)));
+   }
+
+   m_customPlot->xAxis->setRange(0, m_rawData.size());
+   m_customPlot->yAxis->setRange(min, max);
+   m_customPlot->yAxis->setAutoTickStep(true);
+   m_customPlot->replot();
+}
+
+
+void GeometryList::plotSelectionChanged(bool tf)
+{
+   QCPGraph* graph(qobject_cast<QCPGraph*>(sender()));
+   if (!graph) return;
+
+   if (tf) {
+      graph->setPen(m_selectPen);
+      graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc));
+   }else {
+      graph->setPen(m_pen);
+      graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle));
+      return;
+   }   
+       
+   if (!tf) return;
+       
+   bool ok;
+   int geom(graph->name().toInt(&ok));
+   if (!ok) return;
+
+   QTableWidget* table(m_configurator.energyTable);
+   table->setCurrentCell(geom, 0, QItemSelectionModel::Rows | QItemSelectionModel::ClearAndSelect);
+   table->scrollToItem(table->item(geom,0));
+   on_energyTable_itemSelectionChanged();
 }
 
 
@@ -127,9 +229,23 @@ void GeometryList::on_speedSlider_valueChanged(int value)
 void GeometryList::on_energyTable_itemSelectionChanged()
 {
    QList<QTableWidgetItem*> selection = m_configurator.energyTable->selectedItems();
-   if (!selection.isEmpty()) {
-      int row(selection.first()->row());
-      if (row > -1) m_geometryList.setCurrentGeometry(row);
+   if (selection.isEmpty()) return;
+
+   int index(selection.first()->row());
+   if (index > -1) m_geometryList.setCurrentGeometry(index);
+
+   QCPGraph* graph(m_customPlot->graph(index+1));
+   if (graph && graph->selected()) return;
+         
+   QList<QCPGraph*> selectedGraphs(m_customPlot->selectedGraphs());
+   QList<QCPGraph*>::iterator iter;
+   for (iter = selectedGraphs.begin(); iter != selectedGraphs.end(); ++iter) {
+       (*iter)->setSelected(false);
+   }
+
+   if (graph) {
+       graph->setSelected(true);
+       m_customPlot->replot();
    }
 }
 

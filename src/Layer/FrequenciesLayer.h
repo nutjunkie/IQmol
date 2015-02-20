@@ -64,6 +64,9 @@ namespace Layer {
          void setSpeed(double const speed);
          void setScale(double const scale);
 
+         double maxFrequency() const;
+         double maxIntensity() const;
+
 
       Q_SIGNALS:
          void pushAnimators(AnimatorList const&);

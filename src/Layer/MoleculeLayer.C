@@ -139,9 +139,9 @@ Molecule::Molecule(QObject* parent) : Base(DefaultMoleculeName, parent),
 
    connect(newAction("Remove"), SIGNAL(triggered()), 
       this, SLOT(removeMolecule()));
-#warning "################################";
-#warning "# !!! TURN OFF FOR RELEASE !!! #";
-#warning "################################";
+//#warning "################################";
+//#warning "# !!! TURN OFF FOR RELEASE !!! #";
+//#warning "################################";
 //   connect(newAction("Dump Data"), SIGNAL(triggered()), 
 //      this, SLOT(dumpData()));
 

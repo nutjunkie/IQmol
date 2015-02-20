@@ -61,6 +61,18 @@ void Frequencies::fromData(Data::Frequencies const& vibrationData)
 }
 
 
+double Frequencies::maxFrequency() const
+{
+   return m_frequencies.maxFrequency();
+}
+
+
+double Frequencies::maxIntensity() const
+{
+   return m_frequencies.maxIntensity();
+}
+
+
 void Frequencies::setMolecule(Molecule* molecule) 
 {
    m_molecule = molecule;

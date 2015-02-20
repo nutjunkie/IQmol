@@ -25,7 +25,11 @@
 #include "Configurator.h"
 #include "MoleculeLayer.h"
 #include "ui_GeometryListConfigurator.h"
+#include <QPen>
+#include <QBrush>
 
+
+class QCustomPlot;
 
 namespace IQmol {
 
@@ -46,6 +50,7 @@ namespace Configurator {
 
       public:
          explicit GeometryList(Layer::GeometryList&);
+         ~GeometryList();
 
       public Q_SLOTS:
          void reset();
@@ -65,13 +70,20 @@ namespace Configurator {
          void on_loopButton_clicked(bool tf);
          void on_updateBondsButton_clicked(bool tf);
          void on_energyTable_itemSelectionChanged();
+         void plotSelectionChanged(bool);
 
       private:
          void closeEvent(QCloseEvent*);
+         void plotEnergies();
+
          Ui::GeometryListConfigurator m_configurator;
          Layer::GeometryList& m_geometryList;
+         QCustomPlot* m_customPlot;
+         QList<QPair<int, double> > m_rawData;
+         QPen m_pen;
+         QPen m_selectPen;
    };
 
-} } // End namespace IQmol::Layer
+} } // End namespace IQmol::Configurator
 
 #endif

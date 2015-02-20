@@ -39,6 +39,10 @@ namespace Data {
          void setThermochemicalData(double const zpve, double const enthalpy, 
             double const entropy);
 
+
+         double maxFrequency() const;
+         double maxIntensity() const;
+
          void dump() const;
          VibrationalModeList const& modes() const { return m_modes; }
 
