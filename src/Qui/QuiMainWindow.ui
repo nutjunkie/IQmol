@@ -944,13 +944,155 @@ QToolButton:checked {
                 </item>
                </layout>
               </widget>
+              <widget class="QWidget" name="pageADC">
+               <property name="geometry">
+                <rect>
+                 <x>0</x>
+                 <y>0</y>
+                 <width>499</width>
+                 <height>187</height>
+                </rect>
+               </property>
+               <attribute name="label">
+                <string>ADC</string>
+               </attribute>
+               <layout class="QVBoxLayout" name="verticalLayout_18">
+                <item>
+                 <layout class="QVBoxLayout" name="verticalLayoutADC1">
+                  <item>
+                   <layout class="QGridLayout" name="gridLayoutADC1">
+                    <item row="1" column="0">
+                     <widget class="QLabel" name="label_adc1">
+                      <property name="text">
+                       <string>Singlet States</string>
+                      </property>
+                      <property name="buddy">
+                       <cstring>qui_adc_states1</cstring>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="2">
+                     <widget class="QLineEdit" name="qui_adc_states1"/>
+                    </item>
+                    <item row="2" column="0">
+                     <widget class="QLabel" name="label_adc2">
+                      <property name="text">
+                       <string>Triplet States</string>
+                      </property>
+                      <property name="buddy">
+                       <cstring>qui_adc_states2</cstring>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="2" column="2">
+                     <widget class="QLineEdit" name="qui_adc_states2"/>
+                    </item>
+                    <item row="1" column="3">
+                     <spacer name="horizontalSpacerADC1">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>40</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                    <item row="3" column="0">
+                     <widget class="QLabel" name="label_adc_core">
+                      <property name="text">
+                       <string>Core Orbitals</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="3" column="2">
+                     <layout class="QHBoxLayout" name="adc_core_layout">
+                      <item>
+                       <widget class="QSpinBox" name="qui_adc_core"/>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_24">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                     </layout>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <layout class="QGridLayout" name="gridLayoutADC2">
+                    <item row="0" column="0">
+                     <widget class="QCheckBox" name="adc_do_diis">
+                      <property name="text">
+                       <string>Use DIIS</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="1">
+                     <widget class="QCheckBox" name="adc_prop_es2es">
+                      <property name="text">
+                       <string>State-to-State Properties</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="2" column="0">
+                     <widget class="QCheckBox" name="adc_prop_tpa">
+                      <property name="text">
+                       <string>Two-Photon Absorption</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="0">
+                     <widget class="QCheckBox" name="adc_prop_es">
+                      <property name="text">
+                       <string>Excited State Properties</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="3" column="1">
+                     <widget class="QCheckBox" name="adc_prop_soc">
+                      <property name="text">
+                       <string>Spin-Orbit Coupling</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="2" column="1">
+                     <widget class="QCheckBox" name="adc_ecorr">
+                      <property name="text">
+                       <string>Energy Corrections</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="3" column="0">
+                     <widget class="QCheckBox" name="adc_prop_cd">
+                      <property name="text">
+                       <string>Circular Dichroism</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
               <widget class="QWidget" name="pageAbInitioMD">
                <property name="geometry">
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>469</width>
-                 <height>163</height>
+                 <width>499</width>
+                 <height>187</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1664,6 +1806,11 @@ QToolButton:checked {
               <string>Surface Crossing</string>
              </property>
             </item>
+           </item>
+           <item>
+            <property name="text">
+             <string>ADC</string>
+            </property>
            </item>
           </item>
           <item>
@@ -3830,6 +3977,194 @@ QToolButton:checked {
             </item>
            </layout>
           </widget>
+          <widget class="QWidget" name="AdvancedADC">
+           <layout class="QVBoxLayout" name="verticalLayout_29">
+            <item>
+             <widget class="QGroupBox" name="adc_guess">
+              <property name="title">
+               <string>Guess Options</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_19">
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_197">
+                 <property name="text">
+                  <string>Singles Guess Vectors</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QSpinBox" name="adc_nguess_singles"/>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_204">
+                 <property name="text">
+                  <string>Doubles Guess Vectors</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QSpinBox" name="adc_nguess_doubles"/>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="adc_davidson">
+              <property name="title">
+               <string>Davidson Options</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_20">
+               <item>
+                <layout class="QGridLayout" name="gridLayout_adc_davidson">
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_217">
+                   <property name="text">
+                    <string>Convergence</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_163">
+                   <property name="text">
+                    <string>Max. Subspace</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="label_168">
+                   <property name="text">
+                    <string>Max. Iterations</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="2">
+                  <spacer name="horizontalSpacer_37">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QSpinBox" name="adc_davidson_conv"/>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QSpinBox" name="adc_davidson_maxsubspace"/>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QSpinBox" name="adc_davidson_maxiter"/>
+                 </item>
+                 <item row="3" column="0">
+                  <widget class="QLabel" name="label_218">
+                   <property name="text">
+                    <string>Threshold</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="1">
+                  <widget class="QSpinBox" name="adc_davidson_thresh"/>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="adc_diis">
+              <property name="title">
+               <string>DIIS Options</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_26">
+               <item>
+                <layout class="QGridLayout" name="gridLayout_adc_diis">
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_42">
+                   <property name="text">
+                    <string>Res. Convergence</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QSpinBox" name="adc_diis_start"/>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QSpinBox" name="adc_diis_econv"/>
+                 </item>
+                 <item row="4" column="0">
+                  <widget class="QLabel" name="label_177">
+                   <property name="text">
+                    <string>Max. Iterations</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QSpinBox" name="adc_diis_rconv"/>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_219">
+                   <property name="text">
+                    <string>Energy Convergence</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="label_164">
+                   <property name="text">
+                    <string>DIIS Start</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="4" column="1">
+                  <widget class="QSpinBox" name="adc_diis_maxiter"/>
+                 </item>
+                 <item row="0" column="2">
+                  <spacer name="horizontalSpacer_38">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="3" column="0">
+                  <widget class="QLabel" name="label_52">
+                   <property name="text">
+                    <string>DIIS Size</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="1">
+                  <widget class="QSpinBox" name="adc_diis_size"/>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
           <widget class="QWidget" name="AdvancedEOMStates">
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
@@ -3885,6 +4220,22 @@ widgets.</string>
               </item>
               <item row="6" column="1">
                <widget class="QLineEdit" name="eom_ip_beta"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_8">
+              <item>
+               <widget class="QSpinBox" name="cc_frzn_core"/>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="cc_rest_occ"/>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="cc_rest_vir"/>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="cc_frzn_virt"/>
               </item>
              </layout>
             </item>

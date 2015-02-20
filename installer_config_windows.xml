@@ -2,11 +2,11 @@
     <shortName>IQmol</shortName>
     <fullName>IQmol</fullName>
     <version>2.4.0</version>
-    <readmeFile>C:\Users\agilbert\Development\IQmol\README</readmeFile>
-    <licenseFile>C:\Users\agilbert\Development\IQmol\LICENSE</licenseFile>
-    <leftImage>C:\Users\agilbert\Development\IQmol\src\Main\resources\Installer-lhs.png</leftImage>
-    <logoImage>C:\Users\agilbert\Development\IQmol\src\Main\resources\Installer-header.png</logoImage>
-    <splashImage>C:\Users\agilbert\Development\IQmol\src\Main\resources\installer-splash-windows.png</splashImage>
+    <readmeFile>C:/Users/agilbert/Development/IQmol/README</readmeFile>
+    <licenseFile>C:/Users/agilbert/Development/IQmol/LICENSE</licenseFile>
+    <leftImage>C:/Users/agilbert/Development/IQmol/src/Main/resources/Installer-lhs.png</leftImage>
+    <logoImage>C:/Users/agilbert/Development/IQmol/src/Main/resources/Installer-header.png</logoImage>
+    <splashImage>C:/Users/agilbert/Development/IQmol/src/Main/resources/Installer-splash-windows.png</splashImage>
     <componentList>
         <component>
             <name>default</name>
@@ -73,6 +73,9 @@
                         </distributionDirectory>
                         <distributionDirectory>
                             <origin>C:/Users/agilbert/Development/IQmol/samples</origin>
+                        </distributionDirectory>
+                        <distributionDirectory>
+                            <origin>C:/Users/agilbert/Development/IQmol/deploy/lib</origin>
                         </distributionDirectory>
                     </distributionFileList>
                 </folder>
