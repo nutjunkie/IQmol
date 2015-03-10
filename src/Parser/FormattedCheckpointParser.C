@@ -28,6 +28,7 @@
 #include "Constants.h"
 #include "Hessian.h"
 #include "Energy.h"
+#include "QsLog.h"
 #include <QtDebug>
 #include <cmath>
 
@@ -253,11 +254,18 @@ bool FormattedCheckpoint::dataAreConsistent(ShellData const& shellData, unsigned
        nPrimitives += shellData.shellPrimitives[i];
    }
 
-   if (shellData.shellToAtom.size()               != nShells     ||
-       shellData.shellPrimitives.size()           != nShells     ||
-       shellData.exponents.size()                 != nPrimitives ||
-       shellData.contractionCoefficients.size()   != nPrimitives ||
-       shellData.contractionCoefficientsSP.size() != nPrimitives  ) {
+   if ( shellData.shellToAtom.size()               != nShells     ||
+        shellData.shellPrimitives.size()           != nShells     ||
+        shellData.exponents.size()                 != nPrimitives ||
+        shellData.contractionCoefficients.size()   != nPrimitives ||
+       (shellData.contractionCoefficientsSP.size() != nPrimitives &&
+        shellData.contractionCoefficientsSP.size() != 0)      ) {
+       QLOG_WARN() << "Inconsistent checkpoint data:";
+       QLOG_WARN() << "  Shells" << shellData.shellToAtom.size()               << nShells;
+       QLOG_WARN() << "  Prims " << shellData.shellPrimitives.size()           << nShells;
+       QLOG_WARN() << "  Expts " << shellData.exponents.size()                 << nPrimitives;
+       QLOG_WARN() << "  CCs   " << shellData.contractionCoefficients.size()   << nPrimitives;
+       QLOG_WARN() << "  SP CCs" << shellData.contractionCoefficientsSP.size() << nPrimitives;
        m_errors.append("Inconsistent shell data read from file");
        return false;
    }
