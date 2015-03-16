@@ -82,6 +82,7 @@ void QChemJobInfo::set(Field const field, QString const& value)
       case Coordinates:
       case Constraints:
       case ScanCoordinates:
+      case ExternalCharges:
       case EfpFragments:
       case EfpParameters:
       case Queue:

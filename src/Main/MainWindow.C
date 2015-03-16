@@ -761,6 +761,11 @@ void MainWindow::configureAppearance()
 
 void MainWindow::newViewer()
 {
+// this is to test the exception capturing
+//int *foo = (int*)-1;
+//qDebug() << "printing crap";
+//qDebug() << *foo;
+
    MainWindow* mw(new MainWindow());
    mw->move(x()+30,y()+30);
    mw->show();

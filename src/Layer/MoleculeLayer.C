@@ -114,6 +114,9 @@ Molecule::Molecule(QObject* parent) : Base(DefaultMoleculeName, parent),
    setFlags(Qt::ItemIsSelectable | Qt::ItemIsDropEnabled | 
       Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
 
+   m_chargesList.setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+   m_chargesList.setCheckState(Qt::Checked);
+
    setCheckState(Qt::Checked);
    setConfigurator(&m_configurator);
 
@@ -196,10 +199,11 @@ void Molecule::appendData(Layer::List& list)
    }
 
    Layer::List::iterator iter;
+   Files*    files(0);
+   Atoms*    atoms(0);
+   Bonds*    bonds(0);
+   Charges*  charges(0);
    CubeData* cubeData(0);
-   Files* files(0);
-   Atoms* atoms(0);
-   Bonds* bonds(0);
    EfpFragments* efpFragments(0);
    QString text;
    PrimitiveList primitiveList;
@@ -235,6 +239,13 @@ void Molecule::appendData(Layer::List& list)
              for (bond = bondList.begin(); bond != bondList.end(); ++bond) {
                  bonds->removeLayer(*bond);
                  primitiveList.append(*bond);
+             }
+          }else if ((charges = qobject_cast<Charges*>(*iter))) {
+             ChargeList chargeList(charges->findLayers<Charge>(Children));
+             ChargeList::iterator charge;
+             for (charge = chargeList.begin(); charge != chargeList.end(); ++charge) {
+                 charges->removeLayer(*charge);
+                 primitiveList.append(*charge);
              }
           }else if ((efpFragments = qobject_cast<EfpFragments*>(*iter))) {
              QList<EfpFragment*> efps(efpFragments->findLayers<EfpFragment>(Children));
@@ -696,6 +707,22 @@ QString Molecule::efpParametersAsString()
    }
 
    return EfpFragment::efpParamsSection(names);
+}
+
+
+QString Molecule::externalChargesAsString()
+{
+   ChargeList charges(m_chargesList.findLayers<Charge>(Visible|Children));
+   if (charges.isEmpty()) return QString();
+
+   QString s;
+
+   ChargeList::iterator iter;
+   for (iter = charges.begin(); iter != charges.end(); ++iter) {
+       s += (*iter)->toString() + "\n"; 
+   }
+
+   return s;
 }
 
 
@@ -1529,6 +1556,7 @@ Process2::QChemJobInfo Molecule::qchemJobInfo()
    jobInfo.set(Process2::QChemJobInfo::ScanCoordinates, scanCoordinatesAsString());
    jobInfo.set(Process2::QChemJobInfo::EfpFragments,    efpFragmentsAsString());
    jobInfo.set(Process2::QChemJobInfo::EfpParameters,   efpParametersAsString());
+   jobInfo.set(Process2::QChemJobInfo::ExternalCharges, externalChargesAsString());
 
    AtomList atomList(findLayers<Atom>(Children | Visible));
    if (atomList.isEmpty()) jobInfo.setEfpOnlyJob(true);

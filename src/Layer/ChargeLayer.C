@@ -50,6 +50,18 @@ Charge::Charge(double const charge, Vec const& position) : Primitive("Charge")
    setPosition(position);
 }
 
+// TODO - This shouldn't be here
+QString Charge::toString() 
+{
+   QString s;
+   qglviewer::Vec position(getPosition());
+   s += QString::number(position.x, 'f', 6) + "   ";
+   s += QString::number(position.y, 'f', 6) + "   ";
+   s += QString::number(position.z, 'f', 6) + "   ";
+   s += QString::number(m_charge,   'f', 6);
+   return s;
+}
+
 
 void Charge::setCharge(double const charge)
 {
@@ -239,10 +251,11 @@ void Charge::drawLabel(QGLViewer& viewer, QFontMetrics& fontMetrics)
 }
 
 
-// --------------- ChargeConfigurator ---------------
 
-// This should be able to configure more than one charge at a time
-//   - saturation color
-//   - shape?
+Charges::Charges() : Base("Charges") 
+{ 
+   setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+   setCheckState(Qt::Checked);
+}
 
 } } // end namespace IQmol::Layer

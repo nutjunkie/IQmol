@@ -31,6 +31,7 @@
 #include "UndoCommands.h"
 #include "QMsgBox.h"
 #include "JobInfo.h"
+#include "Exception.h"
 #include "QVariantPointer.h"
 #include "CartesianCoordinatesParser.h"
 #include "TextStream.h"
@@ -185,6 +186,10 @@ void ViewerModel::fileOpenFinished()
 {
    ParseJobFiles* parser = qobject_cast<ParseJobFiles*>(sender());
    if (!parser) return;
+
+   if (parser->status() == Task::SigTrap) {
+      throw SignalException();
+   }
 
    Data::Bank& bank(parser->data());
    QFileInfo info(parser->filePath());

@@ -32,6 +32,7 @@
 
 #include "IQmolApplication.h"
 #include "Preferences.h"
+#include "Exception.h"
 #include "IQmol.h"
 #include <QStringList>
 #include <QDir>
@@ -42,7 +43,45 @@
 #include <windows.h>
 #endif
 
-int main(int argc, char *argv[]) {
+
+//************************************************************************************
+#include <stdio.h>
+#include <execinfo.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+
+int LogFileDescriptor(-1);
+
+void signalHandler(int signal) 
+{
+  void   *array[20];
+  size_t size(backtrace(array, 20));
+
+  if (LogFileDescriptor < 0) {
+     fprintf(stderr, "Fatal error encountered: signal %d\n", signal);
+     backtrace_symbols_fd(array, size, STDERR_FILENO);
+  }else {
+     QLOG_FATAL() << "Fatal error encountered: signal " << signal;
+     backtrace_symbols_fd(array, size, LogFileDescriptor);
+     backtrace_symbols_fd(array, size, STDERR_FILENO);
+     QLOG_FATAL() << "Message: " << strsignal(signal);
+  }
+
+  if (signal != SIGABRT) throw IQmol::SignalException();
+}
+
+//************************************************************************************
+
+
+int main(int argc, char *argv[]) 
+{
+    // Install our signal handler for all the signals we care about
+    for (int i = 4; i < 30; i++) {
+        signal(i, signalHandler);   
+    }
+
     IQmol::IQmolApplication iqmol(argc, argv);
     Q_INIT_RESOURCE(IQmol);
 
@@ -63,6 +102,8 @@ int main(int argc, char *argv[]) {
 
        logger.addDestination(fileDestination.get());
        logger.addDestination(debugDestination.get());
+       LogFileDescriptor = fileDestination->handle();
+
 #ifdef Q_OS_WIN32
        if (IQmol::Preferences::LogFileHidden()) {
           int fileHidden(0x2);  // Where is FILE_ATTRIBUTE_HIDDEN defined?
@@ -95,8 +136,17 @@ int main(int argc, char *argv[]) {
     if (args.isEmpty()) args.push_back("");
     iqmol.queueOpenFiles(args);
 
-    int ret(iqmol.exec());
-    QLOG_INFO() << "Return code:" << ret;
-    QLOG_INFO() << "----------- Session Ended -----------";
+    int ret(0);
+
+    try {
+       ret = iqmol.exec();
+       QLOG_INFO() <<  "Return code:" << ret;
+       QLOG_INFO() <<  "----------- Session Ended -----------";
+    } catch (std::exception& e ) {
+       QLOG_FATAL() << e.what();
+       QLOG_FATAL() << "------- EXCEPTION ENCOUNTERED -------";
+       iqmol.exception();
+    }
+
     return ret;
 }

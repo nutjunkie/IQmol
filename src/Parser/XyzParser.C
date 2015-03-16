@@ -57,7 +57,7 @@ bool Xyz::parse(TextStream& textStream)
 Data::Geometry* Xyz::readNextGeometry(TextStream& textStream)
 {
    const QRegExp integerOnly("^\\d+$");  // note nextLine() returns a trimmed line
-   QRegExp anyReal("([-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?)");
+   QRegExp anyReal("([-+]?[0-9]*\\.[0-9]+([eE][-+]?[0-9]+)?)");
 
    Data::Geometry* geometry(0);
    QString line(textStream.previousLine());

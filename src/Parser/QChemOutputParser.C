@@ -243,6 +243,10 @@ qDebug() << "Setting total energy to" << total.value();
          tokens = TextStream::tokenize(line);
          if (tokens.size() >= 5) setTotalEnergy(tokens[4], currentGeometry, "RIMP2");
 
+      }else if (line.contains("RI-MP2 TOTAL ENERGY")) {
+         tokens = TextStream::tokenize(line);
+         if (tokens.size() >= 5) setTotalEnergy(tokens[4], currentGeometry, "RIMP2");
+
       }else if (line.contains("Total SOS-MP2 energy")) {
          tokens = TextStream::tokenize(line);
          if (tokens.size() >= 5) setTotalEnergy(tokens[4], currentGeometry, "SOS-MP2");

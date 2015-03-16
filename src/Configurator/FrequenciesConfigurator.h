@@ -76,6 +76,7 @@ namespace Configurator {
          void on_widthSlider_valueChanged(int);
 
          void plotSelectionChanged(bool);
+         void contextMenuRequest(QPoint);
          void updatePlot();
 
       private:

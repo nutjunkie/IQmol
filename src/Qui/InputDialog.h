@@ -115,6 +115,8 @@ class InputDialog : public QMainWindow {
       void on_svp_toggled(bool);
       void on_chemsol_toggled(bool);
 
+      void on_readChargesButton_clicked(bool);
+
       // Manual slots
       void widgetChanged(QObject* orig, QString const& value);
       void widgetChanged(QString const& value);
@@ -139,11 +141,11 @@ class InputDialog : public QMainWindow {
       void fontBigger()  { fontAdjust(true);  }
       void fontSmaller() { fontAdjust(false); }
       void setFont();
+      void readChargesFinished();
 
 
    protected:
       void resizeEvent(QResizeEvent* event);
-
 
    private:
       // ---------- Data ----------

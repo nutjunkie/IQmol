@@ -24,6 +24,7 @@
 #include "Data.h"
 #include "Bank.h"
 #include "Mesh.h"
+#include "PointCharge.h"
 
 #include "Surface.h"
 #include "CubeData.h"
@@ -32,6 +33,7 @@
 
 #include "AtomLayer.h"
 #include "BondLayer.h"
+#include "ChargeLayer.h"
 #include "FileLayer.h"
 #include "CubeDataLayer.h"
 #include "DipoleLayer.h"
@@ -95,6 +97,11 @@ Layer::List Factory::toLayers(Data::Base& data)
          case Data::Type::Geometry: {
             Data::Geometry& geometry(dynamic_cast<Data::Geometry&>(data));
             layers << convert(geometry);
+         } break;
+
+         case Data::Type::PointChargeList: {
+            Data::PointChargeList&  charges(dynamic_cast<Data::PointChargeList&>(data));
+            layers << convert(charges);
          } break;
 
          case Data::Type::MolecularOrbitalsList: {
@@ -227,6 +234,25 @@ List Factory::convert(Data::Geometry& geometry)
        bonds->appendLayer(bond);
    }
 
+   return list;
+}
+
+
+
+List Factory::convert(Data::PointChargeList& pointCharges)
+{
+   Charges* charges(new Charges());
+   unsigned nCharges(pointCharges.size());
+   
+   for (unsigned i = 0; i < nCharges; ++i) {
+       double q(pointCharges[i]->value());
+       qglviewer::Vec position(pointCharges[i]->position());
+       Charge* charge(new Charge(q,position));
+       charges->appendLayer(charge);
+   }
+
+   List list;
+   list.append(charges);
    return list;
 }
 

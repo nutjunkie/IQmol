@@ -3,7 +3,7 @@ CONFIG += lib
 include(../common.pri)
 QT += sql
 
-INCLUDEPATH += ../Util ../QMsgBox ../Old ../Process
+INCLUDEPATH += ../Util ../QMsgBox ../Old ../Process ../Parser ../Data
 
 HEADERS += \
    $$PWD/Actions.h \

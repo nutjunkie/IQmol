@@ -21,6 +21,7 @@
 ********************************************************************************/
 
 #include "Preferences.h"
+#include "PointCharge.h"
 
 #include "InputDialog.h"
 #include "ExternalChargesSection.h"
@@ -38,6 +39,7 @@
 #include "RemSection.h"
 #include "MoleculeSection.h"
 #include "QsLog.h"
+#include "ParseFile.h"
 
 #include <QMenuBar>
 #include <QClipboard>
@@ -165,6 +167,8 @@ void InputDialog::setQChemJobInfo(IQmol::Process2::QChemJobInfo const& jobInfo)
       m_qchemJobInfo.get(IQmol::Process2::QChemJobInfo::ScanCoordinates));
    m_currentJob->setEfpParameters(
       m_qchemJobInfo.get(IQmol::Process2::QChemJobInfo::EfpParameters));
+   m_currentJob->setExternalCharges(
+      m_qchemJobInfo.get(IQmol::Process2::QChemJobInfo::ExternalCharges));
 
    if (m_qchemJobInfo.efpOnlyJob()) {
       m_ui.basis->setEnabled(false);
@@ -733,6 +737,63 @@ qDebug() << "WARN: setting QChemJobInfo, not JobInfo";
          m_ui.jobList->setCurrentIndex(index-1);
       }
    }
+}
+
+
+void InputDialog::on_readChargesButton_clicked(bool) 
+{
+   QString filePath(QFileDialog::getOpenFileName(this, tr("Open File"), 
+     Preferences::LastFileAccessed()));
+   while (filePath.endsWith("/")) {
+      filePath.chop(1);
+   }
+   if (filePath.isEmpty()) return;
+
+   Parser::ParseFile* parser(new Parser::ParseFile(filePath));
+   connect(parser, SIGNAL(finished()), this, SLOT(readChargesFinished()));
+   parser->start();
+}
+
+
+void InputDialog::readChargesFinished()
+{
+   Parser::ParseFile* parser = qobject_cast<Parser::ParseFile*>(sender());
+   if (!parser) return;
+
+   Data::Bank& bank(parser->data());
+   QFileInfo info(parser->filePath());
+   QStringList errors(parser->errors());
+
+   if (!errors.isEmpty()) QMsgBox::warning(this, "IQmol", errors.join("\n"));
+
+   QList<Data::PointChargeList*> chargesLists(bank.takeData<Data::PointChargeList>());
+
+   if (chargesLists.isEmpty()) {
+      if (errors.isEmpty()) errors.append("No valid data found in " + info.filePath());
+      QMsgBox::warning(this, "IQmol", errors.join("\n"));
+      parser->deleteLater();
+      return;
+   }
+
+   QString s;
+
+   QList<Data::PointChargeList*>::iterator iter;
+   for (iter = chargesLists.begin(); iter != chargesLists.end(); ++iter) {
+       Data::PointChargeList::iterator charge;
+       for (charge = (*iter)->begin(); charge != (*iter)->end(); ++charge) {
+           qglviewer::Vec position((*charge)->position());
+           double q((*charge)->value());
+           s += QString::number(position.x, 'f', 6) + "   ";
+           s += QString::number(position.y, 'f', 6) + "   ";
+           s += QString::number(position.z, 'f', 6) + "   ";
+           s += QString::number(q,          'f', 6) + " \n";
+       }
+   }
+
+   m_currentJob->setExternalCharges(s);
+   parser->deleteLater();
+   Preferences::LastFileAccessed(info.filePath());
+   updatePreviewText();
 }
 
 

@@ -297,6 +297,7 @@ namespace IQmol {
             QString scanCoordinatesAsString();
             QString efpFragmentsAsString();
             QString efpParametersAsString();
+            QString externalChargesAsString();
 
             template <class T>
             QList<double> atomicCharges();

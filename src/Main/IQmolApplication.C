@@ -36,16 +36,26 @@
 #include <QThread>
 #include <QThreadPool>
 
+#include <exception>
 
 
 namespace IQmol {
 
 IQmolApplication::IQmolApplication(int &argc, char **argv )
-  : QApplication(argc, argv), m_splashScreen(0)
+  : QApplication(argc, argv), m_splashScreen(0), 
+    m_unhandledException(QMessageBox::Critical, "IQmol", "IQmol encountered an exception.\n"
+    "See log file for details.", QMessageBox::Abort)
+    
 {
    setOrganizationDomain("iqmol.org");
    setApplicationName("IQmol");
    // Can't log anything yet as the logger hasn't been initialized
+}
+
+
+IQmolApplication::~IQmolApplication()
+{
+   if (m_splashScreen) delete m_splashScreen;
 }
 
 
@@ -60,11 +70,7 @@ void IQmolApplication::showSplash()
 
 void IQmolApplication::hideSplash()
 {  
-    if (m_splashScreen) {
-       m_splashScreen->close();
-       //delete m_splashScreen;
-       //m_splashScreen = 0;
-    }
+   if (m_splashScreen) m_splashScreen->close();
 }
 
 
@@ -142,7 +148,7 @@ void IQmolApplication::open(QString const& file)
 
    static bool connected(false);
    if (!connected) {
-//      connect(this, SIGNAL(lastWindowClosed()), this, SLOT(maybeQuit()));
+      // connect(this, SIGNAL(lastWindowClosed()), this, SLOT(maybeQuit()));
       connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
       connected = true;
    }
@@ -162,11 +168,6 @@ bool IQmolApplication::event(QEvent* event)
          accepted = true;
          } break;
 
-//      case QEvent::Close: {
-//         disconnect(this, SIGNAL(lastWindowClosed()), this, SLOT(maybeQuit()));
-//         accepted = QApplication::event(event);
-//         } break;
-
       case QEvent::User: {
          QString file(static_cast<FileOpenEvent*>(event)->file());
          open(file);
@@ -185,33 +186,13 @@ bool IQmolApplication::event(QEvent* event)
 void IQmolApplication::maybeQuit()
 {
    Process2::ServerRegistry::instance().closeAllConnections();
-
    QApplication::quit();  // no maybe about it, the rest is just annoying
-   return;
+}
 
-   disconnect(this, SIGNAL(lastWindowClosed()), this, SLOT(maybeQuit()));
 
-   QPixmap pixmap;
-   pixmap.load(":/imageInformation");
-   QMessageBox messageBox(QMessageBox::NoIcon, "IQmol", "No viewer windows remain");
-   QPushButton* quitButton = messageBox.addButton("Quit", QMessageBox::AcceptRole);
-   QPushButton* newButton  = messageBox.addButton("New", QMessageBox::RejectRole);
-   QPushButton* openButton = messageBox.addButton("Open", QMessageBox::RejectRole);
-   messageBox.setIconPixmap(pixmap);
-   messageBox.exec();
-
-   if (messageBox.clickedButton() == quitButton) {
-      QApplication::quit();
-   }else if (messageBox.clickedButton() == newButton) {
-      MainWindow* mw(new MainWindow());
-      mw->show();
-   }else if (messageBox.clickedButton() == openButton) {
-      MainWindow* mw(new MainWindow());
-      mw->show();
-      mw->openFile();
-   }
-
-   connect(this, SIGNAL(lastWindowClosed()), this, SLOT(maybeQuit()));
+void IQmolApplication::exception()
+{
+   m_unhandledException.exec();   
 }
 
 

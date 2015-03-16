@@ -50,6 +50,8 @@ namespace Layer {
          void drawLabel(QGLViewer& viewer, QFontMetrics& fontMetrics);
          void setCharge(double const charge);
 
+         QString toString();
+
       protected:
          GLfloat m_color[4];
 
@@ -75,10 +77,9 @@ namespace Layer {
       Q_OBJECT;
 
       public:
-         Charges() : Base("Charges") { }
+         Charges();
          QList<Charge*> getCharges() { return findLayers<Charge>(Children); }
    };
-
 
 }
 

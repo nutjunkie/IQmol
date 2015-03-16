@@ -24,7 +24,6 @@
 
 #include <QThread>
 #include <QTime>
-#include <exception>
 
 
 namespace IQmol {
@@ -36,7 +35,7 @@ namespace IQmol {
       Q_OBJECT
 
       public:
-         enum Status { Pending, Running, Completed, Terminated, Error };
+         enum Status { Pending, Running, Completed, Terminated, Error, SigTrap };
  
          Task(QThread* thread = 0, int timeout = 1000);
 

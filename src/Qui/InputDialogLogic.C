@@ -111,17 +111,18 @@ bool requiresAuxBasis()
    QtNode& correlation(reg.get("CORRELATION"));
    QString value(correlation.getValue().toUpper());
 
-   bool tf((value == "RI-MP2")     ||  (value == "SOSMP2")     || 
-           (value == "MOSMP2")    ||  (value == "RI-CIS(D)")   ||
-           (value == "SOS-CIS(D)") ||  (value == "SOS-CIS(D0)") ||
-           (value == "CCD")       ||  (value == "CCD(2)")     ||
-           (value == "CCSD")      ||  (value == "CCSD(T)")    ||
-           (value == "CCSD(2)")   ||  (value == "CCSD(dT)")   ||
-           (value == "CCSD(fT)")  ||  (value == "QCCD")       ||
-           (value == "QCISD")     ||  (value == "QCISD(T)")   || 
-           (value == "OD")        ||  (value == "OD(T)")      ||
-           (value == "OD(2)")     ||  (value == "VOD")        ||
-           (value == "VOD(2)")    ||  (value == "VQCCD"));
+   bool tf((value == "RI-MP2")     || (value == "SOSMP2")      || 
+           (value == "ATTMP2")     ||
+           (value == "MOSMP2")     || (value == "RI-CIS(D)")   ||
+           (value == "SOS-CIS(D)") || (value == "SOS-CIS(D0)") ||
+           (value == "CCD")        ||  (value == "CCD(2)")     ||
+           (value == "CCSD")       ||  (value == "CCSD(T)")    ||
+           (value == "CCSD(2)")    ||  (value == "CCSD(dT)")   ||
+           (value == "CCSD(fT)")   ||  (value == "QCCD")       ||
+           (value == "QCISD")      ||  (value == "QCISD(T)")   || 
+           (value == "OD")         ||  (value == "OD(T)")      ||
+           (value == "OD(2)")      ||  (value == "VOD")        ||
+           (value == "VOD(2)")     ||  (value == "VQCCD"));
 
    QtNode& exchange(reg.get("EXCHANGE"));
    value = exchange.getValue().toUpper();
@@ -129,8 +130,8 @@ bool requiresAuxBasis()
 
    QtNode& method(reg.get("METHOD"));
    value = method.getValue().toUpper();
-   tf = tf || (value == "RI-CIS(D)") || (value == "SOS-CIS(D)") || (value == "RI-MP2") 
-           || (value == "SOS-CIS(D0)" || (value == "SOSMP2") );
+   tf = tf || (value == "RI-CIS(D)")  || (value == "SOS-CIS(D)") || (value == "RI-MP2") 
+           || (value == "SOS-CIS(D0)" || (value == "SOSMP2")     || (value == "ATTMP2") );
 
    return tf;
 }

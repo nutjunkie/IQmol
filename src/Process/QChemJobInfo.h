@@ -44,7 +44,7 @@ namespace Process2 {
             EspFileName, MoFileName, DensityFileName, ErrorFileName,
             RunFileName, ServerName, LocalWorkingDirectory, RemoteWorkingDirectory, 
             InputString, Charge, Multiplicity, Coordinates, Constraints, ScanCoordinates,
-            EfpFragments, EfpParameters,
+            EfpFragments, EfpParameters, ExternalCharges,
             Queue, Walltime, Memory, Scratch, Ncpus };
             
          QChemJobInfo() : m_charge(0), m_multiplicity(1), m_localFilesExist(false),

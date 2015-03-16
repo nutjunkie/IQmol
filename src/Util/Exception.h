@@ -46,6 +46,12 @@ namespace IQmol {
          QByteArray m_byteArray;
    };
 
+
+   class SignalException : public std::exception {
+      public:
+         const char* what() const throw() { return "Signal caught"; }
+   };
+
 } // end namespace IQmol
 
 #endif

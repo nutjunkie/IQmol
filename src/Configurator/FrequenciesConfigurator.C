@@ -117,6 +117,15 @@ void Frequencies::load()
 }
 
 
+void Frequencies::contextMenuRequest(QPoint pos)
+{
+  QMenu *menu = new QMenu(this);
+  menu->setAttribute(Qt::WA_DeleteOnClose);
+  menu->addAction("Save PNG", this, SLOT(savePNG()));
+  menu->popup(m_customPlot->mapToGlobal(pos));
+}
+
+
 void Frequencies::on_widthSlider_valueChanged(int)
 {
    updatePlot();
@@ -184,7 +193,6 @@ void Frequencies::updatePlot()
 
 void Frequencies::plotImpulse(double const scaleFactor)
 {
-//qDebug() << "Plot impulse called";
    QVector<double> x(1), y(1);
    double maxIntensity(m_frequencies.maxIntensity());;
 
@@ -202,7 +210,7 @@ void Frequencies::plotImpulse(double const scaleFactor)
        connect(graph, SIGNAL(selectionChanged(bool)), this, SLOT(plotSelectionChanged(bool)));
    }
 
-   m_customPlot->xAxis->setRange(0, 3500);
+   m_customPlot->xAxis->setRange(0, 4000);
    m_customPlot->yAxis->setRange(-0.00*maxIntensity, 1.05*maxIntensity);
    m_customPlot->yAxis->setAutoTickStep(true);
 }

@@ -160,7 +160,12 @@ qDebug() << "About to parse file" << filePath;
    }
 
    if (extension == "xyz") {
-      QLOG_INFO() << "Using Xyz parser";
+      QLOG_INFO() << "Using XYZ parser";
+      parser = new Xyz;
+   }
+
+   if (extension == "txt") {
+      QLOG_INFO() << "Using XYZ parser";
       parser = new Xyz;
    }
 

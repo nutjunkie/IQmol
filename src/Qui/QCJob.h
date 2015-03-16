@@ -61,6 +61,7 @@ class Job {
       void setScanCoordinates(QString const&);
       void setEfpFragments(QString const&);
       void setEfpParameters(QString const&);
+      void setExternalCharges(QString const&);
       void setMolecule(Molecule*);
       QString  getCoordinates();
       int  getNumberOfAtoms();
