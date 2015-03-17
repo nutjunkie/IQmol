@@ -1,7 +1,7 @@
 <project>
     <shortName>IQmol</shortName>
     <fullName>IQmol</fullName>
-    <version>2.4.0</version>
+    <version>2.5.0</version>
     <readmeFile>/home/agilbert/Development/IQmol/README</readmeFile>
     <licenseFile>/home/agilbert/Development/IQmol/LICENSE</licenseFile>
     <wrapLicenseFileText>0</wrapLicenseFileText>
@@ -17,7 +17,7 @@
             <desktopShortcutList>
                 <shortcut>
                     <comment>IQmol - Molecular Editor</comment>
-                    <exec>${installdir}/bin/IQmol</exec>
+                    <exec>${installdir}/bin/iqmol.sh</exec>
                     <icon>${installdir}/share/IQmol.png</icon>
                     <name>IQmol</name>
                     <path>${installdir}</path>
@@ -64,6 +64,9 @@
                         <distributionFile>
                             <origin>/home/agilbert/Development/IQmol/deploy/bin/IQmol</origin>
                         </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/bin/iqmol.sh</origin>
+                        </distributionFile>
                     </distributionFileList>
                 </folder>
                 <folder>
@@ -95,9 +98,90 @@
                     <name>lib</name>
                     <platforms>all</platforms>
                     <distributionFileList>
-                        <distributionDirectory>
-                            <origin>/home/agilbert/Development/IQmol/deploy/lib</origin>
-                        </distributionDirectory>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libc.so.6</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libdrm.so.2</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libffi.so.6</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libgcc_s.so.1</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libGL.so.1</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libglapi.so.0</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libglib-2.0.so.0</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libGLU.so.1</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libgobject-2.0.so.0</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libgthread-2.0.so.0</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libicudata.so.52</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libicui18n.so.52</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libicuuc.so.52</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libopenbabel.so.4</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libpcre.so.3</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libpthread.so.0</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libQt5Core.so.5</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libQt5DBus.so.5</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libQt5Gui.so.5</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libQt5Network.so.5</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libQt5OpenGL.so.5</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libQt5PrintSupport.so.5</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libQt5Sql.so.5</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libQt5Svg.so.5</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libQt5Widgets.so.5</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libQt5Xml.so.5</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/librt.so.1</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/libstdc++.so.6</origin>
+                        </distributionFile>
                     </distributionFileList>
                 </folder>
             </folderList>
