@@ -182,6 +182,12 @@
                         <distributionFile>
                             <origin>/home/agilbert/Development/IQmol/deploy/lib/libstdc++.so.6</origin>
                         </distributionFile>
+                        <distributionDirectory>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/plugins</origin>
+                        </distributionDirectory>
+                        <distributionDirectory>
+                            <origin>/home/agilbert/Development/IQmol/deploy/lib/openbabel</origin>
+                        </distributionDirectory>
                     </distributionFileList>
                 </folder>
             </folderList>
