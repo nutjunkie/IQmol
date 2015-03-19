@@ -118,7 +118,8 @@ win32 {
    LIBS += C:\MinGW\lib\gcc\mingw32\4.8.1\libgfortran.a
 
    # OpenBabel
-   LIBS += C:\Users\agilbert\Development\extlib\lib\libopenbabel.a 
+   INCLUDEPATH += C:\Users\agilbert\Development\openbabel-2.3.2\include
+   LIBS        += C:\Users\agilbert\Development\extlib\lib\libopenbabel.a 
 
    # OpenMesh
    INCLUDEPATH += C:\Users\agilbert\Development\OpenMesh-2.4\src
@@ -126,11 +127,12 @@ win32 {
    LIBS        += C:\Users\agilbert\Development\extlib\lib\libOpenMeshCored.a 
 
    # SSH2
+   INCLUDEPATH += C:\Users\agilbert\Development\extlib\include
    LIBS        += -LC:\Users\agilbert\Development\extlib\lib
    LIBS        += -lssh2 -lssl -lcrypto -lgdi32
 
    # QGLViewer
-   INCLUDEPATH += C:\Users\agilbert\Development\libQGLViewer-2.5.2/QGLViewer
+   INCLUDEPATH += C:\Users\agilbert\Development\libQGLViewer-2.5.2
    LIBS       += C:\Users\agilbert\Development\extlib\lib\libQGLViewer2.a
    #LIBS        += -lQGLViewer 
 

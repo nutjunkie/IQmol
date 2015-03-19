@@ -43,17 +43,58 @@
 #include <windows.h>
 #endif
 
+int LogFileDescriptor(-1);
 
-//************************************************************************************
+//****************************************************************************
+
 #include <stdio.h>
-#include <execinfo.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
 
 
-int LogFileDescriptor(-1);
+#ifdef Q_OS_WIN32
+#if 0
+void printStack()
+{
+   unsigned int   i;
+   void         * stack[ 100 ];
+   unsigned short frames;
+   SYMBOL_INFO  * symbol;
+   HANDLE         process;
 
+   process = GetCurrentProcess();
+   SymInitialize( process, NULL, TRUE );
+   frames               = CaptureStackBackTrace( 0, 100, stack, NULL );
+   symbol  = (SYMBOL_INFO*)malloc(sizeof(SYMBOL_INFO + 256*sizeof(char), 1));
+   symbol->MaxNameLen   = 255;
+   symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+
+   for (i = 0; i < frames; i++) {
+       SymFromAddr( process, ( DWORD64 )( stack[ i ] ), 0, symbol );
+       printf( "%i: %s - 0x%0X\n", frames-i-1, symbol->Name, symbol->Address);
+   }
+
+   free( symbol );
+}
+#endif
+
+void signalHandler(int signal) 
+{
+  if (LogFileDescriptor < 0) {
+     fprintf(stderr, "Fatal error encountered: signal %d\n", signal);
+  }else {
+     QLOG_FATAL() << "Fatal error encountered: signal " << signal;
+  }
+
+  if (signal != SIGABRT) throw IQmol::SignalException();
+}
+
+
+
+#else
+
+#include <execinfo.h>
 void signalHandler(int signal) 
 {
   void   *array[20];
@@ -71,8 +112,9 @@ void signalHandler(int signal)
 
   if (signal != SIGABRT) throw IQmol::SignalException();
 }
+#endif
 
-//************************************************************************************
+//****************************************************************************
 
 
 int main(int argc, char *argv[]) 
