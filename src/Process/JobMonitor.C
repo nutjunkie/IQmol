@@ -651,7 +651,7 @@ void JobMonitor::jobError()
    QString msg("Job ");
    msg += job->jobName() + " failed:\n\n";
    msg += job->message();
-   QMsgBox::warning(QApplication::activeWindow(), "IQmol", msg);
+   QMsgBox::warning(0, "IQmol", msg);
 }
 
 
@@ -665,7 +665,7 @@ void JobMonitor::jobFinished()
       if (job->status() == Job::Error) {
          QString msg(job->jobName() + " failed:\n");
          msg += job->message();
-         QMsgBox::warning(QApplication::activeWindow(), "IQmol", msg);
+         QMsgBox::warning(0, "IQmol", msg);
       }else {
          resultsAvailable(job->jobInfo().get(QChemJobInfo::LocalWorkingDirectory),
                           job->jobInfo().get(QChemJobInfo::BaseName),
@@ -675,10 +675,12 @@ void JobMonitor::jobFinished()
    }else {
       QString msg("Job " + job->jobName() + " finished.\n");
       msg += "Copy results from server?";
-      if (QMsgBox::question(QApplication::activeWindow(), "IQmol", msg,
-         QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+       
+      if (QMsgBox::question(0, "IQmol", msg, QMessageBox::Yes | QMessageBox::No,
+          QMessageBox::Yes) == QMessageBox::Yes) {
          copyResults(job);
       }
+
    }
 }
 
