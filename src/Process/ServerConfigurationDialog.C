@@ -44,9 +44,9 @@ ServerConfigurationDialog::ServerConfigurationDialog(ServerConfiguration& config
    m_dialog.setupUi(this);
    init();
    m_currentConfiguration = new ServerConfiguration(m_originalConfiguration);
-   m_blockUpdate = true;
+   blockUpdate(true);
    copyFrom(m_originalConfiguration);
-   m_blockUpdate = false;
+   blockUpdate(false);
 
    connect(m_dialog.buttonBox, SIGNAL(accepted()), this, SLOT(verify()));
 }
@@ -80,6 +80,11 @@ void ServerConfigurationDialog::init()
 
 void ServerConfigurationDialog::updateAllowedQueueSystems(bool httpOnly)
 {
+   bool currentHttpOnly(m_dialog.queueSystem->itemText(0) ==
+         ServerConfiguration::toString(ServerConfiguration::Web));
+
+   if (currentHttpOnly == httpOnly) return;
+
    m_dialog.queueSystem->clear();
 
    if (httpOnly) {
@@ -100,15 +105,21 @@ void ServerConfigurationDialog::updateAllowedQueueSystems(bool httpOnly)
 
 void ServerConfigurationDialog::on_localRadioButton_toggled(bool tf)
 {
+qDebug() << "Local Radio button toggled";
    if (!tf) return;
+qDebug() << "  to true";
 
    m_dialog.remoteHostGroupBox->setEnabled(false);
    m_dialog.configureConnectionButton->setEnabled(false);
    updateAllowedQueueSystems(false);
 
-   if (m_blockUpdate) return;
+   if (blockUpdate()) return;
+qDebug() << "  update not blocked";
 
    m_currentConfiguration->setDefaults(ServerConfiguration::Local);
+   on_queueSystem_currentIndexChanged(m_dialog.queueSystem->currentText());
+
+qDebug() << "  local defaults set";
    copyFrom(*m_currentConfiguration);
 }
 
@@ -124,7 +135,7 @@ void ServerConfigurationDialog::on_sshRadioButton_toggled(bool tf)
    m_dialog.workingDirectory->setEnabled(true);
    updateAllowedQueueSystems(false);
 
-   if (m_blockUpdate) return;
+   if (blockUpdate()) return;
 
    m_currentConfiguration->setDefaults(ServerConfiguration::SSH);
    copyFrom(*m_currentConfiguration);
@@ -142,7 +153,7 @@ void ServerConfigurationDialog::on_httpRadioButton_toggled(bool tf)
    m_dialog.workingDirectory->setEnabled(false);
    updateAllowedQueueSystems(true);
 
-   if (m_blockUpdate) return;
+   if (blockUpdate()) return;
 
    m_currentConfiguration->setDefaults(ServerConfiguration::HTTP);
    copyFrom(*m_currentConfiguration);
@@ -160,7 +171,7 @@ void ServerConfigurationDialog::on_httpsRadioButton_toggled(bool tf)
    m_dialog.workingDirectory->setEnabled(false);
    updateAllowedQueueSystems(true);
 
-   if (m_blockUpdate) return;
+   if (blockUpdate()) return;
 
    m_currentConfiguration->setDefaults(ServerConfiguration::HTTPS);
    copyFrom(*m_currentConfiguration);
@@ -184,8 +195,10 @@ void ServerConfigurationDialog::on_configureQueueButton_clicked(bool)
 
 void ServerConfigurationDialog::on_queueSystem_currentIndexChanged(QString const& queue)
 {
-  if (m_blockUpdate) return;
-  m_currentConfiguration->setDefaults(ServerConfiguration::toQueueSystemT(queue));
+  if (blockUpdate()) return;
+  ServerConfiguration::QueueSystemT queueT(ServerConfiguration::toQueueSystemT(queue));
+  //if (m_currentConfiguration->queueSystem() == queueT) return;
+  m_currentConfiguration->setDefaults(queueT);
 }
 
 
@@ -452,9 +465,9 @@ void ServerConfigurationDialog::on_loadButton_clicked(bool)
       if (yaml.first()) {
          yaml.first()->dump();
          ServerConfiguration config(*(yaml.first()));
-         m_blockUpdate = true;
+         blockUpdate(true);
          copyFrom(config);
-         m_blockUpdate = false;
+         blockUpdate(false);
       }
 
    } catch (YAML::Exception& err) {
@@ -479,6 +492,19 @@ void ServerConfigurationDialog::on_exportButton_clicked(bool)
    if (!node.saveToFile(filePath)) {
       QMsgBox::warning(this, "IQmol", "Failed to export server configuration");
    }
+}
+
+
+void ServerConfigurationDialog::blockUpdate(bool const tf)
+{
+   qDebug() << "Setting block update to" << tf;
+   m_blockUpdate = tf;
+}
+
+
+bool ServerConfigurationDialog::blockUpdate() const
+{
+   return m_blockUpdate;
 }
 
 } } // end namespace IQmol::Process
