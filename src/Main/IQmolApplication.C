@@ -55,7 +55,8 @@ IQmolApplication::IQmolApplication(int &argc, char **argv )
 
 IQmolApplication::~IQmolApplication()
 {
-   if (m_splashScreen) delete m_splashScreen;
+// This seems to cause a crash on exit under windows
+//   if (m_splashScreen) delete m_splashScreen;
 }
 
 

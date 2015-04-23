@@ -42,6 +42,7 @@ HttpConnection::HttpConnection(QString const& hostname, int const port) :
 HttpConnection::~HttpConnection()
 {
    close();
+   killThread();
 }
 
 

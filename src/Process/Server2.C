@@ -73,6 +73,7 @@ QStringList Server::tableFields() const
 void Server::closeConnection()
 {
    if (m_connection) {
+      m_connection->close();
       delete m_connection;
       m_connection = 0;
    }
