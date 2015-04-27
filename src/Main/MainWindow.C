@@ -60,13 +60,22 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent),
    m_viewerView(this),
    m_undoStack(this),
    m_undoStackView(&m_undoStack, this),
-   m_viewer(m_viewerModel, this),
    m_viewerSelectionModel(&m_viewerModel, this),
    m_logMessageDialog(0),
    m_preferencesBrowser(this),
    m_quiInputDialog(0),
-   m_shaderDialog(0)
+   m_shaderDialog(0),
+   m_context(0)
 {
+   QGLFormat format(QGL::SampleBuffers);
+   format.setVersion(2,1);
+   format.setProfile(QGLFormat::CompatibilityProfile);
+   //format.setVersion(3,3);
+   //format.setProfile(QGLFormat::CoreProfile);
+   m_context = new QGLContext(format);
+
+   m_viewer = new Viewer(m_context, m_viewerModel, this);
+
    setStatusBar(0);
    setWindowTitle("IQmol");
    setWindowModified(false);
@@ -81,16 +90,17 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent),
    m_undoStackView.setEmptyLabel("History:");
    m_viewerView.setModel(&m_viewerModel);
    m_viewerView.setSelectionModel(&m_viewerSelectionModel);
-   m_viewer.setActiveViewerMode(Viewer::BuildAtom);
-
-   m_viewer.setDefaultSceneRadius();
-   m_viewer.resetView();
+   m_viewer->setActiveViewerMode(Viewer::BuildAtom);
+   m_viewer->setDefaultSceneRadius();
+   m_viewer->resetView();
 }
 
 MainWindow::~MainWindow()
 {
    delete m_quiInputDialog;
    delete m_shaderDialog;
+   delete m_viewer;
+   delete m_context;
 }
 
 void MainWindow::createLayout()
@@ -128,7 +138,7 @@ void MainWindow::createLayout()
    // Main splitter
    QSplitter* splitter = new QSplitter(Qt::Horizontal, this);
    splitter->addWidget(m_sideSplitter);
-   splitter->addWidget(&m_viewer);
+   splitter->addWidget(m_viewer);
    splitter->setCollapsible(0, true);
    splitter->setCollapsible(1, false);
 
@@ -153,32 +163,32 @@ void MainWindow::createConnections()
    connect(&m_toolBar, SIGNAL(addHydrogens()),    &m_viewerModel, SLOT(addHydrogens()));
    connect(&m_toolBar, SIGNAL(minimizeEnergy()),  &m_viewerModel, SLOT(minimizeEnergy()));
    connect(&m_toolBar, SIGNAL(deleteSelection()), &m_viewerModel, SLOT(deleteSelection()));
-   connect(&m_toolBar, SIGNAL(takeSnapshot()),    &m_viewer,      SLOT(saveSnapshot()));
+   connect(&m_toolBar, SIGNAL(takeSnapshot()),    m_viewer,       SLOT(saveSnapshot()));
    connect(&m_toolBar, SIGNAL(record(bool)),      this,           SLOT(setRecord(bool)));
    connect(&m_toolBar, SIGNAL(fullScreen()),      this,           SLOT(fullScreen()));
    connect(&m_toolBar, SIGNAL(showHelp()),        this,           SLOT(showHelp()));
 
    connect(&m_toolBar, SIGNAL(viewerModeChanged(Viewer::Mode const)), 
-      &m_viewer, SLOT(setActiveViewerMode(Viewer::Mode const)));
+      m_viewer, SLOT(setActiveViewerMode(Viewer::Mode const)));
    connect(&m_toolBar, SIGNAL(buildElementSelected(unsigned int)), 
-      &m_viewer, SLOT(setDefaultBuildElement(unsigned int)));
+      m_viewer, SLOT(setDefaultBuildElement(unsigned int)));
    connect(&m_toolBar, SIGNAL(buildFragmentSelected(QString const&, Viewer::Mode const)), 
-      &m_viewer, SLOT(setDefaultBuildFragment(QString const&, Viewer::Mode const)));
+      m_viewer, SLOT(setDefaultBuildFragment(QString const&, Viewer::Mode const)));
       
 
    connect(this, SIGNAL(recordingActive(bool)), 
       &m_toolBar, SLOT(setRecordAnimationButtonChecked(bool)));
          
    connect(this, SIGNAL(recordingActive(bool)), 
-      &m_viewer, SLOT(setRecord(bool)));
+      m_viewer, SLOT(setRecord(bool)));
 
-   connect(&m_viewer, SIGNAL(recordingCanceled()), 
+   connect(m_viewer, SIGNAL(recordingCanceled()), 
       this, SLOT(recordingCanceled()));
  
 
    // ViewerModel 
    connect(&m_viewerModel, SIGNAL(updated()), 
-      &m_viewer, SLOT(updateGL()));
+      m_viewer, SLOT(updateGL()));
 
    connect(&m_viewerView, SIGNAL(doubleClicked(QModelIndex const&)),
       &m_viewerModel, SLOT(itemDoubleClicked(QModelIndex const&))); 
@@ -187,25 +197,25 @@ void MainWindow::createConnections()
       &m_viewerModel, SLOT(itemExpanded(QModelIndex const&))); 
 
    connect(&m_viewerModel, SIGNAL(sceneRadiusChanged(double const)), 
-      &m_viewer, SLOT(setSceneRadius(double const)));
+      m_viewer, SLOT(setSceneRadius(double const)));
 
    connect(&m_viewerModel, SIGNAL(changeActiveViewerMode(Viewer::Mode const)), 
-      &m_viewer, SLOT(setActiveViewerMode(Viewer::Mode const)));
+      m_viewer, SLOT(setActiveViewerMode(Viewer::Mode const)));
 
    connect(&m_viewerModel, SIGNAL(displayMessage(QString const&)),
-       &m_viewer, SLOT(displayMessage(QString const&)));
+       m_viewer, SLOT(displayMessage(QString const&)));
 
    connect(&m_viewerModel, SIGNAL(postCommand(QUndoCommand*)),
        this, SLOT(addCommand(QUndoCommand*)));
 
    connect(&m_viewerModel, SIGNAL(foregroundColorChanged(QColor const&)),
-       &m_viewer, SLOT(setForegroundColor(QColor const&)));
+       m_viewer, SLOT(setForegroundColor(QColor const&)));
 
    connect(&m_viewerModel, SIGNAL(pushAnimators(AnimatorList const&)),
-      &m_viewer, SLOT(pushAnimators(AnimatorList const&)));
+      m_viewer, SLOT(pushAnimators(AnimatorList const&)));
 
    connect(&m_viewerModel, SIGNAL(popAnimators(AnimatorList const&)),
-      &m_viewer, SLOT(popAnimators(AnimatorList const&)));
+      m_viewer, SLOT(popAnimators(AnimatorList const&)));
 
    connect(&m_viewerModel, SIGNAL(fileOpened(QString const&)),
       this, SLOT(fileOpened(QString const&)));
@@ -220,22 +230,22 @@ void MainWindow::createConnections()
 
 
    // Viewer
-   connect(&m_viewer, SIGNAL(openFileFromDrop(QString const&)),
+   connect(m_viewer, SIGNAL(openFileFromDrop(QString const&)),
       &m_viewerModel, SLOT(open(QString const&)));
 
-   connect(&m_viewer, SIGNAL(enableUpdate(bool const)), 
+   connect(m_viewer, SIGNAL(enableUpdate(bool const)), 
       &m_viewerModel, SLOT(enableUpdate(bool const)));
 
-   connect(&m_viewer, SIGNAL(postCommand(QUndoCommand*)),
+   connect(m_viewer, SIGNAL(postCommand(QUndoCommand*)),
       this, SLOT(addCommand(QUndoCommand*)));
 
-   connect(&m_viewer, SIGNAL(activeViewerModeChanged(Viewer::Mode const)),
+   connect(m_viewer, SIGNAL(activeViewerModeChanged(Viewer::Mode const)),
       &m_toolBar, SLOT(setToolBarMode(Viewer::Mode const)));
 
-   connect(&m_viewer, SIGNAL(escapeFullScreen()), 
+   connect(m_viewer, SIGNAL(escapeFullScreen()), 
       this, SLOT(fullScreen()));
 
-   connect(&m_viewer, SIGNAL(animationStep()), 
+   connect(m_viewer, SIGNAL(animationStep()), 
       &m_viewerModel, SLOT(reperceiveBondsForAnimation()));
 
 
@@ -252,10 +262,10 @@ void MainWindow::createConnections()
    connect(&m_viewerModel, SIGNAL(clearSelection()),
       &m_viewerSelectionModel, SLOT(clearSelection()));
 
-   connect(&m_viewer, SIGNAL(clearSelection()),
+   connect(m_viewer, SIGNAL(clearSelection()),
       &m_viewerSelectionModel, SLOT(clearSelection()));
 
-   connect(&m_viewer, 
+   connect(m_viewer, 
       SIGNAL(select(QModelIndex const&, QItemSelectionModel::SelectionFlags)),
       &m_viewerSelectionModel, 
       SLOT(select(QModelIndex const&, QItemSelectionModel::SelectionFlags)));
@@ -385,7 +395,7 @@ void MainWindow::createMenus()
 
       name = "Save Picture";
       action = menu->addAction(name);
-      connect(action, SIGNAL(triggered()), &m_viewer, SLOT(saveSnapshot()));
+      connect(action, SIGNAL(triggered()), m_viewer, SLOT(saveSnapshot()));
       action->setShortcut(Qt::CTRL + Qt::Key_P);
 
       name = "Record Animation";
@@ -483,7 +493,7 @@ void MainWindow::createMenus()
 
       name = "Reset View";
       action = menu->addAction(name);
-      connect(action, SIGNAL(triggered()), &m_viewer, SLOT(resetView()));
+      connect(action, SIGNAL(triggered()), m_viewer, SLOT(resetView()));
       action->setShortcut(Qt::CTRL + Qt::Key_R);
 
       name = "Show Axes";
@@ -753,7 +763,7 @@ void MainWindow::configureAppearance()
 {
    if (!m_shaderDialog) {
       m_shaderDialog = new ShaderDialog(this);
-      connect(m_shaderDialog, SIGNAL(updated()), &m_viewer, SLOT(updateGL()));
+      connect(m_shaderDialog, SIGNAL(updated()), m_viewer, SLOT(updateGL()));
    }
    m_shaderDialog->show();
 }
@@ -820,7 +830,7 @@ void MainWindow::reindexAtoms()
        (*iter)->setChecked(false); 
    }
 
-   m_viewer.reindexAtoms(molecules.first());
+   m_viewer->reindexAtoms(molecules.first());
 }
 
 
@@ -845,9 +855,9 @@ void MainWindow::setLabel()
    bool turnOn(action->isChecked());
 
    if (turnOn) {
-      m_viewer.setLabelType(action->data().toInt());
+      m_viewer->setLabelType(action->data().toInt());
    }else {
-      m_viewer.setLabelType(Layer::Atom::None);
+      m_viewer->setLabelType(Layer::Atom::None);
    }
 
    QList<QAction*>::iterator iter;
@@ -903,23 +913,23 @@ void MainWindow::fullScreen()
 {
    QString msg;
 
-   if (m_viewer.isFullScreen()) {
+   if (m_viewer->isFullScreen()) {
       // From full screen
       m_toolBar.show();
       m_sideSplitter->show();
-      m_viewer.setFullScreen(false);
+      m_viewer->setFullScreen(false);
       m_fullScreenAction->setChecked(false);
       msg = "";
    } else {
       // To full screen
       m_toolBar.hide();
       m_sideSplitter->hide();
-      m_viewer.setFullScreen(true);
+      m_viewer->setFullScreen(true);
       m_fullScreenAction->setChecked(true);
       msg = "Use <esc> to exit full screen mode";
    }
 
-   m_viewer.QGLViewer::displayMessage(msg, 5000);
+   m_viewer->QGLViewer::displayMessage(msg, 5000);
 }
 
 
@@ -961,7 +971,7 @@ void MainWindow::showQChemUIold()
    m_quiInputDialog->setWindowModality(Qt::WindowModal);
    m_quiInputDialog->show();
 
-   m_viewer.setActiveViewerMode(Viewer::Manipulate);
+   m_viewer->setActiveViewerMode(Viewer::Manipulate);
 }
 
 
@@ -1001,7 +1011,7 @@ void MainWindow::showQChemUI()
    m_quiInputDialog->setWindowModality(Qt::WindowModal);
    m_quiInputDialog->show();
 
-   m_viewer.setActiveViewerMode(Viewer::Manipulate);
+   m_viewer->setActiveViewerMode(Viewer::Manipulate);
 }
 
 

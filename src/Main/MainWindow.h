@@ -68,7 +68,7 @@ namespace IQmol {
          MainWindow(QWidget* parent = 0);
          ~MainWindow();
 
-         void initViewer() { m_viewer.initShaders(); }
+         void initViewer() { m_viewer->initShaders(); }
 
       Q_SIGNALS:
          void recordingActive(bool);
@@ -129,7 +129,7 @@ namespace IQmol {
          QUndoView       m_undoStackView;
          QProgressBar    m_progressBar;
          QLabel          m_status;
-         Viewer          m_viewer;
+         Viewer*         m_viewer;
 
          QItemSelectionModel   m_viewerSelectionModel;
          LogMessageDialog      m_logMessageDialog;
@@ -144,6 +144,8 @@ namespace IQmol {
          QSplitter* m_sideSplitter;
          Qui::InputDialog* m_quiInputDialog;
          ShaderDialog* m_shaderDialog;
+
+         QGLContext* m_context;
    };
 
 } // end namespace IQmol

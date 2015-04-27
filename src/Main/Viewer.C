@@ -57,8 +57,8 @@ QFontMetrics Viewer::s_labelFontMetrics(Viewer::s_labelFont);
 
 
 //! Window set up is done here
-Viewer::Viewer(ViewerModel& model, QWidget* parent) : 
-   QGLViewer(QGLFormat(QGL::SampleBuffers), parent), 
+Viewer::Viewer(QGLContext* context, ViewerModel& model, QWidget* parent) : 
+   QGLViewer(context, parent), 
    m_viewerModel(model), 
    m_selectionHighlighting(true),
    m_labelType(Layer::Atom::None),
@@ -96,7 +96,6 @@ Viewer::Viewer(ViewerModel& model, QWidget* parent) :
    setDefaultBuildElement(6);
    setActiveViewerMode(BuildAtom);  // this should get overwritten by the MainWindow class
 }
-
 
 //! The OpenGL context is not available in the constructor, so all GL setup
 //! must be done here.

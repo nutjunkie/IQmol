@@ -72,7 +72,7 @@ namespace IQmol {
          enum Mode { Manipulate, Select, ManipulateSelection, ReindexAtoms,
             BuildAtom, BuildFunctionalGroup, BuildEfp, BuildMolecule };
 
-         Viewer(ViewerModel& model, QWidget* parent);
+         Viewer(QGLContext* context, ViewerModel& model, QWidget* parent);
          void init();
          void initShaders();
 
