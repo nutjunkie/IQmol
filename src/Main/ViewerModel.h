@@ -40,8 +40,6 @@ class QUndoCommand;
 
 namespace IQmol {
 
-
-//   class JobInfo;
    class ParseJobFiles;
 
    /// Model for the hierarchical data structures contained within the
@@ -114,13 +112,9 @@ namespace IQmol {
          void saveAll();
          void saveAs();
 
-         //bool open(QString const& fileName);     // deprecate
-         //void openCalculationResults(JobInfo*);  // deprecate
-
          void open(QString const& fileName, QString const& filter,  void* moleculePointer);
          void open(QString const& fileName);
          void fileOpenFinished();
-//         void open(JobInfo*);
 
 
       Q_SIGNALS:

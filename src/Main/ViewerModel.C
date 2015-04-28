@@ -30,7 +30,6 @@
 #include "Preferences.h"
 #include "UndoCommands.h"
 #include "QMsgBox.h"
-//#include "JobInfo.h"
 #include "Exception.h"
 #include "QVariantPointer.h"
 #include "CartesianCoordinatesParser.h"
@@ -168,22 +167,6 @@ void ViewerModel::open(QString const& filePath, QString const& filter, void* mol
 }
 
 
-/* deprecate
-void ViewerModel::open(JobInfo* jobInfo)
-{
-   if (!jobInfo) return;
-   if (!jobInfo->localFilesExist()) {
-      QMsgBox::information(0, "IQmol", "Failed to find job files on local machine.");
-      return;
-   }
-
-   ParseJobFiles* parser = new ParseJobFiles(*jobInfo);
-   connect(parser, SIGNAL(finished()), this, SLOT(fileOpenFinished()));
-   parser->start();
-}
-
-*/
-
 void ViewerModel::fileOpenFinished()
 {
    ParseJobFiles* parser = qobject_cast<ParseJobFiles*>(sender());
@@ -261,11 +244,8 @@ void ViewerModel::processParsedData(ParseJobFiles* parser)
    QStandardItem* child;
    QStandardItem* root(invisibleRootItem());
 
-   // If we have a valid JobInfo, then we look for the Molecule that created it.
-//deprecate   JobInfo const* jobInfo(parser->jobInfo());
    void* moleculePointer(parser->moleculePointer());
 
-//deprecate   if (overwrite && (jobInfo || moleculePointer)) {
    if (overwrite && moleculePointer) {
       for (int row = 0; row < root->rowCount(); ++row) {
           child = root->child(row);
@@ -273,7 +253,6 @@ void ViewerModel::processParsedData(ParseJobFiles* parser)
              Layer::Base* base = QVariantPointer<Layer::Base>::toPointer(child->data());
              Layer::Molecule* mol = qobject_cast<Layer::Molecule*>(base);
 
-//           if (mol && (mol->jobInfoMatch(jobInfo) || mol == moleculePointer)) {
              if (mol && mol == moleculePointer) {
                 molecule->setCheckState(mol->checkState());
                 // makeActive = makeActive || (mol->checkState() == Qt::Checked);

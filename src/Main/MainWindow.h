@@ -88,8 +88,6 @@ namespace IQmol {
          void showPreferences() { m_preferencesBrowser.show(); }
          void showLogMessages();
          void showQChemUI();
-//       void showQChemUIold();
-//       void showProcessMonitor();  // deprecate
          void showJobMonitor();
          void testInternetConnection();
          void submitJob(IQmol::Process2::QChemJobInfo&);
@@ -108,7 +106,6 @@ namespace IQmol {
          void toggleRecordingActive();
          void recordingCanceled() { setRecord(false); }
 
-//       void editServers();
          void editNewServers();
          void configureAppearance();
          void clearRecentFilesMenu();

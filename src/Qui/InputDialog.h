@@ -36,15 +36,6 @@ class QStackedWidget;
 class QFont;
 
 
-namespace IQmol {
-   class JobInfo;  // deprecate
-}
-
-//namespace Ui {
-//   class MainWindow;
-//}
-
-
 namespace Qui {
 
 class QtNode;
@@ -75,8 +66,6 @@ class InputDialog : public QMainWindow {
 
 	  /// The JobInfo object encapsulates the communication 
 	  /// between the QUI and IQmol.
-      void setJobInfo(IQmol::JobInfo* jobInfo);  // deprecate
-
       void setQChemJobInfo(IQmol::Process2::QChemJobInfo const&);
 
       /// Allows the update of the servers in the server ComboBox
@@ -86,7 +75,6 @@ class InputDialog : public QMainWindow {
       void showMessage(QString const& msg);
 
    Q_SIGNALS:
-      void submitJobRequest(IQmol::JobInfo*);  // deprecate
       void submitJobRequest(IQmol::Process2::QChemJobInfo&);
 
 
@@ -150,7 +138,6 @@ class InputDialog : public QMainWindow {
    private:
       // ---------- Data ----------
       Ui::MainWindow  m_ui;
-      IQmol::JobInfo* m_jobInfo;  // deprecate
       IQmol::Process2::QChemJobInfo m_qchemJobInfo;
 
       OptionDatabase& m_db;

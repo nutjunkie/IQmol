@@ -23,7 +23,6 @@
 ********************************************************************************/
 
 #include "ParseFile.h"
-#include "JobInfo.h"
 
 
 namespace IQmol {
@@ -41,18 +40,13 @@ namespace IQmol {
 
          ParseJobFiles(QString const& filePath, QString const& filter, void* moleculePointer);
          ParseJobFiles(QString const& filePath);
-//deprecate
-//         ParseJobFiles(JobInfo const& jobInfo);
 
          void setFlags(unsigned flags) { m_flags = flags; }
          unsigned flags() const { return m_flags; }
-//deprecate
-//       JobInfo const* jobInfo() const { return m_jobInfo; }
          void* moleculePointer() const { return m_moleculePointer; }
 
       private:
          unsigned m_flags;
-//deprecate         JobInfo const* m_jobInfo;
          void* m_moleculePointer;
    };
 

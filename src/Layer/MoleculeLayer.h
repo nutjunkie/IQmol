@@ -78,7 +78,6 @@ namespace IQmol {
    class SpatialProperty;
    class PointChargePotential;
    class NearestNuclearCharge;
-//   class JobInfo;  //deprecate
 
    namespace Layer {
 
@@ -136,13 +135,6 @@ namespace IQmol {
             void setFile(QString const& fileName);
             QString fileName() const { return m_inputFile.fileName(); }
    
-            /// Creates a new JobInfo object and sends it out into the ether.
-            /// This really needs to be a smart pointer because we don't delete
-            /// as it may be being used by a Process or Server.  One day...
-/*
-            JobInfo* jobInfo();   //deprecate
-            bool jobInfoMatch(JobInfo const* jobInfo);   //deprecate
-*/
             Process2::QChemJobInfo qchemJobInfo();
             void qchemJobInfoChanged(Process2::QChemJobInfo const&);
    
@@ -283,10 +275,6 @@ namespace IQmol {
             void reperceiveBonds(bool postCmd);
    
          private Q_SLOTS:
-            /// This is the mechanism by which the QUI can communicate changes back
-            /// to the Molecule.  Currently this is the charge and multiplicity.
-//          void jobInfoChanged();  //deprecate
-
             void dumpData() { m_bank.dump(); }
             void setAtomicCharges(Data::Type::ID type);
             void updateAtomicCharges();
@@ -395,10 +383,6 @@ namespace IQmol {
             Configurator::Molecule m_configurator;
             IQmol::SurfaceAnimatorDialog  m_surfaceAnimator;
             
-            // This is the last JobInfo we created
-
-//          JobInfo* m_jobInfo;  //deprecate
-   
             Layer::Info      m_info;
             Layer::Container m_atomList;
             Layer::Container m_bondList;

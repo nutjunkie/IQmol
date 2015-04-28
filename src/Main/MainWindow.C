@@ -21,10 +21,6 @@
 ********************************************************************************/
 
 #include "MainWindow.h"
-
-#include "ServerListDialog.h"  //deprecate
-#include "ProcessMonitor.h"  // deprecate
-#include "ServerRegistry.h"   // deprecate
 #include "ServerConfigurationListDialog.h"
 #include "JobMonitor.h"
 #include "ServerRegistry2.h" 
@@ -32,7 +28,6 @@
 #include "QMsgBox.h"
 #include "Animator.h"
 #include "Preferences.h"
-#include "JobInfo.h"
 #include "ShaderDialog.h"
 #include "Network.h"
 #include "Qui/InputDialog.h"
@@ -221,12 +216,6 @@ void MainWindow::createConnections()
 
    connect(&m_viewerModel, SIGNAL(fileOpened(QString const&)),
       this, SLOT(fileOpened(QString const&)));
-
-
-/*
-   connect(&(ProcessMonitor::instance()), SIGNAL(resultsAvailable(JobInfo*)),
-       &m_viewerModel, SLOT(open(JobInfo*)));
-*/
 
    connect(&(Process2::JobMonitor::instance()), 
        SIGNAL(resultsAvailable(QString const&, QString const&, void*)),
@@ -719,15 +708,6 @@ void MainWindow::createMenus()
 }
 
 
-/*
-void MainWindow::editServers()
-{
-   ServerListDialog dialog(this);
-   dialog.exec();  
-}
-*/
-
-
 void MainWindow::editNewServers()
 {
    Process2::ServerConfigurationListDialog dialog(this);
@@ -939,50 +919,6 @@ void MainWindow::fullScreen()
 
    m_viewer->QGLViewer::displayMessage(msg, 5000);
 }
-
-
-/*
-void MainWindow::showQChemUIold() 
-{
-   if (!m_quiInputDialog) {
-      m_quiInputDialog = new Qui::InputDialog(this);
-      if (!m_quiInputDialog->init()) {
-         m_qchemSetupAction->setEnabled(false);
-         delete m_quiInputDialog;
-         m_quiInputDialog = 0;
-         return;
-      }
-
-      // deprecate
-      connect(m_quiInputDialog, SIGNAL(submitJobRequest(IQmol::JobInfo*)),
-         &(ProcessMonitor::instance()), SLOT(submitJob(IQmol::JobInfo*)));
-
-      // deprecate
-      connect(&(ProcessMonitor::instance()), SIGNAL(jobAccepted()),
-         m_quiInputDialog, SLOT(close()));
-
-      // deprecate
-      connect(&(ProcessMonitor::instance()), SIGNAL(postStatusMessage(QString const&)),
-         m_quiInputDialog, SLOT(showMessage(QString const&)));
-   }
-
-   Layer::Molecule* mol(m_viewerModel.activeMolecule());
-   if (!mol) return;
-
-   // (Re-)Load the servers here in case the user has made any modifications
-   QStringList serverList(ServerRegistry::instance().availableServers());
-   
-   if (serverList.isEmpty())  serverList.append("(none)");
-
-   m_quiInputDialog->setServerList(serverList);
-   m_quiInputDialog->showMessage("");
-   m_quiInputDialog->setJobInfo(mol->jobInfo());
-   m_quiInputDialog->setWindowModality(Qt::WindowModal);
-   m_quiInputDialog->show();
-
-   m_viewer->setActiveViewerMode(Viewer::Manipulate);
-}
-*/
 
 
 void MainWindow::showQChemUI() 
