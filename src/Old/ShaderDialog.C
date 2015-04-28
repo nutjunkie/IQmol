@@ -121,8 +121,10 @@ void ShaderDialog::on_shaderCombo_currentIndexChanged(int)
 {
    QString name(m_dialog.shaderCombo->currentText());
 
-   if (m_shaderLibrary.bindShader(name)) {
-      QMsgBox::warning(this, "IQmol", "Shader not found");
+   if (!m_shaderLibrary.bindShader(name)) {
+      QString msg("Shader not found: ");
+      msg += name;
+      QMsgBox::warning(this, "IQmol", msg);
       return;
    }
 

@@ -28,9 +28,9 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QGLFramebufferObject>
-#include <QGLFunctions>
 #include <cstdlib>
 #include <time.h>
+#include <QDebug>
 
 
 
@@ -54,6 +54,8 @@ ShaderLibrary::ShaderLibrary(QGLContext* context) : m_normalBuffer(0), m_filterB
 }
 
 
+
+
 void ShaderLibrary::init()
 {
    const GLubyte* vendor   = glGetString(GL_VENDOR);
@@ -64,10 +66,10 @@ void ShaderLibrary::init()
    QLOG_INFO() << "Vendor   " << QString((char*)vendor);
    QLOG_INFO() << "Renderer " << QString((char*)renderer);
 
-#ifdef IQMOL_SHADERS
+//#ifdef IQMOL_SHADERS
    const GLubyte* shading  = glGetString(GL_SHADING_LANGUAGE_VERSION);
    QLOG_INFO() << "GLSL     " << QString((char*)shading);
-#endif
+//#endif
 }
 
 
@@ -93,9 +95,9 @@ bool ShaderLibrary::bindShader(QString const& shader)
 {
    bool okay(false);
    if (m_shaders.contains(shader)) {
-#ifdef IQMOL_SHADERS
+//#ifdef IQMOL_SHADERS
       m_glFunctions->glUseProgram(m_shaders.value(shader));
-#endif
+//#endif
       m_currentShader = shader;
       okay = true;
    }
@@ -111,7 +113,7 @@ void ShaderLibrary::loadAllShaders()
    defaultParameters.insert("Highlights", QVariant(0.5));
    setUniformVariables(NoShader, defaultParameters);
 
-#ifdef IQMOL_SHADERS
+//#ifdef IQMOL_SHADERS
    QDir dir(Preferences::ShaderDirectory());
    if (!dir.exists() || !dir.isReadable()) {
       QLOG_WARN() << "Could not access shader directory: " + dir.path();
@@ -142,7 +144,7 @@ void ShaderLibrary::loadAllShaders()
           }
        }
    }
-#endif
+//#endif
 }
 
 
@@ -162,6 +164,7 @@ void ShaderLibrary::loadPreferences()
 
 // Define stubs
 void ShaderLibrary::destroy() { }
+ShaderLibrary::~ShaderLibrary() { }
 
 bool ShaderLibrary::suspend() { return true; }
 bool ShaderLibrary::resume() { return true; }
@@ -302,7 +305,7 @@ unsigned ShaderLibrary::createProgram(QString const& vertexPath, QString const& 
       return 0;
    }
 
-   unsigned program(glCreateProgram());
+   unsigned program(m_glFunctions->glCreateProgram());
    m_glFunctions->glAttachShader(program, vertexShader);
    m_glFunctions->glAttachShader(program, fragmentShader);
 
@@ -588,9 +591,9 @@ void ShaderLibrary::setUniformVariable(GLuint /*program*/, GLint location,
    GLuint h(texture.size.height());
 
    switch (texture.slot) {
-      case NormalBuffer:     glActiveTexture(GL_TEXTURE0);  break;
-      case FilterBuffer:     glActiveTexture(GL_TEXTURE1);  break;
-      case RotationTexture:  glActiveTexture(GL_TEXTURE2);  break;
+      case NormalBuffer:     m_glFunctions->glActiveTexture(GL_TEXTURE0);  break;
+      case FilterBuffer:     m_glFunctions->glActiveTexture(GL_TEXTURE1);  break;
+      case RotationTexture:  m_glFunctions->glActiveTexture(GL_TEXTURE2);  break;
    }
 
    glBindTexture(GL_TEXTURE_2D, texture.id);
@@ -802,15 +805,15 @@ void ShaderLibrary::bindTextures(QString const& shader)
 
 void ShaderLibrary::releaseTextures()
 {
-   glActiveTexture(GL_TEXTURE0);  
+   m_glFunctions->glActiveTexture(GL_TEXTURE0);  
    glBindTexture(GL_TEXTURE_2D, 0);
    glDisable(GL_TEXTURE_2D);
 
-   glActiveTexture(GL_TEXTURE1);  
+   m_glFunctions->glActiveTexture(GL_TEXTURE1);  
    glBindTexture(GL_TEXTURE_2D, 0);
    glDisable(GL_TEXTURE_2D);
 
-   glActiveTexture(GL_TEXTURE2);  
+   m_glFunctions->glActiveTexture(GL_TEXTURE2);  
    glBindTexture(GL_TEXTURE_2D, 0);
    glDisable(GL_TEXTURE_2D);
 }

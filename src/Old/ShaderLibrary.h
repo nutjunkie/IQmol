@@ -35,6 +35,7 @@
 #include <QStringList>
 #include "QGLViewer/vec.h"
 #include <QDebug>
+#include <QGLFunctions>
 
 #ifdef Q_OS_WIN32
 #undef IQMOL_SHADERS
@@ -42,6 +43,7 @@
 #define IQMOL_SHADERS
 #endif
 
+#define IQMOL_SHADERS
 
 
 class QGLFramebufferObject;
@@ -114,11 +116,11 @@ namespace IQmol {
                return false;
             }
             unsigned program(m_shaders.value(shaderName));
-            glUseProgram(program);
+            m_glFunctions->glUseProgram(program);
 
             QByteArray raw(variable.toLocal8Bit());
             const char* c_str(raw.data());
-            GLint location(glGetUniformLocation(program, c_str));
+            GLint location(m_glFunctions->glGetUniformLocation(program, c_str));
             if (location < 0) {
                // qDebug() << "Shader location not found:" << shaderName << variable;
                return false;
