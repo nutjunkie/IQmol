@@ -22,7 +22,7 @@
 
 #include "QsLog.h"
 #include "QMsgBox.h"
-#include "JobInfo.h"   // deprecate
+//#include "JobInfo.h"   // deprecate
 #include "QChemJobInfo.h" 
 #include "AtomLayer.h"
 #include "BondLayer.h"
@@ -98,7 +98,7 @@ Molecule::Molecule(QObject* parent) : Base(DefaultMoleculeName, parent),
    m_reperceiveBondsForAnimation(false),
    m_configurator(*this), 
    m_surfaceAnimator(this), 
-   m_jobInfo(0),   //deprecate
+// m_jobInfo(0),   //deprecate
    m_info(this), 
    m_atomList(this, "Atoms"), 
    m_bondList(this, "Bonds"), 
@@ -1501,13 +1501,16 @@ Charge* Molecule::createCharge(double const Q, Vec const& position)
 
 
 // deprecate
+/*
 bool Molecule::jobInfoMatch(JobInfo const* jobInfo) 
 { 
    return jobInfo == m_jobInfo; 
 }
+*/
 
 
 // deprecate
+/*
 JobInfo* Molecule::jobInfo()
 {
    if (m_jobInfo) disconnect(m_jobInfo, SIGNAL(updated()), this, SLOT(jobInfoChanged()));
@@ -1543,6 +1546,7 @@ JobInfo* Molecule::jobInfo()
    connect(m_jobInfo, SIGNAL(updated()), this, SLOT(jobInfoChanged()));
    return m_jobInfo;
 }
+*/
 
 
 Process2::QChemJobInfo Molecule::qchemJobInfo()
@@ -1578,6 +1582,7 @@ Process2::QChemJobInfo Molecule::qchemJobInfo()
 }
 
 
+/* deprecate
 void Molecule::jobInfoChanged()
 { 
    if (m_jobInfo) {
@@ -1586,6 +1591,7 @@ void Molecule::jobInfoChanged()
       m_info.setMultiplicity(m_jobInfo->getMultiplicity());
    }
 }
+*/
 
 
 void Molecule::qchemJobInfoChanged(Process2::QChemJobInfo const& qchemJobInfo)

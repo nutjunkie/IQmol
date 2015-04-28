@@ -41,7 +41,7 @@ class QUndoCommand;
 namespace IQmol {
 
 
-   class JobInfo;
+//   class JobInfo;
    class ParseJobFiles;
 
    /// Model for the hierarchical data structures contained within the
@@ -120,7 +120,7 @@ namespace IQmol {
          void open(QString const& fileName, QString const& filter,  void* moleculePointer);
          void open(QString const& fileName);
          void fileOpenFinished();
-         void open(JobInfo*);
+//         void open(JobInfo*);
 
 
       Q_SIGNALS:

@@ -72,9 +72,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent),
    format.setProfile(QGLFormat::CompatibilityProfile);
    //format.setVersion(3,3);
    //format.setProfile(QGLFormat::CoreProfile);
-   m_context = new QGLContext(format);
 
-   m_viewer = new Viewer(m_context, m_viewerModel, this);
+   m_context = new QGLContext(format);
+   m_viewer  = new Viewer(m_context, m_viewerModel, this);
 
    setStatusBar(0);
    setWindowTitle("IQmol");
@@ -95,6 +95,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent),
    m_viewer->resetView();
 }
 
+
 MainWindow::~MainWindow()
 {
    delete m_quiInputDialog;
@@ -102,6 +103,7 @@ MainWindow::~MainWindow()
    delete m_viewer;
    delete m_context;
 }
+
 
 void MainWindow::createLayout()
 {
@@ -221,8 +223,10 @@ void MainWindow::createConnections()
       this, SLOT(fileOpened(QString const&)));
 
 
+/*
    connect(&(ProcessMonitor::instance()), SIGNAL(resultsAvailable(JobInfo*)),
        &m_viewerModel, SLOT(open(JobInfo*)));
+*/
 
    connect(&(Process2::JobMonitor::instance()), 
        SIGNAL(resultsAvailable(QString const&, QString const&, void*)),
@@ -715,11 +719,13 @@ void MainWindow::createMenus()
 }
 
 
+/*
 void MainWindow::editServers()
 {
    ServerListDialog dialog(this);
    dialog.exec();  
 }
+*/
 
 
 void MainWindow::editNewServers()
@@ -745,10 +751,12 @@ void MainWindow::showJobMonitor() {
 }
 
 
+/*
 void MainWindow::showProcessMonitor() { 
    ProcessMonitor::instance().show(); 
    ProcessMonitor::instance().raise();
 }
+*/
 
 
 void MainWindow::testInternetConnection()
@@ -933,6 +941,7 @@ void MainWindow::fullScreen()
 }
 
 
+/*
 void MainWindow::showQChemUIold() 
 {
    if (!m_quiInputDialog) {
@@ -973,6 +982,7 @@ void MainWindow::showQChemUIold()
 
    m_viewer->setActiveViewerMode(Viewer::Manipulate);
 }
+*/
 
 
 void MainWindow::showQChemUI() 

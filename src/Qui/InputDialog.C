@@ -28,7 +28,7 @@
 #include "GeometryConstraint.h"
 #include "KeywordSection.h"
 #include "QCJob.h"
-#include "JobInfo.h"   // deprecate
+//#include "JobInfo.h"   // deprecate
 #include "Job.h" 
 #include "LJParametersSection.h"
 #include "Option.h"
@@ -214,6 +214,7 @@ void InputDialog::setQChemJobInfo(IQmol::Process2::QChemJobInfo const& jobInfo)
 }
 
 
+/*
 void InputDialog::setJobInfo(IQmol::JobInfo* jobInfo)
 {
    if (!jobInfo) return;
@@ -274,6 +275,7 @@ void InputDialog::setJobInfo(IQmol::JobInfo* jobInfo)
 
    updatePreviewText();
 }
+*/
 
 
 void InputDialog::setServerList(QStringList const& servers)
@@ -894,12 +896,14 @@ qDebug() << "submitJob called in QUI";
       IQmol::Process2::QChemJobInfo::ServerName, m_ui.serverCombo->currentText());
    submitJobRequest(m_qchemJobInfo);
 
+/*
    // deprecate
    if (m_jobInfo) {
       m_jobInfo->set(IQmol::JobInfo::InputString, generateInputString());
       m_jobInfo->set(IQmol::JobInfo::ServerName, m_ui.serverCombo->currentText());
       submitJobRequest(m_jobInfo);
    }
+*/
    return;
 }
 
@@ -1030,10 +1034,12 @@ void InputDialog::on_qui_charge_valueChanged(int value)
       int multiplicity(m_ui.qui_multiplicity->value()); 
       multiplicity += (multiplicity == 1) ? 1 : -1;
       m_ui.qui_multiplicity->setValue(multiplicity); 
+/* deprecate 
       if (m_jobInfo) {
           m_jobInfo->set(IQmol::JobInfo::Charge, value);
           m_jobInfo->set(IQmol::JobInfo::Multiplicity, multiplicity);
       }
+*/
    }
 }
 
@@ -1041,7 +1047,8 @@ void InputDialog::on_qui_charge_valueChanged(int value)
 void InputDialog::on_qui_multiplicity_valueChanged(int value) 
 {
    if (m_currentJob) m_currentJob->setMultiplicity(value);
-   if (m_jobInfo)  m_jobInfo->set(IQmol::JobInfo::Multiplicity, value);
+//deprecate
+// if (m_jobInfo)  m_jobInfo->set(IQmol::JobInfo::Multiplicity, value);
 }
 
 

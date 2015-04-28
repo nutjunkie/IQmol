@@ -26,25 +26,28 @@
 namespace IQmol {
 
 ParseJobFiles::ParseJobFiles(QString const& filePath) : Parser::ParseFile(filePath),  
-   m_jobInfo(0), m_moleculePointer(0)
+//   m_jobInfo(0), m_moleculePointer(0)
+    m_moleculePointer(0)
 {
    m_flags = MakeActive;
 }
 
 
 ParseJobFiles::ParseJobFiles(QString const& filePath, QString const& filter, 
-   void* moleculePointer) : Parser::ParseFile(filePath, filter),  m_jobInfo(0), 
+   void* moleculePointer) : Parser::ParseFile(filePath, filter),  // m_jobInfo(0), 
    m_moleculePointer(moleculePointer)
 {
    m_flags = Overwrite | AddStar;
 }
 
 
+/*
 ParseJobFiles::ParseJobFiles(JobInfo const& jobInfo) : 
    Parser::ParseFile(jobInfo.get(JobInfo::LocalWorkingDirectory)), m_jobInfo(&jobInfo), 
    m_moleculePointer(0) 
 {
    m_flags = Overwrite | AddStar;
 }
+*/
 
 } // end namespace IQmol
