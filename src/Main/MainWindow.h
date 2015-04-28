@@ -56,7 +56,6 @@ class QMenu;
 namespace IQmol {
 
    class ModelView;
-   class ShaderDialog;
 
    /// MainWindow is the top level window in IQmol which contains the
    /// ToolBar, Viewer, ViewerModelView and History.
@@ -67,8 +66,6 @@ namespace IQmol {
       public: 
          MainWindow(QWidget* parent = 0);
          ~MainWindow();
-
-         void initViewer() { m_viewer->initShaders(); }
 
       Q_SIGNALS:
          void recordingActive(bool);
@@ -140,7 +137,6 @@ namespace IQmol {
 
          QSplitter* m_sideSplitter;
          Qui::InputDialog* m_quiInputDialog;
-         ShaderDialog* m_shaderDialog;
 
          QGLContext* m_context;
    };

@@ -142,7 +142,6 @@ void IQmolApplication::open(QString const& file)
    hideSplash();
    mw->show();
    mw->raise();
-   mw->initViewer();
 
    // Create the instance of the JobMonitor
    Process2::JobMonitor::instance();

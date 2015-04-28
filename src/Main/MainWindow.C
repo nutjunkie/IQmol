@@ -28,8 +28,6 @@
 #include "QMsgBox.h"
 #include "Animator.h"
 #include "Preferences.h"
-#include "ShaderDialog.h"
-#include "ShaderLibrary.h"
 #include "Network.h"
 #include "Qui/InputDialog.h"
 #include <QResizeEvent>
@@ -60,7 +58,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent),
    m_logMessageDialog(0),
    m_preferencesBrowser(this),
    m_quiInputDialog(0),
-   m_shaderDialog(0),
    m_context(0)
 {
    QGLFormat format(QGL::SampleBuffers);
@@ -71,6 +68,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent),
 
    m_context = new QGLContext(format);
    m_viewer  = new Viewer(m_context, m_viewerModel, this);
+   m_viewer->initShaders();
 
    setStatusBar(0);
    setWindowTitle("IQmol");
@@ -95,7 +93,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent),
 MainWindow::~MainWindow()
 {
    delete m_quiInputDialog;
-   delete m_shaderDialog;
    delete m_viewer;
    delete m_context;
 }
@@ -655,31 +652,6 @@ void MainWindow::createMenus()
    // ----- Calculation Menu -----
    menu = menuBar()->addMenu("Calculation");
 
-/*
-      name = "Q-Chem Setup";
-      action = menu->addAction(name);
-      connect(action, SIGNAL(triggered()), this, SLOT(showQChemUIold()));
-      action->setShortcut(Qt::CTRL + Qt::Key_U );
-      m_qchemSetupAction = action;
-
-      name = "Job Monitor";
-      action = menu->addAction(name);
-      connect(action, SIGNAL(triggered()), this, SLOT(showProcessMonitor()));
-      action->setShortcut(Qt::CTRL + Qt::Key_J );
-
-      menu->addSeparator();
-
-      name = "Remove All Processes";
-      action = menu->addAction(name);
-      connect(action, SIGNAL(triggered()), 
-         &(ProcessMonitor::instance()), SLOT(clearProcessList()));
-      name = "Edit Old Servers";
-      action = menu->addAction(name);
-      connect(action, SIGNAL(triggered()), this, SLOT(editServers()));
-
-      menu->addSeparator();
-*/
-
       name = "Q-Chem Setup";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), this, SLOT(showQChemUI()));
@@ -732,14 +704,6 @@ void MainWindow::showJobMonitor() {
 }
 
 
-/*
-void MainWindow::showProcessMonitor() { 
-   ProcessMonitor::instance().show(); 
-   ProcessMonitor::instance().raise();
-}
-*/
-
-
 void MainWindow::testInternetConnection()
 {
    if (Network::TestNetworkConnection()) {
@@ -750,11 +714,7 @@ void MainWindow::testInternetConnection()
 
 void MainWindow::configureAppearance()
 {
-   if (!m_shaderDialog) {
-      m_shaderDialog = new ShaderDialog(ShaderLibrary::instance(), this);
-      connect(m_shaderDialog, SIGNAL(updated()), m_viewer, SLOT(updateGL()));
-   }
-   m_shaderDialog->show();
+   if (m_viewer) m_viewer->editShaders();
 }
 
 
