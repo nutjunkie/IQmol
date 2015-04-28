@@ -23,7 +23,7 @@
 #include "IQmolApplication.h"
 #include "MainWindow.h"
 #include "JobMonitor.h"
-#include "ServerRegistry2.h"
+#include "ServerRegistry.h"
 #include "QMsgBox.h"
 #include "QsLog.h"
 #include <QDir>

@@ -20,9 +20,9 @@
    
 ********************************************************************************/
 
-#include "ServerRegistry2.h"
+#include "ServerRegistry.h"
 #include "Preferences.h"
-#include "Server2.h"
+#include "Server.h"
 #include "QMsgBox.h"
 #include "Exception.h"
 

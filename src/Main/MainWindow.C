@@ -23,12 +23,13 @@
 #include "MainWindow.h"
 #include "ServerConfigurationListDialog.h"
 #include "JobMonitor.h"
-#include "ServerRegistry2.h" 
+#include "ServerRegistry.h" 
 
 #include "QMsgBox.h"
 #include "Animator.h"
 #include "Preferences.h"
 #include "ShaderDialog.h"
+#include "ShaderLibrary.h"
 #include "Network.h"
 #include "Qui/InputDialog.h"
 #include <QResizeEvent>
@@ -750,7 +751,7 @@ void MainWindow::testInternetConnection()
 void MainWindow::configureAppearance()
 {
    if (!m_shaderDialog) {
-      m_shaderDialog = new ShaderDialog(this);
+      m_shaderDialog = new ShaderDialog(ShaderLibrary::instance(), this);
       connect(m_shaderDialog, SIGNAL(updated()), m_viewer, SLOT(updateGL()));
    }
    m_shaderDialog->show();

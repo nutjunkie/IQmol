@@ -359,11 +359,11 @@ set(IQmol_Process_HEADERS
     Process/QueueResources.h
     Process/QueueResourcesDialog.h
     Process/QueueSystem.h
-    Process/Server2.h
+    Process/Server.h
     Process/ServerConfiguration.h
     Process/ServerConfigurationDialog.h
     Process/ServerConfigurationListDialog.h
-    Process/ServerRegistry2.h
+    Process/ServerRegistry.h
     Process/SshFileDialog.h
     Process/SystemDependent.h
 )
@@ -375,11 +375,11 @@ set(IQmol_Process_SOURCES
     Process/QueueOptionsDialog.C
     Process/QueueResources.C
     Process/QueueResourcesDialog.C
-    Process/Server2.C
+    Process/Server.C
     Process/ServerConfiguration.C
     Process/ServerConfigurationDialog.C
     Process/ServerConfigurationListDialog.C
-    Process/ServerRegistry2.C
+    Process/ServerRegistry.C
     Process/SshFileDialog.C
     Process/SystemDependent.C
 )

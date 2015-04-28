@@ -30,7 +30,8 @@
 
 namespace IQmol {
 
-ShaderDialog::ShaderDialog(QWidget* parent) : QDialog(parent)
+ShaderDialog::ShaderDialog(ShaderLibrary& library, QWidget* parent) : QDialog(parent),
+   m_shaderLibrary(library)
 {
    m_dialog.setupUi(this);
 
@@ -81,8 +82,7 @@ ShaderDialog::ShaderDialog(QWidget* parent) : QDialog(parent)
           this, SLOT(installShaderParameters(int)));
    }
 
-   ShaderLibrary& library(ShaderLibrary::instance());
-   QStringList shaderNames(library.availableShaders());
+   QStringList shaderNames(m_shaderLibrary.availableShaders());
    m_dialog.shaderCombo->addItems(shaderNames);
 
    int index(m_dialog.shaderCombo->findText(Preferences::DefaultShader()));
@@ -91,7 +91,7 @@ ShaderDialog::ShaderDialog(QWidget* parent) : QDialog(parent)
    m_dialog.shaderCombo->setCurrentIndex(index);
    on_shaderCombo_currentIndexChanged(index);
 
-   if (!library.filtersAvailable()) {
+   if (m_shaderLibrary.filtersAvailable()) {
       m_dialog.shaderFilterTabWidget->removeTab(1);
       return;
    }
@@ -119,16 +119,15 @@ ShaderDialog::ShaderDialog(QWidget* parent) : QDialog(parent)
 
 void ShaderDialog::on_shaderCombo_currentIndexChanged(int)
 {
-   ShaderLibrary& library(ShaderLibrary::instance());
    QString name(m_dialog.shaderCombo->currentText());
 
-   if (!library.bindShader(name)) {
+   if (m_shaderLibrary.bindShader(name)) {
       QMsgBox::warning(this, "IQmol", "Shader not found");
       return;
    }
 
    hideOptionControls();
-   copyParametersToDialog(library.uniformUserVariableList(name));
+   copyParametersToDialog(m_shaderLibrary.uniformUserVariableList(name));
    updated();
 }
 
@@ -247,9 +246,8 @@ QVariantMap ShaderDialog::getParametersFromDialog()
 
 void ShaderDialog::installShaderParameters(int)
 {
-   ShaderLibrary& library(ShaderLibrary::instance());
    QString name(m_dialog.shaderCombo->currentText());
-   library.setUniformVariables(name, getParametersFromDialog());
+   m_shaderLibrary.setUniformVariables(name, getParametersFromDialog());
    updated();
 }
 
@@ -317,8 +315,7 @@ QVariantMap ShaderDialog::getFilterParameters()
 
 void ShaderDialog::installFilterParameters()
 {
-   ShaderLibrary& library(ShaderLibrary::instance());
-   library.setFilterVariables(getFilterParameters());
+   m_shaderLibrary.setFilterVariables(getFilterParameters());
    updated();
 }
 

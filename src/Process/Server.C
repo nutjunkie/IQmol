@@ -20,8 +20,8 @@
    
 ********************************************************************************/
 
-#include "Server2.h"
-#include "ServerRegistry2.h"
+#include "Server.h"
+#include "ServerRegistry.h"
 #include "Reply.h"
 #include "Connection.h"
 #include "LocalConnection.h"
