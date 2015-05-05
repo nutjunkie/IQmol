@@ -160,6 +160,9 @@ QString QChemJobInfo::get(Field const field) const
       case RunFileName:
          value = m_data[BaseName] + ".run";
          break;
+      case BatchFileName:
+         value = m_data[BaseName] + ".bat";
+         break;
       case ErrorFileName:
          value = m_data[BaseName] + ".err";
          break;

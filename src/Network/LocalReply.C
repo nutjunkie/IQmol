@@ -24,18 +24,18 @@
 #include "LocalConnection.h"
 #include "QsLog.h"
 #include <QFileInfo>
-#include <QProcess>
 #include <QDir>
 
 
 namespace IQmol {
 namespace Network {
 
-LocalExecute::LocalExecute(LocalConnection* connection, QString const& command) :
-   LocalReply(connection), m_command(command)
+LocalExecute::LocalExecute(LocalConnection* connection, QString const& command, 
+   QString const& workingDirectory) : LocalReply(connection), m_command(command)
 {
    m_timer.setSingleShot(true);
    m_timer.setInterval(connection->timeout());
+   m_process.setWorkingDirectory(workingDirectory);
 }
 
 
@@ -84,6 +84,7 @@ void LocalExecute::run()
    }
 
    QLOG_DEBUG() << "Executing command" << command << "with args:" << arguments;
+   qDebug() << "Executing command" << command << "with args:" << arguments;
 
    if (!cmd.isExecutable()) {
       QFile file(command);
@@ -114,8 +115,11 @@ void LocalExecute::run()
 
    connect(&m_timer, SIGNAL(timeout()), this, SLOT(timeout()));
 
-   m_process.setWorkingDirectory(cmd.absolutePath());
    m_process.start(cmd.filePath(), arguments);
+qDebug() << "QProcess:" << m_process.program();
+qDebug() << "QProcess:" << m_process.arguments();
+qDebug() << "QProcess:" << m_process.workingDirectory();
+qDebug() << "QProcess:" << m_process.processId();
    m_timer.start();
 }
 
@@ -131,6 +135,7 @@ void LocalExecute::timeout()
 
 void LocalExecute::runFinished(int /* exitCode */, QProcess::ExitStatus status)
 {
+   m_timer.stop();
    switch (status) {
       case QProcess::NormalExit:
          m_message = m_process.readAllStandardOutput();
@@ -148,6 +153,7 @@ void LocalExecute::runFinished(int /* exitCode */, QProcess::ExitStatus status)
 
 void LocalExecute::runError(QProcess::ProcessError error)
 {
+   m_timer.stop();
    QStringList list(m_command.split(QRegExp("\\s+"), QString::SkipEmptyParts));
    m_message = list.isEmpty() ? "Program" : list.first();
 

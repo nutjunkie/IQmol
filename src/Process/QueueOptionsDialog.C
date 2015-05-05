@@ -69,12 +69,6 @@ QueueOptionsDialog::QueueOptionsDialog(ServerConfiguration* configuration, QWidg
       m_dialog.jobLimit->setVisible(false);
    }
 
-
-#ifdef Q_OS_WIN32
-      m_dialog.runFileGroupBox->setEnabled(
-         m_configuration->connection() != ServerConfiguration::Local);
-#endif
-
    connect(m_dialog.buttonBox, SIGNAL(accepted()), this, SLOT(copyToServer()));
 }
 

@@ -127,6 +127,13 @@ Reply* LocalConnection::execute(QString const& command)
 }
 
 
+Reply* LocalConnection::execute(QString const& command, QString const& workingDirectory)
+{
+   LocalReply* reply(new LocalExecute(this, command, workingDirectory));
+   return reply;
+}
+
+
 Reply* LocalConnection::getFiles(QStringList const& fileList, QString const& destinationPath)
 {
    qDebug() << "Warning, LocalConnection::getFiles not implemented";

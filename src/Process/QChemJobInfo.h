@@ -41,7 +41,7 @@ namespace Process2 {
          /// RunFileName    - the name of the submission script
          /// Note that not all these are serialized
          enum Field { BaseName, InputFileName, OutputFileName, AuxFileName, 
-            EspFileName, MoFileName, DensityFileName, ErrorFileName,
+            EspFileName, MoFileName, DensityFileName, ErrorFileName, BatchFileName,
             RunFileName, ServerName, LocalWorkingDirectory, RemoteWorkingDirectory, 
             InputString, Charge, Multiplicity, Coordinates, Constraints, ScanCoordinates,
             EfpFragments, EfpParameters, ExternalCharges,

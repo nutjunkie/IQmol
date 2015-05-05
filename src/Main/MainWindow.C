@@ -63,6 +63,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent),
    QGLFormat format(QGL::SampleBuffers);
    format.setVersion(2,1);
    format.setProfile(QGLFormat::CompatibilityProfile);
+   //format.setSampleBuffers(true);
+   //format.setSamples(4);
    //format.setVersion(3,3);
    //format.setProfile(QGLFormat::CoreProfile);
 

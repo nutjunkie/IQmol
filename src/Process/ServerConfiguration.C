@@ -350,7 +350,7 @@ qDebug() << "Setting defaults for " << toString(queueSystem);
          m_configuration.insert(QueueInfo,   "(unused)");
          m_configuration.insert(RunFileTemplate, System::TemplateForRunFile(local));
          m_configuration.insert(JobLimit, 1024);
-         m_configuration.insert(JobFileList, "find ${JOB_DIR} -type f");
+         m_configuration.insert(JobFileList, System::JobFileListCommand(local));
       } break;
 
       case PBS: {

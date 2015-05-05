@@ -47,6 +47,7 @@ namespace Network {
          bool removeDirectory(QString const& path);
 
          Reply* execute(QString const& command);
+         Reply* execute(QString const& command, QString const& workingDirectory);
          Reply* getFile(QString const& sourcePath, QString const& destinationPath);
          Reply* putFile(QString const& sourcePath, QString const& destinationPath);
          Reply* getFiles(QStringList const& fileList, QString const& destinationPath);
