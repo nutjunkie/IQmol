@@ -20,8 +20,8 @@
    
 ********************************************************************************/
 
-#include "Server2.h"
-#include "ServerRegistry2.h"
+#include "Server.h"
+#include "ServerRegistry.h"
 #include "Reply.h"
 #include "Connection.h"
 #include "LocalConnection.h"
@@ -73,6 +73,7 @@ QStringList Server::tableFields() const
 void Server::closeConnection()
 {
    if (m_connection) {
+      m_connection->close();
       delete m_connection;
       m_connection = 0;
    }
@@ -259,6 +260,9 @@ qDebug() << "copyRunFile() called";
       qDebug() << "Run   file contents written to" << fileName;
 
       QString destination(job->jobInfo().getRemoteFilePath(QChemJobInfo::RunFileName));
+#ifdef Q_OS_WIN32
+      if (isLocal()) destination = job->jobInfo().getRemoteFilePath(QChemJobInfo::BatchFileName);
+#endif
       reply = m_connection->putFile(fileName, destination);
       connect(reply, SIGNAL(finished()), this, SLOT(queueJob()));
       m_activeRequests.insert(reply, job);
@@ -295,9 +299,11 @@ qDebug() << "queueJob() called";
       submit = substituteMacros(submit);
       submit = job->substituteMacros(submit);
 
-      QLOG_DEBUG() << "Executing submit command:     " << submit;
+      QString workingDirectory(job->jobInfo().get(QChemJobInfo::RemoteWorkingDirectory));
 
-      reply = m_connection->execute(submit);
+      QLOG_DEBUG() << "Executing submit command:     " << submit << "in directory" << workingDirectory;
+
+      reply = m_connection->execute(submit, workingDirectory);
       connect(reply, SIGNAL(finished()), this, SLOT(submitFinished()));
       m_activeRequests.insert(reply, job);
       reply->start();
@@ -355,18 +361,18 @@ bool Server::parseSubmitMessage(Job* job, QString const& message)
          // A successful submission returns a single token containing the job ID
          QStringList tokens(message.split(QRegExp("\\s+"), QString::SkipEmptyParts));
          if (tokens.size() == 1) {
-             job->setJobId(tokens.first());
-             QLOG_DEBUG() << "PBS job submitted with id" << job->jobId();
-             ok = true;
-          }
+            job->setJobId(tokens.first());
+            QLOG_DEBUG() << "PBS job submitted with id" << job->jobId();
+            ok = true;
+         } 
       } break;
          
       case ServerConfiguration::Web: {
          QRegExp rx("Qchemserv-Jobid::([0-9a-zA-Z\\-_]+)");
          if (message.contains("Qchemserv-Status::OK") && rx.indexIn(message,0) != -1) {
-             job->setJobId(rx.cap(1));
-             ok = true;
-          }
+            job->setJobId(rx.cap(1));
+            ok = true;
+         }
       } break;
 
       case ServerConfiguration::SGE: {
@@ -376,6 +382,7 @@ bool Server::parseSubmitMessage(Job* job, QString const& message)
          if (message.contains("has been submitted")) {
             int id(tokens[2].toInt(&ok));
             if (ok) job->setJobId(QString::number(id));
+            ok = true;
          }
       } break;
 
@@ -383,11 +390,27 @@ bool Server::parseSubmitMessage(Job* job, QString const& message)
          qDebug() << "Need to correctly parse submit message for server type "
                   << ServerConfiguration::toString(m_configuration.queueSystem());
          // A successful submission returns a string like:
-         //   [1] 9539 $QC/exe/qcprog.exe .aaaa.inp.9539.qcin.1 $QCSCRATCH/local/qchem953
-         QStringList tokens(message.split(QRegExp("\\s+"), QString::SkipEmptyParts));
-         if (tokens.size() >= 2) {
-            int id(tokens[1].toInt(&ok));
-            if (ok) job->setJobId(QString::number(id));
+         //   [1] 9876 $QC/exe/qcprog.exe .aaaa.inp.9876.qcin.1 $QCSCRATCH/local/qchem9876
+         // ...or on Windows we parse for the following 
+         //   ProcessId = 1234
+         QStringList tokens;
+
+         if (message.contains("ProcessId =")) {
+            tokens = message.split(QRegExp("ProcessId ="), QString::SkipEmptyParts);
+            if (tokens.size() >= 2) {
+               int id(tokens[1].toInt(&ok));
+               if (ok) job->setJobId(QString::number(id));
+            }else {
+               // It is possible that the job has completed before the batch file
+               // determines its PID, so we let this slide.
+               ok = true;
+            }
+         }else {
+            tokens = message.split(QRegExp("\\s+"), QString::SkipEmptyParts);
+            if (tokens.size() >= 2) {
+               int id(tokens[1].toInt(&ok));
+               if (ok) job->setJobId(QString::number(id));
+            }
          }
       } break;
 
@@ -556,6 +579,8 @@ bool Server::parseQueryMessage(Job* job, QString const& message)
 
       case ServerConfiguration::Basic: {
          if (message.isEmpty()) {
+            status = Job::Finished;
+         }else if (message.contains("No tasks are running")) { // Windows
             status = Job::Finished;
          }else {
             status = Job::Running;

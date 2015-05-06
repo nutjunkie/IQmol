@@ -56,7 +56,6 @@ class QMenu;
 namespace IQmol {
 
    class ModelView;
-   class ShaderDialog;
 
    /// MainWindow is the top level window in IQmol which contains the
    /// ToolBar, Viewer, ViewerModelView and History.
@@ -67,8 +66,6 @@ namespace IQmol {
       public: 
          MainWindow(QWidget* parent = 0);
          ~MainWindow();
-
-         void initViewer() { m_viewer.initShaders(); }
 
       Q_SIGNALS:
          void recordingActive(bool);
@@ -87,9 +84,7 @@ namespace IQmol {
          void showAbout() { m_aboutDialog.show(); }
          void showPreferences() { m_preferencesBrowser.show(); }
          void showLogMessages();
-         void showQChemUIold();
          void showQChemUI();
-         void showProcessMonitor();  // deprecate
          void showJobMonitor();
          void testInternetConnection();
          void submitJob(IQmol::Process2::QChemJobInfo&);
@@ -108,7 +103,6 @@ namespace IQmol {
          void toggleRecordingActive();
          void recordingCanceled() { setRecord(false); }
 
-         void editServers();
          void editNewServers();
          void configureAppearance();
          void clearRecentFilesMenu();
@@ -129,7 +123,7 @@ namespace IQmol {
          QUndoView       m_undoStackView;
          QProgressBar    m_progressBar;
          QLabel          m_status;
-         Viewer          m_viewer;
+         Viewer*         m_viewer;
 
          QItemSelectionModel   m_viewerSelectionModel;
          LogMessageDialog      m_logMessageDialog;
@@ -143,7 +137,8 @@ namespace IQmol {
 
          QSplitter* m_sideSplitter;
          Qui::InputDialog* m_quiInputDialog;
-         ShaderDialog* m_shaderDialog;
+
+         QGLContext* m_context;
    };
 
 } // end namespace IQmol

@@ -45,7 +45,6 @@ void Background::draw()
       glClearColor(m_backgroundColor.redF(), m_backgroundColor.greenF(), 
          m_backgroundColor.blueF(), m_backgroundColor.alphaF());
    } else {
-qDebug() << "Drawing white clear color";
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f); 
    }
 

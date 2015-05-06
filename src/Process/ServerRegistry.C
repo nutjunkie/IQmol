@@ -24,11 +24,11 @@
 #include "Preferences.h"
 #include "Server.h"
 #include "QMsgBox.h"
-#include <exception>
-#include <cstdlib>
+#include "Exception.h"
 
 
 namespace IQmol {
+namespace Process2 {
 
 ServerRegistry* ServerRegistry::s_instance = 0;
 QList<Server*>  ServerRegistry::s_servers;
@@ -39,28 +39,11 @@ ServerRegistry& ServerRegistry::instance()
 {
    if (s_instance == 0) {
       s_instance = new ServerRegistry();
+
       loadFromPreferences();
       atexit(ServerRegistry::destroy);
    }
    return *s_instance;
-}
-
-
-Server* ServerRegistry::newServer()
-{
-   Server* server(new Server());
-   // By default, new Servers are Basic Local ones
-   server->setDefaults(Server::Local, Server::Basic);
-   QString name("Server"); 
-   int i(1);
-
-   while (get(name)) {
-      name = "Server " + QString::number(i++);
-   }
-
-   server->m_name = name;
-   s_servers.append(server);
-   return server;
 }
 
 
@@ -75,7 +58,48 @@ QStringList ServerRegistry::availableServers() const
 }
 
 
-Server* ServerRegistry::get(QString const& serverName) const
+Server* ServerRegistry::addServer(ServerConfiguration& config)
+{
+   QString name(config.value(ServerConfiguration::ServerName));
+   int count(0);
+
+   while (find(name)) {
+      ++count;
+      name = config.value(ServerConfiguration::ServerName) + "_" + QString::number(count);
+   }
+
+   config.setValue(ServerConfiguration::ServerName, name);
+
+   Server* server(new Server(config));
+   s_servers.append(server);
+   save();
+
+   return server;
+}
+
+
+void ServerRegistry::closeAllConnections()
+{
+   QList<Server*>::iterator iter;
+   for (iter = s_servers.begin(); iter != s_servers.end(); ++iter) {
+       (*iter)->closeConnection();
+   }
+}
+
+
+void ServerRegistry::connectServers(QStringList const& servers)
+{
+   QStringList::const_iterator iter;
+   for (iter = servers.begin(); iter != servers.end(); ++iter) {
+       Server* server(find(*iter));
+       if (server) {
+          server->open();
+       }
+   }
+}
+
+
+Server* ServerRegistry::find(QString const& serverName) const
 {
    int index(indexOf(serverName));
    if (index >= 0) return s_servers[index];
@@ -87,6 +111,7 @@ void ServerRegistry::remove(QString const& serverName)
 {
    int index(indexOf(serverName));
    if (index >= 0) s_deletedServers.append(s_servers.takeAt(index));
+   save();
 }
 
 
@@ -94,14 +119,15 @@ void ServerRegistry::remove(Server* server)
 {
    int index(s_servers.indexOf(server));
    if (index >= 0) s_deletedServers.append(s_servers.takeAt(index));
+   save();
 }
-
 
 
 void ServerRegistry::moveUp(QString const& serverName)
 {
    int index(indexOf(serverName));
    if (index > 0) s_servers.swap(index, index-1);
+   save();
 }
 
 
@@ -109,6 +135,7 @@ void ServerRegistry::moveDown(QString const& serverName)
 {
    int index(indexOf(serverName));
    if (index < s_servers.size() -1) s_servers.swap(index, index+1);
+   save();
 }
 
 
@@ -135,21 +162,21 @@ void ServerRegistry::destroy()
 
 void ServerRegistry::loadFromPreferences()
 {
-   Server* server;
-   QVariantList list(Preferences::ServerList());
+   QVariantList list(Preferences::ServerConfigurationList());
    QVariantList::iterator iter;
 
    try {
       for (iter = list.begin(); iter != list.end(); ++iter) {
-          server = new Server();
-          server->fromQVariant(*iter);
-          s_servers.append(server);
+          s_servers.append(new Server(ServerConfiguration(*iter)));
       }
-   } catch (std::exception& err) {
+
+      // Default iqmol.q-chem.com server
+      if (s_servers.isEmpty()) s_servers.append(new Server(ServerConfiguration()));
+
+   } catch (Exception& ex) {
       QString msg("Problem loading servers from Preferences file:\n");
-      msg += err.what();
+      msg += ex.what();
       QMsgBox::warning(0, "IQmol", msg);
-      return;
    }
 }
 
@@ -159,10 +186,9 @@ void ServerRegistry::saveToPreferences()
    QVariantList list;
    QList<Server*>::const_iterator iter;
    for (iter = s_servers.begin(); iter != s_servers.end(); ++iter) {
-       list.append((*iter)->toQVariant());
+       list.append((*iter)->configuration().toQVariant());
    }
-   Preferences::ServerList(list);
+   Preferences::ServerConfigurationList(list);
 }
 
-
-} // end namespace IQmol
+} } // end namespace IQmol::Process

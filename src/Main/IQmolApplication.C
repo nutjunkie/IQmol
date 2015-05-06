@@ -23,7 +23,7 @@
 #include "IQmolApplication.h"
 #include "MainWindow.h"
 #include "JobMonitor.h"
-#include "ServerRegistry2.h"
+#include "ServerRegistry.h"
 #include "QMsgBox.h"
 #include "QsLog.h"
 #include <QDir>
@@ -55,6 +55,7 @@ IQmolApplication::IQmolApplication(int &argc, char **argv )
 
 IQmolApplication::~IQmolApplication()
 {
+// This seems to cause a crash on exit under windows
 //   if (m_splashScreen) delete m_splashScreen;
 }
 
@@ -141,7 +142,6 @@ void IQmolApplication::open(QString const& file)
    hideSplash();
    mw->show();
    mw->raise();
-   mw->initViewer();
 
    // Create the instance of the JobMonitor
    Process2::JobMonitor::instance();

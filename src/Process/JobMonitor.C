@@ -26,8 +26,8 @@
 #include "QChemOutputParser.h"
 #include "QueueResources.h"
 #include "QueueResourcesDialog.h"
-#include "Server2.h"
-#include "ServerRegistry2.h"
+#include "Server.h"
+#include "ServerRegistry.h"
 #include "Preferences.h"
 #include "RemoveDirectory.h"
 #include "NetworkException.h"
@@ -324,7 +324,9 @@ bool JobMonitor::getWorkingDirectory(Server* server, QChemJobInfo& qchemJobInfo)
       dirPath = Preferences::LastFileAccessed();
       QFileInfo info(dirPath);
       if (info.isFile()) dirPath = info.path();
+#ifndef Q_OS_WIN32
       dirPath += "/" + qchemJobInfo.get(QChemJobInfo::BaseName);
+#endif
       if (!getLocalWorkingDirectory(dirPath)) return false;
    }else {
       dirPath = qchemJobInfo.get(QChemJobInfo::BaseName);
@@ -394,6 +396,7 @@ bool JobMonitor::getRemoteWorkingDirectory(Server* server, QString& name)
 
 bool JobMonitor::getLocalWorkingDirectory(QString& dirName)
 {
+qDebug() << "JobMonitor::getLocalWorkingDirectory called with DIR" << dirName;
    QDir dir(dirName);
    dir.setFilter(QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs);
 

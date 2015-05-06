@@ -27,12 +27,14 @@
 
 namespace IQmol {
 
+   class ShaderLibrary;
+
    class ShaderDialog : public QDialog {
 
       Q_OBJECT
 
       public:
-         ShaderDialog(QWidget* parent);
+         ShaderDialog(ShaderLibrary&, QWidget* parent);
 
       Q_SIGNALS:
          void updated();  // to trigger a redraw
@@ -65,6 +67,7 @@ namespace IQmol {
          QCheckBox* m_checkBoxes[s_maxCheckBoxes];
          QCheckBox* m_lightBoxes[s_maxLightBoxes];
          Ui::ShaderDialog m_dialog;
+         ShaderLibrary& m_shaderLibrary;
    };
 
 

@@ -62,6 +62,7 @@ namespace Network {
          }
 
          virtual Reply* execute(QString const& command) = 0;
+         virtual Reply* execute(QString const& command, QString const& workingDirectory) = 0;
          virtual Reply* getFile(QString const& sourcePath, QString const& destinationPath) = 0;
          virtual Reply* putFile(QString const& sourcePath, QString const& destinationPath) = 0;
          virtual Reply* getFiles(QStringList const& fileList, QString const& destinationPath) = 0;

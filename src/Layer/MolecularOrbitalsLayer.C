@@ -350,6 +350,7 @@ qDebug() << "Grid already exists";
 
 #ifndef Q_OS_WIN32
    // Deleting this under Windows causes a crash, go figure.
+   // actually it is not just windows.
    //delete progressDialog;
 #endif
 

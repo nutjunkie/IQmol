@@ -28,7 +28,6 @@
 #include "GeometryConstraint.h"
 #include "KeywordSection.h"
 #include "QCJob.h"
-#include "JobInfo.h"   // deprecate
 #include "Job.h" 
 #include "LJParametersSection.h"
 #include "Option.h"
@@ -69,7 +68,7 @@ using namespace IQmol;
 namespace Qui {
 
 
-InputDialog::InputDialog(QWidget* parent) : QMainWindow(parent), m_jobInfo(0),
+InputDialog::InputDialog(QWidget* parent) : QMainWindow(parent),
    m_db(OptionDatabase::instance()), m_reg(OptionRegister::instance()), 
    m_taint(false), m_currentJob(0), m_fileIn("")
 {
@@ -207,68 +206,6 @@ void InputDialog::setQChemJobInfo(IQmol::Process2::QChemJobInfo const& jobInfo)
    m_reg.get("JOB_TYPE").applyRules();
 
    if (m_currentJob && m_qchemJobInfo.efpOnlyJob()) {
-      m_currentJob->printOption("BASIS", false);
-   }
-
-   updatePreviewText();
-}
-
-
-void InputDialog::setJobInfo(IQmol::JobInfo* jobInfo)
-{
-   if (!jobInfo) return;
-   m_jobInfo = jobInfo; 
-   m_fileIn.setFile(m_jobInfo->get(IQmol::JobInfo::BaseName) + ".inp");
-
-   m_ui.jobList->setCurrentIndex(0);
-   if (!m_currentJob) {
-      qDebug() << "Attempt to set JobInfo with no current Job";
-      return;
-   }
-
-   m_currentJob->setCoordinates(m_jobInfo->get(IQmol::JobInfo::Coordinates));
-   m_currentJob->setEfpFragments(m_jobInfo->get(IQmol::JobInfo::EfpFragments));
-   m_currentJob->setConstraints(m_jobInfo->get(IQmol::JobInfo::Constraints));
-   m_currentJob->setScanCoordinates(m_jobInfo->get(IQmol::JobInfo::ScanCoordinates));
-   m_currentJob->setEfpParameters(m_jobInfo->get(IQmol::JobInfo::EfpParameters));
-
-   if (m_jobInfo->efpOnlyJob()) {
-      m_ui.basis->setEnabled(false);
-      m_ui.label_basis->setEnabled(false);
-      m_ui.ecp->setEnabled(false);
-      m_ui.label_ecp->setEnabled(false);
-
-      m_currentJob->setOption("SYMMETRY_IGNORE", "true");
-      m_ui.efp_input->setEnabled(true);
-      m_currentJob->setOption("EFP_INPUT", "true");
-      m_currentJob->setOption("EFP_FRAGMENTS_ONLY", "true");
-      m_currentJob->setOption("GUI",  "0");
-   }else {
-      m_ui.basis->setEnabled(true);
-      m_ui.label_basis->setEnabled(true);
-      m_ui.ecp->setEnabled(true);
-      m_ui.label_ecp->setEnabled(true);
-
-      m_ui.efp_input->setEnabled(false);
-      m_currentJob->setOption("GUI",  "2");
-      m_currentJob->setOption("EFP_FRAGMENTS_ONLY", "false");
-
-      QString frag(m_jobInfo->get(IQmol::JobInfo::EfpFragments));
-      m_ui.efp_fragments_only->setEnabled(!frag.isEmpty());
-   }
-
-   // We need the temporaries as setting the charge will overwrite the
-   // jobInfo->multiplicity
-   int charge(m_jobInfo->getCharge());
-   int multiplicity(m_jobInfo->getMultiplicity());
-   m_ui.qui_charge->setValue(charge);
-   m_ui.qui_multiplicity->setValue(multiplicity);
-
-   on_jobList_currentIndexChanged(0);
-   TAINT(false);
-   m_reg.get("JOB_TYPE").applyRules();
-
-   if (m_currentJob && m_jobInfo->efpOnlyJob()) {
       m_currentJob->printOption("BASIS", false);
    }
 
@@ -489,8 +426,6 @@ void InputDialog::addNewJob()
    // The default Molecule section is set to "read", but 
    // for the first job we specify things explicitly.
    if (m_jobs.size() == 1) {
-qDebug() << "WARN: setting QChemJobInfo, not JobInfo";
-      //setJobInfo(m_jobInfo); 
       setQChemJobInfo(m_qchemJobInfo); 
    }
 }
@@ -730,9 +665,7 @@ void InputDialog::on_deleteJobButton_clicked(bool)
       addNewJob();
    }else {
       if (index == 0) {
-qDebug() << "WARN: setting QChemJobInfo, not JobInfo";
-      //setJobInfo(m_jobInfo); 
-      setQChemJobInfo(m_qchemJobInfo); 
+         setQChemJobInfo(m_qchemJobInfo); 
       }else {
          m_ui.jobList->setCurrentIndex(index-1);
       }
@@ -886,21 +819,13 @@ void InputDialog::submitJob()
 {      
    capturePreviewTextChanges();
    updatePreviewText();
-qDebug() << "submitJob called in QUI";
+   qDebug() << "submitJob called in QUI";
 
    m_qchemJobInfo.set(
       IQmol::Process2::QChemJobInfo::InputString, generateInputString());
    m_qchemJobInfo.set(
       IQmol::Process2::QChemJobInfo::ServerName, m_ui.serverCombo->currentText());
    submitJobRequest(m_qchemJobInfo);
-
-   // deprecate
-   if (m_jobInfo) {
-      m_jobInfo->set(IQmol::JobInfo::InputString, generateInputString());
-      m_jobInfo->set(IQmol::JobInfo::ServerName, m_ui.serverCombo->currentText());
-      submitJobRequest(m_jobInfo);
-   }
-   return;
 }
 
 
@@ -1030,10 +955,6 @@ void InputDialog::on_qui_charge_valueChanged(int value)
       int multiplicity(m_ui.qui_multiplicity->value()); 
       multiplicity += (multiplicity == 1) ? 1 : -1;
       m_ui.qui_multiplicity->setValue(multiplicity); 
-      if (m_jobInfo) {
-          m_jobInfo->set(IQmol::JobInfo::Charge, value);
-          m_jobInfo->set(IQmol::JobInfo::Multiplicity, multiplicity);
-      }
    }
 }
 
@@ -1041,7 +962,6 @@ void InputDialog::on_qui_charge_valueChanged(int value)
 void InputDialog::on_qui_multiplicity_valueChanged(int value) 
 {
    if (m_currentJob) m_currentJob->setMultiplicity(value);
-   if (m_jobInfo)  m_jobInfo->set(IQmol::JobInfo::Multiplicity, value);
 }
 
 

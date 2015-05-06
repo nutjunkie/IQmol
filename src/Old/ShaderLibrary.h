@@ -35,6 +35,7 @@
 #include <QStringList>
 #include "QGLViewer/vec.h"
 #include <QDebug>
+#include <QGLFunctions>
 
 #ifdef Q_OS_WIN32
 #undef IQMOL_SHADERS
@@ -42,6 +43,7 @@
 #define IQMOL_SHADERS
 #endif
 
+#define IQMOL_SHADERS
 
 
 class QGLFramebufferObject;
@@ -72,10 +74,12 @@ namespace IQmol {
 
       public:
          static const QString NoShader;
-         static ShaderLibrary& instance();
 
-         QStringList availableShaders() const { return s_shaders.keys(); }
-         QString const& currentShader() { return s_currentShader; }
+         ShaderLibrary(QGLContext*);
+         ~ShaderLibrary();
+
+         QStringList availableShaders() const { return m_shaders.keys(); }
+         QString const& currentShader() { return m_currentShader; }
 
          bool bindShader(QString const& name);
          bool suspend();
@@ -107,16 +111,16 @@ namespace IQmol {
             const& value)
          {
 #ifdef IQMOL_SHADERS
-            if (!s_shaders.contains(shaderName)) {
+            if (!m_shaders.contains(shaderName)) {
                qDebug() << "Shader not found:" << shaderName;
                return false;
             }
-            unsigned program(s_shaders.value(shaderName));
-            glUseProgram(program);
+            unsigned program(m_shaders.value(shaderName));
+            m_glFunctions->glUseProgram(program);
 
             QByteArray raw(variable.toLocal8Bit());
             const char* c_str(raw.data());
-            GLint location(glGetUniformLocation(program, c_str));
+            GLint location(m_glFunctions->glGetUniformLocation(program, c_str));
             if (location < 0) {
                // qDebug() << "Shader location not found:" << shaderName << variable;
                return false;
@@ -130,17 +134,16 @@ namespace IQmol {
 
 
       private:
-         static QGLFramebufferObject* s_normalBuffer;
-         static QGLFramebufferObject* s_filterBuffer;
+         QGLFramebufferObject* m_normalBuffer;
+         QGLFramebufferObject* m_filterBuffer;
 
-         static GLuint   s_rotationTextureId;
-         static GLuint   s_rotationTextureSize;
-         static GLfloat* s_rotationTextureData;
+         GLuint   m_rotationTextureId;
+         GLuint   m_rotationTextureSize;
+         GLfloat* m_rotationTextureData;
 
-         static QMap<QString, unsigned> s_shaders;
-         static ShaderLibrary* s_instance;
-         static QString s_currentShader;
-         static void destroy();
+         QMap<QString, unsigned> m_shaders;
+         QString m_currentShader;
+         void destroy();
 
          void initializeTextures();
 
@@ -155,7 +158,7 @@ namespace IQmol {
 
          QVariantMap parseUniformVariables(QString const& vertexShaderPath);
 
-         static QVariantMap s_currentMaterial;
+         QVariantMap m_currentMaterial;
          bool setMaterialParameters(QVariantMap const& map);
          void setUniformVariable(GLuint program, GLint location, QSize const&);
          void setUniformVariable(GLuint program, GLint location, QSizeF const&);
@@ -167,10 +170,9 @@ namespace IQmol {
          void setUniformVariable(GLuint program, GLint location, GLFloatArray const& value);
          void setUniformVariable(GLuint program, GLint location, mat4x4 const& value);
 
-         ShaderLibrary() : m_filtersAvailable(false), m_filtersActive(false),
-            m_shadersInitialized(false) { }
          explicit ShaderLibrary(ShaderLibrary const&) { }
-         ~ShaderLibrary();
+
+         QGLFunctions* m_glFunctions;
    };
 
 

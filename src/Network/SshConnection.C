@@ -673,6 +673,16 @@ Reply* SshConnection::execute(QString const& command)
 }
 
 
+Reply* SshConnection::execute(QString const& command, QString const& workingDirectory)
+{
+   QString cmd("cd ");
+   cmd += workingDirectory + " && " + command;
+   SshReply* reply(new SshExecute(this, cmd));
+   thread(reply);
+   return reply;
+}
+
+
 Reply* SshConnection::putFile(QString const& sourcePath, QString const& destinationPath) 
 {
    SshReply* reply(new SshPutFile(this, sourcePath, destinationPath));

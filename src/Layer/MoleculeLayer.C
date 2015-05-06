@@ -22,7 +22,6 @@
 
 #include "QsLog.h"
 #include "QMsgBox.h"
-#include "JobInfo.h"   // deprecate
 #include "QChemJobInfo.h" 
 #include "AtomLayer.h"
 #include "BondLayer.h"
@@ -98,7 +97,6 @@ Molecule::Molecule(QObject* parent) : Base(DefaultMoleculeName, parent),
    m_reperceiveBondsForAnimation(false),
    m_configurator(*this), 
    m_surfaceAnimator(this), 
-   m_jobInfo(0),   //deprecate
    m_info(this), 
    m_atomList(this, "Atoms"), 
    m_bondList(this, "Bonds"), 
@@ -1500,51 +1498,6 @@ Charge* Molecule::createCharge(double const Q, Vec const& position)
 }
 
 
-// deprecate
-bool Molecule::jobInfoMatch(JobInfo const* jobInfo) 
-{ 
-   return jobInfo == m_jobInfo; 
-}
-
-
-// deprecate
-JobInfo* Molecule::jobInfo()
-{
-   if (m_jobInfo) disconnect(m_jobInfo, SIGNAL(updated()), this, SLOT(jobInfoChanged()));
-   // This is sloppy.  We create a JobInfo object here, but don't delete it in
-   // the dtor as we may have passed the JobInfo on to a Process or Server.
-   m_jobInfo = new JobInfo();
-
-   m_jobInfo->set(JobInfo::Charge, totalCharge());
-   m_jobInfo->set(JobInfo::Multiplicity, multiplicity());
-   m_jobInfo->set(JobInfo::Coordinates, coordinatesAsString());
-   m_jobInfo->set(JobInfo::Constraints, constraintsAsString());
-   m_jobInfo->set(JobInfo::ScanCoordinates, scanCoordinatesAsString());
-   m_jobInfo->set(JobInfo::EfpFragments, efpFragmentsAsString());
-   m_jobInfo->set(JobInfo::EfpParameters, efpParametersAsString());
-
-   AtomList atomList(findLayers<Atom>(Children | Visible));
-   if (atomList.isEmpty()) {
-      m_jobInfo->setEfpOnlyJob(true);
-   }
-
-   QString name;
-
-   if (m_inputFile.filePath().isEmpty()) {
-      QFileInfo fileInfo(Preferences::LastFileAccessed());
-      m_jobInfo->set(JobInfo::LocalWorkingDirectory, fileInfo.path());
-      m_jobInfo->set(JobInfo::BaseName, text());
-   }else {
-      m_jobInfo->set(JobInfo::LocalWorkingDirectory, m_inputFile.path());
-      m_jobInfo->set(JobInfo::BaseName, m_inputFile.completeBaseName());
-      name =  + "/" + m_inputFile.completeBaseName() + ".inp";
-   }
-
-   connect(m_jobInfo, SIGNAL(updated()), this, SLOT(jobInfoChanged()));
-   return m_jobInfo;
-}
-
-
 Process2::QChemJobInfo Molecule::qchemJobInfo()
 {
    Process2::QChemJobInfo jobInfo;
@@ -1575,16 +1528,6 @@ Process2::QChemJobInfo Molecule::qchemJobInfo()
 
    jobInfo.setMoleculePointer(this);
    return jobInfo;
-}
-
-
-void Molecule::jobInfoChanged()
-{ 
-   if (m_jobInfo) {
-      setText(m_jobInfo->get(JobInfo::BaseName)); 
-      m_info.setCharge(m_jobInfo->getCharge());
-      m_info.setMultiplicity(m_jobInfo->getMultiplicity());
-   }
 }
 
 
