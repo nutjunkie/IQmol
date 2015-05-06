@@ -55,7 +55,7 @@ IQmolApplication::IQmolApplication(int &argc, char **argv )
 
 IQmolApplication::~IQmolApplication()
 {
-   if (m_splashScreen) delete m_splashScreen;
+//   if (m_splashScreen) delete m_splashScreen;
 }
 
 
