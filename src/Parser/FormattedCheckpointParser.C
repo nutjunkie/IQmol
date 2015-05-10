@@ -148,7 +148,6 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       }else if (key == "Alpha Orbital Energies") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
-qDebug() << "Reading in alpha energies" << n;
          moData.alphaEnergies = readDoubleArray(textStream, n);
          moData.betaEnergies  = moData.alphaEnergies;
 
@@ -166,7 +165,6 @@ qDebug() << "Reading in alpha energies" << n;
          dipole.setValue(data[0],data[1],data[2]);
 
       }else if (key == "Cartesian Force Constants") {
-qDebug() << "Reading Hessian information";
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok || !geometry) goto error;
          QList<double> data(readDoubleArray(textStream, n));
@@ -358,6 +356,12 @@ Data::ShellList* FormattedCheckpoint::makeShellList(ShellData const& shellData,
           case 3:
              shellList->append( new Data::Shell(Data::Shell::F10, position, expts, coefs) );
              break;
+          case -4:
+             shellList->append( new Data::Shell(Data::Shell::G9, position, expts, coefs) );
+             break;
+          case 4:
+             shellList->append( new Data::Shell(Data::Shell::G15, position, expts, coefs) );
+             break;
 
           default:
              delete shellList;
@@ -367,6 +371,7 @@ Data::ShellList* FormattedCheckpoint::makeShellList(ShellData const& shellData,
              m_errors.append(msg);
              return 0;
              break;
+
        }
    }
 

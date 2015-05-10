@@ -69,6 +69,7 @@ namespace Data {
                 AtomicCharge,           GasteigerCharge,        ChelpgCharge,
                 SpinDensity,            VdwRadius,              MultipoleExpansionList,
                 NmrReference,           NmrReferenceList,
+                ElectronicTransition,   ElectronicTransitionList, ExcitedStates,
                /*---------------------  *---------------------  *--------------------- */
                 YamlNode
       };

@@ -14,7 +14,9 @@ SOURCES = \
    $$PWD/DataFactory.C \
    $$PWD/EfpFragment.C \
    $$PWD/EfpFragmentLibrary.C \
+   $$PWD/ElectronicTransition.C \
    $$PWD/Energy.C \
+   $$PWD/ExcitedStates.C \
    $$PWD/File.C \
    $$PWD/Frequencies.C \
    $$PWD/Geometry.C \
@@ -49,7 +51,9 @@ HEADERS = \
    $$PWD/DipoleMoment.h \
    $$PWD/EfpFragment.h \
    $$PWD/EfpFragmentLibrary.h \
+   $$PWD/ElectronicTransition.h \
    $$PWD/Energy.h \
+   $$PWD/ExcitedStates.h \
    $$PWD/File.h \
    $$PWD/Frequencies.h \
    $$PWD/Geometry.h \

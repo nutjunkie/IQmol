@@ -33,20 +33,21 @@ namespace Configurator {
 MolecularOrbitals::MolecularOrbitals(Layer::MolecularOrbitals& molecularOrbitals)
   : m_molecularOrbitals(molecularOrbitals)
 {
-   m_molecularOrbitalsConfigurator.setupUi(this);
+   m_configurator.setupUi(this);
 
-   connect(m_molecularOrbitalsConfigurator.orbitalRangeMin, SIGNAL(currentIndexChanged(int)),
-      m_molecularOrbitalsConfigurator.orbitalRangeMax, SLOT(setCurrentIndex(int)));
+   connect(m_configurator.orbitalRangeMin, SIGNAL(currentIndexChanged(int)),
+      m_configurator.orbitalRangeMax, SLOT(setCurrentIndex(int)));
  
-   m_molecularOrbitalsConfigurator.surfaceType->clear();
-   m_molecularOrbitalsConfigurator.surfaceType->addItem("Orbital", Orbital);
-   m_molecularOrbitalsConfigurator.surfaceType->addItem("Density", Density);
-   m_molecularOrbitalsConfigurator.surfaceType->addItem("Spin Density", SpinDiffDensity);
-   m_molecularOrbitalsConfigurator.surfaceType->addItem("Spin Only Density", SpinOnlyDensity);
-   m_molecularOrbitalsConfigurator.surfaceType->setCurrentIndex(0);
+   m_configurator.surfaceType->clear();
+   m_configurator.surfaceType->addItem("Orbital", Orbital);
+   m_configurator.surfaceType->addItem("Density", Density);
+   m_configurator.surfaceType->addItem("Spin Density", SpinDiffDensity);
+   m_configurator.surfaceType->addItem("Spin Only Density", SpinOnlyDensity);
+   m_configurator.surfaceType->setCurrentIndex(0);
 
    setPositiveColor(Preferences::PositiveSurfaceColor());
    setNegativeColor(Preferences::NegativeSurfaceColor());
+   m_configurator.opacity->setValue(Preferences::SurfaceOpacity());
 }
 
 
@@ -61,7 +62,7 @@ void MolecularOrbitals::init()
 
 void MolecularOrbitals::on_surfaceType_currentIndexChanged(int index) 
 {
-   QVariant qvar(m_molecularOrbitalsConfigurator.surfaceType->itemData(index));
+   QVariant qvar(m_configurator.surfaceType->itemData(index));
 
    switch (qvar.toUInt()) {
       case Orbital:
@@ -112,7 +113,7 @@ void MolecularOrbitals::setPositiveColor(QColor const& color)
    if (color.isValid()) {
       QString bg("background-color: ");
       bg += color.name();
-      m_molecularOrbitalsConfigurator.positiveColorButton->setStyleSheet(bg);
+      m_configurator.positiveColorButton->setStyleSheet(bg);
       Preferences::PositiveSurfaceColor(color);
    }
 }
@@ -123,7 +124,7 @@ void MolecularOrbitals::setNegativeColor(QColor const& color)
    if (color.isValid()) {
       QString bg("background-color: ");
       bg += color.name();
-      m_molecularOrbitalsConfigurator.negativeColorButton->setStyleSheet(bg);
+      m_configurator.negativeColorButton->setStyleSheet(bg);
       Preferences::NegativeSurfaceColor(color);
    }
 }
@@ -139,6 +140,7 @@ void MolecularOrbitals::on_cancelButton_clicked(bool)
 void MolecularOrbitals::on_calculateButton_clicked(bool)
 { 
    on_addToQueueButton_clicked(true);
+   Preferences::SurfaceOpacity(m_configurator.opacity->value());
    accept();
    calculateSurfaces(); 
 }
@@ -146,19 +148,22 @@ void MolecularOrbitals::on_calculateButton_clicked(bool)
 
 void MolecularOrbitals::on_addToQueueButton_clicked(bool) 
 {
-   int quality(m_molecularOrbitalsConfigurator.quality->value());
-   double isovalue(m_molecularOrbitalsConfigurator.isovalue->value());
-   Spin spin = m_molecularOrbitalsConfigurator.alphaRadio->isChecked() ? Alpha : Beta;
+   int quality(m_configurator.quality->value());
+   double isovalue(m_configurator.isovalue->value());
+   Spin spin = m_configurator.alphaRadio->isChecked() ? Alpha : Beta;
    QColor positive(Preferences::PositiveSurfaceColor());
    QColor negative(Preferences::NegativeSurfaceColor());
-   bool simplifyMesh(m_molecularOrbitalsConfigurator.simplifyMeshCheckBox->isChecked());
+   bool simplifyMesh(m_configurator.simplifyMeshCheckBox->isChecked());
 
-   int index(m_molecularOrbitalsConfigurator.surfaceType->currentIndex());
-   QVariant qvar(m_molecularOrbitalsConfigurator.surfaceType->itemData(index));
+   int index(m_configurator.surfaceType->currentIndex());
+   QVariant qvar(m_configurator.surfaceType->itemData(index));
    bool isSigned(true);
 
+   int op(m_configurator.opacity->value());
+   double opacity = op == 100 ? 0.999 : double(op)/100.0;
+
    Data::SurfaceInfo info(Data::SurfaceType::Custom, quality, isovalue, 
-     positive, negative, isSigned, simplifyMesh);
+     positive, negative, isSigned, simplifyMesh, opacity);
 
    switch (qvar.toUInt()) {
 
@@ -169,8 +174,8 @@ void MolecularOrbitals::on_addToQueueButton_clicked(bool)
             info.type().setKind(Data::SurfaceType::BetaOrbital);
          }
 
-         int orb1(m_molecularOrbitalsConfigurator.orbitalRangeMin->currentIndex()+1);
-         int orb2(m_molecularOrbitalsConfigurator.orbitalRangeMax->currentIndex()+1);
+         int orb1(m_configurator.orbitalRangeMin->currentIndex()+1);
+         int orb2(m_configurator.orbitalRangeMax->currentIndex()+1);
 
          for (int i = std::min(orb1,orb2); i <= std::max(orb1, orb2); ++i) {
              info.type().setIndex(i);
@@ -205,22 +210,22 @@ void MolecularOrbitals::on_addToQueueButton_clicked(bool)
 
 void MolecularOrbitals::enableOrbitalSelection(bool tf)
 {
-   m_molecularOrbitalsConfigurator.orbitalRangeMin->setEnabled(tf);
-   m_molecularOrbitalsConfigurator.orbitalRangeMax->setEnabled(tf);
+   m_configurator.orbitalRangeMin->setEnabled(tf);
+   m_configurator.orbitalRangeMax->setEnabled(tf);
 }
 
 
 void MolecularOrbitals::enableSpin(bool tf)
 {
-   m_molecularOrbitalsConfigurator.alphaRadio->setEnabled(tf);
-   m_molecularOrbitalsConfigurator.betaRadio->setEnabled(tf);
+   m_configurator.alphaRadio->setEnabled(tf);
+   m_configurator.betaRadio->setEnabled(tf);
 }
 
 
 void MolecularOrbitals::enableNegativeColor(bool tf)
 {
-   m_molecularOrbitalsConfigurator.negativeColorButton->setVisible(tf);
-   m_molecularOrbitalsConfigurator.negativeLabel->setVisible(tf);
+   m_configurator.negativeColorButton->setVisible(tf);
+   m_configurator.negativeLabel->setVisible(tf);
 }
 
 
@@ -229,13 +234,13 @@ void MolecularOrbitals::updateOrbitalRange(int nElectrons)
    int index;
    QComboBox* combo;
 
-   combo = m_molecularOrbitalsConfigurator.orbitalRangeMin;
+   combo = m_configurator.orbitalRangeMin;
    index = combo->currentIndex();
    updateOrbitalRange(nElectrons, combo);
    if (index < 0 || index >= (int)m_nOrbitals) index = nElectrons-1;
    combo->setCurrentIndex(index);
 
-   combo = m_molecularOrbitalsConfigurator.orbitalRangeMax;
+   combo = m_configurator.orbitalRangeMax;
    index = combo->currentIndex();
    updateOrbitalRange(nElectrons, combo);
    if (index < 0 || index >= (int)m_nOrbitals) index = nElectrons;

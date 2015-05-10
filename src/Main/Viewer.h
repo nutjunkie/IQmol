@@ -36,6 +36,7 @@
 #include "Snapshot.h"
 #include "IQmol.h"
 #include "QGLViewer/qglviewer.h"
+#include "QGLViewer/manipulatedFrame.h"
 #include <QFontMetrics>
 #include <QStandardItemModel>
 #include <QItemSelectionModel>

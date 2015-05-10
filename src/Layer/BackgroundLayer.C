@@ -51,8 +51,8 @@ void Background::draw()
    glClear(GL_COLOR_BUFFER_BIT);
 
    if (false) {
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f); 
-   glClear(GL_COLOR_BUFFER_BIT);
+      glClearColor(1.0f, 1.0f, 1.0f, 1.0f); 
+      glClear(GL_COLOR_BUFFER_BIT);
       drawGradient();
    }
 }

@@ -93,6 +93,9 @@ namespace Preferences {
    bool    LoggingEnabled();
    void    LoggingEnabled(bool const);
    
+   double  SurfaceOpacity();
+   void    SurfaceOpacity(double const);
+   
    QString DefaultForceField();
    void    DefaultForceField(QString const&);
 

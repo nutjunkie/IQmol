@@ -34,12 +34,9 @@ namespace Data {
 
 template<> const Type::ID SurfaceList::TypeID = Type::SurfaceList;
 
-// Note the opacity is set to slightly less than 1.0 to ensure all surfaces are
-// draw after the Primitives when sorted, however, because it is > 0.99 it
-// won't trigger the transparency overhead in draw()
-
-Surface::Surface(SurfaceInfo const& info) : m_opacity(0.999), m_min(0.0), m_max(0.0)
+Surface::Surface(SurfaceInfo const& info) : m_min(0.0), m_max(0.0)
 {
+   m_opacity = info.opacity();
    m_description = info.toString();
 // add isovalue info to description
    m_isSigned = info.isSigned();

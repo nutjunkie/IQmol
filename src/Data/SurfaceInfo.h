@@ -41,13 +41,19 @@ namespace Data {
          SurfaceInfo(SurfaceType const&, unsigned const quality = 3,  
             double const isovalue = 0.02, QColor const& positive = QColor(), 
             QColor const& negative = QColor(), bool isSigned = false,
-            bool simplifyMesh = false);
+            bool simplifyMesh = false, double const opacity = 0.999); 
+			// Note the opacity is set to slightly less than 1.0 to ensure all
+			// surfaces are draw after the Primitives when sorted, however,
+			// because it is > 0.99 it won't trigger the transparency overhead
+			// in draw()
+
 
          SurfaceType& type() { return m_surfaceType; }
          SurfaceType const& type() const { return m_surfaceType; }
 
          unsigned quality() const { return m_quality; }
          double isovalue() const { return m_isovalue; }
+         double opacity() const { return m_opacity; }
          bool isSigned() const;
          bool simplifyMesh() const { return m_simplifyMesh; }
          void setIsSigned(bool const tf) { m_isSigned = tf; }
@@ -79,6 +85,7 @@ namespace Data {
             ar & m_negativeColor;
             ar & m_isSigned;
             ar & m_simplifyMesh;
+            ar & m_opacity;
          }
 
          SurfaceType m_surfaceType;
@@ -88,6 +95,7 @@ namespace Data {
          QColor      m_negativeColor;
          bool        m_isSigned;
          bool        m_simplifyMesh;
+         double      m_opacity;
    };
 
    typedef Data::List<Data::SurfaceInfo> SurfaceInfoList;

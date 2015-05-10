@@ -78,6 +78,7 @@ void ResetBrowserPreferences()
            << "LogFilePath"
            << "LogFileHidden"
            << "LoggingEnabled"
+           << "SurfaceOpacity"
            // And a few others
            << "MainWindowSize"
            << "QuiWindowSize"
@@ -193,6 +194,18 @@ void LogFilePath(QString const& filePath)
    Set("LogFilePath", QVariant::fromValue(filePath));
 }
 
+// ---------
+
+double SurfaceOpacity()
+{
+   QVariant value(Get("SurfaceOpacity"));
+   return value.isNull() ? 100: value.value<double>();
+}
+
+void SurfaceOpacity(double const value) 
+{
+   Set("SurfaceOpacity", QVariant::fromValue(value));
+}
 
 // ---------
 

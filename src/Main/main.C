@@ -52,6 +52,21 @@ int LogFileDescriptor(-1);
 #include <stdlib.h>
 #include <unistd.h>
 
+const char* signalText(const int& signal)
+{
+   switch(signal) {
+      case  4:  return "Illegal instruction";       break;
+      case  6:  return "Abort signal";              break;
+      case  8:  return "Floating point exception";  break;
+      case 11:  return "Invalid memory reference";  break;
+      case 13:  return "Broken pipe";               break;
+      default:                                      break;
+         
+   }
+
+   return "Unknown";
+}
+
 
 #ifdef Q_OS_WIN32
 #if 0
@@ -120,9 +135,10 @@ void signalHandler(int signal)
 int main(int argc, char *argv[]) 
 {
     // Install our signal handler for all the signals we care about
-    for (int i = 4; i < 30; i++) {
-        signal(i, signalHandler);   
-    }
+    signal( 4, signalHandler);   // Illegal Instruction
+    signal( 8, signalHandler);   // Floating point exception
+    signal(11, signalHandler);   // Invalid memory reference
+    signal(13, signalHandler);   // Broken pipe
 
     IQmol::IQmolApplication iqmol(argc, argv);
     Q_INIT_RESOURCE(IQmol);

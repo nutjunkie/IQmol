@@ -74,7 +74,7 @@ namespace Configurator {
          void setNegativeColor(QColor const& color);
 
          Layer::MolecularOrbitals& m_molecularOrbitals;
-         Ui::MolecularOrbitalsConfigurator m_molecularOrbitalsConfigurator;
+         Ui::MolecularOrbitalsConfigurator m_configurator;
 
          unsigned int m_nAlpha;
          unsigned int m_nBeta;

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>670</width>
-    <height>304</height>
+    <width>661</width>
+    <height>299</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -63,79 +63,19 @@ QToolButton:checked {
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout" name="gridLayout_2">
-     <item row="4" column="0">
-      <widget class="QLabel" name="label_6">
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>Log File:</string>
+        <string>QChem Database File</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Fragment Directory:</string>
+     <item row="4" column="1">
+      <widget class="QLineEdit" name="logFileLineEdit">
+       <property name="toolTip">
+        <string>Changes to the log file location require IQmol to be restarted</string>
        </property>
       </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>Maximum Undo Level:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Default Force Field:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
-        <widget class="QComboBox" name="forceFieldCombo">
-         <item>
-          <property name="text">
-           <string>MMFF94</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>MMFF94s</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>UFF</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Ghemical</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Gaff</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
      </item>
      <item row="1" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout">
@@ -200,44 +140,108 @@ QToolButton:checked {
        </item>
       </layout>
      </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Default Force Field:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QComboBox" name="forceFieldCombo">
+         <item>
+          <property name="text">
+           <string>MMFF94</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>MMFF94s</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>UFF</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Ghemical</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Gaff</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
      <item row="2" column="1">
       <widget class="QLineEdit" name="fragmentDirectoryLineEdit"/>
      </item>
-     <item row="4" column="1">
-      <widget class="QLineEdit" name="logFileLineEdit">
-       <property name="toolTip">
-        <string>Changes to the log file location require IQmol to be restarted</string>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Log File:</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="2">
-      <widget class="QPushButton" name="browseLogFileButton">
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Maximum Undo Level:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Fragment Directory:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2">
+      <widget class="QPushButton" name="browseQChemDatabaseFileButton">
        <property name="text">
         <string>Browse</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="2">
-      <widget class="QPushButton" name="browseFragmentDirectoryButton">
-       <property name="text">
-        <string>Browse</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>QChem Database File</string>
        </property>
       </widget>
      </item>
      <item row="3" column="1">
       <widget class="QLineEdit" name="qchemDatabaseFileLineEdit"/>
      </item>
-     <item row="3" column="2">
-      <widget class="QPushButton" name="browseQChemDatabaseFileButton">
+     <item row="6" column="1">
+      <widget class="QLabel" name="label_7">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
        <property name="text">
-        <string>Browse</string>
+        <string>Log file changes will not take effect until restart</string>
        </property>
       </widget>
      </item>
@@ -272,21 +276,17 @@ QToolButton:checked {
        </item>
       </layout>
      </item>
-     <item row="6" column="1">
-      <widget class="QLabel" name="label_7">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
+     <item row="4" column="2">
+      <widget class="QPushButton" name="browseLogFileButton">
        <property name="text">
-        <string>Log file changes will not take effect until restart</string>
+        <string>Browse</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="QPushButton" name="browseFragmentDirectoryButton">
+       <property name="text">
+        <string>Browse</string>
        </property>
       </widget>
      </item>
