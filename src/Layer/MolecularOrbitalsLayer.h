@@ -51,6 +51,8 @@ namespace Layer {
       public:
          MolecularOrbitals(Data::MolecularOrbitals&);
          void setMolecule(Molecule* molecule);
+         double alphaOrbitalEnergy(unsigned const i) const;
+         double betaOrbitalEnergy(unsigned const i) const;
 
       Q_SIGNALS:
          void progress(double);

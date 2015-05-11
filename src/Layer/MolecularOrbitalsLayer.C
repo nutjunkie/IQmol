@@ -78,6 +78,19 @@ MolecularOrbitals::MolecularOrbitals(Data::MolecularOrbitals& molecularOrbitals)
 }
 
 
+double MolecularOrbitals::alphaOrbitalEnergy(unsigned const i) const 
+{ 
+   return m_molecularOrbitals.alphaOrbitalEnergy(i);
+}
+
+
+double MolecularOrbitals::betaOrbitalEnergy(unsigned const i) const 
+{ 
+   return m_molecularOrbitals.betaOrbitalEnergy(i);
+}
+
+
+
 void MolecularOrbitals::appendSurfaces(Data::SurfaceList& surfaceList)
 {
    Data::SurfaceList::const_iterator iter;

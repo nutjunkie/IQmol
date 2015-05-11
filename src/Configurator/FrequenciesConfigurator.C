@@ -168,7 +168,6 @@ void Frequencies::on_lorentzianButton_clicked(bool)
 
 void Frequencies::updatePlot()
 {
-//qDebug() << "Update plot called";
    m_customPlot->clearGraphs();
    double scale(m_configurator.scaleFactor->value());
    double width(m_configurator.widthSlider->value());

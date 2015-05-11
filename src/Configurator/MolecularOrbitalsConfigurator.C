@@ -24,20 +24,24 @@
 #include "MolecularOrbitalsLayer.h"
 #include "Spin.h"
 #include "Preferences.h"
+#include "qcustomplot.h"
 #include <QColorDialog>
+#include <QMouseEvent>
+#include <QVector>
 
 
 namespace IQmol {
 namespace Configurator {
 
 MolecularOrbitals::MolecularOrbitals(Layer::MolecularOrbitals& molecularOrbitals)
-  : m_molecularOrbitals(molecularOrbitals)
+  : m_molecularOrbitals(molecularOrbitals), m_customPlot(0)
 {
    m_configurator.setupUi(this);
 
    connect(m_configurator.orbitalRangeMin, SIGNAL(currentIndexChanged(int)),
       m_configurator.orbitalRangeMax, SLOT(setCurrentIndex(int)));
- 
+
+
    m_configurator.surfaceType->clear();
    m_configurator.surfaceType->addItem("Orbital", Orbital);
    m_configurator.surfaceType->addItem("Density", Density);
@@ -48,6 +52,20 @@ MolecularOrbitals::MolecularOrbitals(Layer::MolecularOrbitals& molecularOrbitals
    setPositiveColor(Preferences::PositiveSurfaceColor());
    setNegativeColor(Preferences::NegativeSurfaceColor());
    m_configurator.opacity->setValue(Preferences::SurfaceOpacity());
+
+   m_pen.setColor(Qt::blue);
+   m_pen.setStyle(Qt::SolidLine);
+   m_pen.setWidth(1);
+
+   m_selectedPen.setColor(Qt::red);
+   m_selectedPen.setStyle(Qt::SolidLine);
+   m_selectedPen.setWidth(3);
+}
+
+
+MolecularOrbitals::~MolecularOrbitals()
+{
+   if (m_customPlot) delete m_customPlot;
 }
 
 
@@ -57,6 +75,174 @@ void MolecularOrbitals::init()
    m_nBeta  = m_molecularOrbitals.nBeta();
    m_nOrbitals = m_molecularOrbitals.nOrbitals();
    updateOrbitalRange(m_nAlpha);
+   if (m_nOrbitals > 0) initPlot();
+ 
+}
+
+
+void MolecularOrbitals::initPlot()
+{
+   m_customPlot = new QCustomPlot(); 
+   m_customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+   m_customPlot->axisRect()->setRangeDrag(m_customPlot->yAxis->orientation());
+   m_customPlot->axisRect()->setRangeZoom(m_customPlot->yAxis->orientation());
+   m_customPlot->xAxis->setSelectableParts(QCPAxis::spNone);
+   
+   QFrame* frame(m_configurator.energyFrame);
+   QVBoxLayout* layout(new QVBoxLayout());
+   frame->setLayout(layout);
+   layout->addWidget(m_customPlot);
+
+   QVector<double>  ticks;
+   QVector<QString> labels;
+
+   ticks << 0.75 << 2.50;
+   labels << "Alpha" << "Beta";
+
+   m_customPlot->xAxis->setAutoTicks(false);
+   m_customPlot->xAxis->setAutoTickLabels(false);
+   m_customPlot->xAxis->setTickVector(ticks);
+   m_customPlot->xAxis->setTickVectorLabels(labels);
+   m_customPlot->xAxis->setSubTickCount(0);
+   m_customPlot->xAxis->setRange(0,3.25);
+
+
+   unsigned nOrbs(m_molecularOrbitals.nOrbitals());
+   unsigned nAlpha(m_molecularOrbitals.nAlpha());
+   unsigned nBeta( m_molecularOrbitals.nBeta());
+   QVector<double>  xAlpha(nOrbs), yAlpha(nOrbs), xBeta(nOrbs), yBeta(nOrbs); 
+   QVector<double> a(1), b(1), y(1);
+   QCPGraph* graph(0);
+
+   unsigned i(0), g(0);
+
+   // Alpha
+   while (i < nOrbs) {
+       y[0] = m_molecularOrbitals.alphaOrbitalEnergy(i);
+
+       g = 1; // degeneracy
+       while (i+g < nOrbs && 
+              std::abs(y[0]-m_molecularOrbitals.alphaOrbitalEnergy(i+g)) < 0.001) { ++g; }
+
+       for (unsigned k = i; k < i+g; ++k) {
+           a[0]  = 0.75 - 0.25*(g-1) + (k-i)*0.50;
+           graph = m_customPlot->addGraph();
+           graph->setData(a, y);
+           graph->setName(QString::number(k));
+           graph->setScatterStyle(k<nAlpha ? QCPScatterStyle::ssOccupied 
+                                           : QCPScatterStyle::ssVirtual);
+           connect(graph, SIGNAL(selectionChanged(bool)), this, SLOT(plotSelectionChanged(bool)));
+       }
+
+       i += g;
+   }
+
+   i = 0;
+   // Beta
+   while (i < nOrbs) {
+       y[0] = m_molecularOrbitals.betaOrbitalEnergy(i);
+
+       g = 1; // degeneracy
+       while (i+g < nOrbs && 
+              std::abs(y[0]-m_molecularOrbitals.betaOrbitalEnergy(i+g)) < 0.001) { ++g; }
+
+       for (unsigned k = i; k < i+g; ++k) {
+           a[0]  = 2.50 - 0.25*(g-1) + (k-i)*0.50;
+           graph = m_customPlot->addGraph();
+           graph->setData(a, y);
+           graph->setName(QString::number(k+nOrbs));
+           graph->setScatterStyle(k<nBeta ? QCPScatterStyle::ssOccupied 
+                                           : QCPScatterStyle::ssVirtual);
+           connect(graph, SIGNAL(selectionChanged(bool)), this, SLOT(plotSelectionChanged(bool)));
+       }
+
+       i += g;
+   }
+
+   m_customPlot->yAxis->setLabel("Energy/Hartree");
+   m_customPlot->yAxis->setNumberPrecision(3);
+   // Set the scale
+   double yMin(-1.0), yMax(0.5);
+   // Show 5 occupied and virtual orbitals to start with
+   unsigned index, nShow(5);
+   
+   if (nBeta > nAlpha) {
+      // Use the beta energies instead
+      index = nBeta < nShow ? 0 : nBeta-nShow;
+      yMin  = m_molecularOrbitals.betaOrbitalEnergy(index);
+      index = nOrbs > nBeta+nShow ? nBeta+nShow : nOrbs;
+      yMax  = m_molecularOrbitals.betaOrbitalEnergy(index);
+   }else {
+      index = nAlpha < nShow ? 0 : nAlpha-nShow;
+      yMin  = m_molecularOrbitals.alphaOrbitalEnergy(index);
+      index = nOrbs > nAlpha+nShow ? nAlpha+nShow : nOrbs;
+      yMax  = m_molecularOrbitals.alphaOrbitalEnergy(index);
+   }
+
+   yMax = std::min(yMax, 0.5*std::abs(yMin));
+   m_customPlot->yAxis->setRange(1.05*yMin,1.05*yMax);
+
+/*
+   connect(m_configurator.orbitalRangeMin, SIGNAL(currentIndexChanged(int)),
+      this, SLOT(clearSelectedOrbitals(int)));
+   connect(m_configurator.orbitalRangeMax, SIGNAL(currentIndexChanged(int)),
+      this, SLOT(clearSelectedOrbitals(int)));
+*/
+}
+
+
+void MolecularOrbitals::plotSelectionChanged(bool tf)
+{
+   QCPGraph* graph(qobject_cast<QCPGraph*>(sender()));
+   if (!graph) return;
+   
+   if (tf) {
+      graph->setPen(m_selectedPen);
+   }else {
+      graph->setPen(m_pen);
+      m_configurator.energyLabel->setText("");
+      return;
+   }
+
+   bool ok;
+   unsigned orb(graph->name().toUInt(&ok));
+   unsigned nOrbs(m_molecularOrbitals.nOrbitals());
+   if (!ok) return;
+
+   double energy(0.0);
+   QString label;
+   if (orb < nOrbs) {  //alpha
+      energy = m_molecularOrbitals.alphaOrbitalEnergy(orb);
+      label  = "Alpha orbital ";
+      m_configurator.alphaRadio->setChecked(true);
+      on_alphaRadio_clicked(true);
+   }else {  // beta
+      orb -= nOrbs;
+      energy = m_molecularOrbitals.betaOrbitalEnergy(orb);
+      label  = "Beta orbital ";
+      m_configurator.betaRadio->setChecked(true);
+      on_betaRadio_clicked(true);
+   }
+
+   m_configurator.surfaceType->setCurrentIndex(0);
+   m_configurator.orbitalRangeMin->setCurrentIndex(orb);
+   m_configurator.orbitalRangeMax->setCurrentIndex(orb);
+
+   label += QString::number(orb+1);
+   label += ": ";
+   label += QString::number(energy, 'f', 3);
+   label += " Eh";
+   m_configurator.energyLabel->setText(label);
+}
+
+
+void MolecularOrbitals::clearSelectedOrbitals(int)
+{
+   QList<QCPGraph*> selection(m_customPlot->selectedGraphs());
+   QList<QCPGraph*>::iterator iter;
+   for (iter = selection.begin(); iter != selection.end(); ++iter) {
+       (*iter)->setSelected(false);
+   }
 }
 
 

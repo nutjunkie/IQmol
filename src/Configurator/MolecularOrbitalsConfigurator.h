@@ -25,7 +25,11 @@
 #include "Configurator.h"
 #include "ui_MolecularOrbitalsConfigurator.h"
 #include "SurfaceInfo.h"
+#include <QPen>
 
+
+class QCustomPlot;
+class QMouseEvent;
 
 namespace IQmol {
 
@@ -44,7 +48,7 @@ namespace Configurator {
          enum { Orbital, Density, SpinDiffDensity, SpinOnlyDensity };
 
          explicit MolecularOrbitals(Layer::MolecularOrbitals&);
-         ~MolecularOrbitals() { }
+         ~MolecularOrbitals();
 
       public Q_SLOTS:
          void init();
@@ -63,6 +67,8 @@ namespace Configurator {
          void on_betaRadio_clicked(bool)  { updateOrbitalRange(m_nBeta); }
          void on_positiveColorButton_clicked(bool);
          void on_negativeColorButton_clicked(bool);
+         void plotSelectionChanged(bool tf);
+         void clearSelectedOrbitals(int);
 
       private:
          void enableOrbitalSelection(bool);
@@ -72,6 +78,7 @@ namespace Configurator {
          void updateOrbitalRange(int nElectrons, QComboBox*);
          void setPositiveColor(QColor const& color);
          void setNegativeColor(QColor const& color);
+         void initPlot();
 
          Layer::MolecularOrbitals& m_molecularOrbitals;
          Ui::MolecularOrbitalsConfigurator m_configurator;
@@ -79,6 +86,9 @@ namespace Configurator {
          unsigned int m_nAlpha;
          unsigned int m_nBeta;
          unsigned int m_nOrbitals;
+         QCustomPlot* m_customPlot;
+         QPen m_pen;
+         QPen m_selectedPen;
    };
 
 } } // End namespace IQmol::Configurator
