@@ -187,7 +187,7 @@ QString TemplateForRunFile(bool const local)
             "\n"
             "setlocal enabledelayedexpansion\n"
             "\n"
-            "set PATH=%QC%;%QC%\exe;%PATH%\n"
+            "set PATH=%QC%;%QC%\\exe;%PATH%\n"
             "\n"
             "set QCproc=:\n"
             "for /F \"tokens=2 delims= \" %%A IN ('tasklist /fi ^\"imagename eq %QCEXE%^\" /nh') do set QCproc=!QCproc!%%A:\n"
