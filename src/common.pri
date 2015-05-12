@@ -4,7 +4,7 @@ QT     += xml opengl gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
-QMAKE_CXXFLAGS += -O0 -g -ggdb
+QMAKE_CXXFLAGS += -O2 -g -ggdb
 
 
 

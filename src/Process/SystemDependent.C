@@ -174,7 +174,7 @@ QString TemplateForRunFile(bool const local)
             "::\n"
             ":: The values below are examples only, you should set your own values.\n"
             "\n"
-            "set QC=C:\\QChem\\qc42\n"
+            "set QC=C:\\QChem\\qc43\n"
             "set QCSCRATCH=C:\\QChem\\scratch\n"
             "\n"
             ":: <-- End user configuration -->\n"
