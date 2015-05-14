@@ -178,6 +178,9 @@ double Atom::getRadius(bool const selected)
    double r(0.0);
 
    switch (m_drawMode) {
+      case Primitive::Plastic:
+         r = s_radiusBallsAndSticks;
+         if (m_smallerHydrogens && m_atomicNumber == 1) r *= 0.7;
       case Primitive::BallsAndSticks:
          r = s_radiusBallsAndSticks * m_scale;
          if (m_smallerHydrogens && m_atomicNumber == 1) r *= 0.7;

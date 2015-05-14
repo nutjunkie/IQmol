@@ -31,6 +31,7 @@ namespace Layer {
 
 // Static Data
 GLfloat Bond::s_defaultColor[]       = {0.3f, 0.3f, 0.3f, 1.0f};
+GLfloat Bond::s_plasticColor[]       = {0.6f, 0.6f, 0.6f, 1.0f};
 GLfloat Bond::s_radiusBallsAndSticks =  0.10;
 GLfloat Bond::s_radiusTubes          =  0.10;
 GLfloat Bond::s_radiusWireFrame      =  3.00;  // pixels
@@ -79,6 +80,9 @@ void Bond::drawPrivate(bool selected)
       case Primitive::BallsAndSticks:
          drawBallsAndSticks(selected);
          break;
+      case Primitive::Plastic:
+         drawPlastic(selected);
+         break;
       case Primitive::Tubes:
          drawTubes(selected);
          break;
@@ -89,6 +93,7 @@ void Bond::drawPrivate(bool selected)
          break;
    }
 }
+
 
 
 void Bond::drawBallsAndSticks(bool selected)
@@ -213,6 +218,60 @@ void Bond::drawBallsAndSticks(bool selected)
          glPopMatrix();
       } break;
       
+   }
+
+   gluDeleteQuadric(quad); 
+}
+
+
+void Bond::drawPlastic(bool selected)
+{
+   // We don't allow scaling cos it looks naff
+   GLfloat offset(0.08);
+   GLfloat bondRadius(0.10);
+   GLfloat capRadius(2*bondRadius);
+
+   GLfloat aRadius = m_begin->smallHydrogen() ? 0.28 : 0.40;
+   GLfloat bRadius = m_end->smallHydrogen()   ? 0.28 : 0.40;
+   GLfloat aShift  = aRadius + offset - capRadius;
+   GLfloat bShift  = bRadius + offset - capRadius;
+
+   if (selected) {
+      bondRadius += Primitive::s_selectOffset;
+      capRadius  += Primitive::s_selectOffset;
+      glColor4fv(Primitive::s_selectColor);
+   }else {
+      glColor4fv(s_plasticColor);
+   }
+
+   Vec a(m_begin->displacedPosition());
+   Vec b(m_end  ->displacedPosition());
+   Vec ab(b-a);
+
+   GLfloat length(ab.norm());
+   ab.normalize();
+
+   Frame frame(m_frame);
+   GLUquadric* quad = gluNewQuadric();
+
+   glPushMatrix();
+   glMultMatrixd(frame.matrix());
+   gluCylinder(quad, bondRadius, bondRadius, length, Primitive::s_resolution, 1);
+   glPopMatrix();
+
+   // cap the ends
+   if (length > aRadius+bRadius) {
+      frame.translate(aShift*ab);
+      glPushMatrix();
+      glMultMatrixd(frame.matrix());
+      gluSphere(quad, capRadius, Primitive::s_resolution, Primitive::s_resolution);
+      glPopMatrix();
+
+      frame.translate((length-(aShift+bShift))*ab);
+      glPushMatrix();
+      glMultMatrixd(frame.matrix());
+      gluSphere(quad, capRadius, Primitive::s_resolution, Primitive::s_resolution);
+      glPopMatrix();
    }
 
    gluDeleteQuadric(quad); 

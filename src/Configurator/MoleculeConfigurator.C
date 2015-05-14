@@ -63,6 +63,7 @@ void Molecule::on_ballsAndSticks_clicked(bool)
 {
    m_drawMode = Layer::Primitive::BallsAndSticks;
    m_molecule.updateDrawMode(m_drawMode);
+   m_moleculeConfigurator.atomRadiusScale->setEnabled(true);
    m_moleculeConfigurator.bondRadiusScale->setEnabled(true);
    m_moleculeConfigurator.smallerHydrogens->setEnabled(true);
 }
@@ -74,6 +75,7 @@ void Molecule::on_tubes_clicked(bool)
    m_molecule.updateDrawMode(m_drawMode);
    m_moleculeConfigurator.atomRadiusScale->setValue(
       m_moleculeConfigurator.bondRadiusScale->value());
+   m_moleculeConfigurator.atomRadiusScale->setEnabled(true);
    m_moleculeConfigurator.bondRadiusScale->setEnabled(true);
    m_moleculeConfigurator.smallerHydrogens->setEnabled(false);
 }
@@ -83,6 +85,7 @@ void Molecule::on_spaceFilling_clicked(bool)
 {
    m_drawMode = Layer::Primitive::SpaceFilling;
    m_molecule.updateDrawMode(m_drawMode);
+   m_moleculeConfigurator.atomRadiusScale->setEnabled(true);
    m_moleculeConfigurator.bondRadiusScale->setEnabled(false);
    m_moleculeConfigurator.smallerHydrogens->setEnabled(false);
 }
@@ -94,8 +97,21 @@ void Molecule::on_wireFrame_clicked(bool)
    m_molecule.updateDrawMode(m_drawMode);
    m_moleculeConfigurator.atomRadiusScale->setValue(
       m_moleculeConfigurator.bondRadiusScale->value());
+   m_moleculeConfigurator.atomRadiusScale->setEnabled(true);
    m_moleculeConfigurator.bondRadiusScale->setEnabled(true);
    m_moleculeConfigurator.smallerHydrogens->setEnabled(false);
+}
+
+
+void Molecule::on_plastic_clicked(bool)
+{
+   m_drawMode = Layer::Primitive::Plastic;
+   m_molecule.updateDrawMode(m_drawMode);
+/*
+   m_moleculeConfigurator.atomRadiusScale->setEnabled(false);
+   m_moleculeConfigurator.bondRadiusScale->setEnabled(false);
+   m_moleculeConfigurator.smallerHydrogens->setEnabled(false);
+*/
 }
 
 
