@@ -344,6 +344,7 @@ qDebug() << "Setting defaults for " << toString(queueSystem);
 
       case Basic: {
          bool local(connection() == Local);
+         if (local) m_configuration.insert(UpdateInterval, 10);
          m_configuration.insert(Submit, System::SubmitCommand(local));
          m_configuration.insert(Query,  System::QueryCommand(local));
          m_configuration.insert(Kill,   System::KillCommand(local));
