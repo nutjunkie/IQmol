@@ -350,9 +350,9 @@ qDebug() << "submitFinished() called";
 // This should be delegated
 bool Server::parseSubmitMessage(Job* job, QString const& message)
 {
-   qDebug() << "-------------------------------------------";
-   qDebug() << "Submit returned" << message;
-   qDebug() << "-------------------------------------------";
+   QLOG_TRACE() << "-------------------------------------------";
+   QLOG_TRACE() << "Submit returned:" << message;
+   QLOG_TRACE() << "-------------------------------------------";
 
    bool ok(false);
 
@@ -393,12 +393,11 @@ bool Server::parseSubmitMessage(Job* job, QString const& message)
          //   [1] 9876 $QC/exe/qcprog.exe .aaaa.inp.9876.qcin.1 $QCSCRATCH/local/qchem9876
          // ...or on Windows we parse for the following 
          //   ProcessId = 1234
-         QStringList tokens;
 
-         if (message.contains("ProcessId =")) {
-            tokens = message.split(QRegExp("ProcessId ="), QString::SkipEmptyParts);
-            if (tokens.size() >= 2) {
-               int id(tokens[1].toInt(&ok));
+         if (message.contains("ProcessId =")) { // Windows
+            QRegExp rx("ProcessId =\\s+(\\d+)\\s+=");
+            if (rx.indexIn(message) != -1) {
+               int id(rx.cap(1).toInt(&ok));
                if (ok) job->setJobId(QString::number(id));
             }else {
                // It is possible that the job has completed before the batch file
@@ -406,7 +405,7 @@ bool Server::parseSubmitMessage(Job* job, QString const& message)
                ok = true;
             }
          }else {
-            tokens = message.split(QRegExp("\\s+"), QString::SkipEmptyParts);
+            QStringList tokens(message.split(QRegExp("\\s+"), QString::SkipEmptyParts));
             if (tokens.size() >= 2) {
                int id(tokens[1].toInt(&ok));
                if (ok) job->setJobId(QString::number(id));

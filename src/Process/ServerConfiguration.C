@@ -176,6 +176,8 @@ ServerConfiguration::ServerConfiguration()
 {
    setDefaults(HTTP);
    setDefaults(Web);
+   //setDefaults(Local);
+   //setDefaults(Basic);
 }
 
 
