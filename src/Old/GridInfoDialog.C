@@ -161,7 +161,9 @@ void GridInfoDialog::exportCubeFile(bool const invertSign)
        QStringList coordinates(m_molecule->coordinatesForCubeFile());
        if ((*iter)->saveToCubeFile(name, coordinates, invertSign)) {
           Preferences::LastFileAccessed(name);
-          qDebug() << "Cube data saved to " << name;
+          QString msg("Cube data saved to ");
+          msg += name;
+          QMsgBox::info(this, "IQmol", msg);
        }else {
           QString msg("Unable to save to file ");
           msg += name + "\n";
