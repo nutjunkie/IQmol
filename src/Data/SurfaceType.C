@@ -71,8 +71,7 @@ bool SurfaceType::isDensity() const
 bool SurfaceType::isSigned() const
 {
    return (m_kind == AlphaOrbital) || (m_kind == BetaOrbital) ||
-          (m_kind == SpinDensity)  || (m_kind == DensityCombo) ||
-          (m_kind == CubeData);
+          (m_kind == SpinDensity)  || (m_kind == DensityCombo);
 }
 
 
