@@ -38,26 +38,18 @@ Frequencies::Frequencies(Data::Frequencies const& frequencies) : Base("Frequenci
    m_frequencies(frequencies), m_configurator(*this), m_play(false), m_loop(-1.0), 
    m_speed(0.0625), m_scale(0.25)
 {
-   fromData(m_frequencies);
-   setConfigurator(&m_configurator);
-}
-
-
-void Frequencies::fromData(Data::Frequencies const& vibrationData) 
-{        
    Data::VibrationalModeList::const_iterator iter;
-   Data::VibrationalModeList const& modes(vibrationData.modes());
+   Data::VibrationalModeList const& modes(m_frequencies.modes());
    double intensity, frequency;
 
    for (iter = modes.begin(); iter != modes.end(); ++iter) {
-       intensity = (*iter)->intensity();
-       frequency = (*iter)->frequency();
-       Mode* mode = new Mode(frequency, (*iter)->eigenvector(), intensity);
+       Mode* mode = new Mode(**iter);
        connect(mode, SIGNAL(playMode(Mode const&)), this, SLOT(playMode(Mode const&)));
        appendLayer(mode);
    }
 
    m_configurator.load();
+   setConfigurator(&m_configurator);
 }
 
 
@@ -70,6 +62,18 @@ double Frequencies::maxFrequency() const
 double Frequencies::maxIntensity() const
 {
    return m_frequencies.maxIntensity();
+}
+
+
+double Frequencies::maxRamanIntensity() const
+{
+   return m_frequencies.maxRamanIntensity();
+}
+
+
+bool Frequencies::haveRaman() const
+{
+   return m_frequencies.haveRaman();
 }
 
 
@@ -94,15 +98,17 @@ void Frequencies::configure()
 void Frequencies::setActiveMode(Mode const& mode)
 {  
    clearActiveMode();
-
    if (!m_molecule) return;
+
    AtomList atoms(m_molecule->findLayers<Atom>(Children));
-   if (atoms.size() != mode.nAtoms()) return;
+   QList<qglviewer::Vec> const& eigenvector(mode.data().eigenvector());
+
+   if (atoms.size() != eigenvector.size()) return;
 
    for (int i = 0; i < atoms.size(); ++i) {
        m_animatorList.append(
-          new Animator::Vibration(atoms[i], mode.eigenvector(i), m_speed, m_scale, m_loop));
-       atoms[i]->setDisplacement( mode.eigenvector(i) );
+          new Animator::Vibration(atoms[i], eigenvector[i], m_speed, m_scale, m_loop));
+       atoms[i]->setDisplacement( eigenvector[i] );
    }
 
    connect(m_animatorList.last(), SIGNAL(finished()), &m_configurator, SLOT(reset()));
@@ -189,6 +195,20 @@ void Frequencies::setScale(double const scale)
 
 // --------------- Mode ---------------
 
+Mode::Mode(Data::VibrationalMode const& mode) : m_mode(mode)
+{
+   double frequency(m_mode.frequency());
+   if (frequency < 0.0) {
+      setText(QString("%1i").arg(-frequency, 8, 'f', 2));
+    }else {
+      setText(QString("%1 ").arg(frequency, 8, 'f', 2));
+    }
+
+    setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+}
+
+
+/*
 Mode::Mode(double const frequency, QList<qglviewer::Vec> const& eigenvectors, 
    double const intensity) : m_frequency(frequency), m_intensity(intensity),
    m_eigenvectors(eigenvectors)
@@ -199,9 +219,7 @@ Mode::Mode(double const frequency, QList<qglviewer::Vec> const& eigenvectors,
       setText(QString("%1 ").arg(m_frequency, 8, 'f', 2));
     }
 
-    setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 }
-
 
 Mode::Mode(double const frequency, Eigenvectors const& eigenvectors, double const intensity) 
  : m_frequency(frequency), m_intensity(intensity)
@@ -230,5 +248,6 @@ Vec const& Mode::eigenvector(unsigned int atom) const
    static Vec zero(0.0, 0.0, 0.0);
    return ((int)atom > m_eigenvectors.size()-1) ? zero : m_eigenvectors[atom];
 }
+*/
 
 } } // end namespace IQmol::Layer

@@ -23,6 +23,7 @@
 #include "FrequenciesConfigurator.h"
 #include "QVariantPointer.h"
 #include "FrequenciesLayer.h"
+#include "VibrationalMode.h"
 #include "Preferences.h"
 #include "AtomLayer.h"
 #include <QColorDialog>
@@ -40,6 +41,17 @@ Frequencies::Frequencies(Layer::Frequencies& frequencies) : m_frequencies(freque
    m_customPlot(0)
 {
    m_configurator.setupUi(this);
+   if (m_frequencies.haveRaman()) {
+      m_configurator.frequencyTable->setColumnWidth(0,60);
+      m_configurator.frequencyTable->horizontalHeaderItem(0)->setText("Freq. (cm⁻¹)");
+      m_configurator.frequencyTable->horizontalHeaderItem(1)->setText("Intens. (km/mol)");
+      m_configurator.frequencyTable->horizontalHeaderItem(2)->setText("Raman (Å4/amu)");
+   }else {
+      m_configurator.frequencyTable->setColumnCount(2);
+      m_configurator.frequencyTable->horizontalHeaderItem(0)->setText("Frequency (cm⁻¹)");
+      m_configurator.frequencyTable->horizontalHeaderItem(1)->setText("Intensity (km/mol)");
+      m_configurator.ramanCheckbox->hide();
+   }
 
    m_configurator.frequencyTable->horizontalHeader()
 #if QT_VERSION >= 0x050000
@@ -92,6 +104,7 @@ void Frequencies::load()
 
    QTableWidgetItem* frequency;
    QTableWidgetItem* intensity;
+   QTableWidgetItem* raman;
    
    int row(0);
    QList<Layer::Mode*>::iterator iter;
@@ -99,7 +112,7 @@ void Frequencies::load()
 
        frequency = new QTableWidgetItem( (*iter)->text() );
        frequency->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
-       intensity = new QTableWidgetItem(QString::number((*iter)->intensity(), 'f', 3));
+       intensity = new QTableWidgetItem(QString::number((*iter)->data().intensity(), 'f', 3));
 
        frequency->setData(Qt::UserRole, QVariantPointer<Layer::Mode>::toQVariant(*iter));
        intensity->setData(Qt::UserRole, QVariantPointer<Layer::Mode>::toQVariant(*iter));
@@ -108,8 +121,20 @@ void Frequencies::load()
        table->setItem(row, 0, frequency);
        table->setItem(row, 1, intensity);
 
-       m_rawData.append(qMakePair((*iter)->frequency(),(*iter)->intensity()));
+       if (m_frequencies.haveRaman()) {
+          raman = new QTableWidgetItem(QString::number((*iter)->data().ramanIntensity(), 'f', 3));
+          raman->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
+          table->setItem(row, 2, raman);
+       }
+
+       m_rawIrData.append(qMakePair((*iter)->data().frequency(),
+          (*iter)->data().intensity()));
+       m_rawRamanData.append(qMakePair((*iter)->data().frequency(),
+          (*iter)->data().ramanIntensity()));
+
    }
+
+   m_rawData = m_rawIrData;
 
    table->setCurrentCell(0, 0, QItemSelectionModel::Rows | QItemSelectionModel::ClearAndSelect);
    on_frequencyTable_itemSelectionChanged();
@@ -130,6 +155,14 @@ void Frequencies::on_widthSlider_valueChanged(int)
 {
    updatePlot();
 }
+
+
+void Frequencies::on_ramanCheckbox_clicked(bool tf)
+{
+   m_rawData = tf ? m_rawRamanData : m_rawIrData;
+   updatePlot();
+}
+
 
 void Frequencies::on_scaleFactor_valueChanged(double scale)
 {
@@ -193,7 +226,13 @@ void Frequencies::updatePlot()
 void Frequencies::plotImpulse(double const scaleFactor)
 {
    QVector<double> x(1), y(1);
-   double maxIntensity(m_frequencies.maxIntensity());;
+   double maxIntensity;
+
+   if (m_configurator.ramanCheckbox->isChecked()) {
+      maxIntensity = (m_frequencies.maxRamanIntensity());
+   } else {
+      maxIntensity = (m_frequencies.maxIntensity());
+   }
 
    for (int mode = 0; mode < m_rawData.size(); ++mode) {
        x[0] = scaleFactor * m_rawData[mode].first;

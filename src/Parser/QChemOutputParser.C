@@ -300,7 +300,7 @@ qDebug() << "Setting total energy to" << total.value();
          readHessian(textStream, currentGeometry);
 
       }else if (line.contains("VIBRATIONAL ANALYSIS")) {
-         textStream.skipLine(9);
+         textStream.seek("Mode:");
          readVibrationalModes(textStream);
 
       }else if (line.contains("DISTRIBUTED MULTIPOLE ANALYSIS")) {
@@ -512,12 +512,9 @@ void QChemOutput::readVibrationalModes(TextStream& textStream)
    Data::Frequencies* frequencies = new Data::Frequencies;
 
    while (!textStream.atEnd()) {
-      line = textStream.nextLine();
-      if (!line.contains("Mode:")) break;
-
       // Frequency:
       tokens = textStream.nextLineAsTokens();
-      if (tokens.size() < 2 || !tokens[0].contains("Frequency:")) goto error;
+      if (tokens.size() < 2 || !tokens[0].contains("Frequency:")) break;
 
       v1 = 0;  v2 = 0;  v3 = 0;
 
@@ -537,8 +534,10 @@ void QChemOutput::readVibrationalModes(TextStream& textStream)
          v1 = new Data::VibrationalMode(w);
       }
 
-      // IR Active:
+     // Skip Force Cnst and Red. Mass
       textStream.skipLine(2);
+
+      // IR Active:
       tokens = textStream.nextLineAsTokens();
       if (tokens.size() < 3 || !tokens[1].contains("Active:")) goto error;
       if (tokens.size() == 5 && v3) v3->setIrActive(tokens[4].contains("YES"));
@@ -572,8 +571,30 @@ void QChemOutput::readVibrationalModes(TextStream& textStream)
       if (tokens.size() >= 4 && v2) v2->setRamanActive(tokens[3].contains("YES"));
       if (tokens.size() >= 3 && v1) v1->setRamanActive(tokens[2].contains("YES"));
 
+      // Raman Intens: (maybe)
+      tokens = textStream.nextLineAsTokens();
+      if (tokens.size() > 2 && tokens[1].contains("Intens:")) {
+         frequencies->haveRaman(true);
+         if (tokens.size() == 5) {
+            w = tokens[4].toDouble(&ok);
+            if (!ok) goto error;
+            if (v3) v3->setRamanIntensity(w);
+         }
+         if (tokens.size() >= 4) {
+            w = tokens[3].toDouble(&ok);
+            if (!ok) goto error;
+            if (v2) v2->setRamanIntensity(w);
+         }
+         if (tokens.size() >= 3) {
+            w = tokens[2].toDouble(&ok);
+            if (!ok) goto error;
+            if (v1) v1->setRamanIntensity(w);
+         }
+         // Skip Depolar and X Y Z lines
+         textStream.skipLine(2); 
+      }
+
       // Eigenvectors
-      textStream.skipLine(); 
       while (!textStream.atEnd()) {
          tokens = textStream.nextLineAsTokens();
          if (tokens.size() < 4 || tokens[0].contains("TransDip")) break;
@@ -602,7 +623,7 @@ void QChemOutput::readVibrationalModes(TextStream& textStream)
       if (v2) { frequencies->append(v2);  v2 = 0; }
       if (v3) { frequencies->append(v3);  v3 = 0; }
 
-      textStream.skipLine();
+      textStream.skipLine(2);
    }
 
    line = textStream.seek("Zero point vibrational energy:");
@@ -624,6 +645,7 @@ void QChemOutput::readVibrationalModes(TextStream& textStream)
    error:
      QString msg("Problem parsing vibrational frequencies, line ");
      m_errors.append(msg += QString::number(textStream.lineNumber()));
+qDebug() << "ERROR: " << msg;
      if (v1) delete v1;
      if (v2) delete v2;
      if (v3) delete v3;
