@@ -35,7 +35,7 @@ namespace Network {
 
       public:
          LocalConnection();
-         ~LocalConnection();
+         ~LocalConnection() { close(); }
 
          void open();
          void close();

@@ -52,7 +52,7 @@ namespace IQmol {
 
       private Q_SLOTS:
          void open(QString const& file);
-         void maybeQuit();
+         void quitRequest();
 
       private:
          void initOpenBabel();

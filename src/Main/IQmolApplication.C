@@ -134,6 +134,7 @@ void IQmolApplication::open(QString const& file)
    QWidget* window(QApplication::activeWindow());
    if ( !(mw = qobject_cast<MainWindow*>(window)) ) {
       mw = new MainWindow();
+      connect(mw, SIGNAL(quit()), this, SLOT(quitRequest()));
       QApplication::setActiveWindow(mw);
    }
 
@@ -142,14 +143,12 @@ void IQmolApplication::open(QString const& file)
    hideSplash();
    mw->show();
    mw->raise();
-
    // Create the instance of the JobMonitor
    Process2::JobMonitor::instance();
 
    static bool connected(false);
    if (!connected) {
-      // connect(this, SIGNAL(lastWindowClosed()), this, SLOT(maybeQuit()));
-      connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
+      connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quitRequest()));
       connected = true;
    }
    QLOG_INFO() << "Number of threads:" << QThread::idealThreadCount();
@@ -183,7 +182,7 @@ bool IQmolApplication::event(QEvent* event)
 }
 
 
-void IQmolApplication::maybeQuit()
+void IQmolApplication::quitRequest()
 {
    Process2::ServerRegistry::instance().closeAllConnections();
    QApplication::quit();  // no maybe about it, the rest is just annoying

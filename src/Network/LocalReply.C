@@ -54,8 +54,7 @@ LocalExecute::~LocalExecute()
 
 void LocalExecute::run()
 {
-
-   m_status = Error;;
+   m_status = Error;
    QStringList arguments;
    QStringList list(m_command.split("\"", QString::SkipEmptyParts));
 
@@ -105,7 +104,6 @@ void LocalExecute::run()
       }
    }
 
-   m_status = Running;
 
    connect(&m_process, SIGNAL(finished(int, QProcess::ExitStatus)), 
       this, SLOT(runFinished(int, QProcess::ExitStatus)));
@@ -114,6 +112,8 @@ void LocalExecute::run()
       this, SLOT(runError(QProcess::ProcessError)));
 
    connect(&m_timer, SIGNAL(timeout()), this, SLOT(timeout()));
+
+   m_status = Running;
 
    m_process.start(cmd.filePath(), arguments);
 qDebug() << "QProcess:" << m_process.program();

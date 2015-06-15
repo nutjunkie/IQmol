@@ -39,13 +39,6 @@ HttpConnection::HttpConnection(QString const& hostname, int const port) :
 }
 
 
-HttpConnection::~HttpConnection()
-{
-   close();
-   killThread();
-}
-
-
 void HttpConnection::open()
 {
    // If m_secure

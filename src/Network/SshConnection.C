@@ -62,11 +62,6 @@ SshConnection::SshConnection(QString const& hostname, int const port) :
 }
 
 
-SshConnection::~SshConnection()
-{
-   close();
-}
-
 
 void SshConnection::open()
 {
@@ -113,7 +108,6 @@ void SshConnection::close()
 #endif
    }
 
-   killThread();
    m_status = Connection::Closed;
 }
 
