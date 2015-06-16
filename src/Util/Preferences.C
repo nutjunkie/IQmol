@@ -199,7 +199,7 @@ void LogFilePath(QString const& filePath)
 double SurfaceOpacity()
 {
    QVariant value(Get("SurfaceOpacity"));
-   return value.isNull() ? 100: value.value<double>();
+   return value.isNull() ? 50 : value.value<double>();
 }
 
 void SurfaceOpacity(double const value) 
