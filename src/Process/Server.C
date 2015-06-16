@@ -49,7 +49,7 @@ Server::Server(ServerConfiguration const& configuration) : m_configuration(confi
 
 Server::~Server()
 {
-   if (m_connection)  delete m_connection;
+   closeConnection();
 }
 
 
