@@ -680,6 +680,18 @@ void ServerConfigurationList(QVariantList const& servers)
 
 // ---------
 
+QString ServerQueryJobFinished() {
+   QVariant value(Get("ServerQueryJobFinished"));
+   return value.isNull() ? QString("No tasks are running") : value.value<QString>();
+}
+
+void ServerQueryJobFinished(QString const& repsonse) {
+   Set("ServerQueryJobFinished", QVariant::fromValue(repsonse));
+}
+
+
+// ---------
+
 
 QVariantList JobMonitorList()
 {

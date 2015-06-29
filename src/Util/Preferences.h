@@ -135,6 +135,9 @@ namespace Preferences {
    QVariantList ServerConfigurationList();
    void ServerConfigurationList(QVariantList const&);
 
+   QString ServerQueryJobFinished();
+   void    ServerQueryJobFinished(QString const& repsonse);
+   
    QMap<QString,QString> PasswordVaultContents();
    void PasswordVaultContents(QMap<QString,QString> const&);
    void ClearPasswordVaultContents();
