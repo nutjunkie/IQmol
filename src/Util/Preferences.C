@@ -212,7 +212,12 @@ void SurfaceOpacity(double const value)
 bool LogFileHidden()
 {
    QVariant value(Get("LogFileHidden"));
+
+#ifdef Q_OS_WIN32
+   return value.isNull() ? false : value.value<bool>();
+#else
    return value.isNull() ? true : value.value<bool>();
+#endif
 }
 
 void LogFileHidden(bool const tf) 
