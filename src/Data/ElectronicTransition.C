@@ -29,10 +29,44 @@ namespace Data {
 
 template<> const Type::ID ElectronicTransitionList::TypeID = Type::ElectronicTransitionList;
 
+
+bool ElectronicTransition::addAmplitude(QStringList const& list)
+{
+   if (list.size() < 3) return false;
+
+   bool ok;
+
+   unsigned i(list[0].toUInt(&ok));
+   if (!ok) return false;
+   unsigned a(list[1].toUInt(&ok));
+   if (!ok) return false;
+   double amplitude(list[2].toDouble(&ok));
+   if (!ok) return false;
+      
+   Spin spin(Alpha);
+   if (list.size() == 4 && list[3] == "b") spin = Beta;
+   m_amplitudes.append(Amplitude(spin, i, a, amplitude, spin));
+   
+   return true;
+}
+
+
 void ElectronicTransition::dump() const
 {
    qDebug() << "  Transition:" << m_energy << "eV   " << m_strength;
    qDebug() << "    " << m_transitionMoment.x << m_transitionMoment.y << m_transitionMoment.z;
+   qDebug() << "    Amplitudes size" << m_amplitudes.size();
+
+   QList<Amplitude>::const_iterator iter;
+   for (iter = m_amplitudes.begin(); iter != m_amplitudes.end(); ++iter) {
+       (*iter).dump();
+   }
+}
+
+
+void Amplitude::dump() const
+{
+   qDebug() << SpinLabel(m_spin) << m_i << "-->" << m_a << "  (" << m_amplitude << ")"; 
 }
 
 } } // end namespace IQmol::Data

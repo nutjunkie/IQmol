@@ -22,6 +22,7 @@
 
 ********************************************************************************/
 
+#include "Spin.h"
 #include "DataList.h"
 #include "QGLViewer/vec.h"
 
@@ -29,29 +30,34 @@
 namespace IQmol {
 namespace Data {
 
+   class Amplitude;
+
    /// Data class representing molecule with a particular geometry.  
    class ElectronicTransition : public Base {
 
       friend class boost::serialization::access;
 
       public:
+         Type::ID typeID() const { return Type::ElectronicTransition; }
+
+         enum Multiplicity { Singlet, Doublet, Triplet, Quartet };
+
          ElectronicTransition(double const energy = 0.0, double const strength = 0.0,
             qglviewer::Vec const transitionMoment = qglviewer::Vec()) : 
             m_energy(energy), m_strength(strength), m_transitionMoment(transitionMoment) { }
-
-         Type::ID typeID() const { return Type::ElectronicTransition; }
          
          double energy()   const { return m_energy; }
          double strength() const { return m_strength; }
          qglviewer::Vec const& transitionMoment() { return m_transitionMoment; }
 
-         void setEnergy(double const energy) { m_energy = energy; }
-         void setStrength(double const strength) { m_strength = strength; }
-         void setTransitionMoment(qglviewer::Vec const& vec) { m_transitionMoment = vec; }
+         bool addAmplitude(QStringList const&);
+         QList<Amplitude>& amplitudes() { return m_amplitudes; }
 
+/*
          bool operator<(ElectronicTransition const& that) {
             return (m_energy < that.m_energy);
          }
+*/
 
          void dump() const;
 
@@ -69,12 +75,57 @@ namespace Data {
             ar & m_energy;
             ar & m_strength;
             ar & m_transitionMoment;
+            ar & m_amplitudes;
          }
 
          double m_energy;
          double m_strength;
          qglviewer::Vec m_transitionMoment;
+         QList<Amplitude> m_amplitudes;
+         
         // Mulliken charges or something to show the movement of the electron
+   };
+
+
+
+   class Amplitude : public Base {
+
+      friend class boost::serialization::access;
+      friend class ExcitedStates;
+
+      public: 
+          Amplitude(Spin spin = Alpha, unsigned const i = 0, unsigned const a = 0, 
+             double const amplitude = 0.0, double const ei = 0.0, double const ea = 0.0)
+              : m_spin(spin), m_i(i), m_a(a), m_amplitude(amplitude), m_ei(ei), m_ea(ea) { } 
+
+         void serialize(InputArchive& ar, unsigned int const version = 0) {
+            privateSerialize(ar, version);
+         }
+
+         void serialize(OutputArchive& ar, unsigned int const version = 0) {
+            privateSerialize(ar, version);
+         }
+
+         void dump() const;
+
+         Spin     m_spin;;
+         unsigned m_i;
+         unsigned m_a;
+         double   m_amplitude;
+         double   m_ei;
+         double   m_ea;
+      protected:
+
+      private:
+         template <class Archive>
+         void privateSerialize(Archive& ar, unsigned const /* version */) {
+            ar & m_spin;
+            ar & m_i;
+            ar & m_a;
+            ar & m_amplitude;
+            ar & m_ei;
+            ar & m_ea;
+         }
    };
 
    typedef Data::List<Data::ElectronicTransition> ElectronicTransitionList;

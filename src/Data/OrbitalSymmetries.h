@@ -1,5 +1,5 @@
-#ifndef IQMOL_DATA_EXCITEDSTATES_H
-#define IQMOL_DATA_EXCITEDSTATES_H
+#ifndef IQMOL_DATA_ORBITALSYMMETRIES_H
+#define IQMOL_DATA_ORBITALSYMMETRIES_H
 /*******************************************************************************
 
   Copyright (C) 2011-2013 Andrew Gilbert
@@ -22,39 +22,32 @@
 
 ********************************************************************************/
 
-#include "ElectronicTransition.h"
-#include "OrbitalSymmetries.h"
+#include "Data.h"
+#include "Spin.h"
+#include <QList>
 
 
 namespace IQmol {
 namespace Data {
 
-   class TransitionLine;
-
-   class ExcitedStates : public Base {
+   class OrbitalSymmetries : public Base {
 
       friend class boost::serialization::access;
 
       public:
-         Type::ID typeID() const { return Type::ExcitedStates; }
+         OrbitalSymmetries() : m_nAlpha(0), m_nBeta(0) { }
 
-         enum ExcitedStatesT { CIS, TDDFT, EOM };
-         void setType(ExcitedStatesT const type) { m_type = type; }
+         Type::ID typeID() const { return Type::OrbitalSymmetries; }
 
-         void append(ElectronicTransition* transition) { m_transitions.append(transition); }
+         void append(Spin const, double const energy, QString const& symmetry);
+         void setOccupied(Spin const, unsigned const nOrb);
 
-         OrbitalSymmetries& orbitalSymmetries() { return m_orbitalSymmetries; }
-         OrbitalSymmetries const& orbitalSymmetries() const { return m_orbitalSymmetries; }
+         unsigned nOrbitals() const { return m_alphaEnergies.size(); }
+         unsigned nAlpha() const { return m_nAlpha; }
+         unsigned nBeta()  const { return m_nBeta; }
 
-         double maxEnergy() const;
-         double maxIntensity() const;
-         bool   isEmpty() const { return m_transitions.isEmpty(); }
-
-         void dump() const;
-
-         ElectronicTransitionList const& transitions() const { return m_transitions; }
-
-         QList<Amplitude> amplitudes(unsigned const transition) const;
+         double energy(Spin const, unsigned const n) const;
+         QString const& symmetry(Spin const, unsigned const n) const;
 
          void serialize(InputArchive& ar, unsigned int const version = 0) {
             privateSerialize(ar, version);
@@ -64,21 +57,26 @@ namespace Data {
             privateSerialize(ar, version);
          }
 
+         void dump() const;
+
       private:
          template <class Archive>
-         void privateSerialize(Archive& ar, unsigned const /* version */) {
-            ar & m_transitions;
-            ar & m_orbitalSymmetries;
-            ar & m_type;
-            ar & m_label;
+         void privateSerialize(Archive& ar, unsigned int const) {
+            ar & m_nAlpha;
+            ar & m_nBeta;
+            ar & m_alphaEnergies;
+            ar & m_alphaSymmetries;
+            ar & m_betaEnergies;
+            ar & m_betaSymmetries;
          }
 
-         ElectronicTransitionList m_transitions;
-         OrbitalSymmetries m_orbitalSymmetries;
-         ExcitedStatesT m_type;
-         QString m_label;
+         unsigned m_nAlpha;
+         unsigned m_nBeta;
+         QList<double>  m_alphaEnergies;
+         QList<double>  m_betaEnergies;
+         QList<QString> m_alphaSymmetries;
+         QList<QString> m_betaSymmetries;
    };
-
 
 } } // end namespace IQmol::Data
 

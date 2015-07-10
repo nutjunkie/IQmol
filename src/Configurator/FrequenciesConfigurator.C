@@ -320,6 +320,7 @@ void Frequencies::plotSpectrum(Profile const profile, double const scaleFactor, 
    m_customPlot->yAxis->setTickStep(0.2);
 }
 
+
 void Frequencies::plotSelectionChanged(bool tf)
 {
 //qDebug() << "Plot selection changed called";

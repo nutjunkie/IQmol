@@ -35,3 +35,8 @@ sudo apt-get install libqglviewer2 libqglviewer-dev libqglviewer-dev
 # run cmake
 cmake .. -DCMAKE_INSTALL_PREFIX=${HOME}/.local/IQmol
 make install
+
+
+                                    ========
+                                     O S  X
+                                    ========

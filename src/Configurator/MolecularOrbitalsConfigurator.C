@@ -106,7 +106,6 @@ void MolecularOrbitals::initPlot()
    m_customPlot->xAxis->setSubTickCount(0);
    m_customPlot->xAxis->setRange(0,3.25);
 
-
    unsigned nOrbs(m_molecularOrbitals.nOrbitals());
    unsigned nAlpha(m_molecularOrbitals.nAlpha());
    unsigned nBeta( m_molecularOrbitals.nBeta());
@@ -336,7 +335,7 @@ void MolecularOrbitals::on_addToQueueButton_clicked(bool)
 {
    int quality(m_configurator.quality->value());
    double isovalue(m_configurator.isovalue->value());
-   Spin spin = m_configurator.alphaRadio->isChecked() ? Alpha : Beta;
+   Data::Spin spin(m_configurator.alphaRadio->isChecked() ? Data::Alpha : Data::Beta);
    QColor positive(Preferences::PositiveSurfaceColor());
    QColor negative(Preferences::NegativeSurfaceColor());
    bool simplifyMesh(m_configurator.simplifyMeshCheckBox->isChecked());
@@ -354,7 +353,7 @@ void MolecularOrbitals::on_addToQueueButton_clicked(bool)
    switch (qvar.toUInt()) {
 
       case Orbital: {
-         if (spin == Alpha) {
+         if (spin == Data::Alpha) {
             info.type().setKind(Data::SurfaceType::AlphaOrbital);
          }else {
             info.type().setKind(Data::SurfaceType::BetaOrbital);
@@ -382,7 +381,7 @@ void MolecularOrbitals::on_addToQueueButton_clicked(bool)
 
       case SpinOnlyDensity: {
          info.setIsSigned(false);
-         if (spin == Alpha) {
+         if (spin == Data::Alpha) {
             info.type().setKind(Data::SurfaceType::AlphaDensity);
          }else {
             info.type().setKind(Data::SurfaceType::BetaDensity);

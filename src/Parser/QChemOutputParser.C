@@ -34,6 +34,8 @@
 #include "MultipoleExpansion.h"
 #include "EfpFragment.h"
 #include "Constants.h"
+#include "ExcitedStates.h"
+#include "Spin.h"
 #include <QRegExp>
 #include <QFile>
 
@@ -235,7 +237,7 @@ bool QChemOutput::parse(TextStream& textStream)
                scf.setValue(energy, Data::Energy::Hartree);
                Data::TotalEnergy& total = currentGeometry->getProperty<Data::TotalEnergy>();
                total.setValue(energy, Data::Energy::Hartree);
-qDebug() << "Setting total energy to" << total.value();
+               //qDebug() << "Setting total energy to" << total.value();
             }
          }
 
@@ -287,6 +289,21 @@ qDebug() << "Setting total energy to" << total.value();
          textStream.skipLine(3);
          readCharges(textStream, currentGeometry, "Stewart");
 
+      }else if (line.contains("Orbital Energies (a.u.) and Symmetries")) {
+qDebug() << "Reading Orbital energies ";
+         textStream.skipLine(2);
+         readOrbitalSymmetries(textStream);
+
+      }else if (line.contains("TDDFT/TDA Excitation Energies")) {
+qDebug() << "Reading TDDFT States --";
+         textStream.skipLine(2);
+         readCisStates(textStream, currentGeometry);
+
+      }else if (line.contains("CIS Excitation Energies")) {
+qDebug() << "Reading CIS States --";
+         textStream.skipLine(2);
+         readCisStates(textStream, currentGeometry);
+
       }else if (line.contains("ATOM           ISOTROPIC")) {
          textStream.skipLine(1);
          readNmrShifts(textStream, currentGeometry);
@@ -320,6 +337,7 @@ qDebug() << "Setting total energy to" << total.value();
       }else {
          geometryList->setDefaultIndex(-1);
          m_dataBank.append(geometryList);
+geometryList->dump();
       }
    }
 
@@ -335,13 +353,151 @@ qDebug() << "Setting total energy to" << total.value();
 }
 
 
+
+
+
+void QChemOutput::readCisStates(TextStream& textStream, Data::Geometry* geometry) 
+{
+qDebug() << "Reading CIS States";
+   //Data::ExcitedStates& states(geometry->getProperty<Data::ExcitedStates>());
+   Data::ExcitedStates* states(new Data::ExcitedStates());
+
+   QStringList tokens;
+
+   QString label, line;
+   double energy(0.0), strength(0.0), xx;
+   bool ok;
+   qglviewer::Vec moment;
+
+   // This is to match lines similar to the following
+   //  D(  7) --> S(  1) amplitude =  0.6732 beta
+   QRegExp rx("[DS]\\(\\s*(\\d+)\\) --> [VS]\\(\\s*(\\d+)\\) amplitude = (.{7}) ([ab]?)");
+   
+   while (!textStream.atEnd()) {
+      tokens = textStream.nextLineAsTokens();
+      int size(tokens.size());
+
+      if (size == 0) {
+         // do nothing
+      }else if (tokens[0].contains("-------------------------------------------")) {
+         break;
+
+      }else if (size >= 8 && tokens[0].contains("Excited")) {
+      
+         energy = tokens[7].toDouble(&ok);
+         if (!ok) goto error;
+
+      }else if (size >= 2 && tokens[0].contains("Multiplicity")) {
+         label = tokens[1];
+
+      }else if (size >= 8 && tokens[0].contains("Trans")) {
+
+         moment.x = tokens[2].toDouble(&ok);
+         if (!ok) goto error;
+
+         moment.y = tokens[4].toDouble(&ok);
+         if (!ok) goto error;
+
+         moment.z = tokens[6].toDouble(&ok);
+         if (!ok) goto error;
+
+      }else if (size >= 3 && tokens[0].contains("Strength")) {
+         strength = tokens[2].toDouble(&ok);
+         if (!ok) goto error;
+
+         Data::ElectronicTransition* transition(
+            new Data::ElectronicTransition(energy, strength, moment));
+
+         while (!textStream.atEnd()) {
+            line = textStream.nextLine();
+            //qDebug() << "Searching for transition:" << line;
+            if (rx.indexIn(line,0) == -1) break;
+            //qDebug() << "Regular expression match" 
+            //         << rx.cap(1) << rx.cap(2) << rx.cap(3) 
+            //         << rx.cap(4) << rx.cap(5) << rx.cap(6);
+
+            if (!transition->addAmplitude(rx.capturedTexts().mid(1))) goto error;;
+         }
+     
+         states->append(transition);
+      }
+   }
+
+   states->dump();
+
+   if (!states->isEmpty()) {
+      m_dataBank.append(states);
+   }
+
+   return;
+
+   error:
+     QString msg("Problem parsing excited states section, line number ");
+     m_errors.append(msg += QString::number(textStream.lineNumber()));
+}
+
+
+void QChemOutput::readOrbitalSymmetries(TextStream& textStream)
+{
+   // We only parse the orbital symmetries section if we have excited states
+   QList<Data::ExcitedStates*> es(m_dataBank.findData<Data::ExcitedStates>());
+   if (es.isEmpty()) return;
+
+   Data::OrbitalSymmetries& data(es.last()->orbitalSymmetries());
+   Data::Spin spin(Data::Alpha);
+
+   unsigned nOrb(0);
+   QStringList tokens;
+   QStringList symmetries;
+
+   while (!textStream.atEnd()) {
+      tokens = textStream.nextLineAsTokens(); 
+
+      if (tokens.isEmpty()) {
+         // do nothing
+      }else if (tokens[0].contains("--------------")) {
+         break;
+      }else if (tokens[0].contains("Alpha")) {
+         spin = Data::Alpha;
+      }else if (tokens[0].contains("Beta")) {
+         spin = Data::Beta;
+
+      }else if (tokens[0] == ("--") && tokens[1].contains("Occupied")) {
+         nOrb = 0;
+      }else if (tokens[0] == ("--") && tokens[1].contains("Virtual")) {
+         data.setOccupied(spin, nOrb);
+      }else {
+         symmetries = textStream.nextLineAsTokens();
+         if (2*tokens.size() != symmetries.size()) goto error;
+
+         bool ok;
+         double energy;
+         QString symmetry;
+
+         for (int i = 0; i < tokens.size(); ++i) {
+             energy   = tokens[i].toDouble(&ok);   if (!ok) goto error;
+             symmetry = symmetries.at(2*i);
+             symmetry += " " + symmetries.at(2*i + 1);
+             data.append(spin, energy, symmetry);
+             ++nOrb;
+         }
+      } 
+   }
+
+   return;
+
+   error:
+     QString msg("Problem parsing excited states section, line number ");
+     m_errors.append(msg += QString::number(textStream.lineNumber()));
+}
+
+
 void QChemOutput::readDMA(TextStream& textStream, Data::Geometry* geometry)
 {
    Data::MultipoleExpansionList* dma(new Data::MultipoleExpansionList);
    Data::MultipoleExpansion* site;
    
    QList<double> x;
-   QStringList tokens;
    QString line;
 
    // Charges and positions

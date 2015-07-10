@@ -1,3 +1,5 @@
+#ifndef IQMOL_DATA_SPIN_H
+#define IQMOL_DATA_SPIN_H
 /*******************************************************************************
 
   Copyright (C) 2011-2013 Andrew Gilbert
@@ -20,33 +22,18 @@
 
 ********************************************************************************/
 
-#include "Bank.h"
-#include <QDebug>
+#include <QString>
 
 
 namespace IQmol {
 namespace Data {
 
-Bank::~Bank() 
-{ 
-   if (m_deleteContents) {
-       for (int i = 0; i < size(); ++i) {
-           //qDebug() << "Bank bust deleting " << at(i) << Type::toString(at(i)->typeID());
-           delete at(i);
-       }
-   }
-}
+   enum Spin { Alpha, Beta };
 
-
-void Bank::dump() const 
-{
-   int n(size());
-   for (int i = 0; i < n; ++i) {
-       qDebug() << "Data::Bank item" << i+1 << "of" << n << ":";
-       qDebug() <<  at(i)->typeID();
-       qDebug() <<  Type::toString(at(i)->typeID());
-       at(i)->dump();
+   inline QString SpinLabel(Spin spin) {
+      return (spin == Alpha) ? QString("Alpha") : QString("Beta");
    }
-}
 
 } } // end namespace IQmol::Data
+
+#endif

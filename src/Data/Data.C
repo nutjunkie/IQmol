@@ -104,6 +104,8 @@ QString toString(ID const id)
       case ExcitedStates:            s = "Data::ExcitedStates";             break;
       case NmrReference:             s = "Data::NmrReference";              break;
       case NmrReferenceList:         s = "Data::NmrReferenceList";          break;
+
+      case OrbitalSymmetries:        s = "Data::OrbitalSymmetries";         break;
       case YamlNode:                 s = "Data::YamlNode";                  break;
    }
 

@@ -228,9 +228,11 @@ void GeometryList::setReperceiveBonds(bool const tf)
 
 void GeometryList::configure()
 {
-   resetGeometry();
-   m_configurator.reset();
-   m_configurator.display();
+   if (m_geometryList.size() > 1) {
+      resetGeometry();
+      m_configurator.reset();
+      m_configurator.display();
+   }
 }
 
 
