@@ -14,16 +14,16 @@ macx {
    //CONFIG += release
 
    # QGLViewer
-   INCLUDEPATH += $(DEV)/libQGLViewer-2.5.3
-   LIBS        += $(DEV)/libQGLViewer-2.5.3/QGLViewer/libQGLViewer.a
+   INCLUDEPATH += $(DEV)/libQGLViewer-2.6.1
+   LIBS        += $(DEV)/libQGLViewer-2.6.1/QGLViewer/libQGLViewer.a
 
    # gfortran
-   LIBS += -L$(DEV)/extlib/lib -lgfortran 
+   LIBS += -L/usr/local/gfortran/lib -lgfortran
 
    # OpenMesh
    INCLUDEPATH += $(DEV)/OpenMesh-2.4/src
-   LIBS        += $(DEV)/OpenMesh-2.4/build/Build/lib/OpenMesh/libOpenMeshCored.a
-   LIBS        += $(DEV)/OpenMesh-2.4/build/Build/lib/OpenMesh/libOpenMeshToolsd.a
+   LIBS        += $(DEV)/OpenMesh-2.4/build/Build/lib/OpenMesh/libOpenMeshCore.a
+   LIBS        += $(DEV)/OpenMesh-2.4/build/Build/lib/OpenMesh/libOpenMeshTools.a
 
 
    # OpenBabel
@@ -39,17 +39,25 @@ macx {
 
 home {
    # SSH2
-   INCLUDEPATH += $(DEV)/libssh2-1.4.3/include
-   LIBS        += $(DEV)/libssh2-1.4.3/src/.libs/libssh2.a
+   INCLUDEPATH += $(DEV)/libssh2-1.5.0/include
+   LIBS        += $(DEV)/libssh2-1.5.0/src/.libs/libssh2.a
 
    #libcrypto
-   LIBS += $(DEV)/extlib/lib/libcrypto.a
+   LIBS += $(DEV)/openssl-1.0.2a/libcrypto.a
 
    # Boost
-   INCLUDEPATH  += $(DEV)/extlib/include
-   LIBS         += $(DEV)/extlib/lib/libboost_iostreams.a \
-                   $(DEV)/extlib/lib/libboost_serialization.a \
-                   $(DEV)/extlib/lib/libboost_exception.a
+   #INCLUDEPATH  += $(DEV)/extlib/include
+   #LIBS         += $(DEV)/extlib/lib/libboost_iostreams.a \
+   #                $(DEV)/extlib/lib/libboost_serialization.a \
+   #                $(DEV)/extlib/lib/libboost_exception.a
+
+   # Boost
+   INCLUDEPATH  += $(DEV)/boost_1_56_0
+   LIBS         += $(DEV)/boost_1_56_0/stage/lib/libboost_iostreams.a \
+                   $(DEV)/boost_1_56_0/stage/lib/libboost_serialization.a \
+                   $(DEV)/boost_1_56_0/stage/lib/libboost_exception.a
+                   
+ QMAKE_LFLAGS += -stdlib=libstdc++
 }
 
 

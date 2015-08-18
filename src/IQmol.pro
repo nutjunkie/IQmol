@@ -22,9 +22,9 @@ SUBDIRS  = Util \
            Network \
            Yaml \
            Plot \
-           Process \
            Old \
            Configurator \
+           Process \
            Layer \
 
 SUBDIRS += Main \

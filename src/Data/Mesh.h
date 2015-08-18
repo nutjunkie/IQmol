@@ -127,6 +127,8 @@ namespace Data {
 
          void serialize(OutputArchive& ar, unsigned const version = 0);
 
+         void writeToFile();
+
          /// Applies a non-reversable clipping plane to the mesh
          void clip(qglviewer::Vec const& normal, qglviewer::Vec const& pointOnPlane);
 

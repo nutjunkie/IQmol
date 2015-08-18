@@ -341,6 +341,21 @@ void Mesh::serialize(InputArchive& ar, unsigned const)
 }
 
 
+void Mesh::writeToFile() 
+{
+   OpenMesh::IO::Options options;
+   options += OpenMesh::IO::Options::VertexNormal;
+
+   std::stringstream osstream(std::ios_base::out);
+
+   if (OpenMesh::IO::write_mesh(m_omMesh, "mesh.stl", options)) {
+      qDebug() << "Mesh written to mesh.stl";
+   }else {
+      qDebug() << "Mesh write to file failed";
+   }
+}
+
+
 bool Mesh::computeScalarField(Function3D const& function)
 {
    if (!hasProperty(ScalarField) && !requestProperty(ScalarField))  return false;
