@@ -20,8 +20,8 @@ SUBDIRS  = Util \
            Qui \
            Old \
            Parser \
-           Layer \
            Configurator \
+           Layer \
            Network \
            Yaml \
            Plot \

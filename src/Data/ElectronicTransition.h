@@ -43,11 +43,13 @@ namespace Data {
          enum Multiplicity { Singlet, Doublet, Triplet, Quartet };
 
          ElectronicTransition(double const energy = 0.0, double const strength = 0.0,
-            qglviewer::Vec const transitionMoment = qglviewer::Vec()) : 
-            m_energy(energy), m_strength(strength), m_transitionMoment(transitionMoment) { }
+            qglviewer::Vec const transitionMoment = qglviewer::Vec(), 
+            double spinSquared = 0.0) : m_energy(energy), m_strength(strength), 
+            m_transitionMoment(transitionMoment), m_spinSquared(spinSquared) { }
          
          double energy()   const { return m_energy; }
          double strength() const { return m_strength; }
+         double spinSquared() const { return m_spinSquared; }
          qglviewer::Vec const& transitionMoment() { return m_transitionMoment; }
 
          bool addAmplitude(QStringList const&);
@@ -74,12 +76,14 @@ namespace Data {
          void privateSerialize(Archive& ar, unsigned const /* version */) {
             ar & m_energy;
             ar & m_strength;
+            ar & m_spinSquared;
             ar & m_transitionMoment;
             ar & m_amplitudes;
          }
 
          double m_energy;
          double m_strength;
+         double m_spinSquared;
          qglviewer::Vec m_transitionMoment;
          QList<Amplitude> m_amplitudes;
          

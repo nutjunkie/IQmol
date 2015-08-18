@@ -1,15 +1,13 @@
 #CONFIG += no_keywords
+
 QT     += xml opengl gui network
-
-
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 QMAKE_CXXFLAGS += -O2 -g -ggdb
 
 
-
 macx {
-   //CONFIG += release
+   #CONFIG += release
 
    # Set the $DEV environment variable to the top directory used to compile all
    # the packages.  To simplify distribution, we use static libraries wherever
@@ -32,14 +30,11 @@ macx {
    LIBS        += $(DEV)/boost_1_56_0/stage/lib/libboost_iostreams.a
    LIBS        += $(DEV)/boost_1_56_0/stage/lib/libboost_serialization.a
    LIBS        += $(DEV)/boost_1_56_0/stage/lib/libboost_exception.a
-   #LIBS         += -L$(DEV)/boost_1_56_0/stage/lib/
-   #LIBS         += -lboost_exception -lboost_serialization  -lboost_iostreams
 
    # OpenMesh
    INCLUDEPATH += $(DEV)/OpenMesh-4.0/src
    LIBS        += $(DEV)/OpenMesh-4.0/build/Build/lib/libOpenMeshCore.a
    LIBS        += $(DEV)/OpenMesh-4.0/build/Build/lib/libOpenMeshTools.a
-
 
    # OpenBabel
    INCLUDEPATH += /usr/local/include/openbabel-2.0
@@ -48,28 +43,27 @@ macx {
    # gfortran
    LIBS += /usr/local/gfortran/lib/libgfortran.a
    LIBS += /usr/local/gfortran/lib/libquadmath.a
-
-   LIBS += -L/usr/local/gfortran/lib -lgcc_ext.10. 5
-   #LIBS += -L/usr/local/gfortran/lib -lgfortran -lquadmath
+   LIBS += -L/usr/local/gfortran/lib -lgcc_ext.10.5
 
 
    # Misc
    LIBS += -L/usr/X11/lib  
    LIBS += -framework GLUT
    LIBS += -L/usr/lib -lz
-   #LIBS += -L/usr/local/lib -lssl -lz
 
-   #LIBS += -L$(DEV)/extlib/lib -lgfortran 
-
-#   QMAKE_LFLAGS += -Wl,--rpath=\\\$\$ORIGIN/../Frameworks
-
-   QMAKE_LFLAGS += -Wl,-no_compact_unwind -stdlib=libstdc++
+   # QMAKE_LFLAGS += -Wl,--rpath=\\\$\$ORIGIN/../Frameworks
+   QMAKE_LFLAGS   += -Wl,-no_compact_unwind -stdlib=libstdc++
    QMAKE_RPATHDIR += /Applications/Qt5.5.0/5.5/clang_64/lib/
 }
 
 
 
+
+
+
 unix:!macx {
+   #CONFIG += release
+ 
    # QGLViewer
    INCLUDEPATH += $(DEV)/libQGLViewer-2.6.0
    LIBS        += $(DEV)/libQGLViewer-2.6.0/QGLViewer/libQGLViewer.a

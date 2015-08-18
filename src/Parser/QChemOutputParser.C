@@ -36,6 +36,7 @@
 #include "Constants.h"
 #include "ExcitedStates.h"
 #include "Spin.h"
+#include "QsLog.h"
 #include <QRegExp>
 #include <QFile>
 
@@ -365,13 +366,13 @@ qDebug() << "Reading CIS States";
    QStringList tokens;
 
    QString label, line;
-   double energy(0.0), strength(0.0), xx;
+   double energy(0.0), strength(0.0), s2(0.0);
    bool ok;
    qglviewer::Vec moment;
 
    // This is to match lines similar to the following
    //  D(  7) --> S(  1) amplitude =  0.6732 beta
-   QRegExp rx("[DS]\\(\\s*(\\d+)\\) --> [VS]\\(\\s*(\\d+)\\) amplitude = (.{7}) ([ab]?)");
+   QRegExp rx("[DS]\\(\\s*(\\d+)\\) --> [VS]\\(\\s*(\\d+)\\) amplitude = (.{7})\\s?([ab]?)");
    
    while (!textStream.atEnd()) {
       tokens = textStream.nextLineAsTokens();
@@ -388,6 +389,18 @@ qDebug() << "Reading CIS States";
          if (!ok) goto error;
 
       }else if (size >= 2 && tokens[0].contains("Multiplicity")) {
+         if (tokens[1].contains("Singlet")) {
+            s2 = 0.0;
+         }else if (tokens[1].contains("Triplet")) {
+            s2 = 2.0;
+         }else {
+            s2 = tokens[1].toDouble(&ok);
+            if (!ok) {
+               QLOG_WARN() << "Failed to convert S^2 value for transition";
+               s2 = 0.0;
+            }
+         }
+
          label = tokens[1];
 
       }else if (size >= 8 && tokens[0].contains("Trans")) {
@@ -406,7 +419,7 @@ qDebug() << "Reading CIS States";
          if (!ok) goto error;
 
          Data::ElectronicTransition* transition(
-            new Data::ElectronicTransition(energy, strength, moment));
+            new Data::ElectronicTransition(energy, strength, moment, s2));
 
          while (!textStream.atEnd()) {
             line = textStream.nextLine();

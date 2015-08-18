@@ -53,7 +53,7 @@ bool ElectronicTransition::addAmplitude(QStringList const& list)
 
 void ElectronicTransition::dump() const
 {
-   qDebug() << "  Transition:" << m_energy << "eV   " << m_strength;
+   qDebug() << "  Transition:" << m_energy << "eV   " << m_strength << " <S^2> = " << m_spinSquared;
    qDebug() << "    " << m_transitionMoment.x << m_transitionMoment.y << m_transitionMoment.z;
    qDebug() << "    Amplitudes size" << m_amplitudes.size();
 

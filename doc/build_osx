@@ -1,9 +1,12 @@
-						  Building IQmol From Source 
-                          ==========================
+                     ====================================
+					  Building IQmol From Source on OS X
+                     ====================================
 
+Libraries
+~~~~~~~~~
 
-Mac OSX
-~~~~~~~
+Most of the work required in compiling IQmol is setting up the required
+libraries.  The compilation of the code should be relatively straightforward.
 
  o Download the Qt libraries from http://www.qt.io
    The latest version tested is 5.5.0.  Ensure that the bin directory
@@ -43,14 +46,17 @@ Mac OSX
    - Download: http://sourceforge.net/projects/boost/files/boost/1.56.0/
      Later versions of boost seem to have removed the load_collection function which
      is part of the serialization routines.
-   - Compile: 
+   - Compile: needs the -stdlib=libstdc++ setting to be compatible with Qt.
+     Further details at:
+     http://stackoverflow.com/questions/20108407/how-do-i-compile-boost-for-os-x-64b-platforms-with-stdlibc
 
         ./bootstrap.sh --prefix= toolset=clang
         ./b2 toolset=clang --without-mpi cxxflags="-arch x86_64 -fvisibility=hidden \
              -fvisibility-inlines-hidden -stdlib=libstdc++ -ftemplate-depth=512" \
              linkflags="-stdlib=libstdc++" stage
 
-   - Static libraries are in stage/lib
+   - Static libraries are in stage/lib.  If they do not appear you may need to
+     add "link=static runtime-link=static" to the b2 arguments
 
 
  o OpenMesh:
@@ -90,6 +96,10 @@ Mac OSX
      Libs:    /usr/local/lib
 
 
+
+Compilation
+~~~~~~~~~~~
+
  o Compile the SymMol object file in src/Main
       gfortran -c symmol.f90
 
@@ -97,3 +107,9 @@ Mac OSX
       qmake IQmol.pro
       make
 
+
+
+Other
+~~~~~
+ o In order to get the command line tools installed you need to:
+     xcode-select --install 

@@ -1,0 +1,95 @@
+                   =======================================
+  				    Building IQmol From Source on Windows
+                   =======================================
+
+Libraries
+~~~~~~~~~
+
+Most of the work required in compiling IQmol is setting up the required
+libraries.  The compilation of the code should be relatively straightforward.
+
+ o Download the Qt libraries from http://www.qt.io
+   The latest version tested is 5.x.x.  Qt provides a command prompt that sets
+   up the required environment (path, etc).  All compilation (unless otherwise
+   stated) should be performed in one of these prompts to ensure a native
+   Windows binary is  produced without any linking to cygwin libraries.
+
+ o Ensure gfortran is installed, installer packages can be found at
+   https://gcc.gnu.org/wiki/GFortranBinaries
+
+ o Cmake will be required to compile some of the libraries, the installer can
+   be obtained from http://www.cmake.org/download/
+
+ o Make sure the zlib and libxml2 MinGW libraries have been installed.
+
+
+ o OpenSSL:
+   - Download: https://www.openssl.org/source  (version 1.0.1p)
+   - Compile:  all in a cygwin prompt
+
+      ./Configure --prefix=../extlibs2 no-idea no-mdc2 no-rc5 mingw
+      make depend
+      make
+
+
+ o LibSSH2:
+   - Download: http://www.libssh2.org  (version 1.6.0)
+   - Compile: 
+
+      ./configure --with-openssl --with-libssl-prefix=../openssl-1.0.1g --without-libgcrypt --with-libz
+
+
+ o Boost:
+   - Download: http://sourceforge.net/projects/boost/files/boost/1.56.0/
+     Later versions of boost seem to have removed the load_collection function which
+     is part of the serialization routines.
+   - Compile: 
+
+
+ o OpenMesh:
+   - Download: http://www.openmesh.org/download/ 
+   - Compile:
+    
+ o QGLViewer:
+   - Download: http://libqglviewer.com/download.html
+   - Complie:
+
+
+ o OpenBabel:
+   - Download: http://openbabel.org/wiki/Get_Open_Babel (2.3.1)
+
+   - Compilation:  The OpenBabel libraries are difficult to compile using
+     MinGW.  I was unable to get the plugins working and so had to compile
+	 these directly into the executable.  The IQmol.pro file takes care of the
+	 inclusion of the required files.   
+
+       cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=/where/to/install -DZLIB_INCLUDE_DIR=/include -DZLIB_LIBRARY=/lib/libz.a -DLIBXML2_INCLUDE_DIR=/include -DLIBXML2_LIBRARIES=/lib/libxml2.a
+       mingw32-make
+
+
+
+
+Compilation
+~~~~~~~~~~~
+
+ o Compile the SymMol object file in src/Main
+      mingw32-gfortran -c symmol.f90
+
+ o Compile the remaining IQmol source
+      qmake IQmol.pro
+      make
+
+
+
+Other
+~~~~~
+ o Distribution Version: Windows
+   - Copy the Openbable directory containging the plugin source into the
+     IQmol/src directory.  IQmol.pro includes this for Windows and is required
+	 because I can't get the plugins compiled properly.
+   - Copy the symmol.o file from a previous build into src.  I have no idea how
+     I compiled this now.
+   - run qmake -win32 -o Makefile IQmol.pro
+   - make
+   - If memory is exhausted, debugging symbols can be stripped using strip -g lib*.a
+   - for some reason common.pri needs to be added to IQmol/IQmol.pro after the libraries
