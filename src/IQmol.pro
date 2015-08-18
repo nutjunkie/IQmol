@@ -18,13 +18,13 @@ TEMPLATE = subdirs
 SUBDIRS  = Util \
            Data \
            Qui \
+           Old \
            Parser \
+           Configurator \
+           Layer \
            Network \
            Yaml \
            Plot \
-           Old \
-           Configurator \
            Process \
-           Layer \
 
 SUBDIRS += Main \

@@ -91,6 +91,7 @@ namespace Layer {
          int getIndex() const { return m_index; }
          int getReorderIndex() const { return m_reorderIndex; }
          double getRadius(bool const selected);
+         bool smallHydrogen() const { return (m_atomicNumber == 1 && m_smallerHydrogens); }
 
       public Q_SLOTS:
          void setDisplacement(qglviewer::Vec const& displacement) { 

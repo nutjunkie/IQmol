@@ -23,10 +23,13 @@
 ********************************************************************************/
 
 #include "ElectronicTransition.h"
+#include "OrbitalSymmetries.h"
 
 
 namespace IQmol {
 namespace Data {
+
+   class TransitionLine;
 
    class ExcitedStates : public Base {
 
@@ -35,13 +38,23 @@ namespace Data {
       public:
          Type::ID typeID() const { return Type::ExcitedStates; }
 
+         enum ExcitedStatesT { CIS, TDDFT, EOM };
+         void setType(ExcitedStatesT const type) { m_type = type; }
+
          void append(ElectronicTransition* transition) { m_transitions.append(transition); }
+
+         OrbitalSymmetries& orbitalSymmetries() { return m_orbitalSymmetries; }
+         OrbitalSymmetries const& orbitalSymmetries() const { return m_orbitalSymmetries; }
 
          double maxEnergy() const;
          double maxIntensity() const;
+         bool   isEmpty() const { return m_transitions.isEmpty(); }
 
          void dump() const;
+
          ElectronicTransitionList const& transitions() const { return m_transitions; }
+
+         QList<Amplitude> amplitudes(unsigned const transition) const;
 
          void serialize(InputArchive& ar, unsigned int const version = 0) {
             privateSerialize(ar, version);
@@ -55,10 +68,17 @@ namespace Data {
          template <class Archive>
          void privateSerialize(Archive& ar, unsigned const /* version */) {
             ar & m_transitions;
+            ar & m_orbitalSymmetries;
+            ar & m_type;
+            ar & m_label;
          }
 
          ElectronicTransitionList m_transitions;
+         OrbitalSymmetries m_orbitalSymmetries;
+         ExcitedStatesT m_type;
+         QString m_label;
    };
+
 
 } } // end namespace IQmol::Data
 

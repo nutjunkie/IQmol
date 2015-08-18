@@ -37,8 +37,8 @@ bool IQmol::parseFile(QString const& filePath)
    if (ifs.is_open()) {
       boost::iostreams::filtering_istream filter; 
 #ifdef Q_OS_MAC
-      // Can't get this working on Windows, or Linux
-      filter.push(boost::iostreams::gzip_decompressor());
+      // Can't get this working on Windows, or Linux, or even Mac now
+      //filter.push(boost::iostreams::gzip_decompressor());
 #endif
       filter.push(ifs);
       Data::InputArchive inputArchive(filter);
@@ -61,8 +61,7 @@ bool IQmol::save(QString const& filePath, Data::Bank& data)
    if (ofs.is_open()) {
       boost::iostreams::filtering_ostream filter;
 #ifdef Q_OS_MAC
-      // Can't get this working on Windows
-      filter.push(boost::iostreams::gzip_compressor());
+      //filter.push(boost::iostreams::gzip_compressor());
 #endif
       filter.push(ofs);
       boost::archive::text_oarchive outputArchive(filter);

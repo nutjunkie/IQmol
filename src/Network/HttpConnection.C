@@ -30,19 +30,13 @@
 #include <QNetworkAccessManager>
 
 
+
 namespace IQmol {
 namespace Network {
 
 HttpConnection::HttpConnection(QString const& hostname, int const port) :
    Connection(hostname, port), m_networkAccessManager(0), m_secure(false)
 {
-}
-
-
-HttpConnection::~HttpConnection()
-{
-   close();
-   killThread();
 }
 
 

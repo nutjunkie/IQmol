@@ -39,7 +39,6 @@ namespace Parser {
          static QStringList parseForErrors(TextStream&);
 
       private:
-
          Data::Geometry* readStandardCoordinates(TextStream&);
          void readStandardCoordinates(TextStream&, Data::Geometry*);
          void readCharges(TextStream&, Data::Geometry*, QString const& label);
@@ -49,6 +48,8 @@ namespace Parser {
          void readVibrationalModes(TextStream&);
          void readEffectiveRegion(TextStream&);
          void readDMA(TextStream&, Data::Geometry*);
+         void readCisStates(TextStream&, Data::Geometry*);
+         void readOrbitalSymmetries(TextStream&);
          void setTotalEnergy(QString const&, Data::Geometry*, QString const& label);
    };
 

@@ -1533,9 +1533,11 @@ Process2::QChemJobInfo Molecule::qchemJobInfo()
 
 void Molecule::qchemJobInfoChanged(Process2::QChemJobInfo const& qchemJobInfo)
 { 
-   setText(qchemJobInfo.get(Process2::QChemJobInfo::BaseName)); 
-   m_info.setCharge(qchemJobInfo.getCharge());
-   m_info.setMultiplicity(qchemJobInfo.getMultiplicity());
+   if (text() == DefaultMoleculeName) {
+      setText(qchemJobInfo.get(Process2::QChemJobInfo::BaseName)); 
+      m_info.setCharge(qchemJobInfo.getCharge());
+      m_info.setMultiplicity(qchemJobInfo.getMultiplicity());
+   }
 }
 
 

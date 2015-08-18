@@ -43,6 +43,7 @@ void Bank::dump() const
    int n(size());
    for (int i = 0; i < n; ++i) {
        qDebug() << "Data::Bank item" << i+1 << "of" << n << ":";
+       qDebug() <<  at(i)->typeID();
        qDebug() <<  Type::toString(at(i)->typeID());
        at(i)->dump();
    }

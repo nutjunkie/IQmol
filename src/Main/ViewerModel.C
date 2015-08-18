@@ -817,11 +817,13 @@ void ViewerModel::checkItemChanged(QStandardItem* item)
       disconnect(this, SIGNAL(itemChanged(QStandardItem*)), 
          this, SLOT(checkItemChanged(QStandardItem*)));
 
+
+      Layer::Base* base;
+
       if (item->checkState() == Qt::Checked) {
          item->setIcon(QIcon()); 
       }else {
          // close all the child configurators
-         Layer::Base* base;
          if ((base = dynamic_cast<Layer::Base*>(item))) {
             QList<Layer::Base*> children(base->findLayers<Layer::Base>(Layer::Children));
             QList<Layer::Base*>::iterator child;
@@ -831,14 +833,17 @@ void ViewerModel::checkItemChanged(QStandardItem* item)
          }     
       }
 
-      Layer::Surface* layer;
-      if ((layer = dynamic_cast<Layer::Surface*>(item))) {
-         layer->setCheckStatus(item->checkState());
-      }
+      if ((base = dynamic_cast<Layer::Base*>(item))) {
 
-      Layer::Molecule* molecule;
-      if ((molecule = dynamic_cast<Layer::Molecule*>(item))) {
-         displayMessage("");
+         Layer::Surface* layer;
+         if ((layer = dynamic_cast<Layer::Surface*>(base))) {
+            layer->setCheckStatus(item->checkState());
+         }
+
+         Layer::Molecule* molecule;
+         if ((molecule = dynamic_cast<Layer::Molecule*>(base))) {
+            displayMessage("");
+         }
       }
 
       connect(this, SIGNAL(itemChanged(QStandardItem*)), 

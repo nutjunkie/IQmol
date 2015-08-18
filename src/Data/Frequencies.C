@@ -54,6 +54,19 @@ double Frequencies::maxIntensity() const
 }
 
 
+double Frequencies::maxRamanIntensity() const
+{
+   double max(0.0);
+
+   VibrationalModeList::const_iterator iter;
+   for (iter = m_modes.begin(); iter != m_modes.end(); ++iter) {
+       if ((*iter)->ramanIntensity() > max) max = (*iter)->ramanIntensity();
+   }
+
+   return max; 
+}
+
+
 
 void Frequencies::setThermochemicalData(double const zpve, double const enthalpy, 
    double const entropy)

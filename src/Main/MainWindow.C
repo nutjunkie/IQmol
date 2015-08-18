@@ -406,7 +406,7 @@ void MainWindow::createMenus()
 
       name = "Quit";
       action = menu->addAction(name);
-      connect(action, SIGNAL(triggered()), this, SLOT(quit()));
+      connect(action, SIGNAL(triggered()), this, SIGNAL(quit()));
       action->setShortcut(Qt::CTRL + Qt::Key_Q);
 
 

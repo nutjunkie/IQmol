@@ -74,6 +74,7 @@ namespace Configurator {
          void on_gaussianButton_clicked(bool);
          void on_lorentzianButton_clicked(bool);
          void on_widthSlider_valueChanged(int);
+         void on_ramanCheckbox_clicked(bool);
 
          void plotSelectionChanged(bool);
          void contextMenuRequest(QPoint);
@@ -91,6 +92,8 @@ namespace Configurator {
          Layer::Frequencies& m_frequencies;
          QCustomPlot* m_customPlot;
          QList<QPair<double, double> > m_rawData;
+         QList<QPair<double, double> > m_rawRamanData;
+         QList<QPair<double, double> > m_rawIrData;
          QPen m_pen;
          QPen m_selectPen;
    };

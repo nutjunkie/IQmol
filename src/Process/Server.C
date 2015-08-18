@@ -30,6 +30,7 @@
 #include "WriteToTemporaryFile.h"
 #include "TextStream.h"
 #include "JobMonitor.h"
+#include "Preferences.h"
 #include "QsLog.h"
 #include <QDebug>
 
@@ -49,7 +50,7 @@ Server::Server(ServerConfiguration const& configuration) : m_configuration(confi
 
 Server::~Server()
 {
-   if (m_connection)  delete m_connection;
+   closeConnection();
 }
 
 
@@ -580,6 +581,8 @@ bool Server::parseQueryMessage(Job* job, QString const& message)
          if (message.isEmpty()) {
             status = Job::Finished;
          }else if (message.contains("No tasks are running")) { // Windows
+            status = Job::Finished;
+         }else if (message.contains(Preferences::ServerQueryJobFinished())) { // Windows
             status = Job::Finished;
          }else {
             status = Job::Running;

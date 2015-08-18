@@ -45,7 +45,7 @@ namespace Network {
 
       public:
          SshConnection(QString const& hostname, int const port = 22);
-         ~SshConnection();
+         ~SshConnection() { close(); }
 
          void open();
          void close();

@@ -30,7 +30,7 @@
 #include <vector>
 
 
-typedef std::vector<OpenBabel::vector3> Eigenvectors;
+//typedef std::vector<OpenBabel::vector3> Eigenvectors;
 
 namespace OpenBabel {
    class OBVibrationData;
@@ -40,6 +40,7 @@ namespace IQmol {
 
 namespace Data {
    class Frequencies;
+   class VibrationalMode;
 }
 
 namespace Layer {
@@ -55,8 +56,6 @@ namespace Layer {
       public:
          Frequencies(Data::Frequencies const&);
 
-         void fromData(Data::Frequencies const&);
-
          void setMolecule(Molecule*);
          void setPlay(bool const play);
          void setLoop(bool const loop);
@@ -66,7 +65,8 @@ namespace Layer {
 
          double maxFrequency() const;
          double maxIntensity() const;
-
+         double maxRamanIntensity() const;
+         bool   haveRaman() const;
 
       Q_SIGNALS:
          void pushAnimators(AnimatorList const&);
@@ -83,7 +83,7 @@ namespace Layer {
          Data::Frequencies const& m_frequencies;
          Configurator::Frequencies m_configurator;
          AnimatorList m_animatorList;
-         bool m_play;
+         bool   m_play;
          double m_loop;  // -1.0 => loop forever
          double m_speed;
          double m_scale;
@@ -94,17 +94,9 @@ namespace Layer {
        Q_OBJECT
 
        public:
-          Mode(double const frequency, Eigenvectors const& eigenvectors, 
-             double const intensity);
-
-          Mode(double const frequency, QList<qglviewer::Vec> const& eigenvectors, 
-             double const intensity);
+          Mode(Data::VibrationalMode const& mode);
+          Data::VibrationalMode const& data() const { return m_mode; }
              
-          double frequency() const { return m_frequency; } 
-          double intensity() const { return m_intensity; } 
-          int nAtoms() const { return m_eigenvectors.size(); }
-          qglviewer::Vec const& eigenvector(unsigned int const atom) const;
-
        Q_SIGNALS:
           void playMode(Mode const&);
 
@@ -112,10 +104,7 @@ namespace Layer {
           void configure() { playMode(*this); }
 
        private:
-          static QList<qglviewer::Vec> m_emptyList;
-          double m_frequency;
-          double m_intensity;
-          QList<qglviewer::Vec>  m_eigenvectors;
+          Data::VibrationalMode const& m_mode;
    };
 
 

@@ -43,7 +43,7 @@ namespace Network {
 
       public:
          HttpConnection(QString const& hostAddress, int const port = 80);
-         ~HttpConnection();
+         ~HttpConnection() { close(); }
 
          void setSecure(bool secure) { m_secure = secure; }
          bool secure() const { return m_secure; }

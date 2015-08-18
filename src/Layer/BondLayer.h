@@ -60,9 +60,11 @@ namespace Layer {
          void drawBallsAndSticks(bool selected);
          void drawTubes(bool selected);
          void drawWireFrame(bool selected);
+         void drawPlastic(bool selected);
 
          // Static Data
-         static GLfloat s_defaultColor[];        // Gray bonds for BallsAndSticks
+         static GLfloat s_defaultColor[];        // Grey bonds for BallsAndSticks
+         static GLfloat s_plasticColor[];        // Light grey for molymod-type
          static GLfloat s_radiusBallsAndSticks;  // Default tube radius in angstroms
          static GLfloat s_radiusTubes;           // Default tube radius in angstroms
          static GLfloat s_radiusWireFrame;       // Default wire frame radius in pixels

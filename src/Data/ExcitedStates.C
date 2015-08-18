@@ -27,7 +27,6 @@
 namespace IQmol {
 namespace Data {
 
-
 double ExcitedStates::maxEnergy() const
 {
    double max(0.0);
@@ -54,10 +53,37 @@ double ExcitedStates::maxIntensity() const
 }
 
 
+QList<Amplitude> ExcitedStates::amplitudes(unsigned const transition) const
+{
+   QList<Amplitude> amplitudes;
+
+   if (transition < m_transitions.size()) {
+      amplitudes = m_transitions[transition]->amplitudes();
+
+      unsigned nAlpha(m_orbitalSymmetries.nAlpha());
+      unsigned nBeta(m_orbitalSymmetries.nBeta());
+      
+// off by one
+      QList<Amplitude>::iterator iter;
+      for (iter = amplitudes.begin(); iter != amplitudes.end(); ++iter) {
+          unsigned i((*iter).m_i);
+          unsigned a((*iter).m_a);
+          Spin spin((*iter).m_spin);
+          a += (spin == Alpha) ? nAlpha : nBeta;
+          (*iter).m_ei = m_orbitalSymmetries.energy(spin, i-1);
+          (*iter).m_ea = m_orbitalSymmetries.energy(spin, a-1);
+      }
+   } 
+
+   return amplitudes;
+}
+
+
 void ExcitedStates::dump() const
 {
    qDebug() << "  Electronic States:";
    m_transitions.dump();
+   m_orbitalSymmetries.dump();
 }
 
 } } // end namespace IQmol::Data

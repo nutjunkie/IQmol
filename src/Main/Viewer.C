@@ -44,7 +44,8 @@ using namespace qglviewer;
 
 namespace IQmol {
 
-Vec Layer::GLObject::s_cameraPosition = Vec(0.0, 0.0, 0.0);
+Vec Layer::GLObject::s_cameraPosition  = Vec(0.0, 0.0, 0.0);
+Vec Layer::GLObject::s_cameraDirection = Vec(0.0, 0.0, 1.0);
 
 const Qt::Key Viewer::s_buildKey(Qt::Key_Alt);
 const Qt::Key Viewer::s_selectKey(Qt::Key_Shift);
@@ -194,8 +195,8 @@ void Viewer::draw()
    qDebug() << "Filters are on in drawNew";
 
    makeCurrent();
-   Vec cameraPosition(camera()->position());
-   Layer::GLObject::SetCameraPosition(cameraPosition);
+   Layer::GLObject::SetCameraPosition(camera()->position());
+   Layer::GLObject::SetCameraDirection(camera()->viewDirection());
 
    QString shader(m_shaderLibrary->currentShader());
 

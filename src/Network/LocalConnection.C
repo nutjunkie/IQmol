@@ -36,12 +36,6 @@ LocalConnection::LocalConnection() : Connection("localhost", 0)
 }
 
 
-LocalConnection::~LocalConnection()
-{
-   killThread();
-}
-
-
 void LocalConnection::open()
 {
    m_status = Connection::Opened;

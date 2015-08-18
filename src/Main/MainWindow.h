@@ -69,6 +69,7 @@ namespace IQmol {
 
       Q_SIGNALS:
          void recordingActive(bool);
+         void quit();
 
       public Q_SLOTS:
          void openDir();
@@ -92,7 +93,6 @@ namespace IQmol {
          void newViewer();
          void fullScreen();
          void closeEvent(QCloseEvent*);
-         void quit() { QApplication::quit(); }
          void windowModified() { setWindowModified(true); }
 
          void setForceField();

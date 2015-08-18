@@ -34,7 +34,8 @@
 #include <limits>
 #define FOREVER ( std::numeric_limits<int>::max() )
 
-#define IQMOL_VERSION "2.5.1"
+#define IQMOL_VERSION "2.5.2"
+#define IQMOL_YEAR "2015"
 
 class QToolButton;
 class QColor;
@@ -45,13 +46,13 @@ namespace IQmol {
    QString const DefaultMoleculeName = "Untitled";
    double const DefaultSceneRadius = 4.0;
 
-   enum Spin { Alpha, Beta };
+//   enum Spin { Alpha, Beta };
 
    enum Axes { XAxis = 0x1, YAxis = 0x2, ZAxis = 0x4 };
 
-   inline QString SpinLabel(Spin spin) {
-      return (spin == Alpha) ? QString("Alpha") : QString("Beta");
-   }
+ //  inline QString SpinLabel(Spin spin) {
+ //     return (spin == Alpha) ? QString("Alpha") : QString("Beta");
+ //  }
 
    QString subscript(QString const& s);
    QString superscript(QString const& s);

@@ -44,6 +44,7 @@ namespace Data {
          
          double frequency() const { return m_frequency; }
          double intensity() const { return m_intensity; }
+         double ramanIntensity() const { return m_ramanIntensity; }
          bool irActive() const { return m_irActive; }
          bool ramanActive() const { return m_ramanActive; }
          QList<qglviewer::Vec> const&  eigenvector() const { return m_eigenvector; }
@@ -52,6 +53,7 @@ namespace Data {
          void setIntensity(double const intensity) { m_intensity = intensity; }
          void setIrActive(bool const tf) { m_irActive = tf; }
          void setRamanActive(bool const tf) { m_ramanActive = tf; }
+         void setRamanIntensity(double const intensity) { m_ramanIntensity = intensity; }
          void appendDirectionVector(qglviewer::Vec const& vec) { m_eigenvector.append(vec); }
 
          bool operator<(VibrationalMode const& that) {
@@ -75,13 +77,15 @@ namespace Data {
             ar & m_intensity;
             ar & m_irActive;
             ar & m_ramanActive;
+            ar & m_ramanIntensity;
             ar & m_eigenvector;
          }
 
          double m_frequency;
          double m_intensity;
-         bool m_irActive;
-         bool m_ramanActive;
+         bool   m_irActive;
+         bool   m_ramanActive;
+         double m_ramanIntensity;
          QList<qglviewer::Vec> m_eigenvector;
    };
 
