@@ -11,11 +11,11 @@ SOURCES = \
    $$PWD/QueueOptionsDialog.C \
    $$PWD/QueueResources.C \
    $$PWD/QueueResourcesDialog.C \
-   $$PWD/Server2.C \
+   $$PWD/Server.C \
    $$PWD/ServerConfiguration.C \
    $$PWD/ServerConfigurationDialog.C \
    $$PWD/ServerConfigurationListDialog.C \
-   $$PWD/ServerRegistry2.C \
+   $$PWD/ServerRegistry.C \
    $$PWD/SshFileDialog.C \
    $$PWD/SystemDependent.C \
 
@@ -26,11 +26,11 @@ HEADERS = \
    $$PWD/QueueOptionsDialog.h \
    $$PWD/QueueResources.h \
    $$PWD/QueueResourcesDialog.h \
-   $$PWD/Server2.h \
+   $$PWD/Server.h \
    $$PWD/ServerConfiguration.h \
    $$PWD/ServerConfigurationDialog.h \
    $$PWD/ServerConfigurationListDialog.h \
-   $$PWD/ServerRegistry2.h \
+   $$PWD/ServerRegistry.h \
    $$PWD/SshFileDialog.h \
    $$PWD/SystemDependent.h \
 

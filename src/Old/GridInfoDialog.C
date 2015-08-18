@@ -154,14 +154,16 @@ void GridInfoDialog::exportCubeFile(bool const invertSign)
    for (iter = grids.begin(); iter != grids.end(); ++iter) {
        QFileInfo fileInfo(Preferences::LastFileAccessed());
        QString name(m_molecule->text());
-       name += "_" + (*iter)->surfaceType().toString() + ".cube";
+       name += "." + (*iter)->surfaceType().toString() + ".cube";
        name.replace(" ","_");
        fileInfo.setFile(fileInfo.dir(), name);
        name = fileInfo.filePath();
        QStringList coordinates(m_molecule->coordinatesForCubeFile());
        if ((*iter)->saveToCubeFile(name, coordinates, invertSign)) {
           Preferences::LastFileAccessed(name);
-          qDebug() << "Cube data saved to " << name;
+          QString msg("Cube data saved to ");
+          msg += name;
+          QMsgBox::information(this, "IQmol", msg);
        }else {
           QString msg("Unable to save to file ");
           msg += name + "\n";

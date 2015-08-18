@@ -21,8 +21,8 @@
 ********************************************************************************/
 
 #include "ServerConfigurationListDialog.h"
-#include "ServerRegistry2.h"
-#include "Server2.h"
+#include "ServerRegistry.h"
+#include "Server.h"
 #include "ServerConfigurationDialog.h"
 #include "QMsgBox.h"
 #include <QHeaderView>

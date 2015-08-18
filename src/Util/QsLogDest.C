@@ -38,6 +38,7 @@ class FileDestination : public Destination
 public:
     FileDestination(const QString& filePath);
     virtual void write(const QString& message, Level level);
+    virtual int handle() { return mFile.handle(); }
 
 private:
     QFile mFile;
@@ -63,6 +64,7 @@ class DebugOutputDestination : public Destination
 {
 public:
     virtual void write(const QString& message, Level level);
+    virtual int handle() { return STDERR_FILENO; }
 };
 
 void DebugOutputDestination::write(const QString& message, Level)

@@ -32,6 +32,12 @@ namespace Network {
 
    class Reply;
 
+   class ConnectionThread : public QThread {
+      public:
+         ConnectionThread() { QThread::setTerminationEnabled(true); }
+   };
+
+
    /// Base class for network connections
    class Connection : public QObject {
 
@@ -46,7 +52,7 @@ namespace Network {
          Connection(QString const& hostname, int const port) : QObject(), m_hostname(hostname),
             m_port(port), m_status(Closed), m_timeout(10000) { }  // 10s default
          
-         virtual ~Connection() { }
+         virtual ~Connection();
 
          virtual void open() = 0;
          virtual void close() = 0;
@@ -62,6 +68,7 @@ namespace Network {
          }
 
          virtual Reply* execute(QString const& command) = 0;
+         virtual Reply* execute(QString const& command, QString const& workingDirectory) = 0;
          virtual Reply* getFile(QString const& sourcePath, QString const& destinationPath) = 0;
          virtual Reply* putFile(QString const& sourcePath, QString const& destinationPath) = 0;
          virtual Reply* getFiles(QStringList const& fileList, QString const& destinationPath) = 0;
@@ -84,13 +91,15 @@ namespace Network {
          Status   m_status;
          unsigned m_timeout;
 
-         void thread(Reply*);
-         void killThread();
+         void     thread(Reply*);
 
       private:
+         void     killThread();
          explicit Connection(Connection const&) : QObject() { }
          QThread  m_thread;
    };
+
+
 
 } } // end namespace IQmol::Network
 

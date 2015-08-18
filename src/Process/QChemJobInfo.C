@@ -82,6 +82,7 @@ void QChemJobInfo::set(Field const field, QString const& value)
       case Coordinates:
       case Constraints:
       case ScanCoordinates:
+      case ExternalCharges:
       case EfpFragments:
       case EfpParameters:
       case Queue:
@@ -158,6 +159,9 @@ QString QChemJobInfo::get(Field const field) const
          break;
       case RunFileName:
          value = m_data[BaseName] + ".run";
+         break;
+      case BatchFileName:
+         value = m_data[BaseName] + ".bat";
          break;
       case ErrorFileName:
          value = m_data[BaseName] + ".err";

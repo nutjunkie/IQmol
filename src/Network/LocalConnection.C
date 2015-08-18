@@ -36,12 +36,6 @@ LocalConnection::LocalConnection() : Connection("localhost", 0)
 }
 
 
-LocalConnection::~LocalConnection()
-{
-   killThread();
-}
-
-
 void LocalConnection::open()
 {
    m_status = Connection::Opened;
@@ -123,6 +117,13 @@ bool LocalConnection::removeDirectory(QString const& /* dirName */)
 Reply* LocalConnection::execute(QString const& command)
 {
    LocalReply* reply(new LocalExecute(this, command));
+   return reply;
+}
+
+
+Reply* LocalConnection::execute(QString const& command, QString const& workingDirectory)
+{
+   LocalReply* reply(new LocalExecute(this, command, workingDirectory));
    return reply;
 }
 

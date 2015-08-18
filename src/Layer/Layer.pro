@@ -3,7 +3,6 @@ CONFIG += lib
 include(../common.pri)
 
 INCLUDEPATH += ../Data ../Util ../Old ../Configurator ../Parser ../Process ../Main
-#INCLUDEPATH += $$BUILD_DIR/IQmol
 
 SOURCES = \
    $$PWD/AtomLayer.C \
@@ -20,6 +19,7 @@ SOURCES = \
    $$PWD/GeometryListLayer.C \
    $$PWD/EfpFragmentLayer.C \
    $$PWD/EfpFragmentListLayer.C \
+   $$PWD/ExcitedStatesLayer.C \
    $$PWD/FileLayer.C \
    $$PWD/FrequenciesLayer.C \
    $$PWD/GroupLayer.C \
@@ -48,6 +48,7 @@ HEADERS = \
    $$PWD/GlobalLayer.h \
    $$PWD/EfpFragmentLayer.h \
    $$PWD/EfpFragmentListLayer.h \
+   $$PWD/ExcitedStatesLayer.h \
    $$PWD/FileLayer.h \
    $$PWD/FrequenciesLayer.h \
    $$PWD/GLObjectLayer.h \

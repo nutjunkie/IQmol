@@ -42,8 +42,8 @@ HttpReply::HttpReply(HttpConnection* connection) : m_connection(connection), m_n
 
 HttpReply::~HttpReply()
 {
-   QLOG_TRACE() << "Deleting HttpReply";
-   if (m_networkReply) m_networkReply->deleteLater(); 
+   // The QNetworkAcessManager takes care of this.
+   // if (m_networkReply) m_networkReply->deleteLater(); 
 }
 
 

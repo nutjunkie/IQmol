@@ -38,7 +38,7 @@ namespace Data {
       friend class boost::serialization::access;
 
       public:
-         enum AngularMomentum { S, P, D5, D6, F7, F10 };
+         enum AngularMomentum { S, P, D5, D6, F7, F10, G9, G15 };
 
          Shell(AngularMomentum const angularMomentum = S, 
             qglviewer::Vec const& position = qglviewer::Vec(), 
@@ -76,9 +76,9 @@ namespace Data {
          /// not be appropriate for other wavefunction analyses.
 		 static double s_thresh; 
 		 /// Shell values are stored in this static array, the length of which
-		 /// is sufficient for up to f angular momentum.
+		 /// is sufficient for up to g angular momentum.
          /// This could cause problems if Shells are ever used in parallel
-         static double s_values[10];
+         static double s_values[15];
 
          double computeSignificantRadius(double const thresh);
          QString toString(AngularMomentum const) const;

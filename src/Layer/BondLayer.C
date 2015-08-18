@@ -22,6 +22,9 @@
 
 #include "BondLayer.h"
 #include "AtomLayer.h"
+#include "GLShape.h"
+
+#include <QDebug>
 
 
 using namespace qglviewer;
@@ -31,6 +34,7 @@ namespace Layer {
 
 // Static Data
 GLfloat Bond::s_defaultColor[]       = {0.3f, 0.3f, 0.3f, 1.0f};
+GLfloat Bond::s_plasticColor[]       = {0.6f, 0.6f, 0.6f, 1.0f};
 GLfloat Bond::s_radiusBallsAndSticks =  0.10;
 GLfloat Bond::s_radiusTubes          =  0.10;
 GLfloat Bond::s_radiusWireFrame      =  3.00;  // pixels
@@ -79,6 +83,9 @@ void Bond::drawPrivate(bool selected)
       case Primitive::BallsAndSticks:
          drawBallsAndSticks(selected);
          break;
+      case Primitive::Plastic:
+         drawPlastic(selected);
+         break;
       case Primitive::Tubes:
          drawTubes(selected);
          break;
@@ -89,6 +96,7 @@ void Bond::drawPrivate(bool selected)
          break;
    }
 }
+
 
 
 void Bond::drawBallsAndSticks(bool selected)
@@ -213,6 +221,157 @@ void Bond::drawBallsAndSticks(bool selected)
          glPopMatrix();
       } break;
       
+   }
+
+   gluDeleteQuadric(quad); 
+}
+
+
+void Bond::drawPlastic(bool selected)
+{
+   // We don't allow scaling cos it looks naff
+   GLfloat offset(0.08);   // height of the cap
+   GLfloat bondRadius(0.10);
+   GLfloat capRadius(2*bondRadius);
+   GLfloat aRadius = m_begin->smallHydrogen() ? 0.28 : 0.40;
+   GLfloat bRadius = m_end->smallHydrogen()   ? 0.28 : 0.40;
+   GLfloat aShift  = aRadius + offset - capRadius;
+   GLfloat bShift  = bRadius + offset - capRadius;
+
+   if (selected) {
+      bondRadius += Primitive::s_selectOffset;
+      capRadius  += Primitive::s_selectOffset;
+      glColor4fv(Primitive::s_selectColor);
+   }else {
+      glColor4fv(s_plasticColor);
+   }
+
+   Vec a(m_begin->displacedPosition());
+   Vec b(m_end  ->displacedPosition());
+   Vec ab(b-a);
+
+   GLfloat length(ab.normalize());
+
+   GLUquadric* quad = gluNewQuadric();
+   Frame frame(m_frame);
+
+   switch (m_order) {
+      case 20: {
+         GLfloat s(0.40); // separation
+         GLfloat r(0.5*(s+0.25*length*length)/s); // radius of torus
+         bondRadius *= 0.7;
+
+         Vec normal = cross(s_cameraPosition-a, s_cameraPosition-b);
+         //Vec normal(cross(ab,s_cameraDirection));
+         normal.normalize();
+
+         Vec midPoint(a+0.5*length*ab);
+         Vec displacement((r-s)*normal);
+         Vec center(midPoint-displacement);
+         Vec ca(a-center);
+         Vec cb(b-center);
+
+/*
+// These lengths should be the same
+qDebug() << "Lengths: ca:" << r << ca.norm() << cb.norm(); 
+qDebug() << "Midpoint " << midPoint.x << midPoint.y << midPoint.z;
+qDebug() << "A        " << a.x << a.y << a.z;
+qDebug() << "B        " << b.x << b.y << b.z;
+qDebug() << "Center   " << center.x << center.y << center.z;;
+qDebug() << "Normal   " << normal.x << normal.y << normal.z;;
+*/
+
+         double arc(Quaternion(ca, cb).angle());
+
+         // Align the frame x-axis to the ca
+         frame.setPositionAndOrientation(center, Quaternion(Vec(1, 0, 0), ca));
+         // Now determine the frame coordinates of b and 
+         Vec fb(frame.coordinatesOf(b).unit());
+         frame.rotate(Quaternion(Vec(1, 0, 0), atan2(fb.z, fb.y)));
+
+         glPushMatrix();
+         glMultMatrixd(frame.matrix());
+         GLShape::Torus(r, bondRadius, 0.1, arc);
+
+glColor3f(1.0, 0.0, 0.0);
+         gluSphere(quad, 0.5*capRadius, Primitive::s_resolution, Primitive::s_resolution);
+         glPopMatrix();
+
+         //  and cap the ends
+         if (length > aRadius+bRadius) {
+            double thetaA(std::acos(1.0-0.5*(aRadius+offset)*(aRadius+offset)/(r*r)));
+          //Vec capA(frame.inverseCoordinatesOf(Vec(r*std::cos(thetaA), r*std::sin(thetaA), 0.0)));
+            Vec capA(r*std::cos(thetaA), r*std::sin(thetaA), 0.0);
+            capA += capRadius*((Vec(r, 0, 0)-capA).unit());
+
+            frame.setPosition(frame.inverseCoordinatesOf(capA));
+
+            glPushMatrix();
+            glMultMatrixd(frame.matrix());
+glColor3f(0.0, 1.0, 0.0);
+            gluSphere(quad, capRadius, Primitive::s_resolution, Primitive::s_resolution);
+            glPopMatrix();
+
+
+            //double thetaB(std::acos(1.0-bShift*bShift/(2*r*r)));
+            double thetaB(std::acos(1.0-0.5*(bRadius+offset)*(bRadius+offset)/(r*r)));
+            thetaB = arc-thetaB;
+
+          //Vec capB(frame.inverseCoordinatesOf(Vec(r*std::cos(thetaB), r*std::sin(thetaB), 0.0)));
+            Vec capB(r*std::cos(thetaB), r*std::sin(thetaB), 0.0);
+            capB += capRadius*((Vec(r, 0, 0)-capB).unit());
+
+            frame.setPosition(center);
+            frame.setPosition(frame.inverseCoordinatesOf(capB));
+
+            glPushMatrix();
+            glMultMatrixd(frame.matrix());
+glColor3f(0.0, 0.0, 1.0);
+            gluSphere(quad, capRadius, Primitive::s_resolution, Primitive::s_resolution);
+            glPopMatrix();
+         }
+ 
+glColor4fv(s_plasticColor);
+  
+         // second bond
+         center = midPoint-displacement;
+         ca = a-center;
+		 cb = b-center;
+         frame.setPositionAndOrientation(center, Quaternion(Vec(1, 0, 0), cb));
+         Vec fa(frame.coordinatesOf(a).unit());
+         frame.rotate(Quaternion(Vec(1, 0, 0), atan2(fa.z, fa.y)));
+
+         glPushMatrix();
+         glMultMatrixd(frame.matrix());
+         GLShape::Torus(r, bondRadius, 0.1, arc);
+         //gluSphere(quad, capRadius, Primitive::s_resolution, Primitive::s_resolution);
+         glPopMatrix();
+
+      } break;
+
+
+      default: {
+         // Draw regular bond
+         glPushMatrix();
+         glMultMatrixd(frame.matrix());
+         gluCylinder(quad, bondRadius, bondRadius, length, Primitive::s_resolution, 1);
+         glPopMatrix();
+
+         //  and cap the ends
+         if (length > aRadius+bRadius) {
+            frame.translate(aShift*ab);
+            glPushMatrix();
+            glMultMatrixd(frame.matrix());
+            gluSphere(quad, capRadius, Primitive::s_resolution, Primitive::s_resolution);
+            glPopMatrix();
+
+            frame.translate((length-(aShift+bShift))*ab);
+            glPushMatrix();
+            glMultMatrixd(frame.matrix());
+            gluSphere(quad, capRadius, Primitive::s_resolution, Primitive::s_resolution);
+            glPopMatrix();
+         }
+      } break;
    }
 
    gluDeleteQuadric(quad); 

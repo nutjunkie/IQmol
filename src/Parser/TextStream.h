@@ -84,7 +84,8 @@ namespace Parser {
 
          // Returns the next line that contains the given string.
          QString const& seek(QString const& str, 
-            Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive) {
+            Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive) 
+         {
             nextLine();
             while (!atEnd() && !m_previousLine.contains(str, caseSensitive)) {
                nextLine();
@@ -92,7 +93,8 @@ namespace Parser {
             return m_previousLine;
          }
 
-         QString const& seek(QRegExp const& regExp) {
+         QString const& seek(QRegExp const& regExp) 
+         {
             nextLine();
             while (!atEnd() && !m_previousLine.contains(regExp)) {
                nextLine();
@@ -101,11 +103,13 @@ namespace Parser {
          }
 
          QStringList seekAndSplit(QString const& str,
-            Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive) {
+            Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive) 
+         {
             return tokenize(seek(str, caseSensitive));
          }
 
-         QStringList seekAndSplit(QRegExp const& regExp) {
+         QStringList seekAndSplit(QRegExp const& regExp) 
+         {
             return tokenize(seek(regExp));
          }
 

@@ -14,7 +14,9 @@ SOURCES = \
    $$PWD/DataFactory.C \
    $$PWD/EfpFragment.C \
    $$PWD/EfpFragmentLibrary.C \
+   $$PWD/ElectronicTransition.C \
    $$PWD/Energy.C \
+   $$PWD/ExcitedStates.C \
    $$PWD/File.C \
    $$PWD/Frequencies.C \
    $$PWD/Geometry.C \
@@ -27,6 +29,7 @@ SOURCES = \
    $$PWD/MolecularOrbitalsList.C \
    $$PWD/MultipoleExpansion.C \
    $$PWD/NmrReference.C \
+   $$PWD/OrbitalSymmetries.C \
    $$PWD/PointCharge.C \
    $$PWD/RemSectionData.C \
    $$PWD/Shell.C \
@@ -49,7 +52,9 @@ HEADERS = \
    $$PWD/DipoleMoment.h \
    $$PWD/EfpFragment.h \
    $$PWD/EfpFragmentLibrary.h \
+   $$PWD/ElectronicTransition.h \
    $$PWD/Energy.h \
+   $$PWD/ExcitedStates.h \
    $$PWD/File.h \
    $$PWD/Frequencies.h \
    $$PWD/Geometry.h \
@@ -62,6 +67,7 @@ HEADERS = \
    $$PWD/MolecularOrbitalsList.h \
    $$PWD/MultipoleExpansion.h \
    $$PWD/NmrReference.h \
+   $$PWD/OrbitalSymmetries.h \
    $$PWD/PointCharge.h \
    $$PWD/PointGroup.h \
    $$PWD/RemSectionData.h \

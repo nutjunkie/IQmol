@@ -2,7 +2,7 @@ LIB = Configurator
 CONFIG += lib
 include(../common.pri)
 
-INCLUDEPATH += ../Layer ../Data ../Util ../Old
+INCLUDEPATH += ../Layer ../Data ../Util ../Old ../Plot
 #INCLUDEPATH += $$BUILD_DIR/IQmol
 
 SOURCES = \
@@ -12,6 +12,7 @@ SOURCES = \
    $$PWD/CubeDataConfigurator.C \
    $$PWD/DipoleConfigurator.C \
    $$PWD/EfpFragmentListConfigurator.C \
+   $$PWD/ExcitedStatesConfigurator.C \
    $$PWD/FileConfigurator.C \
    $$PWD/FrequenciesConfigurator.C \
    $$PWD/GeometryListConfigurator.C \
@@ -28,6 +29,7 @@ HEADERS = \
    $$PWD/CubeDataConfigurator.h \
    $$PWD/DipoleConfigurator.h \
    $$PWD/EfpFragmentListConfigurator.h \
+   $$PWD/ExcitedStatesConfigurator.h \
    $$PWD/FileConfigurator.h \
    $$PWD/FrequenciesConfigurator.h \
    $$PWD/GeometryListConfigurator.h \
@@ -42,6 +44,7 @@ FORMS = \
    $$PWD/CubeDataConfigurator.ui \
    $$PWD/DipoleConfigurator.ui \
    $$PWD/EfpFragmentListConfigurator.ui \
+   $$PWD/ExcitedStatesConfigurator.ui \
    $$PWD/FileConfigurator.ui \
    $$PWD/FrequenciesConfigurator.ui \
    $$PWD/GeometryListConfigurator.ui \

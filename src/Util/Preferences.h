@@ -93,6 +93,9 @@ namespace Preferences {
    bool    LoggingEnabled();
    void    LoggingEnabled(bool const);
    
+   double  SurfaceOpacity();
+   void    SurfaceOpacity(double const);
+   
    QString DefaultForceField();
    void    DefaultForceField(QString const&);
 
@@ -132,6 +135,9 @@ namespace Preferences {
    QVariantList ServerConfigurationList();
    void ServerConfigurationList(QVariantList const&);
 
+   QString ServerQueryJobFinished();
+   void    ServerQueryJobFinished(QString const& repsonse);
+   
    QMap<QString,QString> PasswordVaultContents();
    void PasswordVaultContents(QMap<QString,QString> const&);
    void ClearPasswordVaultContents();

@@ -49,7 +49,7 @@ namespace Layer {
       Q_OBJECT
 
       public:
-         enum DrawMode { BallsAndSticks, Tubes, SpaceFilling, WireFrame };
+         enum DrawMode { BallsAndSticks, Tubes, SpaceFilling, WireFrame, Plastic };
 
 		 Primitive(QString const& label = QString()) : GLObject(label), 
             m_drawMode(BallsAndSticks), m_scale(1.0), m_inGroup(false) { }
@@ -80,8 +80,7 @@ void setInGroup(bool tf) { m_inGroup = tf; }
          QString m_label;
          int m_index;
          double m_scale;
-
-bool m_inGroup;
+         bool m_inGroup;
    };
 
 

@@ -21,6 +21,7 @@
 ********************************************************************************/
 
 #include "MolecularOrbitals.h"
+#include "QsLog.h"
 #include <QDebug>
 
 
@@ -36,22 +37,26 @@ MolecularOrbitals::MolecularOrbitals(unsigned const nAlpha, unsigned const nBeta
 
 
    m_nOrbitals = m_alphaEnergies.size();
-qDebug() << "Number of alpha electrons :: " << m_nAlpha;
-qDebug() << "Number of beta  electrons :: " << m_nBeta;
-qDebug() << "Number of orbitals        :: " << m_nOrbitals;
-   if (m_nOrbitals == 0) return;
-   m_nBasis    = alphaCoefficients.size()/m_nOrbitals;
-qDebug() << "Number of basis functions :: " << m_nBasis;
-qDebug() << "Alpha MO coefficient size :: " << alphaCoefficients.size();
-qDebug() << "Alpha MO energies    size :: " << alphaEnergies.size();
-qDebug() << "Beta  MO coefficient size :: " << betaCoefficients.size();
-qDebug() << "Beta  MO energies    size :: " << betaEnergies.size();
+   QLOG_DEBUG() << "Number of alpha electrons :: " << m_nAlpha;
+   QLOG_DEBUG() << "Number of beta  electrons :: " << m_nBeta;
+   QLOG_DEBUG() << "Number of orbitals        :: " << m_nOrbitals;
 
+   if (m_nOrbitals == 0) return;
+
+   m_nBasis    = alphaCoefficients.size()/m_nOrbitals;
+   QLOG_DEBUG() << "Number of basis functions :: " << m_nBasis;
+   QLOG_DEBUG() << "Alpha MO coefficient size :: " << alphaCoefficients.size();
+   QLOG_DEBUG() << "Alpha MO energies    size :: " << alphaEnergies.size();
+   QLOG_DEBUG() << "Beta  MO coefficient size :: " << betaCoefficients.size();
+   QLOG_DEBUG() << "Beta  MO energies    size :: " << betaEnergies.size();
 
    if (alphaCoefficients.size() != (int)m_nOrbitals*(int)m_nBasis ||
        betaCoefficients.size()  != (int)m_nOrbitals*(int)m_nBasis) {
-      m_nOrbitals = 0;
-      return;
+       m_nOrbitals = 0;
+       QLOG_WARN() << "Inconsistent MO data" 
+                   << alphaCoefficients.size() << "!=" <<(int)m_nOrbitals*(int)m_nBasis
+                   << betaCoefficients.size()  << "!=" <<(int)m_nOrbitals*(int)m_nBasis;
+       return;
    }
 
    m_alphaCoefficients.resize(m_nOrbitals, m_nBasis);
@@ -77,11 +82,6 @@ qDebug() << "Beta  MO energies    size :: " << betaEnergies.size();
 
 bool MolecularOrbitals::consistent() const
 {
-qDebug() << "MOs: checking consistency";
-qDebug() << "orbitals" << m_nOrbitals;
-qDebug() << "N alpha " << m_nAlpha;
-qDebug() << "N beta  " << m_nBeta;
-
    bool ok(true);
    ok = ok && m_nOrbitals > 0;
    ok = ok && m_nAlpha <= m_nOrbitals;

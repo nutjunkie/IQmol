@@ -78,6 +78,7 @@ void ResetBrowserPreferences()
            << "LogFilePath"
            << "LogFileHidden"
            << "LoggingEnabled"
+           << "SurfaceOpacity"
            // And a few others
            << "MainWindowSize"
            << "QuiWindowSize"
@@ -193,13 +194,30 @@ void LogFilePath(QString const& filePath)
    Set("LogFilePath", QVariant::fromValue(filePath));
 }
 
+// ---------
+
+double SurfaceOpacity()
+{
+   QVariant value(Get("SurfaceOpacity"));
+   return value.isNull() ? 50 : value.value<double>();
+}
+
+void SurfaceOpacity(double const value) 
+{
+   Set("SurfaceOpacity", QVariant::fromValue(value));
+}
 
 // ---------
 
 bool LogFileHidden()
 {
    QVariant value(Get("LogFileHidden"));
+
+#ifdef Q_OS_WIN32
+   return value.isNull() ? false : value.value<bool>();
+#else
    return value.isNull() ? true : value.value<bool>();
+#endif
 }
 
 void LogFileHidden(bool const tf) 
@@ -662,6 +680,18 @@ QVariantList ServerConfigurationList()
 void ServerConfigurationList(QVariantList const& servers)
 {
    SetList("ServerConfigurationList", servers);
+}
+
+
+// ---------
+
+QString ServerQueryJobFinished() {
+   QVariant value(Get("ServerQueryJobFinished"));
+   return value.isNull() ? QString("No tasks are running") : value.value<QString>();
+}
+
+void ServerQueryJobFinished(QString const& repsonse) {
+   Set("ServerQueryJobFinished", QVariant::fromValue(repsonse));
 }
 
 

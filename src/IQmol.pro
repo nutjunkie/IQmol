@@ -24,8 +24,7 @@ SUBDIRS  = Util \
            Configurator \
            Network \
            Yaml \
+           Plot \
            Process \
-
-#win32:SUBDIRS += OpenBabel \
 
 SUBDIRS += Main \

@@ -27,6 +27,47 @@
 namespace IQmol {
 namespace Data {
 
+
+double Frequencies::maxFrequency() const
+{
+   double max(0.0);
+
+   VibrationalModeList::const_iterator iter;
+   for (iter = m_modes.begin(); iter != m_modes.end(); ++iter) {
+       if ((*iter)->frequency() > max) max = (*iter)->frequency();
+   }
+
+   return max; 
+}
+
+
+double Frequencies::maxIntensity() const
+{
+   double max(0.0);
+
+   VibrationalModeList::const_iterator iter;
+   for (iter = m_modes.begin(); iter != m_modes.end(); ++iter) {
+       if ((*iter)->intensity() > max) max = (*iter)->intensity();
+   }
+
+   return max; 
+}
+
+
+double Frequencies::maxRamanIntensity() const
+{
+   double max(0.0);
+
+   VibrationalModeList::const_iterator iter;
+   for (iter = m_modes.begin(); iter != m_modes.end(); ++iter) {
+       if ((*iter)->ramanIntensity() > max) max = (*iter)->ramanIntensity();
+   }
+
+   return max; 
+}
+
+
+
 void Frequencies::setThermochemicalData(double const zpve, double const enthalpy, 
    double const entropy)
 {

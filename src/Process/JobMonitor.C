@@ -26,8 +26,8 @@
 #include "QChemOutputParser.h"
 #include "QueueResources.h"
 #include "QueueResourcesDialog.h"
-#include "Server2.h"
-#include "ServerRegistry2.h"
+#include "Server.h"
+#include "ServerRegistry.h"
 #include "Preferences.h"
 #include "RemoveDirectory.h"
 #include "NetworkException.h"
@@ -324,7 +324,9 @@ bool JobMonitor::getWorkingDirectory(Server* server, QChemJobInfo& qchemJobInfo)
       dirPath = Preferences::LastFileAccessed();
       QFileInfo info(dirPath);
       if (info.isFile()) dirPath = info.path();
+#ifndef Q_OS_WIN32
       dirPath += "/" + qchemJobInfo.get(QChemJobInfo::BaseName);
+#endif
       if (!getLocalWorkingDirectory(dirPath)) return false;
    }else {
       dirPath = qchemJobInfo.get(QChemJobInfo::BaseName);
@@ -394,6 +396,7 @@ bool JobMonitor::getRemoteWorkingDirectory(Server* server, QString& name)
 
 bool JobMonitor::getLocalWorkingDirectory(QString& dirName)
 {
+qDebug() << "JobMonitor::getLocalWorkingDirectory called with DIR" << dirName;
    QDir dir(dirName);
    dir.setFilter(QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs);
 
@@ -651,7 +654,7 @@ void JobMonitor::jobError()
    QString msg("Job ");
    msg += job->jobName() + " failed:\n\n";
    msg += job->message();
-   QMsgBox::warning(QApplication::activeWindow(), "IQmol", msg);
+   QMsgBox::warning(0, "IQmol", msg);
 }
 
 
@@ -665,7 +668,7 @@ void JobMonitor::jobFinished()
       if (job->status() == Job::Error) {
          QString msg(job->jobName() + " failed:\n");
          msg += job->message();
-         QMsgBox::warning(QApplication::activeWindow(), "IQmol", msg);
+         QMsgBox::warning(0, "IQmol", msg);
       }else {
          resultsAvailable(job->jobInfo().get(QChemJobInfo::LocalWorkingDirectory),
                           job->jobInfo().get(QChemJobInfo::BaseName),
@@ -675,10 +678,12 @@ void JobMonitor::jobFinished()
    }else {
       QString msg("Job " + job->jobName() + " finished.\n");
       msg += "Copy results from server?";
-      if (QMsgBox::question(QApplication::activeWindow(), "IQmol", msg,
-         QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+       
+      if (QMsgBox::question(0, "IQmol", msg, QMessageBox::Yes | QMessageBox::No,
+          QMessageBox::Yes) == QMessageBox::Yes) {
          copyResults(job);
       }
+
    }
 }
 

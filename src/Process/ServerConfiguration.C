@@ -176,6 +176,8 @@ ServerConfiguration::ServerConfiguration()
 {
    setDefaults(HTTP);
    setDefaults(Web);
+   //setDefaults(Local);
+   //setDefaults(Basic);
 }
 
 
@@ -344,13 +346,14 @@ qDebug() << "Setting defaults for " << toString(queueSystem);
 
       case Basic: {
          bool local(connection() == Local);
+         if (local) m_configuration.insert(UpdateInterval, 10);
          m_configuration.insert(Submit, System::SubmitCommand(local));
          m_configuration.insert(Query,  System::QueryCommand(local));
          m_configuration.insert(Kill,   System::KillCommand(local));
          m_configuration.insert(QueueInfo,   "(unused)");
          m_configuration.insert(RunFileTemplate, System::TemplateForRunFile(local));
          m_configuration.insert(JobLimit, 1024);
-         m_configuration.insert(JobFileList, "find ${JOB_DIR} -type f");
+         m_configuration.insert(JobFileList, System::JobFileListCommand(local));
       } break;
 
       case PBS: {

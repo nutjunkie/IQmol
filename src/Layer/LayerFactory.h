@@ -28,6 +28,7 @@
 #include "MolecularOrbitalsList.h"
 #include "File.h"
 #include "EfpFragment.h"
+#include "PointCharge.h"
 
 
 namespace IQmol {
@@ -56,6 +57,7 @@ namespace Layer {
          Layer::List convert(Data::GeometryList&);
          Layer::List convert(Data::MolecularOrbitalsList&);
          Layer::List convert(Data::EfpFragmentList&);
+         Layer::List convert(Data::PointChargeList&);
 
          static void destroy();
          explicit Factory(Factory const&) { }

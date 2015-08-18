@@ -120,6 +120,14 @@ namespace Layer {
             s_cameraPosition = position; 
          }
 
+         /// This should be called just before a draw of the whole scene.
+         static void SetCameraDirection(qglviewer::Vec const& direction) 
+         { 
+            s_cameraDirection = direction; 
+         }
+
+
+
       public Q_SLOTS:
          virtual void setReferenceFrame(qglviewer::Frame* frame) { 
             m_frame.setReferenceFrame(frame); 
@@ -149,6 +157,7 @@ namespace Layer {
 
       protected:
          static qglviewer::Vec s_cameraPosition;
+         static qglviewer::Vec s_cameraDirection;
          qglviewer::Frame m_frame;
          double m_alpha;   
          GLuint m_callList;

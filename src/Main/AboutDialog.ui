@@ -178,7 +178,26 @@
         </font>
        </property>
        <property name="text">
-        <string>Copyright © 2014 Andrew Gilbert</string>
+        <string>Copyright ©</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="yearLabel">
+       <property name="text">
+        <string>YEAR</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_4">
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Andrew Gilbert</string>
        </property>
       </widget>
      </item>

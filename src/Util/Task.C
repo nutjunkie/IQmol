@@ -21,6 +21,7 @@
 ********************************************************************************/
 
 #include "Task.h"
+#include "Exception.h"
 
 
 namespace IQmol {
@@ -49,6 +50,7 @@ void Task::setStatus(Status const status)
       case Completed:
       case Terminated:
       case Error:
+      case SigTrap:
         finished();
         break;
    }
@@ -61,10 +63,14 @@ void Task::process()
    setStatus(Running);
    QTime time;
    time.start();
+
    try {
       run();
       m_thread->quit();
       setStatus(Completed);
+   } catch (SignalException& e) {
+      m_thread->quit();
+      setStatus(SigTrap);
    } catch (std::exception& err) {
       m_thread->quit();
       m_info = QString(err.what());

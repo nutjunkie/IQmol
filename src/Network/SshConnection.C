@@ -62,11 +62,6 @@ SshConnection::SshConnection(QString const& hostname, int const port) :
 }
 
 
-SshConnection::~SshConnection()
-{
-   close();
-}
-
 
 void SshConnection::open()
 {
@@ -113,7 +108,6 @@ void SshConnection::close()
 #endif
    }
 
-   killThread();
    m_status = Connection::Closed;
 }
 
@@ -668,6 +662,16 @@ bool SshConnection::blockingExecute(QString const& command, QString* message)
 Reply* SshConnection::execute(QString const& command)
 {
    SshReply* reply(new SshExecute(this, command));
+   thread(reply);
+   return reply;
+}
+
+
+Reply* SshConnection::execute(QString const& command, QString const& workingDirectory)
+{
+   QString cmd("cd ");
+   cmd += workingDirectory + " && " + command;
+   SshReply* reply(new SshExecute(this, cmd));
    thread(reply);
    return reply;
 }

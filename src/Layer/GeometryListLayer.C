@@ -48,6 +48,7 @@ GeometryList::GeometryList(Data::GeometryList const& geometryList, QString const
    Data::GeometryList::const_iterator iter;
    for (iter = m_geometryList.begin(); iter != m_geometryList.end(); ++iter) {
        Data::Geometry* geometry(const_cast<Data::Geometry*>(*iter));
+
        if (geometry) appendRow(new Layer::Geometry(*geometry));
    }
 
@@ -227,9 +228,11 @@ void GeometryList::setReperceiveBonds(bool const tf)
 
 void GeometryList::configure()
 {
-   resetGeometry();
-   m_configurator.reset();
-   m_configurator.display();
+   if (m_geometryList.size() > 1) {
+      resetGeometry();
+      m_configurator.reset();
+      m_configurator.display();
+   }
 }
 
 

@@ -184,6 +184,15 @@ void Job::setEfpParameters(QString const& efpParameters)
 }
 
 
+void Job::setExternalCharges(QString const& charges) 
+{
+   if (charges.isEmpty()) return;
+   ExternalChargesSection* externalCharges(new ExternalChargesSection(charges));
+   addSection(externalCharges);
+   externalCharges->print(!charges.isEmpty());
+}
+
+
 void Job::setMolecule(Molecule* mol) 
 {
    if (m_moleculeSection) m_moleculeSection->setMolecule(mol);

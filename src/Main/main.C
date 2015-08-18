@@ -32,6 +32,7 @@
 
 #include "IQmolApplication.h"
 #include "Preferences.h"
+#include "Exception.h"
 #include "IQmol.h"
 #include <QStringList>
 #include <QDir>
@@ -42,7 +43,103 @@
 #include <windows.h>
 #endif
 
-int main(int argc, char *argv[]) {
+int LogFileDescriptor(-1);
+
+//****************************************************************************
+
+#include <stdio.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+const char* signalText(const int& signal)
+{
+   switch(signal) {
+      case  4:  return "Illegal instruction";       break;
+      case  6:  return "Abort signal";              break;
+      case  8:  return "Floating point exception";  break;
+      case 11:  return "Invalid memory reference";  break;
+      case 13:  return "Broken pipe";               break;
+      default:                                      break;
+         
+   }
+
+   return "Unknown";
+}
+
+
+#ifdef Q_OS_WIN32
+#if 0
+void printStack()
+{
+   unsigned int   i;
+   void         * stack[ 100 ];
+   unsigned short frames;
+   SYMBOL_INFO  * symbol;
+   HANDLE         process;
+
+   process = GetCurrentProcess();
+   SymInitialize( process, NULL, TRUE );
+   frames               = CaptureStackBackTrace( 0, 100, stack, NULL );
+   symbol  = (SYMBOL_INFO*)malloc(sizeof(SYMBOL_INFO + 256*sizeof(char), 1));
+   symbol->MaxNameLen   = 255;
+   symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+
+   for (i = 0; i < frames; i++) {
+       SymFromAddr( process, ( DWORD64 )( stack[ i ] ), 0, symbol );
+       printf( "%i: %s - 0x%0X\n", frames-i-1, symbol->Name, symbol->Address);
+   }
+
+   free( symbol );
+}
+#endif
+
+void signalHandler(int signal) 
+{
+  if (LogFileDescriptor < 0) {
+     fprintf(stderr, "Fatal error encountered: signal %d\n", signal);
+  }else {
+     QLOG_FATAL() << "Fatal error encountered: signal " << signal;
+  }
+
+  if (signal != SIGABRT) throw IQmol::SignalException();
+}
+
+
+
+#else
+
+#include <execinfo.h>
+void signalHandler(int signal) 
+{
+  void   *array[20];
+  size_t size(backtrace(array, 20));
+
+  if (LogFileDescriptor < 0) {
+     fprintf(stderr, "Fatal error encountered: signal %d\n", signal);
+     backtrace_symbols_fd(array, size, STDERR_FILENO);
+  }else {
+     QLOG_FATAL() << "Fatal error encountered: signal " << signal;
+     backtrace_symbols_fd(array, size, LogFileDescriptor);
+     backtrace_symbols_fd(array, size, STDERR_FILENO);
+     QLOG_FATAL() << "Message: " << strsignal(signal);
+  }
+
+  if (signal != SIGABRT) throw IQmol::SignalException();
+}
+#endif
+
+//****************************************************************************
+
+
+int main(int argc, char *argv[]) 
+{
+    // Install our signal handler for all the signals we care about
+    signal( 4, signalHandler);   // Illegal Instruction
+    signal( 8, signalHandler);   // Floating point exception
+    signal(11, signalHandler);   // Invalid memory reference
+    signal(13, signalHandler);   // Broken pipe
+
     IQmol::IQmolApplication iqmol(argc, argv);
     Q_INIT_RESOURCE(IQmol);
 
@@ -63,6 +160,8 @@ int main(int argc, char *argv[]) {
 
        logger.addDestination(fileDestination.get());
        logger.addDestination(debugDestination.get());
+       LogFileDescriptor = fileDestination->handle();
+
 #ifdef Q_OS_WIN32
        if (IQmol::Preferences::LogFileHidden()) {
           int fileHidden(0x2);  // Where is FILE_ATTRIBUTE_HIDDEN defined?
@@ -95,8 +194,17 @@ int main(int argc, char *argv[]) {
     if (args.isEmpty()) args.push_back("");
     iqmol.queueOpenFiles(args);
 
-    int ret(iqmol.exec());
-    QLOG_INFO() << "Return code:" << ret;
-    QLOG_INFO() << "----------- Session Ended -----------";
+    int ret(0);
+
+    try {
+       ret = iqmol.exec();
+       QLOG_INFO() <<  "Return code:" << ret;
+       QLOG_INFO() <<  "----------- Session Ended -----------";
+    } catch (std::exception& e ) {
+       QLOG_FATAL() << e.what();
+       QLOG_FATAL() << "------- EXCEPTION ENCOUNTERED -------";
+       iqmol.exception();
+    }
+
     return ret;
 }

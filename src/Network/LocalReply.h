@@ -50,7 +50,8 @@ namespace Network {
       Q_OBJECT
 
       public:
-         LocalExecute(LocalConnection* connection, QString const& command);
+         LocalExecute(LocalConnection* connection, QString const& command, 
+            QString const& workingDirectory = QString());
          ~LocalExecute();
 
       protected Q_SLOTS:

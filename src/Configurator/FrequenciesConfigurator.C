@@ -23,20 +23,37 @@
 #include "FrequenciesConfigurator.h"
 #include "QVariantPointer.h"
 #include "FrequenciesLayer.h"
+#include "VibrationalMode.h"
 #include "Preferences.h"
 #include "AtomLayer.h"
 #include <QColorDialog>
 #include <QHeaderView>
+#include "QsLog.h"
+#include <cmath>
+
+#include "qcustomplot.h"
 
 
 namespace IQmol {
 namespace Configurator { 
 
-Frequencies::Frequencies(Layer::Frequencies& frequencies) : m_frequencies(frequencies)
+Frequencies::Frequencies(Layer::Frequencies& frequencies) : m_frequencies(frequencies), 
+   m_customPlot(0)
 {
-   m_frequenciesConfigurator.setupUi(this);
+   m_configurator.setupUi(this);
+   if (m_frequencies.haveRaman()) {
+      m_configurator.frequencyTable->setColumnWidth(0,60);
+      m_configurator.frequencyTable->horizontalHeaderItem(0)->setText("Freq. (cm⁻¹)");
+      m_configurator.frequencyTable->horizontalHeaderItem(1)->setText("Intens. (km/mol)");
+      m_configurator.frequencyTable->horizontalHeaderItem(2)->setText("Raman (Å4/amu)");
+   }else {
+      m_configurator.frequencyTable->setColumnCount(2);
+      m_configurator.frequencyTable->horizontalHeaderItem(0)->setText("Frequency (cm⁻¹)");
+      m_configurator.frequencyTable->horizontalHeaderItem(1)->setText("Intensity (km/mol)");
+      m_configurator.ramanCheckbox->hide();
+   }
 
-   m_frequenciesConfigurator.frequencyTable->horizontalHeader()
+   m_configurator.frequencyTable->horizontalHeader()
 #if QT_VERSION >= 0x050000
      ->setSectionResizeMode(QHeaderView::Stretch);
 #else
@@ -46,44 +63,296 @@ Frequencies::Frequencies(Layer::Frequencies& frequencies) : m_frequencies(freque
    connect(this, SIGNAL(update()), &m_frequencies, SIGNAL(update()));
 
    setVectorColor(Preferences::VibrationVectorColor());
+
+   m_customPlot = new QCustomPlot();
+   m_customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+   m_customPlot->axisRect()->setRangeDrag(m_customPlot->xAxis->orientation());
+   m_customPlot->axisRect()->setRangeZoom(m_customPlot->xAxis->orientation());
+   m_customPlot->xAxis->setSelectableParts(QCPAxis::spNone);
+   m_customPlot->xAxis->setLabel("Frequency");
+   m_customPlot->yAxis->setLabel("Intensity");
+
+   QFrame* frame(m_configurator.spectrumFrame);
+   QVBoxLayout* layout(new QVBoxLayout());
+   frame->setLayout(layout);
+   layout->addWidget(m_customPlot);
+
+   m_configurator.widthSlider->setEnabled(false);
+   m_configurator.widthLabel->setEnabled(false);
+
+   m_pen.setColor(Qt::blue);
+   m_pen.setStyle(Qt::SolidLine);
+   m_pen.setWidthF(1);
+
+   m_selectPen.setColor(Qt::red);
+   m_selectPen.setStyle(Qt::SolidLine);
+   m_selectPen.setWidthF(3);
+}
+
+
+Frequencies::~Frequencies()
+{
+   if (m_customPlot) delete m_customPlot;
 }
 
 
 void Frequencies::load()
 {
-   QTableWidget* table(m_frequenciesConfigurator.frequencyTable);
+   QTableWidget* table(m_configurator.frequencyTable);
    QList<Layer::Mode*> modes(m_frequencies.findLayers<Layer::Mode>(Layer::Children));
    table->setRowCount(modes.size());
 
    QTableWidgetItem* frequency;
    QTableWidgetItem* intensity;
-         
+   QTableWidgetItem* raman;
+   
    int row(0);
    QList<Layer::Mode*>::iterator iter;
+   for (iter = modes.begin(); iter != modes.end(); ++iter, ++row) {
 
-   for (iter = modes.begin(); iter != modes.end(); ++iter) {
        frequency = new QTableWidgetItem( (*iter)->text() );
        frequency->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
-
-       intensity = new QTableWidgetItem(QString::number((*iter)->intensity(), 'f', 3));
+       intensity = new QTableWidgetItem(QString::number((*iter)->data().intensity(), 'f', 3));
 
        frequency->setData(Qt::UserRole, QVariantPointer<Layer::Mode>::toQVariant(*iter));
        intensity->setData(Qt::UserRole, QVariantPointer<Layer::Mode>::toQVariant(*iter));
-
        intensity->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
+
        table->setItem(row, 0, frequency);
        table->setItem(row, 1, intensity);
-       ++row;
+
+       if (m_frequencies.haveRaman()) {
+          raman = new QTableWidgetItem(QString::number((*iter)->data().ramanIntensity(), 'f', 3));
+          raman->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
+          table->setItem(row, 2, raman);
+       }
+
+       m_rawIrData.append(qMakePair((*iter)->data().frequency(),
+          (*iter)->data().intensity()));
+       m_rawRamanData.append(qMakePair((*iter)->data().frequency(),
+          (*iter)->data().ramanIntensity()));
+
    }
 
+   m_rawData = m_rawIrData;
+
    table->setCurrentCell(0, 0, QItemSelectionModel::Rows | QItemSelectionModel::ClearAndSelect);
+   on_frequencyTable_itemSelectionChanged();
+   updatePlot();
+}
+
+
+void Frequencies::contextMenuRequest(QPoint pos)
+{
+  QMenu *menu = new QMenu(this);
+  menu->setAttribute(Qt::WA_DeleteOnClose);
+  menu->addAction("Save PNG", this, SLOT(savePNG()));
+  menu->popup(m_customPlot->mapToGlobal(pos));
+}
+
+
+void Frequencies::on_widthSlider_valueChanged(int)
+{
+   updatePlot();
+}
+
+
+void Frequencies::on_ramanCheckbox_clicked(bool tf)
+{
+   m_rawData = tf ? m_rawRamanData : m_rawIrData;
+   updatePlot();
+}
+
+
+void Frequencies::on_scaleFactor_valueChanged(double scale)
+{
+   QTableWidget* table(m_configurator.frequencyTable);
+   for (int mode = 0; mode < m_rawData.size(); ++mode) {
+       table->item(mode, 0)->setText(QString::number(m_rawData[mode].first * scale,'f', 2));
+   }
+   
+   updatePlot();
+}
+
+
+void Frequencies::on_impulseButton_clicked(bool)
+{
+   m_configurator.widthSlider->setEnabled(false);
+   m_configurator.widthLabel->setEnabled(false);
+   updatePlot();
+}
+
+
+void Frequencies::on_gaussianButton_clicked(bool)
+{
+   m_configurator.widthSlider->setEnabled(true);
+   m_configurator.widthLabel->setEnabled(true);
+   updatePlot();
+}
+
+
+void Frequencies::on_lorentzianButton_clicked(bool)
+{
+   m_configurator.widthSlider->setEnabled(true);
+   m_configurator.widthLabel->setEnabled(true);
+   updatePlot();
+}
+
+
+void Frequencies::updatePlot()
+{
+   m_customPlot->clearGraphs();
+   double scale(m_configurator.scaleFactor->value());
+   double width(m_configurator.widthSlider->value());
+
+   if (m_configurator.impulseButton->isChecked()) {
+      plotImpulse(scale);
+      m_customPlot->yAxis->setLabel("Intensity");
+
+   }else if (m_configurator.gaussianButton->isChecked()) {
+      plotSpectrum(Gaussian, scale, width);
+      m_customPlot->yAxis->setLabel("Rel. Intensity");
+
+   }else if (m_configurator.lorentzianButton->isChecked()) {
+      plotSpectrum(Lorentzian, scale, width);
+      m_customPlot->yAxis->setLabel("Rel. Intensity");
+
+   }
+
+   m_customPlot->replot();
+}
+
+
+void Frequencies::plotImpulse(double const scaleFactor)
+{
+   QVector<double> x(1), y(1);
+   double maxIntensity;
+
+   if (m_configurator.ramanCheckbox->isChecked()) {
+      maxIntensity = (m_frequencies.maxRamanIntensity());
+   } else {
+      maxIntensity = (m_frequencies.maxIntensity());
+   }
+
+   for (int mode = 0; mode < m_rawData.size(); ++mode) {
+       x[0] = scaleFactor * m_rawData[mode].first;
+       y[0] = m_rawData[mode].second;
+
+       QCPGraph* graph(m_customPlot->addGraph());
+       graph->setData(x, y);
+       graph->setName(QString::number(mode));
+       graph->setLineStyle(QCPGraph::lsImpulse);
+       graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle));
+       graph->setPen(m_pen);
+       graph->setSelectedPen(m_selectPen);
+       connect(graph, SIGNAL(selectionChanged(bool)), this, SLOT(plotSelectionChanged(bool)));
+   }
+
+   m_customPlot->xAxis->setRange(0, 4000);
+   m_customPlot->yAxis->setRange(-0.00*maxIntensity, 1.05*maxIntensity);
+   m_customPlot->yAxis->setAutoTickStep(true);
+}
+
+
+
+void Frequencies::plotSpectrum(Profile const profile, double const scaleFactor, double const width) 
+{
+//qDebug() << "Plot spectrum called";
+   unsigned const bins(400);
+   unsigned const maxWavenumber(4000);
+   double   const delta(double(maxWavenumber)/bins);
+
+   QVector<double> x(bins), y(bins);
+
+   for (int xi = 0; xi < bins; ++xi) {
+       x[xi] = xi*delta;
+       y[xi] = 0.0;
+   }
+
+   switch (profile) {
+
+      case Gaussian: {
+         double g(20*width);
+         double A(std::sqrt(4.0*std::log(2.0)/(g*M_PI)));
+         double a(-4.0*std::log(2.0)/g);
+         for (int mode = 0; mode < m_rawData.size(); ++mode) {
+             double nu(m_rawData[mode].first);
+             double I(m_rawData[mode].second);
+             for (int xi = 0; xi < bins; ++xi) {
+                 y[xi] += I*A*std::exp(a*(x[xi]-nu)*(x[xi]-nu));
+             }
+         }
+      } break;
+
+      case Lorentzian: {
+         double A(2.0/M_PI);
+         double g(0.5*width);
+         double g2(g*g);
+         for (int mode = 0; mode < m_rawData.size(); ++mode) {
+             double nu(m_rawData[mode].first);
+             double I(m_rawData[mode].second);
+             for (int xi = 0; xi < bins; ++xi) {
+                 y[xi] += I*A*g / (g2+(x[xi]-nu)*(x[xi]-nu));
+             }
+         }
+      } break;
+
+   }
+
+   double maxIntensity(0.0);
+   for (int xi = 0; xi < bins; ++xi) {
+       if (y[xi] > maxIntensity) maxIntensity = y[xi];
+   }
+
+   for (int xi = 0; xi < bins; ++xi) {
+       y[xi] /= maxIntensity;
+   }
+
+   QCPGraph* graph(m_customPlot->addGraph());
+   graph->setData(x, y);
+   graph->setPen(m_pen);
+   graph->setAntialiased(true);
+   graph->setSelectedPen(m_selectPen);
+
+   m_customPlot->xAxis->setRange(0, 3500);
+   m_customPlot->yAxis->setRange(0, 1.00);
+   m_customPlot->yAxis->setAutoTickStep(false);
+   m_customPlot->yAxis->setTickStep(0.2);
+}
+
+
+void Frequencies::plotSelectionChanged(bool tf)
+{
+//qDebug() << "Plot selection changed called";
+   QCPGraph* graph(qobject_cast<QCPGraph*>(sender()));
+   if (!graph) return;
+
+   if (tf) {
+      graph->setPen(m_selectPen);
+      graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc));
+   }else {
+      graph->setPen(m_pen);
+      graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle));
+      return;
+   }
+
+   if (!tf) return;
+   if (!m_configurator.impulseButton->isChecked()) return;
+
+   bool ok;
+   int mode(graph->name().toInt(&ok));
+   if (!ok) return;
+
+   QTableWidget* table(m_configurator.frequencyTable);
+   table->setCurrentCell(mode, 0, QItemSelectionModel::Rows | QItemSelectionModel::ClearAndSelect);
+   table->scrollToItem(table->item(mode,0));
    on_frequencyTable_itemSelectionChanged();
 }
 
 
 void Frequencies::reset()
 {
-   m_frequenciesConfigurator.playButton->setChecked(false);
+   m_configurator.playButton->setChecked(false);
    m_frequencies.setPlay(false);
    on_frequencyTable_itemSelectionChanged();
 }
@@ -97,7 +366,7 @@ void Frequencies::on_playButton_clicked(bool play)
 
 void Frequencies::on_backButton_clicked(bool)
 {
-   QTableWidget* table(m_frequenciesConfigurator.frequencyTable);
+   QTableWidget* table(m_configurator.frequencyTable);
    int currentRow(table->currentRow());
    if (currentRow > 0) {
       table->setCurrentCell(currentRow-1, 0,
@@ -108,7 +377,7 @@ void Frequencies::on_backButton_clicked(bool)
 
 void Frequencies::on_forwardButton_clicked(bool)
 {
-   QTableWidget* table(m_frequenciesConfigurator.frequencyTable);
+   QTableWidget* table(m_configurator.frequencyTable);
    int currentRow(table->currentRow());
    if (currentRow < table->rowCount()-1) {
       table->setCurrentCell(currentRow+1, 0,
@@ -136,7 +405,7 @@ void Frequencies::setVectorColor(QColor const& color)
    if (color.isValid()) {
       QString bg("background-color: ");
       bg += color.name();
-      m_frequenciesConfigurator.colorButton->setStyleSheet(bg);
+      m_configurator.colorButton->setStyleSheet(bg);
       Layer::Atom::setVibrationVectorColor(color);
       Preferences::VibrationVectorColor(color);
       update();
@@ -163,20 +432,37 @@ void Frequencies::on_frequencyTable_itemDoubleClicked(QTableWidgetItem* item)
    if (mode) {
       m_frequencies.setActiveMode(*mode);
       m_frequencies.setPlay(true);
-      m_frequenciesConfigurator.playButton->setChecked(true);
+      m_configurator.playButton->setChecked(true);
    }
 }
 
 
 void Frequencies::on_frequencyTable_itemSelectionChanged()
 {
-   QList<QTableWidgetItem*> selection = m_frequenciesConfigurator.frequencyTable->selectedItems();
+   QList<QTableWidgetItem*> selection = m_configurator.frequencyTable->selectedItems();
    if (selection.isEmpty()) return;
    Layer::Mode* mode = QVariantPointer<Layer::Mode>::toPointer(
        selection.first()->data(Qt::UserRole));
    if (mode) {
       m_frequencies.setActiveMode(*mode);
       m_frequencies.setPlay();
+   }
+
+   if (!m_configurator.impulseButton->isChecked()) return;
+
+   int index(selection.first()->row());
+   QCPGraph* graph(m_customPlot->graph(index));
+   if (graph && graph->selected()) return;
+
+   QList<QCPGraph*> selectedGraphs(m_customPlot->selectedGraphs());
+   QList<QCPGraph*>::iterator iter;
+   for (iter = selectedGraphs.begin(); iter != selectedGraphs.end(); ++iter) {
+       (*iter)->setSelected(false);
+   }
+
+   if (graph) {
+       graph->setSelected(true);
+       m_customPlot->replot();
    }
 }
 

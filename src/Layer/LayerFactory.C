@@ -24,6 +24,8 @@
 #include "Data.h"
 #include "Bank.h"
 #include "Mesh.h"
+#include "PointCharge.h"
+#include "ExcitedStates.h"
 
 #include "Surface.h"
 #include "CubeData.h"
@@ -32,6 +34,7 @@
 
 #include "AtomLayer.h"
 #include "BondLayer.h"
+#include "ChargeLayer.h"
 #include "FileLayer.h"
 #include "CubeDataLayer.h"
 #include "DipoleLayer.h"
@@ -40,6 +43,7 @@
 #include "EfpFragmentListLayer.h"
 #include "EfpFragmentLayer.h"
 #include "FrequenciesLayer.h"
+#include "ExcitedStatesLayer.h"
 #include "MolecularOrbitalsLayer.h"
 #include "QsLog.h"
 #include "openbabel/mol.h"
@@ -97,6 +101,11 @@ Layer::List Factory::toLayers(Data::Base& data)
             layers << convert(geometry);
          } break;
 
+         case Data::Type::PointChargeList: {
+            Data::PointChargeList&  charges(dynamic_cast<Data::PointChargeList&>(data));
+            layers << convert(charges);
+         } break;
+
          case Data::Type::MolecularOrbitalsList: {
             Data::MolecularOrbitalsList& list(dynamic_cast<Data::MolecularOrbitalsList&>(data));
             layers << convert(list);
@@ -106,6 +115,12 @@ Layer::List Factory::toLayers(Data::Base& data)
             Data::MolecularOrbitals& 
                molecularOrbitals(dynamic_cast<Data::MolecularOrbitals&>(data));
             layers.append(new MolecularOrbitals(molecularOrbitals));
+         } break;
+
+         case Data::Type::ExcitedStates: {
+            Data::ExcitedStates& 
+               states(dynamic_cast<Data::ExcitedStates&>(data));
+            layers.append(new ExcitedStates(states));
          } break;
 
          case Data::Type::Frequencies: {
@@ -231,6 +246,38 @@ List Factory::convert(Data::Geometry& geometry)
 }
 
 
+List Factory::convert(Data::GeometryList& geometryList)
+{
+   List list;
+   unsigned nGeometries(geometryList.size());
+
+   if (nGeometries > 0) {
+      list <<  convert(*(geometryList.first()));  // Atom and Bond lists
+      list.append(new GeometryList(geometryList));
+   }
+
+   return list;
+}
+
+
+List Factory::convert(Data::PointChargeList& pointCharges)
+{
+   Charges* charges(new Charges());
+   unsigned nCharges(pointCharges.size());
+   
+   for (unsigned i = 0; i < nCharges; ++i) {
+       double q(pointCharges[i]->value());
+       qglviewer::Vec position(pointCharges[i]->position());
+       Charge* charge(new Charge(q,position));
+       charges->appendLayer(charge);
+   }
+
+   List list;
+   list.append(charges);
+   return list;
+}
+
+
 List Factory::convert(Data::MolecularOrbitalsList& molecularOrbitalsList)
 {
    List list;
@@ -248,23 +295,6 @@ List Factory::convert(Data::MolecularOrbitalsList& molecularOrbitalsList)
       for (iter = molecularOrbitalsList.begin(); iter != molecularOrbitalsList.end(); ++iter) {
           base->appendLayer(new MolecularOrbitals(**iter));
       }
-   }
-
-   return list;
-}
-
-
-List Factory::convert(Data::GeometryList& geometryList)
-{
-   List list;
-   unsigned nGeometries(geometryList.size());
-
-   if (nGeometries > 0) {
-      list <<  convert(*(geometryList.first()));  // Atom and Bond lists
-   }
-
-   if (nGeometries > 1) {
-      list.append(new GeometryList(geometryList));
    }
 
    return list;

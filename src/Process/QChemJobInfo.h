@@ -41,10 +41,10 @@ namespace Process2 {
          /// RunFileName    - the name of the submission script
          /// Note that not all these are serialized
          enum Field { BaseName, InputFileName, OutputFileName, AuxFileName, 
-            EspFileName, MoFileName, DensityFileName, ErrorFileName,
+            EspFileName, MoFileName, DensityFileName, ErrorFileName, BatchFileName,
             RunFileName, ServerName, LocalWorkingDirectory, RemoteWorkingDirectory, 
             InputString, Charge, Multiplicity, Coordinates, Constraints, ScanCoordinates,
-            EfpFragments, EfpParameters,
+            EfpFragments, EfpParameters, ExternalCharges,
             Queue, Walltime, Memory, Scratch, Ncpus };
             
          QChemJobInfo() : m_charge(0), m_multiplicity(1), m_localFilesExist(false),

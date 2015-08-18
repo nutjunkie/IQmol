@@ -36,6 +36,7 @@
 #include "Snapshot.h"
 #include "IQmol.h"
 #include "QGLViewer/qglviewer.h"
+#include "QGLViewer/manipulatedFrame.h"
 #include <QFontMetrics>
 #include <QStandardItemModel>
 #include <QItemSelectionModel>
@@ -52,6 +53,8 @@ namespace qglviewer {
 namespace IQmol {
 
    class ViewerModel;
+   class ShaderDialog;
+   class ShaderLibrary;
 
    /// An OpenGL widget based that forms the main display of IQmol.
    class Viewer : public QGLViewer {
@@ -72,14 +75,17 @@ namespace IQmol {
          enum Mode { Manipulate, Select, ManipulateSelection, ReindexAtoms,
             BuildAtom, BuildFunctionalGroup, BuildEfp, BuildMolecule };
 
-         Viewer(ViewerModel& model, QWidget* parent);
+         Viewer(QGLContext* context, ViewerModel& model, QWidget* parent);
+         ~Viewer();
+
          void init();
          void initShaders();
 
 		 // Returns the number of hits for the last select() action.  Note this
 		 // is not necessarily the same as the size of m_selectedObjects
-         int selectionHits() const { return m_selectionHits; }
+         int  selectionHits() const { return m_selectionHits; }
          void setSelectionHighlighting(bool const tf) { m_selectionHighlighting = tf; }
+         void editShaders();
 
       Q_SIGNALS:
          void activeViewerModeChanged(Viewer::Mode const);
@@ -128,7 +134,6 @@ namespace IQmol {
          void setCursor(Cursors::Type const type) { QWidget::setCursor(m_cursors.get(type)); }
          qglviewer::Vec worldCoordinatesOf(QMouseEvent* e, 
             qglviewer::Vec const& hint = qglviewer::Vec(0.0, 0.0, 0.0));
-
 
       private:
          static const Qt::Key s_buildKey;
@@ -208,6 +213,10 @@ namespace IQmol {
          Snapshot* m_snapper;
          bool m_blockUpdate;
          bool m_shadersInit;
+
+         QGLContext*    m_glContext;
+         ShaderLibrary* m_shaderLibrary;
+         ShaderDialog*  m_shaderDialog;
    };
 
 

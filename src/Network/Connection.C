@@ -22,6 +22,7 @@
 
 #include "Connection.h"
 #include "Reply.h"
+#include <QDebug>
 
 
 namespace IQmol {
@@ -36,11 +37,21 @@ void Connection::thread(Reply* reply)
 }
 
 
+Connection::~Connection()
+{
+   killThread();
+}
+
+
 void Connection::killThread()
 {
    if (m_thread.isRunning()) {
-      m_thread.quit();
+      //m_thread.quit();
+      qDebug() << "Terminating thread for connection" << m_hostname;
+      m_thread.terminate();
+      qDebug() << "Waiting...";
       m_thread.wait();
+      qDebug() << "...thread killed";
    }
 }
 

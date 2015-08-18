@@ -15,6 +15,7 @@ LIBS += $$BUILD_DIR/libQui.a \
         $$BUILD_DIR/libProcess.a \
         $$BUILD_DIR/libNetwork.a \
         $$BUILD_DIR/libYaml.a \
+        $$BUILD_DIR/libPlot.a \
         $$BUILD_DIR/libUtil.a
 
 include(../common.pri)

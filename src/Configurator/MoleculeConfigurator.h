@@ -56,6 +56,7 @@ namespace Configurator {
          void on_tubes_clicked(bool);
          void on_spaceFilling_clicked(bool);
          void on_wireFrame_clicked(bool);
+         void on_plastic_clicked(bool);
          void on_smallerHydrogens_clicked(bool);
          void on_atomRadiusScale_valueChanged(int);
          void on_bondRadiusScale_valueChanged(int);

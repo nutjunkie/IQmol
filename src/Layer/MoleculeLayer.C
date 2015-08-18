@@ -22,7 +22,6 @@
 
 #include "QsLog.h"
 #include "QMsgBox.h"
-#include "JobInfo.h"   // deprecate
 #include "QChemJobInfo.h" 
 #include "AtomLayer.h"
 #include "BondLayer.h"
@@ -98,7 +97,6 @@ Molecule::Molecule(QObject* parent) : Base(DefaultMoleculeName, parent),
    m_reperceiveBondsForAnimation(false),
    m_configurator(*this), 
    m_surfaceAnimator(this), 
-   m_jobInfo(0),   //deprecate
    m_info(this), 
    m_atomList(this, "Atoms"), 
    m_bondList(this, "Bonds"), 
@@ -113,6 +111,9 @@ Molecule::Molecule(QObject* parent) : Base(DefaultMoleculeName, parent),
 {
    setFlags(Qt::ItemIsSelectable | Qt::ItemIsDropEnabled | 
       Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
+
+   m_chargesList.setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+   m_chargesList.setCheckState(Qt::Checked);
 
    setCheckState(Qt::Checked);
    setConfigurator(&m_configurator);
@@ -139,9 +140,9 @@ Molecule::Molecule(QObject* parent) : Base(DefaultMoleculeName, parent),
 
    connect(newAction("Remove"), SIGNAL(triggered()), 
       this, SLOT(removeMolecule()));
-#warning "################################";
-#warning "# !!! TURN OFF FOR RELEASE !!! #";
-#warning "################################";
+//#warning "################################";
+//#warning "# !!! TURN OFF FOR RELEASE !!! #";
+//#warning "################################";
 //   connect(newAction("Dump Data"), SIGNAL(triggered()), 
 //      this, SLOT(dumpData()));
 
@@ -196,10 +197,11 @@ void Molecule::appendData(Layer::List& list)
    }
 
    Layer::List::iterator iter;
+   Files*    files(0);
+   Atoms*    atoms(0);
+   Bonds*    bonds(0);
+   Charges*  charges(0);
    CubeData* cubeData(0);
-   Files* files(0);
-   Atoms* atoms(0);
-   Bonds* bonds(0);
    EfpFragments* efpFragments(0);
    QString text;
    PrimitiveList primitiveList;
@@ -235,6 +237,13 @@ void Molecule::appendData(Layer::List& list)
              for (bond = bondList.begin(); bond != bondList.end(); ++bond) {
                  bonds->removeLayer(*bond);
                  primitiveList.append(*bond);
+             }
+          }else if ((charges = qobject_cast<Charges*>(*iter))) {
+             ChargeList chargeList(charges->findLayers<Charge>(Children));
+             ChargeList::iterator charge;
+             for (charge = chargeList.begin(); charge != chargeList.end(); ++charge) {
+                 charges->removeLayer(*charge);
+                 primitiveList.append(*charge);
              }
           }else if ((efpFragments = qobject_cast<EfpFragments*>(*iter))) {
              QList<EfpFragment*> efps(efpFragments->findLayers<EfpFragment>(Children));
@@ -696,6 +705,22 @@ QString Molecule::efpParametersAsString()
    }
 
    return EfpFragment::efpParamsSection(names);
+}
+
+
+QString Molecule::externalChargesAsString()
+{
+   ChargeList charges(m_chargesList.findLayers<Charge>(Visible|Children));
+   if (charges.isEmpty()) return QString();
+
+   QString s;
+
+   ChargeList::iterator iter;
+   for (iter = charges.begin(); iter != charges.end(); ++iter) {
+       s += (*iter)->toString() + "\n"; 
+   }
+
+   return s;
 }
 
 
@@ -1473,51 +1498,6 @@ Charge* Molecule::createCharge(double const Q, Vec const& position)
 }
 
 
-// deprecate
-bool Molecule::jobInfoMatch(JobInfo const* jobInfo) 
-{ 
-   return jobInfo == m_jobInfo; 
-}
-
-
-// deprecate
-JobInfo* Molecule::jobInfo()
-{
-   if (m_jobInfo) disconnect(m_jobInfo, SIGNAL(updated()), this, SLOT(jobInfoChanged()));
-   // This is sloppy.  We create a JobInfo object here, but don't delete it in
-   // the dtor as we may have passed the JobInfo on to a Process or Server.
-   m_jobInfo = new JobInfo();
-
-   m_jobInfo->set(JobInfo::Charge, totalCharge());
-   m_jobInfo->set(JobInfo::Multiplicity, multiplicity());
-   m_jobInfo->set(JobInfo::Coordinates, coordinatesAsString());
-   m_jobInfo->set(JobInfo::Constraints, constraintsAsString());
-   m_jobInfo->set(JobInfo::ScanCoordinates, scanCoordinatesAsString());
-   m_jobInfo->set(JobInfo::EfpFragments, efpFragmentsAsString());
-   m_jobInfo->set(JobInfo::EfpParameters, efpParametersAsString());
-
-   AtomList atomList(findLayers<Atom>(Children | Visible));
-   if (atomList.isEmpty()) {
-      m_jobInfo->setEfpOnlyJob(true);
-   }
-
-   QString name;
-
-   if (m_inputFile.filePath().isEmpty()) {
-      QFileInfo fileInfo(Preferences::LastFileAccessed());
-      m_jobInfo->set(JobInfo::LocalWorkingDirectory, fileInfo.path());
-      m_jobInfo->set(JobInfo::BaseName, text());
-   }else {
-      m_jobInfo->set(JobInfo::LocalWorkingDirectory, m_inputFile.path());
-      m_jobInfo->set(JobInfo::BaseName, m_inputFile.completeBaseName());
-      name =  + "/" + m_inputFile.completeBaseName() + ".inp";
-   }
-
-   connect(m_jobInfo, SIGNAL(updated()), this, SLOT(jobInfoChanged()));
-   return m_jobInfo;
-}
-
-
 Process2::QChemJobInfo Molecule::qchemJobInfo()
 {
    Process2::QChemJobInfo jobInfo;
@@ -1529,6 +1509,7 @@ Process2::QChemJobInfo Molecule::qchemJobInfo()
    jobInfo.set(Process2::QChemJobInfo::ScanCoordinates, scanCoordinatesAsString());
    jobInfo.set(Process2::QChemJobInfo::EfpFragments,    efpFragmentsAsString());
    jobInfo.set(Process2::QChemJobInfo::EfpParameters,   efpParametersAsString());
+   jobInfo.set(Process2::QChemJobInfo::ExternalCharges, externalChargesAsString());
 
    AtomList atomList(findLayers<Atom>(Children | Visible));
    if (atomList.isEmpty()) jobInfo.setEfpOnlyJob(true);
@@ -1550,21 +1531,13 @@ Process2::QChemJobInfo Molecule::qchemJobInfo()
 }
 
 
-void Molecule::jobInfoChanged()
-{ 
-   if (m_jobInfo) {
-      setText(m_jobInfo->get(JobInfo::BaseName)); 
-      m_info.setCharge(m_jobInfo->getCharge());
-      m_info.setMultiplicity(m_jobInfo->getMultiplicity());
-   }
-}
-
-
 void Molecule::qchemJobInfoChanged(Process2::QChemJobInfo const& qchemJobInfo)
 { 
-   setText(qchemJobInfo.get(Process2::QChemJobInfo::BaseName)); 
-   m_info.setCharge(qchemJobInfo.getCharge());
-   m_info.setMultiplicity(qchemJobInfo.getMultiplicity());
+   if (text() == DefaultMoleculeName) {
+      setText(qchemJobInfo.get(Process2::QChemJobInfo::BaseName)); 
+      m_info.setCharge(qchemJobInfo.getCharge());
+      m_info.setMultiplicity(qchemJobInfo.getMultiplicity());
+   }
 }
 
 

@@ -21,6 +21,7 @@
 ********************************************************************************/
 
 #include "ShaderLibrary.h"
+#include "ShaderDialog.h"
 #include "Viewer.h"
 #include "ViewerModel.h"
 #include "IQmol.h"
@@ -43,7 +44,8 @@ using namespace qglviewer;
 
 namespace IQmol {
 
-Vec Layer::GLObject::s_cameraPosition = Vec(0.0, 0.0, 0.0);
+Vec Layer::GLObject::s_cameraPosition  = Vec(0.0, 0.0, 0.0);
+Vec Layer::GLObject::s_cameraDirection = Vec(0.0, 0.0, 1.0);
 
 const Qt::Key Viewer::s_buildKey(Qt::Key_Alt);
 const Qt::Key Viewer::s_selectKey(Qt::Key_Shift);
@@ -57,8 +59,8 @@ QFontMetrics Viewer::s_labelFontMetrics(Viewer::s_labelFont);
 
 
 //! Window set up is done here
-Viewer::Viewer(ViewerModel& model, QWidget* parent) : 
-   QGLViewer(QGLFormat(QGL::SampleBuffers), parent), 
+Viewer::Viewer(QGLContext* context, ViewerModel& model, QWidget* parent) : 
+   QGLViewer(context, parent), 
    m_viewerModel(model), 
    m_selectionHighlighting(true),
    m_labelType(Layer::Atom::None),
@@ -72,7 +74,9 @@ Viewer::Viewer(ViewerModel& model, QWidget* parent) :
    m_manipulateSelectionHandler(this),
    m_snapper(0),
    m_blockUpdate(false),
-   m_shadersInit(false)
+   m_glContext(context),
+   m_shaderDialog(0),
+   m_shaderLibrary(0)
 { 
    // Disable the default keybindings, the menu handles those we want
    setShortcut(DRAW_AXIS, 0);
@@ -98,6 +102,13 @@ Viewer::Viewer(ViewerModel& model, QWidget* parent) :
 }
 
 
+Viewer::~Viewer()
+{
+   if (m_shaderDialog) delete m_shaderDialog;
+   if (m_shaderLibrary) delete m_shaderLibrary;
+}
+
+
 //! The OpenGL context is not available in the constructor, so all GL setup
 //! must be done here.
 void Viewer::init()
@@ -113,13 +124,8 @@ void Viewer::init()
    setForegroundColor(Preferences::ForegroundColor());
    setBackgroundColor(Preferences::BackgroundColor());
 
-   if (0) {
-      glDisable(GL_LIGHT0);
-      glEnable(GL_LIGHT1);
-   }else {
-      glEnable(GL_LIGHT0);
-      glDisable(GL_LIGHT1);
-   }
+   glEnable(GL_LIGHT0);
+   glDisable(GL_LIGHT1);
 
    //setFPSIsDisplayed(true);
 
@@ -141,64 +147,73 @@ void Viewer::init()
 
 void Viewer::initShaders()
 {
-   ShaderLibrary& library(ShaderLibrary::instance());
-   if (!library.shadersInitialized()) library.loadAllShaders();
+   makeCurrent();
+   m_shaderLibrary = new ShaderLibrary(m_glContext);
+
    if (QGLFramebufferObject::hasOpenGLFramebufferObjects()) {
       QLOG_INFO() << "OpenGL framebuffers are active";
-      library.setFiltersAvailable(true);
+      m_shaderLibrary->setFiltersAvailable(true);
    }else {
       QLOG_INFO() << "OpenGL framebuffers are unavailable";
-      library.setFiltersAvailable(false);
+      m_shaderLibrary->setFiltersAvailable(false);
    }
-   m_shadersInit = true;
 }
+
+
+void Viewer::editShaders()
+{
+   if (!m_shaderLibrary) return;
+
+   if (!m_shaderDialog) {
+      m_shaderDialog = new ShaderDialog(*m_shaderLibrary, this);
+      connect(m_shaderDialog, SIGNAL(updated()), this, SLOT(updateGL()));
+   }
+   m_shaderDialog->show();
+}
+
 
 
 void Viewer::resizeGL(int width, int height)
 {
    QGLViewer::resizeGL(width, height);
+   if (!m_shaderLibrary) return;
 
    GLdouble m[16]; 
    camera()->getProjectionMatrix(m);
-
-   if (m_shadersInit) {
-      ShaderLibrary& library(ShaderLibrary::instance());
-      library.resizeScreenBuffers(QSize(width, height), m);
-   }
+   m_shaderLibrary->resizeScreenBuffers(QSize(width, height), m);
 }
 
 
 void Viewer::draw()
 {
-   if (m_blockUpdate || !m_shadersInit) return;
+   if (m_blockUpdate || !m_shaderLibrary) return;
 
    m_objects = m_viewerModel.getVisibleObjects();
    m_selectedObjects = m_viewerModel.getSelectedObjects();
-   ShaderLibrary& library(ShaderLibrary::instance());
 
-   if (!library.filtersActive() || animationIsStarted()) return fastDraw();
+   if (!m_shaderLibrary->filtersActive() || animationIsStarted()) return fastDraw();
    qDebug() << "Filters are on in drawNew";
 
    makeCurrent();
-   Vec cameraPosition(camera()->position());
-   Layer::GLObject::SetCameraPosition(cameraPosition);
+   Layer::GLObject::SetCameraPosition(camera()->position());
+   Layer::GLObject::SetCameraDirection(camera()->viewDirection());
 
-   QString shader(library.currentShader());
+   QString shader(m_shaderLibrary->currentShader());
 
    glShadeModel(GL_SMOOTH);
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  
 
    // Generate normal and filter maps
-   library.bindNormalMap(camera()->zNear(), camera()->zFar());
+   m_shaderLibrary->bindNormalMap(camera()->zNear(), camera()->zFar());
    drawObjects(m_objects);
-   library.releaseNormalMap();
-   library.generateFilters();
+   m_shaderLibrary->releaseNormalMap();
+   m_shaderLibrary->generateFilters();
 
    // Redraw everything to get the transparency right
    // library.clearBuffers();
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-   library.bindShader(shader);
-   library.bindTextures(shader);
+   m_shaderLibrary->bindShader(shader);
+   m_shaderLibrary->bindTextures(shader);
 
    drawGlobals();
    drawObjects(m_objects);
@@ -206,9 +221,9 @@ void Viewer::draw()
    drawObjects(m_currentBuildHandler->buildObjects());
 
     // Suspend the shader for text rendering
-   library.suspend();
-   library.releaseTextures();
-   library.clearFrameBuffers();
+   m_shaderLibrary->suspend();
+   m_shaderLibrary->releaseTextures();
+   m_shaderLibrary->clearFrameBuffers();
 
    if (m_labelType != Layer::Atom::None) drawLabels(m_objects);
    if (m_currentHandler->selectionMode() != Handler::None) {
@@ -233,7 +248,6 @@ void Viewer::fastDraw()
 {
    if (m_blockUpdate) return;
 
-//qDebug() << "Fast draw called";
    makeCurrent();
    Layer::GLObject::SetCameraPosition(camera()->position());
 
@@ -242,14 +256,13 @@ void Viewer::fastDraw()
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-   ShaderLibrary& library(ShaderLibrary::instance());
-   library.resume();
+   m_shaderLibrary->resume();
    drawGlobals();
    drawObjects(m_objects);
    drawObjects(m_currentBuildHandler->buildObjects());
 
    // suspend the shader for writing text and highlighting
-   library.suspend();
+   m_shaderLibrary->suspend();
    drawSelected(m_selectedObjects);
 
    if (m_labelType != Layer::Atom::None) drawLabels(m_objects);

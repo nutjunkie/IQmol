@@ -35,9 +35,18 @@ namespace Data {
       public:
          Type::ID typeID() const { return Type::Frequencies; }
 
+         Frequencies() : m_zpve(0.0), m_entropy(0.0), m_enthalpy(0.0), m_haveRaman(false) { }
+
          void append(VibrationalMode* mode) { m_modes.append(mode); }
          void setThermochemicalData(double const zpve, double const enthalpy, 
             double const entropy);
+
+         void haveRaman(bool tf) { m_haveRaman = tf; }
+         bool haveRaman() const { return m_haveRaman; }
+
+         double maxFrequency() const;
+         double maxIntensity() const;
+         double maxRamanIntensity() const;
 
          void dump() const;
          VibrationalModeList const& modes() const { return m_modes; }
@@ -56,12 +65,14 @@ namespace Data {
             ar & m_zpve;
             ar & m_entropy;
             ar & m_enthalpy;
+            ar & m_haveRaman;
             ar & m_modes;
          }
 
          double m_zpve;
          double m_entropy;
          double m_enthalpy;
+         bool   m_haveRaman; 
          VibrationalModeList m_modes;
    };
 

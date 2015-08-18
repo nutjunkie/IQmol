@@ -28,6 +28,7 @@
 #include "Constants.h"
 #include "Hessian.h"
 #include "Energy.h"
+#include "QsLog.h"
 #include <QtDebug>
 #include <cmath>
 
@@ -147,7 +148,6 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       }else if (key == "Alpha Orbital Energies") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
-qDebug() << "Reading in alpha energies" << n;
          moData.alphaEnergies = readDoubleArray(textStream, n);
          moData.betaEnergies  = moData.alphaEnergies;
 
@@ -165,7 +165,6 @@ qDebug() << "Reading in alpha energies" << n;
          dipole.setValue(data[0],data[1],data[2]);
 
       }else if (key == "Cartesian Force Constants") {
-qDebug() << "Reading Hessian information";
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok || !geometry) goto error;
          QList<double> data(readDoubleArray(textStream, n));
@@ -253,11 +252,18 @@ bool FormattedCheckpoint::dataAreConsistent(ShellData const& shellData, unsigned
        nPrimitives += shellData.shellPrimitives[i];
    }
 
-   if (shellData.shellToAtom.size()               != nShells     ||
-       shellData.shellPrimitives.size()           != nShells     ||
-       shellData.exponents.size()                 != nPrimitives ||
-       shellData.contractionCoefficients.size()   != nPrimitives ||
-       shellData.contractionCoefficientsSP.size() != nPrimitives  ) {
+   if ( shellData.shellToAtom.size()               != nShells     ||
+        shellData.shellPrimitives.size()           != nShells     ||
+        shellData.exponents.size()                 != nPrimitives ||
+        shellData.contractionCoefficients.size()   != nPrimitives ||
+       (shellData.contractionCoefficientsSP.size() != nPrimitives &&
+        shellData.contractionCoefficientsSP.size() != 0)      ) {
+       QLOG_WARN() << "Inconsistent checkpoint data:";
+       QLOG_WARN() << "  Shells" << shellData.shellToAtom.size()               << nShells;
+       QLOG_WARN() << "  Prims " << shellData.shellPrimitives.size()           << nShells;
+       QLOG_WARN() << "  Expts " << shellData.exponents.size()                 << nPrimitives;
+       QLOG_WARN() << "  CCs   " << shellData.contractionCoefficients.size()   << nPrimitives;
+       QLOG_WARN() << "  SP CCs" << shellData.contractionCoefficientsSP.size() << nPrimitives;
        m_errors.append("Inconsistent shell data read from file");
        return false;
    }
@@ -350,6 +356,12 @@ Data::ShellList* FormattedCheckpoint::makeShellList(ShellData const& shellData,
           case 3:
              shellList->append( new Data::Shell(Data::Shell::F10, position, expts, coefs) );
              break;
+          case -4:
+             shellList->append( new Data::Shell(Data::Shell::G9, position, expts, coefs) );
+             break;
+          case 4:
+             shellList->append( new Data::Shell(Data::Shell::G15, position, expts, coefs) );
+             break;
 
           default:
              delete shellList;
@@ -359,6 +371,7 @@ Data::ShellList* FormattedCheckpoint::makeShellList(ShellData const& shellData,
              m_errors.append(msg);
              return 0;
              break;
+
        }
    }
 

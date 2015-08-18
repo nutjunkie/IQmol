@@ -16,7 +16,8 @@
 
 namespace Qui {
 
-void ExternalChargesSection::processData() {
+void ExternalChargesSection::processData() 
+{
    int numberOfCharges = m_data.count(QRegExp("\\n"));
 
    // This is a hack switch to undo the charge truncation

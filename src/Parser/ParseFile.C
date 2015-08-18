@@ -155,12 +155,17 @@ qDebug() << "About to parse file" << filePath;
    QString extension(fileInfo.suffix().toLower());
    Base* parser(0);
 
-   if (extension == "run" || extension == "err") {
+   if (extension == "run" || extension == "err" || extension == "bat") {
       return false;
    }
 
    if (extension == "xyz") {
-      QLOG_INFO() << "Using Xyz parser";
+      QLOG_INFO() << "Using XYZ parser";
+      parser = new Xyz;
+   }
+
+   if (extension == "txt") {
+      QLOG_INFO() << "Using XYZ parser";
       parser = new Xyz;
    }
 

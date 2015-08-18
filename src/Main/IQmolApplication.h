@@ -23,11 +23,13 @@
 ********************************************************************************/
 
 #include <QApplication>
+#include <QMessageBox>
 #include <QEvent>
 
 
 class QStringList;
 class QSplashScreen;
+
 
 namespace IQmol {
 
@@ -38,20 +40,24 @@ namespace IQmol {
 
       public:
          IQmolApplication(int &argc, char** argv);
+         ~IQmolApplication();
          void queueOpenFiles(QStringList const& files);
          void showSplash();
          void hideSplash();
+
+         void exception();
 
       protected:
          bool event(QEvent*);
 
       private Q_SLOTS:
          void open(QString const& file);
-         void maybeQuit();
+         void quitRequest();
 
       private:
          void initOpenBabel();
          QSplashScreen* m_splashScreen;
+         QMessageBox    m_unhandledException;
    };
 
 

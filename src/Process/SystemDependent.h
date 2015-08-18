@@ -67,6 +67,10 @@ namespace System {
    /// or a basic remote linux server.
    QString KillCommand(bool const local = true);
 
+   /// Returns the command used to kill a process either on the local machine
+   /// or a basic remote linux server.
+   QString JobFileListCommand(bool const local = true);
+
    QString ExecutableName(bool const local = true);
 
    /// Returns the command used to submit a process either on the local machine

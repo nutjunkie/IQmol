@@ -81,9 +81,8 @@ QString QueryCommand(bool const local)
       QFileInfo tasklist("/Windows/System32/tasklist.exe");
       if (tasklist.exists()) {
          QString spid("\"PID eq ${JOB_ID}\"");
-         //QString sname("\"IMAGENAME eq ${EXE_NAME}\"");
          QStringList args;
-         args << "/v" << "/fo list" << "/fi " + spid << "/fi ";
+         args << "/v" << "/fo list" << "/fi " + spid;
          cmd = tasklist.filePath() + " " + args.join(" ");
       }else {
          return QString("Error: tasklist.exe not found");
@@ -120,21 +119,93 @@ QString SubmitCommand(bool const local)
    QString cmd("./${JOB_NAME}.run");
    if (local) {
 #ifdef Q_OS_WIN32
-      cmd = "${QC}/qcenv_s.bat ${JOB_NAME}.inp ${JOB_NAME}.out";
+      cmd = "${JOB_DIR}/${JOB_NAME}.bat";
 #endif
    }
    return cmd;
 }
 
 
+QString JobFileListCommand(bool const local)
+{
+   QString cmd("find ${JOB_DIR} -type f");
+   if (local) {
+      cmd = "(unused)";
+   }
+   return cmd;
+}
+
+
+
+
 QString TemplateForRunFile(bool const local)
 {
-   QString cmd("#! /bin/csh\nsource ~/.cshrc\nqchem ${JOB_NAME}.inp ${JOB_NAME}.out &");
-   if (local) {
+   QString cmd;
+   cmd = "#! /bin/csh\n"
+         "# --- Q-Chem environment variable setup\n"
+         "# The following variables MUST be set with correct values.\n"
+         "# QC:\n"
+         "#     Q-Chem top directory.  It should contain the following\n"
+         "#     files/directories after initial installation:\n"
+         "#     exe, qcaux, qcref, samples, qcenv.bat, qc.bat, readme.txt\n"
+         "# QCSCRATCH:\n"
+         "#     the full path of the directory for scratch files.\n"
+         "#\n"
+         "#     The QC, QCSCRATCH and QCAUX variables provided below are\n"
+         "#     examples, you should set your own values.\n"
+         "#     Do NOT use double quote in setting these variables.\n"
+         "\n"
+         "setenv QC        /usr/local/qchem\n"
+         "setenv QCSCRATCH /scratch\n"
+         "setenv QCAUX     $QC/aux\n"
+         "\n"
+         "#  <-- End user configuration -->\n"
+         "\n"
+         "qchem ${JOB_NAME}.inp ${JOB_NAME}.out &";
 #ifdef Q_OS_WIN32
-      cmd = "(unused)";
-#endif
+   if (local) {
+      cmd = "@echo off\n"
+            ":: The following variables MUST be set with correct values:\n"
+            "::\n"
+            ":: QC - The Q-Chem top directory.  It should contain the following\n"
+            "::      files/directories after initial installation:\n"
+            "::      exe, qcaux, qcref, samples, qcenv.bat, qc.bat, readme.txt\n"
+            ":: QCSCRATCH - the full path of the directory for scratch files.\n"
+            "::\n"
+            ":: The values below are examples only, you should set your own values.\n"
+            "\n"
+            "set QC=C:\\qchem\\qc43\n"
+            "set QCSCRATCH=C:\\qchem\\scratch\n"
+            "\n"
+            ":: <-- End user configuration -->\n"
+            "\n"
+            "set QCAUX=%QC%\\qcaux\n"
+            "set QCEXE=qchem_s.exe\n"
+            "set QCPROG=%QC%\\exe\\%QCEXE%\n"
+            "set QCPROG_S=%QCPROG%\n"
+            "set HOME=%QC%\n"
+            "\n"
+            "setlocal enabledelayedexpansion\n"
+            "\n"
+            "set PATH=%QC%;%QC%\\exe;%PATH%\n"
+            "\n"
+            "set QCproc=:\n"
+            "for /F \"tokens=2 delims= \" %%A IN ('tasklist /fi ^\"imagename eq %QCEXE%^\" /nh') do set QCproc=!QCproc!%%A:\n"
+            "start /B qc ${JOB_NAME}.inp ${JOB_NAME}.out\n"
+            "timeout /t 1 >nul"
+            "set ProcessId=\n"
+            "for /F \"tokens=2 delims= \" %%A IN ('tasklist /fi ^\"imagename eq %QCEXE%^\" /nh') do (call :findpid %%A)\n"
+            "echo ProcessId = %ProcessId% =\n"
+            "exit\n"
+            "\n"
+            ":findpid\n"
+            "if not [%1] == [] (\n"
+            "   echo.\"%QCProc%\" | findstr /C:^:%1^: 1>nul\n"
+            "   if errorlevel 1 ( set ProcessId=%1 )\n"
+            ")\n";
+       
    }
+#endif
    return cmd;
 }
 

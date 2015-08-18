@@ -43,7 +43,7 @@ namespace Network {
 
       public:
          HttpConnection(QString const& hostAddress, int const port = 80);
-         ~HttpConnection();
+         ~HttpConnection() { close(); }
 
          void setSecure(bool secure) { m_secure = secure; }
          bool secure() const { return m_secure; }
@@ -59,6 +59,7 @@ namespace Network {
 
 
          Reply* execute(QString const& query);
+         Reply* execute(QString const& query, QString const& /*workingDirectory*/) { return execute(query); }
          Reply* putFile(QString const& sourcePath, QString const& destinationPath);
          Reply* getFile(QString const& sourcePath, QString const& destinationPath);
          Reply* getFiles(QStringList const& fileList, QString const& destinationPath);

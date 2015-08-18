@@ -24,7 +24,10 @@
 
 #include "Configurator.h"
 #include "ui_FrequenciesConfigurator.h"
+#include <QPen>
+#include <QBrush>
 
+class QCustomPlot;
 
 namespace IQmol {
 
@@ -44,6 +47,7 @@ namespace Configurator {
 
       public:
          explicit Frequencies(Layer::Frequencies& frequencies);
+         ~Frequencies();
       
       Q_SIGNALS:
          void update();
@@ -65,11 +69,33 @@ namespace Configurator {
          void on_colorButton_clicked(bool);
          void on_loopButton_clicked(bool);
 
+         void on_scaleFactor_valueChanged(double);
+         void on_impulseButton_clicked(bool);
+         void on_gaussianButton_clicked(bool);
+         void on_lorentzianButton_clicked(bool);
+         void on_widthSlider_valueChanged(int);
+         void on_ramanCheckbox_clicked(bool);
+
+         void plotSelectionChanged(bool);
+         void contextMenuRequest(QPoint);
+         void updatePlot();
+
       private:
+         enum Profile { Gaussian, Lorentzian };
+
          void closeEvent(QCloseEvent*);
-         Ui::FrequenciesConfigurator m_frequenciesConfigurator;
-         Layer::Frequencies& m_frequencies;
          void setVectorColor(QColor const& color);
+         void plotImpulse(double const scaleFactor);
+         void plotSpectrum(Profile const, double const scaleFactor, double const width);
+
+         Ui::FrequenciesConfigurator m_configurator;
+         Layer::Frequencies& m_frequencies;
+         QCustomPlot* m_customPlot;
+         QList<QPair<double, double> > m_rawData;
+         QList<QPair<double, double> > m_rawRamanData;
+         QList<QPair<double, double> > m_rawIrData;
+         QPen m_pen;
+         QPen m_selectPen;
    };
 
 } } // end namespace IQmol::Configurator
