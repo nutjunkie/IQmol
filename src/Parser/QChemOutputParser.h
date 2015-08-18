@@ -51,6 +51,9 @@ namespace Parser {
          void readCisStates(TextStream&, Data::Geometry*);
          void readOrbitalSymmetries(TextStream&);
          void setTotalEnergy(QString const&, Data::Geometry*, QString const& label);
+
+         unsigned m_nAlpha;
+         unsigned m_nBeta;
    };
 
 } } // end namespace IQmol::Parser

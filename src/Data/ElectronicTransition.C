@@ -30,21 +30,34 @@ namespace Data {
 template<> const Type::ID ElectronicTransitionList::TypeID = Type::ElectronicTransitionList;
 
 
-bool ElectronicTransition::addAmplitude(QStringList const& list)
+bool ElectronicTransition::addAmplitude(QStringList const& list, 
+   unsigned const nAlpha, unsigned const nBeta)
 {
+   
    if (list.size() < 3) return false;
 
    bool ok;
 
-   unsigned i(list[0].toUInt(&ok));
+   unsigned i(list[1].toUInt(&ok));
    if (!ok) return false;
-   unsigned a(list[1].toUInt(&ok));
+   unsigned a(list[3].toUInt(&ok));
    if (!ok) return false;
-   double amplitude(list[2].toDouble(&ok));
+   double amplitude(list[4].toDouble(&ok));
    if (!ok) return false;
       
    Spin spin(Alpha);
-   if (list.size() == 4 && list[3] == "b") spin = Beta;
+   if (list.size() == 6 && list[5] == "b") spin = Beta;
+
+   int singlyOccupied(nAlpha-nBeta);
+   int doublyOccupied(nBeta);
+
+   if (list[0] == "S") i += doublyOccupied;
+   if (list[2] == "S") a += doublyOccupied;
+   if (list[2] == "V") a += doublyOccupied+singlyOccupied;
+
+   qDebug() << "Adding amplitude:" << i << "->" << a << "     " << list;
+   //("D", "8", "V", "2", " 0.1506", "b")
+
    m_amplitudes.append(Amplitude(spin, i, a, amplitude, spin));
    
    return true;

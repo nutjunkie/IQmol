@@ -60,8 +60,8 @@ QList<Amplitude> ExcitedStates::amplitudes(unsigned const transition) const
    if (transition < m_transitions.size()) {
       amplitudes = m_transitions[transition]->amplitudes();
 
-      unsigned nAlpha(m_orbitalSymmetries.nAlpha());
-      unsigned nBeta(m_orbitalSymmetries.nBeta());
+//      unsigned nAlpha(m_orbitalSymmetries.nAlpha());
+//      unsigned nBeta(m_orbitalSymmetries.nBeta());
       
 // off by one
       QList<Amplitude>::iterator iter;
@@ -69,7 +69,7 @@ QList<Amplitude> ExcitedStates::amplitudes(unsigned const transition) const
           unsigned i((*iter).m_i);
           unsigned a((*iter).m_a);
           Spin spin((*iter).m_spin);
-          a += (spin == Alpha) ? nAlpha : nBeta;
+//          a += (spin == Alpha) ? nAlpha : nBeta;
           (*iter).m_ei = m_orbitalSymmetries.energy(spin, i-1);
           (*iter).m_ea = m_orbitalSymmetries.energy(spin, a-1);
       }

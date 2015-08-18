@@ -139,6 +139,9 @@ bool QChemOutput::parse(TextStream& textStream)
    Data::GeometryList* geometryList(0);
    Data::GeometryList* scanGeometries(0);
 
+   m_nAlpha = 0;
+   m_nBeta  = 0;
+
    QStringList tokens;
    QString line;
 
@@ -226,6 +229,14 @@ bool QChemOutput::parse(TextStream& textStream)
          if (tokens.size() > 3 && currentGeometry) {
             Data::PointGroup& pg = currentGeometry->getProperty<Data::PointGroup>();
             pg.setValue(tokens[3]);
+         }
+
+      }else if (line.contains("beta electrons")) {
+         tokens = TextStream::tokenize(line);
+         if (tokens.size() >= 6) {
+            bool ok;
+            m_nAlpha = tokens[2].toUInt(&ok);
+            m_nBeta  = tokens[5].toUInt(&ok);
          }
 
       }else if (line.contains("Total energy in the final basis set")) {
@@ -372,7 +383,7 @@ qDebug() << "Reading CIS States";
 
    // This is to match lines similar to the following
    //  D(  7) --> S(  1) amplitude =  0.6732 beta
-   QRegExp rx("[DS]\\(\\s*(\\d+)\\) --> [VS]\\(\\s*(\\d+)\\) amplitude = (.{7})\\s?([ab]?)");
+   QRegExp rx("([DS])\\(\\s*(\\d+)\\) --> ([VS])\\(\\s*(\\d+)\\) amplitude = (.{7})\\s?([ab]?)");
    
    while (!textStream.atEnd()) {
       tokens = textStream.nextLineAsTokens();
@@ -423,13 +434,8 @@ qDebug() << "Reading CIS States";
 
          while (!textStream.atEnd()) {
             line = textStream.nextLine();
-            //qDebug() << "Searching for transition:" << line;
             if (rx.indexIn(line,0) == -1) break;
-            //qDebug() << "Regular expression match" 
-            //         << rx.cap(1) << rx.cap(2) << rx.cap(3) 
-            //         << rx.cap(4) << rx.cap(5) << rx.cap(6);
-
-            if (!transition->addAmplitude(rx.capturedTexts().mid(1))) goto error;;
+            if (!transition->addAmplitude(rx.capturedTexts().mid(1), m_nAlpha, m_nBeta)) goto error;;
          }
      
          states->append(transition);
