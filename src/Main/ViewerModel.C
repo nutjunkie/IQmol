@@ -829,12 +829,17 @@ void ViewerModel::checkItemChanged(QStandardItem* item)
       disconnect(this, SIGNAL(itemChanged(QStandardItem*)), 
          this, SLOT(checkItemChanged(QStandardItem*)));
 
+qDebug() << "checkItemChanged:" << item;
+
+      Layer::Base* base;
+
       if (item->checkState() == Qt::Checked) {
          item->setIcon(QIcon()); 
       }else {
          // close all the child configurators
-         Layer::Base* base;
+qDebug() << " casting to Layer::Base*";
          if ((base = dynamic_cast<Layer::Base*>(item))) {
+qDebug() << "   sucess";
             QList<Layer::Base*> children(base->findLayers<Layer::Base>(Layer::Children));
             QList<Layer::Base*>::iterator child;
             for (child = children.begin(); child != children.end(); ++child) {
@@ -843,14 +848,21 @@ void ViewerModel::checkItemChanged(QStandardItem* item)
          }     
       }
 
-      Layer::Surface* layer;
-      if ((layer = dynamic_cast<Layer::Surface*>(item))) {
-         layer->setCheckStatus(item->checkState());
-      }
+      if ((base = dynamic_cast<Layer::Base*>(item))) {
 
-      Layer::Molecule* molecule;
-      if ((molecule = dynamic_cast<Layer::Molecule*>(item))) {
-         displayMessage("");
+         Layer::Surface* layer;
+         qDebug() << " casting to Layer::Surface*";
+         if ((layer = dynamic_cast<Layer::Surface*>(base))) {
+            qDebug() << "   sucess";
+            layer->setCheckStatus(item->checkState());
+         }
+
+         Layer::Molecule* molecule;
+         qDebug() << " casting to Layer::Molecule*";
+         if ((molecule = dynamic_cast<Layer::Molecule*>(base))) {
+            qDebug() << "   sucess";
+            displayMessage("");
+         }
       }
 
       connect(this, SIGNAL(itemChanged(QStandardItem*)), 
