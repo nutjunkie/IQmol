@@ -35,7 +35,7 @@ namespace Data {
          enum Units { Hartree, EV, KJMol, KCalMol, Wavenumber, MHz };
 
          Energy(double const value = 0.0, Units const units = Hartree) : m_value(value),
-            m_units(units), m_label(QString()) { }
+            m_units(units), m_label("") { }
 
          Type::ID typeID() const { return Type::Energy; }
 

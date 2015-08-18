@@ -53,64 +53,64 @@ win32 {
 
 
 macx {
-   greaterThan(QT_MAJOR_VERSION, 4): CONFIG += home
-   lessThan(QT_MAJOR_VERSION, 5):    CONFIG += work
    //CONFIG += release
 
-   # QGLViewer
-   INCLUDEPATH += $(DEV)/libQGLViewer-2.5.3
-   LIBS        += $(DEV)/libQGLViewer-2.5.3/QGLViewer/libQGLViewer.a
+   # Set the $DEV environment variable to the top directory used to compile all
+   # the packages.  To simplify distribution, we use static libraries wherever
+   # possible.
 
-   # gfortran
-   LIBS += -L$(DEV)/extlib/lib -lgfortran 
+   # SSL/libcrypto
+   LIBS        += $(DEV)/openssl-1.0.1p/libssl.a
+   LIBS        += $(DEV)/openssl-1.0.1p/libcrypto.a
+
+   # SSH2
+   INCLUDEPATH += $(DEV)/libssh2-1.6.0/include
+   LIBS        += $(DEV)/libssh2-1.6.0/src/.libs/libssh2.a
+
+   # QGLViewer
+   INCLUDEPATH += $(DEV)/libQGLViewer-2.6.3
+   LIBS        += $(DEV)/libQGLViewer-2.6.3/QGLViewer/libQGLViewer.a
+
+   # Boost
+   INCLUDEPATH += $(DEV)/boost_1_56_0/
+   LIBS        += $(DEV)/boost_1_56_0/stage/lib/libboost_iostreams.a
+   LIBS        += $(DEV)/boost_1_56_0/stage/lib/libboost_serialization.a
+   LIBS        += $(DEV)/boost_1_56_0/stage/lib/libboost_exception.a
+   #LIBS         += -L$(DEV)/boost_1_56_0/stage/lib/
+   #LIBS         += -lboost_exception -lboost_serialization  -lboost_iostreams
 
    # OpenMesh
-   INCLUDEPATH += $(DEV)/OpenMesh-2.4/src
-   LIBS        += $(DEV)/OpenMesh-2.4/build/Build/lib/OpenMesh/libOpenMeshCored.a
-   LIBS        += $(DEV)/OpenMesh-2.4/build/Build/lib/OpenMesh/libOpenMeshToolsd.a
+   INCLUDEPATH += $(DEV)/OpenMesh-4.0/src
+   LIBS        += $(DEV)/OpenMesh-4.0/build/Build/lib/libOpenMeshCore.a
+   LIBS        += $(DEV)/OpenMesh-4.0/build/Build/lib/libOpenMeshTools.a
 
 
    # OpenBabel
    INCLUDEPATH += /usr/local/include/openbabel-2.0
    LIBS        += -L/usr/local/lib -lopenbabel
 
+   # gfortran
+   LIBS += /usr/local/gfortran/lib/libgfortran.a
+   LIBS += /usr/local/gfortran/lib/libquadmath.a
+
+   LIBS += -L/usr/local/gfortran/lib -lgcc_ext.10. 5
+   #LIBS += -L/usr/local/gfortran/lib -lgfortran -lquadmath
+
+
    # Misc
-   LIBS += -L/usr/X11/lib
+   LIBS += -L/usr/X11/lib  
    LIBS += -framework GLUT
-   LIBS += -L/usr/local/lib -lssl -lz
+   LIBS += -L/usr/lib -lz
+   #LIBS += -L/usr/local/lib -lssl -lz
+
+   #LIBS += -L$(DEV)/extlib/lib -lgfortran 
+
+#   QMAKE_LFLAGS += -Wl,--rpath=\\\$\$ORIGIN/../Frameworks
+
+   QMAKE_LFLAGS += -Wl,-no_compact_unwind -stdlib=libstdc++
+   QMAKE_RPATHDIR += /Applications/Qt5.5.0/5.5/clang_64/lib/
 }
 
-
-home {
-   # SSH2
-   INCLUDEPATH += $(DEV)/libssh2-1.4.3/include
-   LIBS        += $(DEV)/libssh2-1.4.3/src/.libs/libssh2.a
-
-   #libcrypto
-   LIBS += $(DEV)/extlib/lib/libcrypto.a
-
-   # Boost
-   INCLUDEPATH  += $(DEV)/extlib/include
-   LIBS         += $(DEV)/extlib/lib/libboost_iostreams.a \
-                   $(DEV)/extlib/lib/libboost_serialization.a \
-                   $(DEV)/extlib/lib/libboost_exception.a
-}
-
-
-work {
-   # SSH2
-   INCLUDEPATH += $(DEV)/extlib/include/libssh2
-   LIBS        += -L$(DEV)/extlib/lib/libssh2/ -lssh2 -lcrypto
-
-   #libcrypto
-   LIBS += -lcrypto
-
-   # Boost
-   INCLUDEPATH += $(DEV)/boost_1_56_0/build/include
-   LIBS        += $(DEV)/boost_1_56_0/build/lib/libboost_iostreams.a
-   LIBS        += $(DEV)/boost_1_56_0/build/lib/libboost_serialization.a
-   LIBS        += $(DEV)/boost_1_56_0/build/lib/libboost_exception.a
-}
 
 
 unix:!macx {

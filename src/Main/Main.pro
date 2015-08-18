@@ -27,8 +27,7 @@ macx:FORMS       += $$PWD/PeriodicTableMac.ui
 win32:FORMS      += $$PWD/PeriodicTable.ui
 unix:!macx:FORMS += $$PWD/PeriodicTable.ui
 
-!win32:OBJECTS += $(DEV)/extlib/obj/symmol.o
-win32:OBJECTS += $$PWD/symmol.o
+OBJECTS += $$PWD/symmol.o
 
 SOURCES += \
    $$PWD/FragmentTable.C \

@@ -1,0 +1,99 @@
+						  Building IQmol From Source 
+                          ==========================
+
+
+Mac OSX
+~~~~~~~
+
+ o Download the Qt libraries from http://www.qt.io
+   The latest version tested is 5.5.0.  Ensure that the bin directory
+   containing qmake is added to your PATH, the default location for this is
+   /Applications/Qt5.5.0/5.5/clang_64/bin
+
+ o Ensure gfortran is installed, installer packages can be found at
+   https://gcc.gnu.org/wiki/GFortranBinaries#MacOS
+
+ o Cmake will be required to compile some of the libraries, the installer can
+   be obtained from http://www.cmake.org/download/
+
+
+
+ o OpenSSL:
+   - Download: https://www.openssl.org/source  (version 1.0.1p)
+   - Compile:  The regular compilation does not compile x86 code, so we envoke
+     Configure manually:
+
+        ./Configure darwin64-x86_64-cc
+        make
+
+   - Static libraries appear in top directory
+
+
+ o LibSSH2:
+   - Download: http://www.libssh2.org  (version 1.6.0)
+   - Compile: 
+
+        ./configure --with-openssl --with-libssl-prefix=$DEV/openssl-1.0.1p --with-libz
+        make
+
+   - Shared and static libraries located in src/.libs
+
+
+ o Boost:
+   - Download: http://sourceforge.net/projects/boost/files/boost/1.56.0/
+     Later versions of boost seem to have removed the load_collection function which
+     is part of the serialization routines.
+   - Compile: 
+
+        ./bootstrap.sh --prefix= toolset=clang
+        ./b2 toolset=clang --without-mpi cxxflags="-arch x86_64 -fvisibility=hidden \
+             -fvisibility-inlines-hidden -stdlib=libstdc++ -ftemplate-depth=512" \
+             linkflags="-stdlib=libstdc++" stage
+
+   - Static libraries are in stage/lib
+
+
+ o OpenMesh:
+   - Download: http://www.openmesh.org/download/ 
+   - Compile: by default OpenMesh links to libc++ which is incompatibile with Qt.
+     Add the following lines near the top of the CMakeLists.txt file:
+
+        add_compile_options(-stdlib=libstdc++)
+        set( CMAKE_EXE_LINKER_FLAGS "-stdlib=libstdc++" )
+        set( CMAKE_SHARED_LINKER_FLAGS "-stdlib=libstdc++" )
+        set( CMAKE_MODULE_LINKER_FLAGS "-stdlib=libstdc++" )
+        set( CMAKE_CXX_FLAGS "-stdlib=libstdc++" )
+    
+     Then compiled using cmake:
+
+        mkdir build && cd build
+        cmake ../
+        make
+
+   - Shared and static libraries located in build/Build/lib
+
+
+ o QGLViewer:
+   - Download: http://libqglviewer.com/download.html
+   - Complie:
+        qmake QGLVIEWER_STATIC=yes
+        make
+
+   - Static library appears in QGLViewer
+
+
+ o OpenBabel:
+   - Download: http://openbabel.org/wiki/Get_Open_Babel (2.3.1)
+     Use the installer which puts things in the following locations:
+     Headers: /usr/local/include/openbabel-2.0
+     PlugIns: /usr/local/lib/openbable/2.3.1
+     Libs:    /usr/local/lib
+
+
+ o Compile the SymMol object file in src/Main
+      gfortran -c symmol.f90
+
+ o Compile the remaining IQmol source
+      qmake IQmol.pro
+      make
+
