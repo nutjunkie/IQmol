@@ -32,6 +32,11 @@
 #include <boost/archive/xml_oarchive.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/list.hpp>
+#include <boost/version.hpp>
+#if BOOST_VERSION >= 105800
+#include <boost/serialization/collections_save_imp.hpp>
+#include <boost/serialization/collections_load_imp.hpp>
+#endif
 #include <exception>
 #include "Matrix.h"
 
