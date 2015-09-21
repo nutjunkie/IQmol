@@ -18,9 +18,9 @@ TEMPLATE = subdirs
 SUBDIRS  = Util \
            Data \
            Qui \
-           Old \
            Parser \
            Configurator \
+           Old \
            Layer \
            Network \
            Yaml \

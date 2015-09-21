@@ -645,12 +645,15 @@ void ShaderLibrary::initializeTextures()
        if (((i + 1) % 4) == 0) angle += 0.375*M_PI;
    }
 
+/*
    GLFloatArray array;
    array.type = GLfloat2v;
    array.size = nSamples;
    array.ptr  = angles;
 
-   //setUniformVariable("Filters", "SamplingVectors", array);
+   setUniformVariable("Filters", "SamplingVectors", array);
+*/
+
    delete angles;
 
 

@@ -28,6 +28,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QString>
+#include <unistd.h>
 
 namespace QsLogging
 {
