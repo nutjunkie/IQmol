@@ -265,6 +265,11 @@ qDebug() << "Setting connection to HTTP";
          QMsgBox::warning(this, "IQmol", "User name must be set");
          return false;
       }
+
+      if (m_dialog.workingDirectory->text().contains("~")) {
+         QMsgBox::warning(this, "IQmol", "Use of shortcut ~ in working directory not supported");
+         return false;
+      }
    }
    // end sanity checks
 
