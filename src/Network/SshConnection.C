@@ -96,12 +96,10 @@ void SshConnection::close()
       ::close(m_socket);
 #endif
       m_socket = 0;
-      //QLOG_TRACE() << "  Socket closed";
    }
 
    --s_numberOfConnections;
    if (s_numberOfConnections == 0) {
-      //QLOG_TRACE() << "Calling libssh2_exit()";
       libssh2_exit();
 #ifdef WIN32
       WSACleanup();
@@ -567,7 +565,7 @@ void SshConnection::setBlocking()
 
 bool SshConnection::waitSocket()
 {
-   QLOG_TRACE() << "Calling waitSocket";
+   //QLOG_TRACE() << "Calling waitSocket";
    if (!m_socket)  throw Exception("Wait on uninitialized socket");
    if (!m_session) throw Exception("Wait on uninitialized SSH session");
 

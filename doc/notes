@@ -284,17 +284,62 @@ IQmol 3.0
 
    computation needs to be factored out
 
+
+
+
  o IQfchk -> (cube file) -> IQmesh -> (stl file) -> IQview
    IQmath	
 
    ambient occlusion of mesh -> (cube file)
    IQfchk multipoles, gdma, analysis esp.
+
+   - Volumetric data (cube?) (interpolation) /economization
+   - surface data (stl/ply)
    
-   vector fields
+
+   animation? moveable meshes (building, vibration);
+   
+   visualization of vector fields
+
+   parsing of pdb files, generate cartoons, anchor points
+
+
+   GLObject
+
+   Data pipeline
+
+   input files
+
+
+   - shapes (balls, cylinders, torus, planes, arrows)  (variable resolution?)
+   - lines (fields)
+   - vectors
+   - meshes
+
+
+       GLObject  - mesh - shape - ball
+
+                 - line - vector
+  
        
    stand-alone package
    generate grid data -> cube files
    Tasked with generating cube file data
+
+
+   builder - smiles codes
+          - equations
+          - click and drag (fragments, atoms)
+          - molecule name?
+          - peptide builder
+
+   slection behaviour
+
+
+   services - name lookup
+            - job submission
+            - mesh generation, etc
+
 
 
 

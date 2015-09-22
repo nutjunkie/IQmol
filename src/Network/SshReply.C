@@ -235,7 +235,7 @@ void SshPutFile::runDelegate()
        copyProgress();
    } 
 
-   QLOG_TRACE() <<  "Closing send channel";
+   //QLOG_TRACE() <<  "Closing send channel";
    fclose(localFileHandle);
    libssh2_channel_send_eof(channel);
    libssh2_channel_wait_eof(channel);

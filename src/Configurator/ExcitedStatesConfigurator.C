@@ -67,6 +67,7 @@ void ExcitedStates::initSpectrum()
    m_spectrum->axisRect()->setRangeDrag(m_spectrum->xAxis->orientation());
    m_spectrum->axisRect()->setRangeZoom(m_spectrum->xAxis->orientation());
    m_spectrum->xAxis->setSelectableParts(QCPAxis::spNone);
+   m_spectrum->xAxis->setLabel("Energy/eV");
 
    QFrame* frame(m_configurator.spectrumFrame);
    QVBoxLayout* layout(new QVBoxLayout());
@@ -113,6 +114,7 @@ void ExcitedStates::load(Data::ExcitedStates const& states)
 
 void ExcitedStates::updateSpectrum()
 {
+   m_spectrum->xAxis->setLabel("Energy/eV");
    m_spectrum->clearGraphs();
    double width(m_configurator.widthSlider->value());
 

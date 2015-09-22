@@ -214,7 +214,7 @@ ServerConfiguration::ServerConfiguration(YAML::Node const& node)
 
 QString ServerConfiguration::value(FieldT const field) const
 {
-   if (!m_configuration.contains(field)) {
+   if (!m_configuration.contains(field) && field != Cookie) {
       QLOG_WARN() << "Server configuration field not found" << toString(field);
    }
 

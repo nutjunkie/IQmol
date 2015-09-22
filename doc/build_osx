@@ -103,6 +103,10 @@ Compilation
  o Compile the SymMol object file in src/Main
       gfortran -c symmol.f90
 
+ o Edit the common.pri file to reflect the locations of the various libraries
+   required.  I keep all these in a common directory set in the $DEV environment
+   variable.
+
  o Compile the remaining IQmol source
       qmake IQmol.pro
       make
