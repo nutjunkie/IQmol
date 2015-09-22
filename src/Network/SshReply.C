@@ -25,6 +25,7 @@
 #include "Exception.h"
 #include "QsLog.h"
 #include <QFileInfo>
+#include <unistd.h>
 
 
 namespace IQmol {

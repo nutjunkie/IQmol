@@ -47,7 +47,7 @@ Constraint::Constraint(AtomList const& atoms)
 }
 
 
-Constraint::Constraint(Data::PositionConstraint const& constraint)
+Constraint::Constraint(Data::PositionConstraint const& /* constraint*/)
 {
    init();
    qDebug() << "Warning: constraint not correctly copied";
@@ -55,7 +55,7 @@ Constraint::Constraint(Data::PositionConstraint const& constraint)
 }
 
 
-Constraint::Constraint(Data::DistanceConstraint const& constraint)
+Constraint::Constraint(Data::DistanceConstraint const& /* constraint*/)
 {
    init();
    qDebug() << "Warning: constraint not correctly copied";
@@ -63,7 +63,7 @@ Constraint::Constraint(Data::DistanceConstraint const& constraint)
 }
 
 
-Constraint::Constraint(Data::AngleConstraint const& constraint)
+Constraint::Constraint(Data::AngleConstraint const& /* constraint*/)
 {
    init();
    qDebug() << "Warning: constraint not correctly copied";
@@ -71,7 +71,7 @@ Constraint::Constraint(Data::AngleConstraint const& constraint)
 }
 
 
-Constraint::Constraint(Data::TorsionConstraint const& constraint)
+Constraint::Constraint(Data::TorsionConstraint const& /* constraint*/)
 {
    init();
    qDebug() << "Warning: constraint not correctly copied";
