@@ -120,14 +120,13 @@ void SshExecute::runDelegate()
    for ( ; ; ) { // loop until we block
        int bc;
        char buffer[0x400];
-          do {
-           bc = libssh2_channel_read(channel, buffer, sizeof(buffer));
-           if (bc > 0) {
+       do {
+          bc = libssh2_channel_read(channel, buffer, sizeof(buffer));
+          if (bc > 0) {
               output.append(buffer, bc);
               bytecount += bc;
-           }
-           //qDebug() <<" sleeping 2"; sleep(2);
-
+          }
+          //qDebug() <<" sleeping 2"; sleep(2);
        } while( bc > 0 && !m_interrupt);
 
        if (m_interrupt) goto cleanup;
@@ -341,7 +340,7 @@ void SshGetFile::runDelegate(bool& getFilesInterrupt)
        double frac(double(got)/double(fileSize));
        copyProgress(frac);
        // qDebug() << "CopyProgress" << m_interrupt << frac;
-        //qDebug() << "sleeping 1"; sleep(1);
+       // qDebug() << "sleeping 1"; sleep(1);
    }
 
    cleanup:
