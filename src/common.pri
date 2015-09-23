@@ -35,14 +35,17 @@ macx {
    LIBS        += -L/usr/local/lib -lopenbabel
 
    # SSH2
-   LIBSSH2      = $(DEV)/libssh2-1.6.0
+   #LIBSSH2      = $(DEV)/libssh2-1.6.0
+   LIBSSH2      = $(DEV)/libssh2-1.4.3
    INCLUDEPATH += $${LIBSSH2}/include
    LIBS        += $${LIBSSH2}/src/.libs/libssh2.a
 
    # libssl/libcrypto
    LIBSSL       = $(DEV)/openssl-1.0.1p
-   INCLUDEPATH += $${LIBSSL}/include
-   LIBS        += $${LIBSSL}/libssl.a $${LIBSSL}/libcrypto.a
+   #INCLUDEPATH += $${LIBSSL}/include
+   #LIBS        += $${LIBSSL}/libssl.a 
+   LIBS        += -lssl
+   LIBS        += $${LIBSSL}/libcrypto.a
 
    # gfortran
    LIBS += /usr/local/gfortran/lib/libgfortran.a
