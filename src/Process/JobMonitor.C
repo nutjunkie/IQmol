@@ -386,7 +386,9 @@ bool JobMonitor::getRemoteWorkingDirectory(Server* server, QString& name)
    } while (exists);
 
    if (!server->makeDirectory(pathName)) {
-      throw Exception("Failed to create directory on server");
+      QString msg("Failed to create directory on server");
+      QMsgBox::warning(QApplication::activeWindow(), "IQmol", msg);
+      return false;
    }
    
    name = pathName;
