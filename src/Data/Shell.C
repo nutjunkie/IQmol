@@ -247,7 +247,7 @@ double* Shell::evaluate(Vec const& gridPoint) const
          break;
 
       case G9: {
-         double x2(x*x), y2(y*y), z2(x*x);
+         double x2(x*x), y2(y*y), z2(z*z);
          s_values[0] = s * (3*r2*r2 - 30*r2*z2 + 35*z2*z2) * eighth     ;
          s_values[1] = s *  x*z      * (7*z2 - 3*r2)       * rt5o8      ;
          s_values[2] = s *  y*z      * (7*z2 - 3*r2)       * rt5o8      ;
