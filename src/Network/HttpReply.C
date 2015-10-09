@@ -52,6 +52,7 @@ void HttpReply::finishedSlot()
 
    QString status(headerValue("Qchemserv-Status"));
 
+/*
 qDebug() << "HttpReply finishedSlot called with header"; 
 qDebug() << "-------------------------------------------------------------";
    dumpHeader();
@@ -60,8 +61,7 @@ qDebug() << m_message;
 qDebug() << "HttpReply finishedSlot called with status"; 
 qDebug() << status;
 qDebug() << "-------------------------------------------------------------";
-
-
+*/
 
    if (status.contains("OK")) {
       if (m_status != Error) m_status = m_interrupt ? Interrupted : Finished;

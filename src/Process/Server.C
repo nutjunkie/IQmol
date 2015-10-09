@@ -482,10 +482,6 @@ void Server::queryFinished()
 // This should be delegated
 bool Server::parseQueryMessage(Job* job, QString const& message)
 {  
-   //qDebug() << "-------------------------------------------";
-   //qDebug() << "Query returned" << message;
-   //qDebug() << "-------------------------------------------";
-
    bool ok(false);
    Job::Status status(Job::Unknown);
    QString statusMessage;
@@ -601,7 +597,12 @@ bool Server::parseQueryMessage(Job* job, QString const& message)
          break;
    }
 
-   QLOG_TRACE() << "parseQueryMessage setting status to " << Job::toString(status) << ok;
+   // Only print message if there has been a change in status
+   if (job->status() != status) {
+      QLOG_TRACE() << "Query returned:" << message;
+      QLOG_TRACE() << "parseQueryMessage setting status to " << Job::toString(status) << ok;
+   }
+
    if (!Job::isActive(status)) unwatchJob(job);
    job->setStatus(status, statusMessage); 
 
