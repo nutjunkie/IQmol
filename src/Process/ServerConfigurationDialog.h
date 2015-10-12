@@ -23,12 +23,11 @@
 ********************************************************************************/
 
 #include "ui_ServerConfigurationDialog.h"
+#include "ServerConfiguration.h"
 
 
 namespace IQmol {
 namespace Process2 {
-
-   class ServerConfiguration;
 
    class ServerConfigurationDialog : public QDialog {
 
@@ -74,7 +73,7 @@ namespace Process2 {
          Ui::ServerConfigurationDialog m_dialog;
 
          ServerConfiguration& m_originalConfiguration;
-         ServerConfiguration* m_currentConfiguration;
+         ServerConfiguration  m_currentConfiguration;
    };
 
 } } // end namespace IQmol::Process

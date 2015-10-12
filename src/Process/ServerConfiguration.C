@@ -196,6 +196,7 @@ ServerConfiguration& ServerConfiguration::operator=(ServerConfiguration const& t
 
 void ServerConfiguration::copy(ServerConfiguration const& that)
 {
+   // Al the data members are held in the ConfigMap
    m_configuration = that.m_configuration;
 }
 
