@@ -116,7 +116,7 @@ QString KillCommand(bool const local)
 
 QString SubmitCommand(bool const local)
 {
-   QString cmd("./${JOB_NAME}.run");
+   QString cmd("csh ${JOB_NAME}.run");
    if (local) {
 #ifdef Q_OS_WIN32
       cmd = "${JOB_DIR}/${JOB_NAME}.bat";
@@ -144,16 +144,12 @@ QString TemplateForRunFile(bool const local)
    cmd = "#! /bin/csh\n"
          "# --- Q-Chem environment variable setup\n"
          "# The following variables MUST be set with correct values.\n"
-         "# QC:\n"
-         "#     Q-Chem top directory.  It should contain the following\n"
-         "#     files/directories after initial installation:\n"
-         "#     exe, qcaux, qcref, samples, qcenv.bat, qc.bat, readme.txt\n"
-         "# QCSCRATCH:\n"
-         "#     the full path of the directory for scratch files.\n"
+         "#    QC:        Q-Chem top directory. \n"
+         "#    QCSCRATCH: the full path of the directory for scratch files.\n"
          "#\n"
-         "#     The QC, QCSCRATCH and QCAUX variables provided below are\n"
-         "#     examples, you should set your own values.\n"
-         "#     Do NOT use double quote in setting these variables.\n"
+         "#  The QC, QCSCRATCH and QCAUX variables provided below\n"
+         "#  are examples - you should set your own values.\n"
+         "#  Do NOT use double quote in setting these variables.\n"
          "\n"
          "setenv QC        /usr/local/qchem\n"
          "setenv QCSCRATCH /scratch\n"
