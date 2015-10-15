@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>846</width>
-    <height>585</height>
+    <width>931</width>
+    <height>645</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -446,8 +446,8 @@ QToolButton:checked {
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>448</width>
-             <height>414</height>
+             <width>523</width>
+             <height>482</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -457,17 +457,17 @@ QToolButton:checked {
                <bool>true</bool>
               </property>
               <property name="currentIndex">
-               <number>3</number>
+               <number>11</number>
               </property>
               <property name="tabSpacing">
-               <number>6</number>
+               <number>-1</number>
               </property>
               <widget class="QWidget" name="pageAuxiliaryBasis">
                <property name="geometry">
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>197</width>
+                 <width>499</width>
                  <height>60</height>
                 </rect>
                </property>
@@ -517,12 +517,52 @@ QToolButton:checked {
                 </item>
                </layout>
               </widget>
+              <widget class="QWidget" name="pagePrimaryBasis">
+               <attribute name="label">
+                <string>Primary Basis</string>
+               </attribute>
+               <layout class="QVBoxLayout" name="verticalLayout_33">
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_9">
+                  <item>
+                   <widget class="QComboBox" name="qui_primary_basis"/>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_39">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_4">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>197</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
               <widget class="QWidget" name="pageAtenuationParameter">
                <property name="geometry">
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>166</width>
+                 <width>499</width>
                  <height>60</height>
                 </rect>
                </property>
@@ -581,7 +621,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>173</width>
+                 <width>499</width>
                  <height>60</height>
                 </rect>
                </property>
@@ -636,7 +676,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>425</width>
+                 <width>499</width>
                  <height>166</height>
                 </rect>
                </property>
@@ -778,7 +818,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>381</width>
+                 <width>499</width>
                  <height>162</height>
                 </rect>
                </property>
@@ -950,7 +990,7 @@ QToolButton:checked {
                  <x>0</x>
                  <y>0</y>
                  <width>499</width>
-                 <height>187</height>
+                 <height>211</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1092,7 +1132,7 @@ QToolButton:checked {
                  <x>0</x>
                  <y>0</y>
                  <width>499</width>
-                 <height>187</height>
+                 <height>163</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1221,7 +1261,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>345</width>
+                 <width>499</width>
                  <height>64</height>
                 </rect>
                </property>
@@ -1286,7 +1326,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>426</width>
+                 <width>499</width>
                  <height>146</height>
                 </rect>
                </property>
@@ -1385,7 +1425,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>202</width>
+                 <width>499</width>
                  <height>83</height>
                 </rect>
                </property>
@@ -1447,7 +1487,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>402</width>
+                 <width>499</width>
                  <height>155</height>
                 </rect>
                </property>
@@ -1538,7 +1578,11 @@ QToolButton:checked {
                    </widget>
                   </item>
                   <item row="2" column="1">
-                   <widget class="QComboBox" name="basis2"/>
+                   <widget class="QComboBox" name="basis2">
+                    <property name="editable">
+                     <bool>false</bool>
+                    </property>
+                   </widget>
                   </item>
                   <item row="3" column="0" colspan="2">
                    <widget class="QCheckBox" name="dual_basis_energy">
@@ -1589,7 +1633,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>423</width>
+                 <width>499</width>
                  <height>105</height>
                 </rect>
                </property>
@@ -3346,6 +3390,13 @@ QToolButton:checked {
              <widget class="QCheckBox" name="ssg">
               <property name="text">
                <string>Compute SSG Wavefunction</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="mp2v">
+              <property name="text">
+               <string>MP2[V]</string>
               </property>
              </widget>
             </item>
@@ -6599,7 +6650,7 @@ Eventually this should go.</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>846</width>
+     <width>931</width>
      <height>22</height>
     </rect>
    </property>
