@@ -10,7 +10,7 @@ QMAKE_CXXFLAGS += -O2 -g -ggdb
 # possible.
 
 macx {
-   #CONFIG += release
+   CONFIG += release
 
    # QGLViewer
    QGLVIEWER    = $(DEV)/libQGLViewer-2.6.3

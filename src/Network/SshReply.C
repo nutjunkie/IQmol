@@ -148,7 +148,7 @@ void SshExecute::runDelegate()
    }
 
    cleanup:
-      QLOG_TRACE() <<  "Closing channel";
+      //QLOG_TRACE() <<  "Closing channel";
       while ( (rc = libssh2_channel_close(channel)) == LIBSSH2_ERROR_EAGAIN ) {
           m_connection->waitSocket();
       }
