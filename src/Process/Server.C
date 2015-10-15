@@ -41,8 +41,8 @@ namespace Process2 {
 Server::Server(ServerConfiguration const& configuration) : m_configuration(configuration),
    m_connection(0)
 {
-   qDebug() << "Constructing a New Server with configuration";
-   m_configuration.dump();
+   //qDebug() << "Constructing a New Server with configuration";
+   //m_configuration.dump();
    setUpdateInterval(m_configuration.updateInterval());
    connect(&m_updateTimer, SIGNAL(timeout()), this, SLOT(queryAllJobs()));
 }

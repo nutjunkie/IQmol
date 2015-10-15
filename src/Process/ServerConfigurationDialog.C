@@ -47,6 +47,9 @@ ServerConfigurationDialog::ServerConfigurationDialog(ServerConfiguration& config
    copyFrom(m_originalConfiguration);
    blockUpdate(false);
 
+   // Hide this temporarily as it causes the server to not appear in the list
+   m_dialog.testConnectionButton->hide();
+
    connect(m_dialog.buttonBox, SIGNAL(accepted()), this, SLOT(verify()));
 }
 

@@ -116,7 +116,7 @@ QString KillCommand(bool const local)
 
 QString SubmitCommand(bool const local)
 {
-   QString cmd("csh ${JOB_NAME}.run");
+   QString cmd("/bin/csh ${JOB_NAME}.run");
    if (local) {
 #ifdef Q_OS_WIN32
       cmd = "${JOB_DIR}/${JOB_NAME}.bat";
