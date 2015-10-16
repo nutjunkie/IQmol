@@ -58,7 +58,7 @@ macx {
    LIBS += -L/usr/lib -lz
 
    QMAKE_LFLAGS   += -Wl,-no_compact_unwind -stdlib=libstdc++
-   QMAKE_RPATHDIR += /Applications/Qt5.5.0/5.5/clang_64/lib/
+   QMAKE_RPATHDIR += @executable_path/../Frameworks
 }
 
 
