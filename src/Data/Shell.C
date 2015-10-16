@@ -65,6 +65,8 @@ void Shell::normalize()
       case D6:   pf = 4.0*Ns;  ex = 1.75;  break;
       case F7:   pf = 8.0*Ns;  ex = 2.25;  break;
       case F10:  pf = 8.0*Ns;  ex = 2.25;  break;
+      case G9:   pf =16.0*Ns;  ex = 2.75;  break;
+      case G15:  pf =16.0*Ns;  ex = 2.75;  break;
    }   
 
    for (int i = 0; i < m_exponents.size(); ++i) {
