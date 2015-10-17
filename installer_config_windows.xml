@@ -1,7 +1,7 @@
 <project>
     <shortName>IQmol</shortName>
     <fullName>IQmol</fullName>
-    <version>2.5.1</version>
+    <version>2.6.0</version>
     <readmeFile>C:/Users/agilbert/Development/IQmol/README</readmeFile>
     <licenseFile>C:/Users/agilbert/Development/IQmol/LICENSE</licenseFile>
     <leftImage>C:/Users/agilbert/Development/IQmol/src/Main/resources/Installer-lhs.png</leftImage>
@@ -77,6 +77,9 @@
                         <distributionDirectory>
                             <origin>C:/Users/agilbert/Development/IQmol/deploy/lib</origin>
                         </distributionDirectory>
+                        <distributionFile>
+                            <origin>C:/Users/agilbert/Development/IQmol/doc/IQmolUserGuide.pdf</origin>
+                        </distributionFile>
                     </distributionFileList>
                 </folder>
                 <folder>
