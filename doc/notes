@@ -6,7 +6,6 @@ TODO LIST:
     - esp/hf/mo plot files from QChem
 
  - clean up MoleculeLayer class
- - color vdW surfaces by atom type
  - For the geometry configurator, a context menu should allow the user to
    export the coordinates to a file.  (This can be done with copy and paste)
  - Normalize light directions in shaders
@@ -63,7 +62,6 @@ IQmol 2.6
      -  http://www.chemspider.com
 
  o Sundry:
-    - Rename Process2 namespace -> Process
     - Test public key, hostbased and agent authentication for SshConnection
     - Copy progress needs reporting in the JobMonitor
     - The JobMonitor should be started after the splash screen has been showed as
