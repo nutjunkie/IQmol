@@ -104,7 +104,8 @@ bool Geometry::sameAtoms(QStringList const& symbols) const
    unsigned nAtoms(m_atoms.size());
    bool same(nAtoms == (unsigned)symbols.size());
    for (unsigned i = 0; i < nAtoms; ++i) {
-       same = same && (m_atoms[i]->getLabel<AtomicSymbol>() == symbols[i]);
+       //same = same && (m_atoms[i]->getLabel<AtomicSymbol>() == symbols[i]);
+       same = same && (m_atoms[i]->getLabel<AtomicSymbol>().compare(symbols[i], Qt::CaseInsensitive) == 0);
    }
    return same;
 }
