@@ -2,7 +2,7 @@ project(IQmol C CXX Fortran)
 cmake_minimum_required(VERSION 2.8)
 
 find_package(OpenGL REQUIRED)
-find_package(Qt4 COMPONENTS QtCore QtGui QtNetwork QtOpenGL QtSql QtXml
+find_package(Qt5 COMPONENTS QtCore QtGui QtNetwork QtOpenGL QtSql QtXml
     REQUIRED)
 set(Boost_USE_STATIC_LIBS TRUE)
 find_package(Boost COMPONENTS iostreams serialization REQUIRED)

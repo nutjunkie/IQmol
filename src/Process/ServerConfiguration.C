@@ -196,6 +196,7 @@ ServerConfiguration& ServerConfiguration::operator=(ServerConfiguration const& t
 
 void ServerConfiguration::copy(ServerConfiguration const& that)
 {
+   // Al the data members are held in the ConfigMap
    m_configuration = that.m_configuration;
 }
 
@@ -214,7 +215,7 @@ ServerConfiguration::ServerConfiguration(YAML::Node const& node)
 
 QString ServerConfiguration::value(FieldT const field) const
 {
-   if (!m_configuration.contains(field)) {
+   if (!m_configuration.contains(field) && field != Cookie) {
       QLOG_WARN() << "Server configuration field not found" << toString(field);
    }
 

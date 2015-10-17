@@ -137,6 +137,15 @@ bool requiresAuxBasis()
 }
 
 
+bool requiresPrimaryBasis()
+{
+   QtNode& method(OptionRegister::instance().get("METHOD"));
+   QString value(method.getValue().toUpper());
+   value = method.getValue().toUpper();
+   return  (value == "MP2[V]");
+}
+
+
 bool requiresOmega()
 {
    OptionRegister& reg(OptionRegister::instance());
@@ -261,6 +270,30 @@ void InputDialog::initializeQuiLogic()
    );
 
 
+   QtNode& mp2v(reg.get("MP2V"));
+   QtNode& qui_primary_basis(reg.get("QUI_PRIMARY_BASIS"));
+   method.addRule(
+      If (method == "MP2[V]", 
+           mp2v.shouldBe("true") 
+         + Disable(m_ui.correlation) 
+         + basis2.makeSameAs(qui_primary_basis), 
+         mp2v.shouldBe("false")
+      )
+   );
+
+   qui_primary_basis.addRule(
+      If (mp2v == QtTrue, basis2.makeSameAs(qui_primary_basis))
+   );
+
+   basis2.addRule(
+      If (mp2v == QtTrue, basis2.makeSameAs(qui_primary_basis))
+   );
+
+   mp2v.addRule(
+      If (mp2v == QtTrue, method.shouldBe("MP2[V]"))
+   );
+
+
 
   // ----- T A B B E D   W I D G E T   O P T I O N S -----
 
@@ -344,6 +377,14 @@ void InputDialog::initializeQuiLogic()
 
    correlation.addRule(rule);
    exchange.addRule(rule);
+   method.addRule(rule);
+
+   s = "Primary Basis";
+   rule = If (requiresPrimaryBasis,  
+              AddPage(m_ui.toolBoxOptions, m_toolBoxOptions.value(s), s),
+              RemovePage(m_ui.toolBoxOptions, s)
+          );
+
    method.addRule(rule);
 
 
@@ -788,6 +829,10 @@ void InputDialog::initializeQuiLogic()
    QtNode& cc_rest_occ(reg.get("CC_REST_OCC"));
 
    qui_adc_core.addRule(If(isCVS_ADC, cc_rest_occ.makeSameAs(qui_adc_core)));
+
+
+
+
 
    // ----- A D V A N C E D   O P T I O N S   P A N E L -----
 

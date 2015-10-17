@@ -5,40 +5,47 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 QMAKE_CXXFLAGS += -O2 -g -ggdb
 
+# Set the $DEV environment variable to the top directory used to compile all
+# the packages.  To simplify distribution, we use static libraries wherever
+# possible.
 
 macx {
-   #CONFIG += release
-
-   # Set the $DEV environment variable to the top directory used to compile all
-   # the packages.  To simplify distribution, we use static libraries wherever
-   # possible.
-
-   # SSL/libcrypto
-   LIBS        += $(DEV)/openssl-1.0.1p/libssl.a
-   LIBS        += $(DEV)/openssl-1.0.1p/libcrypto.a
-
-   # SSH2
-   INCLUDEPATH += $(DEV)/libssh2-1.6.0/include
-   LIBS        += $(DEV)/libssh2-1.6.0/src/.libs/libssh2.a
+   CONFIG += release
 
    # QGLViewer
-   INCLUDEPATH += $(DEV)/libQGLViewer-2.6.3
-   LIBS        += $(DEV)/libQGLViewer-2.6.3/QGLViewer/libQGLViewer.a
+   QGLVIEWER    = $(DEV)/libQGLViewer-2.6.3
+   INCLUDEPATH += $${QGLVIEWER}
+   LIBS        += $${QGLVIEWER}/QGLViewer/libQGLViewer.a
 
    # Boost
-   INCLUDEPATH += $(DEV)/boost_1_56_0/
-   LIBS        += $(DEV)/boost_1_56_0/stage/lib/libboost_iostreams.a
-   LIBS        += $(DEV)/boost_1_56_0/stage/lib/libboost_serialization.a
-   LIBS        += $(DEV)/boost_1_56_0/stage/lib/libboost_exception.a
+   BOOST        = $(DEV)/boost_1_56_0
+   INCLUDEPATH += $${BOOST}
+   LIBS        += $${BOOST}/stage/lib/libboost_iostreams.a
+   LIBS        += $${BOOST}/stage/lib/libboost_serialization.a
+   LIBS        += $${BOOST}/stage/lib/libboost_exception.a
 
    # OpenMesh
-   INCLUDEPATH += $(DEV)/OpenMesh-4.0/src
-   LIBS        += $(DEV)/OpenMesh-4.0/build/Build/lib/libOpenMeshCore.a
-   LIBS        += $(DEV)/OpenMesh-4.0/build/Build/lib/libOpenMeshTools.a
+   OPENMESH     = $(DEV)/OpenMesh-4.0
+   INCLUDEPATH += $${OPENMESH}/src
+   LIBS        += $${OPENMESH}/build/Build/lib/libOpenMeshCore.a
+   LIBS        += $${OPENMESH}/build/Build/lib/libOpenMeshTools.a
 
    # OpenBabel
    INCLUDEPATH += /usr/local/include/openbabel-2.0
    LIBS        += -L/usr/local/lib -lopenbabel
+
+   # SSH2
+   #LIBSSH2      = $(DEV)/libssh2-1.6.0
+   LIBSSH2      = $(DEV)/libssh2-1.4.3
+   INCLUDEPATH += $${LIBSSH2}/include
+   LIBS        += $${LIBSSH2}/src/.libs/libssh2.a
+
+   # libssl/libcrypto
+   LIBSSL       = $(DEV)/openssl-1.0.1p
+   #INCLUDEPATH += $${LIBSSL}/include
+   #LIBS        += $${LIBSSL}/libssl.a 
+   LIBS        += -lssl
+   LIBS        += $${LIBSSL}/libcrypto.a
 
    # gfortran
    LIBS += /usr/local/gfortran/lib/libgfortran.a
@@ -50,13 +57,9 @@ macx {
    LIBS += -framework GLUT
    LIBS += -L/usr/lib -lz
 
-   # QMAKE_LFLAGS += -Wl,--rpath=\\\$\$ORIGIN/../Frameworks
    QMAKE_LFLAGS   += -Wl,-no_compact_unwind -stdlib=libstdc++
-   QMAKE_RPATHDIR += /Applications/Qt5.5.0/5.5/clang_64/lib/
+   QMAKE_RPATHDIR += @executable_path/../Frameworks
 }
-
-
-
 
 
 
@@ -64,36 +67,45 @@ unix:!macx {
    #CONFIG += release
  
    # QGLViewer
-   INCLUDEPATH += $(DEV)/libQGLViewer-2.6.0
-   LIBS        += $(DEV)/libQGLViewer-2.6.0/QGLViewer/libQGLViewer.a
+   QGLVIEWER    = $(DEV)/libQGLViewer-2.6.3
+   INCLUDEPATH += $${QGLVIEWER}
+   LIBS        += $${QGLVIEWER}/QGLViewer/libQGLViewer.a
 
    # Boost
-   INCLUDEPATH += $(DEV)/boost_1_57_0
-#  LIBS        += $(DEV)/boost_1_57_0/stage/lib/libboost_iostreams.a
-   LIBS        += $(DEV)/boost_1_57_0/stage/lib/libboost_serialization.a
-   LIBS        += $(DEV)/boost_1_57_0/stage/lib/libboost_exception.a
+   BOOST        = /usr/lib
+   LIBS        += $${BOOST}/libboost_iostreams.a
+   LIBS        += $${BOOST}/libboost_serialization.a
    
    # OpenMesh
-   INCLUDEPATH += $(DEV)/OpenMesh-3.2/src
-   LIBS        += $(DEV)/OpenMesh-3.2/build/Build/lib/OpenMesh/libOpenMeshCored.a
-   LIBS        += $(DEV)/OpenMesh-3.2/build/Build/lib/OpenMesh/libOpenMeshToolsd.a
+   OPENMESH     = $(DEV)/OpenMesh-3.3
+   INCLUDEPATH += $${OPENMESH}/src
+   LIBS        += $${OPENMESH}/build/Build/lib/libOpenMeshCored.a
+   LIBS        += $${OPENMESH}/build/Build/lib/libOpenMeshToolsd.a
 
    # OpenBabel
-   INCLUDEPATH += $(DEV)/openbabel-2.3.2/include
-   LIBS        += -L$(DEV)/openbabel-2.3.2/build/lib -lopenbabel
+   OPENBABEL    = $(DEV)/openbabel-2.3.2
+   INCLUDEPATH += $${OPENBABEL}/include
+   LIBS        += -L$${OPENBABEL}/build/lib -lopenbabel
 
    # SSH2
-   INCLUDEPATH += $(DEV)/libssh2-1.4.3/include
-   LIBS        += $(DEV)/extlib/lib/libssh2.a
+   LIBSSH2      = $(DEV)/libssh2-1.6.0
+   INCLUDEPATH += $${LIBSSH2}/include
+   LIBS        += $$LIBSSH2/src/.libs/libssh2.a
 
-   # libcrypto
-   LIBS += $(DEV)/extlib/lib/libcrypto.a
+   # libssl/crypto
+   LIBSSL       = $(DEV)/openssl-1.0.2d
+   INCLUDEPATH += $${LIBSSL}/include
+   LIBS        += $${LIBSSL}/libssl.a $${LIBSSL}/libcrypto.a
 
    # gfortran
-   LIBS        += /usr/lib/gcc/x86_64-linux-gnu/4.6/libgfortran.a
+   LIBS        += /usr/lib/gcc/x86_64-linux-gnu/4.7.3/libgfortran.a
+
+   # Misc
+   LIBS        += -lz -ldl
 
    QMAKE_LFLAGS += '-Wl,-rpath,\'\$$ORIGIN/../lib\'' 
 }
+
 
 
 win32 {

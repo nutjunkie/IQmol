@@ -40,7 +40,12 @@ void RemSection::addAdHoc(QString const& rem, QString const& quiValue,
    m_adHoc[ucRem + "::" + quiValue] = validQChemValues[0];
 
    for (int i = 0; i < validQChemValues.count(); ++i) {
-       m_adHoc[ucRem + "::" + validQChemValues[i]] = quiValue;
+	   // Even more ad Hoc.  This avoids MP2 getting transformed to MP2[V].
+	   // What really needs to be done is to have different translation units
+	   // depending on which direction the translation occurs.
+       if (quiValue != "MP2[V]") {
+          m_adHoc[ucRem + "::" + validQChemValues[i]] = quiValue;
+       }
    }
 }
 

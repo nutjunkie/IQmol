@@ -1,0 +1,93 @@
+                     =====================================
+                      Building IQmol From Source on Linux
+                     =====================================
+
+These steps were used to compile under Ubuntu 13.04
+
+1) Insure the necessary utilities and libraries are installed:
+
+     apt-get install git
+     apt-get install cmake
+     apt-get install gfortran
+     apt-get install libssl-dev
+     apt-get install libboost-dev
+
+
+2) Download the Qt libraries from www.qt.io
+
+   Note that Qt5 libraries are required and most distributions only have Qt4
+   packages so you cannot use apt-get.  The download (~600Mb) seems to be very
+   slow and it is recommended that an appropriate mirror is used.  Be sure to 
+   add the Qt bin directory to your path, using bash this can be accomplished
+   by adding something similar to the following to ~/.bashrc:
+
+      if [ -d "$DEV/Qt5.5.0/5.5/gcc_64/bin" ] ; then
+         PATH="$DEV/Qt5.5.0/5.5/gcc_64/bin:$PATH"
+      fi
+
+   Note that $DEV should be set to the directory containing the Qt installation
+
+
+3) Download the OpenMesh source from www.openmesh.org
+
+   The latest version tested is version 3.3 but I needed to specify the C++
+   compiler by adding the following line to the CMakeLists.txt file:
+
+     set (CMAKE_CXX_COMPILER "g++-4.4")
+
+   Compile using cmake (both static and shared libraries are written to the
+   build/Build/lib directory):
+
+        mkdir build && cd build
+        cmake ../
+        make
+
+
+4) Download the OpenBabel source from www.openbable.org
+
+   The latest version of the source is 2.3.2.  As with OpenMesh, I needed to
+   specify the compier as g++-4.4.  Compile using cmake, libraries appear in 
+   the lib directory.
+
+        mkdir build && cd build
+        cmake ../
+        make
+
+   I copied the babelconfig.h file from build/include to include/openbabel.
+
+
+5) Download the LibSSH2 source from www.libssh2.org
+
+   The latest version tested is 1.6.  Compilation is straightforward and
+   results in shared and static libraries located in src/.libs
+
+        ./configure --with-openssl --with-libz
+        make
+
+
+6) Download the OpenSSL source from www.openssl.org
+
+        ./config
+         make
+
+
+7) Download the QGLViewer source from libqglviewer.com and compile using qmake
+
+        qmake QGLVIEWER_STATIC=yes QGLViewer.pro
+        make
+
+
+8) Compile the SymMol object file in src/Main
+   There is one Fortran source file that must be compiled using gfortran.  I haven't 
+   worked out how to get Qt to do this in the .pro file:
+
+       gfortran -c symmol.f90
+
+
+9) Compile IQmol  
+   You may need to edit the IQmol/src/common.pri file to reflect the locations
+   of the various installed packages.  I put all the compiled libraries above
+   in the $DEV directory which I specify in .bashrc
+
+       qmake IQmol.pro
+       make

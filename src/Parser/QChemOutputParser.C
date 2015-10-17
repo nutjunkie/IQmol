@@ -115,7 +115,7 @@ QStringList QChemOutput::parseForErrors(TextStream& textStream)
    if (nNiceEndings < nJobs) {
       nJobs -= nNiceEndings;
       if (nJobs == 1) {
-        errors.append("Job failed");
+        errors.append("Job failed to finish");
       }else {
         errors.append(QString::number(nJobs) + " Jobs failed");
       }
@@ -273,6 +273,10 @@ bool QChemOutput::parse(TextStream& textStream)
          tokens = TextStream::tokenize(line);
          if (tokens.size() >= 6) setTotalEnergy(tokens[5], currentGeometry, "TRIM-MP2");
 
+      }else if (line.contains("MP2[V]      total energy")) {
+         tokens = TextStream::tokenize(line);
+         if (tokens.size() >= 5) setTotalEnergy(tokens[4], currentGeometry, "MP2[V]");
+ 
       }else if (line.contains("MP2         total energy")) {
          tokens = TextStream::tokenize(line);
          if (tokens.size() >= 5) setTotalEnergy(tokens[4], currentGeometry, "MP2");

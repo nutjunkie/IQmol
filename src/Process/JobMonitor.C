@@ -386,7 +386,10 @@ bool JobMonitor::getRemoteWorkingDirectory(Server* server, QString& name)
    } while (exists);
 
    if (!server->makeDirectory(pathName)) {
-      throw Exception("Failed to create directory on server");
+      QString msg("Failed to create directory on server: ");
+      msg += pathName;
+      QMsgBox::warning(QApplication::activeWindow(), "IQmol", msg);
+      return false;
    }
    
    name = pathName;
@@ -1005,11 +1008,14 @@ void JobMonitor::cleanUp(Job* job)
       dir.rename(oldName, newName);
    }
 
-   oldName = "Test.FChk";
-   if (dir.exists(oldName) && oldName != newName) {
-      if (dir.exists(newName)) dir.remove(newName);
-      dir.rename(oldName, newName);
-   }
+//   This is a hangover from past versions of QChem that used to write the
+//   checkpoint file to Test.FChk.  Now it causes problems if the user calls
+//   the job 'test' on OSX (stupid case inconsistencies).
+//   oldName = "Test.FChk";
+//   if (dir.exists(oldName) && oldName != newName) {
+//      if (dir.exists(newName)) dir.remove(newName);
+//      dir.rename(oldName, newName);
+//   }
 
    if (dir.exists("pathtable")) dir.remove("pathtable");
 

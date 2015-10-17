@@ -65,6 +65,8 @@ void Shell::normalize()
       case D6:   pf = 4.0*Ns;  ex = 1.75;  break;
       case F7:   pf = 8.0*Ns;  ex = 2.25;  break;
       case F10:  pf = 8.0*Ns;  ex = 2.25;  break;
+      case G9:   pf =16.0*Ns;  ex = 2.75;  break;
+      case G15:  pf =16.0*Ns;  ex = 2.75;  break;
    }   
 
    for (int i = 0; i < m_exponents.size(); ++i) {
@@ -247,7 +249,7 @@ double* Shell::evaluate(Vec const& gridPoint) const
          break;
 
       case G9: {
-         double x2(x*x), y2(y*y), z2(x*x);
+         double x2(x*x), y2(y*y), z2(z*z);
          s_values[0] = s * (3*r2*r2 - 30*r2*z2 + 35*z2*z2) * eighth     ;
          s_values[1] = s *  x*z      * (7*z2 - 3*r2)       * rt5o8      ;
          s_values[2] = s *  y*z      * (7*z2 - 3*r2)       * rt5o8      ;

@@ -1446,6 +1446,7 @@ void InputDialog::widgetChanged(bool const& value)
 void InputDialog::widgetChanged(QObject* orig, QString const& value) 
 {
    QString name(orig->objectName().toUpper());
+   //qDebug() << "Widget changed" << name << "to" << value;
    if (m_reg.exists(name)) m_reg.get(name).setValue(value);
    if (m_currentJob) {
       capturePreviewTextChanges();

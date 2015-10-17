@@ -54,3 +54,4 @@ FORMS = \
    $$PWD/ScalarConstraintConfigurator.ui \
    $$PWD/SurfaceConfigurator.ui \
    $$PWD/VectorConstraintConfigurator.ui \
+   $$PWD/../Old/SurfaceAnimatorDialog.ui \

@@ -21,7 +21,6 @@
 ********************************************************************************/
 
 #include "ServerConfigurationDialog.h"
-#include "ServerConfiguration.h"
 #include "QueueOptionsDialog.h"
 #include "SshConnection.h"
 #include "SshReply.h"
@@ -43,10 +42,13 @@ ServerConfigurationDialog::ServerConfigurationDialog(ServerConfiguration& config
 {
    m_dialog.setupUi(this);
    init();
-   m_currentConfiguration = new ServerConfiguration(m_originalConfiguration);
+   m_currentConfiguration = m_originalConfiguration;
    blockUpdate(true);
    copyFrom(m_originalConfiguration);
    blockUpdate(false);
+
+   // Hide this temporarily as it causes the server to not appear in the list
+   m_dialog.testConnectionButton->hide();
 
    connect(m_dialog.buttonBox, SIGNAL(accepted()), this, SLOT(verify()));
 }
@@ -54,7 +56,6 @@ ServerConfigurationDialog::ServerConfigurationDialog(ServerConfiguration& config
 
 ServerConfigurationDialog::~ServerConfigurationDialog()
 {
-   delete m_currentConfiguration;
 }
 
 
@@ -116,11 +117,11 @@ qDebug() << "  to true";
    if (blockUpdate()) return;
 qDebug() << "  update not blocked";
 
-   m_currentConfiguration->setDefaults(ServerConfiguration::Local);
+   m_currentConfiguration.setDefaults(ServerConfiguration::Local);
    on_queueSystem_currentIndexChanged(m_dialog.queueSystem->currentText());
 
 qDebug() << "  local defaults set";
-   copyFrom(*m_currentConfiguration);
+   copyFrom(m_currentConfiguration);
 }
 
 
@@ -137,8 +138,8 @@ void ServerConfigurationDialog::on_sshRadioButton_toggled(bool tf)
 
    if (blockUpdate()) return;
 
-   m_currentConfiguration->setDefaults(ServerConfiguration::SSH);
-   copyFrom(*m_currentConfiguration);
+   m_currentConfiguration.setDefaults(ServerConfiguration::SSH);
+   copyFrom(m_currentConfiguration);
 }
 
 
@@ -155,8 +156,8 @@ void ServerConfigurationDialog::on_httpRadioButton_toggled(bool tf)
 
    if (blockUpdate()) return;
 
-   m_currentConfiguration->setDefaults(ServerConfiguration::HTTP);
-   copyFrom(*m_currentConfiguration);
+   m_currentConfiguration.setDefaults(ServerConfiguration::HTTP);
+   copyFrom(m_currentConfiguration);
 }
 
 
@@ -173,8 +174,8 @@ void ServerConfigurationDialog::on_httpsRadioButton_toggled(bool tf)
 
    if (blockUpdate()) return;
 
-   m_currentConfiguration->setDefaults(ServerConfiguration::HTTPS);
-   copyFrom(*m_currentConfiguration);
+   m_currentConfiguration.setDefaults(ServerConfiguration::HTTPS);
+   copyFrom(m_currentConfiguration);
 }
 
 
@@ -187,8 +188,8 @@ void ServerConfigurationDialog::on_configureConnectionButton_clicked(bool)
 
 void ServerConfigurationDialog::on_configureQueueButton_clicked(bool)
 {
-   copyTo(m_currentConfiguration);
-   QueueOptionsDialog dialog(m_currentConfiguration, this);
+   copyTo(&m_currentConfiguration);
+   QueueOptionsDialog dialog(&m_currentConfiguration, this);
    dialog.exec();
 }
 
@@ -197,8 +198,8 @@ void ServerConfigurationDialog::on_queueSystem_currentIndexChanged(QString const
 {
   if (blockUpdate()) return;
   ServerConfiguration::QueueSystemT queueT(ServerConfiguration::toQueueSystemT(queue));
-  //if (m_currentConfiguration->queueSystem() == queueT) return;
-  m_currentConfiguration->setDefaults(queueT);
+  //if (m_currentConfiguration.queueSystem() == queueT) return;
+  m_currentConfiguration.setDefaults(queueT);
 }
 
 
@@ -265,6 +266,11 @@ qDebug() << "Setting connection to HTTP";
          QMsgBox::warning(this, "IQmol", "User name must be set");
          return false;
       }
+
+      if (m_dialog.workingDirectory->text().contains("~")) {
+         QMsgBox::warning(this, "IQmol", "Use of shortcut ~ in working directory not supported");
+         return false;
+      }
    }
    // end sanity checks
 
@@ -310,18 +316,18 @@ bool ServerConfigurationDialog::testConnection()
 {
    bool okay(false);
 
-   if (!copyTo(m_currentConfiguration)) return okay;
+   if (!copyTo(&m_currentConfiguration)) return okay;
 
-   switch (m_currentConfiguration->connection()) {
+   switch (m_currentConfiguration.connection()) {
       case ServerConfiguration::Local:
          QMsgBox::information(this, "IQmol", "Local connection just fine");
          break;
       case ServerConfiguration::SSH:
-         okay = testSshConnection(*m_currentConfiguration);
+         okay = testSshConnection(m_currentConfiguration);
          break;
       case ServerConfiguration::HTTP:
       case ServerConfiguration::HTTPS:
-         okay = testHttpConnection(*m_currentConfiguration);
+         okay = testHttpConnection(m_currentConfiguration);
          break;
    }
 
@@ -424,7 +430,7 @@ bool ServerConfigurationDialog::testHttpConnection(ServerConfiguration const& co
 
 void ServerConfigurationDialog::verify()
 {
-   if (!copyTo(m_currentConfiguration)) return;
+   if (!copyTo(&m_currentConfiguration)) return;
 
 /* don't bother with the testing at the moment, it is just annoying
    if (!m_tested && !m_dialog.localRadioButton->isChecked()) {
@@ -436,7 +442,7 @@ void ServerConfigurationDialog::verify()
    }
 */
 
-   m_originalConfiguration = *m_currentConfiguration;
+   m_originalConfiguration = m_currentConfiguration;
 
    accept();
 }
@@ -464,9 +470,9 @@ void ServerConfigurationDialog::on_loadButton_clicked(bool)
       QList<Data::YamlNode*> yaml(bank.findData<Data::YamlNode>());
       if (yaml.first()) {
          yaml.first()->dump();
-         ServerConfiguration config(*(yaml.first()));
+         m_currentConfiguration = ServerConfiguration(*(yaml.first()));
          blockUpdate(true);
-         copyFrom(config);
+         copyFrom(m_currentConfiguration);
          blockUpdate(false);
       }
 
@@ -479,7 +485,7 @@ void ServerConfigurationDialog::on_loadButton_clicked(bool)
 
 void ServerConfigurationDialog::on_exportButton_clicked(bool)
 {
-   if (!copyTo(m_currentConfiguration)) return;
+   if (!copyTo(&m_currentConfiguration)) return;
 
    QString filePath(QDir::homePath()); 
    filePath += "/iqmol_server.cfg";
@@ -488,7 +494,7 @@ void ServerConfigurationDialog::on_exportButton_clicked(bool)
        tr("Configuration Files (*.cfg)"));
 
    if (filePath.isEmpty()) return;
-   Data::YamlNode node(m_currentConfiguration->toYamlNode());
+   Data::YamlNode node(m_currentConfiguration.toYamlNode());
    if (!node.saveToFile(filePath)) {
       QMsgBox::warning(this, "IQmol", "Failed to export server configuration");
    }
