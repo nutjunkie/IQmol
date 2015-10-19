@@ -616,6 +616,7 @@ void Viewer::popAnimator(Animator::Base* base)
       QLOG_DEBUG() << "Stoping animation";
       stopAnimation();
       m_viewerModel.determineSymmetry();
+      m_viewerModel.saveToCurrentGeometry();
    }
 }
 

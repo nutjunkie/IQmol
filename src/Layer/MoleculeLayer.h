@@ -244,6 +244,7 @@ namespace IQmol {
             void detectSymmetry();
             void autoDetectSymmetry();
             void invalidateSymmetry();
+            void saveToCurrentGeometry();
    
          Q_SIGNALS:
             void softUpdate(); // issue if the number of primitives does not change

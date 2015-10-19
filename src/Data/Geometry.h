@@ -46,11 +46,14 @@ namespace Data {
          QString atomicSymbol(unsigned const i) const;
          unsigned atomicNumber(unsigned const i) const;
          qglviewer::Vec position(unsigned const i) const;
+
          QList<qglviewer::Vec> const& coordinates() const { return m_coordinates; }
+         void setCoordinates(QList<qglviewer::Vec> const&);
 
          /// Use to convert between Bohr and Angstrom
          void scaleCoordinates(double const);
-         void translate(qglviewer::Vec const&);
+         // don't think this is used.
+         //void translate(qglviewer::Vec const&);
 
          /// Two geometries are considered the same if their AtomLists contain
          /// the same atoms in the same order.  Everything else could be

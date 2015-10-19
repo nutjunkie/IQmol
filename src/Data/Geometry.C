@@ -23,6 +23,7 @@
 #include "Geometry.h"
 #include "AtomicProperty.h"
 #include "Numerical.h"
+#include "QsLog.h"
 #include <QDebug>
 #include "openbabel/mol.h"
 
@@ -243,11 +244,28 @@ void Geometry::scaleCoordinates(double const scale)
 }
 
 
+void Geometry::setCoordinates(QList<qglviewer::Vec> const& newCoordinates)
+{
+   if (newCoordinates.size() == m_coordinates.size()) {
+   qglviewer::Vec vec(m_coordinates.first());
+qDebug() << "First Coordinate before:" << vec.x << vec.y << vec.z;
+      m_coordinates = newCoordinates;
+      vec  = m_coordinates.first();
+qDebug() << "First Coordinate after :" << vec.x << vec.y << vec.z;
+   }else {
+      QLOG_WARN() << "Coordinate mismatch in Geometry::setCoordinates";
+   }
+}
+
+
+
+/*
 void Geometry::translate(qglviewer::Vec const& shift)
 {
    for (int i = 0; i < m_coordinates.size(); ++i) {
        m_coordinates[i] += shift;
    }
 }
+*/
 
 } } // end namespace IQmol::Data

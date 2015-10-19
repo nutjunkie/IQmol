@@ -107,7 +107,8 @@ Molecule::Molecule(QObject* parent) : Base(DefaultMoleculeName, parent),
    m_scanList(this, "Scan Coordinates"), 
    m_groupList(this, "Groups"), 
    m_efpFragmentList(this),
-   m_currentGeometry(0), m_chargeType(Data::Type::GasteigerCharge)
+   m_currentGeometry(0), 
+   m_chargeType(Data::Type::GasteigerCharge)
 {
    setFlags(Qt::ItemIsSelectable | Qt::ItemIsDropEnabled | 
       Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
@@ -1439,6 +1440,29 @@ void Molecule::setGeometry(IQmol::Data::Geometry& geometry)
 }
 
 
+void Molecule::saveToCurrentGeometry()
+{
+   if (!m_currentGeometry) return;
+
+   AtomList atomList(findLayers<Atom>(Children));
+   unsigned nAtoms(atomList.size());
+   if (nAtoms != m_currentGeometry->nAtoms()) {
+      QLOG_DEBUG() << "Invalid Geometry passed to Molecule::saveToCurrentGeometry";
+      return;
+   }
+   qDebug() << "Saving current geometry";
+
+   QList<qglviewer::Vec> coordinates;
+   AtomList::iterator iter;
+   for (iter = atomList.begin(); iter != atomList.end(); ++iter) {
+       coordinates.append( (*iter)->getPosition() );
+   }
+
+   m_currentGeometry->setCoordinates(coordinates);
+}
+
+
+
 void Molecule::reindexAtomsAndBonds()
 {
    m_maxAtomicNumber = 0;
@@ -1777,6 +1801,7 @@ void Molecule::symmetrize(double tolerance, bool updateCoordinates)
       postCommand(cmd);
       m_modified = true;
       softUpdate();
+      saveToCurrentGeometry();
 
       centerOfNuclearChargeAvailable(centerOfNuclearCharge());
       setAtomicCharges(Data::Type::GasteigerCharge);
@@ -1791,6 +1816,89 @@ void Molecule::symmetrize(double tolerance, bool updateCoordinates)
    double t = time.elapsed() / 1000.0;
    QLOG_TRACE() << "Point group symmetry set to" << pointGroup << " time taken:" << t << "s";
 }
+
+
+void Molecule::translateToCenter(GLObjectList const& selection)
+{
+   Command::MoveObjects* cmd(new Command::MoveObjects(this, "Translate to center", true));
+
+   // the ordering here is important!!
+   Atom* atom;
+   AtomList atomList;
+   GLObjectList::const_iterator iter;
+   for (iter = selection.begin(); iter != selection.end(); ++iter) {
+       if ( (atom = qobject_cast<Atom*>(*iter)) ) atomList.append(atom); 
+   }
+
+   switch (atomList.size()) {
+      case 1:
+         translate(-atomList[0]->getPosition());
+         break;
+      case 2:
+         translate(-atomList[0]->getPosition());
+         alignToAxis(atomList[1]->getPosition());
+         break;
+      case 3:
+         translate(-atomList[0]->getPosition());
+         alignToAxis(atomList[1]->getPosition());
+         rotateIntoPlane(atomList[2]->getPosition());
+         break;
+      default:
+         translate(-centerOfNuclearCharge());
+         break;
+   }
+
+   postCommand(cmd);
+
+   softUpdate();
+   centerOfNuclearChargeAvailable(centerOfNuclearCharge());
+   reindexAtomsAndBonds();
+   saveToCurrentGeometry();
+   m_modified = true;
+}
+
+
+void Molecule::translate(Vec const& displacement)
+{
+   GLObjectList objects(findLayers<GLObject>(Children));
+   GLObjectList::iterator iter;
+   for (iter = objects.begin(); iter != objects.end(); ++iter) {
+       (*iter)->setPosition((*iter)->getPosition()+displacement);
+   }
+   m_frame.setPosition(m_frame.position()+displacement);
+}
+
+
+void Molecule::rotate(Quaternion const& rotation)
+{
+   GLObjectList objects(findLayers<GLObject>(Children));
+   GLObjectList::iterator iter;
+   for (iter = objects.begin(); iter != objects.end(); ++iter) {
+       (*iter)->setPosition(rotation.rotate((*iter)->getPosition()));
+       (*iter)->setOrientation(rotation * (*iter)->getOrientation());
+   }
+   m_frame.setPosition(rotation.rotate(m_frame.position()));
+   m_frame.setOrientation(rotation * m_frame.orientation());
+}
+
+
+// Aligns point along axis (default z-axis)
+void Molecule::alignToAxis(Vec const& point, Vec const axis)
+{
+   rotate(Quaternion(point, axis));
+}
+
+
+// Rotates point into the plane defined by the normal vector
+void Molecule::rotateIntoPlane(Vec const& pt, Vec const& axis, Vec const& normal)
+{
+   Vec pp(pt);
+   pp.projectOnPlane(axis);
+   rotate(Quaternion(pp, cross(normal, axis)));
+}
+
+
+
 
 
 // The following is essentially a wrapper around OBMol::FindChildren
@@ -2063,45 +2171,6 @@ Bond* Molecule::getBond(Atom* A, Atom* B)
 }
 
 
-void Molecule::translateToCenter(GLObjectList const& selection)
-{
-   Command::MoveObjects* cmd(new Command::MoveObjects(this, "Translate to center", true));
-
-   // the ordering here is important!!
-   Atom* atom;
-   AtomList atomList;
-   GLObjectList::const_iterator iter;
-   for (iter = selection.begin(); iter != selection.end(); ++iter) {
-       if ( (atom = qobject_cast<Atom*>(*iter)) ) atomList.append(atom); 
-   }
-
-   switch (atomList.size()) {
-      case 1:
-         translate(-atomList[0]->getPosition());
-         break;
-      case 2:
-         translate(-atomList[0]->getPosition());
-         alignToAxis(atomList[1]->getPosition());
-         break;
-      case 3:
-         translate(-atomList[0]->getPosition());
-         alignToAxis(atomList[1]->getPosition());
-         rotateIntoPlane(atomList[2]->getPosition());
-         break;
-      default:
-         translate(-centerOfNuclearCharge());
-         break;
-   }
-
-   postCommand(cmd);
-
-   softUpdate();
-   centerOfNuclearChargeAvailable(centerOfNuclearCharge());
-   reindexAtomsAndBonds();
-   m_modified = true;
-}
-
-
 Vec Molecule::centerOfNuclearCharge()
 {
    Vec center;
@@ -2118,46 +2187,6 @@ Vec Molecule::centerOfNuclearCharge()
 
    if (atoms.size() > 0) center = center / totalCharge;
    return center;
-}
-
-
-void Molecule::translate(Vec const& displacement)
-{
-   GLObjectList objects(findLayers<GLObject>(Children));
-   GLObjectList::iterator iter;
-   for (iter = objects.begin(); iter != objects.end(); ++iter) {
-       (*iter)->setPosition((*iter)->getPosition()+displacement);
-   }
-   m_frame.setPosition(m_frame.position()+displacement);
-}
-
-
-void Molecule::rotate(Quaternion const& rotation)
-{
-   GLObjectList objects(findLayers<GLObject>(Children));
-   GLObjectList::iterator iter;
-   for (iter = objects.begin(); iter != objects.end(); ++iter) {
-       (*iter)->setPosition(rotation.rotate((*iter)->getPosition()));
-       (*iter)->setOrientation(rotation * (*iter)->getOrientation());
-   }
-   m_frame.setPosition(rotation.rotate(m_frame.position()));
-   m_frame.setOrientation(rotation * m_frame.orientation());
-}
-
-
-// Aligns point along axis (default z-axis)
-void Molecule::alignToAxis(Vec const& point, Vec const axis)
-{
-   rotate(Quaternion(point, axis));
-}
-
-
-// Rotates point into the plane defined by the normal vector
-void Molecule::rotateIntoPlane(Vec const& pt, Vec const& axis, Vec const& normal)
-{
-   Vec pp(pt);
-   pp.projectOnPlane(axis);
-   rotate(Quaternion(pp, cross(normal, axis)));
 }
 
 

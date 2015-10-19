@@ -732,13 +732,20 @@ void ViewerModel::translateToCenter()
 
 void ViewerModel::symmetrize(double const tolerance)
 {
-   forAllMolecules(boost::bind(&Layer::Molecule::symmetrize, _1, tolerance, true));
+   bool updateCoordinates(true);
+   forAllMolecules(boost::bind(&Layer::Molecule::symmetrize, _1, tolerance, updateCoordinates));
 }
 
 
 void ViewerModel::toggleAutoDetectSymmetry()
 {
    Layer::Molecule::toggleAutoDetectSymmetry();
+}
+
+
+void ViewerModel::saveToCurrentGeometry()
+{
+   forAllMolecules(boost::bind(&Layer::Molecule::saveToCurrentGeometry, _1));
 }
 
 
@@ -778,7 +785,8 @@ void ViewerModel::ungroupSelection()
 
 void ViewerModel::forAllMolecules(boost::function<void(Layer::Molecule&)> function)
 {
-   MoleculeList molecules(moleculeList());
+   bool visibleOnly(true);
+   MoleculeList molecules(moleculeList(visibleOnly));
    MoleculeList::iterator iter;
    for (iter = molecules.begin(); iter != molecules.end(); ++iter) {
        function(*(*iter));

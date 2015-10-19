@@ -85,6 +85,7 @@ namespace IQmol {
          void symmetrize() { symmetrize(m_symmetryTolerance); }
          void symmetrize(double const);
          void determineSymmetry();
+         void saveToCurrentGeometry();
          void adjustSymmetryTolerance();
          void toggleAutoDetectSymmetry();
 
