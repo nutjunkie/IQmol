@@ -54,7 +54,6 @@ namespace Process2 {
          static QString toString(FieldT const);
          static QString toString(ConnectionT const);
          static QString toString(QueueSystemT const);
-         static QString toString(AuthenticationT const);
 
          static FieldT toFieldT(QString const& field);
          static ConnectionT toConnectionT(QString const& connection);

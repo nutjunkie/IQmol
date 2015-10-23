@@ -94,21 +94,6 @@ QString ServerConfiguration::toString(QueueSystemT const queue)
 }
 
 
-QString ServerConfiguration::toString(AuthenticationT const authentication)
-{
-   QString s;
-   switch (authentication) {
-     case Network::Connection::None:                s = "None";                     break;
-     case Network::Connection::Agent:               s = "SSH Agent";                break;
-     case Network::Connection::HostBased:           s = "SSH Host Based";           break;
-     case Network::Connection::KeyboardInteractive: s = "SSH Keyboard Interactive"; break;
-     case Network::Connection::Password:            s = "SSH Password Prompt";      break;
-     case Network::Connection::PublicKey:           s = "SSH Public Key";           break;
-   }
-   return s;
-}
-
-
 ServerConfiguration::FieldT ServerConfiguration::toFieldT(QString const& field)
 { 
    if (field.contains("server",     Qt::CaseInsensitive))  return ServerName;
@@ -224,7 +209,7 @@ QString ServerConfiguration::value(FieldT const field) const
    switch (field) {
       
       case Authentication:
-         s = toString(authentication());
+         s = Network::Connection::toString(authentication());
          break;
 
       case QueueSystem:
@@ -484,7 +469,7 @@ qDebug() << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
 
        switch (iter.key()) {
           case Authentication:
-             value = toString(authentication()).toStdString();
+             value = Network::Connection::toString(authentication()).toStdString();
              break;
           case QueueSystem:
              value = toString(queueSystem()).toStdString();

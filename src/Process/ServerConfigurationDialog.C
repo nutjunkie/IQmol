@@ -65,17 +65,17 @@ void ServerConfigurationDialog::init()
 
    // Not pretty, the ordering of these is linked to the enum in Network/Connection.h
    m_dialog.authentication->addItem(
-      ServerConfiguration::toString(Network::Connection::None)); 
+      Network::Connection::toString(Network::Connection::None)); 
    m_dialog.authentication->addItem(
-      ServerConfiguration::toString(Network::Connection::Agent)); 
+      Network::Connection::toString(Network::Connection::Agent)); 
    m_dialog.authentication->addItem(
-      ServerConfiguration::toString(Network::Connection::HostBased)); 
+      Network::Connection::toString(Network::Connection::HostBased)); 
    m_dialog.authentication->addItem(
-      ServerConfiguration::toString(Network::Connection::KeyboardInteractive)); 
+      Network::Connection::toString(Network::Connection::KeyboardInteractive)); 
    m_dialog.authentication->addItem(
-      ServerConfiguration::toString(Network::Connection::Password)); 
+      Network::Connection::toString(Network::Connection::Password)); 
    m_dialog.authentication->addItem(
-      ServerConfiguration::toString(Network::Connection::PublicKey)); 
+      Network::Connection::toString(Network::Connection::PublicKey)); 
 }
 
 
