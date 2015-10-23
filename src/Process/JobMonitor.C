@@ -263,17 +263,17 @@ void JobMonitor::submitJob(QChemJobInfo& qchemJobInfo)
    Job* job(0);
    qchemJobInfo.dump();
 
+   QString serverName(qchemJobInfo.get(QChemJobInfo::ServerName));
+   Server* server(ServerRegistry::instance().find(serverName));
+
+   if (!server) {
+      QString msg("Invalid server: ");
+      msg += serverName;
+      QMsgBox::warning(this, "IQmol", msg);
+      return;
+   }
+
    try {
-      QString serverName(qchemJobInfo.get(QChemJobInfo::ServerName));
-      Server* server(ServerRegistry::instance().find(serverName));
-
-      if (!server) {
-         QString msg("Invalid server: ");
-         msg += serverName;
-         QMsgBox::warning(this, "IQmol", msg);
-         return;
-      }
-
       // stop the update timer while we are doing this
       BlockServerUpdates bs(server);
       postUpdateMessage("Connecting to server...");
@@ -300,9 +300,11 @@ void JobMonitor::submitJob(QChemJobInfo& qchemJobInfo)
 
    }catch (Network::AuthenticationCancelled& ex) {
       if (job) s_deletedJobs.append(job);
+      server->closeConnection();
 
    }catch (Network::AuthenticationError& ex) {
       if (job) s_deletedJobs.append(job);
+      server->closeConnection();
       postUpdateMessage("");
       QMsgBox::warning(this, "IQmol", "Invalid username or password");
 
