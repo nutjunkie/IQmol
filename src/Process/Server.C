@@ -86,9 +86,10 @@ void Server::open()
    if (m_connection && 
        m_connection->status() == Network::Connection::Authenticated) return;
 
-   QLOG_TRACE() << "Opening server" << name();
-
    if (!m_connection) {
+      QLOG_TRACE() << "Creating connection" 
+                   << m_configuration.value(ServerConfiguration::Connection);
+
       QVariant address(m_configuration.value(ServerConfiguration::HostAddress));
       int port(m_configuration.port());
 
@@ -107,6 +108,7 @@ void Server::open()
    }
 
    if (m_connection->status() == Network::Connection::Closed) {
+      QLOG_TRACE() << "Opening connection to server" << name();
       m_connection->open();
    }
 
