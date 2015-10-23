@@ -60,6 +60,7 @@ namespace Configurator {
             if (!m_geometry.isNull()) setGeometry(m_geometry);
             sync();
             show();
+            raise();
          }
 
       public Q_SLOTS:
