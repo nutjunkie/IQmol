@@ -49,6 +49,9 @@ namespace Network {
          enum AuthenticationT { None, Agent, HostBased, KeyboardInteractive, Password,
             PublicKey };
 
+         static QString toString(Status const);
+         static QString toString(AuthenticationT const);
+
          Connection(QString const& hostname, int const port) : QObject(), m_hostname(hostname),
             m_port(port), m_status(Closed), m_timeout(10000) { }  // 10s default
          
