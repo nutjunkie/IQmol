@@ -29,7 +29,7 @@ namespace IQmol {
 namespace Network {
 
 HttpReply::HttpReply(HttpConnection* connection) : m_connection(connection), m_networkReply(0),
-   m_https(connection->secure())
+   m_https(connection->isSecure())
 { 
    m_timeout = m_connection->timeout();
    m_timer.setInterval(m_timeout);

@@ -34,15 +34,14 @@
 namespace IQmol {
 namespace Network {
 
-HttpConnection::HttpConnection(QString const& hostname, int const port) :
-   Connection(hostname, port), m_networkAccessManager(0), m_secure(false)
+HttpConnection::HttpConnection(QString const& hostname, int const port, bool const https) :
+   Connection(hostname, port), m_networkAccessManager(0), m_secure(https)
 {
 }
 
 
 void HttpConnection::open()
 {
-   // If m_secure
    m_networkAccessManager = new QNetworkAccessManager(this);
    if (!m_networkAccessManager) throw Exception("HTTP open connection failed");
    m_status = Opened;

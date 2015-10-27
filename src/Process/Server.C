@@ -101,8 +101,10 @@ void Server::open()
             m_connection = new Network::SshConnection(address.toString(), port);
             break;
          case ServerConfiguration::HTTP:
-         case ServerConfiguration::HTTPS:
             m_connection = new Network::HttpConnection(address.toString(), port);
+            break;
+         case ServerConfiguration::HTTPS:
+            m_connection = new Network::HttpConnection(address.toString(), port, true);
             break;
       }
    }

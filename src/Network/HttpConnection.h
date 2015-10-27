@@ -42,11 +42,11 @@ namespace Network {
       friend class HttpPost;
 
       public:
-         HttpConnection(QString const& hostAddress, int const port = 80);
+         HttpConnection(QString const& hostAddress, int const port = 80, 
+            bool const https = false);
          ~HttpConnection() { close(); }
 
-         void setSecure(bool secure) { m_secure = secure; }
-         bool secure() const { return m_secure; }
+         bool isSecure() const { return m_secure; }
 
          void open();
          void close();
