@@ -121,6 +121,7 @@ namespace IQmol {
          void reindexAtoms(Layer::Molecule*);
          void setRecord(bool);
          void blockUpdate(bool tf);
+         void movieMakingFinished();
 
       protected:
          void dropEvent(QDropEvent*);

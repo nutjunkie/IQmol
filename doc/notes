@@ -36,7 +36,7 @@ THINGS TO CONSIDER:
 
 
 
-IQmol 2.6 
+IQmol 2.7 
 ~~~~~~~~~
 
  o File Formats
@@ -57,6 +57,11 @@ IQmol 2.6
  o Symmetry module:
     - Display of symmetry elements (transparent planes)
     - Animation of symmetry operations.
+
+           - Symmetry item (configurator is PG table)
+              - rotation
+              - reflection
+    
 
  o CactusServer for naming molecules
      -  http://www.chemspider.com
@@ -372,6 +377,7 @@ qmake -spec macx-g++ -o Makefile IQmol.pro
 
 generating png files for fragments
 for i in `cat ../all.list `;do babel -ixyz $i.xyz -O $i.png ; done
+and chemdraw
 
 Hidden function warning:
 struct Derived: public Base {

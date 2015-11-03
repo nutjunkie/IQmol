@@ -96,7 +96,9 @@ void Surface::sync()
 
 void Surface::on_propertyCombo_currentIndexChanged(int)
 {
+
    QString type(m_surfaceConfigurator.propertyCombo->currentText());
+qDebug() << "Changing property combo" << type;
    disconnect(m_surfaceConfigurator.positiveColorButton, 0, 0, 0);
 
    if (type == "None") {
@@ -144,7 +146,9 @@ void Surface::on_propertyCombo_currentIndexChanged(int)
          QLOG_ERROR() << "No Molecule found";
       }else {
          m_surface.setColors(m_gradientColors);
+qDebug() << "Computing propert data";
          m_surface.computePropertyData(parents.first()->getPropertyEvaluator(type));
+qDebug() << "Computing propert data finished";
       }
 
       m_surfaceConfigurator.scaleButton->setEnabled(m_surface.propertyIsSigned());

@@ -36,16 +36,21 @@ macx {
 
    # SSH2
    #LIBSSH2      = $(DEV)/libssh2-1.6.0
-   LIBSSH2      = $(DEV)/libssh2-1.4.3
-   INCLUDEPATH += $${LIBSSH2}/include
-   LIBS        += $${LIBSSH2}/src/.libs/libssh2.a
+   #LIBSSH2      = $(DEV)/libssh2-1.4.3
+   #INCLUDEPATH += $${LIBSSH2}/include
+   #LIBS        += $${LIBSSH2}/src/.libs/libssh2.a
+   INCLUDEPATH += $(DEV)/extlib/include
+   LIBS        += $(DEV)/extlib/lib//libssh2.a
 
    # libssl/libcrypto
-   LIBSSL       = $(DEV)/openssl-1.0.1p
+   #LIBSSL       = $(DEV)/openssl-1.0.2d
    #INCLUDEPATH += $${LIBSSL}/include
    #LIBS        += $${LIBSSL}/libssl.a 
-   LIBS        += -lssl
-   LIBS        += $${LIBSSL}/libcrypto.a
+   #LIBS        += $${LIBSSL}/libcrypto.a
+   #LIBS        += -lssl -lcrypto
+   INCLUDEPATH += $(DEV)/extlib/include
+   LIBS        += $(DEV)/extlib/lib/libssl.a 
+   LIBS        += $(DEV)/extlib/lib/libcrypto.a
 
    # gfortran
    LIBS += /usr/local/gfortran/lib/libgfortran.a

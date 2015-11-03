@@ -649,6 +649,7 @@ void Viewer::setRecord(bool activate)
       }else {
          m_snapper = new Snapshot(this, Snapshot::Movie);
          connect(this, SIGNAL(animationStep()), m_snapper, SLOT(capture()));
+         connect(m_snapper, SIGNAL(movieFinished()), this, SLOT(movieMakingFinished()));
          if (!m_snapper->requestFileName()) {
             delete m_snapper;
             m_snapper = 0;
@@ -656,11 +657,18 @@ void Viewer::setRecord(bool activate)
          }
       } 
    }else {
-      if (m_snapper) {
-         m_snapper->makeMovie();
-         delete m_snapper;
-      } 
+      if (m_snapper) m_snapper->makeMovie();
+   }
+}
+
+
+void Viewer::movieMakingFinished()
+{
+   if (m_snapper) {
+      delete m_snapper;
       m_snapper = 0;
+   }else {
+      QLOG_WARN() << "movieMakingFinished called with null snapshot taker";
    }
 }
 

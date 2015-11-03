@@ -248,10 +248,8 @@ void Geometry::setCoordinates(QList<qglviewer::Vec> const& newCoordinates)
 {
    if (newCoordinates.size() == m_coordinates.size()) {
    qglviewer::Vec vec(m_coordinates.first());
-qDebug() << "First Coordinate before:" << vec.x << vec.y << vec.z;
       m_coordinates = newCoordinates;
       vec  = m_coordinates.first();
-qDebug() << "First Coordinate after :" << vec.x << vec.y << vec.z;
    }else {
       QLOG_WARN() << "Coordinate mismatch in Geometry::setCoordinates";
    }

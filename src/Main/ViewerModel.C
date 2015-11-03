@@ -334,7 +334,6 @@ void ViewerModel::copySelectionToClipboard()
        coordinates += (*mol)->coordinatesAsString(selectedOnly);
    }
 
-   qDebug() << "Coordinates copied to ClipBoard:";
    qDebug() << coordinates;
    QApplication::clipboard()->setText(coordinates);
 }
