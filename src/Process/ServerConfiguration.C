@@ -280,7 +280,7 @@ QVariantList ServerConfiguration::queueResourcesList() const
 
 void ServerConfiguration::setDefaults(ConnectionT const connection)
 {
-qDebug() << "Setting defaults for " << toString(connection);
+   //qDebug() << "Setting defaults for " << toString(connection);
    m_configuration.insert(Connection, (int)connection);
 
    switch (connection) {

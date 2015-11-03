@@ -106,21 +106,17 @@ void ServerConfigurationDialog::updateAllowedQueueSystems(bool httpOnly)
 
 void ServerConfigurationDialog::on_localRadioButton_toggled(bool tf)
 {
-qDebug() << "Local Radio button toggled";
    if (!tf) return;
-qDebug() << "  to true";
 
    m_dialog.remoteHostGroupBox->setEnabled(false);
    m_dialog.configureConnectionButton->setEnabled(false);
    updateAllowedQueueSystems(false);
 
    if (blockUpdate()) return;
-qDebug() << "  update not blocked";
 
    m_currentConfiguration.setDefaults(ServerConfiguration::Local);
    on_queueSystem_currentIndexChanged(m_dialog.queueSystem->currentText());
 
-qDebug() << "  local defaults set";
    copyFrom(m_currentConfiguration);
 }
 
@@ -245,10 +241,8 @@ bool ServerConfigurationDialog::copyTo(ServerConfiguration* config)
 
    ServerConfiguration::ConnectionT connection(ServerConfiguration::Local);
    if (m_dialog.sshRadioButton->isChecked()) {
-qDebug() << "Setting connection to SSH";
       connection = ServerConfiguration::SSH;
    }else if (m_dialog.httpRadioButton->isChecked()) {
-qDebug() << "Setting connection to HTTP";
       connection = ServerConfiguration::HTTP;
    }else if (m_dialog.httpsRadioButton->isChecked()) {
       connection = ServerConfiguration::HTTPS;
@@ -503,7 +497,6 @@ void ServerConfigurationDialog::on_exportButton_clicked(bool)
 
 void ServerConfigurationDialog::blockUpdate(bool const tf)
 {
-   qDebug() << "Setting block update to" << tf;
    m_blockUpdate = tf;
 }
 
