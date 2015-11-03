@@ -29,6 +29,7 @@
 #include "Hessian.h"
 #include "Energy.h"
 #include "PointGroup.h"
+#include "Geometry.h"
 #include "DipoleMoment.h"
 #include "EfpFragmentLibrary.h"
 #include "MultipoleExpansion.h"
@@ -36,6 +37,7 @@
 #include "Constants.h"
 #include "ExcitedStates.h"
 #include "Spin.h"
+#include "Nmr.h"
 #include "QsLog.h"
 #include <QRegExp>
 #include <QFile>
@@ -138,6 +140,7 @@ bool QChemOutput::parse(TextStream& textStream)
    Data::Geometry* currentGeometry(0);
    Data::GeometryList* geometryList(0);
    Data::GeometryList* scanGeometries(0);
+   Data::Nmr* nmr(0);
 
    m_nAlpha = 0;
    m_nBeta  = 0;
@@ -320,9 +323,15 @@ qDebug() << "Reading CIS States --";
          textStream.skipLine(2);
          readCisStates(textStream, currentGeometry);
 
-      }else if (line.contains("ATOM           ISOTROPIC")) {
+      }else if (line.contains("ATOM           ISOTROPIC        ANISOTROPIC       REL. SHIFTS")) {
          textStream.skipLine(1);
-         readNmrShifts(textStream, currentGeometry);
+         if (!nmr) nmr = new Data::Nmr;
+         readNmrShifts(textStream, currentGeometry, nmr);
+
+      }else if (line.contains("ATOM           ISOTROPIC")) {
+ //        textStream.skipLine(1);
+         if (!nmr) nmr = new Data::Nmr;
+         readNmrCouplings(textStream, currentGeometry, nmr);
 
       }else if (line.contains("Cartesian Multipole Moments")) {
          textStream.skipLine(4);
@@ -353,7 +362,6 @@ qDebug() << "Reading CIS States --";
       }else {
          geometryList->setDefaultIndex(-1);
          m_dataBank.append(geometryList);
-geometryList->dump();
       }
    }
 
@@ -895,9 +903,10 @@ void QChemOutput::readHessian(TextStream& textStream, Data::Geometry* geometry)
 }
 
 
-void QChemOutput::readNmrShifts(TextStream& textStream, Data::Geometry* geometry)
+void QChemOutput::readNmrShifts(TextStream& textStream, Data::Geometry* geometry, Data::Nmr* nmr)
 {
-   if (!geometry) return;
+   qDebug() << "Reading NMR Shifts";
+   if (!geometry || !nmr) return;
    QStringList tokens;
 
    QList<double> isotropic;
@@ -943,12 +952,23 @@ void QChemOutput::readNmrShifts(TextStream& textStream, Data::Geometry* geometry
 
    allOk = geometry->setAtomicProperty<Data::NmrShiftIsotropic>(isotropic);
 
-   if (!allOk) m_errors.append("Failed to read NMR Isotropic shifts");
+   if (allOk) { 
+      nmr->setIsotropicShifts(isotropic);
+   }else {
+      m_errors.append("Failed to read NMR Isotropic shifts");
+   }
 
    if (haveRelativeShifts) {
       allOk = geometry->setAtomicProperty<Data::NmrShiftRelative>(relative);
       if (!allOk) m_errors.append("Failed to read NMR Relative shifts");
    }
+}
+
+
+void QChemOutput::readNmrCouplings(TextStream& textStream, Data::Geometry* geometry, Data::Nmr* nmr)
+{
+   qDebug() << "Reading NMR coupling constants";
+   if (!geometry || !nmr) return;
 }
 
 

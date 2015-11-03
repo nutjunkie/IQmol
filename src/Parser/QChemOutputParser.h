@@ -23,10 +23,15 @@
 ********************************************************************************/
 
 #include "Parser.h"
-#include "Geometry.h"
 
 
 namespace IQmol {
+
+namespace Data {
+   class Nmr;
+   class Geometry;
+}
+
 namespace Parser {
 
    class QChemOutput : public Base {
@@ -42,7 +47,8 @@ namespace Parser {
          Data::Geometry* readStandardCoordinates(TextStream&);
          void readStandardCoordinates(TextStream&, Data::Geometry*);
          void readCharges(TextStream&, Data::Geometry*, QString const& label);
-         void readNmrShifts(TextStream&, Data::Geometry*);
+         void readNmrShifts(TextStream&, Data::Geometry*, Data::Nmr*);
+         void readNmrCouplings(TextStream&, Data::Geometry*, Data::Nmr*);
          void readDipoleMoment(TextStream&, Data::Geometry*);
          void readHessian(TextStream&, Data::Geometry*);
          void readVibrationalModes(TextStream&);
