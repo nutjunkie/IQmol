@@ -347,8 +347,8 @@ void Surface::drawFaceNormals(Data::Mesh const& mesh)
    float scale(0.12);
 
    for (face = mesh.fbegin(); face != mesh.fend(); ++face) {
-       p = mesh.faceCentroid(face.handle());
-       n = mesh.normal(face.handle());
+       p = mesh.faceCentroid(*face);
+       n = mesh.normal(*face);
        glVertex3fv( &p[0] );
        p += scale*n;
        glVertex3fv( &p[0]);
@@ -393,23 +393,23 @@ GLuint Surface::compile(Data::Mesh const& mesh)
 
          glBegin(GL_TRIANGLES);
             for (face = data.faces_begin(); face != data.faces_end(); ++face) {
-                vertex   = data.cfv_iter(face.handle());
+                vertex   = data.cfv_iter(*face);
                 property = mesh.scalarFieldValue(vertex);
                 color    = gradient.colorAt(property);
                 glColor4f( color.redF(), color.greenF(), color.blueF(), m_alpha );
-                glArrayElement( vertex.handle().idx());
+                glArrayElement(vertex->idx());
 
                 ++vertex;
                 property = mesh.scalarFieldValue(vertex);
                 color    = gradient.colorAt(property);
                 glColor4f( color.redF(), color.greenF(), color.blueF(), m_alpha );
-                glArrayElement( vertex.handle().idx());
+                glArrayElement( vertex->idx());
 
                 ++vertex;
                 property = mesh.scalarFieldValue(vertex);
                 color    = gradient.colorAt(property);
                 glColor4f( color.redF(), color.greenF(), color.blueF(), m_alpha );
-                glArrayElement( vertex.handle().idx());
+                glArrayElement( vertex->idx());
             }
          glEnd();
 
@@ -417,12 +417,12 @@ GLuint Surface::compile(Data::Mesh const& mesh)
 
          glBegin(GL_TRIANGLES);
             for (face = data.faces_begin(); face != data.faces_end(); ++face) {
-                vertex = data.cfv_iter(face.handle());
-                glArrayElement( vertex.handle().idx());
+                vertex = data.cfv_iter(*face);
+                glArrayElement(vertex->idx());
                 ++vertex;
-                glArrayElement( vertex.handle().idx());
+                glArrayElement(vertex->idx());
                 ++vertex;
-                glArrayElement( vertex.handle().idx());
+                glArrayElement(vertex->idx());
             }
          glEnd();
 
