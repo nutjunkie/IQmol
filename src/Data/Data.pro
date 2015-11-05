@@ -28,7 +28,7 @@ SOURCES = \
    $$PWD/MolecularOrbitals.C \
    $$PWD/MolecularOrbitalsList.C \
    $$PWD/MultipoleExpansion.C \
-   $$PWD/Nmr.C \
+   $$PWD/NmrData.C \
    $$PWD/NmrReference.C \
    $$PWD/OrbitalSymmetries.C \
    $$PWD/PointCharge.C \
@@ -67,7 +67,7 @@ HEADERS = \
    $$PWD/MolecularOrbitals.h \
    $$PWD/MolecularOrbitalsList.h \
    $$PWD/MultipoleExpansion.h \
-   $$PWD/Nmr.h \
+   $$PWD/NmrData.h \
    $$PWD/NmrReference.C \
    $$PWD/NmrReference.h \
    $$PWD/OrbitalSymmetries.h \

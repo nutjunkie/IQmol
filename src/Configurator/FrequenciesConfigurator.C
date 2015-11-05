@@ -110,11 +110,13 @@ void Frequencies::load()
    QList<Layer::Mode*>::iterator iter;
    for (iter = modes.begin(); iter != modes.end(); ++iter, ++row) {
 
-       frequency = new QTableWidgetItem( (*iter)->text() );
+       QString text((*iter)->text());
+       frequency = new QTableWidgetItem(text + "     ");
        frequency->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
-       intensity = new QTableWidgetItem(QString::number((*iter)->data().intensity(), 'f', 3));
-
        frequency->setData(Qt::UserRole, QVariantPointer<Layer::Mode>::toQVariant(*iter));
+
+       text = QString::number((*iter)->data().intensity(), 'f', 3);
+       intensity = new QTableWidgetItem(text + "     ");
        intensity->setData(Qt::UserRole, QVariantPointer<Layer::Mode>::toQVariant(*iter));
        intensity->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
 
@@ -122,7 +124,8 @@ void Frequencies::load()
        table->setItem(row, 1, intensity);
 
        if (m_frequencies.haveRaman()) {
-          raman = new QTableWidgetItem(QString::number((*iter)->data().ramanIntensity(), 'f', 3));
+          text = QString::number((*iter)->data().ramanIntensity(), 'f', 3);
+          raman = new QTableWidgetItem(text + "     ");
           raman->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
           table->setItem(row, 2, raman);
        }

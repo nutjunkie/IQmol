@@ -368,6 +368,10 @@ IQview
 								  S U N D R Y
                                  =============
 
+pointer/reference
+data members in a class for which the class is responsible for should be pointers.
+other data members can be references
+
 #!/bin/tcsh
 find . -name Makefile -exec \rm {} \;
 qmake -spec macx-g++ -o Makefile IQmol.pro

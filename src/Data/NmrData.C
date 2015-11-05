@@ -20,25 +20,39 @@
 
 ********************************************************************************/
 
-#include "NmrReference.h"
+#include "NmrData.h"
 #include <QDebug>
 
 
 namespace IQmol {
 namespace Data {
 
-template<> const Type::ID NmrReferenceList::TypeID = Type::NmrReferenceList;
+//template<> const Type::ID NmrReferenceList::TypeID = Type::NmrReferenceList;
 
-
-
-
-void NmrReference::dump() const 
+void Nmr::dump() const 
 {
-   qDebug() << "Method: " << m_method;
-   QMap<QString, double>::const_iterator iter;
-   for (iter = m_shifts.begin(); iter != m_shifts.end(); ++iter) {
-       qDebug() << "  " << iter.key() << "  " << iter.value();
-   } 
+   qDebug() << "NMR isotropic shifts: " << m_isotropicShifts;
+   qDebug() << "NMR relative shifts:  " << m_relativeShifts;
+   qDebug() << "NMR couplings:";
+   QStringList list(PrintMatrix(m_isotropicCouplings)); 
+
+   QStringList::iterator iter;
+   for (iter = list.begin(); iter != list.end(); ++iter) {
+       qDebug() << *iter;
+   }
+}
+
+
+bool Nmr::haveCouplings()
+{
+   return m_isotropicCouplings.size1() == m_isotropicShifts.size() &&
+          m_isotropicCouplings.size2() == m_isotropicShifts.size();
+}
+
+
+bool Nmr::haveRelativeShifts()
+{
+   return !m_relativeShifts.isEmpty();
 }
 
 } } // end namespace IQmol::Data

@@ -38,7 +38,7 @@ QString PrintVector(Vector const& vector)
 }
 
 
-QString PrintMatrix(Matrix const& matrix, unsigned const columns)
+QStringList PrintMatrix(Matrix const& matrix, unsigned const columns)
 {
    unsigned nColumnsPerLine(columns);
    unsigned width(12);
@@ -83,6 +83,8 @@ QString PrintMatrix(Matrix const& matrix, unsigned const columns)
    unsigned nCols(matrix.size2()); 
 
    QString output;
+   QStringList list;
+
 
    for (unsigned firstCol = 0; firstCol < nCols; firstCol += nColumnsPerLine) {
        unsigned lastCol(std::min(firstCol+nColumnsPerLine, nCols));
@@ -92,22 +94,22 @@ QString PrintMatrix(Matrix const& matrix, unsigned const columns)
        for (unsigned j = firstCol; j < lastCol; ++j) {
            output += QString::number(j+1).rightJustified(width);
        }
-       output += "\n";
+
+       list << output;
+       output.clear();
 
        // Rows for the current columns
-
        for (unsigned i = 0; i < nRows; ++i) {
            output += QString::number(i+1).rightJustified(4);
            for (unsigned j = firstCol; j < lastCol; ++j) {
                output += QString::number(matrix(i,j), 'f', digits).rightJustified(width);
            }
-           output += "\n";
+           list << output;
+           output.clear();
        }
    }
 
-   output.chop(1);  // remove traling new line 
-
-   return output;
+   return list;
 }
 
 

@@ -37,7 +37,8 @@
 #include "Constants.h"
 #include "ExcitedStates.h"
 #include "Spin.h"
-#include "Nmr.h"
+#include "NmrData.h"
+#include "Matrix.h"
 #include "QsLog.h"
 #include <QRegExp>
 #include <QFile>
@@ -309,7 +310,6 @@ bool QChemOutput::parse(TextStream& textStream)
          readCharges(textStream, currentGeometry, "Stewart");
 
       }else if (line.contains("Orbital Energies (a.u.) and Symmetries")) {
-qDebug() << "Reading Orbital energies ";
          textStream.skipLine(2);
          readOrbitalSymmetries(textStream);
 
@@ -328,8 +328,8 @@ qDebug() << "Reading CIS States --";
          if (!nmr) nmr = new Data::Nmr;
          readNmrShifts(textStream, currentGeometry, nmr);
 
-      }else if (line.contains("ATOM           ISOTROPIC")) {
- //        textStream.skipLine(1);
+      }else if (line.contains("Indirect Nuclear Spin--Spin")) {
+         textStream.skipLine(11);
          if (!nmr) nmr = new Data::Nmr;
          readNmrCouplings(textStream, currentGeometry, nmr);
 
@@ -373,10 +373,13 @@ qDebug() << "Reading CIS States --";
       }
    }
 
+   if (nmr) {
+      nmr->dump();
+      m_dataBank.append(nmr);
+   }
+
    return m_errors.isEmpty();
 }
-
-
 
 
 
@@ -447,7 +450,9 @@ qDebug() << "Reading CIS States";
          while (!textStream.atEnd()) {
             line = textStream.nextLine();
             if (rx.indexIn(line,0) == -1) break;
-            if (!transition->addAmplitude(rx.capturedTexts().mid(1), m_nAlpha, m_nBeta)) goto error;;
+            if (!transition->addAmplitude(rx.capturedTexts().mid(1), m_nAlpha, m_nBeta)) {
+               goto error;;
+            }
          }
      
          states->append(transition);
@@ -470,6 +475,7 @@ qDebug() << "Reading CIS States";
 
 void QChemOutput::readOrbitalSymmetries(TextStream& textStream)
 {
+   qDebug() << "Reading orbital energies";
    // We only parse the orbital symmetries section if we have excited states
    QList<Data::ExcitedStates*> es(m_dataBank.findData<Data::ExcitedStates>());
    if (es.isEmpty()) return;
@@ -903,10 +909,11 @@ void QChemOutput::readHessian(TextStream& textStream, Data::Geometry* geometry)
 }
 
 
-void QChemOutput::readNmrShifts(TextStream& textStream, Data::Geometry* geometry, Data::Nmr* nmr)
+void QChemOutput::readNmrShifts(TextStream& textStream, Data::Geometry* geometry, 
+   Data::Nmr* nmr)
 {
-   qDebug() << "Reading NMR Shifts";
    if (!geometry || !nmr) return;
+   qDebug() << "Reading NMR Shifts";
    QStringList tokens;
 
    QList<double> isotropic;
@@ -954,8 +961,9 @@ void QChemOutput::readNmrShifts(TextStream& textStream, Data::Geometry* geometry
 
    if (allOk) { 
       nmr->setIsotropicShifts(isotropic);
+      nmr->setAtomLabels(atomicSymbols);
    }else {
-      m_errors.append("Failed to read NMR Isotropic shifts");
+      m_errors.append("Failed to read NMR isotropic shifts");
    }
 
    if (haveRelativeShifts) {
@@ -965,10 +973,69 @@ void QChemOutput::readNmrShifts(TextStream& textStream, Data::Geometry* geometry
 }
 
 
-void QChemOutput::readNmrCouplings(TextStream& textStream, Data::Geometry* geometry, Data::Nmr* nmr)
+void QChemOutput::readNmrCouplings(TextStream& textStream, Data::Geometry* geometry, 
+   Data::Nmr* nmr)
 {
-   qDebug() << "Reading NMR coupling constants";
    if (!geometry || !nmr) return;
+   qDebug() << "Reading NMR coupling constants";
+
+   QStringList tokens;
+
+   bool done(false), allOk(true);
+   unsigned nAtoms(geometry->nAtoms());
+
+   Matrix* couplings = new Matrix(nAtoms, nAtoms);
+   for (unsigned i = 0; i < nAtoms; ++i) {
+       for (unsigned j = 0; j < nAtoms; ++j) {
+           (*couplings)(i,j) = 0.0;
+       }
+   }
+
+   QRegExp rx("#(\\d+)");
+
+   while (!textStream.atEnd() && !done && allOk) {
+      tokens = textStream.nextNonEmptyLineAsTokens();
+
+      if (tokens.first() == "Atoms" && tokens.size() > 6) {
+
+         int atom1(0), atom2(0);
+         if (allOk && rx.indexIn(tokens[2],0) != -1) {
+             atom1 = rx.capturedTexts().at(1).toInt(&allOk);
+         }
+         if (allOk && rx.indexIn(tokens[5],0) != -1) {
+            atom2 = rx.capturedTexts().at(1).toInt(&allOk);
+         }
+
+         if (atom1 > 0 && atom2 > 0 && allOk) {
+            //qDebug() << "Atoms captured" << atom1 << atom2;
+            textStream.seek("Total Spin-Spin Coupling Tensor");
+            textStream.skipLine(4);
+    
+            tokens = textStream.nextLineAsTokens();
+            //qDebug() << "Isotropic line: " << tokens;
+            if (tokens.size() > 2) {
+               (*couplings)(atom1-1, atom2-1) = tokens[1].toDouble(&allOk);
+               (*couplings)(atom2-1, atom1-1) = (*couplings)(atom1-1, atom2-1);
+            }
+
+         }else {
+            allOk = false;
+            break;
+         }
+  
+         
+      }else if (tokens.first() == "MO-PROP") {
+         done = true;
+      }
+   }
+
+   if (allOk) { 
+      nmr->setIsotropicCouplings(*couplings);
+   }else {
+      m_errors.append("Failed to read NMR ISS couplings");
+   }
+
+   delete couplings;
 }
 
 

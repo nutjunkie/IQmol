@@ -70,7 +70,12 @@ void Hessian::setData(Matrix const& hessian)
 
 void Hessian::dump() const
 {
-   qDebug() << PrintMatrix(m_hessian);
+   QStringList list(PrintMatrix(m_hessian));
+    
+   QStringList::iterator iter;
+   for (iter = list.begin(); iter != list.end(); ++iter) {
+       qDebug() << *iter;
+   }
 }
 
 } } // end namespace IQmol::Data

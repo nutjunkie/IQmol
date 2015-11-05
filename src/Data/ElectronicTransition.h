@@ -45,7 +45,7 @@ namespace Data {
          ElectronicTransition(double const energy = 0.0, double const strength = 0.0,
             qglviewer::Vec const transitionMoment = qglviewer::Vec(), 
             double spinSquared = 0.0) : m_energy(energy), m_strength(strength), 
-            m_transitionMoment(transitionMoment), m_spinSquared(spinSquared) { }
+            m_spinSquared(spinSquared), m_transitionMoment(transitionMoment) { }
          
          double energy()   const { return m_energy; }
          double strength() const { return m_strength; }

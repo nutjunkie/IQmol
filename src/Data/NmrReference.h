@@ -1,5 +1,5 @@
-#ifndef IQMOL_DATA_NMRREFERENCED_H
-#define IQMOL_DATA_NMRREFERENCED_H
+#ifndef IQMOL_DATA_NMRREFERENCE_H
+#define IQMOL_DATA_NMRREFERENCE_H
 /*******************************************************************************
 
   Copyright (C) 2011-2013 Andrew Gilbert

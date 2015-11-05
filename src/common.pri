@@ -3,7 +3,9 @@
 QT     += xml opengl gui network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
-QMAKE_CXXFLAGS += -O2 -g -ggdb
+QMAKE_CXXFLAGS += -O2 -g -ggdb 
+QMAKE_CXXFLAGS_WARN_ON = -Wall -Wno-unknown-pragmas -Wno-c++11-extensions 
+QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-function
 
 # Set the $DEV environment variable to the top directory used to compile all
 # the packages.  To simplify distribution, we use static libraries wherever

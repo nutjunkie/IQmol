@@ -20,46 +20,50 @@
    
 ********************************************************************************/
 
-#include "QsLog.h"
-#include "QMsgBox.h"
-#include "QChemJobInfo.h" 
+// Data
+#include "AtomicProperty.h"
+#include "Bank.h"
+#include "DipoleMoment.h"
+#include "Energy.h"
+#include "File.h"
+#include "Frequencies.h"
+#include "Geometry.h"
+#include "GeometryList.h"
+#include "GridData.h"
+//#include "MolecularOrbitals.h"
+#include "MultipoleExpansion.h"
+#include "PointGroup.h"
+#include "SurfaceInfo.h"
+
+
+// Layers
+#include "LayerFactory.h"
 #include "AtomLayer.h"
 #include "BondLayer.h"
-#include "Preferences.h"
 #include "ChargeLayer.h"
+#include "ConstraintLayer.h"
+#include "CubeDataLayer.h"
 #include "DipoleLayer.h"
 #include "FrequenciesLayer.h"
 #include "EfpFragmentLayer.h"
 #include "GroupLayer.h"
+#include "MoleculeLayer.h"
+//#include "MolecularOrbitalsLayer.h"
 #include "SurfaceLayer.h"
-#include "CubeDataLayer.h"
+
+
 #include "UndoCommands.h"
 #include "SpatialProperty.h"
 #include "AtomicDensity.h"
 #include "MarchingCubes.h"
 #include "MeshDecimator.h"
-#include "MoleculeLayer.h"
-#include "ProgressDialog.h"
-#include "ConstraintLayer.h"
-#include "MultipoleExpansion.h"
-//#include "MolecularOrbitalsLayer.h"
-
-#include "GridEvaluator.h"
-#include "GridData.h"
-#include "AtomicProperty.h"
-#include "Geometry.h"
-#include "GeometryList.h"
-//#include "MolecularOrbitals.h"
-#include "Frequencies.h"
-#include "Bank.h"
-#include "File.h"
-#include "DipoleMoment.h"
-#include "PointGroup.h"
-#include "Energy.h"
 #include "Constants.h"
-#include "LayerFactory.h"
-#include "SurfaceInfo.h"
-
+#include "QsLog.h"
+#include "QMsgBox.h"
+#include "QChemJobInfo.h" 
+#include "ProgressDialog.h"
+#include "Preferences.h"
+#include "GridEvaluator.h"
 #include "IQmolParser.h"
 
 #include "openbabel/mol.h"
@@ -68,6 +72,7 @@
 #include "openbabel/generic.h"
 #include "openbabel/forcefield.h"
 #include "openbabel/plugin.h"
+
 #include <QFileDialog>
 #include <QDropEvent>
 #include <QProcess>
@@ -75,7 +80,6 @@
 #include <QMenu>
 #include <QUrl>
 #include <vector>
-
 #include <QtDebug>
 
 
@@ -198,12 +202,13 @@ void Molecule::appendData(Layer::List& list)
    }
 
    Layer::List::iterator iter;
-   Files*    files(0);
-   Atoms*    atoms(0);
-   Bonds*    bonds(0);
-   Charges*  charges(0);
-   CubeData* cubeData(0);
+   Files*        files(0);
+   Atoms*        atoms(0);
+   Bonds*        bonds(0);
+   Charges*      charges(0);
+   CubeData*     cubeData(0);
    EfpFragments* efpFragments(0);
+
    QString text;
    PrimitiveList primitiveList;
    Layer::List toSet;

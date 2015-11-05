@@ -150,8 +150,13 @@ namespace Layer {
          void adopted();
 
       public Q_SLOTS:
-         virtual void configure() { if (m_configurator) m_configurator->display(); }
-         virtual void closeConfigurator() { if (m_configurator) m_configurator->close(); }
+         virtual void configure() { 
+            if (m_configurator) m_configurator->display(); 
+         }
+
+         virtual void closeConfigurator() { 
+            if (m_configurator) m_configurator->close(); 
+         }
 
 		 /// The persistent parent exists even if the Layer has been removed
 		 /// from the model.  This is useful for undo actions that need to know
