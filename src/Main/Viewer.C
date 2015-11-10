@@ -200,6 +200,7 @@ void Viewer::draw()
 
    QString shader(m_shaderLibrary->currentShader());
 
+   glEnable(GL_DEPTH_TEST);
    glShadeModel(GL_SMOOTH);
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  
 
@@ -252,6 +253,7 @@ void Viewer::fastDraw()
    Layer::GLObject::SetCameraPosition(camera()->position());
 
    glEnable(GL_LIGHTING);
+   glEnable(GL_DEPTH_TEST);
    glShadeModel(GL_SMOOTH);
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -363,6 +365,7 @@ void Viewer::setLabelType(int const type)
 {
    s_labelFont.setPointSize(Preferences::LabelFontSize());
    switch (type) {
+      case Layer::Atom::None:      m_labelType = Layer::Atom::None;      break;
       case Layer::Atom::Index:     m_labelType = Layer::Atom::Index;     break;
       case Layer::Atom::Element:   m_labelType = Layer::Atom::Element;   break;
       case Layer::Atom::Charge:    m_labelType = Layer::Atom::Charge;    break;
@@ -473,6 +476,7 @@ void Viewer::drawLabels(GLObjectList const& objects)
        }
    }
 
+   
    glDisable(GL_LIGHTING);
    qglColor(foregroundColor());
 

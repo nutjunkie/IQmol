@@ -45,16 +45,17 @@ namespace Parser {
 
       private:
          Data::Geometry* readStandardCoordinates(TextStream&);
-         void readStandardCoordinates(TextStream&, Data::Geometry*);
-         void readCharges(TextStream&, Data::Geometry*, QString const& label);
-         void readNmrShifts(TextStream&, Data::Geometry*, Data::Nmr*);
-         void readNmrCouplings(TextStream&, Data::Geometry*, Data::Nmr*);
-         void readDipoleMoment(TextStream&, Data::Geometry*);
-         void readHessian(TextStream&, Data::Geometry*);
+         void readStandardCoordinates(TextStream&, Data::Geometry&);
+         void readCharges(TextStream&, Data::Geometry&, QString const& label);
+         void readNmrShifts(TextStream&, Data::Geometry&, Data::Nmr&);
+         void readNmrReference(TextStream&, Data::Nmr&);
+         void readNmrCouplings(TextStream&, Data::Geometry&, Data::Nmr&);
+         void readDipoleMoment(TextStream&, Data::Geometry&);
+         void readHessian(TextStream&, Data::Geometry&);
          void readVibrationalModes(TextStream&);
          void readEffectiveRegion(TextStream&);
-         void readDMA(TextStream&, Data::Geometry*);
-         void readCisStates(TextStream&, Data::Geometry*);
+         void readDMA(TextStream&, Data::Geometry&);
+         void readCisStates(TextStream&);
          void readOrbitalSymmetries(TextStream&);
          void setTotalEnergy(QString const&, Data::Geometry*, QString const& label);
 

@@ -36,15 +36,18 @@ Nmr::Nmr(Layer::Nmr& layer, Data::Nmr& data) : m_layer(layer), m_data(data), m_u
 {
    m_ui = new Ui::NmrConfigurator();
    m_ui->setupUi(this);
-   m_ui->shieldingsTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+   QTableWidget* table(m_ui->shieldingsTable);
+   table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
    m_plot = new QCustomPlot();
    m_plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
    m_plot->axisRect()->setRangeDrag(m_plot->xAxis->orientation());
    m_plot->axisRect()->setRangeZoom(m_plot->xAxis->orientation());
    m_plot->xAxis->setSelectableParts(QCPAxis::spNone);
+
    m_plot->xAxis->setLabel("Shift (ppm)");
-   m_plot->yAxis->setLabel("Intensity");
+   //m_plot->yAxis->setLabel("Intensity");
 
    QFrame* frame(m_ui->spectrumFrame);
    QVBoxLayout* layout(new QVBoxLayout());
@@ -72,21 +75,33 @@ Nmr::~Nmr()
 {
    if (m_plot) delete m_plot;
    if (m_ui) delete m_ui;
+
+   QList<Data::NmrReference*>::iterator iter;
+   for (iter = m_references.begin(); iter != m_references.end(); ++iter) 
+       delete (*iter);
+   }
 }
 
 
 void Nmr::load()
 {
    QList<QString> const& atomLabels(m_data.atomLabels());
-   QList<double> const& shifts(m_data.isotropicShifts());
+
+   QTableWidget* table(m_ui->shieldingsTable);
+   table->setRowCount(atomLabels.size());
+
+   QList<double> shifts;
+   if (m_data.haveRelativeShifts()) {
+      shifts = m_data.relativeShifts();
+   }else {
+      loadReferences();
+      shifts = m_data.isotropicShifts();
+   }
 
    if (atomLabels.size() != shifts.size()) {
       QMsgBox::warning(0, "IQmol", "NMR data size mismatch");
       return;
    }
-
-   QTableWidget* table(m_ui->shieldingsTable);
-   table->setRowCount(atomLabels.size());
 
    QTableWidgetItem* label;
    QTableWidgetItem* shift;
@@ -200,7 +215,7 @@ void Nmr::plotImpulse()
        graph->setData(x, y);
        graph->setName(QString::number(shift));
        graph->setLineStyle(QCPGraph::lsImpulse);
-       graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle));
+       //graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle));
        graph->setPen(m_pen);
        graph->setSelectedPen(m_selectPen);
        connect(graph, SIGNAL(selectionChanged(bool)), this, SLOT(plotSelectionChanged(bool)));
@@ -274,10 +289,10 @@ void Nmr::plotSelectionChanged(bool tf)
 
    if (tf) {
       graph->setPen(m_selectPen);
-      graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc));
+      //graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc));
    }else {
       graph->setPen(m_pen);
-      graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle));
+      //graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle));
       return;
    }
 
@@ -317,6 +332,12 @@ void Nmr::on_shieldingsTable_itemSelectionChanged()
        graph->setSelected(true);
        m_plot->replot();
    }
+}
+
+
+void Nmr::on_typeCombo_currentIndexChanged(QString const& text)
+{
+   qDebug() << "Setting spectrum type to " << text;
 }
 
 } } // end namespace IQmol::Configurator

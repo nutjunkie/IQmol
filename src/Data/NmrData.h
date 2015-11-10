@@ -24,6 +24,7 @@
 
 #include "DataList.h"
 #include "Matrix.h"
+#include "NmrReference.h"
 
 
 namespace IQmol {
@@ -34,9 +35,11 @@ namespace Data {
       friend class boost::serialization::access;
 
       public:
-         Nmr() { }
+         Nmr();
 
          Type::ID typeID() const { return Type::Nmr; }
+
+         NmrReference& reference() { return m_reference; }
 
          void setIsotropicShifts(QList<double> const& shifts) {
             m_isotropicShifts = shifts;
@@ -48,7 +51,7 @@ namespace Data {
             m_relativeShifts = shifts;
          }
 
-         QList<double> const& relativeShifts() const { return m_isotropicShifts; }
+         QList<double> const& relativeShifts() const { return m_relativeShifts; }
 
          void setAtomLabels(QStringList const& labels) {
             m_atomLabels = labels;
@@ -65,21 +68,26 @@ namespace Data {
 
          void dump() const;
 
-         void serialize(InputArchive& ar, unsigned int const /*version*/) {
+         void serialize(InputArchive& ar, unsigned int const /*version*/) 
+         {
             ar & m_isotropicShifts;
             ar & m_relativeShifts;
+            ar & m_reference;
          }
 
-         void serialize(OutputArchive& ar, unsigned int const /*version*/) {
+         void serialize(OutputArchive& ar, unsigned int const /*version*/) 
+         {
             ar & m_isotropicShifts;
             ar & m_relativeShifts;
+            ar & m_reference;
          }
 
       private:
          QStringList   m_atomLabels;
          QList<double> m_isotropicShifts;
          QList<double> m_relativeShifts;
-         Matrix m_isotropicCouplings;
+         Matrix        m_isotropicCouplings;
+         NmrReference  m_reference;
    };
 
 } } // end namespace IQmol::Data

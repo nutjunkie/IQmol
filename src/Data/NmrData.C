@@ -29,6 +29,11 @@ namespace Data {
 
 //template<> const Type::ID NmrReferenceList::TypeID = Type::NmrReferenceList;
 
+Nmr::Nmr() 
+{
+   qDebug() << "Constructing a new Data::Nmr object"; 
+}
+
 void Nmr::dump() const 
 {
    qDebug() << "NMR isotropic shifts: " << m_isotropicShifts;
@@ -40,6 +45,8 @@ void Nmr::dump() const
    for (iter = list.begin(); iter != list.end(); ++iter) {
        qDebug() << *iter;
    }
+
+   m_reference.dump();
 }
 
 

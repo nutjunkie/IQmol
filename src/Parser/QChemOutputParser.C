@@ -33,6 +33,7 @@
 #include "DipoleMoment.h"
 #include "EfpFragmentLibrary.h"
 #include "MultipoleExpansion.h"
+#include "NmrReference.h"
 #include "EfpFragment.h"
 #include "Constants.h"
 #include "ExcitedStates.h"
@@ -299,15 +300,15 @@ bool QChemOutput::parse(TextStream& textStream)
 
       }else if (line.contains("Ground-State Mulliken Net Atomic Charges")) {
          textStream.skipLine(3);
-         readCharges(textStream, currentGeometry, "Mulliken");
+         if (currentGeometry) readCharges(textStream, *currentGeometry, "Mulliken");
 
       }else if (line.contains("Ground-State ChElPG Net Atomic Charges")) {
          textStream.skipLine(3);
-         readCharges(textStream, currentGeometry, "CHELPG");
+         if (currentGeometry) readCharges(textStream, *currentGeometry, "CHELPG");
  
       }else if (line.contains("Stewart Net Atomic Charges")) {
          textStream.skipLine(3);
-         readCharges(textStream, currentGeometry, "Stewart");
+         if (currentGeometry) readCharges(textStream, *currentGeometry, "Stewart");
 
       }else if (line.contains("Orbital Energies (a.u.) and Symmetries")) {
          textStream.skipLine(2);
@@ -316,30 +317,35 @@ bool QChemOutput::parse(TextStream& textStream)
       }else if (line.contains("TDDFT/TDA Excitation Energies")) {
 qDebug() << "Reading TDDFT States --";
          textStream.skipLine(2);
-         readCisStates(textStream, currentGeometry);
+         readCisStates(textStream);
 
       }else if (line.contains("CIS Excitation Energies")) {
 qDebug() << "Reading CIS States --";
          textStream.skipLine(2);
-         readCisStates(textStream, currentGeometry);
+         readCisStates(textStream);
 
-      }else if (line.contains("ATOM           ISOTROPIC        ANISOTROPIC       REL. SHIFTS")) {
+      }else if (line.contains("Reference values")) {
          textStream.skipLine(1);
          if (!nmr) nmr = new Data::Nmr;
-         readNmrShifts(textStream, currentGeometry, nmr);
+         readNmrReference(textStream, *nmr);
+    
+      }else if (line.contains("ATOM           ISOTROPIC        ANISOTROPIC       REL.")) {
+         textStream.skipLine(1);
+         if (!nmr) nmr = new Data::Nmr;
+         if (currentGeometry) readNmrShifts(textStream, *currentGeometry, *nmr);
 
       }else if (line.contains("Indirect Nuclear Spin--Spin")) {
          textStream.skipLine(11);
          if (!nmr) nmr = new Data::Nmr;
-         readNmrCouplings(textStream, currentGeometry, nmr);
+         if (currentGeometry) readNmrCouplings(textStream, *currentGeometry, *nmr);
 
       }else if (line.contains("Cartesian Multipole Moments")) {
          textStream.skipLine(4);
-         readDipoleMoment(textStream, currentGeometry);
+         if (currentGeometry) readDipoleMoment(textStream, *currentGeometry);
 
       }else if (line.contains("Hessian of the SCF Energy") || 
                 line.contains("Final Hessian.")) {
-         readHessian(textStream, currentGeometry);
+         if (currentGeometry) readHessian(textStream, *currentGeometry);
 
       }else if (line.contains("VIBRATIONAL ANALYSIS")) {
          textStream.seek("Mode:");
@@ -347,7 +353,7 @@ qDebug() << "Reading CIS States --";
 
       }else if (line.contains("DISTRIBUTED MULTIPOLE ANALYSIS")) {
          textStream.skipLine(4);
-         readDMA(textStream, currentGeometry);
+         if (currentGeometry) readDMA(textStream, *currentGeometry);
 
       // There is a typo in the print out of the word Coordinates
       }else if (line.contains("atoms in the effective region (ANGSTROMS)")) {
@@ -383,10 +389,9 @@ qDebug() << "Reading CIS States --";
 
 
 
-void QChemOutput::readCisStates(TextStream& textStream, Data::Geometry* geometry) 
+void QChemOutput::readCisStates(TextStream& textStream)
 {
 qDebug() << "Reading CIS States";
-   //Data::ExcitedStates& states(geometry->getProperty<Data::ExcitedStates>());
    Data::ExcitedStates* states(new Data::ExcitedStates());
 
    QStringList tokens;
@@ -398,7 +403,8 @@ qDebug() << "Reading CIS States";
 
    // This is to match lines similar to the following
    //  D(  7) --> S(  1) amplitude =  0.6732 beta
-   QRegExp rx("([DS])\\(\\s*(\\d+)\\) --> ([VS])\\(\\s*(\\d+)\\) amplitude = (.{7})\\s?([ab]?)");
+   QRegExp 
+      rx("([DS])\\(\\s*(\\d+)\\) --> ([VS])\\(\\s*(\\d+)\\) amplitude = (.{7})\\s?([ab]?)");
    
    while (!textStream.atEnd()) {
       tokens = textStream.nextLineAsTokens();
@@ -529,7 +535,7 @@ void QChemOutput::readOrbitalSymmetries(TextStream& textStream)
 }
 
 
-void QChemOutput::readDMA(TextStream& textStream, Data::Geometry* geometry)
+void QChemOutput::readDMA(TextStream& textStream, Data::Geometry& geometry)
 {
    Data::MultipoleExpansionList* dma(new Data::MultipoleExpansionList);
    Data::MultipoleExpansion* site;
@@ -551,7 +557,7 @@ void QChemOutput::readDMA(TextStream& textStream, Data::Geometry* geometry)
       return;
    }
 
-   geometry->appendProperty(dma);
+   geometry.appendProperty(dma);
 
    line = textStream.nextLine();
    if (!line.contains("DIPOLES")) return;
@@ -631,7 +637,6 @@ void QChemOutput::setTotalEnergy(QString const& field, Data::Geometry* geometry,
    QString const& label)
 {
    if (!geometry) return;
-
    bool ok;
    double energy(field.toDouble(&ok));
    if (!ok) return;
@@ -846,10 +851,8 @@ qDebug() << "ERROR: " << msg;
 }
 
 
-void QChemOutput::readDipoleMoment(TextStream& textStream, Data::Geometry* geometry)
+void QChemOutput::readDipoleMoment(TextStream& textStream, Data::Geometry& geometry)
 {
-   if (!geometry) return;
-
    QStringList tokens;
    tokens = textStream.nextLineAsTokens();
    if (tokens.size() != 6) goto error;
@@ -861,7 +864,7 @@ void QChemOutput::readDipoleMoment(TextStream& textStream, Data::Geometry* geome
    y = tokens[3].toDouble(&ok);  if (!ok) goto error;
    z = tokens[5].toDouble(&ok);  if (!ok) goto error;
 
-   geometry->getProperty<Data::DipoleMoment>().setValue(x,y,z);
+   geometry.getProperty<Data::DipoleMoment>().setValue(x,y,z);
    return;
 
    error:
@@ -870,11 +873,9 @@ void QChemOutput::readDipoleMoment(TextStream& textStream, Data::Geometry* geome
 }
 
 
-void QChemOutput::readHessian(TextStream& textStream, Data::Geometry* geometry)
+void QChemOutput::readHessian(TextStream& textStream, Data::Geometry& geometry)
 {
-   if (!geometry) return;
-
-   unsigned nAtoms(geometry->nAtoms());
+   unsigned nAtoms(geometry.nAtoms());
    Matrix hessian(3*nAtoms, 3*nAtoms);
    QStringList tokens;
    QList<double> values;
@@ -904,21 +905,66 @@ void QChemOutput::readHessian(TextStream& textStream, Data::Geometry* geometry)
        firstCol += nCol;
    }
 
-   Data::Hessian& h(geometry->getProperty<Data::Hessian>());
+   Data::Hessian& h(geometry.getProperty<Data::Hessian>());
    h.setData(hessian);
 }
 
 
-void QChemOutput::readNmrShifts(TextStream& textStream, Data::Geometry* geometry, 
-   Data::Nmr* nmr)
+void QChemOutput::readNmrReference(TextStream& textStream, Data::Nmr& nmr)
 {
-   if (!geometry || !nmr) return;
+   qDebug() << "Reading NMR Reference";
+
+   int n;
+   QString atom;
+   double shift(0.0), offset(0.0);
+   bool done(false), ok(true);
+   QStringList tokens;
+
+   Data::NmrReference& ref(nmr.reference());
+
+   while (!textStream.atEnd() && !done && ok) {
+      tokens = textStream.nextLineAsTokens();
+      n = tokens.size();
+
+      if (n >= 3) {
+         if (tokens[0] == "Reference") {
+            ref.setSystem(tokens[2]);
+         }
+
+      }else if (n >= 2) {
+         if (tokens[0] == "Atom:") {
+            atom = tokens[1];
+         }else if (tokens[0] == "Method:") {
+            ref.setMethod(tokens[1]);
+         }else if (tokens[0] == "Basis:") {
+            ref.setBasis(tokens[1]);
+         }else if (tokens[0] == "Shift:") {
+            shift = tokens[1].toDouble(&ok);
+         }else if (tokens[0] == "Offset:") {
+            offset = tokens[1].toDouble(&ok);
+            ref.addElement(atom, shift, offset);
+         }
+      
+      } else if (n > 0 && tokens[0].contains("-------")) {
+         done = true;
+      }
+   }
+
+ref.dump();
+
+   if (!ok) m_errors.append("Problem parsing NMR reference ");
+}
+
+
+void QChemOutput::readNmrShifts(TextStream& textStream, Data::Geometry& geometry, 
+   Data::Nmr& nmr)
+{
    qDebug() << "Reading NMR Shifts";
    QStringList tokens;
 
    QList<double> isotropic;
    QList<double> relative;
-   QList<QString> atomicSymbols;
+   QStringList   atomicSymbols;
 
    int n;
    bool done(false), allOk(true), ok;
@@ -951,38 +997,40 @@ void QChemOutput::readNmrShifts(TextStream& textStream, Data::Geometry* geometry
       return;
    }
 
-   if (!geometry->sameAtoms(atomicSymbols)) {
+   if (!geometry.sameAtoms(atomicSymbols)) {
       QString msg("Atom list mismatch around line number: ");
       m_errors.append(msg + QString::number(textStream.lineNumber()));
       return;
    }
 
-   allOk = geometry->setAtomicProperty<Data::NmrShiftIsotropic>(isotropic);
+   qDebug() << "Setting Isotropic shifts" << isotropic;
+   allOk = geometry.setAtomicProperty<Data::NmrShiftIsotropic>(isotropic);
 
    if (allOk) { 
-      nmr->setIsotropicShifts(isotropic);
-      nmr->setAtomLabels(atomicSymbols);
+      nmr.setIsotropicShifts(isotropic);
+      nmr.setAtomLabels(atomicSymbols);
    }else {
       m_errors.append("Failed to read NMR isotropic shifts");
    }
 
    if (haveRelativeShifts) {
-      allOk = geometry->setAtomicProperty<Data::NmrShiftRelative>(relative);
+      nmr.setRelativeShifts(relative);
+   qDebug() << "Setting Relative shifts" << relative ;
+      allOk = geometry.setAtomicProperty<Data::NmrShiftRelative>(relative);
       if (!allOk) m_errors.append("Failed to read NMR Relative shifts");
    }
 }
 
 
-void QChemOutput::readNmrCouplings(TextStream& textStream, Data::Geometry* geometry, 
-   Data::Nmr* nmr)
+void QChemOutput::readNmrCouplings(TextStream& textStream, Data::Geometry& geometry, 
+   Data::Nmr& nmr)
 {
-   if (!geometry || !nmr) return;
    qDebug() << "Reading NMR coupling constants";
 
    QStringList tokens;
 
    bool done(false), allOk(true);
-   unsigned nAtoms(geometry->nAtoms());
+   unsigned nAtoms(geometry.nAtoms());
 
    Matrix* couplings = new Matrix(nAtoms, nAtoms);
    for (unsigned i = 0; i < nAtoms; ++i) {
@@ -1007,12 +1055,10 @@ void QChemOutput::readNmrCouplings(TextStream& textStream, Data::Geometry* geome
          }
 
          if (atom1 > 0 && atom2 > 0 && allOk) {
-            //qDebug() << "Atoms captured" << atom1 << atom2;
             textStream.seek("Total Spin-Spin Coupling Tensor");
             textStream.skipLine(4);
     
             tokens = textStream.nextLineAsTokens();
-            //qDebug() << "Isotropic line: " << tokens;
             if (tokens.size() > 2) {
                (*couplings)(atom1-1, atom2-1) = tokens[1].toDouble(&allOk);
                (*couplings)(atom2-1, atom1-1) = (*couplings)(atom1-1, atom2-1);
@@ -1030,7 +1076,11 @@ void QChemOutput::readNmrCouplings(TextStream& textStream, Data::Geometry* geome
    }
 
    if (allOk) { 
-      nmr->setIsotropicCouplings(*couplings);
+      nmr.setIsotropicCouplings(*couplings);
+      // This is a bit of a hack.  The couplings calculation is done seperately
+      // and so the shifts/shieldings are possibly not available.
+      geometry.setAtomicProperty<Data::NmrShiftRelative>(nmr.relativeShifts());
+      geometry.setAtomicProperty<Data::NmrShiftIsotropic>(nmr.isotropicShifts());
    }else {
       m_errors.append("Failed to read NMR ISS couplings");
    }
@@ -1039,10 +1089,9 @@ void QChemOutput::readNmrCouplings(TextStream& textStream, Data::Geometry* geome
 }
 
 
-void QChemOutput::readCharges(TextStream& textStream, Data::Geometry* geometry, 
+void QChemOutput::readCharges(TextStream& textStream, Data::Geometry& geometry, 
    QString const& label)
 {
-   if (!geometry) return;
    QStringList tokens;
 
    QList<double> charges;
@@ -1076,21 +1125,21 @@ void QChemOutput::readCharges(TextStream& textStream, Data::Geometry* geometry,
       return;
    }
 
-   if (!geometry->sameAtoms(atomicSymbols)) {
+   if (!geometry.sameAtoms(atomicSymbols)) {
       QString msg("Atom list mismatch around line number: ");
       m_errors.append(msg + QString::number(textStream.lineNumber()));
       return;
    }
 
    if (label == "Mulliken") {
-      allOk = geometry->setAtomicProperty<Data::MullikenCharge>(charges);
+      allOk = geometry.setAtomicProperty<Data::MullikenCharge>(charges);
       if (allOk && !spins.isEmpty()) {
-         allOk = allOk && geometry->setAtomicProperty<Data::SpinDensity>(spins);
+         allOk = allOk && geometry.setAtomicProperty<Data::SpinDensity>(spins);
       }
    }else if (label == "Stewart") {
-      allOk = geometry->setAtomicProperty<Data::MultipoleDerivedCharge>(charges);
+      allOk = geometry.setAtomicProperty<Data::MultipoleDerivedCharge>(charges);
    }else if (label == "CHELPG") {
-      allOk = geometry->setAtomicProperty<Data::ChelpgCharge>(charges);
+      allOk = geometry.setAtomicProperty<Data::ChelpgCharge>(charges);
    }else {
       m_errors.append("Unknown charge type");
    }

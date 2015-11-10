@@ -60,7 +60,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent),
    m_quiInputDialog(0),
    m_context(0)
 {
-   QGLFormat format(QGL::SampleBuffers);
+   QGLFormat format(QGL::SampleBuffers | QGL::DepthBuffer);
    format.setVersion(2,1);
    format.setProfile(QGLFormat::CompatibilityProfile);
    //format.setSampleBuffers(true);
@@ -533,7 +533,7 @@ void MainWindow::createMenus()
          action->setCheckable(true);
          m_labelActions << action;
 
-         name = "NMR Shifts";
+         name = "NMR";
          action = subMenu->addAction(name);
          connect(action, SIGNAL(triggered()), this, SLOT(setLabel()));
          action->setData(Layer::Atom::NmrShift);

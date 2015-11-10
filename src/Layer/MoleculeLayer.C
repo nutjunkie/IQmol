@@ -1400,8 +1400,12 @@ void Molecule::setGeometry(IQmol::Data::Geometry& geometry)
        double shift(0.0);
        if (geometry.hasProperty<Data::NmrShiftRelative>()) {
           shift = geometry.getAtomicProperty<Data::NmrShiftRelative>(i).value();
-       }else {
+qDebug() << "Shift set to" << shift << "(relative)";
+       }else if (geometry.hasProperty<Data::NmrShiftIsotropic>()) {
           shift = geometry.getAtomicProperty<Data::NmrShiftIsotropic>(i).value();
+qDebug() << "Shift set to" << shift << "(isotropic)";
+       }else {
+qDebug() << "No NMR data found";
        }
        atoms[i]->setNmrShift(shift);
    }

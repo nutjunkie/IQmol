@@ -56,6 +56,7 @@ namespace Configurator {
       private Q_SLOTS:
          void plotSelectionChanged(bool tf);
          void on_shieldingsTable_itemSelectionChanged();
+         void on_typeCombo_currentIndexChanged(QString const& text);
 
       Q_SIGNALS:
          void updated();
@@ -75,6 +76,8 @@ namespace Configurator {
 
          QPen m_pen;
          QPen m_selectPen;
+
+         QList<Data::NmrReference*> m_references;
    };
 
 } } // end namespace IQmol::Configurator

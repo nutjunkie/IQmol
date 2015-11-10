@@ -30,11 +30,18 @@ namespace Data {
 template<> const Type::ID NmrReferenceList::TypeID = Type::NmrReferenceList;
 
 
+void NmrReference::addElement(QString const& atom, double const shift, double const offset)
+{
+   m_shifts[atom] = shift - offset;
+}
+
 
 
 void NmrReference::dump() const 
 {
    qDebug() << "Method: " << m_method;
+   qDebug() << "Basis:  " << m_basis;
+   qDebug() << "System: " << m_system;
    QMap<QString, double>::const_iterator iter;
    for (iter = m_shifts.begin(); iter != m_shifts.end(); ++iter) {
        qDebug() << "  " << iter.key() << "  " << iter.value();
