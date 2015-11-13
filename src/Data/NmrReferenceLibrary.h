@@ -1,3 +1,5 @@
+#ifndef IQMOL_DATA_NMRREFERENCELIBRARY_H
+#define IQMOL_DATA_NMRREFERENCELIBRARY_H
 /*******************************************************************************
 
   Copyright (C) 2011-2013 Andrew Gilbert
@@ -21,29 +23,33 @@
 ********************************************************************************/
 
 #include "NmrReference.h"
-#include <QDebug>
 
 
 namespace IQmol {
 namespace Data {
 
-template<> const Type::ID NmrReferenceList::TypeID = Type::NmrReferenceList;
+   // Note that this does not derive from the Data::Base class.
+   class NmrReferenceLibrary {
 
+      friend class boost::serialization::access;
+      
+      public:
+         NmrReferenceLibrary& instance();
 
-void NmrReference::addElement(QString const& atom, double const shift, double const offset)
-{
-   m_shifts[atom] = shift - offset;
-}
+         void dump() const;
 
+      private:
+         static NmrReferenceLibrary* s_instance;
+         NmrReferenceLibrary();
+         explicit NmrReferenceLibrary(NmrReferenceLibrary const&) { }
+         ~NmrReferenceLibrary() { }
 
+         static void load();
+         static void cleanup();
 
-void NmrReference::dump() const 
-{
-   qDebug() << "System: " << m_system << "Theory:" << m_method << m_basis;
-   QMap<QString, double>::const_iterator iter;
-   for (iter = m_shifts.begin(); iter != m_shifts.end(); ++iter) {
-       qDebug() << "  " << iter.key() << "  " << iter.value();
-   } 
-}
+         static QList<NmrReference*> s_library;
+   };
 
 } } // end namespace IQmol::Data
+
+#endif

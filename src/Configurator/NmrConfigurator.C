@@ -77,7 +77,7 @@ Nmr::~Nmr()
    if (m_ui) delete m_ui;
 
    QList<Data::NmrReference*>::iterator iter;
-   for (iter = m_references.begin(); iter != m_references.end(); ++iter) 
+   for (iter = m_references.begin(); iter != m_references.end(); ++iter) {
        delete (*iter);
    }
 }

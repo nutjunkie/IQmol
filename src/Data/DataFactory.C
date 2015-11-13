@@ -38,9 +38,7 @@
 #include "Hessian.h"
 #include "Mesh.h"
 #include "NmrReference.h"
-#include "Surface.h"
-#include "SurfaceInfo.h"
-#include "SurfaceType.h"
+#include "NmrReferenceLibrary.h"
 #include "MultipoleExpansion.h"
 #include "MolecularOrbitals.h"
 #include "MolecularOrbitalsList.h"
@@ -48,6 +46,9 @@
 #include "YamlNode.h"
 #include "PointGroup.h"
 #include "RemSectionData.h"
+#include "Surface.h"
+#include "SurfaceInfo.h"
+#include "SurfaceType.h"
 
 #include <cstdlib>
 #include <exception>
@@ -143,8 +144,7 @@ Base* Factory::create(Type::ID const id)
       case Type::SurfaceInfo:             data = new SurfaceInfo();             break;
       case Type::SurfaceInfoList:         data = new SurfaceInfoList();         break;
       case Type::SurfaceType:             data = new SurfaceType();             break;
-//    case Type::NmrReference:            data = new NmrReference();            break;
-
+      case Type::NmrReference:            data = new NmrReference();            break;
       case Type::YamlNode:                data = new YamlNode();                break;
 
    default: 

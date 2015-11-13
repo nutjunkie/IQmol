@@ -34,7 +34,9 @@ namespace Data {
 
       public:
 
-         NmrReference(QString const& method = QString()) : m_method(method) { }
+         NmrReference(QString const& system = QString(), 
+                      QString const& method = QString(), 
+                      QString const& basis  = QString() ) : m_method(method) { }
 
          Type::ID typeID() const { return Type::NmrReference; }
 

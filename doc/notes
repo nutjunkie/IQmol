@@ -357,6 +357,13 @@ IQview
 
 
 
+Parallels black screen:
+Shut down the Ubuntu VM (13.10)
+In Parallels 9 config for the VM, go to Hardware > Video, and disable 3D acceleration.
+Restart Ubuntu 13.10. You will now get a completely black screen.
+Shut down the Ubuntu VM once more.
+Again, in Parallels config for the VM, go to Hardware > Video and reenable 3D acceleration.
+Restart, and you're back in business (No black screen and everything properly updated).
 
 
 

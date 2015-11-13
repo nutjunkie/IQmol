@@ -37,6 +37,7 @@ namespace IQmol {
 
 namespace Data {
    class Nmr;
+   class NmrReference;
 }
 
 namespace Layer {
