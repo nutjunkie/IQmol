@@ -920,7 +920,9 @@ void QChemOutput::readNmrReference(TextStream& textStream, Data::Nmr& nmr)
    bool done(false), ok(true);
    QStringList tokens;
 
-   Data::NmrReference& ref(nmr.reference());
+   Data::NmrReference ref;
+
+   QString method;
 
    while (!textStream.atEnd() && !done && ok) {
       tokens = textStream.nextLineAsTokens();
@@ -935,9 +937,10 @@ void QChemOutput::readNmrReference(TextStream& textStream, Data::Nmr& nmr)
          if (tokens[0] == "Atom:") {
             atom = tokens[1];
          }else if (tokens[0] == "Method:") {
-            ref.setMethod(tokens[1]);
+            method = tokens[1];
          }else if (tokens[0] == "Basis:") {
-            ref.setBasis(tokens[1]);
+            method += "/" + tokens[1];
+            ref.setMethod(method);
          }else if (tokens[0] == "Shift:") {
             shift = tokens[1].toDouble(&ok);
          }else if (tokens[0] == "Offset:") {
@@ -950,9 +953,11 @@ void QChemOutput::readNmrReference(TextStream& textStream, Data::Nmr& nmr)
       }
    }
 
-ref.dump();
-
-   if (!ok) m_errors.append("Problem parsing NMR reference ");
+   if (ok) {
+      nmr.setReference(ref);
+   }else {
+      m_errors.append("Problem parsing NMR reference ");
+   }
 }
 
 
@@ -962,28 +967,28 @@ void QChemOutput::readNmrShifts(TextStream& textStream, Data::Geometry& geometry
    qDebug() << "Reading NMR Shifts";
    QStringList tokens;
 
-   QList<double> isotropic;
-   QList<double> relative;
+   QList<double> shieldings;
+   QList<double> shifts;
    QStringList   atomicSymbols;
 
    int n;
    bool done(false), allOk(true), ok;
-   bool haveRelativeShifts(false);
+   bool haveShifts(false);
 
    while (!textStream.atEnd() && !done && allOk) {
       tokens = textStream.nextLineAsTokens();
       n = tokens.size();
 
       if (n == 6) {
-         haveRelativeShifts = true;
-         relative.append(tokens[5].toDouble(&ok)); 
+         haveShifts = true;
+         shifts.append(tokens[5].toDouble(&ok)); 
          allOk = allOk && ok;
       }else if (n == 5) {
-         relative.append(0.0);
+         shifts.append(0.0);
       }
 
       if (n >= 5) {
-         isotropic.append(tokens[3].toDouble(&ok)); 
+         shieldings.append(tokens[3].toDouble(&ok)); 
          allOk = allOk && ok;
          atomicSymbols.append(tokens[1]);
       }else {
@@ -1003,21 +1008,21 @@ void QChemOutput::readNmrShifts(TextStream& textStream, Data::Geometry& geometry
       return;
    }
 
-   qDebug() << "Setting Isotropic shifts" << isotropic;
-   allOk = geometry.setAtomicProperty<Data::NmrShiftIsotropic>(isotropic);
+   qDebug() << "Setting Shieldings" << shieldings;
+   allOk = geometry.setAtomicProperty<Data::NmrShielding>(shieldings);
 
    if (allOk) { 
-      nmr.setIsotropicShifts(isotropic);
       nmr.setAtomLabels(atomicSymbols);
+      nmr.setShieldings(shieldings);
    }else {
-      m_errors.append("Failed to read NMR isotropic shifts");
+      m_errors.append("Failed to read NMR shieldings");
    }
 
-   if (haveRelativeShifts) {
-      nmr.setRelativeShifts(relative);
-   qDebug() << "Setting Relative shifts" << relative ;
-      allOk = geometry.setAtomicProperty<Data::NmrShiftRelative>(relative);
-      if (!allOk) m_errors.append("Failed to read NMR Relative shifts");
+   if (haveShifts) {
+      nmr.setShifts(shifts);
+      qDebug() << "Setting chemical shifts" << shifts;
+      allOk = geometry.setAtomicProperty<Data::NmrShift>(shifts);
+      if (!allOk) m_errors.append("Failed to read NMR shifts");
    }
 }
 
@@ -1076,11 +1081,11 @@ void QChemOutput::readNmrCouplings(TextStream& textStream, Data::Geometry& geome
    }
 
    if (allOk) { 
-      nmr.setIsotropicCouplings(*couplings);
+      nmr.setCouplings(*couplings);
       // This is a bit of a hack.  The couplings calculation is done seperately
       // and so the shifts/shieldings are possibly not available.
-      geometry.setAtomicProperty<Data::NmrShiftRelative>(nmr.relativeShifts());
-      geometry.setAtomicProperty<Data::NmrShiftIsotropic>(nmr.isotropicShifts());
+      geometry.setAtomicProperty<Data::NmrShift>(nmr.shifts());
+      geometry.setAtomicProperty<Data::NmrShielding>(nmr.shieldings());
    }else {
       m_errors.append("Failed to read NMR ISS couplings");
    }

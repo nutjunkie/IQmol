@@ -35,59 +35,84 @@ namespace Data {
       friend class boost::serialization::access;
 
       public:
-         Nmr();
-
          Type::ID typeID() const { return Type::Nmr; }
-
-         NmrReference& reference() { return m_reference; }
-
-         void setIsotropicShifts(QList<double> const& shifts) {
-            m_isotropicShifts = shifts;
-         }
-
-         QList<double> const& isotropicShifts() const { return m_isotropicShifts; }
-
-         void setRelativeShifts(QList<double> const& shifts) {
-            m_relativeShifts = shifts;
-         }
-
-         QList<double> const& relativeShifts() const { return m_relativeShifts; }
 
          void setAtomLabels(QStringList const& labels) {
             m_atomLabels = labels;
          }
 
-         QStringList const& atomLabels() const { return m_atomLabels; }
-
-         void setIsotropicCouplings(Matrix const& couplings) {
-            m_isotropicCouplings = couplings;
+         QList<QString> const& atomLabels() const { 
+            return m_atomLabels; 
          }
 
+         void setShieldings(QList<double> const& shieldings) {
+            m_shieldings = shieldings;
+         }
+
+         QList<double> const& shieldings() const {
+            return m_shieldings; 
+         }
+
+         void setCouplings(Matrix const& couplings) {
+            m_couplings = couplings;
+         }
+
+         Matrix const& couplings() const { 
+            return m_couplings; 
+         }
+
+         void setReference(NmrReference const& reference) {
+            m_reference = reference;
+         }
+
+         NmrReference const& reference() const { 
+            return m_reference; 
+         }
+
+         void setShifts(QList<double> const& shifts) {
+            m_shifts = shifts;
+         }
+
+         QList<double> const& shifts() const { 
+            return m_shifts; 
+         }
+
+         QList<double> shifts(QString const& isotope) {
+            return shifts(isotope, m_reference);
+         }
+
+         QList<double> shifts(QString const& isotope, NmrReference const&) const;
+
+
          bool haveCouplings();
-         bool haveRelativeShifts();
+         bool haveReference();
 
          void dump() const;
 
          void serialize(InputArchive& ar, unsigned int const /*version*/) 
          {
-            ar & m_isotropicShifts;
-            ar & m_relativeShifts;
+            ar & m_atomLabels;
+            ar & m_shieldings;
             ar & m_reference;
+            ar & m_couplings;
+            ar & m_shifts;
          }
 
          void serialize(OutputArchive& ar, unsigned int const /*version*/) 
          {
-            ar & m_isotropicShifts;
-            ar & m_relativeShifts;
+            ar & m_atomLabels;
+            ar & m_shieldings;
             ar & m_reference;
+            ar & m_couplings;
+            ar & m_shifts;
          }
 
       private:
-         QStringList   m_atomLabels;
-         QList<double> m_isotropicShifts;
-         QList<double> m_relativeShifts;
-         Matrix        m_isotropicCouplings;
-         NmrReference  m_reference;
+         QList<QString> m_atomLabels;
+         QList<double>  m_shieldings;
+         NmrReference   m_reference;
+         Matrix         m_couplings;
+         QList<double>  m_shifts;
    };
 
 } } // end namespace IQmol::Data

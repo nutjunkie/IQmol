@@ -57,17 +57,22 @@ namespace Configurator {
       private Q_SLOTS:
          void plotSelectionChanged(bool tf);
          void on_shieldingsTable_itemSelectionChanged();
-         void on_typeCombo_currentIndexChanged(QString const& text);
+         void on_isotopeCombo_currentIndexChanged(QString const& isotope);
+         void on_systemCombo_currentIndexChanged(QString const& system);
 
       Q_SIGNALS:
          void updated();
 
       private:
-         void load();
-         void loadReferences();
+         void initTable();
+         void loadShifts(Data::NmrReference const*, QString const& isotope);
+         QList<double> computeShifts(Data::NmrReference const*, QString const& isotope);
          void updatePlot();
          void plotImpulse();
          void plotSpectrum();
+
+         QString currentIsotope();
+         Data::NmrReference const* currentReference();
 
          Layer::Nmr& m_layer;
          Data::Nmr& m_data;
@@ -77,8 +82,6 @@ namespace Configurator {
 
          QPen m_pen;
          QPen m_selectPen;
-
-         QList<Data::NmrReference*> m_references;
    };
 
 } } // end namespace IQmol::Configurator

@@ -22,19 +22,24 @@
 
 ********************************************************************************/
 
-#include "NmrReference.h"
-
+#include <QString>
 
 namespace IQmol {
 namespace Data {
 
-   // Note that this does not derive from the Data::Base class.
+   class NmrReference;
+
+   // Note that this is a singleton class and does not derive from the
+   // Data::Base class.
    class NmrReferenceLibrary {
 
-      friend class boost::serialization::access;
-      
       public:
-         NmrReferenceLibrary& instance();
+         static NmrReferenceLibrary& instance();
+
+         void addReference(NmrReference const&);
+
+         QList<NmrReference const*> filter(QString const& element, 
+            QString const& system = QString(), QString const& method = QString());
 
          void dump() const;
 

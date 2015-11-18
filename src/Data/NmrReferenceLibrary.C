@@ -21,6 +21,7 @@
 ********************************************************************************/
 
 #include "NmrReferenceLibrary.h"
+#include "NmrReference.h"
 #include <QDebug>
 
 
@@ -28,6 +29,8 @@ namespace IQmol {
 namespace Data {
 
 NmrReferenceLibrary* NmrReferenceLibrary::s_instance = 0;
+QList<NmrReference*> NmrReferenceLibrary::s_library = QList<NmrReference*>();
+
 
 NmrReferenceLibrary& NmrReferenceLibrary::instance() 
 {
@@ -54,6 +57,34 @@ void NmrReferenceLibrary::cleanup()
 }
 
 
+QList<NmrReference const*> NmrReferenceLibrary::filter(QString const& element, 
+  QString const& system, QString const& method)
+{
+   QList<NmrReference const*> hits;
+
+   bool systemCheck(!system.isEmpty());
+   bool methodCheck(!method.isEmpty());
+   
+   QList<NmrReference*>::iterator iter;
+   for (iter = s_library.begin(); iter != s_library.end(); ++iter) {
+       if ((*iter)->contains(element)) {
+          bool hit(true);
+          if (systemCheck && (*iter)->system() != system) hit = false;
+          if (methodCheck && (*iter)->method() != method) hit = false;
+          if (hit) hits.append(*iter);
+       }
+   }
+
+   return hits;
+}
+
+
+void NmrReferenceLibrary::addReference(NmrReference const& reference)
+{
+   s_library.append(new NmrReference(reference));
+}
+
+
 void NmrReferenceLibrary::dump() const 
 {
    QList<NmrReference*>::iterator iter;
@@ -71,13 +102,70 @@ void NmrReferenceLibrary::load()
    methods << "HF" << "LDA";
    bases   << "STO-3G" << "STO-6G";
 
-   // TMS
+   // Tetramethylsilane (H, C, Si)
    QString system("TMS");
    for (int i = 0; i < methods.size(); ++i) {
        for (int j = 0; j < bases.size(); ++j) {
-           ref = new NmrReference(system, methods[i], bases[i]); 
-           ref->addElement("H", 32.0, 0.0);
-           ref->addElement("C", 174.0, 0.0);
+           QString method(methods[i] + "/" + bases[j]); 
+           ref = new NmrReference(system, method); 
+           ref->addElement("H",  32.0, 0.0);
+           ref->addElement("C",  174.0, 0.0);
+           ref->addElement("Si", 50000.0, 0.0);
+           s_library.append(ref);
+       }
+   }
+
+   // Trimethyl Borate (B)
+   system = "Trimethyl Borate";
+   for (int i = 0; i < methods.size(); ++i) {
+       for (int j = 0; j < bases.size(); ++j) {
+           QString method(methods[i] + "/" + bases[j]); 
+           ref = new NmrReference(system, method); 
+           ref->addElement("B",  32.0, 0.0);
+           s_library.append(ref);
+       }
+   }
+    
+   // Ammonia (N)
+   system = "Ammonia";
+   for (int i = 0; i < methods.size(); ++i) {
+       for (int j = 0; j < bases.size(); ++j) {
+           QString method(methods[i] + "/" + bases[j]); 
+           ref = new NmrReference(system, method); 
+           ref->addElement("N",  32.0, 0.0);
+           s_library.append(ref);
+       }
+   }
+
+   // Trichlorofluoromethane (F)
+   system = "Trichlorofluoromethane";
+   for (int i = 0; i < methods.size(); ++i) {
+       for (int j = 0; j < bases.size(); ++j) {
+           QString method(methods[i] + "/" + bases[j]); 
+           ref = new NmrReference(system, method); 
+           ref->addElement("F",  32.0, 0.0);
+           s_library.append(ref);
+       }
+   }
+
+   system = "Fluorobenzene";
+   for (int i = 0; i < methods.size(); ++i) {
+       for (int j = 0; j < bases.size(); ++j) {
+           QString method(methods[i] + "/" + bases[j]); 
+           ref = new NmrReference(system, method); 
+           ref->addElement("F",  32.0, -113.13);
+           s_library.append(ref);
+       }
+break;
+   }
+
+   //Phosphoric Acid H3PO4 (P) 
+   system = "Phosphoric Acid";
+   for (int i = 0; i < methods.size(); ++i) {
+       for (int j = 0; j < bases.size(); ++j) {
+           QString method(methods[i] + "/" + bases[j]); 
+           ref = new NmrReference(system, method); 
+           ref->addElement("P",  32.0, 0.0);
            s_library.append(ref);
        }
    }

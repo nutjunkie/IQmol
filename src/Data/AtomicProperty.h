@@ -170,15 +170,15 @@ namespace Data {
          Type::ID typeID() const { return Type::ChelpgCharge; }
    };
 
-   class NmrShiftIsotropic : public ScalarProperty {
+   class NmrShielding : public ScalarProperty {
       public:
-         Type::ID typeID() const { return Type::NmrShiftIsotropic; }
+         Type::ID typeID() const { return Type::NmrShielding; }
    };
 
 
-   class NmrShiftRelative : public ScalarProperty {
+   class NmrShift : public ScalarProperty {
       public:
-         Type::ID typeID() const { return Type::NmrShiftRelative; }
+         Type::ID typeID() const { return Type::NmrShift; }
    };
 
 

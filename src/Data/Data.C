@@ -64,8 +64,8 @@ QString toString(ID const id)
       case AtomicSymbol:             s = "Data::AtomicSymbol";              break;
       case AtomicNumber:             s = "Data::AtomicNumber";              break;
       case AtomColor:                s = "Data::AtomColor";                 break;
-      case NmrShiftIsotropic:        s = "Data::NmrShiftIsotropic";         break;
-      case NmrShiftRelative:         s = "Data::NmrShiftRelative";          break;
+      case NmrShielding:            s = "Data::NmrShielding";               break;
+      case NmrShift:                 s = "Data::NmrShift";                  break;
       case Mass:                     s = "Data::Mass";                      break;
       case AtomicCharge:             s = "Data::AtomicCharge";              break;
       case MullikenCharge:           s = "Data::MullikenCharge";            break;

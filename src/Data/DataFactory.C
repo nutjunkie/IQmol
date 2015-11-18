@@ -106,8 +106,8 @@ Base* Factory::create(Type::ID const id)
       case Type::AtomicSymbol:            data = new AtomicSymbol();            break;
       case Type::AtomicNumber:            data = new AtomicNumber();            break;
       case Type::AtomColor:               data = new AtomColor();               break;
-      case Type::NmrShiftIsotropic:       data = new NmrShiftIsotropic();       break;
-      case Type::NmrShiftRelative:        data = new NmrShiftRelative();        break;
+      case Type::NmrShielding:            data = new NmrShielding();             break;
+      case Type::NmrShift:                data = new NmrShift();                break;
       case Type::Mass:                    data = new Mass();                    break;
       case Type::AtomicCharge:            data = new AtomicCharge();            break;
       case Type::MullikenCharge:          data = new MullikenCharge();          break;

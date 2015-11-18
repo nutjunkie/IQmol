@@ -945,7 +945,7 @@ void Molecule::applyDistanceConstraint(Constraint* constraint)
 
    double value(constraint->targetValue());
    Vec shift(0.5*(ab.norm() - value)*ab.unit());
-   Vec delta(value*(a-b).unit());
+   //Vec delta(value*(a-b).unit());
    Vec c;
 
    for (iter = allAtoms.begin(); iter != allAtoms.end(); ++iter) {
@@ -1397,17 +1397,13 @@ void Molecule::setGeometry(IQmol::Data::Geometry& geometry)
    for (unsigned i = 0; i < nAtoms; ++i) {
        atoms[i]->setTranslation(geometry.position(i));
        atoms[i]->setSpinDensity(geometry.getAtomicProperty<Data::SpinDensity>(i).value());
-       double shift(0.0);
-       if (geometry.hasProperty<Data::NmrShiftRelative>()) {
-          shift = geometry.getAtomicProperty<Data::NmrShiftRelative>(i).value();
-qDebug() << "Shift set to" << shift << "(relative)";
-       }else if (geometry.hasProperty<Data::NmrShiftIsotropic>()) {
-          shift = geometry.getAtomicProperty<Data::NmrShiftIsotropic>(i).value();
-qDebug() << "Shift set to" << shift << "(isotropic)";
+       if (geometry.hasProperty<Data::NmrShift>()) {
+          atoms[i]->setNmrShift(geometry.getAtomicProperty<Data::NmrShift>(i).value());
+       }else if (geometry.hasProperty<Data::NmrShielding>()) {
+          atoms[i]->setNmrShielding(geometry.getAtomicProperty<Data::NmrShielding>(i).value());
        }else {
-qDebug() << "No NMR data found";
+          atoms[i]->setNmrShielding(0.0);
        }
-       atoms[i]->setNmrShift(shift);
    }
 
    setAtomicCharges(m_chargeType);

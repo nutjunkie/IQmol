@@ -54,7 +54,8 @@ const Qt::KeyboardModifier Viewer::s_buildModifier(Qt::AltModifier);
 const Qt::KeyboardModifier Viewer::s_selectModifier(Qt::ShiftModifier);
 const Qt::KeyboardModifier Viewer::s_manipulateSelectionModifier(Qt::ControlModifier);
 
-QFont  Viewer::s_labelFont("Helvetica", 14, QFont::Black);
+//QFont  Viewer::s_labelFont("Helvetica", 14, QFont::Black);
+QFont  Viewer::s_labelFont("Arial", 14, QFont::Black);
 QFontMetrics Viewer::s_labelFontMetrics(Viewer::s_labelFont);
 
 
@@ -480,7 +481,7 @@ void Viewer::drawLabels(GLObjectList const& objects)
    glDisable(GL_LIGHTING);
    qglColor(foregroundColor());
 
-   QString mesg = selectedOnly ? "Selection " : "Total ";
+   QString msg = selectedOnly ? "Selection " : "Total ";
    AtomList::const_iterator iter;
    double value(0.0);
 
@@ -488,20 +489,36 @@ void Viewer::drawLabels(GLObjectList const& objects)
       for (iter= atomList.begin(); iter != atomList.end(); ++iter) {
           value += (*iter)->getMass();
       }
-      mesg += "mass: " + QString::number(value,'f', 3);
-      drawText(width()-s_labelFontMetrics.width(mesg), height()-10, mesg);
+      msg += "mass: " + QString::number(value,'f', 3);
+
    }else if (m_labelType == Layer::Atom::Charge) {
       for (iter = atomList.begin(); iter != atomList.end(); ++iter) {
           value += (*iter)->getCharge();
       }
-      mesg += "charge: " + QString::number(value,'f', 2);
-      drawText(width()-s_labelFontMetrics.width(mesg), height()-10, mesg);
+      msg += "charge: " + QString::number(value,'f', 2);
+
    }else if (m_labelType == Layer::Atom::Spin) {
       for (iter = atomList.begin(); iter != atomList.end(); ++iter) {
           value += (*iter)->getSpin();
       }
-      mesg += "spin: " + QString::number(value,'f', 2);
-      drawText(width()-s_labelFontMetrics.width(mesg), height()-10, mesg);
+      msg += "spin: " + QString::number(value,'f', 2);
+
+   }else if (m_labelType == Layer::Atom::NmrShift) {
+      iter = atomList.begin();
+      if (iter == atomList.end()) {
+         msg.clear();
+      }else if ((*iter)->haveNmrShift()) {
+         msg = "Chemical shifts";
+      }else {
+         msg = "Nuclear shieldings";
+      }
+
+   }else {
+      msg.clear();
+   }
+
+   if (!msg.isEmpty()) {
+      drawText(width()-s_labelFontMetrics.width(msg), height()-10, msg);
    }
 
    glEnable(GL_LIGHTING);

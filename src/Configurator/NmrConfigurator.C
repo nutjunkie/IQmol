@@ -22,10 +22,19 @@
 
 #include "ui_NmrConfigurator.h"
 #include "NmrConfigurator.h"
+#include "NmrReferenceLibrary.h"
 #include "NmrLayer.h"
 #include "NmrData.h"
 #include "qcustomplot.h"
 #include "QMsgBox.h"
+
+/* TO DO
+
+   clean up
+   plot lorentzian
+   reverse axis
+
+*/
 
 
 namespace IQmol {
@@ -46,7 +55,7 @@ Nmr::Nmr(Layer::Nmr& layer, Data::Nmr& data) : m_layer(layer), m_data(data), m_u
    m_plot->axisRect()->setRangeZoom(m_plot->xAxis->orientation());
    m_plot->xAxis->setSelectableParts(QCPAxis::spNone);
 
-   m_plot->xAxis->setLabel("Shift (ppm)");
+   m_plot->xAxis->setLabel("Nuclear Shielding (ppm)");
    //m_plot->yAxis->setLabel("Intensity");
 
    QFrame* frame(m_ui->spectrumFrame);
@@ -67,7 +76,7 @@ Nmr::Nmr(Layer::Nmr& layer, Data::Nmr& data) : m_layer(layer), m_data(data), m_u
 
    connect(this, SIGNAL(updated()), &m_layer, SIGNAL(updated()));
 
-   load();
+   initTable();
 }
 
 
@@ -75,115 +84,88 @@ Nmr::~Nmr()
 {
    if (m_plot) delete m_plot;
    if (m_ui) delete m_ui;
-
-   QList<Data::NmrReference*>::iterator iter;
-   for (iter = m_references.begin(); iter != m_references.end(); ++iter) {
-       delete (*iter);
-   }
 }
 
 
-void Nmr::load()
+void Nmr::initTable()
 {
    QList<QString> const& atomLabels(m_data.atomLabels());
+   QList<double> shieldings(m_data.shieldings());
 
-   QTableWidget* table(m_ui->shieldingsTable);
-   table->setRowCount(atomLabels.size());
-
-   QList<double> shifts;
-   if (m_data.haveRelativeShifts()) {
-      shifts = m_data.relativeShifts();
-   }else {
-      loadReferences();
-      shifts = m_data.isotropicShifts();
-   }
-
-   if (atomLabels.size() != shifts.size()) {
-      QMsgBox::warning(0, "IQmol", "NMR data size mismatch");
+   if (atomLabels.size() != shieldings.size()) {
+      QString msg("NMR data size mismatch: ");
+      msg += QString::number(atomLabels.size()) + " != " 
+           + QString::number(shieldings.size());
+      QMsgBox::warning(0, "IQmol", msg);
       return;
    }
 
-   QTableWidgetItem* label;
-   QTableWidgetItem* shift;
+   QTableWidgetItem* item;
+
+   QTableWidget* table(m_ui->shieldingsTable);
+   table->setRowCount(atomLabels.size());
    
    for (int atom = 0; atom < atomLabels.size(); ++atom) {
-       label = new QTableWidgetItem(atomLabels[atom]);
-       shift = new QTableWidgetItem(QString::number(shifts[atom], 'f', 2) + "     ");
-       label->setTextAlignment(Qt::AlignCenter|Qt::AlignVCenter);
-       shift->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
-       table->setItem(atom, 0, label);
-       table->setItem(atom, 1, shift);
+       item = new QTableWidgetItem(atomLabels[atom]);
+       item->setTextAlignment(Qt::AlignCenter|Qt::AlignVCenter);
+       table->setItem(atom, 0, item);
+
+       item = new QTableWidgetItem(QString::number(shieldings[atom], 'f', 2) + "     ");
+       item->setTextAlignment(Qt::AlignCenter|Qt::AlignVCenter);
+       table->setItem(atom, 1, item);
+
+       item = new QTableWidgetItem();
+       item->setTextAlignment(Qt::AlignCenter|Qt::AlignVCenter);
+       table->setItem(atom, 2, item);
    }
 
    table->setCurrentCell(0, 0, QItemSelectionModel::Rows | QItemSelectionModel::ClearAndSelect);
    on_shieldingsTable_itemSelectionChanged();
-   updatePlot();
+   //updatePlot();
 }
 
 
-void Nmr::loadReferences()
+void Nmr::loadShifts(Data::NmrReference const* reference, QString const& isotope)
 {
-   QComboBox* combo(m_ui->referenceCombo);
-   QString name;
+   QList<QString> const& atomLabels(m_data.atomLabels());
+   QTableWidget* table(m_ui->shieldingsTable);
 
-   name = "None";
-   combo->addItem(name);
+   if (reference && reference->contains(isotope)) {
+      QList<double> shieldings(m_data.shieldings());
 
-   name = "TMS HF/6-31G(d)";
-   combo->addItem(name);
-
-   name = "TMS B3LYP/6-31G(d,p)";
-   combo->addItem(name);
-
-   name = "TMS B3LYP/6-31G(d,p)";
-   combo->addItem(name);
-
-   name = "DMSO B3LYP/6-31G(d,p)";
-}
-
-
-/*
-void Nmr::on_widthSlider_valueChanged(int)
-{
-   updatePlot();
-}
-
-
-void Frequencies::on_referenceCombo_indexChanged(int index)
-{
-   QTableWidget* table(m_ui.frequencyTable);
-   for (int mode = 0; mode < m_rawData.size(); ++mode) {
-       table->item(mode, 0)->setText(QString::number(m_rawData[mode].first * scale,'f', 2));
+      for (int row = 0; row < atomLabels.size(); ++row) {
+          if (atomLabels[row] == isotope) {
+             double shift(shieldings[row] - reference->shift(atomLabels[row]));
+             table->item(row, 2)->setText(QString::number(shift, 'f', 2) + "     ");
+          }else {
+             table->item(row, 2)->setText("");
+          }
+      }
+   }else {
+      for (int row = 0; row < atomLabels.size(); ++row) {
+          table->item(row, 2)->setText("");
+      }
    }
-   
-   updatePlot();
 }
 
 
-void Nmr::on_impulseButton_clicked(bool)
+// Note this only returns shifts for the given isotope
+QList<double> Nmr::computeShifts(Data::NmrReference const* reference, QString const& isotope)
 {
-   m_ui.widthSlider->setEnabled(false);
-   m_ui.widthLabel->setEnabled(false);
-   updatePlot();
+   QList<double> shifts;
+
+   if (reference && reference->contains(isotope)) {
+      QList<QString> const& atomLabels(m_data.atomLabels());
+      QList<double> shieldings(m_data.shieldings());
+      double shift(reference->shift(isotope));
+
+      for (int i = 0; i < atomLabels.size(); ++i) {
+          if (atomLabels[i] == isotope) shifts.append(shieldings[i] - shift);
+      }
+   }
+
+   return shifts;
 }
-
-
-void Nmr::on_gaussianButton_clicked(bool)
-{
-   m_ui.widthSlider->setEnabled(true);
-   m_ui.widthLabel->setEnabled(true);
-   updatePlot();
-}
-
-
-void Nmr::on_lorentzianButton_clicked(bool)
-{
-   m_ui.widthSlider->setEnabled(true);
-   m_ui.widthLabel->setEnabled(true);
-   updatePlot();
-}
-
-*/
 
 
 void Nmr::updatePlot()
@@ -205,10 +187,30 @@ void Nmr::plotImpulse()
    QVector<double> x(1), y(1);
    double maxIntensity(1.0);
 
-   QList<double> shifts(m_data.isotropicShifts());
+   
+   QList<double> data;
+   QString isotope(currentIsotope());
+qDebug() << "Plotting impulse for" << isotope;
 
-   for (int shift = 0; shift < shifts.size(); ++shift) {
-       x[0] = shifts[shift];
+   if (isotope.isEmpty()) {
+      data = m_data.shieldings();
+      m_plot->xAxis->setLabel("Nuclear Shielding (ppm)");
+qDebug() << "  shieldings found" << data.size();
+   }else {
+      data = computeShifts(currentReference(), isotope);
+      m_plot->xAxis->setLabel("Chemical Shifts (ppm)");
+qDebug() << "  shifts found" << data.size();
+   }
+
+   qDebug() << "plotting shifts" << data.size();
+
+
+   qDebug() << "---------------------------" ;
+   m_data.dump();
+   qDebug() << "---------------------------" ;
+
+   for (int shift = 0; shift < data.size(); ++shift) {
+       x[0] = data[shift];
        y[0] = maxIntensity; 
 
        QCPGraph* graph(m_plot->addGraph());
@@ -247,7 +249,7 @@ void Nmr::plotSpectrum()
    double g(0.5*width);
    double g2(g*g);
 
-   QList<double> const& shifts(m_data.isotropicShifts());
+   QList<double> shifts(m_data.shieldings());
 
    for (int mode = 0; mode < shifts.size(); ++mode) {
 
@@ -335,9 +337,92 @@ void Nmr::on_shieldingsTable_itemSelectionChanged()
 }
 
 
-void Nmr::on_typeCombo_currentIndexChanged(QString const& text)
+void Nmr::on_isotopeCombo_currentIndexChanged(QString const&)
 {
-   qDebug() << "Setting spectrum type to " << text;
+   QString isotope(currentIsotope());
+
+   Data::NmrReferenceLibrary& library(Data::NmrReferenceLibrary::instance());
+   QList<Data::NmrReference const*> refs(library.filter(isotope));
+
+   QStringList systems;
+   QList<Data::NmrReference const*>::iterator iter;
+   for (iter = refs.begin(); iter != refs.end(); ++iter) {
+       QString system((*iter)->system());
+       qDebug() << "System:" <<  system;
+       if (!systems.contains(system)) systems.append(system);
+   }
+
+   QComboBox* combo(m_ui->systemCombo);
+   combo->clear();
+   combo->addItems(systems);
+
+   loadShifts(currentReference(), currentIsotope()); 
+
+   updatePlot();
+}
+
+
+void Nmr::on_systemCombo_currentIndexChanged(QString const& text)
+{
+   QString isotope(currentIsotope());
+
+   Data::NmrReferenceLibrary& library(Data::NmrReferenceLibrary::instance());
+   QList<Data::NmrReference const*> refs(library.filter(isotope, text));
+
+   qDebug() << "found" << refs.size() << "matches";
+
+   QStringList methods;
+   QList<Data::NmrReference const*>::iterator iter;
+   for (iter = refs.begin(); iter != refs.end(); ++iter) {
+       QString method((*iter)->method());
+       if (!methods.contains(method)) methods.append(method);
+   }
+
+   QComboBox* combo(m_ui->methodCombo);
+   combo->clear();
+   combo->addItems(methods);
+}
+
+
+QString Nmr::currentIsotope()
+{
+   QString isotope;
+   QString text(m_ui->isotopeCombo->currentText());
+
+   // Match the isotope in, e.g. "Proton (1H)"
+   QRegExp rx("\\(\\d+(\\D+)\\)");
+
+   if (rx.indexIn(text) >= 0) {
+      isotope = rx.cap(1);
+   }else {
+      qDebug() << "No references found for" << text;
+   }
+
+   return isotope;
+}
+
+
+Data::NmrReference const* Nmr::currentReference()
+{
+   Data::NmrReference const* reference;
+
+   QString isotope(currentIsotope());
+   QString system(m_ui->systemCombo->currentText());
+   QString method(m_ui->methodCombo->currentText());
+
+   Data::NmrReferenceLibrary& library(Data::NmrReferenceLibrary::instance());
+   QList<Data::NmrReference const*> refs(library.filter(isotope, system, method));
+
+   if (refs.size() == 1) {
+      reference = refs.first();
+qDebug() << "Found reference:";
+      reference->dump();
+   }else {
+      reference = 0;
+qDebug() << "No reference found for" << isotope << system << method;
+   }
+
+   return reference;
 }
 
 } } // end namespace IQmol::Configurator

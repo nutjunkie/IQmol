@@ -81,7 +81,10 @@ namespace Layer {
          void setSpinDensity(double const spin) {m_spin = spin; }
          void setIndex(int const index);
          void setReorderIndex(int const reorderIndex) { m_reorderIndex = reorderIndex; }
-         void setNmrShift(double const nmrShift) {m_nmrShift = nmrShift; }
+
+         void setNmrShift(double const shift) {m_nmr = shift; m_haveNmrShift = true; }
+         void setNmrShielding(double const shift) {m_nmr = shift; m_haveNmrShift = false; }
+         bool haveNmrShift() const { return m_haveNmrShift; }
 
          int getAtomicNumber() const { return m_atomicNumber; }
          QString getAtomicSymbol() const { return m_symbol; }
@@ -129,10 +132,11 @@ namespace Layer {
          int     m_index;
          double  m_charge;
          double  m_spin;
-         double  m_nmrShift;
+         double  m_nmr;
          GLfloat m_vdwRadius;
          QString m_symbol;
          bool    m_smallerHydrogens;
+         bool    m_haveNmrShift;
          int     m_reorderIndex;
          qglviewer::Vec m_displacement;
    };

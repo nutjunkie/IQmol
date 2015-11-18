@@ -27,19 +27,11 @@
 namespace IQmol {
 namespace Data {
 
-//template<> const Type::ID NmrReferenceList::TypeID = Type::NmrReferenceList;
-
-Nmr::Nmr() 
-{
-   qDebug() << "Constructing a new Data::Nmr object"; 
-}
-
 void Nmr::dump() const 
 {
-   qDebug() << "NMR isotropic shifts: " << m_isotropicShifts;
-   qDebug() << "NMR relative shifts:  " << m_relativeShifts;
-   qDebug() << "NMR couplings:";
-   QStringList list(PrintMatrix(m_isotropicCouplings)); 
+   qDebug() << "NMR shieldings: " << m_shieldings;
+   qDebug() << "NMR shifts:     " << m_shifts;
+   QStringList list(PrintMatrix(m_couplings)); 
 
    QStringList::iterator iter;
    for (iter = list.begin(); iter != list.end(); ++iter) {
@@ -52,14 +44,31 @@ void Nmr::dump() const
 
 bool Nmr::haveCouplings()
 {
-   return m_isotropicCouplings.size1() == m_isotropicShifts.size() &&
-          m_isotropicCouplings.size2() == m_isotropicShifts.size();
+   return m_couplings.size1() == m_shieldings.size() &&
+          m_couplings.size2() == m_shieldings.size();
 }
 
 
-bool Nmr::haveRelativeShifts()
+bool Nmr::haveReference()
 {
-   return !m_relativeShifts.isEmpty();
+   return !m_reference.system().isEmpty();
+}
+
+
+QList<double> Nmr::shifts(QString const& isotope, NmrReference const& ref) const
+{ 
+   QList<double> shifts;
+
+   if (ref.contains(isotope)) {
+      double offset(ref.shift(isotope));
+      for (int i = 0; i < m_atomLabels.size(); ++i) {
+          if (m_atomLabels[i] == isotope) {
+             shifts.append(m_shieldings[i]-offset);
+          }
+       }
+   }
+
+   return shifts;
 }
 
 } } // end namespace IQmol::Data

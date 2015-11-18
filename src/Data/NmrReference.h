@@ -35,15 +35,18 @@ namespace Data {
       public:
 
          NmrReference(QString const& system = QString(), 
-                      QString const& method = QString(), 
-                      QString const& basis  = QString() ) : m_method(method) { }
+                      QString const& method = QString() ) : 
+            m_system(system), m_method(method) { }
 
          Type::ID typeID() const { return Type::NmrReference; }
 
-         void setMethod(QString const& method) { m_method = method; }
          void setSystem(QString const& system) { m_system = system; }
-         void setBasis(QString const&  basis)  { m_basis  = basis; }
+         void setMethod(QString const& method) { m_method = method; }
 
+         QString const& system() const { return m_system; }
+         QString const& method() const { return m_method; }
+
+         bool contains(QString const& element) const { return m_shifts.contains(element); }
          void addElement(QString const& symbol, double const shfit, double const offset);
          double shift(QString const& symbol) const;
 
@@ -51,24 +54,21 @@ namespace Data {
 
          void serialize(InputArchive& ar, unsigned int const version = 0) {
             Q_UNUSED(version);
-            ar & m_method;
             ar & m_system;
-            ar & m_basis;
+            ar & m_method;
             ar & m_shifts;
          }
 
          void serialize(OutputArchive& ar, unsigned int const version = 0) {
             Q_UNUSED(version);
-            ar & m_method;
             ar & m_system;
-            ar & m_basis;
+            ar & m_method;
             ar & m_shifts;
          }
 
       private:
-         QString m_method;
          QString m_system;
-         QString m_basis;
+         QString m_method;
 
          QMap<QString, double> m_shifts;
    };

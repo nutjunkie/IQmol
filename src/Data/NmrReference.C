@@ -36,10 +36,15 @@ void NmrReference::addElement(QString const& atom, double const shift, double co
 }
 
 
+double NmrReference::shift(QString const& isotope) const
+{
+   return contains(isotope) ? m_shifts.value(isotope) : 0.0;
+}
+
 
 void NmrReference::dump() const 
 {
-   qDebug() << "System: " << m_system << "Theory:" << m_method << m_basis;
+   qDebug() << "System: " << m_system << "Theory:" << m_method;
    QMap<QString, double>::const_iterator iter;
    for (iter = m_shifts.begin(); iter != m_shifts.end(); ++iter) {
        qDebug() << "  " << iter.key() << "  " << iter.value();
