@@ -252,7 +252,7 @@ QToolTip {
        <item>
         <widget class="QRadioButton" name="lorentzianButton">
          <property name="text">
-          <string>Lorentzian</string>
+          <string>Spectrum</string>
          </property>
         </widget>
        </item>

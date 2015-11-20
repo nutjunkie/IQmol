@@ -29,10 +29,10 @@
 #include "QMsgBox.h"
 
 /* TO DO
-
    clean up
    plot lorentzian
-   reverse axis
+   fix indexing of graphs when subsets of data are plotted
+   impulse selection shows atom highlightied
 
 */
 
@@ -45,6 +45,8 @@ Nmr::Nmr(Layer::Nmr& layer, Data::Nmr& data) : m_layer(layer), m_data(data), m_u
 {
    m_ui = new Ui::NmrConfigurator();
    m_ui->setupUi(this);
+   m_ui->widthSlider->setEnabled(false);
+   m_ui->widthLabel->setEnabled(false);
 
    QTableWidget* table(m_ui->shieldingsTable);
    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -54,17 +56,13 @@ Nmr::Nmr(Layer::Nmr& layer, Data::Nmr& data) : m_layer(layer), m_data(data), m_u
    m_plot->axisRect()->setRangeDrag(m_plot->xAxis->orientation());
    m_plot->axisRect()->setRangeZoom(m_plot->xAxis->orientation());
    m_plot->xAxis->setSelectableParts(QCPAxis::spNone);
-
-   m_plot->xAxis->setLabel("Nuclear Shielding (ppm)");
-   //m_plot->yAxis->setLabel("Intensity");
+   m_plot->xAxis->setRangeReversed(true);
+   m_customPlot->yAxis->setTickStep(0.2);
 
    QFrame* frame(m_ui->spectrumFrame);
    QVBoxLayout* layout(new QVBoxLayout());
    frame->setLayout(layout);
    layout->addWidget(m_plot);
-
-   m_ui->widthSlider->setEnabled(false);
-   m_ui->widthLabel->setEnabled(false);
 
    m_pen.setColor(Qt::blue);
    m_pen.setStyle(Qt::SolidLine);
@@ -119,9 +117,8 @@ void Nmr::initTable()
        table->setItem(atom, 2, item);
    }
 
-   table->setCurrentCell(0, 0, QItemSelectionModel::Rows | QItemSelectionModel::ClearAndSelect);
    on_shieldingsTable_itemSelectionChanged();
-   //updatePlot();
+   on_isotopeCombo_currentIndexChanged(m_ui->isotopeCombo->currentText());
 }
 
 
@@ -172,42 +169,67 @@ void Nmr::updatePlot()
 {
    m_plot->clearGraphs();
 
+   QList<double> data;
+   QString isotope(currentIsotope());
+
+   if (isotope.isEmpty()) {
+      data = m_data.shieldings();
+      m_plot->xAxis->setLabel("Nuclear Shielding (ppm)");
+   }else {
+      data = computeShifts(currentReference(), isotope);
+      m_plot->xAxis->setLabel("Chemical Shifts (ppm)");
+   }
+
+   if (data.isEmpty()) return;
+
+   double min(0.0), max(0.0);
+   if (isotope == "H") {
+      min =   0.0;
+      max =  10.0;
+   }else if (isotope == "B") {
+      min = -130.0;
+      max =   65.0;
+   }else if (isotope == "C") {
+      min =    0.0;
+      max =  220.0;
+   }else if (isotope == "N") {
+      min =    0.0;
+      max =  900.0;
+   }else if (isotope == "F") {
+      min = -280.0;
+      max =  280.0;
+   }else if (isotope == "Si") {
+      min = -380.0;
+      max =   80.0;
+   }else if (isotope == "P") {
+      min = -480.0;
+      max =  270.0;
+   }else {
+      min = max = data.first();
+      for (int i = 1; i < data.size(); ++i) {
+          min = std::min(min, data[i]);
+          max = std::max(max, data[i]);
+      }
+   }
+
+   m_plot->xAxis->setRange(1.05*min, 1.05*max);
+   m_plot->yAxis->setAutoTickStep(true);
+
    if (m_ui->impulseButton->isChecked()) {
-      plotImpulse();
+      plotImpulse(data);
    }else if (m_ui->lorentzianButton->isChecked()) {
-      plotSpectrum();
+      plotSpectrum(data, min, max);
    }
 
    m_plot->replot();
 }
 
 
-void Nmr::plotImpulse()
+void Nmr::plotImpulse(QList<double> const& data)
 {
    QVector<double> x(1), y(1);
-   double maxIntensity(1.0);
+   double intensity(1.0);
 
-   
-   QList<double> data;
-   QString isotope(currentIsotope());
-qDebug() << "Plotting impulse for" << isotope;
-
-   if (isotope.isEmpty()) {
-      data = m_data.shieldings();
-      m_plot->xAxis->setLabel("Nuclear Shielding (ppm)");
-qDebug() << "  shieldings found" << data.size();
-   }else {
-      data = computeShifts(currentReference(), isotope);
-      m_plot->xAxis->setLabel("Chemical Shifts (ppm)");
-qDebug() << "  shifts found" << data.size();
-   }
-
-   qDebug() << "plotting shifts" << data.size();
-
-
-   qDebug() << "---------------------------" ;
-   m_data.dump();
-   qDebug() << "---------------------------" ;
 
    for (int shift = 0; shift < data.size(); ++shift) {
        x[0] = data[shift];
@@ -223,20 +245,19 @@ qDebug() << "  shifts found" << data.size();
        connect(graph, SIGNAL(selectionChanged(bool)), this, SLOT(plotSelectionChanged(bool)));
    }
 
-   m_plot->xAxis->setRange(0, 200);
    m_plot->yAxis->setRange(-0.00, 1.05*maxIntensity);
-   m_plot->yAxis->setAutoTickStep(true);
 }
 
 
 
-void Nmr::plotSpectrum() 
+void Nmr::plotSpectrum(QList<double> const& data, double const min, double const max) 
 {
    double width(m_ui->widthSlider->value());
-//qDebug() << "Plot spectrum called";
    unsigned const bins(400);
-   unsigned const maxPpm(300);
-   double   const delta(double(maxPpm)/bins);
+   unsigned const range(max-min);
+   double   const delta(double(range)/bins);
+
+   qDebug() << "Plot spectrum called between" << min << "and" << max << " delta =" << delta;
 
    QVector<double> x(bins), y(bins);
 
@@ -246,14 +267,14 @@ void Nmr::plotSpectrum()
    }
 
    double A(2.0/M_PI);
-   double g(0.5*width);
+   double g(0.01*width);
    double g2(g*g);
 
    QList<double> shifts(m_data.shieldings());
 
-   for (int mode = 0; mode < shifts.size(); ++mode) {
+   for (int mode = 0; mode < data.size(); ++mode) {
 
-       double nu(shifts[mode]);
+       double nu(data[mode]);
        double I(1.0);
        for (int xi = 0; xi < bins; ++xi) {
            y[xi] += I*A*g / (g2+(x[xi]-nu)*(x[xi]-nu));
@@ -275,17 +296,14 @@ void Nmr::plotSpectrum()
    graph->setAntialiased(true);
    graph->setSelectedPen(m_selectPen);
 
-   m_plot->xAxis->setRange(0, 3500);
-   m_plot->yAxis->setRange(0, 1.00);
-   m_plot->yAxis->setAutoTickStep(false);
-   m_plot->yAxis->setTickStep(0.2);
+   //m_plot->yAxis->setAutoTickStep(false);
+   //m_plot->yAxis->setTickStep(0.2);
 }
 
 
 void Nmr::plotSelectionChanged(bool tf)
 {
-   qDebug() << "Plot selection changed called";
-
+   //qDebug() << "Plot selection changed called" << tf;
    QCPGraph* graph(qobject_cast<QCPGraph*>(sender()));
    if (!graph) return;
 
@@ -309,32 +327,8 @@ void Nmr::plotSelectionChanged(bool tf)
    table->setCurrentCell(atom, 0, 
        QItemSelectionModel::Rows | QItemSelectionModel::ClearAndSelect);
    table->scrollToItem(table->item(atom, 0));
-   on_shieldingsTable_itemSelectionChanged();
 }
 
-
-void Nmr::on_shieldingsTable_itemSelectionChanged()
-{
-   if (!m_ui->impulseButton->isChecked()) return;
-
-   QList<QTableWidgetItem*> selection = m_ui->shieldingsTable->selectedItems();
-   if (selection.isEmpty()) return;
-   int index(selection.first()->row());
-
-   QCPGraph* graph(m_plot->graph(index));
-   if (graph && graph->selected()) return;
-
-   QList<QCPGraph*> selectedGraphs(m_plot->selectedGraphs());
-   QList<QCPGraph*>::iterator iter;
-   for (iter = selectedGraphs.begin(); iter != selectedGraphs.end(); ++iter) {
-       (*iter)->setSelected(false);
-   }
-
-   if (graph) {
-       graph->setSelected(true);
-       m_plot->replot();
-   }
-}
 
 
 void Nmr::on_isotopeCombo_currentIndexChanged(QString const&)
@@ -381,6 +375,44 @@ void Nmr::on_systemCombo_currentIndexChanged(QString const& text)
    QComboBox* combo(m_ui->methodCombo);
    combo->clear();
    combo->addItems(methods);
+}
+
+
+void Nmr::on_impulseButton_clicked(bool)
+{
+   m_ui->widthSlider->setEnabled(false);
+   m_ui->widthLabel->setEnabled(false);
+   updatePlot();
+}
+
+
+void Nmr::on_lorentzianButton_clicked(bool)
+{
+   m_ui->widthSlider->setEnabled(true);
+   m_ui->widthLabel->setEnabled(true);
+   updatePlot();
+}
+
+
+void Nmr::on_widthSlider_valueChanged(int)
+{
+   updatePlot();
+}
+
+
+void Nmr::on_shieldingsTable_itemSelectionChanged()
+{
+   if (!m_ui->impulseButton->isChecked()) return;
+   m_plot->deselectAll();
+
+   QList<QTableWidgetItem*> selection(m_ui->shieldingsTable->selectedItems());
+   QList<QTableWidgetItem*>::iterator iter;
+
+   for (iter = selection.begin(); iter != selection.end(); ++iter) {
+       QCPGraph* graph(m_plot->graph((*iter)->row()));
+       if (graph && !graph->selected()) graph->setSelected(true);
+   }
+   m_plot->replot();
 }
 
 

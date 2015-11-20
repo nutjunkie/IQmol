@@ -59,6 +59,9 @@ namespace Configurator {
          void on_shieldingsTable_itemSelectionChanged();
          void on_isotopeCombo_currentIndexChanged(QString const& isotope);
          void on_systemCombo_currentIndexChanged(QString const& system);
+         void on_widthSlider_valueChanged(int);
+         void on_impulseButton_clicked(bool);
+         void on_lorentzianButton_clicked(bool);
 
       Q_SIGNALS:
          void updated();
@@ -68,8 +71,8 @@ namespace Configurator {
          void loadShifts(Data::NmrReference const*, QString const& isotope);
          QList<double> computeShifts(Data::NmrReference const*, QString const& isotope);
          void updatePlot();
-         void plotImpulse();
-         void plotSpectrum();
+         void plotImpulse(QList<double> const& data);
+         void plotSpectrum(QList<double> const& data, double const min, double const max);
 
          QString currentIsotope();
          Data::NmrReference const* currentReference();
