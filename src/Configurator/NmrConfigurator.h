@@ -71,8 +71,10 @@ namespace Configurator {
          void loadShifts(Data::NmrReference const*, QString const& isotope);
          QList<double> computeShifts(Data::NmrReference const*, QString const& isotope);
          void updatePlot();
-         void plotImpulse(QList<double> const& data);
-         void plotSpectrum(QList<double> const& data, double const min, double const max);
+         void plotImpulse(QList<double> const& data, QPair<double, double> const& range);
+         void plotSpectrum(QList<double> const& data, QPair<double, double> const& range);
+
+         QPair<double, double> standardRange(QString const& isotope);
 
          QString currentIsotope();
          Data::NmrReference const* currentReference();

@@ -442,10 +442,12 @@ void Frequencies::on_frequencyTable_itemDoubleClicked(QTableWidgetItem* item)
 
 void Frequencies::on_frequencyTable_itemSelectionChanged()
 {
-   QList<QTableWidgetItem*> selection = m_configurator.frequencyTable->selectedItems();
+   QList<QTableWidgetItem*> selection(m_configurator.frequencyTable->selectedItems());
    if (selection.isEmpty()) return;
+
    Layer::Mode* mode = QVariantPointer<Layer::Mode>::toPointer(
        selection.first()->data(Qt::UserRole));
+
    if (mode) {
       m_frequencies.setActiveMode(*mode);
       m_frequencies.setPlay();

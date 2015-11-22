@@ -54,8 +54,6 @@ ShaderLibrary::ShaderLibrary(QGLContext* context) : m_normalBuffer(0), m_filterB
 }
 
 
-
-
 void ShaderLibrary::init()
 {
    const GLubyte* vendor   = glGetString(GL_VENDOR);
@@ -175,7 +173,6 @@ void ShaderLibrary::generateFilters() { }
 void ShaderLibrary::bindTextures(QString const& shader) { }
 void ShaderLibrary::releaseTextures() { }
 void ShaderLibrary::clearFrameBuffers() { }
-
 void ShaderLibrary::resizeScreenBuffers(QSize const&, double*) { }
 
 bool ShaderLibrary::setUniformVariables(QString const&, QVariantMap const& map) 
@@ -190,7 +187,6 @@ QVariantMap ShaderLibrary::uniformUserVariableList(QString const&)
 {
    return QVariantMap();
 }
-
 
 #else  // IQMOL_SHADERS
 
