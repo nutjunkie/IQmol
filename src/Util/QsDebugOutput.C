@@ -1,4 +1,4 @@
-// Copyright (c) 2010, Razvan Petru
+// Copyright (c) 2010, 2015an Petru
 // All rights reserved.
 
 // Redistribution and use in source and binary forms, with or without modification,

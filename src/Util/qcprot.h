@@ -40,7 +40,7 @@
  *      in press, Journal of Computational Chemistry 
  *
  *
- *  Copyright (c) 2009-2012, Pu Liu and Douglas L. Theobald
+ *  Copyright (c) 2009-2015, Pu Liu and Douglas L. Theobald
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without modification, are permitted 
