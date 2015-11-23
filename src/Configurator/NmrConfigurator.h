@@ -75,7 +75,6 @@ namespace Configurator {
          void plotSpectrum(QList<double> const& data, QPair<double, double> const& range);
 
          QPair<double, double> standardRange(QString const& isotope);
-
          QString currentIsotope();
          Data::NmrReference const* currentReference();
 
@@ -87,6 +86,8 @@ namespace Configurator {
 
          QPen m_pen;
          QPen m_selectPen;
+         QMap<int, QList<int> > m_graphToRows;
+         QPair<double, double> m_standardDomain;
    };
 
 } } // end namespace IQmol::Configurator

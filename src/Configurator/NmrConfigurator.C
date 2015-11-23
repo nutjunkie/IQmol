@@ -31,11 +31,11 @@
 /* TO DO
    clean up
    plot lorentzian
-
-   impulse selection should show atom highlightied in viewer
-   impulse selection should highlight all associated atoms in the table
-
+   impulse selection should show atom highlightied in viewer (signal required)
 */
+
+// Not pretty, but we use this to indicate when a shift should not be drawn
+#define NO_SHIFT 99999
 
 
 namespace IQmol {
@@ -77,11 +77,9 @@ Nmr::Nmr(Layer::Nmr& layer, Data::Nmr& data) : m_layer(layer), m_data(data), m_u
 
    initTable();
 
-   m_ui->impulseButton->hide();
+   //m_ui->impulseButton->hide();
    m_ui->lorentzianButton->hide();
    m_ui->widthLabel->setText("Resolution");
-   //m_ui->widthLabel->hide();
-   //m_ui->widthSlider->hide();
 }
 
 
@@ -142,37 +140,39 @@ void Nmr::loadShifts(Data::NmrReference const* reference, QString const& isotope
           if (atomLabels[row] == isotope) {
              double shift(shieldings[row] - reference->shift(atomLabels[row]));
              table->item(row,2)->setText(QString::number(shift, 'f', 2) + "     ");
-qDebug() << "Setting table item id" << count;
-             table->item(row,2)->setData(Qt::UserRole, QVariant(count));
              ++count;
           }else {
              table->item(row,2)->setText("");
-             table->item(row,2)->setData(Qt::UserRole, QVariant(-1));
           }
       }
-   qDebug() << count << "UserRole data elements set";
    }else {
       for (int row = 0; row < atomLabels.size(); ++row) {
           table->item(row,2)->setText("");
-          table->item(row,2)->setData(Qt::UserRole, QVariant(row));
       }
    }
 
 }
 
 
-// Note this only returns shifts for the given isotope
 QList<double> Nmr::computeShifts(Data::NmrReference const* reference, QString const& isotope)
 {
    QList<double> shifts;
+   QList<QString> const& atomLabels(m_data.atomLabels());
 
    if (reference && reference->contains(isotope)) {
-      QList<QString> const& atomLabels(m_data.atomLabels());
       QList<double> shieldings(m_data.shieldings());
       double shift(reference->shift(isotope));
 
       for (int i = 0; i < atomLabels.size(); ++i) {
-          if (atomLabels[i] == isotope) shifts.append(shieldings[i] - shift);
+          if (atomLabels[i] == isotope) {
+             shifts.append(shieldings[i] - shift);
+          }else {
+             shifts.append(NO_SHIFT);
+          }
+      }
+   }else {
+      for (int i = 0; i < atomLabels.size(); ++i) {
+          shifts.append(NO_SHIFT);
       }
    }
 
@@ -209,46 +209,43 @@ void Nmr::updatePlot()
 void Nmr::plotImpulse(QList<double> const& data, QPair<double, double> const& domain)
 {
    // Signals that are within the resolution are considered to be the same.
-   double width(m_ui->widthSlider->value());
-   width = width/20;
-   double resolution(width*(domain.second-domain.first)/1000.0);
+   double width(m_ui->widthSlider->value()/20000.0);
+   double resolution(width*(domain.second-domain.first));
 
-   QMap<int, int> intensities;
-   for (int shift = 0; shift < data.size(); ++shift) {
-       int x(data[shift]/resolution);
-       qDebug() << " incrementing " << x << "because of" << data[shift];
-       ++intensities[x];
+   m_graphToRows.clear();
+
+   for (int i = 0; i < data.size(); ++i) {
+       double shift(data[i]);
+       if (shift < NO_SHIFT-1) {
+          int x(shift/resolution);
+           qDebug() << " incrementing " << x << "because of" << shift;
+           m_graphToRows[x].append(i);
+       }
    }
 
    qDebug() << "Signals map with resolution" << resolution << width;
-   qDebug() << intensities;
+   qDebug() << m_graphToRows;
 
    int range(1);
-   QList<int> values(intensities.values());
-   for (int i = 0; i < values.size(); ++i) {
-       range = std::max(range, values[i]);
-   }
-   m_plot->yAxis->setRange(-0.00, 1.05*range);
-
    QVector<double> x(1), y(1);
+   QMap<int, QList<int> >::iterator iter;
 
-   for (int shift = 0; shift < data.size(); ++shift) {
-       x[0] = data[shift];
-       y[0] = intensities[int(data[shift]/resolution)]; 
+   for (iter = m_graphToRows.begin(); iter != m_graphToRows.end(); ++iter) {
+       x[0] = resolution*iter.key();
+       y[0] = iter.value().size();
+       range = std::max(range, iter.value().size());
 
-       // hack so we don't draw the same graph more than onece
-       intensities[int(data[shift]/resolution)] = 0;
-       
        QCPGraph* graph(m_plot->addGraph());
        graph->setData(x, y);
-       graph->setName(QString::number(shift));
+       graph->setName(QString::number(iter.key()));
        graph->setLineStyle(QCPGraph::lsImpulse);
-       //graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle));
+       graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle));
        graph->setPen(m_pen);
        graph->setSelectedPen(m_selectPen);
        connect(graph, SIGNAL(selectionChanged(bool)), this, SLOT(plotSelectionChanged(bool)));
    }
 
+   m_plot->yAxis->setRange(-0.00, 1.05*range);
 }
 
 
@@ -370,7 +367,7 @@ void Nmr::on_lorentzianButton_clicked(bool)
 }
 
 
-void Nmr::on_widthSlider_valueChanged(int)
+void Nmr::on_widthSlider_valueChanged(int value)
 {
    updatePlot();
 }
@@ -378,16 +375,16 @@ void Nmr::on_widthSlider_valueChanged(int)
 
 void Nmr::plotSelectionChanged(bool tf)
 {
-   qDebug() << "Plot selection changed called" << tf;
    QCPGraph* graph(qobject_cast<QCPGraph*>(sender()));
    if (!graph) return;
+   //qDebug() << "Plot selection changed called for" << graph->name();
 
    if (tf) {
       graph->setPen(m_selectPen);
-      //graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc));
+      graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc));
    }else {
       graph->setPen(m_pen);
-      //graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle));
+      graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle));
       return;
    }
 
@@ -395,58 +392,73 @@ void Nmr::plotSelectionChanged(bool tf)
    if (!m_ui->impulseButton->isChecked()) return;
 
    bool ok;
-   int atom(graph->name().toInt(&ok));
-qDebug() << "atom selected graph" << atom;
+   int sig(graph->name().toInt(&ok));
    if (!ok) return;
 
+   QList<int> rows(m_graphToRows.value(sig));
+
    QTableWidget* table(m_ui->shieldingsTable);
-   for (int row = 0; row < table->rowCount(); ++row) {
-       QTableWidgetItem* item(table->item(row,2));
-       int index(item->data(Qt::UserRole).toInt(&ok));
-       if (!ok) { qDebug() << "Egad"; return; }
-       if (index == atom) {
-          table->setCurrentCell(row, 0, 
-             QItemSelectionModel::Rows | QItemSelectionModel::ClearAndSelect);
-          table->scrollToItem(table->item(row, 0));
-	
-          QModelIndex index(table->model()->index(0,0));
-          table->selectionModel()->select( index, QItemSelectionModel::Rows );
-       }       
+   QItemSelectionModel *selectionModel(table->selectionModel());
+   selectionModel->clearSelection();
+   QItemSelection itemSelection;
+
+   for (int i = 0; i < rows.size(); ++i) {
+       table->selectRow(rows[i]);
+       itemSelection.merge(selectionModel->selection(), QItemSelectionModel::Select);
    }
-   
+   selectionModel->select(itemSelection, QItemSelectionModel::Select);
 }
 
 
 void Nmr::on_shieldingsTable_itemSelectionChanged()
 {
-qDebug() << "on_shieldingsTable_itemSelectionChanged called";
    QList<QTableWidgetItem*> selection(m_ui->shieldingsTable->selectedItems());
+qDebug() << "on_shieldingsTable_itemSelectionChanged called with slection"
+         << selection.size();
    if (selection.isEmpty()) return;
+   int row(selection.last()->row());
+qDebug() << "Row:" << row;
 
    // Obtain atom index and select in viewer
+qDebug() << "Need to select atom in Viewer";
 
    if (!m_ui->impulseButton->isChecked()) return;
 
-   bool ok(true);
-   int index(selection.last()->data(Qt::UserRole).toInt(&ok));
-   if (!ok) return;
+   // First find the name of the graph
+   QString name;
+   QMap<int, QList<int> >::iterator iter;
+   for (iter = m_graphToRows.begin(); iter != m_graphToRows.end(); ++iter) {
+       if (iter.value().contains(row)) {
+          //qDebug() << "row selected" << row << "found in" << iter.key();
+          qDebug() << "Selected rows: " << iter.value();
+          qDebug() << "send SIGNAL";
 
-   if (index < 0) {
-      qDebug() << "Invisible selection for row" << selection.first()->row();
+          name = QString::number(iter.key());
+          break;
+       } 
    }
+   if (name.isEmpty()) return;
+
+   // now find the graph
+   int index;
+   for (index = 0; index < m_plot->graphCount(); ++index) {
+       if (m_plot->graph(index)->name() == name) break;
+   }
+   if (index == m_plot->graphCount()) return; 
 
    QCPGraph* graph(m_plot->graph(index));
    if (graph && graph->selected()) return;
 
    QList<QCPGraph*> selectedGraphs(m_plot->selectedGraphs());
-   QList<QCPGraph*>::iterator iter;
-   for (iter = selectedGraphs.begin(); iter != selectedGraphs.end(); ++iter) {
-       (*iter)->setSelected(false);
+   QList<QCPGraph*>::iterator it;
+   for (it = selectedGraphs.begin(); it != selectedGraphs.end(); ++it) {
+       (*it)->setSelected(false);
    }
 
    if (graph) graph->setSelected(true);
    m_plot->replot();
 }
+
 
 
 QPair<double, double> Nmr::standardRange(QString const& isotope)
