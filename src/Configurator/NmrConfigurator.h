@@ -59,6 +59,7 @@ namespace Configurator {
          void on_shieldingsTable_itemSelectionChanged();
          void on_isotopeCombo_currentIndexChanged(QString const& isotope);
          void on_systemCombo_currentIndexChanged(QString const& system);
+         void on_methodCombo_currentIndexChanged(QString const& system);
          void on_widthSlider_valueChanged(int);
          void on_impulseButton_clicked(bool);
          void on_lorentzianButton_clicked(bool);

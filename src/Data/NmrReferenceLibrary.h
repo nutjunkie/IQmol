@@ -37,6 +37,7 @@ namespace Data {
          static NmrReferenceLibrary& instance();
 
          void addReference(NmrReference const&);
+         QStringList availableIsotopes() const;
 
          QList<NmrReference const*> filter(QString const& element, 
             QString const& system = QString(), QString const& method = QString());

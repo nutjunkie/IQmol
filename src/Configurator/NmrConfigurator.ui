@@ -266,10 +266,10 @@ QToolTip {
        <item>
         <widget class="QSlider" name="widthSlider">
          <property name="minimum">
-          <number>10</number>
+          <number>1</number>
          </property>
          <property name="maximum">
-          <number>110</number>
+          <number>100</number>
          </property>
          <property name="value">
           <number>30</number>

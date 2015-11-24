@@ -94,6 +94,22 @@ void NmrReferenceLibrary::dump() const
 }
 
 
+QStringList NmrReferenceLibrary::availableIsotopes() const
+{
+   QStringList isotopes;
+
+   isotopes.append("Proton (1H)");
+// isotopes.append("Boron (11B)");
+   isotopes.append("Carbon (13C)");
+// isotopes.append("Nitrogen (15N)");
+// isotopes.append("Fluorine (19F)");
+   isotopes.append("Silicon (29Si)");
+// isotopes.append "Phosphorus (31P)";
+
+   return isotopes;
+}
+
+
 void NmrReferenceLibrary::load()
 {  
    NmrReference* ref(0);
@@ -102,6 +118,7 @@ void NmrReferenceLibrary::load()
    methods << "HF" << "LDA";
    bases   << "STO-3G" << "STO-6G";
 
+/*
    // Tetramethylsilane (H, C, Si)
    QString system("TMS");
    for (int i = 0; i < methods.size(); ++i) {
@@ -114,7 +131,65 @@ void NmrReferenceLibrary::load()
            s_library.append(ref);
        }
    }
+*/
 
+   QString system("TMS");
+
+ref = new NmrReference("TMS", "HF/STO-3G");
+ref->addElement("Si", 578.55750846);
+ref->addElement("C",  249.43162577);
+ref->addElement("H",   33.75316081);
+s_library.append(ref);
+
+ref = new NmrReference("TMS", "HF/6-31G");
+ref->addElement("Si", 484.50460832);
+ref->addElement("C",  208.19772893);
+ref->addElement("H",   33.67482488);
+s_library.append(ref);
+
+ref = new NmrReference("TMS", "B3LYP/6-31G");
+ref->addElement("Si", 432.38303834);
+ref->addElement("C",  194.31808787);
+ref->addElement("H",   32.78097962);
+s_library.append(ref);
+
+ref = new NmrReference("TMS", "HF/6-31g*");
+ref->addElement("Si", 450.14833029);
+ref->addElement("C",  201.72683332);
+ref->addElement("H",   32.90343930);
+s_library.append(ref);
+
+ref = new NmrReference("TMS", "B3LYP/6-31g*");
+ref->addElement("Si", 413.56045472);
+ref->addElement("C",  189.63133174);
+ref->addElement("H",   32.18393750);
+s_library.append(ref);
+
+ref = new NmrReference("TMS", "HF/6-31g**");
+ref->addElement("Si", 448.39860170);
+ref->addElement("C",  203.14180478);
+ref->addElement("H",   32.33377646);
+s_library.append(ref);
+
+ref = new NmrReference("TMS", "B3LYP/6-31g**");
+ref->addElement("Si", 411.79455658);
+ref->addElement("C",  191.71944127);
+ref->addElement("H",   31.75480046);
+s_library.append(ref);
+
+ref = new NmrReference("TMS", "HF/6-31+G*");
+ref->addElement("Si", 446.66061534);
+ref->addElement("C",  201.83303666);
+ref->addElement("H",   32.81723854);
+s_library.append(ref);
+
+ref = new NmrReference("TMS", "B3LYP/6-31+G*");
+ref->addElement("Si", 408.14935394);
+ref->addElement("C",  190.67818876);
+ref->addElement("H",   32.06583609);
+s_library.append(ref);
+
+/*
    // Trimethyl Borate (B)
    system = "Trimethyl Borate";
    for (int i = 0; i < methods.size(); ++i) {
@@ -169,6 +244,7 @@ break;
            s_library.append(ref);
        }
    }
+*/
 }
 
 } } // end namespace IQmol::Data

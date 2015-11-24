@@ -47,6 +47,7 @@ Nmr::Nmr(Layer::Nmr& layer, Data::Nmr& data) : m_layer(layer), m_data(data), m_u
 {
    m_ui = new Ui::NmrConfigurator();
    m_ui->setupUi(this);
+   m_ui->widthSlider->hide();
    //m_ui->widthSlider->setEnabled(false);
    //m_ui->widthLabel->setEnabled(false);
 
@@ -77,8 +78,11 @@ Nmr::Nmr(Layer::Nmr& layer, Data::Nmr& data) : m_layer(layer), m_data(data), m_u
 
    initTable();
 
-   //m_ui->impulseButton->hide();
-   //m_ui->lorentzianButton->hide();
+   // This needs to occur after the table has been initialized
+   Data::NmrReferenceLibrary& library(Data::NmrReferenceLibrary::instance());
+   m_ui->isotopeCombo->clear();
+   m_ui->isotopeCombo->addItem("Shieldings");
+   m_ui->isotopeCombo->addItems(library.availableIsotopes());
 }
 
 
@@ -137,7 +141,7 @@ void Nmr::loadShifts(Data::NmrReference const* reference, QString const& isotope
       int count(0);
       for (int row = 0; row < atomLabels.size(); ++row) {
           if (atomLabels[row] == isotope) {
-             double shift(shieldings[row] - reference->shift(atomLabels[row]));
+             double shift(reference->shift(atomLabels[row]) - shieldings[row]);
              table->item(row,2)->setText(QString::number(shift, 'f', 2) + "     ");
              ++count;
           }else {
@@ -149,7 +153,6 @@ void Nmr::loadShifts(Data::NmrReference const* reference, QString const& isotope
           table->item(row,2)->setText("");
       }
    }
-
 }
 
 
@@ -164,7 +167,7 @@ QList<double> Nmr::computeShifts(Data::NmrReference const* reference, QString co
 
       for (int i = 0; i < atomLabels.size(); ++i) {
           if (atomLabels[i] == isotope) {
-             shifts.append(shieldings[i] - shift);
+             shifts.append(shift - shieldings[i]);
           }else {
              shifts.append(NO_SHIFT);
           }
@@ -255,32 +258,33 @@ void Nmr::plotImpulse(QList<double> const& data, QPair<double, double> const& do
 void Nmr::plotSpectrum(QList<double> const& data, QPair<double, double> const& domain)
 {
    double width(m_ui->widthSlider->value());
-   unsigned const bins(400);
+   width = 100;
+
+   unsigned const bins(1000);
    unsigned const range(domain.second-domain.first);
    double   const delta(double(range)/bins);
-
-   qDebug() << "Plot spectrum called between" << domain.first 
-            << "and" << domain.second << " delta =" << delta;
 
    QVector<double> x(bins), y(bins);
 
    for (int xi = 0; xi < bins; ++xi) {
-       x[xi] = xi*delta;
+       x[xi] = domain.first + xi*delta;
        y[xi] = 0.0;
    }
 
-   double A(2.0/M_PI);
-   double g(0.01*width);
+   double A(1.0/M_PI);
+   double g(0.01*width*delta);
    double g2(g*g);
+
+   qDebug() << "Plot spectrum called between" << domain.first 
+            << "and" << domain.second << " delta =" << delta
+            << "width = " << width << " g = " << g;
 
    QList<double> shifts(m_data.shieldings());
 
    for (int mode = 0; mode < data.size(); ++mode) {
-
        double nu(data[mode]);
-       double I(1.0);
        for (int xi = 0; xi < bins; ++xi) {
-           y[xi] += I*A*g / (g2+(x[xi]-nu)*(x[xi]-nu));
+           y[xi] += A*g / (g2+(x[xi]-nu)*(x[xi]-nu));
        }
    }
 
@@ -299,6 +303,8 @@ void Nmr::plotSpectrum(QList<double> const& data, QPair<double, double> const& d
    graph->setAntialiased(true);
    graph->setSelectedPen(m_selectPen);
 
+   m_plot->yAxis->setRange(-0.00, 1.05);
+   m_plot->yAxis->setLabel("Relative Intensity");
    //m_plot->yAxis->setAutoTickStep(false);
    //m_plot->yAxis->setTickStep(0.2);
 }
@@ -315,7 +321,6 @@ void Nmr::on_isotopeCombo_currentIndexChanged(QString const&)
    QList<Data::NmrReference const*>::iterator iter;
    for (iter = refs.begin(); iter != refs.end(); ++iter) {
        QString system((*iter)->system());
-       qDebug() << "System:" <<  system;
        if (!systems.contains(system)) systems.append(system);
    }
 
@@ -351,21 +356,30 @@ void Nmr::on_systemCombo_currentIndexChanged(QString const& text)
    QComboBox* combo(m_ui->methodCombo);
    combo->clear();
    combo->addItems(methods);
+
+   loadShifts(currentReference(), isotope);
+   updatePlot();
+}
+
+void Nmr::on_methodCombo_currentIndexChanged(QString const& text)
+{
+   loadShifts(currentReference(), currentIsotope());
+   updatePlot();
 }
 
 
 void Nmr::on_impulseButton_clicked(bool)
 {
-   m_ui->widthSlider->setEnabled(false);
-   m_ui->widthLabel->setEnabled(false);
+   //m_ui->widthSlider->setEnabled(false);
+   //m_ui->widthLabel->setEnabled(false);
    updatePlot();
 }
 
 
 void Nmr::on_lorentzianButton_clicked(bool)
 {
-   m_ui->widthSlider->setEnabled(true);
-   m_ui->widthLabel->setEnabled(true);
+   //m_ui->widthSlider->setEnabled(true);
+   //m_ui->widthLabel->setEnabled(true);
    updatePlot();
 }
 
@@ -492,8 +506,8 @@ QPair<double, double> Nmr::standardRange(QString const& isotope)
           min = std::min(min, data[i]);
           max = std::max(max, data[i]);
       }
-      min *= min < 0 ? 1.05 : 0.95;
-      max *= max > 0 ? 1.05 : 0.95;
+      min *= min < 0 ? 1.10 : 0.90;
+      max *= max > 0 ? 1.10 : 0.90;
    }
 
    return qMakePair(min,max);

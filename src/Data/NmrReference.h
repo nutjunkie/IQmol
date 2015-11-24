@@ -47,7 +47,7 @@ namespace Data {
          QString const& method() const { return m_method; }
 
          bool contains(QString const& element) const { return m_shifts.contains(element); }
-         void addElement(QString const& symbol, double const shfit, double const offset);
+         void addElement(QString const& symbol, double const shfit, double const offset = 0.0);
          double shift(QString const& symbol) const;
 
          void dump() const;
