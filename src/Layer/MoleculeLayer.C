@@ -1212,6 +1212,22 @@ void Molecule::selectAll()
 }
 
 
+// Note the indices are coming in 0-indexed 
+void Molecule::selectAtoms(QList<int> const& indices)
+{
+   AtomList::iterator iter;
+   AtomList atomList(findLayers<Atom>(Visible | Children));
+   for (iter = atomList.begin(); iter != atomList.end(); ++iter) {
+       if (indices.contains((*iter)->getIndex()-1)) {
+          select((*iter)->QStandardItem::index(), QItemSelectionModel::Select);
+       }else {
+          select((*iter)->QStandardItem::index(), QItemSelectionModel::Deselect);
+       }
+   }
+}
+
+
+
 void Molecule::deleteSelection()
 {
    // Must also delete any bond attached to any atom we are deleting.

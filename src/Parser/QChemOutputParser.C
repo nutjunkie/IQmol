@@ -25,9 +25,10 @@
 #include "QChemInputParser.h"
 #include "TextStream.h"
 #include "AtomicProperty.h"
+#include "Constraint.h"
+#include "Energy.h"
 #include "Frequencies.h"
 #include "Hessian.h"
-#include "Energy.h"
 #include "PointGroup.h"
 #include "Geometry.h"
 #include "DipoleMoment.h"
@@ -217,13 +218,18 @@ bool QChemOutput::parse(TextStream& textStream)
       }else if (line.contains("PES scan, value:")) {
          tokens = TextStream::tokenize(line);
          if (tokens.size() > 5 && currentGeometry) {
-            bool ok(false);
-            double energy(tokens[5].toDouble(&ok));
-            if (ok) {
+            bool   energyOk(false), valueOk(false);
+            double value(tokens[3].toDouble(&valueOk));
+            double energy(tokens[5].toDouble(&energyOk));
+
+            if (energyOk && valueOk) {
                if (!scanGeometries) scanGeometries = new Data::GeometryList("Scan Geometries");
                Data::Geometry* geom(new Data::Geometry(*currentGeometry));
-               Data::TotalEnergy& total = geom->getProperty<Data::TotalEnergy>();
+
+               Data::TotalEnergy& total(geom->getProperty<Data::TotalEnergy>());
                total.setValue(energy, Data::Energy::Hartree);
+               Data::Constraint& constraint(geom->getProperty<Data::Constraint>());
+               constraint.setValue(value);
                scanGeometries->append(geom);
             }
          }

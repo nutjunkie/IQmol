@@ -23,6 +23,7 @@
 #include "NmrConfigurator.h"
 #include "NmrLayer.h"
 #include "NmrData.h"
+#include "MoleculeLayer.h"
 
 
 namespace IQmol {
@@ -41,7 +42,13 @@ Nmr::~Nmr()
 
 void Nmr::configure()
 {
-   if (!m_configurator) m_configurator = new Configurator::Nmr(*this, m_data);
+   if (!m_configurator) {
+      m_configurator = new Configurator::Nmr(*this, m_data);
+      if (m_molecule) {
+         connect(m_configurator, SIGNAL(selectAtoms(QList<int> const&)), 
+            m_molecule, SLOT(selectAtoms(QList<int> const&)));
+      }
+   }
    m_configurator->display();
 }
 

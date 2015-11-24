@@ -29,6 +29,12 @@ namespace IQmol {
 namespace Data {
 
 
+void Constraint::dump()
+{
+   qDebug() << " - value:" << m_value; 
+}
+
+
 // --------------- Position Constraint ---------------
 
 PositionConstraint::PositionConstraint(unsigned const atomIndex, 

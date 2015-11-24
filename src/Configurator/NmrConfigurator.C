@@ -31,7 +31,8 @@
 /* TO DO
    clean up
    plot lorentzian
-   impulse selection should show atom highlightied in viewer (signal required)
+   export plots
+   impulse selection should show atom highlighted in viewer (signal required)
 */
 
 // Not pretty, but we use this to indicate when a shift should not be drawn
@@ -58,7 +59,6 @@ Nmr::Nmr(Layer::Nmr& layer, Data::Nmr& data) : m_layer(layer), m_data(data), m_u
    m_plot->axisRect()->setRangeZoom(m_plot->xAxis->orientation());
    m_plot->xAxis->setSelectableParts(QCPAxis::spNone);
    m_plot->xAxis->setRangeReversed(true);
-   m_plot->yAxis->setTickLabels(false);
 
    QFrame* frame(m_ui->spectrumFrame);
    QVBoxLayout* layout(new QVBoxLayout());
@@ -78,8 +78,7 @@ Nmr::Nmr(Layer::Nmr& layer, Data::Nmr& data) : m_layer(layer), m_data(data), m_u
    initTable();
 
    //m_ui->impulseButton->hide();
-   m_ui->lorentzianButton->hide();
-   m_ui->widthLabel->setText("Resolution");
+   //m_ui->lorentzianButton->hide();
 }
 
 
@@ -218,7 +217,7 @@ void Nmr::plotImpulse(QList<double> const& data, QPair<double, double> const& do
        double shift(data[i]);
        if (shift < NO_SHIFT-1) {
           int x(shift/resolution);
-           qDebug() << " incrementing " << x << "because of" << shift;
+           //qDebug() << " incrementing " << x << "because of" << shift;
            m_graphToRows[x].append(i);
        }
    }
@@ -246,6 +245,9 @@ void Nmr::plotImpulse(QList<double> const& data, QPair<double, double> const& do
    }
 
    m_plot->yAxis->setRange(-0.00, 1.05*range);
+   m_plot->yAxis->setAutoTickStep(false);
+   m_plot->yAxis->setTickStep(1);
+   m_plot->yAxis->setLabel("Count");
 }
 
 
@@ -257,7 +259,8 @@ void Nmr::plotSpectrum(QList<double> const& data, QPair<double, double> const& d
    unsigned const range(domain.second-domain.first);
    double   const delta(double(range)/bins);
 
-   qDebug() << "Plot spectrum called between" << domain.first << "and" << domain.second << " delta =" << delta;
+   qDebug() << "Plot spectrum called between" << domain.first 
+            << "and" << domain.second << " delta =" << delta;
 
    QVector<double> x(bins), y(bins);
 
@@ -413,14 +416,11 @@ void Nmr::plotSelectionChanged(bool tf)
 void Nmr::on_shieldingsTable_itemSelectionChanged()
 {
    QList<QTableWidgetItem*> selection(m_ui->shieldingsTable->selectedItems());
-qDebug() << "on_shieldingsTable_itemSelectionChanged called with slection"
-         << selection.size();
+//qDebug() << "on_shieldingsTable_itemSelectionChanged called with slection"
+//         << selection.size();
    if (selection.isEmpty()) return;
    int row(selection.last()->row());
-qDebug() << "Row:" << row;
 
-   // Obtain atom index and select in viewer
-qDebug() << "Need to select atom in Viewer";
 
    if (!m_ui->impulseButton->isChecked()) return;
 
@@ -430,9 +430,8 @@ qDebug() << "Need to select atom in Viewer";
    for (iter = m_graphToRows.begin(); iter != m_graphToRows.end(); ++iter) {
        if (iter.value().contains(row)) {
           //qDebug() << "row selected" << row << "found in" << iter.key();
-          qDebug() << "Selected rows: " << iter.value();
-          qDebug() << "send SIGNAL";
-
+          //qDebug() << "Selected rows: " << iter.value();
+          selectAtoms(iter.value());
           name = QString::number(iter.key());
           break;
        } 

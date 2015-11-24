@@ -65,6 +65,7 @@ namespace Configurator {
 
       Q_SIGNALS:
          void updated();
+         void selectAtoms(QList<int> const& indices);
 
       private:
          void initTable();
@@ -87,7 +88,7 @@ namespace Configurator {
          QPen m_pen;
          QPen m_selectPen;
          QMap<int, QList<int> > m_graphToRows;
-         QPair<double, double> m_standardDomain;
+         QPair<double, double>  m_standardDomain;
    };
 
 } } // end namespace IQmol::Configurator

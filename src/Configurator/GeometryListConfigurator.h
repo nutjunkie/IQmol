@@ -79,7 +79,7 @@ namespace Configurator {
          Ui::GeometryListConfigurator m_configurator;
          Layer::GeometryList& m_geometryList;
          QCustomPlot* m_customPlot;
-         QList<QPair<int, double> > m_rawData;
+         QList<QPair<double, double> > m_rawData;
          QPen m_pen;
          QPen m_selectPen;
    };

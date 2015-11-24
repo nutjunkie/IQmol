@@ -42,6 +42,7 @@ Geometry::Geometry(Geometry const& that) : Base()
    }
    m_charge = that.m_charge;
    m_multiplicity = that.m_multiplicity;
+   m_properties = that.m_properties;
 }
 
 

@@ -220,7 +220,6 @@ namespace IQmol {
             }
 
             unsigned maxAtomicNumber() { return m_maxAtomicNumber; }
-
    
    
          public Q_SLOTS:
@@ -231,6 +230,7 @@ namespace IQmol {
             void constraintUpdated();
             void removeConstraint();
             void selectAll();
+            void selectAtoms(QList<int> const& indices);
 
             void openSurfaceAnimator();
 

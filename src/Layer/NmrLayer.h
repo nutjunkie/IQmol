@@ -45,7 +45,7 @@ namespace Layer {
          Nmr(Data::Nmr&);
          ~Nmr();
 
-     public Q_SLOTS:
+      public Q_SLOTS:
          void configure();
 
       private:

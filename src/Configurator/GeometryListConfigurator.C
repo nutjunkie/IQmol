@@ -24,6 +24,7 @@
 #include "GeometryLayer.h"
 #include "GeometryListLayer.h"
 #include "GeometryListConfigurator.h"
+#include "Constraint.h"
 #include <QHeaderView>
 
 #include "qcustomplot.h"
@@ -93,16 +94,31 @@ void GeometryList::load()
       return;      
    }
 
-
    int row(0);
+   bool property(false);
    QList<Layer::Geometry*>::iterator iter;
    for (iter = geometries.begin(); iter != geometries.end(); ++iter, ++row) {
        energy = new QTableWidgetItem( (*iter)->text() );
        energy->setTextAlignment(Qt::AlignCenter|Qt::AlignVCenter);
        table->setItem(row, 0, energy);
        double e((*iter)->energy());
-       m_rawData.append(qMakePair(row, e));
+       double x(row);
+       Data::Geometry& geom((*iter)->data());
+
+       if (geom.hasProperty<Data::Constraint>()) {
+          x = geom.getProperty<Data::Constraint>().value();
+          property = true;
+       }
+
+       m_rawData.append(qMakePair(x, e));
    }
+
+   if (property) {
+      m_customPlot->xAxis->setLabel("Geometric Parameter");
+   }else {
+   m_customPlot->xAxis->setLabel("Geometry");
+   }
+
    plotEnergies();
 }
 
@@ -111,14 +127,17 @@ void GeometryList::plotEnergies()
 {
    m_customPlot->clearGraphs();
 
-   double max(m_rawData.first().second), min(m_rawData.first().second);
+   double xmax(m_rawData.first().first),  xmin(m_rawData.first().first);
+   double ymax(m_rawData.first().second), ymin(m_rawData.first().second);
    QVector<double> xx(m_rawData.size()), yy(m_rawData.size());
 
    for (int i = 0; i < m_rawData.size(); ++i) {
        xx[i] = m_rawData[i].first;
        yy[i] = m_rawData[i].second;
-       min = std::min(min, yy[i]);
-       max = std::max(max, yy[i]);
+       xmin = std::min(xmin, xx[i]);
+       xmax = std::max(xmax, xx[i]);
+       ymin = std::min(ymin, yy[i]);
+       ymax = std::max(ymax, yy[i]);
    }
 
    QCPGraph* graph(m_customPlot->addGraph());
@@ -142,7 +161,8 @@ void GeometryList::plotEnergies()
    }
 
    m_customPlot->xAxis->setRange(0, m_rawData.size());
-   m_customPlot->yAxis->setRange(min, max);
+   m_customPlot->yAxis->setRange(ymin, ymax);
+   m_customPlot->xAxis->setRange(xmin, xmax);
    m_customPlot->yAxis->setAutoTickStep(true);
    m_customPlot->replot();
 }
