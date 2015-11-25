@@ -332,7 +332,13 @@ bool QChemOutput::parse(TextStream& textStream)
 
       }else if (line.contains("Orbital Energies (a.u.) and Symmetries")) {
          textStream.skipLine(2);
-         readOrbitalSymmetries(textStream);
+         bool readSymmetries(true);
+         readOrbitalSymmetries(textStream, readSymmetries);
+
+      }else if (line.contains("Orbital Energies (a.u.)")) {
+         textStream.skipLine(2);
+         bool readSymmetries(false);
+         readOrbitalSymmetries(textStream, readSymmetries);
 
       }else if (line.contains("TDDFT/TDA Excitation Energies")) {
 qDebug() << "Reading TDDFT States --";
@@ -500,7 +506,7 @@ qDebug() << "Reading CIS States";
 }
 
 
-void QChemOutput::readOrbitalSymmetries(TextStream& textStream)
+void QChemOutput::readOrbitalSymmetries(TextStream& textStream, bool const readSymmetries)
 {
    qDebug() << "Reading orbital energies";
    // We only parse the orbital symmetries section if we have excited states
@@ -531,8 +537,10 @@ void QChemOutput::readOrbitalSymmetries(TextStream& textStream)
       }else if (tokens[0] == ("--") && tokens[1].contains("Virtual")) {
          data.setOccupied(spin, nOrb);
       }else {
-         symmetries = textStream.nextLineAsTokens();
-         if (2*tokens.size() != symmetries.size()) goto error;
+         if (readSymmetries) {
+            symmetries = textStream.nextLineAsTokens();
+            if (2*tokens.size() != symmetries.size()) goto error;
+         }
 
          bool ok;
          double energy;
@@ -540,8 +548,12 @@ void QChemOutput::readOrbitalSymmetries(TextStream& textStream)
 
          for (int i = 0; i < tokens.size(); ++i) {
              energy   = tokens[i].toDouble(&ok);   if (!ok) goto error;
-             symmetry = symmetries.at(2*i);
-             symmetry += " " + symmetries.at(2*i + 1);
+             if (readSymmetries) {
+                symmetry = symmetries.at(2*i);
+                symmetry += " " + symmetries.at(2*i + 1);
+             }else {
+                symmetry = "A";
+             }
              data.append(spin, energy, symmetry);
              ++nOrb;
          }

@@ -39,7 +39,7 @@ QToolButton:pressed {
 }
 </string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1,0">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,1,0">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="2,3">
      <item>
@@ -69,20 +69,31 @@ QToolButton:pressed {
       </widget>
      </item>
      <item>
-      <widget class="QFrame" name="moFrame">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-      </widget>
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
+       <item>
+        <widget class="QFrame" name="moFrame">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="orbitalLabel">
+         <property name="text">
+          <string>...</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>
