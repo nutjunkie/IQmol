@@ -56,7 +56,7 @@ namespace Parser {
          void readEffectiveRegion(TextStream&);
          void readDMA(TextStream&, Data::Geometry&);
          void readCisStates(TextStream&);
-         void readOrbitalSymmetries(TextStream&);
+         void readOrbitalSymmetries(TextStream&, bool const readSymmetries);
          void setTotalEnergy(QString const&, Data::Geometry*, QString const& label);
 
          unsigned m_nAlpha;
