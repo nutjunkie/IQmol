@@ -37,6 +37,7 @@
 #include "NmrReference.h"
 #include "EfpFragment.h"
 #include "Constants.h"
+#include "RemSectionData.h"
 #include "ExcitedStates.h"
 #include "Spin.h"
 #include "NmrData.h"
@@ -147,6 +148,7 @@ bool QChemOutput::parse(TextStream& textStream)
 
    m_nAlpha = 0;
    m_nBeta  = 0;
+   QString method;
 
    QStringList tokens;
    QString line;
@@ -234,6 +236,18 @@ bool QChemOutput::parse(TextStream& textStream)
             }
          }
      
+
+      }else if (line.contains("Requested basis set is")) {
+         tokens = TextStream::tokenize(line);
+         if (tokens.size() == 5) {
+            QList<Data::RemSection*> rem(m_dataBank.findData<Data::RemSection>());
+            if (!rem.isEmpty()) {
+               method = rem.last()->value("method").toUpper();
+               method += "/" + tokens[4];
+               qDebug() << "Setting method to" << method;
+            }
+
+         }
 
       }else if (line.contains("Molecular Point Group")) {
          tokens = TextStream::tokenize(line);
@@ -338,6 +352,7 @@ qDebug() << "Reading CIS States --";
       }else if (line.contains("ATOM           ISOTROPIC        ANISOTROPIC       REL.")) {
          textStream.skipLine(1);
          if (!nmr) nmr = new Data::Nmr;
+         nmr->setMethod(method);
          if (currentGeometry) readNmrShifts(textStream, *currentGeometry, *nmr);
 
       }else if (line.contains("Indirect Nuclear Spin--Spin")) {

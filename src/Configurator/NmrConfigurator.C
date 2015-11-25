@@ -32,7 +32,6 @@
    clean up
    plot lorentzian
    export plots
-   impulse selection should show atom highlighted in viewer (signal required)
 */
 
 // Not pretty, but we use this to indicate when a shift should not be drawn
@@ -47,9 +46,9 @@ Nmr::Nmr(Layer::Nmr& layer, Data::Nmr& data) : m_layer(layer), m_data(data), m_u
 {
    m_ui = new Ui::NmrConfigurator();
    m_ui->setupUi(this);
-   m_ui->widthSlider->hide();
    //m_ui->widthSlider->setEnabled(false);
    //m_ui->widthLabel->setEnabled(false);
+   m_ui->widthLabel->setText("Resolution");
 
    QTableWidget* table(m_ui->shieldingsTable);
    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -178,7 +177,6 @@ QList<double> Nmr::computeShifts(Data::NmrReference const* reference, QString co
       }
    }
 
-   qDebug() << shifts.size() << "Shifts computed";
    return shifts;
 }
 
@@ -199,9 +197,13 @@ void Nmr::updatePlot()
    }
 
    if (m_ui->impulseButton->isChecked()) {
+      // the range is really determining the resolution here
       plotImpulse(data, standardRange(isotope));
    }else if (m_ui->lorentzianButton->isChecked()) {
-      plotSpectrum(data, standardRange(isotope));
+      // There has to be an easier way
+      double min(m_plot->xAxis->pixelToCoord(m_plot->axisRect()->right())); 
+      double max(m_plot->xAxis->pixelToCoord(m_plot->axisRect()->left())); 
+      plotSpectrum(data, qMakePair(min, max));
    }
 
    m_plot->replot();
@@ -225,8 +227,8 @@ void Nmr::plotImpulse(QList<double> const& data, QPair<double, double> const& do
        }
    }
 
-   qDebug() << "Signals map with resolution" << resolution << width;
-   qDebug() << m_graphToRows;
+   //qDebug() << "Signals map with resolution" << resolution << width;
+   //qDebug() << m_graphToRows;
 
    int range(1);
    QVector<double> x(1), y(1);
@@ -250,6 +252,7 @@ void Nmr::plotImpulse(QList<double> const& data, QPair<double, double> const& do
    m_plot->yAxis->setRange(-0.00, 1.05*range);
    m_plot->yAxis->setAutoTickStep(false);
    m_plot->yAxis->setTickStep(1);
+   m_plot->yAxis->setTickLabels(true);
    m_plot->yAxis->setLabel("Count");
 }
 
@@ -257,45 +260,43 @@ void Nmr::plotImpulse(QList<double> const& data, QPair<double, double> const& do
 
 void Nmr::plotSpectrum(QList<double> const& data, QPair<double, double> const& domain)
 {
-   double width(m_ui->widthSlider->value());
-   width = 100;
+   double width(0.1*m_ui->widthSlider->value());
 
-   unsigned const bins(1000);
+   unsigned const bins(5000);
    unsigned const range(domain.second-domain.first);
    double   const delta(double(range)/bins);
 
-   QVector<double> x(bins), y(bins);
-
-   for (int xi = 0; xi < bins; ++xi) {
-       x[xi] = domain.first + xi*delta;
-       y[xi] = 0.0;
-   }
-
    double A(1.0/M_PI);
-   double g(0.01*width*delta);
+   double g(width*delta);
    double g2(g*g);
 
+/*
    qDebug() << "Plot spectrum called between" << domain.first 
             << "and" << domain.second << " delta =" << delta
             << "width = " << width << " g = " << g;
+*/
 
-   QList<double> shifts(m_data.shieldings());
+   double x0;
+   QVector<double> x(bins), y(bins);
 
-   for (int mode = 0; mode < data.size(); ++mode) {
-       double nu(data[mode]);
-       for (int xi = 0; xi < bins; ++xi) {
-           y[xi] += A*g / (g2+(x[xi]-nu)*(x[xi]-nu));
+   for (int i = 0; i < bins; ++i) {
+       x[i] = domain.first + i*delta;
+       y[i] = 0.0;
+       for (int s = 0; s < data.size(); ++s) {
+           x0 = data[s];
+           y[i] += A*g / (g2+(x[i]-x0)*(x[i]-x0));
        }
    }
 
+   // Normalize
    double maxIntensity(0.0);
-   for (int xi = 0; xi < bins; ++xi) {
-       if (y[xi] > maxIntensity) maxIntensity = y[xi];
+   for (int i = 0; i < bins; ++i) {
+       if (y[i] > maxIntensity) maxIntensity = y[i];
    }
-
-   for (int xi = 0; xi < bins; ++xi) {
-       y[xi] /= maxIntensity;
+   for (int i = 0; i < bins; ++i) {
+       y[i] /= maxIntensity;
    }
+   maxIntensity = 1.0;
 
    QCPGraph* graph(m_plot->addGraph());
    graph->setData(x, y);
@@ -303,16 +304,15 @@ void Nmr::plotSpectrum(QList<double> const& data, QPair<double, double> const& d
    graph->setAntialiased(true);
    graph->setSelectedPen(m_selectPen);
 
-   m_plot->yAxis->setRange(-0.00, 1.05);
+   m_plot->yAxis->setRange(-0.00, 1.05*maxIntensity);
    m_plot->yAxis->setLabel("Relative Intensity");
-   //m_plot->yAxis->setAutoTickStep(false);
-   //m_plot->yAxis->setTickStep(0.2);
+   m_plot->yAxis->setTickLabels(false);
 }
 
 
-void Nmr::on_isotopeCombo_currentIndexChanged(QString const&)
+void Nmr::on_isotopeCombo_currentIndexChanged(QString const& text)
 {
-   QString isotope(currentIsotope());
+   QString isotope(currentIsotope(text));
 
    Data::NmrReferenceLibrary& library(Data::NmrReferenceLibrary::instance());
    QList<Data::NmrReference const*> refs(library.filter(isotope));
@@ -342,14 +342,13 @@ void Nmr::on_systemCombo_currentIndexChanged(QString const& text)
    QString isotope(currentIsotope());
 
    Data::NmrReferenceLibrary& library(Data::NmrReferenceLibrary::instance());
-   QList<Data::NmrReference const*> refs(library.filter(isotope, text));
-
-   qDebug() << "found" << refs.size() << "matches";
+   QString method(m_data.method());
+   QList<Data::NmrReference const*> refs(library.filter(isotope, text, method));
 
    QStringList methods;
    QList<Data::NmrReference const*>::iterator iter;
    for (iter = refs.begin(); iter != refs.end(); ++iter) {
-       QString method((*iter)->method());
+       method = (*iter)->method();
        if (!methods.contains(method)) methods.append(method);
    }
 
@@ -435,9 +434,6 @@ void Nmr::on_shieldingsTable_itemSelectionChanged()
    if (selection.isEmpty()) return;
    int row(selection.last()->row());
 
-
-   if (!m_ui->impulseButton->isChecked()) return;
-
    // First find the name of the graph
    QString name;
    QMap<int, QList<int> >::iterator iter;
@@ -450,6 +446,8 @@ void Nmr::on_shieldingsTable_itemSelectionChanged()
           break;
        } 
    }
+
+   if (!m_ui->impulseButton->isChecked()) return;
    if (name.isEmpty()) return;
 
    // now find the graph
@@ -514,19 +512,13 @@ QPair<double, double> Nmr::standardRange(QString const& isotope)
 }
 
 
-QString Nmr::currentIsotope()
-{
+QString Nmr::currentIsotope(QString const& text)
+{ 
+   QString s(text.isEmpty() ? m_ui->isotopeCombo->currentText() : text);
    QString isotope;
-   QString text(m_ui->isotopeCombo->currentText());
-
    // Match the isotope in, e.g. "Proton (1H)"
    QRegExp rx("\\(\\d+(\\D+)\\)");
-
-   if (rx.indexIn(text) >= 0) {
-      isotope = rx.cap(1);
-   }else {
-      qDebug() << "No references found for" << text;
-   }
+   if (rx.indexIn(s) >= 0)  isotope = rx.cap(1);
 
    return isotope;
 }
@@ -545,11 +537,11 @@ Data::NmrReference const* Nmr::currentReference()
 
    if (refs.size() == 1) {
       reference = refs.first();
-qDebug() << "Found reference:";
-      reference->dump();
+      //qDebug() << "Found reference:";
+      //reference->dump();
    }else {
       reference = 0;
-qDebug() << "No reference found for" << isotope << system << method;
+//qDebug() << "No reference found for" << isotope << system << method;
    }
 
    return reference;

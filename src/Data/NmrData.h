@@ -87,6 +87,9 @@ namespace Data {
          bool haveCouplings();
          bool haveReference();
 
+         void setMethod(QString const& method) { m_method = method; }
+         QString method() const { return m_method; }
+
          void dump() const;
 
          void serialize(InputArchive& ar, unsigned int const /*version*/) 
@@ -96,6 +99,7 @@ namespace Data {
             ar & m_reference;
             ar & m_couplings;
             ar & m_shifts;
+            ar & m_method;
          }
 
          void serialize(OutputArchive& ar, unsigned int const /*version*/) 
@@ -105,6 +109,7 @@ namespace Data {
             ar & m_reference;
             ar & m_couplings;
             ar & m_shifts;
+            ar & m_method;
          }
 
       private:
@@ -113,6 +118,7 @@ namespace Data {
          NmrReference   m_reference;
          Matrix         m_couplings;
          QList<double>  m_shifts;
+         QString        m_method;
    };
 
 } } // end namespace IQmol::Data
