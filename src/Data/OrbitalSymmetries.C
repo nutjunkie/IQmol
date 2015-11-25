@@ -31,8 +31,13 @@ namespace Data {
 void OrbitalSymmetries::setOccupied(Spin const spin, unsigned const nOrbs)
 {
    switch (spin) {
-      case Alpha:  m_nAlpha = nOrbs;  break;
-      case Beta:   m_nBeta  = nOrbs;  break;
+      case Alpha:  
+         m_nAlpha = nOrbs;
+         m_nBeta  = nOrbs;
+         break;
+      case Beta:   
+         m_nBeta  = nOrbs;  
+         break;
    }
 }
 
