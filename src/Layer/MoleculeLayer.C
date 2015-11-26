@@ -432,6 +432,7 @@ PrimitiveList Molecule::fromOBMol(OBMol* obMol, AtomMap* atomMap, BondMap* bondM
    FOR_ATOMS_OF_MOL(obAtom, obMol) {
       Vec pos(obAtom->x(), obAtom->y(), obAtom->z());
       atom = atomMap->value(&*obAtom); 
+//qDebug() << "Valency ended up  " << obAtom->GetImplicitValence();
       if (!atom) {
          atom = createAtom(obAtom->GetAtomicNum(), pos);
          addedPrimitives.append(atom);
@@ -500,6 +501,8 @@ OBMol* Molecule::toOBMol(AtomMap* atomMap, BondMap* bondMap, GroupMap* groupMap)
    AtomList::iterator atomIter;
 
    obMol->BeginModify();
+   obMol->SetImplicitValencePerceived();
+   obMol->SetHybridizationPerceived();
 
    for (atomIter = atoms.begin(); atomIter != atoms.end(); ++atomIter) {
        obAtom = obMol->NewAtom();
@@ -1458,6 +1461,9 @@ void Molecule::setGeometry(IQmol::Data::Geometry& geometry)
       bool estimated(true);
       dipoleAvailable(dipoleFromPointCharges(), estimated);
    }
+
+   multiplicityAvailable(geometry.multiplicity());
+   chargeAvailable(geometry.charge());
 }
 
 
@@ -1602,6 +1608,22 @@ void Molecule::addHydrogens()
    obMol->Translate(displacement);
    obMol->BeginModify();
    obMol->EndModify();
+
+   // We now type the atoms and overwrite the valency/hybridization info
+   // if it has been changed by the user.
+   OBAtomTyper atomTyper;
+   atomTyper.AssignImplicitValence(*obMol);
+   atomTyper.AssignHyb(*obMol);
+
+   AtomMap::iterator iter;
+   for (iter = atomMap.begin(); iter != atomMap.end(); ++iter) {
+       int hybrid(iter.value()->getHybridization());
+       if (hybrid > 0) {
+          iter.key()->SetImplicitValence(iter.value()->getValency());
+          iter.key()->SetHyb(hybrid);
+       }
+   }
+
    obMol->AddHydrogens(false,false);
    obMol->Translate(-displacement);
    obMol->BeginModify();

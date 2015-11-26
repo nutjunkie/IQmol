@@ -87,6 +87,8 @@ namespace Layer {
          bool haveNmrShift() const { return m_haveNmrShift; }
 
          int getAtomicNumber() const { return m_atomicNumber; }
+         int getValency() const { return m_valency; }
+         int getHybridization() const { return m_hybridization; }
          QString getAtomicSymbol() const { return m_symbol; }
          double getCharge() const { return m_charge; }
          double getMass() const { return m_mass; }
@@ -109,6 +111,9 @@ namespace Layer {
          GLfloat m_color[4];
          QString symbol() { return m_symbol; }
          double getRadius() { return getRadius(isSelected()); }
+
+      private Q_SLOTS:
+         void updateHybridization();
 
       private:
          QString getLabel(LabelType const type);
@@ -138,6 +143,8 @@ namespace Layer {
          bool    m_smallerHydrogens;
          bool    m_haveNmrShift;
          int     m_reorderIndex;
+         int     m_valency;
+         int     m_hybridization;
          qglviewer::Vec m_displacement;
    };
 

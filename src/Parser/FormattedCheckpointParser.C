@@ -65,10 +65,19 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          moData.nBeta = list.at(1).toInt(&ok);
          if (!ok) goto error;
 
+      }else if (key == "Multiplicity") { 
+         geomData.multiplicity = list.at(1).toUInt(&ok);  
+         if (!ok) goto error;
+
+      }else if (key == "Charge") { 
+         geomData.charge = list.at(1).toInt(&ok);  
+         if (!ok) goto error;
+
       }else if (key == "Atomic numbers") {                 // This should only appear once
          unsigned n(list.at(2).toUInt(&ok));  
          if (!ok) goto error;
          geomData.atomicNumbers = readUnsignedArray(textStream, n);
+
 
       }else if (key == "Current cartesian coordinates") { // This triggers a new geometry
 
@@ -226,6 +235,7 @@ Data::Geometry* FormattedCheckpoint::makeGeometry(GeomData const& geomData)
    Data::Geometry* geom(0);
    if (nAtoms > 0 && 3*nAtoms == (unsigned)geomData.coordinates.size()) {
       geom = new Data::Geometry(geomData.atomicNumbers, geomData.coordinates);
+      geom->setChargeAndMultiplicity(geomData.charge, geomData.multiplicity);
       geom->scaleCoordinates(Constants::BohrToAngstrom);
       geom->computeGasteigerCharges();
    }

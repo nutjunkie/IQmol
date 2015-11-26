@@ -514,6 +514,10 @@ QPair<double, double> Nmr::standardRange(QString const& isotope)
 
 QString Nmr::currentIsotope(QString const& text)
 { 
+// This was changed in response to 
+// https://git.framasoft.org/OpenAtWork/Slicer/commit/6da3a07e0a345fc759f7eb35c0abe2035f35c14c
+// which describes a possible bug in the QComboBox class related to changing the
+// current index before the emmited signal
    QString s(text.isEmpty() ? m_ui->isotopeCombo->currentText() : text);
    QString isotope;
    // Match the isotope in, e.g. "Proton (1H)"

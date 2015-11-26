@@ -160,12 +160,10 @@ qDebug() << "About to parse file" << filePath;
    }
 
    if (extension == "xyz") {
-      QLOG_INFO() << "Using XYZ parser";
       parser = new Xyz;
    }
 
    if (extension == "txt") {
-      QLOG_INFO() << "Using XYZ parser";
       parser = new Xyz;
    }
 
@@ -203,7 +201,7 @@ qDebug() << "About to parse file" << filePath;
 
    if (extension == "ply" || extension == "obj" || 
        extension == "stl" || extension == "off" ) {
-      QLOG_DEBUG() << "Using Mesh parser";
+       QLOG_DEBUG() << "Using Mesh parser";
       parser = new Mesh;
    }
 

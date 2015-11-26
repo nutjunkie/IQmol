@@ -40,6 +40,8 @@ namespace Parser {
          struct GeomData {
                QList<unsigned> atomicNumbers;
                QList<double> coordinates;
+               int charge;
+               unsigned multiplicity;
          };
 
          struct ShellData {

@@ -1,5 +1,11 @@
 TODO LIST:
 ~~~~~~~~~~
+
+ - compile open babel statically on all platforms (allows bespoke changes)
+    - remove plugin directory
+    - remove dynamic library in distribution
+    - formats need checking individually, cml, for example, does not work
+
  - Samples for the Parser/test directory:
     - iqmol archive
     - charges file
@@ -354,6 +360,7 @@ IQview
   - Can read in obj files, but normals and decimation cause crashes.
   - Orbital explorer?
   - Create a viewer purely on glObjects objects?
+  - tilings, periodic systems
 
 
 
@@ -569,6 +576,19 @@ system one using the following:
 The output from running otool on the IQmol should now contain 
     ....
 	/usr/local/lib/libopenbabel.4.dylib (compatibility version 4.0.0, current version 4.0.0)
+
+Static libraries can be built for OpenBabel using the following:
+
+mkdir build
+cd build
+cmake  -DBUILD_SHARED=OFF ..
+make
+
+The build fails on the test, but the static library gets built in src.  The
+data files still need to be available in the share directory
+
+compiler was set to:
+CMAKE_CXX_COMPILER:FILEPATH=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.x    ctoolchain/usr/bin/c++
 
 
 
