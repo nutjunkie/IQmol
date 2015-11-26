@@ -255,7 +255,7 @@ void QChemInput::readRemSection(TextStream& textStream)
             }  
             break;
          default:
-            rem->insert(tokens[0].toLower(), tokens[1]);
+            rem->insert(tokens[0].toLower(), tokens[1].toLower());
             break;
       }     
    }  

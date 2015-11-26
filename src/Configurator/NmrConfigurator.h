@@ -77,7 +77,7 @@ namespace Configurator {
          void plotSpectrum(QList<double> const& data, QPair<double, double> const& range);
 
          QPair<double, double> standardRange(QString const& isotope);
-         QString currentIsotope();
+         QString currentIsotope(QString const& text = QString());
          Data::NmrReference const* currentReference();
 
          Layer::Nmr& m_layer;

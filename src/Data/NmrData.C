@@ -29,6 +29,7 @@ namespace Data {
 
 void Nmr::dump() const 
 {
+   qDebug() << "NMR method:     " << m_method;
    qDebug() << "NMR shieldings: " << m_shieldings;
    qDebug() << "NMR shifts:     " << m_shifts;
    QStringList list(PrintMatrix(m_couplings)); 

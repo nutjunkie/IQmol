@@ -2,6 +2,7 @@
 
 \usepackage{epsf,psfrag,graphicx}
 \usepackage{hyperref,amssymb}
+\usepackage{verbatim}
 
 \newcommand{\qchem}{\href{http://q-chem.com}{{\scshape Q-Chem}}}
 \newcommand{\iqmol}{\href{http://iqmol.org}{{\scshape IQmol}}}
@@ -58,7 +59,7 @@
 \vfill
 \myline\\
 \begin{center}
-{\large v2.6 (2015) Andrew Gilbert}
+{\large v2.7 (2015) Andrew Gilbert}
 \end{center}
 \myline\\
 
@@ -486,6 +487,49 @@ The gradient colors can be altered by clicking inside the gradient box.
 
 
 \newpage
+\subsection{Potential Energy Surfaces}
+
+Several job types provide slices through the potential energy surface (PES).
+These include geometry optimizations, PES scans, reaction pathways  and
+transition state searches.  On opening a \qchem{} output file containing one of
+these job types a Geometries item appears in the MV and can be double-clicked
+to bring up the Geometries dialog.
+\begin{center}
+\includegraphics[scale=0.40]{figures/PesScan.png} \\
+\end{center}
+The pathway can be animated in the viewer using the play button and individual
+frames can be selected from the table or on the plot and the viewer will be
+updated with the corresponding structure.\\
+
+Pathways can also be read in from an XYZ file.  The format for this is simply a
+concatenation of regular XYZ files:
+{\footnotesize
+\begin{verbatim}
+5
+-291.77177
+Si  0.71979   -0.08082   -0.76577  
+H   0.73262   -1.27801    0.22990   
+H   1.10451    0.93673    0.34825   
+H  -1.32980    0.23894   -0.28240  
+H  -1.22713    0.18317    0.47002   
+5
+-291.76961
+Si  0.67218   -0.07483   -0.72935  
+H   0.73053   -1.29428    0.22634   
+H   1.10815    0.95270    0.34714   
+H  -1.29502    0.23567   -0.33016  
+H  -1.19409    0.17584    0.49156 
+....
+\end{verbatim}
+}
+The first line gives the number of atoms, the second (comment) line must have
+the corresponding energy and then the following lines have the xyz coordinates
+of each atom in the system.  This pattern repeats for as many frames as you have
+available.
+
+
+
+\newpage
 \subsection{Vibrational Frequencies}
 
 Vibrational frequencies can be read in from a \qchem{} output file and appear
@@ -504,10 +548,34 @@ This dialog contains an impulse spectrum showing the positions and relative
 intensities of the frequencies.  Individual modes can be selected on the
 spectrum by clicking the hollow circles and this will also update the Viewer
 window with the selected mode.  The impulses can be broadened using either
-Gaussians or Lorenzians to give a more realistic looking spectrum. \\
+Gaussians or Lorentzians to give a more realistic looking spectrum. \\
 
 The horizontal scale of the spectrum can be zoomed (using the scroll wheel on
 the mouse) and translated (left-click and drag) to give greater detail.
+
+
+\newpage
+\subsection{NMR Spectra}
+
+NMR shieldings and chemical shifts can be visualized using \iqmol{}.  A 
+\qchem{} calculation (JOB\_TYPE = NMR) must first be run and the output
+file opened.  Shielding constants can be displayed as atom labels in the
+viewer by selecting the Display $\blacktriangleright$ Atom Labels  
+$\blacktriangleright$ NMR option.
+\begin{center}
+\includegraphics[scale=0.25]{figures/NmrDisplay.png} \\
+\end{center}
+An NMR item will appear on in the MV and double-clicking this brings up the NMR
+Spectrum dialog.
+\begin{center}
+\includegraphics[scale=0.40]{figures/NmrConfigurator.png} \\
+\end{center}
+Various spectrum types can be displayed ($^1$H, $^{13}$C etc) and if 
+a reference is available (e.g. TMS) for the given level of theory, 
+chemical shifts can also be displayed.  Selecting rows in the table
+will also highlight the corresponding atoms in the viewer for easy
+identification.  If impulses are plotted, then these can also be selected
+to identify which atoms are responsible for the selected signal.
 
 
 

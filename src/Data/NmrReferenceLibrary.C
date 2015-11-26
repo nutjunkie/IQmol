@@ -103,7 +103,7 @@ QStringList NmrReferenceLibrary::availableIsotopes() const
    isotopes.append("Carbon (13C)");
 // isotopes.append("Nitrogen (15N)");
 // isotopes.append("Fluorine (19F)");
-   isotopes.append("Silicon (29Si)");
+//   isotopes.append("Silicon (29Si)");
 // isotopes.append "Phosphorus (31P)";
 
    return isotopes;
@@ -153,37 +153,37 @@ ref->addElement("C",  194.31808787);
 ref->addElement("H",   32.78097962);
 s_library.append(ref);
 
-ref = new NmrReference("TMS", "HF/6-31g*");
+ref = new NmrReference("TMS", "HF/6-31G(d)");
 ref->addElement("Si", 450.14833029);
 ref->addElement("C",  201.72683332);
 ref->addElement("H",   32.90343930);
 s_library.append(ref);
 
-ref = new NmrReference("TMS", "B3LYP/6-31g*");
+ref = new NmrReference("TMS", "B3LYP/6-31G(d)");
 ref->addElement("Si", 413.56045472);
 ref->addElement("C",  189.63133174);
 ref->addElement("H",   32.18393750);
 s_library.append(ref);
 
-ref = new NmrReference("TMS", "HF/6-31g**");
+ref = new NmrReference("TMS", "HF/6-31G(d,p)");
 ref->addElement("Si", 448.39860170);
 ref->addElement("C",  203.14180478);
 ref->addElement("H",   32.33377646);
 s_library.append(ref);
 
-ref = new NmrReference("TMS", "B3LYP/6-31g**");
+ref = new NmrReference("TMS", "B3LYP/6-31G(d,p)");
 ref->addElement("Si", 411.79455658);
 ref->addElement("C",  191.71944127);
 ref->addElement("H",   31.75480046);
 s_library.append(ref);
 
-ref = new NmrReference("TMS", "HF/6-31+G*");
+ref = new NmrReference("TMS", "HF/6-31+G(d)");
 ref->addElement("Si", 446.66061534);
 ref->addElement("C",  201.83303666);
 ref->addElement("H",   32.81723854);
 s_library.append(ref);
 
-ref = new NmrReference("TMS", "B3LYP/6-31+G*");
+ref = new NmrReference("TMS", "B3LYP/6-31+G(d)");
 ref->addElement("Si", 408.14935394);
 ref->addElement("C",  190.67818876);
 ref->addElement("H",   32.06583609);
