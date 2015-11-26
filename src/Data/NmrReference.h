@@ -1,8 +1,8 @@
-#ifndef IQMOL_DATA_NMRREFERENCED_H
-#define IQMOL_DATA_NMRREFERENCED_H
+#ifndef IQMOL_DATA_NMRREFERENCE_H
+#define IQMOL_DATA_NMRREFERENCE_H
 /*******************************************************************************
 
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -33,29 +33,43 @@ namespace Data {
       friend class boost::serialization::access;
 
       public:
-         NmrReference(QString const& method = QString()) : m_method(method) { }
+
+         NmrReference(QString const& system = QString(), 
+                      QString const& method = QString() ) : 
+            m_system(system), m_method(method) { }
 
          Type::ID typeID() const { return Type::NmrReference; }
 
-         void addElement(QString const& symbol, double const shfit);
+         void setSystem(QString const& system) { m_system = system; }
+         void setMethod(QString const& method) { m_method = method; }
+
+         QString const& system() const { return m_system; }
+         QString const& method() const { return m_method; }
+
+         bool contains(QString const& element) const { return m_shifts.contains(element); }
+         void addElement(QString const& symbol, double const shfit, double const offset = 0.0);
          double shift(QString const& symbol) const;
 
          void dump() const;
 
          void serialize(InputArchive& ar, unsigned int const version = 0) {
             Q_UNUSED(version);
-            Q_UNUSED(version);
+            ar & m_system;
             ar & m_method;
+            ar & m_shifts;
          }
 
          void serialize(OutputArchive& ar, unsigned int const version = 0) {
             Q_UNUSED(version);
+            ar & m_system;
             ar & m_method;
             ar & m_shifts;
          }
 
       private:
-         QString m_method;  // level of theory
+         QString m_system;
+         QString m_method;
+
          QMap<QString, double> m_shifts;
    };
 

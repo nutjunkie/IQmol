@@ -2,7 +2,7 @@
 #define IQMOL_NETWORK_CONNECTION_H
 /*******************************************************************************
          
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
       
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -48,6 +48,9 @@ namespace Network {
 
          enum AuthenticationT { None, Agent, HostBased, KeyboardInteractive, Password,
             PublicKey };
+
+         static QString toString(Status const);
+         static QString toString(AuthenticationT const);
 
          Connection(QString const& hostname, int const port) : QObject(), m_hostname(hostname),
             m_port(port), m_status(Closed), m_timeout(10000) { }  // 10s default

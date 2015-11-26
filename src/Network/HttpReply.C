@@ -1,6 +1,6 @@
 /*******************************************************************************
          
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
       
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -29,7 +29,7 @@ namespace IQmol {
 namespace Network {
 
 HttpReply::HttpReply(HttpConnection* connection) : m_connection(connection), m_networkReply(0),
-   m_https(connection->secure())
+   m_https(connection->isSecure())
 { 
    m_timeout = m_connection->timeout();
    m_timer.setInterval(m_timeout);
@@ -51,17 +51,6 @@ void HttpReply::finishedSlot()
 {
 
    QString status(headerValue("Qchemserv-Status"));
-
-/*
-qDebug() << "HttpReply finishedSlot called with header"; 
-qDebug() << "-------------------------------------------------------------";
-   dumpHeader();
-qDebug() << "HttpReply finishedSlot called with message"; 
-qDebug() << m_message;
-qDebug() << "HttpReply finishedSlot called with status"; 
-qDebug() << status;
-qDebug() << "-------------------------------------------------------------";
-*/
 
    if (status.contains("OK")) {
       if (m_status != Error) m_status = m_interrupt ? Interrupted : Finished;

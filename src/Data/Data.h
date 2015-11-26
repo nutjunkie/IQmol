@@ -2,7 +2,7 @@
 #define IQMOL_DATA_H
 /*******************************************************************************
 
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -64,11 +64,11 @@ namespace Data {
                /*---------------------  *---------------------  *--------------------- */
                 AtomicProperty,         AtomicSymbol,           AtomColor, 
                 AtomicNumber,
-                NmrShiftIsotropic,      NmrShiftRelative,       Mass, 
+                NmrShielding,           NmrShift,               Mass, 
                 MultipoleExpansion,     MullikenCharge,         MultipoleDerivedCharge, 
                 AtomicCharge,           GasteigerCharge,        ChelpgCharge,
                 SpinDensity,            VdwRadius,              MultipoleExpansionList,
-                NmrReference,           NmrReferenceList,
+                NmrReference,           NmrReferenceList,       Nmr,
                 ElectronicTransition,   ElectronicTransitionList, ExcitedStates,
                 OrbitalSymmetries,
                /*---------------------  *---------------------  *--------------------- */

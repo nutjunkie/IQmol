@@ -1,6 +1,6 @@
 /*******************************************************************************
          
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
       
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -27,6 +27,32 @@
 
 namespace IQmol {
 namespace Network {
+
+QString Connection::toString(Connection::Status const status)
+{
+   QString s;
+   switch (status) {
+      case Closed:         s = "Closed";         break;
+      case Opened:         s = "Opened";         break;
+      case Authenticated:  s = "Authenticated";  break;
+   }
+   return s;
+}
+
+
+QString Connection::toString(Connection::AuthenticationT const authentication)
+{
+   QString s;
+   switch (authentication) {
+      case None:                 s = "None";                  break;
+      case Agent:                s = "Agent";                 break;
+      case HostBased:            s = "Host Based";            break;
+      case KeyboardInteractive:  s = "Keyboard Interactive";  break;
+      case Password:             s = "Password";              break;
+      case PublicKey:            s = "Public Key";            break;
+   }
+   return s;
+}
 
 void Connection::thread(Reply* reply)
 {

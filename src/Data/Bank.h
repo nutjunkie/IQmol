@@ -2,7 +2,7 @@
 #define IQMOL_DATA_BANK_H
 /*******************************************************************************
 
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -44,6 +44,13 @@ namespace Data {
          Bank() : m_deleteContents(true) { }
          ~Bank();
          Type::ID typeID() const { return Type::Bank; }
+
+         Bank(Bank const& that) { copy(that); }
+
+         Bank& operator=(Bank const& that) {
+            if (this != &that) copy(that);
+            return *this;
+         }
 
 		 /// Moves the data from that Bank to this Bank.  After a merge, that
 		 /// will have no data.
@@ -110,9 +117,19 @@ namespace Data {
 
          void dump() const;
 
+
       private:
          bool m_deleteContents;
-         Bank(Bank const&);
+         //Bank(Bank const&);
+
+         void copy(Bank const& that) {
+            Base* base;
+            for (int i = 0; i < that.size(); ++i) {
+                base = Factory::instance().create(that[i]->typeID());
+                *base = *that[i]; 
+                append(base);
+            }
+         }
 
          BOOST_SERIALIZATION_SPLIT_MEMBER();
    };

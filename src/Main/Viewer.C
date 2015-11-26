@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -54,7 +54,8 @@ const Qt::KeyboardModifier Viewer::s_buildModifier(Qt::AltModifier);
 const Qt::KeyboardModifier Viewer::s_selectModifier(Qt::ShiftModifier);
 const Qt::KeyboardModifier Viewer::s_manipulateSelectionModifier(Qt::ControlModifier);
 
-QFont  Viewer::s_labelFont("Helvetica", 14, QFont::Black);
+//QFont  Viewer::s_labelFont("Helvetica", 14, QFont::Black);
+QFont  Viewer::s_labelFont("Arial", 14, QFont::Black);
 QFontMetrics Viewer::s_labelFontMetrics(Viewer::s_labelFont);
 
 
@@ -200,6 +201,7 @@ void Viewer::draw()
 
    QString shader(m_shaderLibrary->currentShader());
 
+   glEnable(GL_DEPTH_TEST);
    glShadeModel(GL_SMOOTH);
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  
 
@@ -252,6 +254,7 @@ void Viewer::fastDraw()
    Layer::GLObject::SetCameraPosition(camera()->position());
 
    glEnable(GL_LIGHTING);
+   glEnable(GL_DEPTH_TEST);
    glShadeModel(GL_SMOOTH);
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -363,6 +366,7 @@ void Viewer::setLabelType(int const type)
 {
    s_labelFont.setPointSize(Preferences::LabelFontSize());
    switch (type) {
+      case Layer::Atom::None:      m_labelType = Layer::Atom::None;      break;
       case Layer::Atom::Index:     m_labelType = Layer::Atom::Index;     break;
       case Layer::Atom::Element:   m_labelType = Layer::Atom::Element;   break;
       case Layer::Atom::Charge:    m_labelType = Layer::Atom::Charge;    break;
@@ -473,10 +477,11 @@ void Viewer::drawLabels(GLObjectList const& objects)
        }
    }
 
+   
    glDisable(GL_LIGHTING);
    qglColor(foregroundColor());
 
-   QString mesg = selectedOnly ? "Selection " : "Total ";
+   QString msg = selectedOnly ? "Selection " : "Total ";
    AtomList::const_iterator iter;
    double value(0.0);
 
@@ -484,20 +489,36 @@ void Viewer::drawLabels(GLObjectList const& objects)
       for (iter= atomList.begin(); iter != atomList.end(); ++iter) {
           value += (*iter)->getMass();
       }
-      mesg += "mass: " + QString::number(value,'f', 3);
-      drawText(width()-s_labelFontMetrics.width(mesg), height()-10, mesg);
+      msg += "mass: " + QString::number(value,'f', 3);
+
    }else if (m_labelType == Layer::Atom::Charge) {
       for (iter = atomList.begin(); iter != atomList.end(); ++iter) {
           value += (*iter)->getCharge();
       }
-      mesg += "charge: " + QString::number(value,'f', 2);
-      drawText(width()-s_labelFontMetrics.width(mesg), height()-10, mesg);
+      msg += "charge: " + QString::number(value,'f', 2);
+
    }else if (m_labelType == Layer::Atom::Spin) {
       for (iter = atomList.begin(); iter != atomList.end(); ++iter) {
           value += (*iter)->getSpin();
       }
-      mesg += "spin: " + QString::number(value,'f', 2);
-      drawText(width()-s_labelFontMetrics.width(mesg), height()-10, mesg);
+      msg += "spin: " + QString::number(value,'f', 2);
+
+   }else if (m_labelType == Layer::Atom::NmrShift) {
+      iter = atomList.begin();
+      if (iter == atomList.end()) {
+         msg.clear();
+      }else if ((*iter)->haveNmrShift()) {
+         msg = "Chemical shifts";
+      }else {
+         msg = "Nuclear shieldings";
+      }
+
+   }else {
+      msg.clear();
+   }
+
+   if (!msg.isEmpty()) {
+      drawText(width()-s_labelFontMetrics.width(msg), height()-10, msg);
    }
 
    glEnable(GL_LIGHTING);
@@ -616,6 +637,7 @@ void Viewer::popAnimator(Animator::Base* base)
       QLOG_DEBUG() << "Stoping animation";
       stopAnimation();
       m_viewerModel.determineSymmetry();
+      m_viewerModel.saveToCurrentGeometry();
    }
 }
 
@@ -648,6 +670,7 @@ void Viewer::setRecord(bool activate)
       }else {
          m_snapper = new Snapshot(this, Snapshot::Movie);
          connect(this, SIGNAL(animationStep()), m_snapper, SLOT(capture()));
+         connect(m_snapper, SIGNAL(movieFinished()), this, SLOT(movieMakingFinished()));
          if (!m_snapper->requestFileName()) {
             delete m_snapper;
             m_snapper = 0;
@@ -655,11 +678,18 @@ void Viewer::setRecord(bool activate)
          }
       } 
    }else {
-      if (m_snapper) {
-         m_snapper->makeMovie();
-         delete m_snapper;
-      } 
+      if (m_snapper) m_snapper->makeMovie();
+   }
+}
+
+
+void Viewer::movieMakingFinished()
+{
+   if (m_snapper) {
+      delete m_snapper;
       m_snapper = 0;
+   }else {
+      QLOG_WARN() << "movieMakingFinished called with null snapshot taker";
    }
 }
 

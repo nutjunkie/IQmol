@@ -2,7 +2,7 @@
 #define IQMOL_LAYER_H
 /*******************************************************************************
 
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -150,8 +150,13 @@ namespace Layer {
          void adopted();
 
       public Q_SLOTS:
-         virtual void configure() { if (m_configurator) m_configurator->display(); }
-         virtual void closeConfigurator() { if (m_configurator) m_configurator->close(); }
+         virtual void configure() { 
+            if (m_configurator) m_configurator->display(); 
+         }
+
+         virtual void closeConfigurator() { 
+            if (m_configurator) m_configurator->close(); 
+         }
 
 		 /// The persistent parent exists even if the Layer has been removed
 		 /// from the model.  This is useful for undo actions that need to know

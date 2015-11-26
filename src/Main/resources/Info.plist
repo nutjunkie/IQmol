@@ -181,7 +181,7 @@
 	<key>CFBundleGetInfoString</key>
 	<string>IQmol - version 1.0.0</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>(C) 2013 Andrew Gilbert</string>
+	<string2015 2013 Andrew Gilbert</string>
 	<key>CFBundleExecutable</key>
 	<string>IQmol</string>
 	<key>CFBundleIdentifier</key>

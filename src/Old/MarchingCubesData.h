@@ -1,7 +1,7 @@
 #ifndef IQMOL_MARCHINGCUBES_DATA_H
 #define IQMOL_MARCHINGCUBES_DATA_H
 /* ---------------------------------------------------------------------------
- *  Copyright (C) 2011-2013 Andrew Gilbert
+ *  Copyright (C) 2011-2015 Andrew Gilbert
  *
  *  This file is part of IQmol, a free molecular visualization program. See
  *  <http://iqmol.org> for more details.

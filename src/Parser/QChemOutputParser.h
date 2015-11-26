@@ -2,7 +2,7 @@
 #define IQMOL_PARSER_QCHEMOUTPUT_H
 /*******************************************************************************
        
-  Copyright (C) 2011-13 Andrew Gilbert
+  Copyright (C) 2011-2015ndrew Gilbert
            
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -23,10 +23,15 @@
 ********************************************************************************/
 
 #include "Parser.h"
-#include "Geometry.h"
 
 
 namespace IQmol {
+
+namespace Data {
+   class Nmr;
+   class Geometry;
+}
+
 namespace Parser {
 
    class QChemOutput : public Base {
@@ -40,16 +45,18 @@ namespace Parser {
 
       private:
          Data::Geometry* readStandardCoordinates(TextStream&);
-         void readStandardCoordinates(TextStream&, Data::Geometry*);
-         void readCharges(TextStream&, Data::Geometry*, QString const& label);
-         void readNmrShifts(TextStream&, Data::Geometry*);
-         void readDipoleMoment(TextStream&, Data::Geometry*);
-         void readHessian(TextStream&, Data::Geometry*);
+         void readStandardCoordinates(TextStream&, Data::Geometry&);
+         void readCharges(TextStream&, Data::Geometry&, QString const& label);
+         void readNmrShifts(TextStream&, Data::Geometry&, Data::Nmr&);
+         void readNmrReference(TextStream&, Data::Nmr&);
+         void readNmrCouplings(TextStream&, Data::Geometry&, Data::Nmr&);
+         void readDipoleMoment(TextStream&, Data::Geometry&);
+         void readHessian(TextStream&, Data::Geometry&);
          void readVibrationalModes(TextStream&);
          void readEffectiveRegion(TextStream&);
-         void readDMA(TextStream&, Data::Geometry*);
-         void readCisStates(TextStream&, Data::Geometry*);
-         void readOrbitalSymmetries(TextStream&);
+         void readDMA(TextStream&, Data::Geometry&);
+         void readCisStates(TextStream&);
+         void readOrbitalSymmetries(TextStream&, bool const readSymmetries);
          void setTotalEnergy(QString const&, Data::Geometry*, QString const& label);
 
          unsigned m_nAlpha;

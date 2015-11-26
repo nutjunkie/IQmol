@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -91,7 +91,7 @@ void Atom::setVibrationVectorColor(QColor const& color)
 
 
 Atom::Atom(int Z) : Primitive("Atom"), m_charge(0.0), m_spin(0.0),
-   m_smallerHydrogens(true), m_reorderIndex(0)
+   m_smallerHydrogens(true), m_haveNmrShift(false), m_reorderIndex(0) 
 {
    setAtomicNumber(Z);
    if (!s_vibrationColorInitialized) {
@@ -217,6 +217,7 @@ void Atom::drawLabel(Viewer& viewer, LabelType const type, QFontMetrics& fontMet
    pos.y += fontMetrics.height()/4.0;
    pos = viewer.camera()->unprojectedCoordinatesOf(pos);
    glColor3f(0.1, 0.1, 0.1);
+
    viewer.renderText(pos[0], pos[1], pos[2], label, viewer.labelFont());
 }
 
@@ -235,7 +236,7 @@ QString Atom::getLabel(LabelType const type)
          break;
       case Mass:      label = QString::number(m_mass, 'f', 3);
          break;
-      case NmrShift:  label = QString::number(m_nmrShift, 'f', 2);
+      case NmrShift:  label = QString::number(m_nmr, 'f', 2);
          break;
       case Spin:      label = QString::number(m_spin, 'f', 2);
          break;

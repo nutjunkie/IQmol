@@ -10,8 +10,8 @@ LIBS += $$BUILD_DIR/libQui.a \
         $$BUILD_DIR/libLayer.a \
         $$BUILD_DIR/libOld.a \
         $$BUILD_DIR/libParser.a \
-        $$BUILD_DIR/libData.a \
         $$BUILD_DIR/libConfigurator.a \
+        $$BUILD_DIR/libData.a \
         $$BUILD_DIR/libProcess.a \
         $$BUILD_DIR/libNetwork.a \
         $$BUILD_DIR/libYaml.a \
@@ -31,12 +31,10 @@ unix:!macx:FORMS += $$PWD/PeriodicTable.ui
 OBJECTS += $$PWD/symmol.o
 
 SOURCES += \
-#  $$PWD/Controller.C \
    $$PWD/FragmentTable.C \
    $$PWD/HelpBrowser.C \
    $$PWD/IQmolApplication.C \
    $$PWD/MainWindow.C \
-#  $$PWD/Model.C \
    $$PWD/PeriodicTable.C \
    $$PWD/PreferencesBrowser.C \
    $$PWD/ToolBar.C \
@@ -46,13 +44,11 @@ SOURCES += \
    $$PWD/ViewerModelView.C \
 
 HEADERS += \
-#  $$PWD/Controller.h \
    $$PWD/AboutDialog.h \
    $$PWD/FragmentTable.h \
    $$PWD/HelpBrowser.h \
    $$PWD/IQmolApplication.h \
    $$PWD/MainWindow.h \
-#  $$PWD/Model.h \
    $$PWD/PeriodicTable.h \
    $$PWD/PreferencesBrowser.h \
    $$PWD/ToolBar.h \

@@ -1,6 +1,6 @@
 /*******************************************************************************
          
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
       
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -86,9 +86,10 @@ void Server::open()
    if (m_connection && 
        m_connection->status() == Network::Connection::Authenticated) return;
 
-   QLOG_TRACE() << "Opening server" << name();
-
    if (!m_connection) {
+      QLOG_TRACE() << "Creating connection" 
+                   << m_configuration.value(ServerConfiguration::Connection);
+
       QVariant address(m_configuration.value(ServerConfiguration::HostAddress));
       int port(m_configuration.port());
 
@@ -100,13 +101,16 @@ void Server::open()
             m_connection = new Network::SshConnection(address.toString(), port);
             break;
          case ServerConfiguration::HTTP:
-         case ServerConfiguration::HTTPS:
             m_connection = new Network::HttpConnection(address.toString(), port);
+            break;
+         case ServerConfiguration::HTTPS:
+            m_connection = new Network::HttpConnection(address.toString(), port, true);
             break;
       }
    }
 
    if (m_connection->status() == Network::Connection::Closed) {
+      QLOG_TRACE() << "Opening connection to server" << name();
       m_connection->open();
    }
 

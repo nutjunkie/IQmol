@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -127,7 +127,7 @@ void MolecularOrbitals::dump() const
    qDebug() << "Restricted:" << m_restricted;
    qDebug() << "There ares " << m_shellList.size() << "shells";
 
-   int s(0), p(0), d5(0), d6(0), f7(0), f10(0);
+   int s(0), p(0), d5(0), d6(0), f7(0), f10(0), g9(0), g15(0);
 
    unsigned nBasis(0);
    ShellList::const_iterator iter;
@@ -139,6 +139,8 @@ void MolecularOrbitals::dump() const
           case  Data::Shell::D6:   ++d6;   nBasis +=  6;  break;   
           case  Data::Shell::F7:   ++f7;   nBasis +=  7;  break;
           case  Data::Shell::F10:  ++f10;  nBasis += 10;  break;   
+          case  Data::Shell::G9:   ++g9;   nBasis +=  9;  break;
+          case  Data::Shell::G15:  ++g15;  nBasis += 15;  break;   
        }
    }
 

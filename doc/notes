@@ -36,7 +36,7 @@ THINGS TO CONSIDER:
 
 
 
-IQmol 2.6 
+IQmol 2.7 
 ~~~~~~~~~
 
  o File Formats
@@ -57,6 +57,11 @@ IQmol 2.6
  o Symmetry module:
     - Display of symmetry elements (transparent planes)
     - Animation of symmetry operations.
+
+           - Symmetry item (configurator is PG table)
+              - rotation
+              - reflection
+    
 
  o CactusServer for naming molecules
      -  http://www.chemspider.com
@@ -352,6 +357,13 @@ IQview
 
 
 
+Parallels black screen:
+Shut down the Ubuntu VM (13.10)
+In Parallels 9 config for the VM, go to Hardware > Video, and disable 3D acceleration.
+Restart Ubuntu 13.10. You will now get a completely black screen.
+Shut down the Ubuntu VM once more.
+Again, in Parallels config for the VM, go to Hardware > Video and reenable 3D acceleration.
+Restart, and you're back in business (No black screen and everything properly updated).
 
 
 
@@ -363,6 +375,10 @@ IQview
 								  S U N D R Y
                                  =============
 
+pointer/reference
+data members in a class for which the class is responsible for should be pointers.
+other data members can be references
+
 #!/bin/tcsh
 find . -name Makefile -exec \rm {} \;
 qmake -spec macx-g++ -o Makefile IQmol.pro
@@ -372,6 +388,7 @@ qmake -spec macx-g++ -o Makefile IQmol.pro
 
 generating png files for fragments
 for i in `cat ../all.list `;do babel -ixyz $i.xyz -O $i.png ; done
+and chemdraw
 
 Hidden function warning:
 struct Derived: public Base {

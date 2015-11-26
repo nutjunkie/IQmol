@@ -2,7 +2,7 @@
 #define IQMOL_IQMOL_H
 /*******************************************************************************
 
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -34,7 +34,7 @@
 #include <limits>
 #define FOREVER ( std::numeric_limits<int>::max() )
 
-#define IQMOL_VERSION "2.6.0"
+#define IQMOL_VERSION "2.7.0"
 #define IQMOL_YEAR "2015"
 
 class QToolButton;

@@ -2,7 +2,7 @@
 #define IQMOL_LAYER_MOLECULE_H
 /*******************************************************************************
        
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
            
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -220,7 +220,6 @@ namespace IQmol {
             }
 
             unsigned maxAtomicNumber() { return m_maxAtomicNumber; }
-
    
    
          public Q_SLOTS:
@@ -231,6 +230,7 @@ namespace IQmol {
             void constraintUpdated();
             void removeConstraint();
             void selectAll();
+            void selectAtoms(QList<int> const& indices);
 
             void openSurfaceAnimator();
 
@@ -244,6 +244,7 @@ namespace IQmol {
             void detectSymmetry();
             void autoDetectSymmetry();
             void invalidateSymmetry();
+            void saveToCurrentGeometry();
    
          Q_SIGNALS:
             void softUpdate(); // issue if the number of primitives does not change

@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -31,8 +31,13 @@ namespace Data {
 void OrbitalSymmetries::setOccupied(Spin const spin, unsigned const nOrbs)
 {
    switch (spin) {
-      case Alpha:  m_nAlpha = nOrbs;  break;
-      case Beta:   m_nBeta  = nOrbs;  break;
+      case Alpha:  
+         m_nAlpha = nOrbs;
+         m_nBeta  = nOrbs;
+         break;
+      case Beta:   
+         m_nBeta  = nOrbs;  
+         break;
    }
 }
 

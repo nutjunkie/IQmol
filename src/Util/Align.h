@@ -2,7 +2,7 @@
 #define IQMOL_UTIL_ALIGN_H
 /*******************************************************************************
        
-  Copyright (C) 2011 Andrew Gilbert
+  Copyright (C) 2011 Andrew 2015ert
            
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.

@@ -2,7 +2,7 @@
 #define IQMOL_CONFIGURATOR_H
 /*******************************************************************************
 
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -60,6 +60,7 @@ namespace Configurator {
             if (!m_geometry.isNull()) setGeometry(m_geometry);
             sync();
             show();
+            raise();
          }
 
       public Q_SLOTS:

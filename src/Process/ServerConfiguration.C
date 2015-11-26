@@ -1,6 +1,6 @@
 /*******************************************************************************
          
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
       
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -94,21 +94,6 @@ QString ServerConfiguration::toString(QueueSystemT const queue)
 }
 
 
-QString ServerConfiguration::toString(AuthenticationT const authentication)
-{
-   QString s;
-   switch (authentication) {
-     case Network::Connection::None:                s = "None";                     break;
-     case Network::Connection::Agent:               s = "SSH Agent";                break;
-     case Network::Connection::HostBased:           s = "SSH Host Based";           break;
-     case Network::Connection::KeyboardInteractive: s = "SSH Keyboard Interactive"; break;
-     case Network::Connection::Password:            s = "SSH Password Prompt";      break;
-     case Network::Connection::PublicKey:           s = "SSH Public Key";           break;
-   }
-   return s;
-}
-
-
 ServerConfiguration::FieldT ServerConfiguration::toFieldT(QString const& field)
 { 
    if (field.contains("server",     Qt::CaseInsensitive))  return ServerName;
@@ -174,7 +159,7 @@ ServerConfiguration::AuthenticationT ServerConfiguration::toAuthenticationT(
 
 ServerConfiguration::ServerConfiguration()
 {
-   setDefaults(HTTP);
+   setDefaults(HTTPS);
    setDefaults(Web);
    //setDefaults(Local);
    //setDefaults(Basic);
@@ -224,7 +209,7 @@ QString ServerConfiguration::value(FieldT const field) const
    switch (field) {
       
       case Authentication:
-         s = toString(authentication());
+         s = Network::Connection::toString(authentication());
          break;
 
       case QueueSystem:
@@ -295,7 +280,7 @@ QVariantList ServerConfiguration::queueResourcesList() const
 
 void ServerConfiguration::setDefaults(ConnectionT const connection)
 {
-qDebug() << "Setting defaults for " << toString(connection);
+   //qDebug() << "Setting defaults for " << toString(connection);
    m_configuration.insert(Connection, (int)connection);
 
    switch (connection) {
@@ -328,8 +313,10 @@ qDebug() << "Setting defaults for " << toString(connection);
          break;
 
       case HTTPS:
+         m_configuration.insert(ServerName, "QChem");
          m_configuration.insert(Port, 443);
          m_configuration.insert(HostAddress, "iqmol.q-chem.com");
+         m_configuration.insert(UserName, "guest");
          m_configuration.insert(WorkingDirectory, "(unused)");
          m_configuration.insert(Authentication, Network::Connection::None);
          break;
@@ -484,7 +471,7 @@ qDebug() << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
 
        switch (iter.key()) {
           case Authentication:
-             value = toString(authentication()).toStdString();
+             value = Network::Connection::toString(authentication()).toStdString();
              break;
           case QueueSystem:
              value = toString(queueSystem()).toStdString();

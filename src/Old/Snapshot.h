@@ -2,7 +2,7 @@
 #define IQMOL_SNAPSHOT_H
 /*******************************************************************************
        
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
            
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -24,6 +24,7 @@
 
 #include <QStringList>
 #include <QImage>
+#include <QProcess>
 
 
 namespace IQmol {
@@ -51,12 +52,20 @@ namespace IQmol {
          void resetCounter() { m_counter = 0; } 
          void makeMovie();
 
+      Q_SIGNALS:
+         void movieFinished();
+
       public Q_SLOTS:
          void capture();
+
+      private Q_SLOTS:
+         void movieError(QProcess::ProcessError);
+         void movieFinished(int, QProcess::ExitStatus);
 
       private:
          void captureVector(QString const& fileName, int const format);
          void capture(QString const& fileName);
+         void removeImageFiles(QString const& msg);
 
          // merge with captureVector
          void writefile(int format, int sort, int options, int nbcol,
@@ -71,6 +80,7 @@ namespace IQmol {
          int m_counter;
          QImage m_image;
          QStringList m_fileNames;
+         QProcess* m_movieProcess;
    };
 
 

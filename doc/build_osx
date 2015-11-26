@@ -21,6 +21,7 @@ libraries.  The compilation of the code should be relatively straightforward.
 
 
 
+
  o OpenSSL:
    - Download: https://www.openssl.org/source  (version 1.0.1p)
    - Compile:  The regular compilation does not compile x86 code, so we envoke

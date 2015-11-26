@@ -1,6 +1,6 @@
 /*******************************************************************************
        
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
            
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -20,46 +20,50 @@
    
 ********************************************************************************/
 
-#include "QsLog.h"
-#include "QMsgBox.h"
-#include "QChemJobInfo.h" 
+// Data
+#include "AtomicProperty.h"
+#include "Bank.h"
+#include "DipoleMoment.h"
+#include "Energy.h"
+#include "File.h"
+#include "Frequencies.h"
+#include "Geometry.h"
+#include "GeometryList.h"
+#include "GridData.h"
+//#include "MolecularOrbitals.h"
+#include "MultipoleExpansion.h"
+#include "PointGroup.h"
+#include "SurfaceInfo.h"
+
+
+// Layers
+#include "LayerFactory.h"
 #include "AtomLayer.h"
 #include "BondLayer.h"
-#include "Preferences.h"
 #include "ChargeLayer.h"
+#include "ConstraintLayer.h"
+#include "CubeDataLayer.h"
 #include "DipoleLayer.h"
 #include "FrequenciesLayer.h"
 #include "EfpFragmentLayer.h"
 #include "GroupLayer.h"
+#include "MoleculeLayer.h"
+//#include "MolecularOrbitalsLayer.h"
 #include "SurfaceLayer.h"
-#include "CubeDataLayer.h"
+
+
 #include "UndoCommands.h"
 #include "SpatialProperty.h"
 #include "AtomicDensity.h"
 #include "MarchingCubes.h"
 #include "MeshDecimator.h"
-#include "MoleculeLayer.h"
-#include "ProgressDialog.h"
-#include "ConstraintLayer.h"
-#include "MultipoleExpansion.h"
-//#include "MolecularOrbitalsLayer.h"
-
-#include "GridEvaluator.h"
-#include "GridData.h"
-#include "AtomicProperty.h"
-#include "Geometry.h"
-#include "GeometryList.h"
-//#include "MolecularOrbitals.h"
-#include "Frequencies.h"
-#include "Bank.h"
-#include "File.h"
-#include "DipoleMoment.h"
-#include "PointGroup.h"
-#include "Energy.h"
 #include "Constants.h"
-#include "LayerFactory.h"
-#include "SurfaceInfo.h"
-
+#include "QsLog.h"
+#include "QMsgBox.h"
+#include "QChemJobInfo.h" 
+#include "ProgressDialog.h"
+#include "Preferences.h"
+#include "GridEvaluator.h"
 #include "IQmolParser.h"
 
 #include "openbabel/mol.h"
@@ -68,6 +72,7 @@
 #include "openbabel/generic.h"
 #include "openbabel/forcefield.h"
 #include "openbabel/plugin.h"
+
 #include <QFileDialog>
 #include <QDropEvent>
 #include <QProcess>
@@ -75,7 +80,6 @@
 #include <QMenu>
 #include <QUrl>
 #include <vector>
-
 #include <QtDebug>
 
 
@@ -107,7 +111,8 @@ Molecule::Molecule(QObject* parent) : Base(DefaultMoleculeName, parent),
    m_scanList(this, "Scan Coordinates"), 
    m_groupList(this, "Groups"), 
    m_efpFragmentList(this),
-   m_currentGeometry(0), m_chargeType(Data::Type::GasteigerCharge)
+   m_currentGeometry(0), 
+   m_chargeType(Data::Type::GasteigerCharge)
 {
    setFlags(Qt::ItemIsSelectable | Qt::ItemIsDropEnabled | 
       Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
@@ -197,12 +202,13 @@ void Molecule::appendData(Layer::List& list)
    }
 
    Layer::List::iterator iter;
-   Files*    files(0);
-   Atoms*    atoms(0);
-   Bonds*    bonds(0);
-   Charges*  charges(0);
-   CubeData* cubeData(0);
+   Files*        files(0);
+   Atoms*        atoms(0);
+   Bonds*        bonds(0);
+   Charges*      charges(0);
+   CubeData*     cubeData(0);
    EfpFragments* efpFragments(0);
+
    QString text;
    PrimitiveList primitiveList;
    Layer::List toSet;
@@ -939,7 +945,7 @@ void Molecule::applyDistanceConstraint(Constraint* constraint)
 
    double value(constraint->targetValue());
    Vec shift(0.5*(ab.norm() - value)*ab.unit());
-   Vec delta(value*(a-b).unit());
+   //Vec delta(value*(a-b).unit());
    Vec c;
 
    for (iter = allAtoms.begin(); iter != allAtoms.end(); ++iter) {
@@ -1206,6 +1212,22 @@ void Molecule::selectAll()
 }
 
 
+// Note the indices are coming in 0-indexed 
+void Molecule::selectAtoms(QList<int> const& indices)
+{
+   AtomList::iterator iter;
+   AtomList atomList(findLayers<Atom>(Visible | Children));
+   for (iter = atomList.begin(); iter != atomList.end(); ++iter) {
+       if (indices.contains((*iter)->getIndex()-1)) {
+          select((*iter)->QStandardItem::index(), QItemSelectionModel::Select);
+       }else {
+          select((*iter)->QStandardItem::index(), QItemSelectionModel::Deselect);
+       }
+   }
+}
+
+
+
 void Molecule::deleteSelection()
 {
    // Must also delete any bond attached to any atom we are deleting.
@@ -1391,13 +1413,13 @@ void Molecule::setGeometry(IQmol::Data::Geometry& geometry)
    for (unsigned i = 0; i < nAtoms; ++i) {
        atoms[i]->setTranslation(geometry.position(i));
        atoms[i]->setSpinDensity(geometry.getAtomicProperty<Data::SpinDensity>(i).value());
-       double shift(0.0);
-       if (geometry.hasProperty<Data::NmrShiftRelative>()) {
-          shift = geometry.getAtomicProperty<Data::NmrShiftRelative>(i).value();
+       if (geometry.hasProperty<Data::NmrShift>()) {
+          atoms[i]->setNmrShift(geometry.getAtomicProperty<Data::NmrShift>(i).value());
+       }else if (geometry.hasProperty<Data::NmrShielding>()) {
+          atoms[i]->setNmrShielding(geometry.getAtomicProperty<Data::NmrShielding>(i).value());
        }else {
-          shift = geometry.getAtomicProperty<Data::NmrShiftIsotropic>(i).value();
+          atoms[i]->setNmrShielding(0.0);
        }
-       atoms[i]->setNmrShift(shift);
    }
 
    setAtomicCharges(m_chargeType);
@@ -1437,6 +1459,29 @@ void Molecule::setGeometry(IQmol::Data::Geometry& geometry)
       dipoleAvailable(dipoleFromPointCharges(), estimated);
    }
 }
+
+
+void Molecule::saveToCurrentGeometry()
+{
+   if (!m_currentGeometry) return;
+
+   AtomList atomList(findLayers<Atom>(Children));
+   unsigned nAtoms(atomList.size());
+   if (nAtoms != m_currentGeometry->nAtoms()) {
+      QLOG_DEBUG() << "Invalid Geometry passed to Molecule::saveToCurrentGeometry";
+      return;
+   }
+   qDebug() << "Saving current geometry";
+
+   QList<qglviewer::Vec> coordinates;
+   AtomList::iterator iter;
+   for (iter = atomList.begin(); iter != atomList.end(); ++iter) {
+       coordinates.append( (*iter)->getPosition() );
+   }
+
+   m_currentGeometry->setCoordinates(coordinates);
+}
+
 
 
 void Molecule::reindexAtomsAndBonds()
@@ -1777,6 +1822,7 @@ void Molecule::symmetrize(double tolerance, bool updateCoordinates)
       postCommand(cmd);
       m_modified = true;
       softUpdate();
+      saveToCurrentGeometry();
 
       centerOfNuclearChargeAvailable(centerOfNuclearCharge());
       setAtomicCharges(Data::Type::GasteigerCharge);
@@ -1791,6 +1837,89 @@ void Molecule::symmetrize(double tolerance, bool updateCoordinates)
    double t = time.elapsed() / 1000.0;
    QLOG_TRACE() << "Point group symmetry set to" << pointGroup << " time taken:" << t << "s";
 }
+
+
+void Molecule::translateToCenter(GLObjectList const& selection)
+{
+   Command::MoveObjects* cmd(new Command::MoveObjects(this, "Translate to center", true));
+
+   // the ordering here is important!!
+   Atom* atom;
+   AtomList atomList;
+   GLObjectList::const_iterator iter;
+   for (iter = selection.begin(); iter != selection.end(); ++iter) {
+       if ( (atom = qobject_cast<Atom*>(*iter)) ) atomList.append(atom); 
+   }
+
+   switch (atomList.size()) {
+      case 1:
+         translate(-atomList[0]->getPosition());
+         break;
+      case 2:
+         translate(-atomList[0]->getPosition());
+         alignToAxis(atomList[1]->getPosition());
+         break;
+      case 3:
+         translate(-atomList[0]->getPosition());
+         alignToAxis(atomList[1]->getPosition());
+         rotateIntoPlane(atomList[2]->getPosition());
+         break;
+      default:
+         translate(-centerOfNuclearCharge());
+         break;
+   }
+
+   postCommand(cmd);
+
+   softUpdate();
+   centerOfNuclearChargeAvailable(centerOfNuclearCharge());
+   reindexAtomsAndBonds();
+   saveToCurrentGeometry();
+   m_modified = true;
+}
+
+
+void Molecule::translate(Vec const& displacement)
+{
+   GLObjectList objects(findLayers<GLObject>(Children));
+   GLObjectList::iterator iter;
+   for (iter = objects.begin(); iter != objects.end(); ++iter) {
+       (*iter)->setPosition((*iter)->getPosition()+displacement);
+   }
+   m_frame.setPosition(m_frame.position()+displacement);
+}
+
+
+void Molecule::rotate(Quaternion const& rotation)
+{
+   GLObjectList objects(findLayers<GLObject>(Children));
+   GLObjectList::iterator iter;
+   for (iter = objects.begin(); iter != objects.end(); ++iter) {
+       (*iter)->setPosition(rotation.rotate((*iter)->getPosition()));
+       (*iter)->setOrientation(rotation * (*iter)->getOrientation());
+   }
+   m_frame.setPosition(rotation.rotate(m_frame.position()));
+   m_frame.setOrientation(rotation * m_frame.orientation());
+}
+
+
+// Aligns point along axis (default z-axis)
+void Molecule::alignToAxis(Vec const& point, Vec const axis)
+{
+   rotate(Quaternion(point, axis));
+}
+
+
+// Rotates point into the plane defined by the normal vector
+void Molecule::rotateIntoPlane(Vec const& pt, Vec const& axis, Vec const& normal)
+{
+   Vec pp(pt);
+   pp.projectOnPlane(axis);
+   rotate(Quaternion(pp, cross(normal, axis)));
+}
+
+
+
 
 
 // The following is essentially a wrapper around OBMol::FindChildren
@@ -2063,45 +2192,6 @@ Bond* Molecule::getBond(Atom* A, Atom* B)
 }
 
 
-void Molecule::translateToCenter(GLObjectList const& selection)
-{
-   Command::MoveObjects* cmd(new Command::MoveObjects(this, "Translate to center", true));
-
-   // the ordering here is important!!
-   Atom* atom;
-   AtomList atomList;
-   GLObjectList::const_iterator iter;
-   for (iter = selection.begin(); iter != selection.end(); ++iter) {
-       if ( (atom = qobject_cast<Atom*>(*iter)) ) atomList.append(atom); 
-   }
-
-   switch (atomList.size()) {
-      case 1:
-         translate(-atomList[0]->getPosition());
-         break;
-      case 2:
-         translate(-atomList[0]->getPosition());
-         alignToAxis(atomList[1]->getPosition());
-         break;
-      case 3:
-         translate(-atomList[0]->getPosition());
-         alignToAxis(atomList[1]->getPosition());
-         rotateIntoPlane(atomList[2]->getPosition());
-         break;
-      default:
-         translate(-centerOfNuclearCharge());
-         break;
-   }
-
-   postCommand(cmd);
-
-   softUpdate();
-   centerOfNuclearChargeAvailable(centerOfNuclearCharge());
-   reindexAtomsAndBonds();
-   m_modified = true;
-}
-
-
 Vec Molecule::centerOfNuclearCharge()
 {
    Vec center;
@@ -2118,46 +2208,6 @@ Vec Molecule::centerOfNuclearCharge()
 
    if (atoms.size() > 0) center = center / totalCharge;
    return center;
-}
-
-
-void Molecule::translate(Vec const& displacement)
-{
-   GLObjectList objects(findLayers<GLObject>(Children));
-   GLObjectList::iterator iter;
-   for (iter = objects.begin(); iter != objects.end(); ++iter) {
-       (*iter)->setPosition((*iter)->getPosition()+displacement);
-   }
-   m_frame.setPosition(m_frame.position()+displacement);
-}
-
-
-void Molecule::rotate(Quaternion const& rotation)
-{
-   GLObjectList objects(findLayers<GLObject>(Children));
-   GLObjectList::iterator iter;
-   for (iter = objects.begin(); iter != objects.end(); ++iter) {
-       (*iter)->setPosition(rotation.rotate((*iter)->getPosition()));
-       (*iter)->setOrientation(rotation * (*iter)->getOrientation());
-   }
-   m_frame.setPosition(rotation.rotate(m_frame.position()));
-   m_frame.setOrientation(rotation * m_frame.orientation());
-}
-
-
-// Aligns point along axis (default z-axis)
-void Molecule::alignToAxis(Vec const& point, Vec const axis)
-{
-   rotate(Quaternion(point, axis));
-}
-
-
-// Rotates point into the plane defined by the normal vector
-void Molecule::rotateIntoPlane(Vec const& pt, Vec const& axis, Vec const& normal)
-{
-   Vec pp(pt);
-   pp.projectOnPlane(axis);
-   rotate(Quaternion(pp, cross(normal, axis)));
 }
 
 

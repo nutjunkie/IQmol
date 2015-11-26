@@ -2,7 +2,7 @@
 #define IQMOL_DATA_ATOMICPROPERTY_H
 /*******************************************************************************
 
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -170,15 +170,15 @@ namespace Data {
          Type::ID typeID() const { return Type::ChelpgCharge; }
    };
 
-   class NmrShiftIsotropic : public ScalarProperty {
+   class NmrShielding : public ScalarProperty {
       public:
-         Type::ID typeID() const { return Type::NmrShiftIsotropic; }
+         Type::ID typeID() const { return Type::NmrShielding; }
    };
 
 
-   class NmrShiftRelative : public ScalarProperty {
+   class NmrShift : public ScalarProperty {
       public:
-         Type::ID typeID() const { return Type::NmrShiftRelative; }
+         Type::ID typeID() const { return Type::NmrShift; }
    };
 
 

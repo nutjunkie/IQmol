@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -70,7 +70,12 @@ void Hessian::setData(Matrix const& hessian)
 
 void Hessian::dump() const
 {
-   qDebug() << PrintMatrix(m_hessian);
+   QStringList list(PrintMatrix(m_hessian));
+    
+   QStringList::iterator iter;
+   for (iter = list.begin(); iter != list.end(); ++iter) {
+       qDebug() << *iter;
+   }
 }
 
 } } // end namespace IQmol::Data

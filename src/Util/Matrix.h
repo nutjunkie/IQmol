@@ -2,7 +2,7 @@
 #define IQMOL_UTIL_MATRIX_H
 /*******************************************************************************
 
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -26,7 +26,7 @@
 #include "boost/numeric/ublas/vector.hpp"
 #include "boost/multi_array.hpp"
 
-#include <QString>
+#include <QStringList>
 
 
 namespace IQmol {
@@ -36,7 +36,7 @@ typedef boost::numeric::ublas::vector<double> Vector;
 typedef boost::multi_array<double, 3> Array3D;
 typedef boost::multi_array<double, 4> Array4D;
 
-QString PrintMatrix(Matrix const&, unsigned const columns = 6);
+QStringList PrintMatrix(Matrix const&, unsigned const columns = 6);
 QString PrintVector(Vector const&);
 
 } // end namespace IQmol

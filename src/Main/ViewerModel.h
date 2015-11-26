@@ -2,7 +2,7 @@
 #define IQMOL_VIEWERMODEL_H
 /*******************************************************************************
 
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -85,6 +85,7 @@ namespace IQmol {
          void symmetrize() { symmetrize(m_symmetryTolerance); }
          void symmetrize(double const);
          void determineSymmetry();
+         void saveToCurrentGeometry();
          void adjustSymmetryTolerance();
          void toggleAutoDetectSymmetry();
 

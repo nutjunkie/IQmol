@@ -2,7 +2,7 @@
 #define IQMOL_DATA_ELECTRONICTRANSITION_H
 /*******************************************************************************
 
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -45,7 +45,7 @@ namespace Data {
          ElectronicTransition(double const energy = 0.0, double const strength = 0.0,
             qglviewer::Vec const transitionMoment = qglviewer::Vec(), 
             double spinSquared = 0.0) : m_energy(energy), m_strength(strength), 
-            m_transitionMoment(transitionMoment), m_spinSquared(spinSquared) { }
+            m_spinSquared(spinSquared), m_transitionMoment(transitionMoment) { }
          
          double energy()   const { return m_energy; }
          double strength() const { return m_strength; }

@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -24,6 +24,7 @@
 #include "Data.h"
 #include "Bank.h"
 #include "Mesh.h"
+#include "NmrData.h"
 #include "PointCharge.h"
 #include "ExcitedStates.h"
 
@@ -45,6 +46,7 @@
 #include "FrequenciesLayer.h"
 #include "ExcitedStatesLayer.h"
 #include "MolecularOrbitalsLayer.h"
+#include "NmrLayer.h"
 #include "QsLog.h"
 #include "openbabel/mol.h"
 
@@ -79,8 +81,7 @@ Layer::List Factory::toLayers(Data::Base& data)
 {
    Layer::List layers;
 
-   qDebug() << "Layer::Factory converting" << Data::Type::toString(data.typeID());
-   //data.dump();
+   //qDebug() << "Layer::Factory converting" << Data::Type::toString(data.typeID());
 
    try {
 
@@ -158,22 +159,29 @@ Layer::List Factory::toLayers(Data::Base& data)
          } break;
 
          case Data::Type::Mesh: {
-            Data::Mesh& mesh(dynamic_cast<Data::Mesh&>(data));
-            Data::Surface surface(mesh);
+            Data::Mesh&  meshData(dynamic_cast<Data::Mesh&>(data));
+            Data::Surface surface(meshData);
             Layer::Surface* surfaceLayer(new Surface(surface));
             surfaceLayer->setCheckState(Qt::Checked);
             layers.append(surfaceLayer);
          } break;
 
          case Data::Type::Surface: {
-            Data::Surface& surface(dynamic_cast<Data::Surface&>(data));
-            Layer::Surface* surfaceLayer(new Surface(surface));
-            surfaceLayer->setCheckState(surface.isVisible() ? Qt::Checked : Qt::Unchecked);
+            Data::Surface&  surfaceData(dynamic_cast<Data::Surface&>(data));
+            Layer::Surface* surfaceLayer(new Surface(surfaceData));
+            surfaceLayer->setCheckState(surfaceData.isVisible() ? Qt::Checked : Qt::Unchecked);
             layers.append(surfaceLayer);
          } break;
 
+         case Data::Type::Nmr: {
+            Data::Nmr&  nmrData(dynamic_cast<Data::Nmr&>(data));
+            Layer::Nmr* nmrLayer(new Nmr(nmrData));
+            layers.append(nmrLayer);
+         } break;
+
          default:
-            QLOG_WARN() << "Conversion from unimplemented data type in Layer::Factory";
+            QLOG_WARN() << "Unimplemented data type in Layer::Factory"
+                        <<  Data::Type::toString(data.typeID());
             break;
       }
 

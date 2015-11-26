@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -334,7 +334,6 @@ void ViewerModel::copySelectionToClipboard()
        coordinates += (*mol)->coordinatesAsString(selectedOnly);
    }
 
-   qDebug() << "Coordinates copied to ClipBoard:";
    qDebug() << coordinates;
    QApplication::clipboard()->setText(coordinates);
 }
@@ -441,17 +440,6 @@ void ViewerModel::updateVisibleObjects()
       Layer::Nested);
 
    // Make sure the selection only contains visible objects;
-/*
-   GLObjectList::iterator object;
-   for (object = m_selectedObjects.begin(); object != m_selectedObjects.end(); ++object) {
-       if (! m_visibleObjects.contains(*object)) {
-          m_selectedObjects.removeAll(*object);
-          if (*object) (*object)->deselect();
-       }
-   }
-*/
-
-
    GLObjectList::iterator object(m_selectedObjects.begin());
    while (object != m_selectedObjects.end()) {
        if ( m_visibleObjects.contains(*object)) {
@@ -472,7 +460,7 @@ void ViewerModel::updateVisibleObjects()
 
 // --------------- Selection Routines ---------------
 
-// The is the main selection routine which should only receive selection
+// This is the main selection routine which should only receive selection
 // signals from m_viewerSelectionModel.
 void ViewerModel::selectionChanged(QItemSelection const& selected, 
    QItemSelection const& deselected)
@@ -517,8 +505,13 @@ void ViewerModel::selectionChanged(QItemSelection const& selected,
    for (iter = list.begin(); iter != list.end(); ++iter) {
        base = QVariantPointer<Layer::Base>::toPointer((*iter).data(Qt::UserRole+1));
        if ( (glObject = qobject_cast<Layer::GLObject*>(base)) ) {
-          glObject->select();
-          m_selectedObjects.append(glObject);
+
+          MoleculeList 
+             parents(glObject->findLayers<Layer::Molecule>(Layer::Parents | Layer::Visible));
+          if (parents.size() > 0) {
+              glObject->select();
+              m_selectedObjects.append(glObject);
+          }
        }else if ( (mode = qobject_cast<Layer::Mode*>(base)) ) {
           QStandardItem* parent(mode->QStandardItem::parent());
           Layer::Frequencies* frequencies;
@@ -732,13 +725,20 @@ void ViewerModel::translateToCenter()
 
 void ViewerModel::symmetrize(double const tolerance)
 {
-   forAllMolecules(boost::bind(&Layer::Molecule::symmetrize, _1, tolerance, true));
+   bool updateCoordinates(true);
+   forAllMolecules(boost::bind(&Layer::Molecule::symmetrize, _1, tolerance, updateCoordinates));
 }
 
 
 void ViewerModel::toggleAutoDetectSymmetry()
 {
    Layer::Molecule::toggleAutoDetectSymmetry();
+}
+
+
+void ViewerModel::saveToCurrentGeometry()
+{
+   forAllMolecules(boost::bind(&Layer::Molecule::saveToCurrentGeometry, _1));
 }
 
 
@@ -778,7 +778,8 @@ void ViewerModel::ungroupSelection()
 
 void ViewerModel::forAllMolecules(boost::function<void(Layer::Molecule&)> function)
 {
-   MoleculeList molecules(moleculeList());
+   bool visibleOnly(true);
+   MoleculeList molecules(moleculeList(visibleOnly));
    MoleculeList::iterator iter;
    for (iter = molecules.begin(); iter != molecules.end(); ++iter) {
        function(*(*iter));

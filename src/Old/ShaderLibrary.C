@@ -1,6 +1,6 @@
 /*******************************************************************************
          
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
       
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -52,8 +52,6 @@ ShaderLibrary::ShaderLibrary(QGLContext* context) : m_normalBuffer(0), m_filterB
    loadPreferences();
    setFilterVariables(QVariantMap()); 
 }
-
-
 
 
 void ShaderLibrary::init()
@@ -175,7 +173,6 @@ void ShaderLibrary::generateFilters() { }
 void ShaderLibrary::bindTextures(QString const& shader) { }
 void ShaderLibrary::releaseTextures() { }
 void ShaderLibrary::clearFrameBuffers() { }
-
 void ShaderLibrary::resizeScreenBuffers(QSize const&, double*) { }
 
 bool ShaderLibrary::setUniformVariables(QString const&, QVariantMap const& map) 
@@ -190,7 +187,6 @@ QVariantMap ShaderLibrary::uniformUserVariableList(QString const&)
 {
    return QVariantMap();
 }
-
 
 #else  // IQMOL_SHADERS
 

@@ -1,6 +1,6 @@
 /*******************************************************************************
        
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
            
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -27,7 +27,6 @@
 #include "gl2ps.h"
 #include <QImageWriter>
 #include <QFileDialog>
-#include <QProcess>
 
 	#include <QDebug>
 
@@ -38,7 +37,7 @@ namespace IQmol {
 
 
 Snapshot::Snapshot(Viewer* viewer, int const flags) : m_viewer(viewer), m_flags(flags), 
-   m_counter(0)
+   m_counter(0), m_movieProcess(0)
 {
    if (m_flags & Movie) m_flags = m_flags | AutoIncrement;
 }
@@ -222,7 +221,10 @@ QPixmap::grabWindow(widget->winId());
 void Snapshot::makeMovie()
 {
 #ifdef Q_OS_MAC
-qDebug() << "Making movies";
+   if (m_movieProcess) {
+      QMsgBox::warning(0, "IQmol", "Movie making already in progress, please wait");
+      return;
+   }
 
    QDir dir(QApplication::applicationDirPath());
    dir.cdUp();
@@ -236,7 +238,7 @@ qDebug() << "Making movies";
    QFile movie(m_fileBaseName + ".mov");
    if (movie.exists()) {
       if (!movie.remove()) {
-         QMsgBox::warning(0, "IQmol", "Could not remove existing movie file" + movie.fileName());
+         QMsgBox::warning(0, "IQmol", "Could not remove existing file " + movie.fileName());
          return;
       }
    }
@@ -249,23 +251,91 @@ qDebug() << "Making movies";
        if (info.exists()) args << m_fileNames[i];
    }
 
-   qDebug() << "Starting QProcess" << script.filePath() << "with args:";
-   qDebug() << args;
+   m_movieProcess = new QProcess;
 
-   QProcess qprocess;
-   qprocess.start(script.filePath(), args);
-   if (!qprocess.waitForFinished()) {
-      qprocess.kill();
-      QMsgBox::warning(0, "IQmol", "Failed to create movie");
-   }
+   connect(m_movieProcess, SIGNAL(error(QProcess::ProcessError)), 
+      this, SLOT(movieError(QProcess::ProcessError)));
 
-   for (int i = 0; i < m_fileNames.size(); ++i) {
-       QFile file(m_fileNames[i]);
-       file.remove();
-   }
+   connect(m_movieProcess, SIGNAL(finished(int, QProcess::ExitStatus)), 
+      this, SLOT(movieFinished(int, QProcess::ExitStatus)));
+
+   qDebug() << "Start movie making";
+   m_movieProcess->start(script.filePath(), args);
+
 #endif
    return;
 }
+
+
+void Snapshot::movieFinished(int, QProcess::ExitStatus exitStatus)
+{
+   qDebug() << "movieFinished(int exitStatus, QProcess::ExitStatus) called";
+   
+   QString msg;
+   switch (exitStatus) {
+      case QProcess::NormalExit:
+         msg = "Movie making finshed.  Remove image files?";
+         break;
+      case QProcess::CrashExit:
+         msg = "Failed to make movie.  Remove image files?";
+         break;
+   }
+   
+   removeImageFiles(msg);
+
+   if (m_movieProcess) delete m_movieProcess;
+   m_movieProcess = 0;
+   movieFinished();
+}
+
+
+void Snapshot::movieError(QProcess::ProcessError error)
+{
+   qDebug() << "movieError(QProcess::ProcessError error) called";
+   QString msg("Failed to create movie:\n");
+   switch (error) {
+
+      case QProcess::FailedToStart: 
+         msg += "Process failed to start";  
+         break;
+
+      case QProcess::Crashed:       
+         msg += "Process crashed";          
+         break;
+
+      case QProcess::Timedout:      
+         msg += "Process timed out";
+         break;
+
+      case QProcess::WriteError:
+      case QProcess::ReadError:
+         msg += "I/O error";          
+         break;
+
+      default:
+         msg += "Unknown error";
+   }
+
+   QMsgBox::warning(0, "IQmol", msg);
+
+   if (m_movieProcess) m_movieProcess->deleteLater();
+   movieFinished();
+}
+
+
+void Snapshot::removeImageFiles(QString const& msg)
+{
+   if (QMsgBox::question(0, "IQmol", msg,
+       QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+       for (int i = 0; i < m_fileNames.size(); ++i) {
+           QFile file(m_fileNames[i]);
+           if (file.exists()) file.remove();
+       }
+   }
+   m_fileNames.clear();
+}
+
+
 
 
 /*

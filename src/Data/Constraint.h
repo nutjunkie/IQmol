@@ -2,7 +2,7 @@
 #define IQMOL_DATA_CONSTRAINT_H
 /*******************************************************************************
 
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -35,13 +35,16 @@ namespace Data {
       public:
          Type::ID typeID() const { return Type::Constraint; }
 
-         Constraint() { }
+         Constraint() : m_value(0.0) { }
 
          virtual ~Constraint() { }
 
          QList<unsigned> const& atomIndices() const { return m_atomIndices; }
 
+         void setValue(double const value) { m_value = value; }
          double value() const { return m_value; }
+
+         virtual void dump();
 
          virtual void serialize(OutputArchive& ar, unsigned const /* version = 0 */) 
          {

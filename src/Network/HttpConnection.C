@@ -1,6 +1,6 @@
 /*******************************************************************************
          
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
       
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -34,15 +34,14 @@
 namespace IQmol {
 namespace Network {
 
-HttpConnection::HttpConnection(QString const& hostname, int const port) :
-   Connection(hostname, port), m_networkAccessManager(0), m_secure(false)
+HttpConnection::HttpConnection(QString const& hostname, int const port, bool const https) :
+   Connection(hostname, port), m_networkAccessManager(0), m_secure(https)
 {
 }
 
 
 void HttpConnection::open()
 {
-   // If m_secure
    m_networkAccessManager = new QNetworkAccessManager(this);
    if (!m_networkAccessManager) throw Exception("HTTP open connection failed");
    m_status = Opened;

@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -490,26 +490,26 @@ void ExcitedStates::moSelectionChanged(bool tf)
       graph->setPen(m_selectedPen);
    }else {
       graph->setPen(m_pen);
-      //m_configurator.energyLabel->setText("");
+      m_configurator.orbitalLabel->setText("");
       return;
    }
 
-   // Need to add label
-
-/*
    bool ok;
    unsigned orb(graph->name().toUInt(&ok));
-   unsigned nOrbs(m_molecularOrbitals.nOrbitals());
+
+   Data::OrbitalSymmetries const& orbitals(m_excitedStates.data().orbitalSymmetries());
+
+   unsigned nOrbs(orbitals.nOrbitals());
    if (!ok) return;
 
    double energy(0.0);
    QString label;
    if (orb < nOrbs) {  //alpha
-      energy = m_molecularOrbitals.alphaOrbitalEnergy(orb);
+      energy = orbitals.energy(Data::Alpha, orb);
       label  = "Alpha orbital ";
    }else {  // beta
       orb -= nOrbs;
-      energy = m_molecularOrbitals.betaOrbitalEnergy(orb);
+      energy = orbitals.energy(Data::Beta, orb);
       label  = "Beta orbital ";
    }
 
@@ -517,8 +517,7 @@ void ExcitedStates::moSelectionChanged(bool tf)
    label += ": ";
    label += QString::number(energy, 'f', 3);
    label += " Eh";
-   m_configurator.energyLabel->setText(label);
-*/
+   m_configurator.orbitalLabel->setText(label);
 }
 
 

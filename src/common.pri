@@ -3,7 +3,9 @@
 QT     += xml opengl gui network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
-QMAKE_CXXFLAGS += -O2 -g -ggdb
+QMAKE_CXXFLAGS += -O2 -g -ggdb 
+QMAKE_CXXFLAGS_WARN_ON = -Wall -Wno-unknown-pragmas -Wno-c++11-extensions 
+QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-function
 
 # Set the $DEV environment variable to the top directory used to compile all
 # the packages.  To simplify distribution, we use static libraries wherever
@@ -34,18 +36,11 @@ macx {
    INCLUDEPATH += /usr/local/include/openbabel-2.0
    LIBS        += -L/usr/local/lib -lopenbabel
 
-   # SSH2
-   #LIBSSH2      = $(DEV)/libssh2-1.6.0
-   LIBSSH2      = $(DEV)/libssh2-1.4.3
-   INCLUDEPATH += $${LIBSSH2}/include
-   LIBS        += $${LIBSSH2}/src/.libs/libssh2.a
-
-   # libssl/libcrypto
-   LIBSSL       = $(DEV)/openssl-1.0.1p
-   #INCLUDEPATH += $${LIBSSL}/include
-   #LIBS        += $${LIBSSL}/libssl.a 
-   LIBS        += -lssl
-   LIBS        += $${LIBSSL}/libcrypto.a
+   # SSH2 / libssl / libcrypto
+   INCLUDEPATH += $(DEV)/extlib/include
+   LIBS        += $(DEV)/extlib/lib//libssh2.a
+   LIBS        += $(DEV)/extlib/lib/libssl.a 
+   LIBS        += $(DEV)/extlib/lib/libcrypto.a
 
    # gfortran
    LIBS += /usr/local/gfortran/lib/libgfortran.a

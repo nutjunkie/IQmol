@@ -2,7 +2,7 @@
 #define IQMOL_NETWORK_HTTPCONNECTION_H
 /*******************************************************************************
          
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
       
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -42,11 +42,11 @@ namespace Network {
       friend class HttpPost;
 
       public:
-         HttpConnection(QString const& hostAddress, int const port = 80);
+         HttpConnection(QString const& hostAddress, int const port = 80, 
+            bool const https = false);
          ~HttpConnection() { close(); }
 
-         void setSecure(bool secure) { m_secure = secure; }
-         bool secure() const { return m_secure; }
+         bool isSecure() const { return m_secure; }
 
          void open();
          void close();

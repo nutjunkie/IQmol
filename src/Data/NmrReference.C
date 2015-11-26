@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -30,9 +30,21 @@ namespace Data {
 template<> const Type::ID NmrReferenceList::TypeID = Type::NmrReferenceList;
 
 
+void NmrReference::addElement(QString const& atom, double const shift, double const offset)
+{
+   m_shifts[atom] = shift - offset;
+}
+
+
+double NmrReference::shift(QString const& isotope) const
+{
+   return contains(isotope) ? m_shifts.value(isotope) : 0.0;
+}
+
+
 void NmrReference::dump() const 
 {
-   qDebug() << "Method: " << m_method;
+   qDebug() << "System: " << m_system << "Theory:" << m_method;
    QMap<QString, double>::const_iterator iter;
    for (iter = m_shifts.begin(); iter != m_shifts.end(); ++iter) {
        qDebug() << "  " << iter.key() << "  " << iter.value();

@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -64,8 +64,8 @@ QString toString(ID const id)
       case AtomicSymbol:             s = "Data::AtomicSymbol";              break;
       case AtomicNumber:             s = "Data::AtomicNumber";              break;
       case AtomColor:                s = "Data::AtomColor";                 break;
-      case NmrShiftIsotropic:        s = "Data::NmrShiftIsotropic";         break;
-      case NmrShiftRelative:         s = "Data::NmrShiftRelative";          break;
+      case NmrShielding:            s = "Data::NmrShielding";               break;
+      case NmrShift:                 s = "Data::NmrShift";                  break;
       case Mass:                     s = "Data::Mass";                      break;
       case AtomicCharge:             s = "Data::AtomicCharge";              break;
       case MullikenCharge:           s = "Data::MullikenCharge";            break;
@@ -104,6 +104,7 @@ QString toString(ID const id)
       case ExcitedStates:            s = "Data::ExcitedStates";             break;
       case NmrReference:             s = "Data::NmrReference";              break;
       case NmrReferenceList:         s = "Data::NmrReferenceList";          break;
+      case Nmr:                      s = "Data::Nmr";                       break;
 
       case OrbitalSymmetries:        s = "Data::OrbitalSymmetries";         break;
       case YamlNode:                 s = "Data::YamlNode";                  break;

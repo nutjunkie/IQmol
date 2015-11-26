@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-  Copyright (C) 2011-2013 Andrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
 
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -23,6 +23,7 @@
 #include "Geometry.h"
 #include "AtomicProperty.h"
 #include "Numerical.h"
+#include "QsLog.h"
 #include <QDebug>
 #include "openbabel/mol.h"
 
@@ -41,6 +42,7 @@ Geometry::Geometry(Geometry const& that) : Base()
    }
    m_charge = that.m_charge;
    m_multiplicity = that.m_multiplicity;
+   m_properties = that.m_properties;
 }
 
 
@@ -243,11 +245,26 @@ void Geometry::scaleCoordinates(double const scale)
 }
 
 
+void Geometry::setCoordinates(QList<qglviewer::Vec> const& newCoordinates)
+{
+   if (newCoordinates.size() == m_coordinates.size()) {
+   qglviewer::Vec vec(m_coordinates.first());
+      m_coordinates = newCoordinates;
+      vec  = m_coordinates.first();
+   }else {
+      QLOG_WARN() << "Coordinate mismatch in Geometry::setCoordinates";
+   }
+}
+
+
+
+/*
 void Geometry::translate(qglviewer::Vec const& shift)
 {
    for (int i = 0; i < m_coordinates.size(); ++i) {
        m_coordinates[i] += shift;
    }
 }
+*/
 
 } } // end namespace IQmol::Data
