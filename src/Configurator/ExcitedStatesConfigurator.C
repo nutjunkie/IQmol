@@ -98,11 +98,15 @@ void ExcitedStates::load(Data::ExcitedStates const& states)
 
        m_rawData.append(qMakePair(energy, strength));
 
-       item = new QTableWidgetItem( QString::number(energy, 'f', 3));
+       QString text(QString::number(energy, 'f', 3));
+       item = new QTableWidgetItem( text + "     ");
+       item->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
        item->setData(Qt::UserRole, row);
        table->setItem(row, 0, item);
 
-       item = new QTableWidgetItem( QString::number(strength, 'f', 3));
+       text = QString::number(strength, 'f', 3);
+       item = new QTableWidgetItem( text + "     ");
+       item->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
        item->setData(Qt::UserRole, row);
        table->setItem(row, 1, item);
        ++row;
