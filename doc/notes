@@ -354,6 +354,7 @@ IQview
   - Can read in obj files, but normals and decimation cause crashes.
   - Orbital explorer?
   - Create a viewer purely on glObjects objects?
+  - tilings, periodic systems
 
 
 

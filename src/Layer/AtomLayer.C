@@ -26,6 +26,7 @@
 #include <openbabel/mol.h>
 #include <openbabel/data.h>
 #include <QColor>
+#include <QMenu>
 #include <vector>
 #include <string>
 #define _USE_MATH_DEFINES
@@ -97,6 +98,34 @@ Atom::Atom(int Z) : Primitive("Atom"), m_charge(0.0), m_spin(0.0),
    if (!s_vibrationColorInitialized) {
       setVibrationVectorColor(Preferences::VibrationVectorColor());
    }
+
+   connect(newAction("Set Valency"), SIGNAL(triggered()),
+     this, SLOT(setValency()));
+
+   connect(newAction("Set Valency"), SIGNAL(triggered()),
+     this, SLOT(setValency()));
+
+    QMenu* menu(new QMenu);
+    QActionGroup* valencies(new QActionGroup(menu));
+    m_valencyMenu = newAction("Set Valency");
+    m_valencyMenu->setMenu(menu);
+
+    QAction* action;
+    for (int i = 1; i <= 6; ++i) {
+        action = menu->addAction(QString::number(i));
+        action->setCheckable(true);
+        action->setChecked(i == m_valency);
+        action->setData(i);
+        connect(action, SIGNAL(triggered()), this, SLOT(updateValency()));
+        valencies->addAction(action);
+    }
+}
+
+
+void Atom::updateValency()
+{
+   QAction* action(qobject_cast<QAction*>(sender()));
+   if (action) m_valency = action->data().toInt();
 }
 
  
@@ -106,6 +135,7 @@ void Atom::setAtomicNumber(unsigned int const Z)
    m_vdwRadius = OpenBabel::etab.GetVdwRad(Z);
    m_mass      = OpenBabel::etab.GetMass(Z);
    m_symbol    = QString(OpenBabel::etab.GetSymbol(Z));
+   m_valency   = OpenBabel::etab.GetMaxBonds(Z);
    setText(m_symbol);
 
    std::vector<double> rgb(OpenBabel::etab.GetRGB(Z));
