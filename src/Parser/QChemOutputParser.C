@@ -39,9 +39,11 @@
 #include "Constants.h"
 #include "RemSectionData.h"
 #include "ExcitedStates.h"
-#include "Spin.h"
+#include "Numerical.h"
 #include "NmrData.h"
 #include "Matrix.h"
+#include "Spin.h"
+
 #include "QsLog.h"
 #include <QRegExp>
 #include <QFile>
@@ -262,6 +264,8 @@ bool QChemOutput::parse(TextStream& textStream)
             bool ok;
             m_nAlpha = tokens[2].toUInt(&ok);
             m_nBeta  = tokens[5].toUInt(&ok);
+            
+            currentGeometry->setMultiplicity(m_nAlpha-m_nBeta + 1);
          }
 
       }else if (line.contains("Total energy in the final basis set")) {
@@ -1182,7 +1186,15 @@ void QChemOutput::readCharges(TextStream& textStream, Data::Geometry& geometry,
       m_errors.append("Unknown charge type");
    }
 
-   if (!allOk) m_errors.append("Problem setting atomic charges");
+   if (allOk) {
+      double q(0.0);
+      for (int i = 0; i < charges.size(); ++i) q += charges[i];
+      geometry.setCharge(Util::round(q));
+qDebug() << "Setting charge to:" << Util::round(q);
+      
+   }else {
+      m_errors.append("Problem setting atomic charges");
+   }
 }
 
 
