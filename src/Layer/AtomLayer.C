@@ -92,41 +92,53 @@ void Atom::setVibrationVectorColor(QColor const& color)
 
 
 Atom::Atom(int Z) : Primitive("Atom"), m_charge(0.0), m_spin(0.0),
-   m_smallerHydrogens(true), m_haveNmrShift(false), m_reorderIndex(0) 
+   m_smallerHydrogens(true), m_haveNmrShift(false), m_reorderIndex(0), 
+   m_hybridization(0)
 {
    setAtomicNumber(Z);
    if (!s_vibrationColorInitialized) {
       setVibrationVectorColor(Preferences::VibrationVectorColor());
    }
 
-   connect(newAction("Set Valency"), SIGNAL(triggered()),
-     this, SLOT(setValency()));
+   QActionGroup* hybrids(new QActionGroup(this));
+   QStringList labels;
+   labels << "sp" << "sp2" << "sp3" << "Square Planar" 
+           << "Trigonal Bipyramid" << "Octahedral";
 
-   connect(newAction("Set Valency"), SIGNAL(triggered()),
-     this, SLOT(setValency()));
-
-    QMenu* menu(new QMenu);
-    QActionGroup* valencies(new QActionGroup(menu));
-    m_valencyMenu = newAction("Set Valency");
-    m_valencyMenu->setMenu(menu);
-
-    QAction* action;
-    for (int i = 1; i <= 6; ++i) {
-        action = menu->addAction(QString::number(i));
-        action->setCheckable(true);
-        action->setChecked(i == m_valency);
-        action->setData(i);
-        connect(action, SIGNAL(triggered()), this, SLOT(updateValency()));
-        valencies->addAction(action);
-    }
+   for (int i = 0; i < labels.size() ; ++i) {
+       QAction* action(newAction(labels[i]));
+       action->setData(i+1);
+       action->setCheckable(true);
+       action->setChecked(false);
+       hybrids->addAction(action);
+       connect(action, SIGNAL(triggered()), this, SLOT(updateHybridization()));
+   }
 }
 
 
-void Atom::updateValency()
+void Atom::updateHybridization()
 {
+   qDebug() << "Hybridization update called";
    QAction* action(qobject_cast<QAction*>(sender()));
-   if (action) m_valency = action->data().toInt();
+   if (action) {
+      m_hybridization = action->data().toInt();
+      switch (m_hybridization) {
+         case 6:  m_valency = 6;  break;
+         case 5:  m_valency = 5;  break;
+         case 4:  m_valency = 4;  break;
+         case 3:  m_valency = 4;  break;
+         case 2:  m_valency = 3;  break;
+         case 1:  m_valency = 2;  break;
+
+         default: 
+            m_hybridization = 0;  
+            break;
+      }
+   }
+
+   qDebug() << "Hybridization/valency updated" << m_hybridization << m_valency;
 }
+
 
  
 void Atom::setAtomicNumber(unsigned int const Z) 

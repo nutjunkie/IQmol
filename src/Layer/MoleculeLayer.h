@@ -254,6 +254,8 @@ namespace IQmol {
             void popAnimators(AnimatorList const&);
             void removeMolecule(Layer::Molecule*);
    
+            void multiplicityAvailable(unsigned);
+            void chargeAvailable(int);
             void pointGroupAvailable(QString const&);
             void energyAvailable(double const, Info::EnergyUnit);
             void dipoleAvailable(qglviewer::Vec const& dipole, bool const estimated);
