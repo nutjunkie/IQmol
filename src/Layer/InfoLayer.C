@@ -55,6 +55,15 @@ void Info::setMolecule(Molecule* molecule)
       connect(m_molecule, SIGNAL(dipoleAvailable(qglviewer::Vec const&, bool const)), 
          this, SLOT(setDipole(qglviewer::Vec const&, bool const)));
 
+      connect(m_molecule, SIGNAL(chargeAvailable(int)), 
+         this, SLOT(setCharge(int)));
+
+      connect(m_molecule, SIGNAL(multiplicityAvailable(unsigned)), 
+         this, SLOT(setMultiplicity(unsigned)));
+
+      connect(m_molecule, SIGNAL(dipoleAvailable(qglviewer::Vec const&, bool const)), 
+         this, SLOT(setDipole(qglviewer::Vec const&, bool const)));
+
       m_dipoleLayer.setMolecule(m_molecule);
    }
 }
