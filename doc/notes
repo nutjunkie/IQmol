@@ -5,6 +5,7 @@ TODO LIST:
     - remove plugin directory
     - remove dynamic library in distribution
     - formats need checking individually, cml, for example, does not work
+      cml needs the libxml 
 
  - Samples for the Parser/test directory:
     - iqmol archive
@@ -590,6 +591,9 @@ data files still need to be available in the share directory
 compiler was set to:
 CMAKE_CXX_COMPILER:FILEPATH=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.x    ctoolchain/usr/bin/c++
 
+
+Setting things up under MinGW/MSYS:
+http://gaia-gis.it/gaia-sins/mingw_how_to.html
 
 
 

@@ -20,52 +20,76 @@ libraries.  The compilation of the code should be relatively straightforward.
  o Cmake will be required to compile some of the libraries, the installer can
    be obtained from http://www.cmake.org/download/
 
- o Make sure the zlib and libxml2 MinGW libraries have been installed.
+ o The MinGW/MSYS environment needs to be set up. See 
 
+           http://www.mingw.org/wiki/Getting_Started
 
- o OpenSSL:
-   - Download: https://www.openssl.org/source  (version 1.0.1p)
-   - Compile:  all in a cygwin prompt
+   for details on how to download the installer and install the developement
+   environemnt.
 
-      ./Configure --prefix=../extlibs2 no-idea no-mdc2 no-rc5 mingw
-      make depend
-      make
-
+ o I followed the instructions on http://gaia-gis.it/gaia-sins/mingw_how_to.html
+   to install libz, libxml2 and openssl.  The relevant libraries should be installed
+   in C:\MinGW\msys\1.0\local\lib
 
  o LibSSH2:
    - Download: http://www.libssh2.org  (version 1.6.0)
-   - Compile: 
+   - Compile (inside C:\MinGW\msys\1.0\bin\bash.exe):
 
-      ./configure --with-openssl --with-libssl-prefix=../openssl-1.0.1g --without-libgcrypt --with-libz
+      ./configure --with-openssl --with-libssl-prefix=/usr/local/
+         --without-libgcrypt --with-libz --with-libz-prefix=/usr/local
 
+      make 
+      make install
 
- o Boost:
-   - Download: http://sourceforge.net/projects/boost/files/boost/1.56.0/
-     Later versions of boost seem to have removed the load_collection function which
-     is part of the serialization routines.
-   - Compile: 
+   - Note that PATH was set set as:
 
-
- o OpenMesh:
-   - Download: http://www.openmesh.org/download/ 
-   - Compile:
-    
- o QGLViewer:
-   - Download: http://libqglviewer.com/download.html
-   - Complie:
+       export PATH=/c/Program\ Files/CMake/bin:/c/MingGW/bin:/usr/bin
 
 
  o OpenBabel:
    - Download: http://openbabel.org/wiki/Get_Open_Babel (2.3.1)
 
-   - Compilation:  The OpenBabel libraries are difficult to compile using
-     MinGW.  I was unable to get the plugins working and so had to compile
-	 these directly into the executable.  The IQmol.pro file takes care of the
-	 inclusion of the required files.   
+   - I compiled the libraries within the bash.exe shell, but Cmake complained
+     that sh.exe was on the path.  Simply resetting the PATH before running
+     the cmake command seemed to work:
 
-       cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=/where/to/install -DZLIB_INCLUDE_DIR=/include -DZLIB_LIBRARY=/lib/libz.a -DLIBXML2_INCLUDE_DIR=/include -DLIBXML2_LIBRARIES=/lib/libxml2.a
-       mingw32-make
+       export PATH=/c/Program\ Files/CMake/bin:/c/MinGW/bin
 
+       cmake ../ -G "MinGW Makefiles" 
+        -DZLIB_INCLUDE_DIR=/usr/local/include -DZLIB_LIBRARY=/usr/local/lib/libz.a 
+        -DLIBXML2_INCLUDE_DIR=/usr/local/include -DLIBXML2_LIBRARIES=/usr/local/lib/libxml2.a
+        -DBUILD_SHARED=OFF
+
+     this presupposes the libxml2 and libz libraries are in C:/MinGW/msys/1.0/local/lib 
+     which is mapped to /usr/local/lib, go figure.  Compile with mingw32-make:
+     
+        mingw32-make
+
+ o QGLViewer:  
+   - Download: http://libqglviewer.com/download.html
+   - Compile (inside C:\MinGW\msys\1.0\bin\bash.exe):
+
+      mkdir build && cd build
+      cmake ../ -G "MinGW Makefiles"
+      mingw32-make
+
+   - Note that /usr/bin needs to be removed from PATH as above
+
+
+ o OpenMesh:
+   - Download: http://www.openmesh.org/download/ 
+   - Complie (within the Qt command prompt):
+   - Compile:
+    
+ o Boost:
+   - Download: http://sourceforge.net/projects/boost/files/boost/1.56.0/
+     Later versions of boost seem to have removed the load_collection function which
+     is part of the serialization routines and there are reports of problems with the
+     build for MinGW
+   - Compile (inside the Qt cmd prompt): 
+
+       bootstrap.bat mingw
+       .\b2 toolset=gcc 
 
 
 
