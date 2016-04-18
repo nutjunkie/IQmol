@@ -44,6 +44,8 @@ double GridSize::stepSize(unsigned const quality)
       case 5:   stepSize = 0.099213;  break;
       case 6:   stepSize = 0.062500;  break;
       case 7:   stepSize = 0.039373;  break;
+      case 8:   stepSize = 0.024803;  break;
+      case 9:   stepSize = 0.015625;  break;
       default:  stepSize = 0.250000;  break;
    }
    return stepSize;
