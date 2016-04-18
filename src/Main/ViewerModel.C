@@ -64,13 +64,13 @@ ViewerModel::ViewerModel(QWidget* parent) : QStandardItemModel(0, 1, parent),
    labels << "Model View";
    setHorizontalHeaderLabels(labels);
    invisibleRootItem()->setCheckState(Qt::Checked);
-
    m_global.setFlags(Qt::ItemIsEnabled);
    appendRow(&m_global);
 
    m_global.appendRow(&m_background);
    m_global.appendRow(&m_axes);
    m_global.appendRow(&m_mesh);
+   m_global.appendRow(&m_clippingPlane);
 
    connect(&m_background, SIGNAL(updated()), this, SIGNAL(updated()));
    connect(&m_background, SIGNAL(foregroundColorChanged(QColor const&)), 
@@ -83,6 +83,9 @@ ViewerModel::ViewerModel(QWidget* parent) : QStandardItemModel(0, 1, parent),
 
    connect(this, SIGNAL(sceneRadiusChanged(double const)), 
       &m_mesh, SLOT(setSceneRadius(double const)));
+
+   connect(this, SIGNAL(sceneRadiusChanged(double const)), 
+      &m_clippingPlane, SLOT(setSceneRadius(double const)));
 
    connect(this, SIGNAL(itemChanged(QStandardItem*)), 
       this, SLOT(checkItemChanged(QStandardItem*)));
@@ -450,7 +453,6 @@ void ViewerModel::updateVisibleObjects()
           object = m_selectedObjects.erase(object);
        }
    }
-      
 
    // Sort our objects based on opacity, high to low
    qSort(m_visibleObjects.begin(), m_visibleObjects.end(), Layer::GLObject::AlphaSort);
@@ -508,10 +510,10 @@ void ViewerModel::selectionChanged(QItemSelection const& selected,
 
           MoleculeList 
              parents(glObject->findLayers<Layer::Molecule>(Layer::Parents | Layer::Visible));
-          if (parents.size() > 0) {
+//        if (parents.size() > 0) {
               glObject->select();
               m_selectedObjects.append(glObject);
-          }
+//          }
        }else if ( (mode = qobject_cast<Layer::Mode*>(base)) ) {
           QStandardItem* parent(mode->QStandardItem::parent());
           Layer::Frequencies* frequencies;
@@ -878,6 +880,18 @@ void ViewerModel::displayGlobals()
    m_background.draw();
    m_axes.draw();
    m_mesh.draw();
+}
+
+
+void ViewerModel::setClippingPlaneEquation()
+{
+   m_clippingPlane.setEquation();  
+}
+
+
+void ViewerModel::displayClippingPlane()
+{
+   m_clippingPlane.draw();  
 }
 
 } // end namespace IQmol

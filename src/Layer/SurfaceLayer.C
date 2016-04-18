@@ -117,13 +117,19 @@ Surface::~Surface()
 }
 
 
-void Surface::setAlpha(double alpha) 
+void Surface::setAlpha(double const alpha) 
 {
    m_alpha = alpha;
    m_surface.setOpacity(m_alpha);
    m_colorPositive[3] = m_alpha;
    m_colorNegative[3] = m_alpha;
    recompile(); // this is really only needed if there is a property
+}
+
+
+void Surface::setClip(bool const tf)
+{
+   m_clip = tf;
 }
 
 
@@ -196,6 +202,8 @@ void Surface::draw()
 {
    if ( (checkState() != Qt::Checked) || m_alpha < 0.01) return;
 
+   if (m_clip) glEnable(GL_CLIP_PLANE0);
+
    GLboolean lighting;
    GLboolean blend;
 
@@ -262,6 +270,7 @@ void Surface::draw()
 
    if (m_drawVertexNormals) drawVertexNormals();
    if (m_drawFaceNormals) drawFaceNormals();
+   if (m_clip) glDisable(GL_CLIP_PLANE0);
 }
 
 

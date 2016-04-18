@@ -191,6 +191,10 @@ void Viewer::draw()
 
    m_objects = m_viewerModel.getVisibleObjects();
    m_selectedObjects = m_viewerModel.getSelectedObjects();
+/*
+   qDebug() << "Viewer::draw() called with" << m_selectedObjects.size() 
+            << "out of" << m_objects.size() << "selected";
+*/
 
    if (!m_shaderLibrary->filtersActive() || animationIsStarted()) return fastDraw();
    qDebug() << "Filters are on in drawNew";
@@ -218,11 +222,13 @@ void Viewer::draw()
    m_shaderLibrary->bindTextures(shader);
 
    drawGlobals();
+
    drawObjects(m_objects);
    drawSelected(m_selectedObjects);
    drawObjects(m_currentBuildHandler->buildObjects());
+   
 
-    // Suspend the shader for text rendering
+   // Suspend the shader for text rendering
    m_shaderLibrary->suspend();
    m_shaderLibrary->releaseTextures();
    m_shaderLibrary->clearFrameBuffers();
@@ -261,8 +267,11 @@ void Viewer::fastDraw()
 
    m_shaderLibrary->resume();
    drawGlobals();
+
+   m_viewerModel.setClippingPlaneEquation();
    drawObjects(m_objects);
    drawObjects(m_currentBuildHandler->buildObjects());
+   m_viewerModel.displayClippingPlane();
 
    // suspend the shader for writing text and highlighting
    m_shaderLibrary->suspend();
@@ -281,9 +290,10 @@ qglColor(foregroundColor());
    color[2] = foregroundColor().blue()  / 255.0;
    color[3] = 1.0;
    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
+
+
    glDisable(GL_LIGHTING);
    //glDisable(GL_DEPTH_TEST);
-
    displayGeometricParameter(m_selectedObjects);
 }
 
@@ -428,6 +438,7 @@ void Viewer::drawObjects(GLObjectList const& objects)
 
 void Viewer::drawSelected(GLObjectList const& objects)
 {
+   //qDebug() << "drawSelected called with" << objects.size() << "objects";
    if (!m_selectionHighlighting || objects.isEmpty()) return;
 
    // create a stencil of the highlighted region
@@ -588,7 +599,9 @@ void Viewer::displayGeometricParameter(GLObjectList const& selection)
          break;
    }
 
-   displayMessage(""); 
+   // We cannot use displayMessage here as it triggers an update
+   //displayMessage(""); 
+
    drawText(10, height()-10, msg);
 }
 
@@ -1060,6 +1073,8 @@ GLObjectList Viewer::startManipulation(QMouseEvent* event)
    GLObjectList::iterator iter;
    selection = m_selectedObjects;
    Layer::Bond* bond;
+
+qDebug() << "Selection size in startManipulation = "<< selection.size();
 
    if ((selection.size() == 1) &&
       (bond = qobject_cast<Layer::Bond*>(selection.first())) ) {

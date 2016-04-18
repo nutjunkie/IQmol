@@ -60,7 +60,8 @@ namespace IQmol {
             void draw();
             void drawFast();
             void drawSelected();
-            void setAlpha(double alpha);
+            void setAlpha(double const alpha);
+            void setClip(bool const tf);
 
             void setMolecule(Molecule*);
             void setCheckStatus(Qt::CheckState const);

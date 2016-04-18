@@ -195,6 +195,7 @@ void Surface::updateScale()
 }
 
 
+
 void Surface::on_swapColorsButton_clicked(bool)
 {
    QColor positive(m_surface.colorPositive());
@@ -278,6 +279,13 @@ void Surface::setArea(double const area)
 void Surface::on_transparencySlider_valueChanged(int value)
 {
    m_surface.setAlpha(value/100.0);
+   m_surface.updated();
+}
+
+
+void Surface::on_clipCheckBox_clicked(bool tf)
+{
+   m_surface.setClip(tf);
    m_surface.updated();
 }
 

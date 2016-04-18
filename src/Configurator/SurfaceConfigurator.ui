@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>351</width>
-    <height>280</height>
+    <width>375</width>
+    <height>278</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -218,22 +218,6 @@ QToolButton:pressed {
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
-      <widget class="QSlider" name="transparencySlider">
-       <property name="maximum">
-        <number>100</number>
-       </property>
-       <property name="value">
-        <number>99</number>
-       </property>
-       <property name="sliderPosition">
-        <number>99</number>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_6">
        <item>
@@ -262,6 +246,33 @@ QToolButton:pressed {
           </size>
          </property>
         </spacer>
+       </item>
+      </layout>
+     </item>
+     <item row="4" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_7">
+       <item>
+        <widget class="QSlider" name="transparencySlider">
+         <property name="maximum">
+          <number>100</number>
+         </property>
+         <property name="value">
+          <number>99</number>
+         </property>
+         <property name="sliderPosition">
+          <number>99</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="clipCheckBox">
+         <property name="text">
+          <string>Clip</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>

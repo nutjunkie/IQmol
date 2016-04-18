@@ -11,6 +11,7 @@ SOURCES = \
    $$PWD/BackgroundLayer.C \
    $$PWD/BondLayer.C \
    $$PWD/ChargeLayer.C \
+   $$PWD/ClippingPlaneLayer.C \
    $$PWD/ConstraintLayer.C \
    $$PWD/ContainerLayer.C \
    $$PWD/CubeDataLayer.C \
@@ -40,6 +41,7 @@ HEADERS = \
    $$PWD/BackgroundLayer.h \
    $$PWD/BondLayer.h \
    $$PWD/ChargeLayer.h \
+   $$PWD/ClippingPlaneLayer.h \
    $$PWD/ConstraintLayer.h \
    $$PWD/ContainerLayer.h \
    $$PWD/CubeDataLayer.h \

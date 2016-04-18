@@ -24,6 +24,7 @@
 
 #include "Viewer.h"
 #include "AxesMeshLayer.h"
+#include "ClippingPlaneLayer.h"
 #include "AxesLayer.h"
 #include "MoleculeLayer.h"
 #include "BackgroundLayer.h"
@@ -56,6 +57,8 @@ namespace IQmol {
          GLObjectList getSelectedObjects() { return m_selectedObjects; }
 
          void displayGlobals();
+         void setClippingPlaneEquation();
+         void displayClippingPlane();
 
          void setForceField(QString const& forceField) { m_forceField = forceField; }
          double sceneRadius(bool visibleOnly = true);
@@ -153,6 +156,7 @@ namespace IQmol {
          Layer::Axes m_axes;
          Layer::AxesMesh m_mesh;
          Layer::Background m_background;
+         Layer::ClippingPlane m_clippingPlane;
 
          GLObjectList m_visibleObjects;
          GLObjectList m_selectedObjects;

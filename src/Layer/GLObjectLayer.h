@@ -54,7 +54,8 @@ namespace Layer {
          /// Note the constructor does not allow a QObject parent.  This
          /// means the destruction of GLObjects must be taken care of 
          /// explicitly and not through the Qt mechanism.
-         explicit GLObject(QString const& text = QString()) : Base(text), m_alpha(1.0) 
+         explicit GLObject(QString const& text = QString()) : Base(text), m_alpha(1.0),
+            m_clip(false)
          { 
             setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
           }
@@ -163,6 +164,7 @@ namespace Layer {
          GLuint m_callList;
          GLuint m_fastCallList;
          GLuint m_selectedCallList;
+         bool   m_clip;
    };
 
 } // end namespace Layer
