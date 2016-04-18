@@ -21,7 +21,7 @@
 ********************************************************************************/
 
 #include "BackgroundLayer.h"
-#include "QGLViewer/qglviewer.h"
+#include "OpenGL.h"
 #include "Preferences.h"
 
 #include <QDebug>
