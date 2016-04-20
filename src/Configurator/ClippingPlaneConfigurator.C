@@ -50,8 +50,12 @@ void ClippingPlane::sync()
    Quaternion orientation(m_clippingPlane.getOrientation());
    Vec axis(0.0, 0.0, 1.0);
    axis = orientation.rotate(axis).unit();
+
    double theta(std::acos(axis.z));
+   if (theta < 0) theta += M_PI;
    double phi(std::atan2(axis.y, axis.x));
+   if (phi < 0) phi += 2.0*M_PI;
+
    m_configurator.thetaValue->setValue(theta); 
    m_configurator.phiValue->setValue(phi); 
 
@@ -78,7 +82,7 @@ void ClippingPlane::on_okButton_clicked(bool)
    y = std::sin(theta)*std::sin(phi);
    z = std::cos(theta);
 
-   m_clippingPlane.setOrientation(Quaternion(Vec(x,y,z), Vec(0.0, 0.0, 1.0)));
+   m_clippingPlane.setOrientation(Quaternion(Vec(0.0, 0.0, 1.0), Vec(x,y,z)));
 
    Quaternion q(Vec(x,y,z), Vec(0.0, 0.0, 1.0));
    qDebug() << "Setting Rotation" << q[0] << q[1] << q[2] << q[3];

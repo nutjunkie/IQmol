@@ -154,6 +154,14 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>xValue</tabstop>
+  <tabstop>yValue</tabstop>
+  <tabstop>zValue</tabstop>
+  <tabstop>thetaValue</tabstop>
+  <tabstop>phiValue</tabstop>
+  <tabstop>okButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
