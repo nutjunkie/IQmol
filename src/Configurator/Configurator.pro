@@ -8,6 +8,7 @@ INCLUDEPATH += ../Layer ../Data ../Util ../Old ../Plot
 SOURCES = \
    $$PWD/AxesMeshConfigurator.C \
    $$PWD/BackgroundConfigurator.C \
+   $$PWD/ClippingPlaneConfigurator.C \
    $$PWD/ConstraintConfigurator.C \
    $$PWD/CubeDataConfigurator.C \
    $$PWD/DipoleConfigurator.C \
@@ -25,6 +26,7 @@ SOURCES = \
 HEADERS = \
    $$PWD/AxesMeshConfigurator.h \
    $$PWD/BackgroundConfigurator.h \
+   $$PWD/ClippingPlaneConfigurator.h \
    $$PWD/Configurator.h \
    $$PWD/ConstraintConfigurator.h \
    $$PWD/CubeDataConfigurator.h \
@@ -43,6 +45,7 @@ HEADERS = \
 FORMS = \
    $$PWD/AxesMeshConfigurator.ui \
    $$PWD/BackgroundConfigurator.ui \
+   $$PWD/ClippingPlaneConfigurator.ui \
    $$PWD/CubeDataConfigurator.ui \
    $$PWD/DipoleConfigurator.ui \
    $$PWD/EfpFragmentListConfigurator.ui \

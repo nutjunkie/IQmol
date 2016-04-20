@@ -1,5 +1,5 @@
-#ifndef IQMOL_LAYER_CLIPPINGPLANE_H
-#define IQMOL_LAYER_CLIPPINGPLANE_H
+#ifndef IQMOL_CLIPPINGPLANECONFIGURATOR_H
+#define IQMOL_CLIPPINGPLANECONFIGURATOR_H
 /*******************************************************************************
 
   Copyright (C) 2011-2015 Andrew Gilbert
@@ -22,38 +22,35 @@
 
 ********************************************************************************/
 
-#include "GLObjectLayer.h"
-#include "ClippingPlaneConfigurator.h"
+#include "Configurator.h"
+#include "ui_ClippingPlaneConfigurator.h"
+
 
 namespace IQmol {
-namespace Layer {
 
-   class ClippingPlane : public GLObject {
+namespace Layer {
+   class ClippingPlane;
+}
+
+namespace Configurator {
+
+   /// Dialog that allows the user to change the appearance of the mesh.
+   class ClippingPlane : public Base {
 
       Q_OBJECT
-      friend class Configurator::ClippingPlane;
 
       public:
-         ClippingPlane();
-         ~ClippingPlane();
+         explicit ClippingPlane(Layer::ClippingPlane&);
+         void sync();
 
-         void draw();
-         void drawSelected();
-         void setEquation();
-
-      public Q_SLOTS:
-         void setSceneRadius(double const radius) { m_sceneRadius = radius; }
-
+      private Q_SLOTS:
+         void on_okButton_clicked(bool);
+   
       private:
-         double m_sceneRadius;
-        
-         void drawPrivate();
-         void drawArrow(double const length, double const radius = -1.0f,
-            int const resolution = 24);
-
-         Configurator::ClippingPlane* m_configurator;
+         Ui::ClippingPlaneConfigurator m_configurator;
+         Layer::ClippingPlane& m_clippingPlane;
    };
 
-} } // end namespace IQmol::Layer
+} } // end namespace IQmol::Configurator
 
 #endif
