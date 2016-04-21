@@ -127,6 +127,11 @@ namespace Layer {
             s_cameraDirection = direction; 
          }
 
+         /// This should be called just before a draw of the whole scene.
+         static void SetCameraPivot(qglviewer::Vec const& pivot) 
+         { 
+            s_cameraPivot = pivot; 
+         }
 
 
       public Q_SLOTS:
@@ -159,6 +164,7 @@ namespace Layer {
       protected:
          static qglviewer::Vec s_cameraPosition;
          static qglviewer::Vec s_cameraDirection;
+         static qglviewer::Vec s_cameraPivot;
          qglviewer::Frame m_frame;
          double m_alpha;   
          GLuint m_callList;

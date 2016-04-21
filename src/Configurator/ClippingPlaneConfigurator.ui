@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>392</width>
-    <height>130</height>
+    <width>358</width>
+    <height>126</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,24 +15,27 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QGridLayout" name="gridLayout_2">
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="3">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Y</string>
+       </property>
+      </widget>
+     </item>
      <item row="0" column="2">
-      <layout class="QHBoxLayout" name="horizontalLayout_5">
-       <item>
-        <widget class="QLabel" name="label_6">
-         <property name="text">
-          <string>Y</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QDoubleSpinBox" name="yValue">
-         <property name="minimum">
-          <double>-99.989999999999995</double>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <widget class="QDoubleSpinBox" name="xValue">
+       <property name="minimum">
+        <double>-99.989999999999995</double>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>X</string>
+       </property>
+      </widget>
      </item>
      <item row="0" column="0">
       <widget class="QLabel" name="label">
@@ -41,85 +44,62 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <layout class="QHBoxLayout" name="horizontalLayout_4">
-       <item>
-        <widget class="QLabel" name="label_5">
-         <property name="text">
-          <string>X</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QDoubleSpinBox" name="xValue">
-         <property name="minimum">
-          <double>-99.989999999999995</double>
-         </property>
-        </widget>
-       </item>
-      </layout>
+     <item row="0" column="4">
+      <widget class="QDoubleSpinBox" name="yValue">
+       <property name="minimum">
+        <double>-99.989999999999995</double>
+       </property>
+      </widget>
      </item>
-     <item row="0" column="3">
-      <layout class="QHBoxLayout" name="horizontalLayout_6">
-       <item>
-        <widget class="QLabel" name="label_7">
-         <property name="text">
-          <string>Z</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QDoubleSpinBox" name="zValue">
-         <property name="minimum">
-          <double>-99.989999999999995</double>
-         </property>
-        </widget>
-       </item>
-      </layout>
+     <item row="0" column="5">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>Z</string>
+       </property>
+      </widget>
      </item>
-     <item row="1" column="2">
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QLabel" name="thetaLabel">
-         <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;theta&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QDoubleSpinBox" name="thetaValue">
-         <property name="maximum">
-          <double>3.140000000000000</double>
-         </property>
-         <property name="singleStep">
-          <double>0.785398000000000</double>
-         </property>
-        </widget>
-       </item>
-      </layout>
+     <item row="0" column="6">
+      <widget class="QDoubleSpinBox" name="zValue">
+       <property name="minimum">
+        <double>-99.989999999999995</double>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="6">
+      <widget class="QDoubleSpinBox" name="phiValue">
+       <property name="maximum">
+        <double>6.280000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.785398000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="5">
+      <widget class="QLabel" name="phiLabel">
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;p&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="4">
+      <widget class="QDoubleSpinBox" name="thetaValue">
+       <property name="maximum">
+        <double>3.140000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.785398000000000</double>
+       </property>
+      </widget>
      </item>
      <item row="1" column="3">
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
-       <item>
-        <widget class="QLabel" name="phiLabel">
-         <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;phi&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QDoubleSpinBox" name="phiValue">
-         <property name="maximum">
-          <double>6.280000000000000</double>
-         </property>
-         <property name="singleStep">
-          <double>0.785398000000000</double>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <widget class="QLabel" name="thetaLabel">
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;t&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
      </item>
-     <item row="1" column="0" colspan="2">
+     <item row="1" column="0" colspan="3">
       <widget class="QLabel" name="label_2">
        <property name="text">
         <string>Normal Direction</string>

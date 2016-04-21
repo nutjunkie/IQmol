@@ -36,7 +36,10 @@ ClippingPlane::ClippingPlane(Layer::ClippingPlane& clippingPlane)
  : m_clippingPlane(clippingPlane)
 {
    m_configurator.setupUi(this);
-   //sync();
+   short theta(952);
+   short phi(981);
+   m_configurator.thetaLabel->setText(QChar(theta));
+   m_configurator.phiLabel->setText(QChar(phi));
 }
 
 
@@ -58,11 +61,6 @@ void ClippingPlane::sync()
 
    m_configurator.thetaValue->setValue(theta); 
    m_configurator.phiValue->setValue(phi); 
-
-   qDebug() << "Getting Position" <<  origin.x << origin.y << origin.z;
-   qDebug() << "Getting Rotation" <<  orientation[0] << orientation[1] 
-                                  <<  orientation[2] << orientation[3];
-   qDebug() << "Calc Angles     " <<  theta << phi;
 }
 
 
@@ -73,8 +71,6 @@ void ClippingPlane::on_okButton_clicked(bool)
    double z(m_configurator.zValue->value());
    m_clippingPlane.setPosition(Vec(x,y,z));
 
-   qDebug() << "Setting Position" <<  x << y << z;
-
    double theta(m_configurator.thetaValue->value());
    double phi(m_configurator.phiValue->value());
 
@@ -83,10 +79,6 @@ void ClippingPlane::on_okButton_clicked(bool)
    z = std::cos(theta);
 
    m_clippingPlane.setOrientation(Quaternion(Vec(0.0, 0.0, 1.0), Vec(x,y,z)));
-
-   Quaternion q(Vec(x,y,z), Vec(0.0, 0.0, 1.0));
-   qDebug() << "Setting Rotation" << q[0] << q[1] << q[2] << q[3];
-   qDebug() << "Calc Angles     " << theta << phi;
 
    accept();
 }
