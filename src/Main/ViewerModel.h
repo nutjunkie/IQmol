@@ -53,8 +53,8 @@ namespace IQmol {
 
       public:
          ViewerModel(QWidget* parent = 0);
-         GLObjectList getVisibleObjects() { return m_visibleObjects; }
-         GLObjectList getSelectedObjects() { return m_selectedObjects; }
+         GLObjectList getVisibleObjects();
+         GLObjectList getSelectedObjects();
 
          void displayGlobals();
          void setClippingPlaneEquation();
@@ -66,7 +66,6 @@ namespace IQmol {
          Layer::Molecule* activeMolecule();
          bool saveAllAndClose();
          bool saveRequired();
-
 
          Qt::DropActions supportedDropActions() const;
          QStringList mimeTypes () const;

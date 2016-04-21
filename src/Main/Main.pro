@@ -32,6 +32,7 @@ OBJECTS += $$PWD/symmol.o
 
 SOURCES += \
    $$PWD/FragmentTable.C \
+   $$PWD/CameraDialog.C \
    $$PWD/HelpBrowser.C \
    $$PWD/IQmolApplication.C \
    $$PWD/MainWindow.C \
@@ -45,6 +46,7 @@ SOURCES += \
 
 HEADERS += \
    $$PWD/AboutDialog.h \
+   $$PWD/CameraDialog.h \
    $$PWD/FragmentTable.h \
    $$PWD/HelpBrowser.h \
    $$PWD/IQmolApplication.h \
@@ -58,6 +60,7 @@ HEADERS += \
 
 FORMS += \
    $$PWD/AboutDialog.ui \
+   $$PWD/CameraDialog.ui \
    $$PWD/FragmentTable.ui \
    $$PWD/HelpBrowser.ui \
    $$PWD/PeriodicTable.ui \

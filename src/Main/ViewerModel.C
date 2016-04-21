@@ -97,6 +97,20 @@ ViewerModel::ViewerModel(QWidget* parent) : QStandardItemModel(0, 1, parent),
 }
 
 
+GLObjectList ViewerModel::getVisibleObjects() 
+{ 
+   //qDebug() << "Number of visible objects" << m_visibleObjects.size(); 
+   return m_visibleObjects; 
+}
+
+
+GLObjectList ViewerModel::getSelectedObjects() 
+{ 
+   //qDebug() << "Number of selected objects" << m_selectedObjects.size(); 
+   return m_selectedObjects; 
+}
+
+
 QStringList ViewerModel::mimeTypes () const
 {
    QStringList types;

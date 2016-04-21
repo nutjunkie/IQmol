@@ -22,6 +22,7 @@
 
 #include "ShaderLibrary.h"
 #include "ShaderDialog.h"
+#include "CameraDialog.h"
 #include "Viewer.h"
 #include "ViewerModel.h"
 #include "IQmol.h"
@@ -46,6 +47,7 @@ namespace IQmol {
 
 Vec Layer::GLObject::s_cameraPosition  = Vec(0.0, 0.0, 0.0);
 Vec Layer::GLObject::s_cameraDirection = Vec(0.0, 0.0, 1.0);
+Vec Layer::GLObject::s_cameraPivot     = Vec(0.0, 0.0, 0.0);
 
 const Qt::Key Viewer::s_buildKey(Qt::Key_Alt);
 const Qt::Key Viewer::s_selectKey(Qt::Key_Shift);
@@ -76,8 +78,9 @@ Viewer::Viewer(QGLContext* context, ViewerModel& model, QWidget* parent) :
    m_snapper(0),
    m_blockUpdate(false),
    m_glContext(context),
+   m_shaderLibrary(0),
    m_shaderDialog(0),
-   m_shaderLibrary(0)
+   m_cameraDialog(0)
 { 
    // Disable the default keybindings, the menu handles those we want
    setShortcut(DRAW_AXIS, 0);
@@ -107,6 +110,7 @@ Viewer::~Viewer()
 {
    if (m_shaderDialog) delete m_shaderDialog;
    if (m_shaderLibrary) delete m_shaderLibrary;
+   if (m_cameraDialog) delete m_cameraDialog;
 }
 
 
@@ -173,6 +177,18 @@ void Viewer::editShaders()
 }
 
 
+void Viewer::editCamera()
+{
+   if (!m_cameraDialog) {
+      m_cameraDialog = new CameraDialog(*camera(), this);
+      connect(m_cameraDialog, SIGNAL(updated()), this, SLOT(updateGL()));
+      connect(m_cameraDialog, SIGNAL(resetView()), this, SLOT(resetView()));
+   }
+   m_cameraDialog->sync();
+   m_cameraDialog->show();
+}
+
+
 
 void Viewer::resizeGL(int width, int height)
 {
@@ -189,12 +205,10 @@ void Viewer::draw()
 {
    if (m_blockUpdate || !m_shaderLibrary) return;
 
+   if (m_cameraDialog) m_cameraDialog->sync();
+
    m_objects = m_viewerModel.getVisibleObjects();
    m_selectedObjects = m_viewerModel.getSelectedObjects();
-/*
-   qDebug() << "Viewer::draw() called with" << m_selectedObjects.size() 
-            << "out of" << m_objects.size() << "selected";
-*/
 
    if (!m_shaderLibrary->filtersActive() || animationIsStarted()) return fastDraw();
    qDebug() << "Filters are on in drawNew";
@@ -202,6 +216,7 @@ void Viewer::draw()
    makeCurrent();
    Layer::GLObject::SetCameraPosition(camera()->position());
    Layer::GLObject::SetCameraDirection(camera()->viewDirection());
+   Layer::GLObject::SetCameraPivot(camera()->pivotPoint());
 
    QString shader(m_shaderLibrary->currentShader());
 

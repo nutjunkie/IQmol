@@ -500,6 +500,10 @@ void MainWindow::createMenus()
 
       menu->addSeparator();
 
+      name = "Camera";
+      action = menu->addAction(name);
+      connect(action, SIGNAL(triggered()), this, SLOT(configureCamera()));
+
       name = "Appearance";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), this, SLOT(configureAppearance()));
@@ -711,6 +715,12 @@ void MainWindow::testInternetConnection()
    if (Network::TestNetworkConnection()) {
       QMsgBox::information(this, "IQmol", "Network access available");
    }
+}
+
+
+void MainWindow::configureCamera()
+{
+   if (m_viewer) m_viewer->editCamera();
 }
 
 

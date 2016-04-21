@@ -55,6 +55,7 @@ namespace IQmol {
    class ViewerModel;
    class ShaderDialog;
    class ShaderLibrary;
+   class CameraDialog;
 
    /// An OpenGL widget based that forms the main display of IQmol.
    class Viewer : public QGLViewer {
@@ -86,6 +87,7 @@ namespace IQmol {
          int  selectionHits() const { return m_selectionHits; }
          void setSelectionHighlighting(bool const tf) { m_selectionHighlighting = tf; }
          void editShaders();
+         void editCamera();
 
       Q_SIGNALS:
          void activeViewerModeChanged(Viewer::Mode const);
@@ -218,6 +220,7 @@ namespace IQmol {
          QGLContext*    m_glContext;
          ShaderLibrary* m_shaderLibrary;
          ShaderDialog*  m_shaderDialog;
+         CameraDialog*  m_cameraDialog;
    };
 
 

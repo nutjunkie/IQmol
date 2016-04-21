@@ -105,6 +105,7 @@ namespace IQmol {
 
          void editNewServers();
          void configureAppearance();
+         void configureCamera();
          void clearRecentFilesMenu();
 
       private:
