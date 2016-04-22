@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>331</width>
-    <height>128</height>
+    <width>392</width>
+    <height>132</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,6 +16,13 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QRadioButton" name="orthographicButton">
+       <property name="text">
+        <string>Orthographic</string>
+       </property>
+      </widget>
+     </item>
      <item>
       <widget class="QRadioButton" name="perspectiveButton">
        <property name="text">
@@ -27,9 +34,22 @@
       </widget>
      </item>
      <item>
-      <widget class="QRadioButton" name="orthographicButton">
+      <widget class="QLabel" name="fieldOfViewLabel">
        <property name="text">
-        <string>Orthographic</string>
+        <string>FoV</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="fieldOfView">
+       <property name="minimum">
+        <number>10</number>
+       </property>
+       <property name="maximum">
+        <number>180</number>
+       </property>
+       <property name="singleStep">
+        <number>5</number>
        </property>
       </widget>
      </item>
@@ -160,7 +180,6 @@
  </widget>
  <tabstops>
   <tabstop>perspectiveButton</tabstop>
-  <tabstop>orthographicButton</tabstop>
   <tabstop>rValue</tabstop>
   <tabstop>okButton</tabstop>
  </tabstops>

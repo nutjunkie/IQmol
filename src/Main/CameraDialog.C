@@ -62,6 +62,8 @@ void CameraDialog::sync()
                                    << "   " << r << theta << phi;
 */
 
+   m_dialog.fieldOfView->setValue();
+
    m_emitSignals = false;
    m_dialog.rValue->setValue(r);
    m_dialog.thetaValue->setValue(Util::round(theta));
@@ -90,9 +92,18 @@ void CameraDialog::updatePosition()
 }
 
 
+void CameraDialog::on_fieldOfView_valueChanged(int angle)
+{
+   m_camera.setFieldOfView(angle);
+}
+
+
+
 void CameraDialog::on_perspectiveButton_clicked(bool tf)
 {
    m_camera.setType(Camera::PERSPECTIVE);
+   m_dialog.fieldOfViewLabel->enable();
+   m_dialog.fieldOfView->enable();
    updated();
 }
 
@@ -100,6 +111,8 @@ void CameraDialog::on_perspectiveButton_clicked(bool tf)
 void CameraDialog::on_orthographicButton_clicked(bool tf)
 {
    m_camera.setType(Camera::ORTHOGRAPHIC);
+   m_dialog.fieldOfViewLabel->disable();
+   m_dialog.fieldOfView->disable();
    updated();
 }
 

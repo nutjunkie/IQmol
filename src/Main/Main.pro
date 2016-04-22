@@ -37,6 +37,7 @@ SOURCES += \
    $$PWD/IQmolApplication.C \
    $$PWD/MainWindow.C \
    $$PWD/PeriodicTable.C \
+   $$PWD/PovRayGen.C \
    $$PWD/PreferencesBrowser.C \
    $$PWD/ToolBar.C \
    $$PWD/main.C \
@@ -52,6 +53,7 @@ HEADERS += \
    $$PWD/IQmolApplication.h \
    $$PWD/MainWindow.h \
    $$PWD/PeriodicTable.h \
+   $$PWD/PovRayGen.h \
    $$PWD/PreferencesBrowser.h \
    $$PWD/ToolBar.h \
    $$PWD/Viewer.h \

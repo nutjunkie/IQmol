@@ -30,6 +30,7 @@
 #include "MoleculeLayer.h"
 #include "EfpFragmentLayer.h"
 #include "Preferences.h"
+#include "PovRayGen.h"
 #include "ManipulatedFrameSetConstraint.h"
 #include "QGLViewer/manipulatedFrame.h"
 #include <QStandardItem>
@@ -198,6 +199,56 @@ void Viewer::resizeGL(int width, int height)
    GLdouble m[16]; 
    camera()->getProjectionMatrix(m);
    m_shaderLibrary->resizeScreenBuffers(QSize(width, height), m);
+}
+
+
+
+void Viewer::generatePovRay()
+{
+   qDebug() << "genratePovRay Slot called";
+   PovRayGen povRayGen;
+
+   m_objects = m_viewerModel.getVisibleObjects();
+   m_selectedObjects = m_viewerModel.getSelectedObjects();
+
+   povRayGen.setCamera(camera());
+
+   povRayGen.setCamera(camera());
+
+/*
+   m_shaderLibrary->resume();
+   //m_shaderLibrary->getParametes();
+
+   // background
+
+   m_viewerModel.setClippingPlaneEquation();
+   drawObjects(m_objects);
+   drawObjects(m_currentBuildHandler->buildObjects());
+   m_viewerModel.displayClippingPlane();
+
+   // suspend the shader for writing text and highlighting
+   m_shaderLibrary->suspend();
+   drawSelected(m_selectedObjects);
+
+   if (m_labelType != Layer::Atom::None) drawLabels(m_objects);
+   if (m_currentHandler->selectionMode() != Handler::None) {
+      drawSelectionRectangle(m_selectHandler.region());
+   }
+
+   // Post draw stuff really
+qglColor(foregroundColor());
+   float color[4];
+   color[0] = foregroundColor().red()   / 255.0;
+   color[1] = foregroundColor().green() / 255.0;
+   color[2] = foregroundColor().blue()  / 255.0;
+   color[3] = 1.0;
+   glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
+
+
+   glDisable(GL_LIGHTING);
+   //glDisable(GL_DEPTH_TEST);
+   displayGeometricParameter(m_selectedObjects);
+*/
 }
 
 

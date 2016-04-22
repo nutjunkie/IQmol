@@ -508,6 +508,11 @@ void MainWindow::createMenus()
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), this, SLOT(configureAppearance()));
 
+      name = "Generate PovRay";
+      action = menu->addAction(name);
+      action->setShortcut(Qt::CTRL + Qt::Key_1);
+      connect(action, SIGNAL(triggered()), m_viewer, SLOT(generatePovRay()));
+
       menu->addSeparator();
 
       name = "Atom Labels";

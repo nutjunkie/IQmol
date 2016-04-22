@@ -108,6 +108,7 @@ namespace IQmol {
          /// Provided as a slot as the base function isn't.
          void updateGL() { QGLViewer::updateGL(); }
          void resizeGL(int width, int height);
+         void generatePovRay();
 
          void displayMessage(QString const& msg) { QGLViewer::displayMessage(msg, FOREVER); }
          void setActiveViewerMode(Viewer::Mode const mode);
@@ -157,6 +158,7 @@ namespace IQmol {
          void drawLabels(GLObjectList const&);
          void displayGeometricParameter(GLObjectList const& selection);
          void drawWithNames(); 
+
 
          void drawSelectionRectangle(QRect const& rect) const;
          void endSelection(QPoint const&);
