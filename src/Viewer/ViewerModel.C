@@ -77,6 +77,7 @@ ViewerModel::ViewerModel(QWidget* parent) : QStandardItemModel(0, 1, parent),
       this, SIGNAL(foregroundColorChanged(QColor const&))); 
    connect(&m_axes, SIGNAL(updated()), this, SIGNAL(updated()));
    connect(&m_mesh, SIGNAL(updated()), this, SIGNAL(updated()));
+   connect(&m_clippingPlane, SIGNAL(updated()), this, SIGNAL(updated()));
 
    connect(this, SIGNAL(sceneRadiusChanged(double const)), 
       &m_axes, SLOT(setSceneRadius(double const)));
@@ -894,18 +895,6 @@ void ViewerModel::displayGlobals()
    m_background.draw();
    m_axes.draw();
    m_mesh.draw();
-}
-
-
-void ViewerModel::setClippingPlaneEquation()
-{
-   m_clippingPlane.setEquation();  
-}
-
-
-void ViewerModel::displayClippingPlane()
-{
-   m_clippingPlane.draw();  
 }
 
 } // end namespace IQmol

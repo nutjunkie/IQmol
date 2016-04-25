@@ -1,5 +1,5 @@
-#ifndef IQMOL_CLIPPINGPLANECONFIGURATOR_H
-#define IQMOL_CLIPPINGPLANECONFIGURATOR_H
+#ifndef IQMOL_CONFIGURATOR_CLIPPINGPLANE_H
+#define IQMOL_CONFIGURATOR_CLIPPINGPLANE_H
 /*******************************************************************************
 
   Copyright (C) 2011-2015 Andrew Gilbert
@@ -45,8 +45,15 @@ namespace Configurator {
 
       private Q_SLOTS:
          void on_okButton_clicked(bool);
+
+         void on_xValue_valueChanged(double);
+         void on_yValue_valueChanged(double);
+         void on_zValue_valueChanged(double);
+         void on_thetaValue_valueChanged(int);
+         void on_phiValue_valueChanged(int);
    
       private:
+         void syncFromDialog();
          Ui::ClippingPlaneConfigurator m_configurator;
          Layer::ClippingPlane& m_clippingPlane;
    };

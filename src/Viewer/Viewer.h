@@ -159,7 +159,6 @@ namespace IQmol {
          void displayGeometricParameter(GLObjectList const& selection);
          void drawWithNames(); 
 
-
          void drawSelectionRectangle(QRect const& rect) const;
          void endSelection(QPoint const&);
          void postSelection(QPoint const&);

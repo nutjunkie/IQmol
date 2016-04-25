@@ -81,6 +81,9 @@ namespace Preferences {
    QVariantMap DefaultFilterParameters();
    void        DefaultFilterParameters(QVariantMap const&);
 
+   QVariantMap DefaultPovRayParameters();
+   void        DefaultPovRayParameters(QVariantMap const&);
+
    QString QChemDatabaseFilePath();
    void    QChemDatabaseFilePath(QString const&);
 

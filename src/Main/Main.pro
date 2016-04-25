@@ -16,12 +16,13 @@ LIBS += $$BUILD_DIR/libQui.a \
         $$BUILD_DIR/libNetwork.a \
         $$BUILD_DIR/libYaml.a \
         $$BUILD_DIR/libPlot.a \
+        $$BUILD_DIR/libViewer.a \
         $$BUILD_DIR/libUtil.a
 
 include(../common.pri)
 
 INCLUDEPATH += . ../Util ../Data ../Parser ../Qui ../Layer \
-                ../Configurator ../Network ../Yaml ../Process ../Old
+                ../Configurator ../Network ../Yaml ../Process ../Old ../Viewer
 INCLUDEPATH += $$BUILD_DIR/Qui   # Required for the ui_QuiMainWindow.h header
 
 macx:FORMS       += $$PWD/PeriodicTableMac.ui
@@ -32,37 +33,28 @@ OBJECTS += $$PWD/symmol.o
 
 SOURCES += \
    $$PWD/FragmentTable.C \
-   $$PWD/CameraDialog.C \
    $$PWD/HelpBrowser.C \
+   $$PWD/IQmol.C \
    $$PWD/IQmolApplication.C \
    $$PWD/MainWindow.C \
    $$PWD/PeriodicTable.C \
-   $$PWD/PovRayGen.C \
    $$PWD/PreferencesBrowser.C \
    $$PWD/ToolBar.C \
    $$PWD/main.C \
-   $$PWD/Viewer.C \
-   $$PWD/ViewerModel.C \
-   $$PWD/ViewerModelView.C \
 
 HEADERS += \
    $$PWD/AboutDialog.h \
-   $$PWD/CameraDialog.h \
    $$PWD/FragmentTable.h \
    $$PWD/HelpBrowser.h \
+   $$PWD/IQmol.h \
    $$PWD/IQmolApplication.h \
    $$PWD/MainWindow.h \
    $$PWD/PeriodicTable.h \
-   $$PWD/PovRayGen.h \
    $$PWD/PreferencesBrowser.h \
    $$PWD/ToolBar.h \
-   $$PWD/Viewer.h \
-   $$PWD/ViewerModel.h \
-   $$PWD/ViewerModelView.h \
 
 FORMS += \
    $$PWD/AboutDialog.ui \
-   $$PWD/CameraDialog.ui \
    $$PWD/FragmentTable.ui \
    $$PWD/HelpBrowser.ui \
    $$PWD/PeriodicTable.ui \

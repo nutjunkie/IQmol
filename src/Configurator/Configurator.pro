@@ -2,8 +2,7 @@ LIB = Configurator
 CONFIG += lib
 include(../common.pri)
 
-INCLUDEPATH += ../Layer ../Data ../Util ../Old ../Plot
-#INCLUDEPATH += $$BUILD_DIR/IQmol
+INCLUDEPATH += ../Layer ../Data ../Util ../Plot ../Viewer ../Main ../Old
 
 SOURCES = \
    $$PWD/AxesMeshConfigurator.C \

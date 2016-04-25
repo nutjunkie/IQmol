@@ -24,6 +24,7 @@
 #include "SurfaceType.h"
 #include "MoleculeLayer.h"
 #include "Preferences.h"
+#include "PovRayGen.h"
 #include "QsLog.h"
 #include "QGLViewer/vec.h"
 #include "MeshDecimator.h"
@@ -198,11 +199,83 @@ void Surface::drawSelected()
 }
 
 
+void Surface::povray(PovRayGen& povraygen) 
+{
+   if ( (checkState() != Qt::Checked) || m_alpha < 0.01) return;
+
+   if (m_drawMode == Lines) {
+      povrayLines(povraygen, m_surface.meshPositive().data(), colorPositive());
+      if (isSigned()) {
+         povrayLines(povraygen, m_surface.meshNegative().data(), colorNegative());
+      }
+   }else {
+      povray(povraygen, m_surface.meshPositive().data(), colorPositive());
+      if (isSigned()) {
+         povray(povraygen, m_surface.meshNegative().data(), colorNegative());
+      }
+   }
+}
+
+
+void Surface::povrayLines(PovRayGen& povray, Data::OMMesh const& data, QColor const& color)
+{
+
+   QList<Vec> edges;
+   Data::OMMesh::ConstEdgeIter edge;
+   Data::OMMesh::Point         point;
+
+   for (edge = data.edges_begin(); edge != data.edges_end(); ++edge) {
+       point  = data.point(data.to_vertex_handle(data.halfedge_handle(edge,0)));
+       edges.append(Vec(point[0], point[1], point[2]));
+       point  = data.point(data.from_vertex_handle(data.halfedge_handle(edge,0)));
+       edges.append(Vec(point[0], point[1], point[2]));
+   }
+
+   povray.writeMesh(edges, color, m_clip);
+}
+
+
+
+void Surface::povray(PovRayGen& povray, Data::OMMesh const& data, QColor const& color)
+{
+   Data::OMMesh::ConstFaceVertexIter faceVertex;
+   Data::OMMesh::ConstVertexIter     vertex;
+   Data::OMMesh::ConstFaceIter       face;
+   Data::OMMesh::Normal              normal;
+   Data::OMMesh::Point               point;
+
+   QList<Vec> vertices;
+   QList<Vec> normals;
+   QList<int> faces;
+   
+   for (vertex = data.vertices_begin(); vertex != data.vertices_end(); ++vertex) {
+       point  = data.point(vertex);
+       normal = data.normal(vertex);
+
+       vertices.append(Vec(point[0],  point[1],  point[2]));
+       normals.append( Vec(normal[0], normal[1], normal[2]));
+   }
+
+   for (face = data.faces_begin(); face != data.faces_end(); ++face) {
+       faceVertex = data.cfv_iter(*face);
+       faces.append(faceVertex->idx());
+       ++faceVertex;
+       faces.append(faceVertex->idx());
+       ++faceVertex;
+       faces.append(faceVertex->idx());
+   }
+
+   povray.writeMesh(vertices, normals, faces, color, m_clip);
+}
+
+
 void Surface::draw() 
 {
    if ( (checkState() != Qt::Checked) || m_alpha < 0.01) return;
 
-   if (m_clip) glEnable(GL_CLIP_PLANE0);
+   if (m_clip) {
+      glEnable(GL_CLIP_PLANE0);
+   }
 
    GLboolean lighting;
    GLboolean blend;

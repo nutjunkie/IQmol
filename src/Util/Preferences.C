@@ -326,6 +326,23 @@ void DefaultShaderParameters(QVariantMap const& map)
 // ---------
 
 
+QVariantMap DefaultPovRayParameters()
+{
+   QVariantMap map;
+   QVariant qvar(Get("DefaultPovRayParameters"));
+   if (!qvar.isNull()) map = qvar.toMap();
+   return map;
+}
+
+void DefaultPovRayParameters(QVariantMap const& map)
+{
+   Set("DefaultPovRayParameters", QVariant(map));
+}
+
+
+// ---------
+
+
 QVariantMap DefaultFilterParameters()
 {
    QVariantMap map;

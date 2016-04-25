@@ -41,6 +41,9 @@ namespace Layer {
          void drawSelected();
          void setEquation();
 
+         qglviewer::Vec normal() const;
+         double distance() const;
+  
       public Q_SLOTS:
          void setSceneRadius(double const radius) { m_sceneRadius = radius; }
 

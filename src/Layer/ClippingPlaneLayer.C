@@ -49,7 +49,7 @@ void ClippingPlane::setEquation()
 {
    // Since the Clipping Plane equation is multiplied by the current modelView,
    // we can define a constant equation (plane normal along Z and passing by
-   // the origin) since we are here in th e manipulatedFrame coordinates system
+   // the origin) since we are here in the manipulatedFrame coordinates system
    // (we glMultMatrixd() with the manipulatedFrame matrix() ).
 
    static const GLdouble ClipEquation[] = { 0.0, 0.0, 1.0, 0.0 };
@@ -58,6 +58,22 @@ void ClippingPlane::setEquation()
    glMultMatrixd(m_frame.matrix());
    glClipPlane(GL_CLIP_PLANE0, ClipEquation); 
    glPopMatrix();
+}
+
+
+qglviewer::Vec ClippingPlane::normal() const
+{
+   qglviewer::Quaternion orientation(getFrame().orientation());
+   return orientation*qglviewer::Vec(0.0, 0.0, 1.0);
+}
+
+
+double ClippingPlane::distance() const
+{
+   qglviewer::Vec n(normal());
+   qglviewer::Vec p(getFrame().position());
+   
+   return n*p;
 }
 
 

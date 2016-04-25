@@ -205,50 +205,16 @@ void Viewer::resizeGL(int width, int height)
 
 void Viewer::generatePovRay()
 {
-   qDebug() << "genratePovRay Slot called";
-   PovRayGen povRayGen;
+   PovRayGen povRayGen(m_shaderLibrary->povrayVariables());
+   povRayGen.setShaderSettings(m_shaderLibrary->uniformUserVariableList("Phong"));
+   povRayGen.setCamera(camera());
+   povRayGen.setBackground(m_viewerModel.backgroundColor());
+   povRayGen.setClippingPlane(m_viewerModel.clippingPlane());
 
    m_objects = m_viewerModel.getVisibleObjects();
-   m_selectedObjects = m_viewerModel.getSelectedObjects();
-
-   povRayGen.setCamera(camera());
-
-   povRayGen.setCamera(camera());
-
-/*
-   m_shaderLibrary->resume();
-   //m_shaderLibrary->getParametes();
-
-   // background
-
-   m_viewerModel.setClippingPlaneEquation();
-   drawObjects(m_objects);
-   drawObjects(m_currentBuildHandler->buildObjects());
-   m_viewerModel.displayClippingPlane();
-
-   // suspend the shader for writing text and highlighting
-   m_shaderLibrary->suspend();
-   drawSelected(m_selectedObjects);
-
-   if (m_labelType != Layer::Atom::None) drawLabels(m_objects);
-   if (m_currentHandler->selectionMode() != Handler::None) {
-      drawSelectionRectangle(m_selectHandler.region());
+   for (int i = 0; i < int(m_objects.size()); ++i) {
+       m_objects.at(i)->povray(povRayGen);
    }
-
-   // Post draw stuff really
-qglColor(foregroundColor());
-   float color[4];
-   color[0] = foregroundColor().red()   / 255.0;
-   color[1] = foregroundColor().green() / 255.0;
-   color[2] = foregroundColor().blue()  / 255.0;
-   color[3] = 1.0;
-   glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
-
-
-   glDisable(GL_LIGHTING);
-   //glDisable(GL_DEPTH_TEST);
-   displayGeometricParameter(m_selectedObjects);
-*/
 }
 
 
@@ -334,10 +300,10 @@ void Viewer::fastDraw()
    m_shaderLibrary->resume();
    drawGlobals();
 
-   m_viewerModel.setClippingPlaneEquation();
+   m_viewerModel.clippingPlane().setEquation();
    drawObjects(m_objects);
    drawObjects(m_currentBuildHandler->buildObjects());
-   m_viewerModel.displayClippingPlane();
+   m_viewerModel.clippingPlane().draw();
 
    // suspend the shader for writing text and highlighting
    m_shaderLibrary->suspend();
@@ -349,7 +315,7 @@ void Viewer::fastDraw()
    }
 
    // Post draw stuff really
-qglColor(foregroundColor());
+   qglColor(foregroundColor());
    float color[4];
    color[0] = foregroundColor().red()   / 255.0;
    color[1] = foregroundColor().green() / 255.0;

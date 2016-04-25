@@ -2,7 +2,7 @@ LIB = Layer
 CONFIG += lib
 include(../common.pri)
 
-INCLUDEPATH += ../Data ../Util ../Old ../Configurator ../Parser ../Process ../Main
+INCLUDEPATH += ../Data ../Util ../Configurator ../Parser ../Process ../Main ../Viewer ../Old
 
 SOURCES = \
    $$PWD/AtomLayer.C \

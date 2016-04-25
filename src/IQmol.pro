@@ -22,6 +22,7 @@ SUBDIRS  = Util \
            Configurator \
            Old \
            Layer \
+           Viewer \
            Network \
            Yaml \
            Plot \

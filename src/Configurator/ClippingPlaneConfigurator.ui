@@ -65,30 +65,10 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="6">
-      <widget class="QDoubleSpinBox" name="phiValue">
-       <property name="maximum">
-        <double>6.280000000000000</double>
-       </property>
-       <property name="singleStep">
-        <double>0.785398000000000</double>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="5">
       <widget class="QLabel" name="phiLabel">
        <property name="text">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;p&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="4">
-      <widget class="QDoubleSpinBox" name="thetaValue">
-       <property name="maximum">
-        <double>3.140000000000000</double>
-       </property>
-       <property name="singleStep">
-        <double>0.785398000000000</double>
        </property>
       </widget>
      </item>
@@ -103,6 +83,26 @@
       <widget class="QLabel" name="label_2">
        <property name="text">
         <string>Normal Direction</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="4">
+      <widget class="QSpinBox" name="thetaValue">
+       <property name="maximum">
+        <number>180</number>
+       </property>
+       <property name="singleStep">
+        <number>15</number>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="6">
+      <widget class="QSpinBox" name="phiValue">
+       <property name="maximum">
+        <number>360</number>
+       </property>
+       <property name="singleStep">
+        <number>15</number>
        </property>
       </widget>
      </item>
@@ -138,8 +138,6 @@
   <tabstop>xValue</tabstop>
   <tabstop>yValue</tabstop>
   <tabstop>zValue</tabstop>
-  <tabstop>thetaValue</tabstop>
-  <tabstop>phiValue</tabstop>
   <tabstop>okButton</tabstop>
  </tabstops>
  <resources/>

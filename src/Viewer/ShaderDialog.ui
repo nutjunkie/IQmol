@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>322</width>
-    <height>538</height>
+    <width>352</width>
+    <height>554</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -47,7 +47,7 @@ QToolButton:pressed {
    <item>
     <widget class="QTabWidget" name="shaderFilterTabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -424,6 +424,258 @@ QToolButton:pressed {
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tab_3">
+      <attribute name="title">
+       <string>POV-Ray</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Phong shader settings are used for lighting</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>Global</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_6">
+          <item row="0" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QLabel" name="label_5">
+              <property name="text">
+               <string>Height</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="height">
+              <property name="minimum">
+               <number>100</number>
+              </property>
+              <property name="maximum">
+               <number>9999</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="0" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QLabel" name="label_6">
+              <property name="text">
+               <string>Width</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="width">
+              <property name="minimum">
+               <number>100</number>
+              </property>
+              <property name="maximum">
+               <number>9999</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Background</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="background">
+            <item>
+             <property name="text">
+              <string>None</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Sand</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Sea</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Grass</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
+          <string>Molecule</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_8">
+            <property name="text">
+             <string>Texture</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="moleculeTexture">
+            <item>
+             <property name="text">
+              <string>None</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Speckle</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_9">
+            <property name="text">
+             <string>Scale</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QSlider" name="moleculeScale">
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>100</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_11">
+            <property name="text">
+             <string>Strength</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QSlider" name="moleculeStrength">
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>100</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="title">
+          <string>Surface</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_7">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_12">
+            <property name="text">
+             <string>Material</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="surfaceMaterial">
+            <item>
+             <property name="text">
+              <string>None</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_13">
+            <property name="text">
+             <string>Texture</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="surfaceTexture">
+            <item>
+             <property name="text">
+              <string>None</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Clouds</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_14">
+            <property name="text">
+             <string>Scale</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QSlider" name="surfaceScale">
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>100</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_15">
+            <property name="text">
+             <string>Strength</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QSlider" name="surfaceStrength">
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>100</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
@@ -459,6 +711,46 @@ QToolButton:pressed {
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>shaderFilterTabWidget</tabstop>
+  <tabstop>shaderCombo</tabstop>
+  <tabstop>slider0</tabstop>
+  <tabstop>slider1</tabstop>
+  <tabstop>slider2</tabstop>
+  <tabstop>slider3</tabstop>
+  <tabstop>slider4</tabstop>
+  <tabstop>slider5</tabstop>
+  <tabstop>checkBox0</tabstop>
+  <tabstop>checkBox1</tabstop>
+  <tabstop>checkBox2</tabstop>
+  <tabstop>checkBox3</tabstop>
+  <tabstop>checkBox4</tabstop>
+  <tabstop>checkBox5</tabstop>
+  <tabstop>lightBox0</tabstop>
+  <tabstop>lightBox1</tabstop>
+  <tabstop>lightBox2</tabstop>
+  <tabstop>lightBox3</tabstop>
+  <tabstop>lightBox4</tabstop>
+  <tabstop>lightBox5</tabstop>
+  <tabstop>height</tabstop>
+  <tabstop>width</tabstop>
+  <tabstop>background</tabstop>
+  <tabstop>moleculeTexture</tabstop>
+  <tabstop>moleculeScale</tabstop>
+  <tabstop>moleculeStrength</tabstop>
+  <tabstop>surfaceMaterial</tabstop>
+  <tabstop>surfaceTexture</tabstop>
+  <tabstop>surfaceScale</tabstop>
+  <tabstop>surfaceStrength</tabstop>
+  <tabstop>saveAsDefault</tabstop>
+  <tabstop>okButton</tabstop>
+  <tabstop>aoRadius</tabstop>
+  <tabstop>aoTotal</tabstop>
+  <tabstop>border</tabstop>
+  <tabstop>antialias</tabstop>
+  <tabstop>ambientOcclusion</tabstop>
+  <tabstop>aoStrength</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

@@ -49,14 +49,23 @@ namespace IQmol {
          void installFilterParameters(bool) { installFilterParameters(); }
          void installFilterParameters(int)  { installFilterParameters(); }
 
+         void setPovRayParameter(int);
+
       private:
          void hideOptionControls();
+
+         void setupShaderTab();
+         void setupEffectsTab();
+         void setupPovRayTab();
 
          void copyParametersToDialog(QVariantMap const& parameters);
          QVariantMap getParametersFromDialog();
 
-         void setFilterParameters(QVariantMap const& parameters);
-         QVariantMap getFilterParameters();
+         void copyFilterParametersToDialog(QVariantMap const& parameters);
+         QVariantMap getFilterParametersFromDialog();
+
+         void copyPovRayParametersToDialog(QVariantMap const& parameters);
+         QVariantMap getPovRayParametersFromDialog();
 
          static const int s_maxSliders = 6;
          static const int s_maxCheckBoxes = 6;

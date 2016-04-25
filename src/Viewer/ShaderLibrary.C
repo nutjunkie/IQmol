@@ -153,6 +153,8 @@ void ShaderLibrary::loadPreferences()
     QVariantMap defaultShaderParameters(Preferences::DefaultShaderParameters());
     setUniformVariables(defaultShader, defaultShaderParameters);
     bindShader(defaultShader);
+
+    m_povrayVariables = Preferences::DefaultPovRayParameters();
 }
 
 

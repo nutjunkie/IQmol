@@ -101,6 +101,11 @@ namespace IQmol {
          void setFilterVariables(QVariantMap const& map);
          void setFiltersAvailable(bool tf) { m_filtersAvailable = tf; };
 
+         void setPovRayVariables(QVariantMap const& map) {
+            m_povrayVariables = map;
+         }
+         QVariantMap const& povrayVariables() const { return m_povrayVariables; }
+
          bool filtersAvailable() { return m_filtersAvailable; };
          bool filtersActive() { return m_filtersActive; };
          bool shadersInitialized() const { return m_shadersInitialized; }
@@ -173,6 +178,7 @@ namespace IQmol {
          explicit ShaderLibrary(ShaderLibrary const&) { }
 
          QGLFunctions* m_glFunctions;
+         QVariantMap m_povrayVariables;
    };
 
 

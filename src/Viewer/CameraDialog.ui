@@ -43,13 +43,16 @@
      <item>
       <widget class="QSpinBox" name="fieldOfView">
        <property name="minimum">
-        <number>10</number>
+        <number>5</number>
        </property>
        <property name="maximum">
         <number>180</number>
        </property>
        <property name="singleStep">
         <number>5</number>
+       </property>
+       <property name="value">
+        <number>45</number>
        </property>
       </widget>
      </item>

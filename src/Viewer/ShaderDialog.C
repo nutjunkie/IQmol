@@ -35,6 +35,21 @@ ShaderDialog::ShaderDialog(ShaderLibrary& library, QWidget* parent) : QDialog(pa
 {
    m_dialog.setupUi(this);
 
+  setupShaderTab();
+
+  if (!m_shaderLibrary.filtersAvailable()) {
+      m_dialog.shaderFilterTabWidget->removeTab(1);
+   }else {
+      // setupEffectsTab();
+      m_dialog.shaderFilterTabWidget->removeTab(1); // disable anyway for the moment
+   }
+
+   setupPovRayTab();
+}
+
+
+void ShaderDialog::setupShaderTab()
+{
    // This is determined by s_maxSliders
    m_labels[0]  = m_dialog.label0;
    m_labels[1]  = m_dialog.label1;
@@ -90,13 +105,11 @@ ShaderDialog::ShaderDialog(ShaderLibrary& library, QWidget* parent) : QDialog(pa
 
    m_dialog.shaderCombo->setCurrentIndex(index);
    on_shaderCombo_currentIndexChanged(index);
+}
 
-   if (m_shaderLibrary.filtersAvailable()) {
-      m_dialog.shaderFilterTabWidget->removeTab(1);
-      return;
-   }
 
-   // Rest is filters
+void ShaderDialog::setupEffectsTab()
+{
    connect(m_dialog.antialias, SIGNAL(clicked(bool)), 
       this, SLOT(installFilterParameters(bool)));
    connect(m_dialog.border, SIGNAL(clicked(bool)), 
@@ -111,9 +124,94 @@ ShaderDialog::ShaderDialog(ShaderLibrary& library, QWidget* parent) : QDialog(pa
    connect(m_dialog.aoStrength, SIGNAL(valueChanged(int)), 
       this, SLOT(installFilterParameters(int)));
 
-   setFilterParameters(Preferences::DefaultFilterParameters());
-   // Hide the effects page for now
-   m_dialog.shaderFilterTabWidget->removeTab(1);
+   copyFilterParametersToDialog(Preferences::DefaultFilterParameters());
+}
+
+
+void ShaderDialog::setupPovRayTab()
+{
+   connect(m_dialog.height, SIGNAL(valueChanged(int)), 
+      this, SLOT(setPovRayParameter(int)));
+   connect(m_dialog.width, SIGNAL(valueChanged(int)), 
+      this, SLOT(setPovRayParameter(int)));
+   connect(m_dialog.background, SIGNAL(currentIndexChanged(int)), 
+      this, SLOT(setPovRayParameter(int)));
+
+   connect(m_dialog.moleculeTexture, SIGNAL(currentIndexChanged(int)), 
+      this, SLOT(setPovRayParameter(int)));
+   connect(m_dialog.moleculeStrength, SIGNAL(valueChanged(int)), 
+      this, SLOT(setPovRayParameter(int)));
+   connect(m_dialog.moleculeScale, SIGNAL(valueChanged(int)), 
+      this, SLOT(setPovRayParameter(int)));
+
+   connect(m_dialog.surfaceMaterial, SIGNAL(currentIndexChanged(int)), 
+      this, SLOT(setPovRayParameter(int)));
+   connect(m_dialog.surfaceTexture, SIGNAL(currentIndexChanged(int)), 
+      this, SLOT(setPovRayParameter(int)));
+   connect(m_dialog.surfaceStrength, SIGNAL(valueChanged(int)), 
+      this, SLOT(setPovRayParameter(int)));
+   connect(m_dialog.surfaceScale, SIGNAL(valueChanged(int)), 
+      this, SLOT(setPovRayParameter(int)));
+
+   copyPovRayParametersToDialog(Preferences::DefaultPovRayParameters());
+}
+
+
+void ShaderDialog::setPovRayParameter(int)
+{
+   m_shaderLibrary.setPovRayVariables(getPovRayParametersFromDialog());
+   updated();
+}
+
+
+QVariantMap ShaderDialog::getPovRayParametersFromDialog()
+{
+   QVariantMap map;
+
+   map.insert("height",     QVariant(m_dialog.height->value()));
+   map.insert("width",      QVariant(m_dialog.width->value()));
+   map.insert("background", QVariant(m_dialog.background->currentText()));
+ 
+   map.insert("moleculeTexture",  QVariant(m_dialog.moleculeTexture->currentText()));
+   map.insert("moleculeScale",    QVariant(m_dialog.moleculeScale->value()/100.0));
+   map.insert("moleculeStrength", QVariant(m_dialog.moleculeStrength->value()/100.0));
+
+   map.insert("surfaceMaterial", QVariant(m_dialog.surfaceMaterial->currentText()));
+   map.insert("surfaceTexture",  QVariant(m_dialog.surfaceTexture->currentText()));
+   map.insert("surfaceScale",    QVariant(m_dialog.surfaceScale->value()/100.0));
+   map.insert("surfaceStrength", QVariant(m_dialog.surfaceStrength->value()/100.0));
+   return map;
+}
+
+
+void ShaderDialog::copyPovRayParametersToDialog(QVariantMap const& map)
+{
+   int    dim;
+   double value;
+   QString name;
+   
+   dim = map.contains("height") ? map.value("height").toInt() : 480;
+   m_dialog.height->setValue(dim);
+   dim = map.contains("width") ? map.value("width").toInt() : 640;
+   m_dialog.width->setValue(dim);
+   name = map.contains("background") ? map.value("background").toString() : "None";
+   m_dialog.background->setCurrentText(name);
+
+   name = map.contains("moleculeTexture") ? map.value("moleculeTexture").toString() : "None";
+   m_dialog.moleculeTexture->setCurrentText(name);
+   value = map.contains("moleculeScale") ? map.value("moleculeScale").toDouble() : 0.5;
+   m_dialog.moleculeScale->setValue(int(100*value));
+   value = map.contains("moleculeStrength") ? map.value("moleculeStrength").toDouble() : 0.5;
+   m_dialog.moleculeStrength->setValue(int(100*value));
+
+   name = map.contains("surfaceTexture") ? map.value("surfaceTexture").toString() : "None";
+   m_dialog.surfaceTexture->setCurrentText(name);
+   name = map.contains("surfaceMaterial") ? map.value("surfaceMaterial").toString() : "None";
+   m_dialog.surfaceMaterial->setCurrentText(name);
+   value = map.contains("surfaceScale") ? map.value("surfaceScale").toDouble() : 0.5;
+   m_dialog.surfaceScale->setValue(int(100*value));
+   value = map.contains("surfaceStrength") ? map.value("surfaceStrength").toDouble() : 0.5;
+   m_dialog.surfaceStrength->setValue(int(100*value));
 }
 
 
@@ -259,10 +357,14 @@ void ShaderDialog::on_saveAsDefault_clicked(bool)
    qDebug() << "Setting Default Shader" << m_dialog.shaderCombo->currentText();
    qDebug() << getParametersFromDialog();
    qDebug() << "Setting Default Shader";
-   qDebug() << getFilterParameters();
+   qDebug() << getFilterParametersFromDialog();
+   qDebug() << "Setting Default PovRay Parameters";
+   qDebug() << getPovRayParametersFromDialog();
+
    Preferences::DefaultShader(m_dialog.shaderCombo->currentText());
    Preferences::DefaultShaderParameters(getParametersFromDialog());
-   Preferences::DefaultFilterParameters(getFilterParameters());
+   Preferences::DefaultFilterParameters(getFilterParametersFromDialog());
+   Preferences::DefaultPovRayParameters(getPovRayParametersFromDialog());
 }
 
 
@@ -272,7 +374,7 @@ void ShaderDialog::on_ambientOcclusion_clicked(bool tf)
 }
 
 
-void ShaderDialog::setFilterParameters(QVariantMap const& map)
+void ShaderDialog::copyFilterParametersToDialog(QVariantMap const& map)
 {
 
    // Don't allow these to be enabled from the Preferences
@@ -302,7 +404,7 @@ void ShaderDialog::setFilterParameters(QVariantMap const& map)
 }
 
 
-QVariantMap ShaderDialog::getFilterParameters()
+QVariantMap ShaderDialog::getFilterParametersFromDialog()
 {
    QVariantMap map;
    map.insert("Antialias", QVariant(m_dialog.antialias->isChecked()));
@@ -317,7 +419,7 @@ QVariantMap ShaderDialog::getFilterParameters()
 
 void ShaderDialog::installFilterParameters()
 {
-   m_shaderLibrary.setFilterVariables(getFilterParameters());
+   m_shaderLibrary.setFilterVariables(getFilterParametersFromDialog());
    updated();
 }
 

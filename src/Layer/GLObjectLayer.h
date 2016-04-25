@@ -32,6 +32,8 @@
 namespace IQmol {
 
 class ManipulatedFrameSetConstraint;
+class PovRayGen;
+class ClippingPlane;
 
 namespace Layer {
 
@@ -97,10 +99,12 @@ namespace Layer {
          virtual void deselect() { unsetProperty(Selected); }
          bool isSelected() const { return hasProperty(Selected); }
 
+         virtual void povray(PovRayGen&) { }
+
          virtual void setAlpha(double alpha) { m_alpha = alpha; }
          virtual double getAlpha() const { return m_alpha; }
 
-         qglviewer::Frame getFrame() { return m_frame; }
+         qglviewer::Frame getFrame() const { return m_frame; }
 
          qglviewer::Vec getPosition() { return m_frame.position(); }
          qglviewer::Quaternion getOrientation() { return m_frame.orientation(); }

@@ -23,6 +23,7 @@
 #include "BondLayer.h"
 #include "AtomLayer.h"
 #include "GLShape.h"
+#include "PovRayGen.h"
 
 #include <QDebug>
 
@@ -229,8 +230,8 @@ void Bond::drawBallsAndSticks(bool selected)
 
 void Bond::drawPlastic(bool selected)
 {
-   // We don't allow scaling cos it looks naff
-   GLfloat offset(0.08);   // height of the cap
+    // We don't allow scaling cos it looks naff
+   GLfloat offset(0.09);   // height of the cap
    GLfloat bondRadius(0.10);
    GLfloat capRadius(2*bondRadius);
    GLfloat aRadius = m_begin->smallHydrogen() ? 0.28 : 0.40;
@@ -540,6 +541,149 @@ void Bond::updateOrientation()
    setPosition(a);
    setOrientation(orient); 
 }
+
+
+void Bond::povray(PovRayGen& povray)
+{
+   updateOrientation(); // This should only need calling if an atom is moving
+   switch (m_drawMode) {
+      case Primitive::BallsAndSticks:
+         povrayBallsAndSticks(povray);
+         break;
+      case Primitive::Plastic:
+         povrayPlastic(povray);
+         break;
+      case Primitive::Tubes:
+         povrayTubes(povray);
+         break;
+      case Primitive::WireFrame:
+         povrayWireFrame(povray);
+         break;
+      default:
+         break;
+   }
+}
+
+
+void Bond::povrayBallsAndSticks(PovRayGen& povray)
+{
+   double radius(s_radiusBallsAndSticks*m_scale);
+   Vec A(m_begin->getPosition());
+   Vec B(m_end->getPosition());
+   Vec normal(cross(s_cameraPosition-A, s_cameraPosition-B).unit());
+
+   switch (m_order) {
+      case 1: {
+ qDebug() << "writing single bond";
+         povray.writeBond(A, B, Qt::darkGray, radius);
+      } break;
+ 
+      case 2: {
+         normal *= 0.08;  // Governs the offset for the bond lines
+         radius *= 0.7;   // Make the bonds a bit thinner
+
+         A -= normal;      B -= normal;
+         povray.writeBond(A, B, Qt::darkGray, radius);
+
+         A += 2.0*normal;  B += 2.0*normal;
+         povray.writeBond(A, B, Qt::darkGray, radius);
+      } break;
+
+      case 3: {
+         normal *= 0.11;  // Governs the offset for the bond lines
+         radius *= 0.45;  // Make the bonds a bit thinner
+
+         A -= normal;  B -= normal;
+         povray.writeBond(A, B, Qt::darkGray, radius);
+         
+         A += normal;  B += normal;
+         povray.writeBond(A, B, Qt::darkGray, radius);
+         
+         A += normal;  B += normal;
+         povray.writeBond(A, B, Qt::darkGray, radius);
+      } break;
+
+      case 4: {
+         normal *= 0.11;  // Governs the offset for the bond lines
+         radius *= 0.40;  // Make the bonds a bit thinner
+
+         A -= 1.5*normal;  B -= 1.5*normal;
+         povray.writeBond(A, B, Qt::darkGray, radius);
+
+         A += normal;  B += normal;
+         povray.writeBond(A, B, Qt::darkGray, radius);
+         
+         A += normal;  B += normal;
+         povray.writeBond(A, B, Qt::darkGray, radius);
+         
+         A += normal;  B += normal;
+         povray.writeBond(A, B, Qt::darkGray, radius);
+         
+      } break;
+
+      default: {
+         radius *= 2;         // Fat bond indicates we don't know what we are doing
+         povray.writeBond(A, B, Qt::darkGray, radius);
+      } break;
+   }
+}
+
+
+void Bond::povrayPlastic(PovRayGen& povray)
+{ 
+   // We don't allow scaling cos it looks naff
+   double offset(0.09);   // height of the cap
+   double bondRadius(0.10);
+   double capRadius(2*bondRadius);
+   double aRadius(m_begin->smallHydrogen() ? 0.28 : 0.40);
+   double bRadius(m_end  ->smallHydrogen() ? 0.28 : 0.40);
+   double aShift(aRadius + offset - capRadius);
+   double bShift(bRadius + offset - capRadius);
+
+   Vec A(m_begin->displacedPosition());
+   Vec B(m_end  ->displacedPosition());
+   Vec AB(B-A);
+
+   double length(AB.normalize());
+
+   // Draw regular bond
+   povray.writeBond(A, B, Qt::lightGray, bondRadius);
+
+   //  and cap the ends
+   if (length > aRadius+bRadius) {
+      A += aShift*AB;
+      povray.writeAtom(A, Qt::lightGray, capRadius);
+      A += (length-(aShift+bShift))*AB;
+      povray.writeAtom(A, Qt::lightGray, capRadius);
+   }
+}
+
+
+
+void Bond::povrayTubes(PovRayGen& povray)
+{
+   double radius(s_radiusTubes*m_scale);
+
+   Vec A(m_begin->displacedPosition());
+   Vec B(m_end  ->displacedPosition());
+   Vec C(0.5*(A+B));
+
+   povray.writeBond(A, C, m_begin->color(), radius);
+   povray.writeBond(C, B, m_end->color(), radius);
+}
+
+void Bond::povrayWireFrame(PovRayGen& povray)
+{
+   double radius(0.02);
+
+   Vec A(m_begin->displacedPosition());
+   Vec B(m_end  ->displacedPosition());
+   Vec C(0.5*(A+B));
+
+   povray.writeBond(A, C, m_begin->color(), radius);
+   povray.writeBond(C, B, m_end->color(), radius);
+}
+
 
 
 } } // end namespace IQmol::Layer

@@ -36,6 +36,7 @@ namespace OpenBabel {
 namespace IQmol {
 
 class Viewer;
+class PovRayGen;
 
 namespace Layer {
 
@@ -74,6 +75,7 @@ namespace Layer {
          void drawFast();
          void drawSelected();
          void drawLabel(Viewer& viewer, LabelType const, QFontMetrics&);
+         void povray(PovRayGen&);
 
          void setAtomicNumber(unsigned int const Z);
          void setSmallerHydrogens(bool const tf) { m_smallerHydrogens = tf; }
@@ -97,6 +99,11 @@ namespace Layer {
          int getReorderIndex() const { return m_reorderIndex; }
          double getRadius(bool const selected);
          bool smallHydrogen() const { return (m_atomicNumber == 1 && m_smallerHydrogens); }
+         QColor color() const { 
+             QColor col;
+             col.setRgbF(m_color[0],m_color[1],m_color[2],m_color[3]); 
+             return col;
+         }
 
       public Q_SLOTS:
          void setDisplacement(qglviewer::Vec const& displacement) { 

@@ -57,8 +57,7 @@ namespace IQmol {
          GLObjectList getSelectedObjects();
 
          void displayGlobals();
-         void setClippingPlaneEquation();
-         void displayClippingPlane();
+         QColor backgroundColor() const { return m_background.color(); }
 
          void setForceField(QString const& forceField) { m_forceField = forceField; }
          double sceneRadius(bool visibleOnly = true);
@@ -135,6 +134,9 @@ namespace IQmol {
          void popAnimators(AnimatorList const&);
          void foregroundColorChanged(QColor const&);
          void fileOpened(QString const&);
+
+      protected:
+         Layer::ClippingPlane& clippingPlane() { return  m_clippingPlane; }
 
       private:
 		 /// Creates a new Molecule with the required connections to the

@@ -53,8 +53,8 @@ void CameraDialog::sync()
    if (theta < 0) theta += M_PI;
    if (phi   < 0) phi   += 2*M_PI;
 
-   theta *= 180.000/M_PI;
-   phi   *= 180.000/M_PI;
+   theta *= 180.0/M_PI;
+   phi   *= 180.0/M_PI;
 
 /*
    qDebug() ;
@@ -62,7 +62,8 @@ void CameraDialog::sync()
                                    << "   " << r << theta << phi;
 */
 
-   m_dialog.fieldOfView->setValue();
+   double fov(m_camera.fieldOfView());
+   m_dialog.fieldOfView->setValue(Util::round(fov*180.0/M_PI));
 
    m_emitSignals = false;
    m_dialog.rValue->setValue(r);
@@ -94,7 +95,8 @@ void CameraDialog::updatePosition()
 
 void CameraDialog::on_fieldOfView_valueChanged(int angle)
 {
-   m_camera.setFieldOfView(angle);
+   m_camera.setFieldOfView(angle*M_PI/180.0);
+   updated();
 }
 
 
@@ -102,8 +104,8 @@ void CameraDialog::on_fieldOfView_valueChanged(int angle)
 void CameraDialog::on_perspectiveButton_clicked(bool tf)
 {
    m_camera.setType(Camera::PERSPECTIVE);
-   m_dialog.fieldOfViewLabel->enable();
-   m_dialog.fieldOfView->enable();
+   m_dialog.fieldOfViewLabel->setEnabled(true);
+   m_dialog.fieldOfView->setEnabled(true);
    updated();
 }
 
@@ -111,8 +113,8 @@ void CameraDialog::on_perspectiveButton_clicked(bool tf)
 void CameraDialog::on_orthographicButton_clicked(bool tf)
 {
    m_camera.setType(Camera::ORTHOGRAPHIC);
-   m_dialog.fieldOfViewLabel->disable();
-   m_dialog.fieldOfView->disable();
+   m_dialog.fieldOfViewLabel->setEnabled(false);
+   m_dialog.fieldOfView->setEnabled(false);
    updated();
 }
 

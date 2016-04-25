@@ -1,5 +1,5 @@
-#ifndef IQMOL_POVRAYGEN_H
-#define IQMOL_POVRAYGEN_H
+#ifndef IQMOL_CAMERADIALOG_H
+#define IQMOL_CAMERADIALOG_H
 /*******************************************************************************
 
   Copyright (C) 2011-2015 Andrew Gilbert
@@ -22,29 +22,44 @@
 
 ********************************************************************************/
 
+#include "ui_CameraDialog.h"
 #include "QGLViewer/camera.h"
-#include <QTextStream>
-#include <QFile>
 
 
 namespace IQmol {
 
-   class PovRayGen {
+class CameraDialog : public QDialog {
 
-      public:
-         PovRayGen();
-         ~PovRayGen();
+   Q_OBJECT
 
-         void setCamera(qglviewer::Camera*);
+   public:
+      CameraDialog(qglviewer::Camera&, QWidget* parent = 0);
 
-      private:
-         void printHeader();
-         void printAtomMacro();
+   Q_SIGNALS:
+      void updated();
+      void resetView();
 
-         QFile       m_file;
-         QTextStream m_stream;
-   };
+   public Q_SLOTS:
+      void sync();
 
+   private Q_SLOTS:
+      void on_okButton_clicked(bool);
+      void on_rValue_valueChanged(double)  { updatePosition(); }
+      void on_thetaValue_valueChanged(int) { updatePosition(); }
+      void on_phiValue_valueChanged(int)   { updatePosition(); }
+      void on_resetButton_clicked(bool)    { resetView(); }
+
+      void updatePosition();
+
+      void on_fieldOfView_valueChanged(int angle);
+      void on_perspectiveButton_clicked(bool tf);
+      void on_orthographicButton_clicked(bool tf);
+
+   private:
+      qglviewer::Camera& m_camera;
+      Ui::CameraDialog m_dialog;
+      bool m_emitSignals;
+};
 
 } // end namespace IQmol
 
