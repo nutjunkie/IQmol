@@ -203,17 +203,20 @@ void Surface::povray(PovRayGen& povraygen)
 {
    if ( (checkState() != Qt::Checked) || m_alpha < 0.01) return;
 
+   // Lines take too long and the PovRay Mesh looks better
+/*
    if (m_drawMode == Lines) {
       povrayLines(povraygen, m_surface.meshPositive().data(), colorPositive());
       if (isSigned()) {
          povrayLines(povraygen, m_surface.meshNegative().data(), colorNegative());
       }
    }else {
+*/
       povray(povraygen, m_surface.meshPositive().data(), colorPositive());
       if (isSigned()) {
          povray(povraygen, m_surface.meshNegative().data(), colorNegative());
       }
-   }
+//   }
 }
 
 

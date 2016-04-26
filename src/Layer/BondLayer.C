@@ -574,7 +574,6 @@ void Bond::povrayBallsAndSticks(PovRayGen& povray)
 
    switch (m_order) {
       case 1: {
- qDebug() << "writing single bond";
          povray.writeBond(A, B, Qt::darkGray, radius);
       } break;
  

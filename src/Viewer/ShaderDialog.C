@@ -136,21 +136,9 @@ void ShaderDialog::setupPovRayTab()
       this, SLOT(setPovRayParameter(int)));
    connect(m_dialog.background, SIGNAL(currentIndexChanged(int)), 
       this, SLOT(setPovRayParameter(int)));
-
    connect(m_dialog.moleculeTexture, SIGNAL(currentIndexChanged(int)), 
       this, SLOT(setPovRayParameter(int)));
-   connect(m_dialog.moleculeStrength, SIGNAL(valueChanged(int)), 
-      this, SLOT(setPovRayParameter(int)));
-   connect(m_dialog.moleculeScale, SIGNAL(valueChanged(int)), 
-      this, SLOT(setPovRayParameter(int)));
-
-   connect(m_dialog.surfaceMaterial, SIGNAL(currentIndexChanged(int)), 
-      this, SLOT(setPovRayParameter(int)));
    connect(m_dialog.surfaceTexture, SIGNAL(currentIndexChanged(int)), 
-      this, SLOT(setPovRayParameter(int)));
-   connect(m_dialog.surfaceStrength, SIGNAL(valueChanged(int)), 
-      this, SLOT(setPovRayParameter(int)));
-   connect(m_dialog.surfaceScale, SIGNAL(valueChanged(int)), 
       this, SLOT(setPovRayParameter(int)));
 
    copyPovRayParametersToDialog(Preferences::DefaultPovRayParameters());
@@ -168,18 +156,12 @@ QVariantMap ShaderDialog::getPovRayParametersFromDialog()
 {
    QVariantMap map;
 
-   map.insert("height",     QVariant(m_dialog.height->value()));
-   map.insert("width",      QVariant(m_dialog.width->value()));
-   map.insert("background", QVariant(m_dialog.background->currentText()));
- 
-   map.insert("moleculeTexture",  QVariant(m_dialog.moleculeTexture->currentText()));
-   map.insert("moleculeScale",    QVariant(m_dialog.moleculeScale->value()/100.0));
-   map.insert("moleculeStrength", QVariant(m_dialog.moleculeStrength->value()/100.0));
-
-   map.insert("surfaceMaterial", QVariant(m_dialog.surfaceMaterial->currentText()));
+   map.insert("height",          QVariant(m_dialog.height->value()));
+   map.insert("width",           QVariant(m_dialog.width->value()));
+   map.insert("background",      QVariant(m_dialog.background->currentText()));
+   map.insert("moleculeTexture", QVariant(m_dialog.moleculeTexture->currentText()));
    map.insert("surfaceTexture",  QVariant(m_dialog.surfaceTexture->currentText()));
-   map.insert("surfaceScale",    QVariant(m_dialog.surfaceScale->value()/100.0));
-   map.insert("surfaceStrength", QVariant(m_dialog.surfaceStrength->value()/100.0));
+
    return map;
 }
 
@@ -194,24 +176,13 @@ void ShaderDialog::copyPovRayParametersToDialog(QVariantMap const& map)
    m_dialog.height->setValue(dim);
    dim = map.contains("width") ? map.value("width").toInt() : 640;
    m_dialog.width->setValue(dim);
-   name = map.contains("background") ? map.value("background").toString() : "None";
+   name = map.contains("background") ? map.value("background").toString() : "Black";
    m_dialog.background->setCurrentText(name);
 
    name = map.contains("moleculeTexture") ? map.value("moleculeTexture").toString() : "None";
    m_dialog.moleculeTexture->setCurrentText(name);
-   value = map.contains("moleculeScale") ? map.value("moleculeScale").toDouble() : 0.5;
-   m_dialog.moleculeScale->setValue(int(100*value));
-   value = map.contains("moleculeStrength") ? map.value("moleculeStrength").toDouble() : 0.5;
-   m_dialog.moleculeStrength->setValue(int(100*value));
-
    name = map.contains("surfaceTexture") ? map.value("surfaceTexture").toString() : "None";
    m_dialog.surfaceTexture->setCurrentText(name);
-   name = map.contains("surfaceMaterial") ? map.value("surfaceMaterial").toString() : "None";
-   m_dialog.surfaceMaterial->setCurrentText(name);
-   value = map.contains("surfaceScale") ? map.value("surfaceScale").toDouble() : 0.5;
-   m_dialog.surfaceScale->setValue(int(100*value));
-   value = map.contains("surfaceStrength") ? map.value("surfaceStrength").toDouble() : 0.5;
-   m_dialog.surfaceStrength->setValue(int(100*value));
 }
 
 

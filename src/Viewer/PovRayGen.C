@@ -44,6 +44,7 @@ PovRayGen::PovRayGen(QVariantMap const& settings) : m_lightFront(true), m_lightH
       //writeAxes();
       writeAtomMacro();
       writeBondMacro();
+      writeSurfaceMacro();
    }else {
       QLOG_WARN() << "Unable to open PovRay file" << fileName;
    }
@@ -109,30 +110,14 @@ void PovRayGen::setShaderSettings(QVariantMap const& settings)
 
 void PovRayGen::writeAtomMacro()
 {
-// rough texture, bumps scale 0.1->0.01
-//normal { bumps 1.0 scale 0.05 }
-//normal { dents 0.5 scale 0.05 }
-//normal { ripples 0.5 scale 0.05 }
-/*
-    texture {
-       //Peel scale 0.5 translate<2,0,0>
-      pigment { FBM_Clouds }
-   }
-*/
    m_stream << "#macro Atom(pos, col, rad)\n";
    m_stream << "sphere {\n";
    m_stream << "   pos, rad \n";
 
-   writeAtomTexture();
+   writeTexture(m_settings.value("moleculeTexture").toString());
 
    m_stream << "}\n";
    m_stream << "#end\n\n";
-/*
-      normal {
-         bumps 0.4  // controls depth of bumps
-         scale .05  // controls width of bumps
-      }
-*/
 }
 
 
@@ -148,6 +133,26 @@ void PovRayGen::writeBondMacro()
    m_stream << "   }\n";
    m_stream << "}\n";
    m_stream << "#end\n\n";
+}
+
+
+void PovRayGen::writeSurfaceMacro()
+{
+   m_stream << "#macro Surface(id, col)\n";
+   m_stream << "object {\n";
+   m_stream << "   id\n";
+   writeTexture(m_settings.value("surfaceTexture").toString());
+   m_stream << "}\n";
+   m_stream << "#end\n\n";
+
+   m_stream << "#macro ClippedSurface(id, col)\n";
+   m_stream << "object {\n";
+   m_stream << "   id\n";
+   writeTexture(m_settings.value("surfaceTexture").toString());
+   m_stream << "   clipped_by { Clipping_Plane }\n";
+   m_stream << "}\n";
+   m_stream << "#end\n\n";
+
 }
 
 
@@ -305,12 +310,21 @@ void PovRayGen::writeSky()
 }
 
 
-void PovRayGen::setBackground(QColor const& color)
+void PovRayGen::setBackground(QColor const& iqmolBackground)
 {
+   QString color(m_settings.value("background").toString());
+   
    m_stream << "background {\n";
-   m_stream << "   color Black\n";
-   //m_stream << "   color <" << color.redF() << ", " << color.greenF() << ", " 
-   //         << color.blueF() << ">\n";
+   if (color == "Black") {
+      m_stream << "   color Black\n";
+   }else if (color == "White") {
+      m_stream << "   color White\n";
+   }else if (color == "None") {
+      m_stream << "   color Clear\n";
+   }else {
+      m_stream << "   color " << formatColor(iqmolBackground) << "\n";
+   }
+
    m_stream << "}\n\n";
 }
 
@@ -366,7 +380,9 @@ void PovRayGen::writeAtom(Vec const& pos, QColor const& col, double const rad)
 }
 
 
-void PovRayGen::writeMesh(QList<qglviewer::Vec> const& edges, QColor const& color, bool clip)
+// deprecate
+void PovRayGen::writeMesh(QList<qglviewer::Vec> const& edges, 
+   QColor const& color, bool clip)
 {
    QString id("Mesh_");
    id += QString::number(m_meshCount);
@@ -395,7 +411,8 @@ void PovRayGen::writeMesh(QList<qglviewer::Vec> const& edges, QColor const& colo
 
 
 void PovRayGen::writeMesh(QList<qglviewer::Vec> const& vertices, 
-   QList<qglviewer::Vec> const& normals, QList<int> const& faces, QColor const& color, bool clip)
+   QList<qglviewer::Vec> const& normals, QList<int> const& faces, 
+   QColor const& color, bool clip)
 {
    unsigned nVertices(vertices.size());
    unsigned nFaces(faces.size()/3);
@@ -432,61 +449,93 @@ void PovRayGen::writeMesh(QList<qglviewer::Vec> const& vertices,
    m_stream << "\n   }\n\n";
    m_stream << "\n}\n\n";
 
-   m_stream << "object {\n";
-   m_stream << "   " << id << "\n";
-
-   writeSurfaceTexture(color);
-
-   if (clip) m_stream << "   clipped_by { Clipping_Plane }\n";
-   m_stream << "}\n";
+   if (clip) {
+      m_stream << "ClippedSurface(" << id << ", " << formatColor(color) << ")\n";
+   }else {
+      m_stream << "Surface(" << id << ", " << formatColor(color) << ")\n";
+   }
+            
 }
 
 
-void PovRayGen::writeSurfaceTexture(QColor const& color)
+// Note that these are assumed to be inside a #declare statement which defines
+// col and if required col_aux
+void PovRayGen::writeTexture(QString const& name)
 {
-   qDebug() << m_settings;
-   QString name(m_settings.value("surfaceTexture").toString());
+   m_stream << "   texture {\n";
 
-   qDebug() << "Surface Texture set to" << name;
-   if (name == "Clouds") {
-      m_stream << "   texture {\n";
-      m_stream << "      pigment { FBM_Clouds }\n";
-      m_stream << "      finish {\n";
-      m_stream << "         phong      0.75\n";
-      m_stream << "         ambient    0.66\n";
-      m_stream << "         diffuse    0.91\n";
-      m_stream << "         specular   0.31\n";
-      m_stream << "         reflection 0.26\n";
-      m_stream << "      }\n";
-      m_stream << "   }\n";
-   }else {
-      m_stream << "   texture {\n";
-      m_stream << "      pigment {\n";
-      m_stream << "         color rgbt " << formatColor(color) << "\n";
-      m_stream << "      }\n";
-      m_stream << "   }\n";
-   }
-}
-
-
-void PovRayGen::writeAtomTexture()
-{
-   qDebug() << "==================";
-   qDebug() << m_settings;
-   qDebug() << "==================";
-   QString name(m_settings.value("moleculeTexture").toString());
-
-   qDebug() << "Molecule Texture set to" << name;
-   if (name == "Speckle") {
-      m_stream << "   texture {\n";
+   // Basic textures
+   if (name == "Chrome") {
+      m_stream << "      Chrome_Metal\n";
       m_stream << "      pigment { color rgbt col }\n";
-      m_stream << "      normal  { bumps 1.0 scale 0.05 }\n";
-      m_stream << "   }\n";
-   }else {
-      m_stream << "   texture {\n";
+   } else if (name == "Crumpled") {
       m_stream << "      pigment { color rgbt col }\n";
+      m_stream << "      normal  { agate 1.0 scale 0.5 }\n";
+   } else if (name == "Rippled") {
+      m_stream << "      pigment { color rgbt col }\n";
+      m_stream << "      normal  { spotted 1.0 scale 0.05 }\n";
+   } else if (name == "Rough") {
+      m_stream << "      pigment { color rgbt col }\n";
+      m_stream << "      normal  { dents 10.0 scale 0.01 }\n";
+
+   } else if (name.contains("Marble")) {
+      QString color("Clear");
+      if (name == "Marble/White") color = "White";
+      if (name == "Marble/Black") color = "Black";
+
+      m_stream << "    pigment{ \n";
+      m_stream << "       bozo turbulence 1.96\n";
+      m_stream << "       color_map { [0.5 rgbt col]\n";
+      m_stream << "                   [0.6 rgbt " << color << "]\n";
+      m_stream << "                   [1.0 rgbt <0.5,0.5,0.5,0.5>]\n";
+      m_stream << "       }\n";
+      m_stream << "       scale 0.05\n";
+      m_stream << "    }\n";
+
+   } else if (name == "Skin") {
+      m_stream << "    pigment{ color rgb col }\n";
+      m_stream << "    normal {\n";
+      m_stream << "       pigment_pattern { \n";
+      m_stream << "         crackle turbulence 0.2\n";
+      m_stream << "         colour_map {[0.00, rgb 0]\n";
+      m_stream << "                     [0.25, rgb 1]\n";
+      m_stream << "                     [0.95, rgb 1]\n";
+      m_stream << "                     [1.00, rgb 0]\n";
+      m_stream << "          }\n";
+      m_stream << "          scale 0.15\n";
+      m_stream << "      } \n";
       m_stream << "   }\n";
+
+   } else if (name == "Shattered") {
+      m_stream << "   pigment{ \n";
+      m_stream << "      crackle scale 1.0 turbulence 0.1 \n";
+      m_stream << "      color_map{[0.04 color Black] \n";
+      m_stream << "                [0.09 color Black] \n";
+      m_stream << "                [0.12 color rgb col] \n";
+      m_stream << "                [1.00 color rgb col]\n";
+      m_stream << "      } // end of color_map\n";
+      m_stream << "      scale 0.15\n";
+      m_stream << "   } // end of pigment\n";
+      m_stream << "   normal { bumps 0.75 scale 0.02 }\n";
+      m_stream << "   translate<0.01, 0.04, 0.00>\n";
+
+   } else if (name == "Mesh") {
+      m_stream << "   pigment{ \n";
+      m_stream << "      crackle scale 1.0 turbulence 0.5 \n";
+      m_stream << "      color_map{[0.04 color col ] \n";
+      m_stream << "                [0.09 color col] \n";
+      m_stream << "                [0.12 color rgb Clear] \n";
+      m_stream << "                [1.00 color rgb Clear]\n";
+      m_stream << "      } // end of color_map\n";
+      m_stream << "      scale 0.10\n";
+      m_stream << "   } // end of pigment\n";
+      m_stream << "   translate<0.01, 0.04, 0.00>\n";
+
+   }else {  // default
+      m_stream << "      pigment { color rgbt col }\n";
    }
+
+   m_stream << "   }\n";
 }
 
 

@@ -205,6 +205,7 @@ void Viewer::resizeGL(int width, int height)
 
 void Viewer::generatePovRay()
 {
+   // The ordering of these calls is important
    PovRayGen povRayGen(m_shaderLibrary->povrayVariables());
    povRayGen.setShaderSettings(m_shaderLibrary->uniformUserVariableList("Phong"));
    povRayGen.setCamera(camera());
