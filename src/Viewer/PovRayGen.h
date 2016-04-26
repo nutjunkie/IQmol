@@ -51,8 +51,10 @@ namespace Layer {
          void writeBond(qglviewer::Vec const& begin, qglviewer::Vec const& end, 
             QColor const& col, double const radius);
    
-         void writeMesh(QList<qglviewer::Vec> const& vertices, QList<qglviewer::Vec> const& normals, 
-            QList<int> const& faces, QColor const&, bool clip);
+         void writeMesh(QList<qglviewer::Vec> const& vertices, 
+            QList<qglviewer::Vec> const& normals,   QList<int> const& faces, 
+            QColor const&, bool clip);
+           
 
          void writeMesh(QList<qglviewer::Vec> const& edges, QColor const&, bool clip);
 
@@ -61,12 +63,11 @@ namespace Layer {
          void writeLight(qglviewer::Vec const& position, QColor const& color = Qt::white);
          void writeAtomMacro();
          void writeBondMacro();
+         void writeSurfaceMacro();
          void writeAxes();
          void writeSky();
          void writeAreaLight(double const size);
-
-         void writeSurfaceTexture(QColor const& color);
-         void writeAtomTexture();
+         void writeTexture(QString const& name);
 
          bool m_lightFront;
          bool m_lightHighlight;
