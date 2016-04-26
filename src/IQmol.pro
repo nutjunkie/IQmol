@@ -22,10 +22,10 @@ SUBDIRS  = Util \
            Configurator \
            Old \
            Layer \
-           Viewer \
            Network \
            Yaml \
            Plot \
            Process \
+           Viewer \
 
 SUBDIRS += Main \
