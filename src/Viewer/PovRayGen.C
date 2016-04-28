@@ -71,8 +71,12 @@ void PovRayGen::writeHeader()
    m_stream << "#include \"textures.inc\"\n";
    m_stream << "//------------------------------------------\n";
    m_stream << "\n\n";
+
+   bool ok(false);
+   double gamma(m_settings.value("gamma").toDouble(&ok));
+   if (!ok || gamma < 0.1) gamma = 1.0;
    m_stream << "global_settings {\n";
-   m_stream << "   assumed_gamma 3.0\n";
+   m_stream << "   assumed_gamma " << gamma << "\n";
    m_stream << "}\n\n";
 }
 

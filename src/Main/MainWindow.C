@@ -391,6 +391,11 @@ void MainWindow::createMenus()
       connect(action, SIGNAL(triggered()), m_viewer, SLOT(saveSnapshot()));
       action->setShortcut(Qt::CTRL + Qt::Key_P);
 
+      name = "Generate PovRay Input";
+      action = menu->addAction(name);
+      action->setShortcut(Qt::CTRL + Qt::Key_1);
+      connect(action, SIGNAL(triggered()), m_viewer, SLOT(generatePovRay()));
+
       name = "Record Animation";
       action = menu->addAction(name);
       action->setCheckable(true);
@@ -507,11 +512,6 @@ void MainWindow::createMenus()
       name = "Appearance";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), this, SLOT(configureAppearance()));
-
-      name = "Generate PovRay";
-      action = menu->addAction(name);
-      action->setShortcut(Qt::CTRL + Qt::Key_1);
-      connect(action, SIGNAL(triggered()), m_viewer, SLOT(generatePovRay()));
 
       menu->addSeparator();
 

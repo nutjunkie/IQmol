@@ -50,6 +50,7 @@ namespace IQmol {
          void installFilterParameters(int)  { installFilterParameters(); }
 
          void setPovRayParameter(int);
+         void setPovRayParameter(double);
 
       private:
          void hideOptionControls();

@@ -95,7 +95,7 @@ texture {
 
 #declare IQmol_Texture_Bubble =
 texture {
-   pigment { rgbf <1,1,1,0.90>  }
+   pigment { rgbf <1,1,1,0.85>  }
    finish {
        Shiny
        diffuse    0.9

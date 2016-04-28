@@ -149,6 +149,8 @@ void ShaderDialog::setupPovRayTab()
       this, SLOT(setPovRayParameter(int)));
    connect(m_dialog.width, SIGNAL(valueChanged(int)), 
       this, SLOT(setPovRayParameter(int)));
+   connect(m_dialog.gamma, SIGNAL(valueChanged(double)), 
+      this, SLOT(setPovRayParameter(double)));
    connect(m_dialog.background, SIGNAL(currentIndexChanged(int)), 
       this, SLOT(setPovRayParameter(int)));
    connect(m_dialog.atomTexture, SIGNAL(currentIndexChanged(int)), 
@@ -159,6 +161,13 @@ void ShaderDialog::setupPovRayTab()
       this, SLOT(setPovRayParameter(int)));
 
    copyPovRayParametersToDialog(Preferences::DefaultPovRayParameters());
+}
+
+
+void ShaderDialog::setPovRayParameter(double)
+{
+   m_shaderLibrary.setPovRayVariables(getPovRayParametersFromDialog());
+   updated();
 }
 
 
@@ -175,6 +184,7 @@ QVariantMap ShaderDialog::getPovRayParametersFromDialog()
 
    map.insert("height",         QVariant(m_dialog.height->value()));
    map.insert("width",          QVariant(m_dialog.width->value()));
+   map.insert("gamma",          QVariant(m_dialog.gamma->value()));
    map.insert("background",     QVariant(m_dialog.background->currentText()));
    map.insert("atomTexture",    QVariant(m_dialog.atomTexture->currentText()));
    map.insert("bondTexture",    QVariant(m_dialog.bondTexture->currentText()));
@@ -194,6 +204,8 @@ void ShaderDialog::copyPovRayParametersToDialog(QVariantMap const& map)
    m_dialog.height->setValue(dim);
    dim = map.contains("width") ? map.value("width").toInt() : 640;
    m_dialog.width->setValue(dim);
+   dim = map.contains("gamma") ? map.value("gamma").toDouble() : 2.2;
+   m_dialog.gamma->setValue(dim);
    name = map.contains("background") ? map.value("background").toString() : "Black";
    m_dialog.background->setCurrentText(name);
 

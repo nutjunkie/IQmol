@@ -442,13 +442,6 @@ QToolButton:pressed {
           <string>Global</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_6">
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_7">
-            <property name="text">
-             <string>Background</string>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="1">
            <layout class="QHBoxLayout" name="horizontalLayout_4">
             <item>
@@ -514,6 +507,40 @@ QToolButton:pressed {
              </property>
             </item>
            </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Background</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QLabel" name="label_11">
+              <property name="text">
+               <string>Gamma</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="gamma">
+              <property name="decimals">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <double>9.900000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.100000000000000</double>
+              </property>
+              <property name="value">
+               <double>2.200000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>
@@ -598,6 +625,10 @@ QToolButton:pressed {
       <zorder>label_4</zorder>
       <zorder>groupBox</zorder>
       <zorder>verticalSpacer_3</zorder>
+      <zorder>label_11</zorder>
+      <zorder>gamma</zorder>
+      <zorder>horizontalSpacer_3</zorder>
+      <zorder>generatePovRay</zorder>
      </widget>
     </widget>
    </item>
