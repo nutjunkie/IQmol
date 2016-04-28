@@ -70,7 +70,8 @@ namespace Parser {
             return tokenize(nextNonEmptyLine());
          }
 
-         QList<double> nextLineAsDoubles() {
+         QList<double> nextLineAsDoubles() 
+         {
              QStringList tokens(nextLineAsTokens());
              QList<double> values;
              double x;  bool ok;
@@ -124,6 +125,33 @@ namespace Parser {
          static QStringList tokenize(QString const& str) {
             return str.split(QRegExp("\\s+"), QString::SkipEmptyParts);
          }
+
+         QString const& nextBlock(QChar const open = '{', QChar const close = '}') 
+         {
+             int nested(0);
+             QChar c;
+             QString block;
+             
+             // keep going until we find our starting brace
+             while (!atEnd() && !nested) {
+                this->operator>>(c); 
+                block += c;
+                if (c == open) ++nested;
+
+             }
+
+             while (!atEnd() && nested) {
+                this->operator>>(c); 
+                block += c;
+                if (c == open)  ++nested;
+                if (c == close) --nested;
+             }
+   
+             // Not strictly correct, but conceptually consistent.
+             m_previousLine = block;
+             return m_previousLine;
+         }
+
 
       private:
          int m_lineCount;

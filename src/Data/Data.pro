@@ -33,6 +33,7 @@ SOURCES = \
    $$PWD/NmrReferenceLibrary.C \
    $$PWD/OrbitalSymmetries.C \
    $$PWD/PointCharge.C \
+   $$PWD/PovRay.C \
    $$PWD/RemSectionData.C \
    $$PWD/Shell.C \
    $$PWD/Surface.C \
@@ -75,6 +76,7 @@ HEADERS = \
    $$PWD/OrbitalSymmetries.h \
    $$PWD/PointCharge.h \
    $$PWD/PointGroup.h \
+   $$PWD/PovRay.h \
    $$PWD/RemSectionData.h \
    $$PWD/Serialization.h \
    $$PWD/Shell.h \

@@ -23,8 +23,11 @@
 #include "ShaderLibrary.h"
 #include "Preferences.h"
 #include "TextStream.h"
+#include "Exception.h"
 #include "QsLog.h"
 #include "GLSLmath.h"
+#include "PovRay.h"
+#include "ParseFile.h"
 #include <QDir>
 #include <QFileInfo>
 #include <QGLFramebufferObject>
@@ -44,11 +47,12 @@ const QString ShaderLibrary::NoShader = "None";
 ShaderLibrary::ShaderLibrary(QGLContext* context) : m_normalBuffer(0), m_filterBuffer(), 
    m_rotationTextureId(0), m_rotationTextureSize(64), m_rotationTextureData(0),
    m_filtersAvailable(false), m_filtersActive(false), m_shadersInitialized(false), 
-   m_currentMaterial(QVariantMap())
+   m_currentMaterial(QVariantMap()), m_povray(0)
 {
    m_glFunctions = new  QGLFunctions(context);
    init();
-   loadAllShaders();
+   loadPovRay();
+   loadShaders();
    loadPreferences();
    setFilterVariables(QVariantMap()); 
 }
@@ -103,7 +107,51 @@ bool ShaderLibrary::bindShader(QString const& shader)
 }
 
 
-void ShaderLibrary::loadAllShaders()
+void ShaderLibrary::loadPovRay()
+{
+   QString fileName(Preferences::ShaderDirectory());
+   fileName += "/iqmol_povray.inc";
+
+   try {
+      Parser::ParseFile parser(fileName);
+      parser.start();
+      parser.wait();
+
+      QStringList errors(parser.errors());
+
+      if (!errors.isEmpty()) {
+         QLOG_WARN() << "Errors parsing" << fileName;
+         QLOG_WARN() << errors;
+      }
+
+      Data::Bank& bank(parser.data());
+      QList<Data::PovRay*> list(bank.takeData<Data::PovRay>());
+      if (!list.isEmpty()) m_povray = list.first();
+
+   } catch (Exception& ex) {    
+      QLOG_ERROR() << "Exception encountered parsing POV-Ray file";
+      QLOG_ERROR() << ex.what();
+   }   
+}
+
+
+QMap<QString, QString> ShaderLibrary::povrayTextures() const
+{
+    QMap<QString, QString> textures;
+    if (m_povray) textures = m_povray->textures();
+    return textures;
+}
+
+
+QStringList ShaderLibrary::povrayTextureNames() const
+{
+    QStringList textures;
+    if (m_povray) textures = m_povray->textures().keys();
+    return textures;
+}
+
+
+void ShaderLibrary::loadShaders()
 {
    m_shaders.insert(NoShader, 0);
    QVariantMap defaultParameters;
@@ -164,7 +212,11 @@ void ShaderLibrary::loadPreferences()
 
 // Define stubs
 void ShaderLibrary::destroy() { }
-ShaderLibrary::~ShaderLibrary() { }
+
+ShaderLibrary::~ShaderLibrary() 
+{ 
+   if (m_povray) delete m_povray;
+}
 
 bool ShaderLibrary::suspend() { return true; }
 bool ShaderLibrary::resume() { return true; }
@@ -214,6 +266,7 @@ ShaderLibrary::~ShaderLibrary()
    destroy();
    delete m_rotationTextureData;
    delete m_glFunctions;
+   if (m_povray) delete m_povray;
 }
 
 

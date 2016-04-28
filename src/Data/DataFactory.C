@@ -43,6 +43,7 @@
 #include "MolecularOrbitals.h"
 #include "MolecularOrbitalsList.h"
 #include "PointCharge.h"
+#include "PovRay.h"
 #include "YamlNode.h"
 #include "PointGroup.h"
 #include "RemSectionData.h"
@@ -145,7 +146,9 @@ Base* Factory::create(Type::ID const id)
       case Type::SurfaceInfoList:         data = new SurfaceInfoList();         break;
       case Type::SurfaceType:             data = new SurfaceType();             break;
       case Type::NmrReference:            data = new NmrReference();            break;
+
       case Type::YamlNode:                data = new YamlNode();                break;
+      case Type::PovRay:                  data = new PovRay();                  break;
 
    default: 
       qDebug() << "TypeID:" << id;

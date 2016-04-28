@@ -130,13 +130,30 @@ void ShaderDialog::setupEffectsTab()
 
 void ShaderDialog::setupPovRayTab()
 {
+   QStringList textures(m_shaderLibrary.povrayTextureNames());
+
+   m_dialog.atomTexture->clear();
+   m_dialog.atomTexture->addItem("None");
+   m_dialog.atomTexture->addItems(textures);
+
+   m_dialog.bondTexture->clear();
+   m_dialog.bondTexture->addItem("None");
+   m_dialog.bondTexture->addItems(textures);
+
+   m_dialog.surfaceTexture->clear();
+   m_dialog.surfaceTexture->addItem("None");
+   m_dialog.surfaceTexture->addItems(textures);
+
+
    connect(m_dialog.height, SIGNAL(valueChanged(int)), 
       this, SLOT(setPovRayParameter(int)));
    connect(m_dialog.width, SIGNAL(valueChanged(int)), 
       this, SLOT(setPovRayParameter(int)));
    connect(m_dialog.background, SIGNAL(currentIndexChanged(int)), 
       this, SLOT(setPovRayParameter(int)));
-   connect(m_dialog.moleculeTexture, SIGNAL(currentIndexChanged(int)), 
+   connect(m_dialog.atomTexture, SIGNAL(currentIndexChanged(int)), 
+      this, SLOT(setPovRayParameter(int)));
+   connect(m_dialog.bondTexture, SIGNAL(currentIndexChanged(int)), 
       this, SLOT(setPovRayParameter(int)));
    connect(m_dialog.surfaceTexture, SIGNAL(currentIndexChanged(int)), 
       this, SLOT(setPovRayParameter(int)));
@@ -156,11 +173,12 @@ QVariantMap ShaderDialog::getPovRayParametersFromDialog()
 {
    QVariantMap map;
 
-   map.insert("height",          QVariant(m_dialog.height->value()));
-   map.insert("width",           QVariant(m_dialog.width->value()));
-   map.insert("background",      QVariant(m_dialog.background->currentText()));
-   map.insert("moleculeTexture", QVariant(m_dialog.moleculeTexture->currentText()));
-   map.insert("surfaceTexture",  QVariant(m_dialog.surfaceTexture->currentText()));
+   map.insert("height",         QVariant(m_dialog.height->value()));
+   map.insert("width",          QVariant(m_dialog.width->value()));
+   map.insert("background",     QVariant(m_dialog.background->currentText()));
+   map.insert("atomTexture",    QVariant(m_dialog.atomTexture->currentText()));
+   map.insert("bondTexture",    QVariant(m_dialog.bondTexture->currentText()));
+   map.insert("surfaceTexture", QVariant(m_dialog.surfaceTexture->currentText()));
 
    return map;
 }
@@ -179,8 +197,10 @@ void ShaderDialog::copyPovRayParametersToDialog(QVariantMap const& map)
    name = map.contains("background") ? map.value("background").toString() : "Black";
    m_dialog.background->setCurrentText(name);
 
-   name = map.contains("moleculeTexture") ? map.value("moleculeTexture").toString() : "None";
-   m_dialog.moleculeTexture->setCurrentText(name);
+   name = map.contains("atomTexture") ? map.value("atomTexture").toString() : "None";
+   m_dialog.atomTexture->setCurrentText(name);
+   name = map.contains("bondTexture") ? map.value("bondTexture").toString() : "None";
+   m_dialog.bondTexture->setCurrentText(name);
    name = map.contains("surfaceTexture") ? map.value("surfaceTexture").toString() : "None";
    m_dialog.surfaceTexture->setCurrentText(name);
 }

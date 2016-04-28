@@ -15,6 +15,7 @@ SOURCES += \
    $$PWD/IQmolParser.C \
    $$PWD/MeshParser.C \
    $$PWD/OpenBabelParser.C \
+   $$PWD/PovRayParser.C \
    $$PWD/QChemInputParser.C \
    $$PWD/QChemOutputParser.C \
    $$PWD/QChemPlotParser.C \
@@ -33,6 +34,7 @@ HEADERS += \
    $$PWD/IQmolParser.h \
    $$PWD/MeshParser.h \
    $$PWD/OpenBabelParser.h \
+   $$PWD/PovRayParser.h \
    $$PWD/QChemInputParser.h \
    $$PWD/QChemOutputParser.h \
    $$PWD/QChemPlotParser.h \

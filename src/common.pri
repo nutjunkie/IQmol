@@ -33,8 +33,12 @@ macx {
    LIBS        += $${OPENMESH}/build/Build/lib/libOpenMeshTools.a
 
    # OpenBabel
-   INCLUDEPATH += /usr/local/include/openbabel-2.0
-   LIBS        += -L/usr/local/lib -lopenbabel
+   #INCLUDEPATH += /usr/local/include/openbabel-2.0
+   #LIBS        += -L/usr/local/lib -lopenbabel
+
+   INCLUDEPATH += $(DEV)/openbabel-2.3.2/include
+   #LIBS        += -L/Users/agilbert/Downloads/openbabel-2.3.2/build/lib -lopenbabel
+   LIBS        += $(DEV)/openbabel-2.3.2/build/src/libopenbabel.a
 
    # SSH2 / libssl / libcrypto
    INCLUDEPATH += $(DEV)/extlib/include

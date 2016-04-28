@@ -72,7 +72,7 @@ namespace Data {
                 ElectronicTransition,   ElectronicTransitionList, ExcitedStates,
                 OrbitalSymmetries,
                /*---------------------  *---------------------  *--------------------- */
-                YamlNode
+                YamlNode,               PovRay
       };
 
       QString toString(ID const);

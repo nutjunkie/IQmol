@@ -37,14 +37,13 @@ namespace Layer {
    class PovRayGen {
 
       public:
-         PovRayGen(QVariantMap const& settings);
+         PovRayGen(QVariantMap const& settings, QMap<QString, QString> const& textures);
          ~PovRayGen();
 
          void setCamera(qglviewer::Camera*);
          void setBackground(QColor const&);
          void setClippingPlane(Layer::ClippingPlane const&);
          void setShaderSettings(QVariantMap const& settings);
-         void setPovRaySettings(QVariantMap const& settings) { m_settings = settings; }
 
          void writeAtom(qglviewer::Vec const& pos, QColor const&, double const radius);
 
@@ -82,8 +81,8 @@ namespace Layer {
          QString formatColor(QColor const&);
 
          QVariantMap m_settings;
+         QMap<QString,QString>  m_textures;
    };
-
 
 } // end namespace IQmol
 

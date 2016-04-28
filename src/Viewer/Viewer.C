@@ -206,7 +206,8 @@ void Viewer::resizeGL(int width, int height)
 void Viewer::generatePovRay()
 {
    // The ordering of these calls is important
-   PovRayGen povRayGen(m_shaderLibrary->povrayVariables());
+   PovRayGen povRayGen(m_shaderLibrary->povrayVariables(),
+                       m_shaderLibrary->povrayTextures());
    povRayGen.setShaderSettings(m_shaderLibrary->uniformUserVariableList("Phong"));
    povRayGen.setCamera(camera());
    povRayGen.setBackground(m_viewerModel.backgroundColor());
@@ -446,7 +447,7 @@ void Viewer::setDefaultBuildFragment(QString const& filePath, Viewer::Mode const
          m_currentBuildHandler = &m_buildMoleculeHandler;
          break;
       default:
-         qDebug() << "Invalid Viewer::Mode in setDefaultBuildFragment";
+         QLOG_WARN() << "Invalid Viewer::Mode in setDefaultBuildFragment";
          return;
    }
 
@@ -1106,8 +1107,6 @@ GLObjectList Viewer::startManipulation(QMouseEvent* event)
    GLObjectList::iterator iter;
    selection = m_selectedObjects;
    Layer::Bond* bond;
-
-qDebug() << "Selection size in startManipulation = "<< selection.size();
 
    if ((selection.size() == 1) &&
       (bond = qobject_cast<Layer::Bond*>(selection.first())) ) {

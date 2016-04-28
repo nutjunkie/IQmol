@@ -31,8 +31,9 @@ using namespace qglviewer;
 
 namespace IQmol {
 
-PovRayGen::PovRayGen(QVariantMap const& settings) : m_lightFront(true), m_lightHighlight(true),
-   m_lightLeft(true), m_lightLower(false), m_meshCount(0), m_settings(settings)
+PovRayGen::PovRayGen(QVariantMap const& settings, QMap<QString, QString> const& textures) : 
+   m_lightFront(true), m_lightHighlight(true),  m_lightLeft(true), m_lightLower(false), 
+   m_meshCount(0), m_settings(settings), m_textures(textures)
 {
    qDebug() << "Generating PovRay file";
    QString fileName("iqmol.pov");
@@ -66,6 +67,7 @@ void PovRayGen::writeHeader()
    m_stream << "//------------------------------------------\n";
    m_stream << "#version 3.6; // 3.7\n";
    m_stream << "#include \"colors.inc\"\n";
+   m_stream << "#include \"shapes.inc\"\n";
    m_stream << "#include \"textures.inc\"\n";
    m_stream << "//------------------------------------------\n";
    m_stream << "\n\n";
@@ -113,9 +115,7 @@ void PovRayGen::writeAtomMacro()
    m_stream << "#macro Atom(pos, col, rad)\n";
    m_stream << "sphere {\n";
    m_stream << "   pos, rad \n";
-
-   writeTexture(m_settings.value("moleculeTexture").toString());
-
+   writeTexture(m_settings.value("atomTexture").toString());
    m_stream << "}\n";
    m_stream << "#end\n\n";
 }
@@ -126,11 +126,7 @@ void PovRayGen::writeBondMacro()
    m_stream << "#macro Bond(beginAtom, endAtom, col, rad)\n";
    m_stream << "cylinder {\n";
    m_stream << "   beginAtom, endAtom, rad\n";
-   m_stream << "   texture {\n";
-   m_stream << "      pigment {\n";
-   m_stream << "         color rgbt col\n";
-   m_stream << "      }\n";
-   m_stream << "   }\n";
+   writeTexture(m_settings.value("bondTexture").toString());
    m_stream << "}\n";
    m_stream << "#end\n\n";
 }
@@ -152,7 +148,6 @@ void PovRayGen::writeSurfaceMacro()
    m_stream << "   clipped_by { Clipping_Plane }\n";
    m_stream << "}\n";
    m_stream << "#end\n\n";
-
 }
 
 
@@ -307,6 +302,38 @@ void PovRayGen::writeSky()
    m_stream << "   }   \n";
    m_stream << "   scale 10000\n";
    m_stream << "}\n";
+/*
+  59   sky_sphere {
+  60     pigment {
+  61       gradient y
+  62       color_map {
+  63         [0.000 0.002 color rgb <1.0, 0.2, 0.0>
+  64                      color rgb <1.0, 0.2, 0.0>]
+  65         [0.002 0.200 color rgb <0.8, 0.1, 0.0>
+  66                      color rgb <0.2, 0.2, 0.3>]
+  67       }
+  68       scale 2
+  69       translate -1
+  70     }
+  71     pigment {
+  72       bozo
+  73       turbulence 0.65
+  74       octaves 6
+  75       omega 0.7
+  76       lambda 2
+  77       color_map {
+  78           [0.0 0.1 color rgb <0.85, 0.85, 0.85>
+  79                    color rgb <0.75, 0.75, 0.75>]
+  80           [0.1 0.5 color rgb <0.75, 0.75, 0.75>
+  81                    color rgbt <1, 1, 1, 1>]
+  82           [0.5 1.0 color rgbt <1, 1, 1, 1>
+  83                    color rgbt <1, 1, 1, 1>]
+  84       }
+  85       scale <0.2, 0.5, 0.2>
+  86     }
+  87     rotate -135*x
+  88   }
+*/
 }
 
 
@@ -380,7 +407,7 @@ void PovRayGen::writeAtom(Vec const& pos, QColor const& col, double const rad)
 }
 
 
-// deprecate
+// This is not useful as the tubes take too long to render in POV-Ray
 void PovRayGen::writeMesh(QList<qglviewer::Vec> const& edges, 
    QColor const& color, bool clip)
 {
@@ -462,80 +489,15 @@ void PovRayGen::writeMesh(QList<qglviewer::Vec> const& vertices,
 // col and if required col_aux
 void PovRayGen::writeTexture(QString const& name)
 {
-   m_stream << "   texture {\n";
+    QString texture(m_textures.value(name));
 
-   // Basic textures
-   if (name == "Chrome") {
-      m_stream << "      Chrome_Metal\n";
-      m_stream << "      pigment { color rgbt col }\n";
-   } else if (name == "Crumpled") {
-      m_stream << "      pigment { color rgbt col }\n";
-      m_stream << "      normal  { agate 1.0 scale 0.5 }\n";
-   } else if (name == "Rippled") {
-      m_stream << "      pigment { color rgbt col }\n";
-      m_stream << "      normal  { spotted 1.0 scale 0.05 }\n";
-   } else if (name == "Rough") {
-      m_stream << "      pigment { color rgbt col }\n";
-      m_stream << "      normal  { dents 10.0 scale 0.01 }\n";
-
-   } else if (name.contains("Marble")) {
-      QString color("Clear");
-      if (name == "Marble/White") color = "White";
-      if (name == "Marble/Black") color = "Black";
-
-      m_stream << "    pigment{ \n";
-      m_stream << "       bozo turbulence 1.96\n";
-      m_stream << "       color_map { [0.5 rgbt col]\n";
-      m_stream << "                   [0.6 rgbt " << color << "]\n";
-      m_stream << "                   [1.0 rgbt <0.5,0.5,0.5,0.5>]\n";
-      m_stream << "       }\n";
-      m_stream << "       scale 0.05\n";
-      m_stream << "    }\n";
-
-   } else if (name == "Skin") {
-      m_stream << "    pigment{ color rgb col }\n";
-      m_stream << "    normal {\n";
-      m_stream << "       pigment_pattern { \n";
-      m_stream << "         crackle turbulence 0.2\n";
-      m_stream << "         colour_map {[0.00, rgb 0]\n";
-      m_stream << "                     [0.25, rgb 1]\n";
-      m_stream << "                     [0.95, rgb 1]\n";
-      m_stream << "                     [1.00, rgb 0]\n";
-      m_stream << "          }\n";
-      m_stream << "          scale 0.15\n";
-      m_stream << "      } \n";
-      m_stream << "   }\n";
-
-   } else if (name == "Shattered") {
-      m_stream << "   pigment{ \n";
-      m_stream << "      crackle scale 1.0 turbulence 0.1 \n";
-      m_stream << "      color_map{[0.04 color Black] \n";
-      m_stream << "                [0.09 color Black] \n";
-      m_stream << "                [0.12 color rgb col] \n";
-      m_stream << "                [1.00 color rgb col]\n";
-      m_stream << "      } // end of color_map\n";
-      m_stream << "      scale 0.15\n";
-      m_stream << "   } // end of pigment\n";
-      m_stream << "   normal { bumps 0.75 scale 0.02 }\n";
-      m_stream << "   translate<0.01, 0.04, 0.00>\n";
-
-   } else if (name == "Mesh") {
-      m_stream << "   pigment{ \n";
-      m_stream << "      crackle scale 1.0 turbulence 0.5 \n";
-      m_stream << "      color_map{[0.04 color col ] \n";
-      m_stream << "                [0.09 color col] \n";
-      m_stream << "                [0.12 color rgb Clear] \n";
-      m_stream << "                [1.00 color rgb Clear]\n";
-      m_stream << "      } // end of color_map\n";
-      m_stream << "      scale 0.10\n";
-      m_stream << "   } // end of pigment\n";
-      m_stream << "   translate<0.01, 0.04, 0.00>\n";
-
-   }else {  // default
-      m_stream << "      pigment { color rgbt col }\n";
-   }
-
-   m_stream << "   }\n";
+    if (texture.isEmpty()) {
+       m_stream << "   texture {\n";
+       m_stream << "      pigment { color rgbt col }\n";
+       m_stream << "   }\n";
+    }else {
+       m_stream << texture << "\n";
+    }
 }
 
 
