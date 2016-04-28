@@ -35,6 +35,7 @@
 
 #include "openbabel/mol.h"
 #include "openbabel/plugin.h"
+#include "openbabel/builder.h"
 #include "openbabel/format.h"
 #include "openbabel/obconversion.h"
 #include "openbabel/generic.h"
@@ -78,7 +79,7 @@ bool OpenBabel::parseFile(QString const& filePath)
 
    ::OpenBabel::OBMol* mol(new ::OpenBabel::OBMol());
    if (conv.Read(mol, &ifs)) {
-      parse(*mol);
+     parse(*mol);
    }else {
       m_errors.append("File format error");
    }
@@ -122,7 +123,6 @@ bool OpenBabel::parse(TextStream& stream)
    std::string s(std::string(byteArray.data()));
    std::istringstream iss(std::string(byteArray.data()));
    if (conv.Read(&mol, &iss)) {
-   //if (conv.ReadString(&mol, s)) {
       parse(mol);
    }else {
       m_errors.append("File format error");
@@ -136,13 +136,18 @@ bool OpenBabel::parse(TextStream& stream)
 
 bool OpenBabel::parse(::OpenBabel::OBMol& obMol)
 {
-qDebug() << "Parsing OBMol";
+   qDebug() << "Parsing OBMol";
    int numberOfConformers(obMol.NumConformers());
    if (numberOfConformers < 1) return false;
 
    QLOG_INFO() << numberOfConformers << "geometries found";
    Data::GeometryList* geometries(new Data::GeometryList);
    m_dataBank.append(geometries);
+
+   if (!mol->Has3D()) {
+      ::OpenBabel::OBBuilder builder;
+      builder.Build(*mol);
+   }
 
    int charge(obMol.GetTotalCharge());
    unsigned multiplicity(obMol.GetTotalSpinMultiplicity());
