@@ -24,6 +24,7 @@
 #include "ServerConfigurationListDialog.h"
 #include "JobMonitor.h"
 #include "ServerRegistry.h" 
+#include "InsertMoleculeDialog.h" 
 
 #include "QMsgBox.h"
 #include "Animator.h"
@@ -570,6 +571,12 @@ void MainWindow::createMenus()
    // ----- Build Menu -----
    menu = menuBar()->addMenu("Build");
 
+      name = "Insert Molecule ID";
+      action = menu->addAction(name);
+      connect(action, SIGNAL(triggered()), this, SLOT(insertMoleculeDialog()));
+
+      menu->addSeparator();
+
       name = "Fill Valencies With Hydrogens";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), &m_viewerModel, SLOT(addHydrogens()));
@@ -945,6 +952,15 @@ void MainWindow::submitJob(IQmol::Process2::QChemJobInfo& qchemJobInfo)
    Layer::Molecule* mol(m_viewerModel.activeMolecule());
    if (!mol) return;
    mol->qchemJobInfoChanged(qchemJobInfo);
+}
+
+
+void MainWindow::insertMoleculeDialog() 
+{
+   InsertMoleculeDialog dialog(this);
+   connect(&dialog, SIGNAL(insertMolecule(QString)), &m_viewerModel, 
+      SLOT(insertMoleculeById(QString)));
+   dialog.exec();
 }
 
 

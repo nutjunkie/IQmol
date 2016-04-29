@@ -93,6 +93,7 @@ namespace IQmol {
          void setConstraint();
          void translateToCenter();
          void minimizeEnergy();
+         void insertMoleculeById(QString identifier);
 
          void cutSelection();
          void copySelectionToClipboard();

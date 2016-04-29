@@ -144,9 +144,9 @@ bool OpenBabel::parse(::OpenBabel::OBMol& obMol)
    Data::GeometryList* geometries(new Data::GeometryList);
    m_dataBank.append(geometries);
 
-   if (!mol->Has3D()) {
+   if (!obMol.Has3D()) {
       ::OpenBabel::OBBuilder builder;
-      builder.Build(*mol);
+      builder.Build(obMol);
    }
 
    int charge(obMol.GetTotalCharge());

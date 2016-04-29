@@ -816,6 +816,12 @@ void ViewerModel::adjustSymmetryTolerance()
 }
 
 
+void ViewerModel::insertMoleculeById(QString identifier)
+{
+   qDebug() << "Insert molecule by ID:" << identifier;
+}
+
+
 double ViewerModel::sceneRadius(bool visibleOnly)
 {
    double radius(DefaultSceneRadius);

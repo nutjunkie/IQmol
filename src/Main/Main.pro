@@ -34,6 +34,7 @@ OBJECTS += $$PWD/symmol.o
 SOURCES += \
    $$PWD/FragmentTable.C \
    $$PWD/HelpBrowser.C \
+   $$PWD/InsertMoleculeDialog.C \
    $$PWD/IQmol.C \
    $$PWD/IQmolApplication.C \
    $$PWD/MainWindow.C \
@@ -46,6 +47,7 @@ HEADERS += \
    $$PWD/AboutDialog.h \
    $$PWD/FragmentTable.h \
    $$PWD/HelpBrowser.h \
+   $$PWD/InsertMoleculeDialog.h \
    $$PWD/IQmol.h \
    $$PWD/IQmolApplication.h \
    $$PWD/MainWindow.h \
@@ -57,6 +59,7 @@ FORMS += \
    $$PWD/AboutDialog.ui \
    $$PWD/FragmentTable.ui \
    $$PWD/HelpBrowser.ui \
+   $$PWD/InsertMoleculeDialog.ui \
    $$PWD/PeriodicTable.ui \
    $$PWD/PeriodicTableMac.ui \
    $$PWD/PreferencesBrowser.ui \

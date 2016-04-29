@@ -89,6 +89,7 @@ namespace IQmol {
          void showJobMonitor();
          void testInternetConnection();
          void submitJob(IQmol::Process2::QChemJobInfo&);
+         void insertMoleculeDialog();
 
          void newViewer();
          void fullScreen();
