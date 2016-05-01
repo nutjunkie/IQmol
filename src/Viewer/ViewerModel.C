@@ -35,6 +35,7 @@
 #include "CartesianCoordinatesParser.h"
 #include "TextStream.h"
 #include "ParseJobFiles.h"
+#include "OpenBabelParser.h"
 #include "YamlNode.h"
 #include "SymmetryToleranceDialog.h"
 #include "ServerConfiguration.h"
@@ -329,10 +330,9 @@ void ViewerModel::pasteSelectionFromClipboard()
    Parser::TextStream textStream(&xyz);
    Data::Geometry* geom(parser.parse(textStream));
 
-   if (geom) {
-      //geom->translate(Vec(0.5, 0.5, 0.5));
-      //geom->dump();
+   if (geom && activeMolecule()) {
       selectAll(); 
+      // This should be added as an Undo action
       activeMolecule()->appendPrimitives(Layer::PrimitiveList(*geom));
       invertSelection(); 
       updateVisibleObjects();
@@ -818,7 +818,37 @@ void ViewerModel::adjustSymmetryTolerance()
 
 void ViewerModel::insertMoleculeById(QString identifier)
 {
-   qDebug() << "Insert molecule by ID:" << identifier;
+   Parser::OpenBabel parser;
+   QString ext;
+
+   if (identifier.indexOf("SMILES:") == 0) {
+      identifier.replace(0,7,"");
+      ext = "smi";
+
+   }else if (identifier.indexOf("INCHI:") == 0) {
+      identifier.replace(0,6,"");
+      ext = "inchi";
+
+   }else if (identifier.indexOf("INCHIKEY:") == 0) {
+      identifier.replace(0,9,"");
+      ext = "inchikey";
+
+   }else {
+      QLOG_WARN() << "Unknown molecule identifier type:" << identifier;
+      return;
+   }
+
+   qDebug() << "Identifier" << identifier;
+
+   bool ok(parser.parse(identifier, ext));
+   QStringList errors(parser.errors());
+   Data::Bank& bank(parser.data());
+
+   if (ok && errors.isEmpty() && !bank.isEmpty()) {
+      if (activeMolecule()) activeMolecule()->appendData(bank);
+   }else {
+      QMsgBox::warning(m_parent, "IQmol", "Invalid string");
+   }
 }
 
 

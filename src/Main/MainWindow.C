@@ -574,6 +574,7 @@ void MainWindow::createMenus()
       name = "Insert Molecule ID";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), this, SLOT(insertMoleculeDialog()));
+      action->setShortcut(Qt::CTRL + Qt::Key_B);
 
       menu->addSeparator();
 
@@ -958,8 +959,8 @@ void MainWindow::submitJob(IQmol::Process2::QChemJobInfo& qchemJobInfo)
 void MainWindow::insertMoleculeDialog() 
 {
    InsertMoleculeDialog dialog(this);
-   connect(&dialog, SIGNAL(insertMolecule(QString)), &m_viewerModel, 
-      SLOT(insertMoleculeById(QString)));
+   connect( &dialog, SIGNAL(insertMoleculeById(QString)), 
+       &m_viewerModel, SLOT(insertMoleculeById(QString)) );
    dialog.exec();
 }
 

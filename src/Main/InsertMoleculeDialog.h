@@ -38,7 +38,7 @@ class InsertMoleculeDialog : public QDialog {
       void insertMoleculeById(QString identifier);
 
    private Q_SLOTS:
-      void on_okButton_clicked();
+      void okButton_clicked();
 
    private:
       Ui::InsertMoleculeDialog m_dialog;

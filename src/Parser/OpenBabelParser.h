@@ -40,6 +40,7 @@ namespace Parser {
          bool parseFile(QString const& filePath);
          bool parse(TextStream&);
          bool parse(::OpenBabel::OBMol& mol);
+         bool parse(QString const& string, QString const& extension);
 
 		 /// Returns true if extension is in the list of supported file formats
          static bool formatSupported(QString const& extension);

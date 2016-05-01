@@ -134,6 +134,40 @@ bool OpenBabel::parse(TextStream& stream)
 }
 
 
+// This might be better returning a Data::Geometry object for convenience
+!!!
+bool OpenBabel::parse(QString const& string, QString const& extension)
+{
+   if (!formatSupported(extension)) {
+      QString msg("File format not supported");
+      m_errors.append(msg);
+      return false;
+   }
+
+   std::string str(string.toStdString());
+   std::string ext(extension.toStdString());
+
+   std::stringstream ss(str);
+   ::OpenBabel::OBConversion conv(&ss);
+
+   if (!conv.SetInFormat(ext.data())) {
+      m_errors.append("Failed to set input format from extension " + extension);
+      return false;
+   }
+
+   ::OpenBabel::OBMol mol;
+
+   if (conv.Read(&mol)) {
+      parse(mol);
+   }else {
+      m_errors.append("File format error");
+   }
+
+   // catch?
+
+   return m_errors.isEmpty();
+}
+
 bool OpenBabel::parse(::OpenBabel::OBMol& obMol)
 {
    qDebug() << "Parsing OBMol";

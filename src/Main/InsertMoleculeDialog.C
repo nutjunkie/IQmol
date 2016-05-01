@@ -29,14 +29,24 @@ namespace IQmol {
 InsertMoleculeDialog::InsertMoleculeDialog(QWidget* parent) : QDialog(parent) 
 {
    m_dialog.setupUi(this);
-   connect(&m_dialog, SIGNAL(accepted()), this, SLOT(on_okButton_clicked()));
+   connect(this, SIGNAL(accepted()), this, SLOT(okButton_clicked()));
 }
 
 
-void InsertMoleculeDialog::on_okButton_clicked()
+void InsertMoleculeDialog::okButton_clicked()
 {
-   insertMoleculeById(m_dialog.identifier->text());
-   accept();
+   QString id(m_dialog.identifier->text());
+
+   if (m_dialog.smiles->isChecked()) {
+      id = "SMILES:" + id;
+      insertMoleculeById(id);
+   }else if (m_dialog.inchi->isChecked()) {
+      id = "INCHI:" + id;
+      insertMoleculeById(id);
+   }else if (m_dialog.inchikey->isChecked()) {
+      id = "INCHIKEY:" + id;
+      insertMoleculeById(id);
+   }
 }
 
 } // end namespace IQmol

@@ -201,6 +201,7 @@ void Molecule::appendData(Layer::List& list)
        labels << (*base)->text();
    }
 
+qDebug() << "appending layers";
    Layer::List::iterator iter;
    Files*        files(0);
    Atoms*        atoms(0);
@@ -215,6 +216,7 @@ void Molecule::appendData(Layer::List& list)
 
    for (iter = list.begin(); iter != list.end(); ++iter) {
        text = (*iter)->text();
+qDebug() << "Layer text" << text;
        // Hack to allow multiple cube data files and frequencies
        if (text == "Cube Data") text = "cubedata";
        if (text == "Frequencies") text = "frequencies";
@@ -227,11 +229,13 @@ void Molecule::appendData(Layer::List& list)
               m_fileList.appendLayer(*file);
           }
 
+// This is currently preventing the addition of primivees to an exisiting molecule
        }else if (!labels.contains(text)) {
           labels << (*iter)->text();
 
           if ((atoms = qobject_cast<Atoms*>(*iter))) {
              AtomList atomList(atoms->getAtoms());
+qDebug() << "Atoms size" << atomList.size();
              AtomList::iterator atom;
              for (atom = atomList.begin(); atom != atomList.end(); ++atom) {
                  atoms->removeLayer(*atom);
@@ -239,6 +243,7 @@ void Molecule::appendData(Layer::List& list)
              }
           }else if ((bonds = qobject_cast<Bonds*>(*iter))) {
              BondList bondList(bonds->findLayers<Bond>(Children));
+qDebug() << "Bonds size" << bondList.size();
              BondList::iterator bond;
              for (bond = bondList.begin(); bond != bondList.end(); ++bond) {
                  bonds->removeLayer(*bond);
@@ -272,6 +277,7 @@ void Molecule::appendData(Layer::List& list)
        }
    }
 
+qDebug() << "Calling appendPrimitives()" << primitiveList.size();
    appendPrimitives(primitiveList);
    BondList bondList(findLayers<Bond>(Children));
    if (bondList.isEmpty()) reperceiveBonds();
@@ -1098,17 +1104,21 @@ void Molecule::appendPrimitives(PrimitiveList const& primitives)
    Charge* charge;
    EfpFragment* efp;
    Group* group;
+qDebug() << "appending primiginves now" << primitives.size();
 
    AtomList atoms(findLayers<Atom>(Children));
    int initialNumberOfAtoms(atoms.size());
 
    PrimitiveList::const_iterator primitive;
    for (primitive = primitives.begin(); primitive != primitives.end(); ++primitive) {
+qDebug() << "appending primitive";
 
        if ( (atom = qobject_cast<Atom*>(*primitive)) ) {
+qDebug() << "appending atom";
           m_atomList.appendLayer(atom);
 
        }else if ( (bond = qobject_cast<Bond*>(*primitive)) ) {
+qDebug() << "appending bond";
           m_bondList.appendLayer(bond);
 
        }else if ( (charge = qobject_cast<Charge*>(*primitive)) ) {
