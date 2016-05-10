@@ -85,6 +85,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent),
 
    m_undoStack.setUndoLimit(Preferences::UndoLimit());
    m_undoStackView.setEmptyLabel("History:");
+   m_undoStackView.setSelectionMode(QAbstractItemView::SingleSelection);
    m_viewerView.setModel(&m_viewerModel);
    m_viewerView.setSelectionModel(&m_viewerSelectionModel);
    m_viewer->setActiveViewerMode(Viewer::BuildAtom);
