@@ -134,6 +134,7 @@ namespace IQmol {
          void pushAnimators(AnimatorList const&);
          void popAnimators(AnimatorList const&);
          void foregroundColorChanged(QColor const&);
+         void backgroundColorChanged(QColor const&);
          void fileOpened(QString const&);
 
       protected:

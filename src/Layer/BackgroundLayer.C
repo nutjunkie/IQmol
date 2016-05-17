@@ -42,13 +42,15 @@ Background::Background() : m_backgroundColor(Preferences::BackgroundColor()),
 void Background::draw()
 {
    if (checkState() == Qt::Checked) {
-      glClearColor(m_backgroundColor.redF(), m_backgroundColor.greenF(), 
-         m_backgroundColor.blueF(), m_backgroundColor.alphaF());
+      backgroundColorChanged(m_backgroundColor);
+//      glClearColor(m_backgroundColor.redF(), m_backgroundColor.greenF(), 
+//         m_backgroundColor.blueF(), m_backgroundColor.alphaF());
    } else {
-        glClearColor(1.0f, 1.0f, 1.0f, 0.0f); 
+      glClearColor(1.0f, 1.0f, 1.0f, 0.0f); 
+      backgroundColorChanged(QColor(255,255,255,0));
    }
 
-   glClear(GL_COLOR_BUFFER_BIT);
+ //  glClear(GL_COLOR_BUFFER_BIT);
 
    if (false) {
       glClearColor(1.0f, 1.0f, 1.0f, 1.0f); 

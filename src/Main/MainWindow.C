@@ -210,6 +210,9 @@ void MainWindow::createConnections()
    connect(&m_viewerModel, SIGNAL(foregroundColorChanged(QColor const&)),
        m_viewer, SLOT(setForegroundColor(QColor const&)));
 
+   connect(&m_viewerModel, SIGNAL(backgroundColorChanged(QColor const&)),
+       m_viewer, SLOT(setBackgroundColor(QColor const&)));
+
    connect(&m_viewerModel, SIGNAL(pushAnimators(AnimatorList const&)),
       m_viewer, SLOT(pushAnimators(AnimatorList const&)));
 

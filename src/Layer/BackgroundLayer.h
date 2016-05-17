@@ -45,6 +45,7 @@ namespace Layer {
 
       Q_SIGNALS:
          void foregroundColorChanged(QColor const&);
+         void backgroundColorChanged(QColor const&);
 
       protected:
          QColor m_backgroundColor;

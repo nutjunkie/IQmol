@@ -76,6 +76,9 @@ ViewerModel::ViewerModel(QWidget* parent) : QStandardItemModel(0, 1, parent),
    connect(&m_background, SIGNAL(updated()), this, SIGNAL(updated()));
    connect(&m_background, SIGNAL(foregroundColorChanged(QColor const&)), 
       this, SIGNAL(foregroundColorChanged(QColor const&))); 
+   connect(&m_background, SIGNAL(backgroundColorChanged(QColor const&)), 
+      this, SIGNAL(backgroundColorChanged(QColor const&))); 
+
    connect(&m_axes, SIGNAL(updated()), this, SIGNAL(updated()));
    connect(&m_mesh, SIGNAL(updated()), this, SIGNAL(updated()));
    connect(&m_clippingPlane, SIGNAL(updated()), this, SIGNAL(updated()));
@@ -871,10 +874,10 @@ void ViewerModel::checkItemChanged(QStandardItem* item)
       disconnect(this, SIGNAL(itemChanged(QStandardItem*)), 
          this, SLOT(checkItemChanged(QStandardItem*)));
 
-
       Layer::Base* base;
 
       if (item->checkState() == Qt::Checked) {
+         // This removes the star icon that appears when there are new results
          item->setIcon(QIcon()); 
       }else {
          // close all the child configurators
@@ -896,6 +899,11 @@ void ViewerModel::checkItemChanged(QStandardItem* item)
 
          Layer::Molecule* molecule;
          if ((molecule = dynamic_cast<Layer::Molecule*>(base))) {
+            displayMessage("");
+         }
+
+         Layer::Background* background;
+         if ((background = dynamic_cast<Layer::Background*>(base))) {
             displayMessage("");
          }
       }
