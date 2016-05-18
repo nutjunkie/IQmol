@@ -112,7 +112,7 @@ JobMonitor::JobMonitor(QWidget* parent) : QMainWindow(parent)
    connect(&m_updateTimer, SIGNAL(timeout()), this, SLOT(updateTable()));
 
    table->setSortingEnabled(false);
-   loadJobListFromPreferences();
+   //loadJobListFromPreferences();
 }
 
 

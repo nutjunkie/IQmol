@@ -52,6 +52,7 @@ namespace Process2 {
          void submitJob(IQmol::Process2::QChemJobInfo&);
          void jobSubmissionSuccessful(Job*);
          void jobSubmissionFailed(Job*);
+         void loadJobListFromPreferences();
 
       Q_SIGNALS:
          /// This signal is emitted only when a job has finished successfully.
@@ -105,7 +106,6 @@ namespace Process2 {
 
          void initializeMenus();
          void saveJobListToPreferences() const;
-         void loadJobListFromPreferences();
 
          void addToTable(Job*);
          void reloadJob(Job* job);
