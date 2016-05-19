@@ -27,6 +27,19 @@
 namespace IQmol {
 namespace Data {
 
+
+QString ExcitedStates::typeLabel() const
+{
+   QString type("Unknown");
+   switch (m_type) {
+      case CIS:    type = "CIS";     break;
+      case CISD:   type = "CIS(D)";  break;
+      case TDDFT:  type = "TDDFT";   break;
+      case EOM:    type = "CIS";     break;
+   }
+   return type;
+}
+
 double ExcitedStates::maxEnergy() const
 {
    double max(0.0);
@@ -76,6 +89,35 @@ QList<Amplitude> ExcitedStates::amplitudes(unsigned const transition) const
    } 
 
    return amplitudes;
+}
+
+
+void ExcitedStates::setCisdEnergies(QList<double> const& singlets, 
+   QList<double> const& triplets) 
+{
+   if (triplets.isEmpty() && singlets.size() == m_transitions.size()) {
+      // Unrestricted case states should be in the same order
+      for (int i = 0; i < m_transitions.size(); ++i) {
+          m_transitions[i]->setEnergy(singlets[i]);
+      }
+      m_type = CISD;
+   }else if (singlets.size() + triplets.size() == m_transitions.size()) {
+      int singlet(0);
+      int triplet(0);
+      double s2;
+      for (int i = 0; i < m_transitions.size(); ++i) {
+          // Restricted case, S^2 is either 0.0 or 2.0
+          s2 = m_transitions[i]->spinSquared();
+          if (s2 < 1.0) {
+             m_transitions[i]->setEnergy(singlets[singlet]);
+             ++singlet;
+          }else {
+             m_transitions[i]->setEnergy(triplets[triplet]);
+             ++triplet;
+          }
+      }
+      m_type = CISD;
+   }
 }
 
 

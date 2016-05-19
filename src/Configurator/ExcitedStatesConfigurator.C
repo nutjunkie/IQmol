@@ -80,6 +80,10 @@ void ExcitedStates::load(Data::ExcitedStates const& states)
 {
    Data::ElectronicTransitionList const& transitions(states.transitions());
 
+   QString label(states.typeLabel());
+   label += " Excited States";
+   setWindowTitle(label);
+
    QTableWidget* table(m_configurator.energyTable); 
    table->setRowCount(transitions.size());
    QTableWidgetItem* item;
@@ -105,13 +109,13 @@ void ExcitedStates::load(Data::ExcitedStates const& states)
        item->setData(Qt::UserRole, row);
        table->setItem(row, 0, item);
 
-       text = QString::number(strength, 'f', 4);
+       text = QString::number(strength, 'f', 3);
        item = new QTableWidgetItem( text + "    ");
        item->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
        item->setData(Qt::UserRole, row);
        table->setItem(row, 1, item);
 
-       text = QString::number(spinSquared, 'f', 4);
+       text = QString::number(spinSquared, 'f', 3);
        item = new QTableWidgetItem( text + "    ");
        item->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
        item->setData(Qt::UserRole, row);

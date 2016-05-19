@@ -23,6 +23,7 @@
 ********************************************************************************/
 
 #include "Parser.h"
+#include "ExcitedStates.h"
 
 
 namespace IQmol {
@@ -55,7 +56,8 @@ namespace Parser {
          void readVibrationalModes(TextStream&);
          void readEffectiveRegion(TextStream&);
          void readDMA(TextStream&, Data::Geometry&);
-         void readCisStates(TextStream&);
+         void readCisStates(TextStream&, Data::ExcitedStates::ExcitedStatesT);
+         void readCisdStates(TextStream&);
          void readOrbitalSymmetries(TextStream&, bool const readSymmetries);
          void setTotalEnergy(QString const&, Data::Geometry*, QString const& label);
 

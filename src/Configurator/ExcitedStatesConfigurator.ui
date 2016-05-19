@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>588</width>
+    <width>702</width>
     <height>505</height>
    </rect>
   </property>
@@ -64,6 +64,11 @@ QToolButton:pressed {
        <column>
         <property name="text">
          <string>Strength</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>&lt;S^2&gt;</string>
         </property>
        </column>
       </widget>
