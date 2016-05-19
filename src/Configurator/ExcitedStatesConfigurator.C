@@ -92,6 +92,7 @@ void ExcitedStates::load(Data::ExcitedStates const& states)
    for (iter = transitions.begin(); iter != transitions.end(); ++iter) {
        double energy((*iter)->energy());
        double strength((*iter)->strength());
+       double spinSquared((*iter)->spinSquared());
 
        m_maxValues.first  = std::max(m_maxValues.first,  energy);
        m_maxValues.second = std::max(m_maxValues.second, strength);
@@ -104,11 +105,18 @@ void ExcitedStates::load(Data::ExcitedStates const& states)
        item->setData(Qt::UserRole, row);
        table->setItem(row, 0, item);
 
-       text = QString::number(strength, 'f', 3);
-       item = new QTableWidgetItem( text + "     ");
+       text = QString::number(strength, 'f', 4);
+       item = new QTableWidgetItem( text + "    ");
        item->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
        item->setData(Qt::UserRole, row);
        table->setItem(row, 1, item);
+
+       text = QString::number(spinSquared, 'f', 4);
+       item = new QTableWidgetItem( text + "    ");
+       item->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
+       item->setData(Qt::UserRole, row);
+       table->setItem(row, 2, item);
+ 
        ++row;
    }
 
