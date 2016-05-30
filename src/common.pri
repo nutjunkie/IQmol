@@ -18,7 +18,7 @@ macx {
    LIBS        += $${QGLVIEWER}/QGLViewer/libQGLViewer.a
 
    # Boost
-   BOOST        = $(DEV)/boost_1_56_0
+   BOOST        = $(DEV)/boost_1_58_0
    INCLUDEPATH += $${BOOST}
    LIBS        += $${BOOST}/stage/lib/libboost_iostreams.a
    LIBS        += $${BOOST}/stage/lib/libboost_serialization.a

@@ -47,6 +47,8 @@
 #include <errno.h>
 #endif
 
+#include <stdio.h>
+
 
 namespace IQmol {
 namespace Network {
@@ -235,6 +237,18 @@ void SshConnection::authenticate(AuthenticationT const authentication, QString& 
       QString msg("Failed to establish a valid SSH session ");
       throw Exception(msg + lastSessionError());
    }
+
+/* Can't get this working at the moment
+   const char* fingerprint(libssh2_hostkey_hash(m_session, LIBSSH2_HOSTKEY_HASH_MD5));
+   fprintf(stderr, "SSH Fingerprint: ");
+
+   for (int i = 0; i < 20; ++i) {
+       fprintf(stderr, "%02X ", (unsigned char)fingerprint[i]);
+   }
+   fprintf(stderr, "\n");
+*/
+
+//!!!
 
    // Check what authentication methods are available
    char* authenticationMethods =

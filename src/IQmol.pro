@@ -29,3 +29,4 @@ SUBDIRS  = Util \
            Viewer \
 
 SUBDIRS += Main \
+#Cofigurator.depends = Util

@@ -102,7 +102,6 @@ Reply* HttpConnection::execute(QString const& query)
 
 Reply* HttpConnection::putFile(QString const& sourcePath, QString const& destinationPath)
 {
-   qDebug() << "Should be catching exceptions"; 
    QFile file(sourcePath);
    QByteArray buffer;
 
