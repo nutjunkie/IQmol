@@ -11,6 +11,7 @@ These steps were used to compile under Ubuntu 13.04
      apt-get install cmake
      apt-get install gfortran
      apt-get install libssl-dev
+     apt-get install openssl
      apt-get install libboost-dev
      apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev
 
@@ -30,68 +31,36 @@ These steps were used to compile under Ubuntu 13.04
    Note that $DEV should be set to the directory containing the Qt installation
 
 
-3) Download the OpenMesh source from www.openmesh.org
-
-   The latest version tested is version 3.3 but I needed to specify the C++
-   compiler by adding the following line to the CMakeLists.txt file:
-
-     set (CMAKE_CXX_COMPILER "g++-4.4")
-
-   Compile using cmake (both static and shared libraries are written to the
-   build/Build/lib directory):
-
-        mkdir build && cd build
-        cmake ../
-        make
-
-
-4) Download the OpenBabel source from www.openbable.org
+3) Download the OpenBabel source from www.openbabel.org
 
    The latest version of the source is 2.3.2.  As with OpenMesh, I needed to
    specify the compier as g++-4.4.  Compile using cmake, libraries appear in 
    the lib directory.
 
-        mkdir build && cd build
-        cmake ../
-        sudo make install
+       mkdir build && cd build
+       cmake ../
+       sudo make install
 
    I copied the babelconfig.h file from build/include to include/openbabel.
 
 
-5) Download the LibSSH2 source from www.libssh2.org
+4) Download the LibSSH2 source from www.libssh2.org
 
    The latest version tested is 1.6.  Compilation is straightforward and
    results in shared and static libraries located in src/.libs
 
-        ./configure --with-openssl --with-libz
-        sudo make install
+       ./configure --with-openssl --with-libz
+       sudo make install
 
 
-
-6) Download the OpenSSL source from www.openssl.org
-
-        ./config
-         make
-
-   Or alternatively, install using a package manager:
-
-        sudo apt-get install openssl
-
-
-7) Download the QGLViewer source from libqglviewer.com and compile using qmake
-
-        qmake QGLVIEWER_STATIC=yes QGLViewer.pro
-        make
-
-
-8) Compile the SymMol object file in src/Main
+5) Compile the SymMol object file in src/Main
    There is one Fortran source file that must be compiled using gfortran.  I haven't 
    worked out how to get Qt to do this in the .pro file:
 
        gfortran -c symmol.f90
 
 
-9) Compile IQmol  
+6) Compile IQmol  
    You may need to edit the IQmol/src/common.pri file to reflect the locations
    of the various installed packages.  I put all the compiled libraries above
    in the $DEV directory which I specify in .bashrc
