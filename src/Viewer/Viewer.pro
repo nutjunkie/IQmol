@@ -3,7 +3,8 @@ CONFIG += lib
 include(../common.pri)
 
 INCLUDEPATH += . ../Util ../Data ../Parser ../Qui ../Layer \
-                ../Configurator ../Network ../Yaml ../Process ../Main ../Old
+                ../Configurator ../Network ../Yaml ../Process ../Main ../Old \
+                ../OpenMesh/src
 INCLUDEPATH +=  $$BUILD_DIR/Qui   # Required for the ui_QuiMainWindow.h header
 
 

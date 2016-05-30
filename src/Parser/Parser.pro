@@ -2,7 +2,7 @@ LIB     = Parser
 CONFIG += lib
 include(../common.pri)
 
-INCLUDEPATH += ../Util ../Data ../Yaml
+INCLUDEPATH += ../Util ../Data ../Yaml ../OpenMesh/src
 
 SOURCES += \
    $$PWD/Parser.C \
