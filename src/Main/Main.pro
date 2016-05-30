@@ -7,7 +7,6 @@ TARGET  = IQmol
 BUILD_DIR  = $$PWD/../../build
 
 LIBS += $$BUILD_DIR/libQui.a \
-        $$BUILD_DIR/libLayer.a \
         $$BUILD_DIR/libViewer.a \
         $$BUILD_DIR/libLayer.a \
         $$BUILD_DIR/libParser.a \
@@ -17,9 +16,9 @@ LIBS += $$BUILD_DIR/libQui.a \
         $$BUILD_DIR/libNetwork.a \
         $$BUILD_DIR/libYaml.a \
         $$BUILD_DIR/libPlot.a \
-        $$BUILD_DIR/libQGLViewer.a \
         $$BUILD_DIR/libOld.a \
-        $$BUILD_DIR/libUtil.a
+        $$BUILD_DIR/libUtil.a \
+        $$BUILD_DIR/libQGLViewer.a
 
 LIBS += $$PWD/../OpenMesh/lib/libOpenMeshCore.a \
         $$PWD/../OpenMesh/lib/libOpenMeshTools.a

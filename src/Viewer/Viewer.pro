@@ -18,8 +18,6 @@ SOURCES += \
    $$PWD/CameraDialog.C \
    $$PWD/Cursors.C \
    $$PWD/GLSLmath.C \
-   $$PWD/GLShape.C \
-   $$PWD/GLShapeLibrary.C \
    $$PWD/ManipulateHandler.C \
    $$PWD/ManipulateSelectionHandler.C \
    $$PWD/ManipulatedFrameSetConstraint.C \
@@ -45,8 +43,6 @@ HEADERS += \
    $$PWD/CameraDialog.h \
    $$PWD/Cursors.h \
    $$PWD/GLSLmath.h \
-   $$PWD/GLShape.h \
-   $$PWD/GLShapeLibrary.h \
    $$PWD/ManipulateHandler.h \
    $$PWD/ManipulateSelectionHandler.h \
    $$PWD/ManipulatedFrameSetConstraint.h \
