@@ -228,8 +228,7 @@ bool QChemOutput::parse(TextStream& textStream)
             if (energyOk && valueOk) {
                if (!scanGeometries) scanGeometries = new Data::GeometryList("Scan Geometries");
                Data::Geometry* geom(new Data::Geometry(*currentGeometry));
-
-               Data::TotalEnergy& total(geom->getProperty<Data::TotalEnergy>());
+               Data::TotalEnergy& total(currentGeometry->getProperty<Data::TotalEnergy>());
                total.setValue(energy, Data::Energy::Hartree);
                Data::Constraint& constraint(geom->getProperty<Data::Constraint>());
                constraint.setValue(value);
@@ -263,7 +262,6 @@ bool QChemOutput::parse(TextStream& textStream)
             bool ok;
             m_nAlpha = tokens[2].toUInt(&ok);
             m_nBeta  = tokens[5].toUInt(&ok);
-            
             currentGeometry->setMultiplicity(m_nAlpha-m_nBeta + 1);
          }
 
@@ -273,11 +271,10 @@ bool QChemOutput::parse(TextStream& textStream)
             bool ok;
             double energy(tokens[8].toDouble(&ok));
             if (ok) {
-               Data::ScfEnergy& scf = currentGeometry->getProperty<Data::ScfEnergy>();
+               Data::ScfEnergy& scf(currentGeometry->getProperty<Data::ScfEnergy>());
                scf.setValue(energy, Data::Energy::Hartree);
-               Data::TotalEnergy& total = currentGeometry->getProperty<Data::TotalEnergy>();
+               Data::TotalEnergy& total(currentGeometry->getProperty<Data::TotalEnergy>());
                total.setValue(energy, Data::Energy::Hartree);
-               //qDebug() << "Setting total energy to" << total.value();
             }
          }
 
@@ -320,6 +317,11 @@ bool QChemOutput::parse(TextStream& textStream)
       }else if (line.contains("EMP4                   =")) {
          tokens = TextStream::tokenize(line);
          if (tokens.size() == 3) setTotalEnergy(tokens[2], currentGeometry, "MP4");
+
+      }else if (line.contains("Energy is  ")) { 
+         // Over-ride for geometry optimizations, which might be on an excited state
+         tokens = TextStream::tokenize(line);
+         if (tokens.size() == 3) setTotalEnergy(tokens[2], currentGeometry);
 
       }else if (line.contains("Ground-State Mulliken Net Atomic Charges")) {
          textStream.skipLine(3);
@@ -737,7 +739,7 @@ void QChemOutput::setTotalEnergy(QString const& field, Data::Geometry* geometry,
    if (!ok) return;
    Data::TotalEnergy& data(geometry->getProperty<Data::TotalEnergy>());
    data.setValue(energy, Data::Energy::Hartree);
-   data.setLabel(label + " energy");
+   if (!label.isEmpty()) data.setLabel(label + " energy");
 }
 
 

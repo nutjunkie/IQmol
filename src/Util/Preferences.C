@@ -417,8 +417,7 @@ void SymmetryTolerance(double const tolerance)
 QColor PositiveSurfaceColor() 
 {
    QVariant value(Get("PositiveSurfaceColor"));
-   return value.isNull() ? QColor(232,65,100) : value.value<QColor>();
-   //return value.isNull() ? QColor("blue") : value.value<QColor>();
+   return value.isNull() ? QColor(0,98,255) : value.value<QColor>();
 }
 
 void PositiveSurfaceColor(QColor const& color) 
@@ -431,8 +430,7 @@ void PositiveSurfaceColor(QColor const& color)
 QColor NegativeSurfaceColor() 
 {
    QVariant value(Get("NegativeSurfaceColor"));
-   return value.isNull() ? QColor(50,100,200) : value.value<QColor>();
-   //return value.isNull() ? QColor("red") : value.value<QColor>();
+   return value.isNull() ? QColor(226,37,79) : value.value<QColor>();
 }
 
 void NegativeSurfaceColor(QColor const& color) 
