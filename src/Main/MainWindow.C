@@ -426,13 +426,13 @@ void MainWindow::createMenus()
       name = "Undo";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), &m_undoStack, SLOT(undo()));
-      action->setShortcut(QKeySequence::Undo);
+      action->setShortcut(Qt::CTRL + Qt::Key_Z); 
       connect(&m_undoStack, SIGNAL(canUndoChanged(bool)), action, SLOT(setEnabled(bool)));
 
       name = "Redo";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), &m_undoStack, SLOT(redo()));
-      action->setShortcut(QKeySequence::Redo);
+      action->setShortcut(Qt::SHIFT = Qt::CTRL + Qt::Key_Z); 
       connect(&m_undoStack, SIGNAL(canRedoChanged(bool)), action, SLOT(setEnabled(bool)));
 
       menu->addSeparator();
