@@ -27,12 +27,13 @@
 #include <QPen>
 
 
-class QCustomPlot;
 class QCPItemText;
 class QCPAbstractItem;
 
 
 namespace IQmol {
+
+class CustomPlot;
 
 namespace Data {
    class ExcitedStates;
@@ -78,8 +79,8 @@ namespace Configurator {
          Layer::ExcitedStates& m_excitedStates; 
          Ui::ExcitedStatesConfigurator m_configurator;
 
-         QCustomPlot* m_moPlot;
-         QCustomPlot* m_spectrum;
+         CustomPlot* m_moPlot;
+         CustomPlot* m_spectrum;
          QCPItemText* m_label;
          QPen m_pen;
          QPen m_selectedPen;

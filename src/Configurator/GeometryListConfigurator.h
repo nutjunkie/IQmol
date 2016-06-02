@@ -29,9 +29,10 @@
 #include <QBrush>
 
 
-class QCustomPlot;
 
 namespace IQmol {
+
+class CustomPlot;
 
 namespace Layer {
    class GeometryList;
@@ -78,7 +79,7 @@ namespace Configurator {
 
          Ui::GeometryListConfigurator m_configurator;
          Layer::GeometryList& m_geometryList;
-         QCustomPlot* m_customPlot;
+         CustomPlot* m_customPlot;
          QList<QPair<double, double> > m_rawData;
          QPen m_pen;
          QPen m_selectPen;

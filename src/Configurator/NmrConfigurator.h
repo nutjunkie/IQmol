@@ -27,13 +27,14 @@
 #include <QBrush>
 
 
-class QCustomPlot;
 
 namespace Ui {
    class NmrConfigurator;
 }
 
 namespace IQmol {
+
+class CustomPlot;
 
 namespace Data {
    class Nmr;
@@ -84,7 +85,7 @@ namespace Configurator {
          Data::Nmr& m_data;
 
          Ui::NmrConfigurator* m_ui;
-         QCustomPlot* m_plot;
+         CustomPlot* m_plot;
 
          QPen m_pen;
          QPen m_selectPen;

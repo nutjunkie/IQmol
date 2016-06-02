@@ -1104,21 +1104,17 @@ void Molecule::appendPrimitives(PrimitiveList const& primitives)
    Charge* charge;
    EfpFragment* efp;
    Group* group;
-qDebug() << "appending primiginves now" << primitives.size();
 
    AtomList atoms(findLayers<Atom>(Children));
    int initialNumberOfAtoms(atoms.size());
 
    PrimitiveList::const_iterator primitive;
    for (primitive = primitives.begin(); primitive != primitives.end(); ++primitive) {
-qDebug() << "appending primitive";
 
        if ( (atom = qobject_cast<Atom*>(*primitive)) ) {
-qDebug() << "appending atom";
           m_atomList.appendLayer(atom);
 
        }else if ( (bond = qobject_cast<Bond*>(*primitive)) ) {
-qDebug() << "appending bond";
           m_bondList.appendLayer(bond);
 
        }else if ( (charge = qobject_cast<Charge*>(*primitive)) ) {

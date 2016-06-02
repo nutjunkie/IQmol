@@ -23,7 +23,7 @@
 #include "MolecularOrbitalsConfigurator.h"
 #include "MolecularOrbitalsLayer.h"
 #include "Preferences.h"
-#include "qcustomplot.h"
+#include "CustomPlot.h"
 #include <QColorDialog>
 #include <QMouseEvent>
 #include <QVector>
@@ -82,7 +82,7 @@ void MolecularOrbitals::init()
 
 void MolecularOrbitals::initPlot()
 {
-   m_customPlot = new QCustomPlot(); 
+   m_customPlot = new CustomPlot(); 
    m_customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
    m_customPlot->axisRect()->setRangeDrag(m_customPlot->yAxis->orientation());
    m_customPlot->axisRect()->setRangeZoom(m_customPlot->yAxis->orientation());

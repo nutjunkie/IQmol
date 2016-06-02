@@ -28,10 +28,11 @@
 #include <QPen>
 
 
-class QCustomPlot;
 class QMouseEvent;
 
 namespace IQmol {
+
+class CustomPlot;
 
 namespace Layer {
    class MolecularOrbitals;
@@ -84,7 +85,7 @@ namespace Configurator {
          unsigned int m_nAlpha;
          unsigned int m_nBeta;
          unsigned int m_nOrbitals;
-         QCustomPlot* m_customPlot;
+         CustomPlot* m_customPlot;
          QPen m_pen;
          QPen m_selectedPen;
    };

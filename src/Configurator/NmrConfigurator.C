@@ -25,13 +25,12 @@
 #include "NmrReferenceLibrary.h"
 #include "NmrLayer.h"
 #include "NmrData.h"
-#include "qcustomplot.h"
+#include "CustomPlot.h"
 #include "QMsgBox.h"
 
 /* TO DO
    clean up
    plot lorentzian
-   export plots
 */
 
 // Not pretty, but we use this to indicate when a shift should not be drawn
@@ -53,7 +52,7 @@ Nmr::Nmr(Layer::Nmr& layer, Data::Nmr& data) : m_layer(layer), m_data(data), m_u
    QTableWidget* table(m_ui->shieldingsTable);
    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
-   m_plot = new QCustomPlot();
+   m_plot = new CustomPlot();
    m_plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
    m_plot->axisRect()->setRangeDrag(m_plot->xAxis->orientation());
    m_plot->axisRect()->setRangeZoom(m_plot->xAxis->orientation());

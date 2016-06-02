@@ -398,7 +398,7 @@ void MainWindow::createMenus()
 
       name = "Generate PovRay Input";
       action = menu->addAction(name);
-      action->setShortcut(Qt::CTRL + Qt::Key_1);
+//      action->setShortcut(Qt::CTRL + Qt::Key_1);
       connect(action, SIGNAL(triggered()), this, SLOT(generatePovRay()));
 
       name = "Record Animation";

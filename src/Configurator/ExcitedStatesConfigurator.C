@@ -24,7 +24,7 @@
 #include "ExcitedStatesLayer.h"
 #include "ElectronicTransition.h"
 #include "ExcitedStates.h"
-#include "qcustomplot.h"
+#include "CustomPlot.h"
 #include <cmath>
 
 
@@ -62,7 +62,7 @@ ExcitedStates::~ExcitedStates()
 
 void ExcitedStates::initSpectrum()
 {
-   m_spectrum = new QCustomPlot(); 
+   m_spectrum = new CustomPlot(); 
    m_spectrum->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
    m_spectrum->axisRect()->setRangeDrag(m_spectrum->xAxis->orientation());
    m_spectrum->axisRect()->setRangeZoom(m_spectrum->xAxis->orientation());
@@ -366,7 +366,7 @@ void ExcitedStates::updateMoPlot(int const index)
 
 void ExcitedStates::initMoPlot()
 {
-   m_moPlot   = new QCustomPlot(); 
+   m_moPlot   = new CustomPlot(); 
    m_moPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
    m_moPlot->axisRect()->setRangeDrag(m_moPlot->yAxis->orientation());
    m_moPlot->axisRect()->setRangeZoom(m_moPlot->yAxis->orientation());
