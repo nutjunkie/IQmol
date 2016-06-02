@@ -135,7 +135,6 @@ bool OpenBabel::parse(TextStream& stream)
 
 
 // This might be better returning a Data::Geometry object for convenience
-//!!!
 bool OpenBabel::parse(QString const& string, QString const& extension)
 {
    if (!formatSupported(extension)) {

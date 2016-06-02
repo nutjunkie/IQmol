@@ -2,7 +2,7 @@ LIB = Data
 CONFIG += lib
 include(../common.pri)
 
-INCLUDEPATH += ../Util ../Parser ../Yaml
+INCLUDEPATH += ../Util ../Parser ../Yaml ../OpenMesh/src
 
 SOURCES = \
    $$PWD/Atom.C \
