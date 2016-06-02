@@ -120,8 +120,7 @@ namespace Process2 {
 
          bool getWorkingDirectory(Server*, QChemJobInfo&);
          bool getRemoteWorkingDirectory(Server*, QString& suggestion);
-         bool getLocalWorkingDirectory(QString& suggestion);
-
+         bool getLocalWorkingDirectory(QString& suggestion, bool allowSpace);
          bool renameFile(QString const& oldName, QString const& newName);
 
 		 /// Clears the jobs from the monitor and their servers.  If

@@ -329,7 +329,8 @@ bool JobMonitor::getWorkingDirectory(Server* server, QChemJobInfo& qchemJobInfo)
 #ifndef Q_OS_WIN32
       dirPath += "/" + qchemJobInfo.get(QChemJobInfo::BaseName);
 #endif
-      if (!getLocalWorkingDirectory(dirPath)) return false;
+      bool allowSpace(false);
+      if (!getLocalWorkingDirectory(dirPath, allowSpace)) return false;
    }else {
       dirPath = qchemJobInfo.get(QChemJobInfo::BaseName);
       if (!getRemoteWorkingDirectory(server, dirPath)) return false;
@@ -399,7 +400,7 @@ bool JobMonitor::getRemoteWorkingDirectory(Server* server, QString& name)
 }
 
 
-bool JobMonitor::getLocalWorkingDirectory(QString& dirName)
+bool JobMonitor::getLocalWorkingDirectory(QString& dirName, bool allowSpace)
 {
 qDebug() << "JobMonitor::getLocalWorkingDirectory called with DIR" << dirName;
    QDir dir(dirName);
@@ -427,7 +428,10 @@ qDebug() << "JobMonitor::getLocalWorkingDirectory called with DIR" << dirName;
       dir.setPath(list.first());
       if (dir.path().isEmpty()) return false;
 
-      if (dir.dirName().contains(" ")) {
+      if (dir.dirName().contains(" ") && !allowSpace) {
+         // This situation should only arise when we are submitting a QChem
+         // job locally, in which case this is effectively the job name.
+         // We can't have a space in the name because QChem will barf.
          QMsgBox::warning(0, "IQmol", "Directory name cannot contain spaces");
       }else {
          if (dir.count() == 0) break;
@@ -437,8 +441,8 @@ qDebug() << "JobMonitor::getLocalWorkingDirectory called with DIR" << dirName;
 
          if (QMsgBox::question(QApplication::activeWindow(), "IQmol", msg,
             QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
-            //Util::RemoveDirectory(dir.path());
-            //QDir::root().mkpath(dir.path());
+            // We don't actually overwrite the directory, only the files within
+            // the directory with the same name as the ones we create.
             break;
          }   
       }   
@@ -943,7 +947,8 @@ void JobMonitor::copyResults(Job* job)
       QDir dir(dirPath);
       dirPath = dir.path();
    
-      if (!getLocalWorkingDirectory(dirPath)) return;
+      bool allowSpace(true);
+      if (!getLocalWorkingDirectory(dirPath, allowSpace)) return;
 
       qchemJobInfo.set(QChemJobInfo::LocalWorkingDirectory, dirPath);
 
