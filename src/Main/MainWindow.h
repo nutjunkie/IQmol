@@ -109,6 +109,8 @@ namespace IQmol {
          void configureCamera();
          void clearRecentFilesMenu();
 
+         void generatePovRay();
+
       private:
          void createMenus();
          void createLayout();

@@ -203,10 +203,10 @@ void Viewer::resizeGL(int width, int height)
 
 
 
-void Viewer::generatePovRay()
+void Viewer::generatePovRay(QString const& filename)
 {
    // The ordering of these calls is important
-   PovRayGen povRayGen(m_shaderLibrary->povrayVariables(),
+   PovRayGen povRayGen(filename, m_shaderLibrary->povrayVariables(),
                        m_shaderLibrary->povrayTextures());
    povRayGen.setShaderSettings(m_shaderLibrary->uniformUserVariableList("Phong"));
    povRayGen.setCamera(camera());
@@ -1173,5 +1173,6 @@ void Viewer::saveSnapshot()
    //Snapshot snap(this);
    //snap.capture();
 }
+
 
 } // end namespace IQmol

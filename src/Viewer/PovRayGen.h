@@ -37,7 +37,8 @@ namespace Layer {
    class PovRayGen {
 
       public:
-         PovRayGen(QVariantMap const& settings, QMap<QString, QString> const& textures);
+         PovRayGen(QString const& filename, QVariantMap const& settings, 
+            QMap<QString, QString> const& textures);
          ~PovRayGen();
 
          void setCamera(qglviewer::Camera*);

@@ -399,7 +399,7 @@ void MainWindow::createMenus()
       name = "Generate PovRay Input";
       action = menu->addAction(name);
       action->setShortcut(Qt::CTRL + Qt::Key_1);
-      connect(action, SIGNAL(triggered()), m_viewer, SLOT(generatePovRay()));
+      connect(action, SIGNAL(triggered()), this, SLOT(generatePovRay()));
 
       name = "Record Animation";
       action = menu->addAction(name);
@@ -968,5 +968,36 @@ void MainWindow::insertMoleculeDialog()
    dialog.exec();
 }
 
+
+void MainWindow::generatePovRay()
+{
+   QFileInfo info(Preferences::LastFileAccessed());
+   info.setFile(info.dir(), info.completeBaseName() + ".pov");
+
+   while (1) {
+      QString filter(tr("POV") + " (*.pov)");
+      QStringList extensions;
+      extensions << filter;
+
+      QString fileName(QFileDialog::getSaveFileName(this, tr("Save File"), 
+         info.filePath(), extensions.join(";;"), &filter));
+
+      if (fileName.isEmpty()) {
+         // This will occur if the user cancels the action.
+         return;
+      }else {
+         QRegExp rx("\\*(\\..+)\\)");
+         if (rx.indexIn(filter) > 0) { 
+            filter = rx.cap(1);
+            if (!fileName.endsWith(filter, Qt::CaseInsensitive)) {
+               fileName += filter;
+            }    
+         }    
+         Preferences::LastFileAccessed(fileName);
+         m_viewer->generatePovRay(fileName);
+         break;
+      }    
+   } 
+}
 
 } // end namespace IQmol
