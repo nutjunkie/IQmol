@@ -22,7 +22,6 @@
 
 #include "MolecularOrbitalsConfigurator.h"
 #include "MolecularOrbitalsLayer.h"
-#include "Spin.h"
 #include "Preferences.h"
 #include "qcustomplot.h"
 #include <QColorDialog>
@@ -34,19 +33,21 @@ namespace IQmol {
 namespace Configurator {
 
 MolecularOrbitals::MolecularOrbitals(Layer::MolecularOrbitals& molecularOrbitals)
-  : m_molecularOrbitals(molecularOrbitals), m_customPlot(0)
+  : m_molecularOrbitals(molecularOrbitals), m_nAlpha(0), m_nBeta(0), m_nOrbitals(0),
+    m_customPlot(0)
 {
    m_configurator.setupUi(this);
 
    connect(m_configurator.orbitalRangeMin, SIGNAL(currentIndexChanged(int)),
       m_configurator.orbitalRangeMax, SLOT(setCurrentIndex(int)));
 
-
    m_configurator.surfaceType->clear();
-   m_configurator.surfaceType->addItem("Orbital", Orbital);
-   m_configurator.surfaceType->addItem("Density", Density);
-   m_configurator.surfaceType->addItem("Spin Density", SpinDiffDensity);
-   m_configurator.surfaceType->addItem("Spin Only Density", SpinOnlyDensity);
+   m_configurator.surfaceType->addItem("Alpha Orbital", AlphaOrbital);
+   m_configurator.surfaceType->addItem("Beta Orbital",  BetaOrbital);
+   m_configurator.surfaceType->addItem("Total Density", TotalDensity);
+   m_configurator.surfaceType->addItem("Spin Density",  SpinDensity);
+   m_configurator.surfaceType->addItem("Alpha Density", AlphaDensity);
+   m_configurator.surfaceType->addItem("Beta Density",  BetaDensity);
    m_configurator.surfaceType->setCurrentIndex(0);
 
    setPositiveColor(Preferences::PositiveSurfaceColor());
@@ -71,12 +72,11 @@ MolecularOrbitals::~MolecularOrbitals()
 
 void MolecularOrbitals::init() 
 { 
-   m_nAlpha = m_molecularOrbitals.nAlpha();
-   m_nBeta  = m_molecularOrbitals.nBeta();
+   m_nAlpha    = m_molecularOrbitals.nAlpha();
+   m_nBeta     = m_molecularOrbitals.nBeta();
    m_nOrbitals = m_molecularOrbitals.nOrbitals();
    updateOrbitalRange(m_nAlpha);
    if (m_nOrbitals > 0) initPlot();
- 
 }
 
 
@@ -130,9 +130,9 @@ void MolecularOrbitals::initPlot()
            graph->setName(QString::number(k));
            graph->setScatterStyle(k<nAlpha ? QCPScatterStyle::ssOccupied 
                                            : QCPScatterStyle::ssVirtual);
-           connect(graph, SIGNAL(selectionChanged(bool)), this, SLOT(plotSelectionChanged(bool)));
+           connect(graph, SIGNAL(selectionChanged(bool)), 
+              this, SLOT(plotSelectionChanged(bool)));
        }
-
        i += g;
    }
 
@@ -152,9 +152,9 @@ void MolecularOrbitals::initPlot()
            graph->setName(QString::number(k+nOrbs));
            graph->setScatterStyle(k<nBeta ? QCPScatterStyle::ssOccupied 
                                            : QCPScatterStyle::ssVirtual);
-           connect(graph, SIGNAL(selectionChanged(bool)), this, SLOT(plotSelectionChanged(bool)));
+           connect(graph, SIGNAL(selectionChanged(bool)), 
+              this, SLOT(plotSelectionChanged(bool)));
        }
-
        i += g;
    }
 
@@ -180,13 +180,6 @@ void MolecularOrbitals::initPlot()
 
    yMax = std::min(yMax, 0.5*std::abs(yMin));
    m_customPlot->yAxis->setRange(1.05*yMin,1.05*yMax);
-
-/*
-   connect(m_configurator.orbitalRangeMin, SIGNAL(currentIndexChanged(int)),
-      this, SLOT(clearSelectedOrbitals(int)));
-   connect(m_configurator.orbitalRangeMax, SIGNAL(currentIndexChanged(int)),
-      this, SLOT(clearSelectedOrbitals(int)));
-*/
 }
 
 
@@ -213,14 +206,12 @@ void MolecularOrbitals::plotSelectionChanged(bool tf)
    if (orb < nOrbs) {  //alpha
       energy = m_molecularOrbitals.alphaOrbitalEnergy(orb);
       label  = "Alpha orbital ";
-      m_configurator.alphaRadio->setChecked(true);
-      on_alphaRadio_clicked(true);
+      updateOrbitalRange(m_nAlpha);
    }else {  // beta
       orb -= nOrbs;
       energy = m_molecularOrbitals.betaOrbitalEnergy(orb);
       label  = "Beta orbital ";
-      m_configurator.betaRadio->setChecked(true);
-      on_betaRadio_clicked(true);
+      updateOrbitalRange(m_nBeta);
    }
 
    m_configurator.surfaceType->setCurrentIndex(0);
@@ -250,28 +241,37 @@ void MolecularOrbitals::on_surfaceType_currentIndexChanged(int index)
    QVariant qvar(m_configurator.surfaceType->itemData(index));
 
    switch (qvar.toUInt()) {
-      case Orbital:
+      case AlphaOrbital:
+
          enableOrbitalSelection(true);
-         enableSpin(true);
          enableNegativeColor(true);
+         updateOrbitalRange(m_nAlpha);
          break;
 
-      case Density:
+      case BetaOrbital:
+         enableOrbitalSelection(true);
+         enableNegativeColor(true);
+         updateOrbitalRange(m_nBeta);
+         break;
+
+      case TotalDensity:
          enableOrbitalSelection(false);
-         enableSpin(false);
          enableNegativeColor(false);
          break;
 
-      case SpinDiffDensity:
+      case SpinDensity:
          enableOrbitalSelection(false);
-         enableSpin(false);
          enableNegativeColor(true);
          break;
 
-      case SpinOnlyDensity:
+      case AlphaDensity:
          enableOrbitalSelection(false);
          enableNegativeColor(false);
-         enableSpin(true);
+         break;
+
+      case BetaDensity:
+         enableOrbitalSelection(false);
+         enableNegativeColor(false);
          break;
 
       default:
@@ -335,7 +335,6 @@ void MolecularOrbitals::on_addToQueueButton_clicked(bool)
 {
    int quality(m_configurator.quality->value());
    double isovalue(m_configurator.isovalue->value());
-   Data::Spin spin(m_configurator.alphaRadio->isChecked() ? Data::Alpha : Data::Beta);
    QColor positive(Preferences::PositiveSurfaceColor());
    QColor negative(Preferences::NegativeSurfaceColor());
    bool simplifyMesh(m_configurator.simplifyMeshCheckBox->isChecked());
@@ -352,13 +351,8 @@ void MolecularOrbitals::on_addToQueueButton_clicked(bool)
 
    switch (qvar.toUInt()) {
 
-      case Orbital: {
-         if (spin == Data::Alpha) {
-            info.type().setKind(Data::SurfaceType::AlphaOrbital);
-         }else {
-            info.type().setKind(Data::SurfaceType::BetaOrbital);
-         }
-
+      case AlphaOrbital: {
+         info.type().setKind(Data::SurfaceType::AlphaOrbital);
          int orb1(m_configurator.orbitalRangeMin->currentIndex()+1);
          int orb2(m_configurator.orbitalRangeMax->currentIndex()+1);
 
@@ -368,27 +362,39 @@ void MolecularOrbitals::on_addToQueueButton_clicked(bool)
          }
       } break;
 
-      case Density: {
+      case BetaOrbital: {
+         info.type().setKind(Data::SurfaceType::BetaOrbital);
+         int orb1(m_configurator.orbitalRangeMin->currentIndex()+1);
+         int orb2(m_configurator.orbitalRangeMax->currentIndex()+1);
+
+         for (int i = std::min(orb1,orb2); i <= std::max(orb1, orb2); ++i) {
+             info.type().setIndex(i);
+             queueSurface(info);
+         }
+      } break;
+
+      case TotalDensity: {
          info.setIsSigned(false);
          info.type().setKind(Data::SurfaceType::TotalDensity);
          queueSurface(info);
       } break;
 
-      case SpinDiffDensity: {
+      case SpinDensity: {
             info.type().setKind(Data::SurfaceType::SpinDensity);
          queueSurface(info);
       } break;
 
-      case SpinOnlyDensity: {
+      case AlphaDensity: {
          info.setIsSigned(false);
-         if (spin == Data::Alpha) {
-            info.type().setKind(Data::SurfaceType::AlphaDensity);
-         }else {
-            info.type().setKind(Data::SurfaceType::BetaDensity);
-         }
+         info.type().setKind(Data::SurfaceType::AlphaDensity);
          queueSurface(info);
       } break;
 
+      case BetaDensity: {
+         info.setIsSigned(false);
+         info.type().setKind(Data::SurfaceType::BetaDensity);
+         queueSurface(info);
+      } break;
    }
 }
 
@@ -397,13 +403,6 @@ void MolecularOrbitals::enableOrbitalSelection(bool tf)
 {
    m_configurator.orbitalRangeMin->setEnabled(tf);
    m_configurator.orbitalRangeMax->setEnabled(tf);
-}
-
-
-void MolecularOrbitals::enableSpin(bool tf)
-{
-   m_configurator.alphaRadio->setEnabled(tf);
-   m_configurator.betaRadio->setEnabled(tf);
 }
 
 

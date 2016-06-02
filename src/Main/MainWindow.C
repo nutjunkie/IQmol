@@ -432,7 +432,7 @@ void MainWindow::createMenus()
       name = "Redo";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), &m_undoStack, SLOT(redo()));
-      action->setShortcut(Qt::SHIFT = Qt::CTRL + Qt::Key_Z); 
+      action->setShortcut(Qt::SHIFT + Qt::CTRL + Qt::Key_Z); 
       connect(&m_undoStack, SIGNAL(canRedoChanged(bool)), action, SLOT(setEnabled(bool)));
 
       menu->addSeparator();
