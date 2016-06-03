@@ -18,6 +18,7 @@ SOURCES = \
    $$PWD/ContainerLayer.C \
    $$PWD/CubeDataLayer.C \
    $$PWD/DipoleLayer.C \
+   $$PWD/GeminalOrbitalsLayer.C \
    $$PWD/GeometryLayer.C \
    $$PWD/GeometryListLayer.C \
    $$PWD/EfpFragmentLayer.C \
@@ -48,6 +49,7 @@ HEADERS = \
    $$PWD/ContainerLayer.h \
    $$PWD/CubeDataLayer.h \
    $$PWD/DipoleLayer.h \
+   $$PWD/GeminalOrbitalsLayer.h \
    $$PWD/GeometryLayer.h \
    $$PWD/GeometryListLayer.h \
    $$PWD/GlobalLayer.h \

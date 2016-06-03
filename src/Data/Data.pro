@@ -19,6 +19,7 @@ SOURCES = \
    $$PWD/ExcitedStates.C \
    $$PWD/File.C \
    $$PWD/Frequencies.C \
+   $$PWD/GeminalOrbitals.C \
    $$PWD/Geometry.C \
    $$PWD/GeometryList.C \
    $$PWD/GridData.C \
@@ -60,6 +61,7 @@ HEADERS = \
    $$PWD/ExcitedStates.h \
    $$PWD/File.h \
    $$PWD/Frequencies.h \
+   $$PWD/GeminalOrbitals.h \
    $$PWD/Geometry.h \
    $$PWD/GeometryList.h \
    $$PWD/GridData.h \

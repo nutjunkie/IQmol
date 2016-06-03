@@ -32,6 +32,7 @@
 #include "CubeData.h"
 #include "Frequencies.h"
 #include "MolecularOrbitals.h"
+#include "GeminalOrbitals.h"
 
 #include "AtomLayer.h"
 #include "BondLayer.h"
@@ -46,6 +47,7 @@
 #include "FrequenciesLayer.h"
 #include "ExcitedStatesLayer.h"
 #include "MolecularOrbitalsLayer.h"
+#include "GeminalOrbitalsLayer.h"
 #include "NmrLayer.h"
 #include "QsLog.h"
 #include "openbabel/mol.h"
@@ -116,6 +118,12 @@ Layer::List Factory::toLayers(Data::Base& data)
             Data::MolecularOrbitals& 
                molecularOrbitals(dynamic_cast<Data::MolecularOrbitals&>(data));
             layers.append(new MolecularOrbitals(molecularOrbitals));
+         } break;
+
+         case Data::Type::GeminalOrbitals: {
+            Data::GeminalOrbitals& 
+               geminalOrbitals(dynamic_cast<Data::GeminalOrbitals&>(data));
+            layers.append(new GeminalOrbitals(geminalOrbitals));
          } break;
 
          case Data::Type::ExcitedStates: {

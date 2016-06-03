@@ -20,8 +20,8 @@
 
 ********************************************************************************/
 
-#include "MolecularOrbitalsLayer.h"
-#include "MolecularOrbitals.h"
+#include "GeminalOrbitalsLayer.h"
+#include "GeminalOrbitals.h"
 #include "MoleculeLayer.h"
 #include "GridInfoDialog.h"
 #include "MarchingCubes.h"
@@ -45,8 +45,8 @@ using namespace qglviewer;
 namespace IQmol {
 namespace Layer {
 
-MolecularOrbitals::MolecularOrbitals(Data::MolecularOrbitals& molecularOrbitals)
- : Base("MO Surfaces"), m_configurator(*this), m_molecularOrbitals(molecularOrbitals)
+GeminalOrbitals::GeminalOrbitals(Data::GeminalOrbitals& molecularOrbitals)
+ : Base("Geminal Orbitals"), m_configurator(*this), m_geminalOrbitals(molecularOrbitals)
 {
    connect(&m_configurator, SIGNAL(queueSurface(Data::SurfaceInfo const&)),
       this, SLOT(addToQueue(Data::SurfaceInfo const&)));
@@ -72,25 +72,14 @@ MolecularOrbitals::MolecularOrbitals(Data::MolecularOrbitals& molecularOrbitals)
    m_shellValues.resize(N);
    m_shellPairValues.resize(N*(N+1)/2);
  
-   m_molecularOrbitals.boundingBox(m_bbMin, m_bbMax);
-   appendSurfaces(m_molecularOrbitals.surfaceList());
+   m_geminalOrbitals.boundingBox(m_bbMin, m_bbMax);
+   appendSurfaces(m_geminalOrbitals.surfaceList());
    computeDensityVectors();
 }
 
 
-double MolecularOrbitals::alphaOrbitalEnergy(unsigned const i) const 
-{ 
-   return m_molecularOrbitals.alphaOrbitalEnergy(i);
-}
 
-
-double MolecularOrbitals::betaOrbitalEnergy(unsigned const i) const 
-{ 
-   return m_molecularOrbitals.betaOrbitalEnergy(i);
-}
-
-
-void MolecularOrbitals::appendSurfaces(Data::SurfaceList& surfaceList)
+void GeminalOrbitals::appendSurfaces(Data::SurfaceList& surfaceList)
 {
    Data::SurfaceList::const_iterator iter;
    for (iter = surfaceList.begin(); iter != surfaceList.end(); ++iter) {
@@ -101,7 +90,7 @@ void MolecularOrbitals::appendSurfaces(Data::SurfaceList& surfaceList)
 }
 
 
-void MolecularOrbitals::setMolecule(Layer::Molecule* molecule)
+void GeminalOrbitals::setMolecule(Layer::Molecule* molecule)
 {
    m_molecule = molecule;
    connect(this, SIGNAL(updated()), m_molecule, SIGNAL(updated()));
@@ -109,28 +98,35 @@ void MolecularOrbitals::setMolecule(Layer::Molecule* molecule)
 }
 
 
-unsigned MolecularOrbitals::nAlpha() const 
+unsigned GeminalOrbitals::nAlpha() const 
 { 
-   return m_molecularOrbitals.nAlpha(); 
+   return m_geminalOrbitals.nAlpha(); 
 }
 
-unsigned MolecularOrbitals::nBeta() const 
+unsigned GeminalOrbitals::nBeta() const 
 { 
-   return m_molecularOrbitals.nBeta(); 
+   return m_geminalOrbitals.nBeta(); 
 }
 
-unsigned MolecularOrbitals::nBasis() const 
+unsigned GeminalOrbitals::nBasis() const 
 { 
-   return m_molecularOrbitals.nBasis(); 
+   return m_geminalOrbitals.nBasis(); 
 }
 
-unsigned MolecularOrbitals::nOrbitals() const 
+unsigned GeminalOrbitals::nOrbitals() const 
 { 
-   return m_molecularOrbitals.nOrbitals(); 
+   return m_geminalOrbitals.nOrbitals(); 
 }
 
 
-void MolecularOrbitals::computeDensityVectors()
+double GeminalOrbitals::geminalOrbitalEnergy(unsigned const i) const 
+{ 
+   return m_geminalOrbitals.geminalOrbitalEnergy(i);
+}
+
+
+
+void GeminalOrbitals::computeDensityVectors()
 {
    using namespace boost::numeric::ublas;
 
@@ -138,8 +134,8 @@ void MolecularOrbitals::computeDensityVectors()
    unsigned Na(nAlpha());
    unsigned Nb(nBeta());
 
-   Matrix const& alphaCoefficients(m_molecularOrbitals.alphaCoefficients());
-   Matrix const& betaCoefficients(m_molecularOrbitals.betaCoefficients());
+   Matrix const& alphaCoefficients(m_geminalOrbitals.alphaCoefficients());
+   Matrix const& betaCoefficients(m_geminalOrbitals.betaCoefficients());
 
    Matrix coeffs(Na, N);
    Matrix density(N, N);
@@ -185,33 +181,33 @@ void MolecularOrbitals::computeDensityVectors()
 
 
 
-void MolecularOrbitals::addToQueue(Data::SurfaceInfo const& info) 
+void GeminalOrbitals::addToQueue(Data::SurfaceInfo const& info) 
 { 
    m_surfaceInfoQueue.append(info); 
 }
 
 
-void MolecularOrbitals::clearSurfaceQueue()
+void GeminalOrbitals::clearSurfaceQueue()
 { 
    m_surfaceInfoQueue.clear(); 
 }
 
 
-void MolecularOrbitals::showGridInfo()
+void GeminalOrbitals::showGridInfo()
 {
    GridInfoDialog dialog(&m_availableGrids, m_molecule);
    dialog.exec();
 }
 
 
-void MolecularOrbitals::editBoundingBox()
+void GeminalOrbitals::editBoundingBox()
 {
    BoundingBoxDialog dialog(&m_bbMin, &m_bbMax);
    dialog.exec();
 }
 
 
-Data::GridData* MolecularOrbitals::findGrid(Data::SurfaceType const& type, 
+Data::GridData* GeminalOrbitals::findGrid(Data::SurfaceType const& type, 
    Data::GridSize const& size, Data::GridDataList const& gridList)
 {
    Data::GridData* grid(0);
@@ -223,7 +219,6 @@ Data::GridData* MolecularOrbitals::findGrid(Data::SurfaceType const& type,
    qDebug() << "List";
    gridList.dump();
   
-
    for (iter = gridList.begin(); iter != gridList.end(); ++iter) {
        if ( type == (*iter)->surfaceType() && size == (*iter)->size() ) {
           grid = (*iter);
@@ -235,7 +230,7 @@ Data::GridData* MolecularOrbitals::findGrid(Data::SurfaceType const& type,
 }
 
 
-void MolecularOrbitals::dumpGridInfo() const
+void GeminalOrbitals::dumpGridInfo() const
 {
    Data::GridDataList::const_iterator iter;
    for (iter = m_availableGrids.begin(); iter != m_availableGrids.end(); ++iter) {
@@ -247,23 +242,20 @@ void MolecularOrbitals::dumpGridInfo() const
 
 
 
-QString MolecularOrbitals::description(Data::SurfaceInfo const& info, bool const tooltip)
+QString GeminalOrbitals::description(Data::SurfaceInfo const& info, bool const tooltip)
 {
    Data::SurfaceType const& type(info.type());
    QString label(type.toString());
 
    if (type.isOrbital()) {
       unsigned nElectrons;
-      double orbitalEnergy;
       unsigned index(type.index());
       Data::SurfaceType::Kind kind(type.kind());
 
       if (kind == Data::SurfaceType::AlphaOrbital) {
          nElectrons = nAlpha();
-         orbitalEnergy = m_molecularOrbitals.alphaOrbitalEnergy(index-1);
       }else {
          nElectrons = nBeta();
-         orbitalEnergy = m_molecularOrbitals.betaOrbitalEnergy(index-1);
       }
 
       if (index == nElectrons-1) {
@@ -277,7 +269,7 @@ QString MolecularOrbitals::description(Data::SurfaceInfo const& info, bool const
       }
 
       if (tooltip) {
-         label += "\nEnergy   = " + QString::number(orbitalEnergy, 'f', 3);
+         label += "\nEnergy   = " + QString::number(0, 'f', 3);
       }
    }
 
@@ -290,7 +282,7 @@ QString MolecularOrbitals::description(Data::SurfaceInfo const& info, bool const
 }
 
 
-void MolecularOrbitals::processSurfaceQueue()
+void GeminalOrbitals::processSurfaceQueue()
 {
    GridQueue gridQueue;
 
@@ -337,7 +329,7 @@ qDebug() << "Grid already exists";
        Data::Surface* surfaceData(generateSurface(*iter));
 
        if (surfaceData) {
-          m_molecularOrbitals.appendSurface(surfaceData);
+          m_geminalOrbitals.appendSurface(surfaceData);
 
           Layer::Surface* surfaceLayer(new Layer::Surface(*surfaceData));
           if (surfaceLayer) {
@@ -371,7 +363,7 @@ qDebug() << "Grid already exists";
 }
 
  
-bool MolecularOrbitals::processGridQueue(GridQueue const& gridQueue)
+bool GeminalOrbitals::processGridQueue(GridQueue const& gridQueue)
 {
    // First obtain a list of the unique grid sizes
    std::set<Data::GridSize> sizes;
@@ -478,7 +470,7 @@ bool MolecularOrbitals::processGridQueue(GridQueue const& gridQueue)
 }
 
 
-Data::Surface* MolecularOrbitals::generateSurface(Data::SurfaceInfo const& surfaceInfo)
+Data::Surface* GeminalOrbitals::generateSurface(Data::SurfaceInfo const& surfaceInfo)
 {
    QTime time;
    time.start();
@@ -527,7 +519,7 @@ Data::Surface* MolecularOrbitals::generateSurface(Data::SurfaceInfo const& surfa
 
 // This requires all the Grids be of the same size and all the orbitals to be
 // of the same spin.  Returns true only if something was calculated.
-bool MolecularOrbitals::computeOrbitalGrids(Data::GridDataList& grids)
+bool GeminalOrbitals::computeOrbitalGrids(Data::GridDataList& grids)
 {
    if (grids.isEmpty()) return false;;
 
@@ -558,10 +550,10 @@ bool MolecularOrbitals::computeOrbitalGrids(Data::GridDataList& grids)
    Matrix const* coefficients;
    if (g0->surfaceType().kind() == Data::SurfaceType::AlphaOrbital) {
       QLOG_TRACE() << "Setting MO coefficient data to Alpha";
-      coefficients = &(m_molecularOrbitals.alphaCoefficients());
+      coefficients = &(m_geminalOrbitals.alphaCoefficients());
    }else {
       QLOG_TRACE() << "Setting MO coefficient data to Beta";
-      coefficients = &(m_molecularOrbitals.betaCoefficients());
+      coefficients = &(m_geminalOrbitals.betaCoefficients());
    }
    
    unsigned nOrb(orbitals.size());
@@ -584,7 +576,7 @@ bool MolecularOrbitals::computeOrbitalGrids(Data::GridDataList& grids)
    double* tmp = new double[nOrb];
    unsigned i, j, k;
 
-   Data::ShellList const& shells(m_molecularOrbitals.shellList());
+   Data::ShellList const& shells(m_geminalOrbitals.shellList());
    Data::ShellList::const_iterator shell;
 
    for (i = 0, x = origin.x;  i < nx;  ++i, x += delta.x) {
@@ -637,7 +629,7 @@ bool MolecularOrbitals::computeOrbitalGrids(Data::GridDataList& grids)
 }
 
 
-bool MolecularOrbitals::computeDensityGrids(Data::GridData*& alpha, Data::GridData*& beta)
+bool GeminalOrbitals::computeDensityGrids(Data::GridData*& alpha, Data::GridData*& beta)
 {
    QTime time;
    time.start();
@@ -778,9 +770,9 @@ bool MolecularOrbitals::computeDensityGrids(Data::GridData*& alpha, Data::GridDa
 }
 
 
-void MolecularOrbitals::computeShellPairs(Vec const& gridPoint)
+void GeminalOrbitals::computeShellPairs(Vec const& gridPoint)
 {
-   Data::ShellList const& shells(m_molecularOrbitals.shellList());
+   Data::ShellList const& shells(m_geminalOrbitals.shellList());
 
    double* values;
    Data::ShellList::const_iterator shell;

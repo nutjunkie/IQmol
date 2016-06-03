@@ -109,6 +109,7 @@ QString toString(ID const id)
       case OrbitalSymmetries:        s = "Data::OrbitalSymmetries";         break;
       case YamlNode:                 s = "Data::YamlNode";                  break;
       case PovRay:                   s = "Data::PovRay";                    break;
+      case GeminalOrbitals:          s = "Data::GeminalOrbitals";           break;
    }
 
    return s;

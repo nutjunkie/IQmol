@@ -15,6 +15,7 @@ SOURCES = \
    $$PWD/ExcitedStatesConfigurator.C \
    $$PWD/FileConfigurator.C \
    $$PWD/FrequenciesConfigurator.C \
+   $$PWD/GeminalOrbitalsConfigurator.C \
    $$PWD/GeometryListConfigurator.C \
    $$PWD/InfoConfigurator.C \
    $$PWD/MoleculeConfigurator.C \
@@ -34,6 +35,7 @@ HEADERS = \
    $$PWD/ExcitedStatesConfigurator.h \
    $$PWD/FileConfigurator.h \
    $$PWD/FrequenciesConfigurator.h \
+   $$PWD/GeminalOrbitalsConfigurator.h \
    $$PWD/GeometryListConfigurator.h \
    $$PWD/InfoConfigurator.h \
    $$PWD/MoleculeConfigurator.h \
@@ -51,6 +53,7 @@ FORMS = \
    $$PWD/ExcitedStatesConfigurator.ui \
    $$PWD/FileConfigurator.ui \
    $$PWD/FrequenciesConfigurator.ui \
+   $$PWD/GeminalOrbitalsConfigurator.ui \
    $$PWD/GeometryListConfigurator.ui \
    $$PWD/InfoConfigurator.ui \
    $$PWD/MoleculeConfigurator.ui \

@@ -125,7 +125,7 @@ void ParseFile::run()
    QStringList::const_iterator file;
    for (file = m_filePaths.begin(); file != m_filePaths.end(); ++file) {
        QString fileName(*file);
-       qDebug() << "Calling parse on" << fileName;
+       QLOG_INFO() << "Parsing file: " << fileName;
        if (parse(fileName, addToFileList)) {
           if (addToFileList) fileList->append(new Data::File(fileName));
        }
@@ -141,7 +141,6 @@ void ParseFile::run()
 
 bool ParseFile::parse(QString const& filePath, bool& addToFileList)
 {
-qDebug() << "About to parse file" << filePath;
    QFileInfo fileInfo(filePath);
    addToFileList = true;
    
