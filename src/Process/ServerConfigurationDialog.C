@@ -262,7 +262,9 @@ bool ServerConfigurationDialog::copyTo(ServerConfiguration* config)
       }
 
       if (m_dialog.workingDirectory->text().contains("~")) {
-         QMsgBox::warning(this, "IQmol", "Use of shortcut ~ in working directory not supported");
+         QString msg("Use of ~ shortcut in working directory may not work\n");
+         msg += "Suggest using $HOME or full path";
+         QMsgBox::warning(this, "IQmol", msg);
          return false;
       }
    }

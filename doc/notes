@@ -1,17 +1,6 @@
 TODO LIST:
 ~~~~~~~~~~
 
- - compile open babel statically on all platforms (allows bespoke changes)
-    - remove plugin directory
-    - remove dynamic library in distribution
-    - formats need checking individually, cml, for example, does not work
-      cml needs the libxml 
-
- - Samples for the Parser/test directory:
-    - iqmol archive
-    - charges file
-    - esp/hf/mo plot files from QChem
-
  - clean up MoleculeLayer class
  - For the geometry configurator, a context menu should allow the user to
    export the coordinates to a file.  (This can be done with copy and paste)
@@ -23,7 +12,6 @@ TODO LIST:
     - need to test public key, hostbased and agent authentication for SshConnection
     - Test queuing of requests on SSH channel
     - Block further updates if one is active
-
 
 
 THINGS TO CONSIDER:
@@ -41,18 +29,8 @@ THINGS TO CONSIDER:
   - JobMonitor list saved too often
 
 
-
-
 IQmol 2.7 
 ~~~~~~~~~
-
- o File Formats
-    - Molden input format (http://www.cmbi.ru.nl/molden/molden_format.html)
-    - Archive file
-    - Samples for the Parser/test directory:
-       - iqmol archive
-       - charges file
-       - esp/hf/mo plot files from QChem
 
  o Spectra:
     - UV and examination of excited states
@@ -107,7 +85,7 @@ IQmol 3.0
     o For plots, (eg. ESP) generate suggested box boundaries.
 
  * Viewer
-    o Clipping planes - a new global object (mouse grabber)
+    o Probe planes - a new global object (mouse grabber)
        - Display property (eg. ESP)
        - Configure color, transparency, size, border
     o Adjustable resolution for large systems.

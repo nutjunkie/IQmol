@@ -101,6 +101,9 @@ Atom::Atom(int Z) : Primitive("Atom"), m_charge(0.0), m_spin(0.0),
       setVibrationVectorColor(Preferences::VibrationVectorColor());
    }
 
+   // We don't allow changes to the valency at the moment as it seems to be unstable
+   // Need to check the OpenBabel code again.
+   return;
    QActionGroup* hybrids(new QActionGroup(this));
    QStringList labels;
    labels << "sp" << "sp2" << "sp3" << "Square Planar" 

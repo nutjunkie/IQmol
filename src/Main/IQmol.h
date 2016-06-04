@@ -34,7 +34,7 @@
 #include <limits>
 #define FOREVER ( std::numeric_limits<int>::max() )
 
-#define IQMOL_VERSION "2.8.0"
+#define IQMOL_VERSION "2.8.0b"
 #define IQMOL_YEAR "2016"
 
 class QToolButton;
