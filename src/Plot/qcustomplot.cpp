@@ -10542,7 +10542,8 @@ bool QCustomPlot::savePdf(const QString &fileName, bool noCosmeticPen, int width
   printer.printEngine()->setProperty(QPrintEngine::PPK_DocumentName, pdfTitle);
   QRect oldViewport = viewport();
   setViewport(QRect(0, 0, newWidth, newHeight));
-  printer.setPaperSize(viewport().size(), QPrinter::DevicePixel);
+  QSize border(20,20);
+  printer.setPaperSize(viewport().size()+border, QPrinter::DevicePixel);
   QCPPainter printpainter;
   if (printpainter.begin(&printer))
   {
@@ -10550,6 +10551,7 @@ bool QCustomPlot::savePdf(const QString &fileName, bool noCosmeticPen, int width
     printpainter.setMode(QCPPainter::pmNoCaching);
     printpainter.setMode(QCPPainter::pmNonCosmetic, noCosmeticPen);
     printpainter.setWindow(mViewport);
+    printpainter.setViewport(viewport());
     if (mBackgroundBrush.style() != Qt::NoBrush &&
         mBackgroundBrush.color() != Qt::white &&
         mBackgroundBrush.color() != Qt::transparent &&

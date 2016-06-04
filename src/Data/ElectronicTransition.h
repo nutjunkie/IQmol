@@ -52,6 +52,7 @@ namespace Data {
          double spinSquared() const { return m_spinSquared; }
          qglviewer::Vec const& transitionMoment() { return m_transitionMoment; }
 
+         void setEnergy(double const energy) { m_energy = energy; }
          bool addAmplitude(QStringList const&, unsigned const nAlpha, unsigned const nBeta);
          QList<Amplitude>& amplitudes() { return m_amplitudes; }
 

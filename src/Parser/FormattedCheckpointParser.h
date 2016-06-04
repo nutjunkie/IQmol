@@ -24,10 +24,16 @@
 
 #include "Parser.h"
 #include "Geometry.h"
-#include "MolecularOrbitals.h"
+#include "Shell.h"
 
 
 namespace IQmol {
+
+namespace Data {
+   class MolecularOrbitals;
+   class GeminalOrbitals;
+}
+
 namespace Parser {
 
    class FormattedCheckpoint : public Base {
@@ -62,13 +68,27 @@ namespace Parser {
             QList<double> betaEnergies;
          };
 
+         struct GmoData {
+            unsigned nAlpha;
+            unsigned nBeta;
+            unsigned nBasis;
+            QList<double> alphaCoefficients;
+            QList<double> betaCoefficients;
+            QList<double> geminalEnergies;
+            QList<double> geminalCoefficients;
+            QList<int>    geminalMoMap;
+         };
+
          void clear(MoData&);
+         void clear(GmoData&);
 
          QList<int> readIntegerArray(TextStream&, unsigned nTokens);
          QList<double> readDoubleArray(TextStream&, unsigned nTokens);
          QList<unsigned> readUnsignedArray(TextStream&, unsigned nTokens);
 
          Data::MolecularOrbitals* makeMolecularOrbitals(MoData const&, ShellData const&,
+            Data::Geometry const&);
+         Data::GeminalOrbitals* makeGeminalOrbitals(GmoData const&, ShellData const&,
             Data::Geometry const&);
          Data::ShellList* makeShellList(ShellData const&, Data::Geometry const& geometry);
          Data::Geometry* makeGeometry(GeomData const&);

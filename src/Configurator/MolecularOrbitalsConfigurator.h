@@ -28,10 +28,11 @@
 #include <QPen>
 
 
-class QCustomPlot;
 class QMouseEvent;
 
 namespace IQmol {
+
+class CustomPlot;
 
 namespace Layer {
    class MolecularOrbitals;
@@ -45,7 +46,8 @@ namespace Configurator {
       Q_OBJECT
 
       public:
-         enum { Orbital, Density, SpinDiffDensity, SpinOnlyDensity };
+         enum { AlphaOrbital, BetaOrbital, TotalDensity, SpinDensity, 
+            AlphaDensity, BetaDensity };
 
          explicit MolecularOrbitals(Layer::MolecularOrbitals&);
          ~MolecularOrbitals();
@@ -63,8 +65,6 @@ namespace Configurator {
          void on_addToQueueButton_clicked(bool);
          void on_calculateButton_clicked(bool);
          void on_cancelButton_clicked(bool);
-         void on_alphaRadio_clicked(bool) { updateOrbitalRange(m_nAlpha); }
-         void on_betaRadio_clicked(bool)  { updateOrbitalRange(m_nBeta); }
          void on_positiveColorButton_clicked(bool);
          void on_negativeColorButton_clicked(bool);
          void plotSelectionChanged(bool tf);
@@ -73,7 +73,6 @@ namespace Configurator {
       private:
          void enableOrbitalSelection(bool);
          void enableNegativeColor(bool);
-         void enableSpin(bool);
          void updateOrbitalRange(int nElectrons);
          void updateOrbitalRange(int nElectrons, QComboBox*);
          void setPositiveColor(QColor const& color);
@@ -86,7 +85,7 @@ namespace Configurator {
          unsigned int m_nAlpha;
          unsigned int m_nBeta;
          unsigned int m_nOrbitals;
-         QCustomPlot* m_customPlot;
+         CustomPlot* m_customPlot;
          QPen m_pen;
          QPen m_selectedPen;
    };

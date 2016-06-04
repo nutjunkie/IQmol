@@ -22,6 +22,8 @@
 
 #include "FormattedCheckpointParser.h"
 #include "MolecularOrbitalsList.h"
+#include "MolecularOrbitals.h"
+#include "GeminalOrbitals.h"
 #include "DipoleMoment.h"
 #include "GeometryList.h"
 #include "TextStream.h"
@@ -46,6 +48,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
    GeomData  geomData;
    ShellData shellData;
    MoData    moData;
+   GmoData   gmoData;
 
    while (!textStream.atEnd()) {
 
@@ -58,11 +61,13 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       QStringList list(TextStream::tokenize(tmp));
 
       if (key == "Number of alpha electrons") {            // This should only appear once
-         moData.nAlpha = list.at(1).toInt(&ok);
+         moData.nAlpha  = list.at(1).toInt(&ok);
+         gmoData.nAlpha = list.at(1).toInt(&ok);
          if (!ok) goto error;
 
       }else if (key == "Number of beta electrons") {       // This should only appear once
-         moData.nBeta = list.at(1).toInt(&ok);
+         moData.nBeta  = list.at(1).toInt(&ok);
+         gmoData.nBeta = list.at(1).toInt(&ok);
          if (!ok) goto error;
 
       }else if (key == "Multiplicity") { 
@@ -97,7 +102,10 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          geometryList->append(geometry);
 
       }else if (key == "Number of basis functions") {
-         // Determined from the size of the MO coefficient matrices
+         gmoData.nBasis = list.at(1).toUInt(&ok);
+         if (!ok) goto error;
+         // Also determined from the size of the MO coefficient matrices 
+         // for MolecularOrbitals
 
       }else if (key == "Shell types") {
          unsigned n(list.at(2).toUInt(&ok));
@@ -165,6 +173,32 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          if (!ok || !geometry) goto error;
          moData.betaEnergies = readDoubleArray(textStream, n);
 
+      }else if (key == "Alpha GMO coefficients") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok) goto error;
+         gmoData.alphaCoefficients = readDoubleArray(textStream, n);
+         gmoData.betaCoefficients  = gmoData.alphaCoefficients;
+
+      }else if (key == "Beta GMO coefficients") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok) goto error;
+         gmoData.betaCoefficients = readDoubleArray(textStream, n);
+
+      }else if (key == "MO to geminal map") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok) goto error;
+         gmoData.geminalMoMap = readIntegerArray(textStream, n);
+
+      }else if (key == "Geminal Coefficients") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok) goto error;
+         gmoData.geminalCoefficients = readDoubleArray(textStream, n);
+
+      }else if (key == "Energies of Geminals") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok) goto error;
+         gmoData.geminalEnergies = readDoubleArray(textStream, n);
+
       }else if (key == "Dipole_Data") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok || !geometry) goto error;
@@ -186,6 +220,8 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
    if (geometry) {
       Data::MolecularOrbitals* mos(makeMolecularOrbitals(moData, shellData, *geometry)); 
       if (mos) molecularOrbitalsList->append(mos);
+      Data::GeminalOrbitals* gmos(makeGeminalOrbitals(gmoData, shellData, *geometry)); 
+      if (gmos) m_dataBank.append(gmos);
    }
 
    if (geometryList) {
@@ -226,6 +262,16 @@ void FormattedCheckpoint::clear(MoData& moData)
    moData.betaCoefficients.clear();
    moData.alphaEnergies.clear();
    moData.betaEnergies.clear();
+}
+
+
+void FormattedCheckpoint::clear(GmoData& gmoData)
+{
+   gmoData.alphaCoefficients.clear();
+   gmoData.betaCoefficients.clear();
+   gmoData.geminalEnergies.clear();
+   gmoData.geminalCoefficients.clear();
+   gmoData.geminalMoMap.clear();
 }
 
 
@@ -310,6 +356,36 @@ Data::MolecularOrbitals* FormattedCheckpoint::makeMolecularOrbitals(MoData const
    return mos;
 }
             
+
+Data::GeminalOrbitals* FormattedCheckpoint::makeGeminalOrbitals(GmoData const& gmoData, 
+   ShellData const& shellData, Data::Geometry const& geometry)
+{
+   // This needs fixing.  Newer versions of QChem only print the orbitals for the
+   // final geometry, so the first ones are just for the geometries
+   if (gmoData.geminalEnergies.isEmpty()) return 0;
+   Data::ShellList* shellList = makeShellList(shellData, geometry);
+   if (!shellList) return 0;
+   Data::GeminalOrbitals* gmos = new Data::GeminalOrbitals(
+      gmoData.nAlpha, 
+      gmoData.nBeta,
+      gmoData.nBasis,
+      gmoData.alphaCoefficients,
+      gmoData.betaCoefficients,
+      gmoData.geminalEnergies,
+      gmoData.geminalCoefficients,
+      gmoData.geminalMoMap,
+      *shellList
+   );
+
+   if (!gmos->consistent()) {
+      QString msg("Geminal data are inconsistent. Check shell types.");
+      m_errors.append(msg);
+      delete gmos;
+      gmos = 0;
+   }
+
+   return gmos;
+}
 
 
 Data::ShellList* FormattedCheckpoint::makeShellList(ShellData const& shellData, 

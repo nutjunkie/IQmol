@@ -90,7 +90,6 @@ double MolecularOrbitals::betaOrbitalEnergy(unsigned const i) const
 }
 
 
-
 void MolecularOrbitals::appendSurfaces(Data::SurfaceList& surfaceList)
 {
    Data::SurfaceList::const_iterator iter;

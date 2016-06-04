@@ -15,7 +15,11 @@ CONFIG  += ordered
 
 TEMPLATE = subdirs
 
-SUBDIRS  = Util \
+SUBDIRS  = QGLViewer \
+           OpenMesh \
+           OpenMesh/src/OpenMesh/Core \
+           OpenMesh/src/OpenMesh/Tools \
+           Util \
            Data \
            Qui \
            Parser \
@@ -26,5 +30,5 @@ SUBDIRS  = Util \
            Yaml \
            Plot \
            Process \
-
-SUBDIRS += Main \
+           Viewer \
+           Main \

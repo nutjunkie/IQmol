@@ -2,12 +2,12 @@ LIB = Configurator
 CONFIG += lib
 include(../common.pri)
 
-INCLUDEPATH += ../Layer ../Data ../Util ../Old ../Plot
-#INCLUDEPATH += $$BUILD_DIR/IQmol
+INCLUDEPATH += ../Layer ../Data ../Util ../Plot ../Viewer ../Main ../Old ../OpenMesh/src
 
 SOURCES = \
    $$PWD/AxesMeshConfigurator.C \
    $$PWD/BackgroundConfigurator.C \
+   $$PWD/ClippingPlaneConfigurator.C \
    $$PWD/ConstraintConfigurator.C \
    $$PWD/CubeDataConfigurator.C \
    $$PWD/DipoleConfigurator.C \
@@ -15,6 +15,7 @@ SOURCES = \
    $$PWD/ExcitedStatesConfigurator.C \
    $$PWD/FileConfigurator.C \
    $$PWD/FrequenciesConfigurator.C \
+   $$PWD/GeminalOrbitalsConfigurator.C \
    $$PWD/GeometryListConfigurator.C \
    $$PWD/InfoConfigurator.C \
    $$PWD/MoleculeConfigurator.C \
@@ -25,6 +26,7 @@ SOURCES = \
 HEADERS = \
    $$PWD/AxesMeshConfigurator.h \
    $$PWD/BackgroundConfigurator.h \
+   $$PWD/ClippingPlaneConfigurator.h \
    $$PWD/Configurator.h \
    $$PWD/ConstraintConfigurator.h \
    $$PWD/CubeDataConfigurator.h \
@@ -33,6 +35,7 @@ HEADERS = \
    $$PWD/ExcitedStatesConfigurator.h \
    $$PWD/FileConfigurator.h \
    $$PWD/FrequenciesConfigurator.h \
+   $$PWD/GeminalOrbitalsConfigurator.h \
    $$PWD/GeometryListConfigurator.h \
    $$PWD/InfoConfigurator.h \
    $$PWD/MoleculeConfigurator.h \
@@ -43,12 +46,14 @@ HEADERS = \
 FORMS = \
    $$PWD/AxesMeshConfigurator.ui \
    $$PWD/BackgroundConfigurator.ui \
+   $$PWD/ClippingPlaneConfigurator.ui \
    $$PWD/CubeDataConfigurator.ui \
    $$PWD/DipoleConfigurator.ui \
    $$PWD/EfpFragmentListConfigurator.ui \
    $$PWD/ExcitedStatesConfigurator.ui \
    $$PWD/FileConfigurator.ui \
    $$PWD/FrequenciesConfigurator.ui \
+   $$PWD/GeminalOrbitalsConfigurator.ui \
    $$PWD/GeometryListConfigurator.ui \
    $$PWD/InfoConfigurator.ui \
    $$PWD/MoleculeConfigurator.ui \

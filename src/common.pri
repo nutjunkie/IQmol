@@ -3,9 +3,7 @@
 QT     += xml opengl gui network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
-QMAKE_CXXFLAGS += -O2 -g -ggdb 
-QMAKE_CXXFLAGS_WARN_ON = -Wall -Wno-unknown-pragmas -Wno-c++11-extensions 
-QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-function
+QMAKE_CXXFLAGS += -O2 -g -ggdb
 
 # Set the $DEV environment variable to the top directory used to compile all
 # the packages.  To simplify distribution, we use static libraries wherever
@@ -20,7 +18,7 @@ macx {
    LIBS        += $${QGLVIEWER}/QGLViewer/libQGLViewer.a
 
    # Boost
-   BOOST        = $(DEV)/boost_1_56_0
+   BOOST        = $(DEV)/boost_1_58_0
    INCLUDEPATH += $${BOOST}
    LIBS        += $${BOOST}/stage/lib/libboost_iostreams.a
    LIBS        += $${BOOST}/stage/lib/libboost_serialization.a
@@ -36,11 +34,15 @@ macx {
    INCLUDEPATH += /usr/local/include/openbabel-2.0
    LIBS        += -L/usr/local/lib -lopenbabel
 
-   # SSH2 / libssl / libcrypto
-   INCLUDEPATH += $(DEV)/extlib/include
-   LIBS        += $(DEV)/extlib/lib//libssh2.a
-   LIBS        += $(DEV)/extlib/lib/libssl.a 
-   LIBS        += $(DEV)/extlib/lib/libcrypto.a
+   # SSH2
+   LIBSSH2      = $(DEV)/libssh2-1.6.0
+   INCLUDEPATH += $${LIBSSH2}/include
+   LIBS        += $${LIBSSH2}/src/.libs/libssh2.a
+
+   # libssl/libcrypto
+   LIBSSL       = $(DEV)/openssl-1.0.2a
+   LIBS        += $${LIBSSL}/libssl.a 
+   LIBS        += $${LIBSSL}/libcrypto.a
 
    # gfortran
    LIBS += /usr/local/gfortran/lib/libgfortran.a
@@ -61,36 +63,42 @@ macx {
 unix:!macx {
    #CONFIG += release
  
+   INCLUDEPATH += /usr/local/include
+   LIBS        += -L/usr/local/lib
+
    # QGLViewer
-   QGLVIEWER    = $(DEV)/libQGLViewer-2.6.3
-   INCLUDEPATH += $${QGLVIEWER}
-   LIBS        += $${QGLVIEWER}/QGLViewer/libQGLViewer.a
+   #QGLVIEWER    = $(DEV)/libQGLViewer-2.6.3
+   #INCLUDEPATH += $${QGLVIEWER}
+   #LIBS        += $${QGLVIEWER}/QGLViewer/libQGLViewer.a
 
    # Boost
-   BOOST        = /usr/lib
-   LIBS        += $${BOOST}/libboost_iostreams.a
-   LIBS        += $${BOOST}/libboost_serialization.a
+   #BOOST        = /usr/lib
+   #LIBS        += $${BOOST}/libboost_iostreams.a
+   #LIBS        += $${BOOST}/libboost_serialization.a
+   LIBS         += -lboost_iostreams -lboost_serialization
    
    # OpenMesh
-   OPENMESH     = $(DEV)/OpenMesh-3.3
-   INCLUDEPATH += $${OPENMESH}/src
-   LIBS        += $${OPENMESH}/build/Build/lib/libOpenMeshCored.a
-   LIBS        += $${OPENMESH}/build/Build/lib/libOpenMeshToolsd.a
+   #OPENMESH     = $(DEV)/OpenMesh-3.3
+   #INCLUDEPATH += $${OPENMESH}/src
+   #LIBS        += $${OPENMESH}/build/Build/lib/libOpenMeshCore.a
+   #LIBS        += $${OPENMESH}/build/Build/lib/libOpenMeshTools.a
 
    # OpenBabel
-   OPENBABEL    = $(DEV)/openbabel-2.3.2
-   INCLUDEPATH += $${OPENBABEL}/include
-   LIBS        += -L$${OPENBABEL}/build/lib -lopenbabel
+   #OPENBABEL    = $(DEV)/openbabel-2.3.2
+   #INCLUDEPATH += $${OPENBABEL}/include
+   INCLUDEPATH  += /usr/local/include/openbabel-2.0
+   LIBS         += -lopenbabel
 
    # SSH2
-   LIBSSH2      = $(DEV)/libssh2-1.6.0
-   INCLUDEPATH += $${LIBSSH2}/include
-   LIBS        += $$LIBSSH2/src/.libs/libssh2.a
+   #LIBSSH2      = $(DEV)/libssh2-1.6.0
+   #INCLUDEPATH += $${LIBSSH2}/include
+   #LIBS        += $$LIBSSH2/src/.libs/libssh2.a
 
    # libssl/crypto
-   LIBSSL       = $(DEV)/openssl-1.0.2d
-   INCLUDEPATH += $${LIBSSL}/include
-   LIBS        += $${LIBSSL}/libssl.a $${LIBSSL}/libcrypto.a
+   #LIBSSL       = $(DEV)/openssl-1.0.2d
+   #INCLUDEPATH += $${LIBSSL}/include
+   #LIBS        += $${LIBSSL}/libssl.a $${LIBSSL}/libcrypto.a
+   LIBS         += -lssh2 -lssl -lcrypto
 
    # gfortran
    LIBS        += /usr/lib/gcc/x86_64-linux-gnu/4.7.3/libgfortran.a
@@ -155,6 +163,7 @@ INCLUDEPATH    += $$PWD  $$BUILD_DIR
 
 lib {
    CONFIG      += staticlib
+   CONFIG      -= shared
    TEMPLATE     = lib
    DESTDIR      = $$BUILD_DIR
    OBJECTS_DIR  = $$BUILD_DIR

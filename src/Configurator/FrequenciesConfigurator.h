@@ -27,9 +27,10 @@
 #include <QPen>
 #include <QBrush>
 
-class QCustomPlot;
 
 namespace IQmol {
+
+class CustomPlot;
 
 namespace Layer {
    class Frequencies;
@@ -77,20 +78,21 @@ namespace Configurator {
          void on_ramanCheckbox_clicked(bool);
 
          void plotSelectionChanged(bool);
-         void contextMenuRequest(QPoint);
          void updatePlot();
+
 
       private:
          enum Profile { Gaussian, Lorentzian };
 
          void closeEvent(QCloseEvent*);
+ //        void contextMenuEvent(QContextMenuEvent*);
          void setVectorColor(QColor const& color);
          void plotImpulse(double const scaleFactor);
          void plotSpectrum(Profile const, double const scaleFactor, double const width);
 
          Ui::FrequenciesConfigurator m_configurator;
          Layer::Frequencies& m_frequencies;
-         QCustomPlot* m_customPlot;
+         CustomPlot* m_customPlot;
          QList<QPair<double, double> > m_rawData;
          QList<QPair<double, double> > m_rawRamanData;
          QList<QPair<double, double> > m_rawIrData;

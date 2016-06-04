@@ -23,6 +23,7 @@
 #include "AtomLayer.h"
 #include "Preferences.h"
 #include "Viewer.h"
+#include "PovRayGen.h"
 #include <openbabel/mol.h>
 #include <openbabel/data.h>
 #include <QColor>
@@ -100,6 +101,9 @@ Atom::Atom(int Z) : Primitive("Atom"), m_charge(0.0), m_spin(0.0),
       setVibrationVectorColor(Preferences::VibrationVectorColor());
    }
 
+   // We don't allow changes to the valency at the moment as it seems to be unstable
+   // Need to check the OpenBabel code again.
+   return;
    QActionGroup* hybrids(new QActionGroup(this));
    QStringList labels;
    labels << "sp" << "sp2" << "sp3" << "Square Planar" 
@@ -165,11 +169,22 @@ void Atom::setIndex(int const index)
 }
 
 
+void Atom::povray(PovRayGen& povray)
+{
+   QColor color;
+   color.setRgbF(m_color[0], m_color[1], m_color[2], m_color[3]);
+   double radius(getRadius());
+   if (m_drawMode == Primitive::WireFrame) radius = 0.02;
+   povray.writeAtom(getPosition(), color, radius);
+}
+
+
 void Atom::draw()
 {
    drawPrivate(false);
    if (s_vibrationDisplayVector) drawDisplacement();
 }
+
 
 void Atom::drawFast()
 {

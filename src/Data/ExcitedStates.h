@@ -38,17 +38,22 @@ namespace Data {
       public:
          Type::ID typeID() const { return Type::ExcitedStates; }
 
-         enum ExcitedStatesT { CIS, TDDFT, EOM };
-         void setType(ExcitedStatesT const type) { m_type = type; }
+         enum ExcitedStatesT { CIS, CISD, TDDFT, EOM };
+
+         ExcitedStates(ExcitedStatesT type = CIS) : m_type(type) { }
+
+//         void setType(ExcitedStatesT const type) { m_type = type; }
+         QString typeLabel() const;
 
          void append(ElectronicTransition* transition) { m_transitions.append(transition); }
 
+         void setCisdEnergies(QList<double> const& singlets, QList<double> const& triplets);
          OrbitalSymmetries& orbitalSymmetries() { return m_orbitalSymmetries; }
          OrbitalSymmetries const& orbitalSymmetries() const { return m_orbitalSymmetries; }
 
          double maxEnergy() const;
          double maxIntensity() const;
-         bool   isEmpty() const { return m_transitions.isEmpty(); }
+         unsigned nTransitions() const { return m_transitions.size(); }
 
          void dump() const;
 
@@ -70,13 +75,11 @@ namespace Data {
             ar & m_transitions;
             ar & m_orbitalSymmetries;
             ar & m_type;
-            ar & m_label;
          }
 
          ElectronicTransitionList m_transitions;
          OrbitalSymmetries m_orbitalSymmetries;
          ExcitedStatesT m_type;
-         QString m_label;
    };
 
 

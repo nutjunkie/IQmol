@@ -188,7 +188,7 @@ QString TemplateForRunFile(bool const local)
             "set QCproc=:\n"
             "for /F \"tokens=2 delims= \" %%A IN ('tasklist /fi ^\"imagename eq %QCEXE%^\" /nh') do set QCproc=!QCproc!%%A:\n"
             "start /B qc ${JOB_NAME}.inp ${JOB_NAME}.out\n"
-            "timeout /t 1 >nul"
+            "timeout /t 1 >nul\n"
             "set ProcessId=\n"
             "for /F \"tokens=2 delims= \" %%A IN ('tasklist /fi ^\"imagename eq %QCEXE%^\" /nh') do (call :findpid %%A)\n"
             "echo ProcessId = %ProcessId% =\n"

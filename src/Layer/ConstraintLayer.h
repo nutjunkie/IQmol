@@ -28,9 +28,6 @@
 #include "openbabel/forcefield.h"
 
 
-class QGLViewer;
-class QFontMetrics;
-
 namespace IQmol {
 
 namespace Data {

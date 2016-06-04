@@ -35,6 +35,7 @@ namespace IQmol {
    }
 
    class MeshDecimatorTask;
+   class PovRayGen;
 
    namespace Layer {
 
@@ -60,7 +61,9 @@ namespace IQmol {
             void draw();
             void drawFast();
             void drawSelected();
-            void setAlpha(double alpha);
+            void setAlpha(double const alpha);
+            void setClip(bool const tf);
+            void povray(PovRayGen&);
 
             void setMolecule(Molecule*);
             void setCheckStatus(Qt::CheckState const);
@@ -115,6 +118,8 @@ namespace IQmol {
             bool m_balanceScale;  // for properties
 
             MeshDecimatorTask* m_decimator;
+            void povray(PovRayGen&, Data::OMMesh const&, QColor const&);
+            void povrayLines(PovRayGen&, Data::OMMesh const&, QColor const&);
       };
    
    } // end namespace Layer

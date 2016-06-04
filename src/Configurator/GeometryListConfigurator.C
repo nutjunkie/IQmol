@@ -27,7 +27,7 @@
 #include "Constraint.h"
 #include <QHeaderView>
 
-#include "qcustomplot.h"
+#include "CustomPlot.h"
 
 
 using namespace qglviewer;
@@ -46,7 +46,7 @@ GeometryList::GeometryList(Layer::GeometryList& geometryList) : m_geometryList(g
    m_configurator.energyTable->verticalHeader()->setResizeMode(QHeaderView::ResizeToContents);
 #endif
 
-   m_customPlot = new QCustomPlot();
+   m_customPlot = new CustomPlot();
 
    m_customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
    m_customPlot->xAxis->setSelectableParts(QCPAxis::spNone);

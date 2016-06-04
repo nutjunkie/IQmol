@@ -41,9 +41,11 @@ namespace Layer {
       public:
          Background();
          void draw();
+         QColor color() const { return m_backgroundColor; }
 
       Q_SIGNALS:
          void foregroundColorChanged(QColor const&);
+         void backgroundColorChanged(QColor const&);
 
       protected:
          QColor m_backgroundColor;

@@ -2,7 +2,9 @@ LIB = Layer
 CONFIG += lib
 include(../common.pri)
 
-INCLUDEPATH += ../Data ../Util ../Old ../Configurator ../Parser ../Process ../Main
+INCLUDEPATH += ../Data ../Util ../Configurator ../Parser ../Process ../Main ../Viewer ../Old \
+               ../OpenMesh/src
+     
 
 SOURCES = \
    $$PWD/AtomLayer.C \
@@ -11,10 +13,12 @@ SOURCES = \
    $$PWD/BackgroundLayer.C \
    $$PWD/BondLayer.C \
    $$PWD/ChargeLayer.C \
+   $$PWD/ClippingPlaneLayer.C \
    $$PWD/ConstraintLayer.C \
    $$PWD/ContainerLayer.C \
    $$PWD/CubeDataLayer.C \
    $$PWD/DipoleLayer.C \
+   $$PWD/GeminalOrbitalsLayer.C \
    $$PWD/GeometryLayer.C \
    $$PWD/GeometryListLayer.C \
    $$PWD/EfpFragmentLayer.C \
@@ -40,10 +44,12 @@ HEADERS = \
    $$PWD/BackgroundLayer.h \
    $$PWD/BondLayer.h \
    $$PWD/ChargeLayer.h \
+   $$PWD/ClippingPlaneLayer.h \
    $$PWD/ConstraintLayer.h \
    $$PWD/ContainerLayer.h \
    $$PWD/CubeDataLayer.h \
    $$PWD/DipoleLayer.h \
+   $$PWD/GeminalOrbitalsLayer.h \
    $$PWD/GeometryLayer.h \
    $$PWD/GeometryListLayer.h \
    $$PWD/GlobalLayer.h \

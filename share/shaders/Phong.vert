@@ -1,46 +1,81 @@
 #version 120
 
 // BEGIN UNIFORM
-uniform float Ambient;              // 0.05
-uniform float Diffuse;              // 0.40
-uniform float Shininess;            // 0.90
-uniform float Highlights;           // 0.70
-uniform bool Enhance_Surface_Edges; // 0
+uniform float user_Ambient;                // 0.50
+uniform float user_Diffuse;                // 0.60
+uniform float user_Highlights;             // 0.40
+uniform float user_Shininess;              // 0.90
+
+uniform float user_Saturation;             // 1.00
+uniform float user_Noise_Intensity;        // 0.00
+
+uniform bool  user_Enhance_Transparency;   // 1
+uniform bool  user_Enhance_Edges;          // 0
+uniform bool  user_Hemisphere_Lighting;    // 1
+
+uniform bool  user_light_Front;            // 1
+uniform bool  user_light_Highlight;        // 1
+uniform bool  user_light_Left;             // 0
+uniform bool  user_light_Lower;            // 0
 // END UNIFORM
-
-// Outputs to fragment shader
-varying vec3 normal;
-varying vec4 color;
-varying vec3 viewDirection;
-
-varying float xray;
+ 
 varying float shine;
-varying float ambient;
-varying float diffuse_scale;
-varying float specular_scale;
+varying vec4  color;
+varying vec3  normal;
+varying vec3  viewDirection;
+varying vec3  v_texCoord3D;
 
 
-void main() 
+void main()
 {
-   // transform vertex to Eye space for user clipping plane calculations
-   vec4 ecpos = gl_ModelViewMatrix * gl_Vertex;
-   gl_ClipVertex = ecpos;
-   viewDirection = normalize(vec3(ecpos) / ecpos.w);
+   const vec3 white = vec3(1.0);
+   const vec4 lightDirection0 = vec4( 0.4,  0.0,  1.0, 1.0);  // similar to gl_LightSource[0]
+   const vec4 lightDirection1 = vec4( 0.3,  0.8, -0.5, 1.0);  // good
+   const vec4 lightDirection2 = vec4(-0.5,  0.0,  0.0, 1.0);
+   const vec4 lightDirection3 = vec4( 0.0, -1.0,  0.2, 1.0);
 
-   // transform vertex to Clip space
-   gl_Position = ftransform();
+   vec3 vertexPosition = vec3(gl_ModelViewMatrix * gl_Vertex);  // in eye coordinates
+   vec3 vertexNormal   = normalize(gl_NormalMatrix * gl_Normal);
 
-   if (Enhance_Surface_Edges && gl_Color.a < 0.99) {
-      xray = gl_Color.a;
-   }else {
-      xray = 1.0;
+   float alpha   = gl_Color.a;
+   float ambient = user_Ambient;
+   float diffuse = 0.0;
+
+   if (user_light_Front) {
+      vec3 lightDirection  = normalize(lightDirection0.xyz);          // deprecate
+      diffuse += lightDirection0.w * max(0.0, dot(lightDirection, vertexNormal));
+   }
+   if (user_light_Highlight) {
+      vec3 lightDirection  = normalize(lightDirection1.xyz);          // deprecate
+      diffuse += lightDirection1.w * max(0.0, dot(lightDirection, vertexNormal));
+   }
+   if (user_light_Left) {
+      vec3 lightDirection  = normalize(lightDirection2.xyz);          // deprecate
+      diffuse += lightDirection2.w * max(0.0, dot(lightDirection, vertexNormal));
+   }
+   if (user_light_Lower) {
+      vec3 lightDirection  = normalize(lightDirection3.xyz);          // deprecate
+      diffuse += lightDirection3.w * max(0.0, dot(lightDirection, vertexNormal));
+   }
+   diffuse *= user_Diffuse;
+
+   if (user_Enhance_Edges) {
+      ambient += (1.0-alpha) * (1.0-ambient);
+   }
+   if (user_Hemisphere_Lighting) {
+      ambient *= (0.5 + 0.5*vertexNormal.y);
    }
 
-   color          = gl_Color;
-   normal         = normalize(gl_NormalMatrix * gl_Normal);
-   ambient        = 0.5 * Ambient;
-   shine          = 100.0 * Shininess;
-   diffuse_scale  = 4.0 * Diffuse;
-   specular_scale = Highlights;
-}
+   vec3 rgb = gl_Color.rgb;
+   rgb *= (ambient+diffuse); 
+   rgb  = user_Saturation*rgb +  (1.0-user_Saturation)*white;
 
+   shine         = max(0.01, 50.0*(1.0-user_Shininess));
+   color         = vec4(rgb, alpha);
+   normal        = vertexNormal;
+   viewDirection = normalize(vertexPosition);
+   v_texCoord3D  = gl_Vertex.xyz;
+   gl_Position   = gl_ModelViewProjectionMatrix * gl_Vertex;
+
+   gl_ClipVertex = gl_ModelViewMatrix * gl_Vertex;
+}

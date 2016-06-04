@@ -312,17 +312,18 @@ void SurfaceAnimatorDialog::computeMultiGridAnimation()
 
    int totalProgress(0);
    int totalSurfaces(m_referenceFrames + (m_referenceFrames-1)*interpolationFrames);
-   QProgressDialog progressDialog("Calculating surfaces", "Cancel", 0, 
-      totalSurfaces, this);
-   progressDialog.setWindowModality(Qt::WindowModal);
-   progressDialog.setValue(totalProgress);
+   QProgressDialog* progressDialog(new QProgressDialog("Calculating surfaces", 
+      "Cancel", 0, totalSurfaces, this));
+      
+   progressDialog->setWindowModality(Qt::WindowModal);
+   progressDialog->setValue(totalProgress);
 
    Data::CubeData* A(new Data::CubeData(cube->cubeData()));
    Data::CubeData* B(0);
 
    // loop over grids
    for (int i = 1; i < m_referenceFrames; ++i) {
-       if (progressDialog.wasCanceled()) {
+       if (progressDialog->wasCanceled()) {
           delete A;
           return;
        }
@@ -369,9 +370,9 @@ void SurfaceAnimatorDialog::computeMultiGridAnimation()
            cube->appendLayer(surface);
 
            ++totalProgress;
-           progressDialog.setValue(totalProgress);
+           progressDialog->setValue(totalProgress);
            QApplication::processEvents();
-           if (progressDialog.wasCanceled()) {
+           if (progressDialog->wasCanceled()) {
               delete A;
               delete B;
               return;
@@ -396,6 +397,8 @@ void SurfaceAnimatorDialog::computeMultiGridAnimation()
    m_animator->setLoopMode(m_dialog.loopButton->isChecked());
    m_animator->setBounceMode(m_dialog.bounceButton->isChecked());
 
+   progressDialog->hide();
+   //   progressDialog->deleteLater();
    delete B;
 }
 

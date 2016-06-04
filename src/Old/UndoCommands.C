@@ -228,7 +228,7 @@ void MoveObjects::saveFrames(QList<Frame>& frames)
    for (int i = 0; i < m_objectList.size(); ++i) {
        frames.append(m_objectList[i]->getFrame());
    }
-   frames.append(m_molecule->getReferenceFrame());
+   if (m_molecule) frames.append(m_molecule->getReferenceFrame());
 }
 
 
@@ -237,7 +237,7 @@ void MoveObjects::loadFrames(QList<Frame> const& frames)
    for (int i = 0; i < m_objectList.size(); ++i) {
        m_objectList[i]->setFrame(frames[i]);
    }
-   m_molecule->setReferenceFrame(frames.last());
+   if (m_molecule) m_molecule->setReferenceFrame(frames.last());
 }
 
 

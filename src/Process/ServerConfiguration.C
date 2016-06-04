@@ -159,7 +159,13 @@ ServerConfiguration::AuthenticationT ServerConfiguration::toAuthenticationT(
 
 ServerConfiguration::ServerConfiguration()
 {
+#ifdef Q_OS_WIN32
+   // Set the default to HTTP on Windows for now as HTTPS seems to require
+   // additional libraries.
+   setDefaults(HTTP);
+#else
    setDefaults(HTTPS);
+#endif
    setDefaults(Web);
    //setDefaults(Local);
    //setDefaults(Basic);

@@ -28,6 +28,7 @@
 #include "CubeParser.h"
 #include "IQmolParser.h"
 #include "MeshParser.h"
+#include "PovRayParser.h"
 #include "QChemInputParser.h"
 #include "QChemOutputParser.h"
 #include "QChemPlotParser.h"
@@ -124,7 +125,7 @@ void ParseFile::run()
    QStringList::const_iterator file;
    for (file = m_filePaths.begin(); file != m_filePaths.end(); ++file) {
        QString fileName(*file);
-       qDebug() << "Calling parse on" << fileName;
+       QLOG_INFO() << "Parsing file: " << fileName;
        if (parse(fileName, addToFileList)) {
           if (addToFileList) fileList->append(new Data::File(fileName));
        }
@@ -140,7 +141,6 @@ void ParseFile::run()
 
 bool ParseFile::parse(QString const& filePath, bool& addToFileList)
 {
-qDebug() << "About to parse file" << filePath;
    QFileInfo fileInfo(filePath);
    addToFileList = true;
    
@@ -211,6 +211,11 @@ qDebug() << "About to parse file" << filePath;
       parser = new Yaml;
    }
  
+   if (extension == "inc" || extension == "pov") {
+      addToFileList = false;
+      QLOG_DEBUG() << "Using PovRay parser";
+      parser = new PovRay;
+   }
    
    if (!parser && OpenBabel::formatSupported(extension)) {
       // Only if we do not have a custom parser do we let Open Babel at it

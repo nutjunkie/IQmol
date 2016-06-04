@@ -36,7 +36,7 @@ namespace Layer {
 
 Frequencies::Frequencies(Data::Frequencies const& frequencies) : Base("Frequencies"), 
    m_frequencies(frequencies), m_configurator(*this), m_play(false), m_loop(-1.0), 
-   m_speed(0.0625), m_scale(0.25)
+   m_speed(0.0625), m_scale(0.25), m_activeMode(0)
 {
    Data::VibrationalModeList::const_iterator iter;
    Data::VibrationalModeList const& modes(m_frequencies.modes());
@@ -97,7 +97,6 @@ void Frequencies::configure()
 
 void Frequencies::setActiveMode(Mode const& mode)
 {  
-   clearActiveMode();
    if (!m_molecule) return;
 
    AtomList atoms(m_molecule->findLayers<Atom>(Children));
@@ -142,8 +141,17 @@ void Frequencies::setLoop(bool const loop)
 
 void Frequencies::playMode(Mode const& mode)
 {
-   setActiveMode(mode);
-   setPlay(true);
+   clearActiveMode();
+
+   if (m_activeMode == &mode) {
+      m_activeMode = 0;
+      setActiveMode(mode);
+      setPlay(false);
+   }else {
+      m_activeMode = &mode;
+      setActiveMode(mode);
+      setPlay(true);
+   }
 }
 
 

@@ -52,6 +52,7 @@ namespace Process2 {
          void submitJob(IQmol::Process2::QChemJobInfo&);
          void jobSubmissionSuccessful(Job*);
          void jobSubmissionFailed(Job*);
+         void loadJobListFromPreferences();
 
       Q_SIGNALS:
          /// This signal is emitted only when a job has finished successfully.
@@ -105,7 +106,6 @@ namespace Process2 {
 
          void initializeMenus();
          void saveJobListToPreferences() const;
-         void loadJobListFromPreferences();
 
          void addToTable(Job*);
          void reloadJob(Job* job);
@@ -120,8 +120,7 @@ namespace Process2 {
 
          bool getWorkingDirectory(Server*, QChemJobInfo&);
          bool getRemoteWorkingDirectory(Server*, QString& suggestion);
-         bool getLocalWorkingDirectory(QString& suggestion);
-
+         bool getLocalWorkingDirectory(QString& suggestion, bool allowSpace);
          bool renameFile(QString const& oldName, QString const& newName);
 
 		 /// Clears the jobs from the monitor and their servers.  If

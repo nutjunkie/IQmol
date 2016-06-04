@@ -24,7 +24,7 @@
 #include "ExcitedStatesLayer.h"
 #include "ElectronicTransition.h"
 #include "ExcitedStates.h"
-#include "qcustomplot.h"
+#include "CustomPlot.h"
 #include <cmath>
 
 
@@ -62,7 +62,7 @@ ExcitedStates::~ExcitedStates()
 
 void ExcitedStates::initSpectrum()
 {
-   m_spectrum = new QCustomPlot(); 
+   m_spectrum = new CustomPlot(); 
    m_spectrum->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
    m_spectrum->axisRect()->setRangeDrag(m_spectrum->xAxis->orientation());
    m_spectrum->axisRect()->setRangeZoom(m_spectrum->xAxis->orientation());
@@ -80,6 +80,10 @@ void ExcitedStates::load(Data::ExcitedStates const& states)
 {
    Data::ElectronicTransitionList const& transitions(states.transitions());
 
+   QString label(states.typeLabel());
+   label += " Excited States";
+   setWindowTitle(label);
+
    QTableWidget* table(m_configurator.energyTable); 
    table->setRowCount(transitions.size());
    QTableWidgetItem* item;
@@ -92,6 +96,7 @@ void ExcitedStates::load(Data::ExcitedStates const& states)
    for (iter = transitions.begin(); iter != transitions.end(); ++iter) {
        double energy((*iter)->energy());
        double strength((*iter)->strength());
+       double spinSquared((*iter)->spinSquared());
 
        m_maxValues.first  = std::max(m_maxValues.first,  energy);
        m_maxValues.second = std::max(m_maxValues.second, strength);
@@ -105,10 +110,17 @@ void ExcitedStates::load(Data::ExcitedStates const& states)
        table->setItem(row, 0, item);
 
        text = QString::number(strength, 'f', 3);
-       item = new QTableWidgetItem( text + "     ");
+       item = new QTableWidgetItem( text + "    ");
        item->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
        item->setData(Qt::UserRole, row);
        table->setItem(row, 1, item);
+
+       text = QString::number(spinSquared, 'f', 3);
+       item = new QTableWidgetItem( text + "    ");
+       item->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
+       item->setData(Qt::UserRole, row);
+       table->setItem(row, 2, item);
+ 
        ++row;
    }
 
@@ -354,7 +366,7 @@ void ExcitedStates::updateMoPlot(int const index)
 
 void ExcitedStates::initMoPlot()
 {
-   m_moPlot   = new QCustomPlot(); 
+   m_moPlot   = new CustomPlot(); 
    m_moPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
    m_moPlot->axisRect()->setRangeDrag(m_moPlot->yAxis->orientation());
    m_moPlot->axisRect()->setRangeZoom(m_moPlot->yAxis->orientation());

@@ -819,7 +819,6 @@ void InputDialog::submitJob()
 {      
    capturePreviewTextChanges();
    updatePreviewText();
-   qDebug() << "submitJob called in QUI";
 
    m_qchemJobInfo.set(
       IQmol::Process2::QChemJobInfo::InputString, generateInputString());

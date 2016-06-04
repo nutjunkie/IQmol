@@ -8,6 +8,8 @@ SOURCES = \
    $$PWD/ColorGradientdialog.C \
    $$PWD/EulerAngles.C \
    $$PWD/Function.C \
+   $$PWD/GLShape.C \
+   $$PWD/GLShapeLibrary.C \
    $$PWD/Matrix.C \
    $$PWD/Preferences.C \
    $$PWD/qcprot.C \
@@ -26,6 +28,8 @@ HEADERS = \
    $$PWD/EulerAngles.h \
    $$PWD/Exception.h \
    $$PWD/Function.h \
+   $$PWD/GLShape.h \
+   $$PWD/GLShapeLibrary.h \
    $$PWD/Matrix.h \
    $$PWD/Numerical.h \
    $$PWD/OpenGL.h \

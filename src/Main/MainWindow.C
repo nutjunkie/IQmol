@@ -24,6 +24,7 @@
 #include "ServerConfigurationListDialog.h"
 #include "JobMonitor.h"
 #include "ServerRegistry.h" 
+#include "InsertMoleculeDialog.h" 
 
 #include "QMsgBox.h"
 #include "Animator.h"
@@ -84,6 +85,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent),
 
    m_undoStack.setUndoLimit(Preferences::UndoLimit());
    m_undoStackView.setEmptyLabel("History:");
+   m_undoStackView.setSelectionMode(QAbstractItemView::SingleSelection);
    m_viewerView.setModel(&m_viewerModel);
    m_viewerView.setSelectionModel(&m_viewerSelectionModel);
    m_viewer->setActiveViewerMode(Viewer::BuildAtom);
@@ -207,6 +209,9 @@ void MainWindow::createConnections()
 
    connect(&m_viewerModel, SIGNAL(foregroundColorChanged(QColor const&)),
        m_viewer, SLOT(setForegroundColor(QColor const&)));
+
+   connect(&m_viewerModel, SIGNAL(backgroundColorChanged(QColor const&)),
+       m_viewer, SLOT(setBackgroundColor(QColor const&)));
 
    connect(&m_viewerModel, SIGNAL(pushAnimators(AnimatorList const&)),
       m_viewer, SLOT(pushAnimators(AnimatorList const&)));
@@ -391,6 +396,11 @@ void MainWindow::createMenus()
       connect(action, SIGNAL(triggered()), m_viewer, SLOT(saveSnapshot()));
       action->setShortcut(Qt::CTRL + Qt::Key_P);
 
+      name = "Generate PovRay Input";
+      action = menu->addAction(name);
+//      action->setShortcut(Qt::CTRL + Qt::Key_1);
+      connect(action, SIGNAL(triggered()), this, SLOT(generatePovRay()));
+
       name = "Record Animation";
       action = menu->addAction(name);
       action->setCheckable(true);
@@ -416,13 +426,13 @@ void MainWindow::createMenus()
       name = "Undo";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), &m_undoStack, SLOT(undo()));
-      action->setShortcut(QKeySequence::Undo);
+      action->setShortcut(Qt::CTRL + Qt::Key_Z); 
       connect(&m_undoStack, SIGNAL(canUndoChanged(bool)), action, SLOT(setEnabled(bool)));
 
       name = "Redo";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), &m_undoStack, SLOT(redo()));
-      action->setShortcut(QKeySequence::Redo);
+      action->setShortcut(Qt::SHIFT + Qt::CTRL + Qt::Key_Z); 
       connect(&m_undoStack, SIGNAL(canRedoChanged(bool)), action, SLOT(setEnabled(bool)));
 
       menu->addSeparator();
@@ -500,6 +510,10 @@ void MainWindow::createMenus()
 
       menu->addSeparator();
 
+      name = "Camera";
+      action = menu->addAction(name);
+      connect(action, SIGNAL(triggered()), this, SLOT(configureCamera()));
+
       name = "Appearance";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), this, SLOT(configureAppearance()));
@@ -560,6 +574,13 @@ void MainWindow::createMenus()
 
    // ----- Build Menu -----
    menu = menuBar()->addMenu("Build");
+
+      name = "Insert Molecule ID";
+      action = menu->addAction(name);
+      connect(action, SIGNAL(triggered()), this, SLOT(insertMoleculeDialog()));
+      action->setShortcut(Qt::CTRL + Qt::Key_B);
+
+      menu->addSeparator();
 
       name = "Fill Valencies With Hydrogens";
       action = menu->addAction(name);
@@ -711,6 +732,12 @@ void MainWindow::testInternetConnection()
    if (Network::TestNetworkConnection()) {
       QMsgBox::information(this, "IQmol", "Network access available");
    }
+}
+
+
+void MainWindow::configureCamera()
+{
+   if (m_viewer) m_viewer->editCamera();
 }
 
 
@@ -932,5 +959,45 @@ void MainWindow::submitJob(IQmol::Process2::QChemJobInfo& qchemJobInfo)
    mol->qchemJobInfoChanged(qchemJobInfo);
 }
 
+
+void MainWindow::insertMoleculeDialog() 
+{
+   InsertMoleculeDialog dialog(this);
+   connect( &dialog, SIGNAL(insertMoleculeById(QString)), 
+       &m_viewerModel, SLOT(insertMoleculeById(QString)) );
+   dialog.exec();
+}
+
+
+void MainWindow::generatePovRay()
+{
+   QFileInfo info(Preferences::LastFileAccessed());
+   info.setFile(info.dir(), info.completeBaseName() + ".pov");
+
+   while (1) {
+      QString filter(tr("POV") + " (*.pov)");
+      QStringList extensions;
+      extensions << filter;
+
+      QString fileName(QFileDialog::getSaveFileName(this, tr("Save File"), 
+         info.filePath(), extensions.join(";;"), &filter));
+
+      if (fileName.isEmpty()) {
+         // This will occur if the user cancels the action.
+         return;
+      }else {
+         QRegExp rx("\\*(\\..+)\\)");
+         if (rx.indexIn(filter) > 0) { 
+            filter = rx.cap(1);
+            if (!fileName.endsWith(filter, Qt::CaseInsensitive)) {
+               fileName += filter;
+            }    
+         }    
+         Preferences::LastFileAccessed(fileName);
+         m_viewer->generatePovRay(fileName);
+         break;
+      }    
+   } 
+}
 
 } // end namespace IQmol

@@ -143,8 +143,10 @@ void IQmolApplication::open(QString const& file)
    hideSplash();
    mw->show();
    mw->raise();
-   // Create the instance of the JobMonitor
-   Process2::JobMonitor::instance();
+
+   // Now we can load jobs from the preferences, if we try to do it 
+   // before now, the dialog appears under the splash screen
+   Process2::JobMonitor::instance().loadJobListFromPreferences();
 
    static bool connected(false);
    if (!connected) {
@@ -185,7 +187,7 @@ bool IQmolApplication::event(QEvent* event)
 void IQmolApplication::quitRequest()
 {
    Process2::ServerRegistry::instance().closeAllConnections();
-   QApplication::quit();  // no maybe about it, the rest is just annoying
+   QApplication::quit();  
 }
 
 

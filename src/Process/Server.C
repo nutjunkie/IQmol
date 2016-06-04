@@ -200,7 +200,6 @@ void Server::queryAllJobs()
 // ---------- Submit ----------
 void Server::submit(Job* job)
 {
-   qDebug() << "Request to submit job " << job->jobName();
    QList<Network::Reply*> keys(m_activeRequests.keys(job));
 
    if (!job) throw Exception("Submit called with null job");
@@ -211,7 +210,7 @@ void Server::submit(Job* job)
 
    QString contents(job->jobInfo().get(QChemJobInfo::InputString));
    QString fileName(Util::WriteToTemporaryFile(contents));
-   qDebug() << "Input file contents written to" << fileName;
+   QLOG_DEBUG() << "Input file contents written to" << fileName;
 
    if (isLocal()) job->jobInfo().localFilesExist(true);
 
@@ -221,7 +220,6 @@ void Server::submit(Job* job)
    if (isWebBased()) {
       QString submit(m_configuration.value(ServerConfiguration::Submit));
       submit = substituteMacros(submit);
-      qDebug() << "Copying http input file to" << submit;
       Network::Reply* reply(m_connection->putFile(fileName, submit));
       connect(reply, SIGNAL(finished()), this, SLOT(submitFinished()));
       m_activeRequests.insert(reply, job);
@@ -358,10 +356,8 @@ void Server::submitFinished()
 // This should be delegated
 bool Server::parseSubmitMessage(Job* job, QString const& message)
 {
-   QLOG_TRACE() << "-------------------------------------------";
    QLOG_TRACE() << "Submit returned message of length:" << message.size();
-   QLOG_TRACE() << "Submit returned:" << message;
-   QLOG_TRACE() << "-------------------------------------------";
+   QLOG_TRACE() << "Submit returned:\n" << message;
 
    bool ok(false);
 

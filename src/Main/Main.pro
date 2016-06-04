@@ -7,8 +7,8 @@ TARGET  = IQmol
 BUILD_DIR  = $$PWD/../../build
 
 LIBS += $$BUILD_DIR/libQui.a \
+        $$BUILD_DIR/libViewer.a \
         $$BUILD_DIR/libLayer.a \
-        $$BUILD_DIR/libOld.a \
         $$BUILD_DIR/libParser.a \
         $$BUILD_DIR/libConfigurator.a \
         $$BUILD_DIR/libData.a \
@@ -16,12 +16,18 @@ LIBS += $$BUILD_DIR/libQui.a \
         $$BUILD_DIR/libNetwork.a \
         $$BUILD_DIR/libYaml.a \
         $$BUILD_DIR/libPlot.a \
-        $$BUILD_DIR/libUtil.a
+        $$BUILD_DIR/libOld.a \
+        $$BUILD_DIR/libUtil.a \
+        $$BUILD_DIR/libQGLViewer.a
+
+LIBS += $$PWD/../OpenMesh/lib/libOpenMeshCore.a \
+        $$PWD/../OpenMesh/lib/libOpenMeshTools.a
 
 include(../common.pri)
 
 INCLUDEPATH += . ../Util ../Data ../Parser ../Qui ../Layer \
-                ../Configurator ../Network ../Yaml ../Process ../Old
+                ../Configurator ../Network ../Yaml ../Process ../Old ../Viewer \
+                ../OpenMesh/src
 INCLUDEPATH += $$BUILD_DIR/Qui   # Required for the ui_QuiMainWindow.h header
 
 macx:FORMS       += $$PWD/PeriodicTableMac.ui
@@ -33,33 +39,32 @@ OBJECTS += $$PWD/symmol.o
 SOURCES += \
    $$PWD/FragmentTable.C \
    $$PWD/HelpBrowser.C \
+   $$PWD/InsertMoleculeDialog.C \
+   $$PWD/IQmol.C \
    $$PWD/IQmolApplication.C \
    $$PWD/MainWindow.C \
    $$PWD/PeriodicTable.C \
    $$PWD/PreferencesBrowser.C \
    $$PWD/ToolBar.C \
    $$PWD/main.C \
-   $$PWD/Viewer.C \
-   $$PWD/ViewerModel.C \
-   $$PWD/ViewerModelView.C \
 
 HEADERS += \
    $$PWD/AboutDialog.h \
    $$PWD/FragmentTable.h \
    $$PWD/HelpBrowser.h \
+   $$PWD/InsertMoleculeDialog.h \
+   $$PWD/IQmol.h \
    $$PWD/IQmolApplication.h \
    $$PWD/MainWindow.h \
    $$PWD/PeriodicTable.h \
    $$PWD/PreferencesBrowser.h \
    $$PWD/ToolBar.h \
-   $$PWD/Viewer.h \
-   $$PWD/ViewerModel.h \
-   $$PWD/ViewerModelView.h \
 
 FORMS += \
    $$PWD/AboutDialog.ui \
    $$PWD/FragmentTable.ui \
    $$PWD/HelpBrowser.ui \
+   $$PWD/InsertMoleculeDialog.ui \
    $$PWD/PeriodicTable.ui \
    $$PWD/PeriodicTableMac.ui \
    $$PWD/PreferencesBrowser.ui \

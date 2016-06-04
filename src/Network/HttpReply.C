@@ -49,13 +49,13 @@ HttpReply::~HttpReply()
 
 void HttpReply::finishedSlot()
 {
+   QLOG_DEBUG() << "HttpReply finished, HEADER:\n" << headerAsString();
 
    QString status(headerValue("Qchemserv-Status"));
 
    if (status.contains("OK")) {
       if (m_status != Error) m_status = m_interrupt ? Interrupted : Finished;
       if (m_message.isEmpty()) {
-         QLOG_TRACE() << "HttpReply message empty, returning header";
          m_message = headerAsString(); 
       }
    }else if (status.contains("ERROR")) {
@@ -124,7 +124,7 @@ void HttpReply::setUrl(QString const& path)
    url.prepend(m_https ? "https://" : "http://");
 
    m_url.setUrl(url);
-   qDebug() << "Setting URL to" <<  m_url;
+   QLOG_DEBUG() << "Setting URL to" <<  m_url;
 }
 
 
@@ -323,7 +323,6 @@ void HttpPost::run()
 
    QByteArray data(m_postData.toLatin1());
 
-qDebug() << "POST:" << data;
 
    m_networkReply = m_connection->m_networkAccessManager->post(request, data);
 
@@ -333,6 +332,8 @@ qDebug() << "POST:" << data;
    for (iter = headers.begin(); iter != headers.end(); ++iter) {
        qDebug() << "HEADER:" << *iter << m_networkReply->request().rawHeader(*iter);
    }
+
+   qDebug() << "POST:" << data;
 
    connect(m_networkReply, SIGNAL(readyRead()), &m_timer, SLOT(start()));
    connect(m_networkReply, SIGNAL(readyRead()), this, SLOT(readToString()));

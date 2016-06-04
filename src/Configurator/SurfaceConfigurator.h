@@ -58,6 +58,7 @@ namespace Configurator{
          void on_linesButton_clicked(bool);
          void on_dotsButton_clicked(bool);
          void on_transparencySlider_valueChanged(int);
+         void on_clipCheckBox_clicked(bool);
          void editGradientColors(bool);
 
       private:

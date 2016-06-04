@@ -249,8 +249,8 @@ QString QChemDatabaseFilePath()
 
    if (value.isNull() || value.toString().isEmpty()) {
       QDir dir(QApplication::applicationDirPath());
-      dir.cdUp();
 #ifdef Q_OS_MAC
+      dir.cdUp();
       dir.cd("Resources");
 #else
       dir.cd("share");
@@ -276,7 +276,9 @@ QString ShaderDirectory()
 
    if (value.isNull()) {
       QDir dir(QApplication::applicationDirPath());
+#ifdef Q_OS_MAC
       dir.cdUp();
+#endif
       dir.cd("share/shaders");
       shaderDir = dir.absolutePath();
    }else {
@@ -326,6 +328,23 @@ void DefaultShaderParameters(QVariantMap const& map)
 // ---------
 
 
+QVariantMap DefaultPovRayParameters()
+{
+   QVariantMap map;
+   QVariant qvar(Get("DefaultPovRayParameters"));
+   if (!qvar.isNull()) map = qvar.toMap();
+   return map;
+}
+
+void DefaultPovRayParameters(QVariantMap const& map)
+{
+   Set("DefaultPovRayParameters", QVariant(map));
+}
+
+
+// ---------
+
+
 QVariantMap DefaultFilterParameters()
 {
    QVariantMap map;
@@ -350,7 +369,9 @@ QString FragmentDirectory()
 
    if (value.isNull() || value.toString().isEmpty()) {
       QDir dir(QApplication::applicationDirPath());
+#ifdef Q_OS_MAC
       dir.cdUp();
+#endif
       dir.cd("share/fragments");
       fragDir = dir.absolutePath();
    }else {
@@ -396,8 +417,7 @@ void SymmetryTolerance(double const tolerance)
 QColor PositiveSurfaceColor() 
 {
    QVariant value(Get("PositiveSurfaceColor"));
-   return value.isNull() ? QColor(232,65,100) : value.value<QColor>();
-   //return value.isNull() ? QColor("blue") : value.value<QColor>();
+   return value.isNull() ? QColor(0,98,255) : value.value<QColor>();
 }
 
 void PositiveSurfaceColor(QColor const& color) 
@@ -410,8 +430,7 @@ void PositiveSurfaceColor(QColor const& color)
 QColor NegativeSurfaceColor() 
 {
    QVariant value(Get("NegativeSurfaceColor"));
-   return value.isNull() ? QColor(50,100,200) : value.value<QColor>();
-   //return value.isNull() ? QColor("red") : value.value<QColor>();
+   return value.isNull() ? QColor(226,37,79) : value.value<QColor>();
 }
 
 void NegativeSurfaceColor(QColor const& color) 

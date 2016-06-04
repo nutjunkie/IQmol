@@ -87,6 +87,7 @@ namespace Layer {
          double m_loop;  // -1.0 => loop forever
          double m_speed;
          double m_scale;
+         const Mode*  m_activeMode;
    };
 
 

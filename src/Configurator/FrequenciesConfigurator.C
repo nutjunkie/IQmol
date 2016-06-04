@@ -31,7 +31,7 @@
 #include "QsLog.h"
 #include <cmath>
 
-#include "qcustomplot.h"
+#include "CustomPlot.h"
 
 
 namespace IQmol {
@@ -64,7 +64,7 @@ Frequencies::Frequencies(Layer::Frequencies& frequencies) : m_frequencies(freque
 
    setVectorColor(Preferences::VibrationVectorColor());
 
-   m_customPlot = new QCustomPlot();
+   m_customPlot = new CustomPlot();
    m_customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
    m_customPlot->axisRect()->setRangeDrag(m_customPlot->xAxis->orientation());
    m_customPlot->axisRect()->setRangeZoom(m_customPlot->xAxis->orientation());
@@ -145,13 +145,16 @@ void Frequencies::load()
 }
 
 
-void Frequencies::contextMenuRequest(QPoint pos)
+/*
+void Frequencies::contextMenuEvent(QContextMenuEvent* event)
 {
   QMenu *menu = new QMenu(this);
   menu->setAttribute(Qt::WA_DeleteOnClose);
-  menu->addAction("Save PNG", this, SLOT(savePNG()));
-  menu->popup(m_customPlot->mapToGlobal(pos));
+  menu->addAction("Save PDF", this, SLOT(savePDF()));
+  menu->popup(m_customPlot->mapToGlobal(event->pos()));
 }
+*/
+
 
 
 void Frequencies::on_widthSlider_valueChanged(int)

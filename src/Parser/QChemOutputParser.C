@@ -38,7 +38,6 @@
 #include "EfpFragment.h"
 #include "Constants.h"
 #include "RemSectionData.h"
-#include "ExcitedStates.h"
 #include "Numerical.h"
 #include "NmrData.h"
 #include "Matrix.h"
@@ -229,8 +228,7 @@ bool QChemOutput::parse(TextStream& textStream)
             if (energyOk && valueOk) {
                if (!scanGeometries) scanGeometries = new Data::GeometryList("Scan Geometries");
                Data::Geometry* geom(new Data::Geometry(*currentGeometry));
-
-               Data::TotalEnergy& total(geom->getProperty<Data::TotalEnergy>());
+               Data::TotalEnergy& total(currentGeometry->getProperty<Data::TotalEnergy>());
                total.setValue(energy, Data::Energy::Hartree);
                Data::Constraint& constraint(geom->getProperty<Data::Constraint>());
                constraint.setValue(value);
@@ -264,7 +262,6 @@ bool QChemOutput::parse(TextStream& textStream)
             bool ok;
             m_nAlpha = tokens[2].toUInt(&ok);
             m_nBeta  = tokens[5].toUInt(&ok);
-            
             currentGeometry->setMultiplicity(m_nAlpha-m_nBeta + 1);
          }
 
@@ -274,11 +271,10 @@ bool QChemOutput::parse(TextStream& textStream)
             bool ok;
             double energy(tokens[8].toDouble(&ok));
             if (ok) {
-               Data::ScfEnergy& scf = currentGeometry->getProperty<Data::ScfEnergy>();
+               Data::ScfEnergy& scf(currentGeometry->getProperty<Data::ScfEnergy>());
                scf.setValue(energy, Data::Energy::Hartree);
-               Data::TotalEnergy& total = currentGeometry->getProperty<Data::TotalEnergy>();
+               Data::TotalEnergy& total(currentGeometry->getProperty<Data::TotalEnergy>());
                total.setValue(energy, Data::Energy::Hartree);
-               //qDebug() << "Setting total energy to" << total.value();
             }
          }
 
@@ -322,6 +318,11 @@ bool QChemOutput::parse(TextStream& textStream)
          tokens = TextStream::tokenize(line);
          if (tokens.size() == 3) setTotalEnergy(tokens[2], currentGeometry, "MP4");
 
+      }else if (line.contains("Energy is  ")) { 
+         // Over-ride for geometry optimizations, which might be on an excited state
+         tokens = TextStream::tokenize(line);
+         if (tokens.size() == 3) setTotalEnergy(tokens[2], currentGeometry);
+
       }else if (line.contains("Ground-State Mulliken Net Atomic Charges")) {
          textStream.skipLine(3);
          if (currentGeometry) readCharges(textStream, *currentGeometry, "Mulliken");
@@ -345,15 +346,17 @@ bool QChemOutput::parse(TextStream& textStream)
          readOrbitalSymmetries(textStream, readSymmetries);
 
       }else if (line.contains("TDDFT/TDA Excitation Energies")) {
-qDebug() << "Reading TDDFT States --";
          textStream.skipLine(2);
-         readCisStates(textStream);
+         readCisStates(textStream, Data::ExcitedStates::TDDFT);
 
       }else if (line.contains("CIS Excitation Energies")) {
-qDebug() << "Reading CIS States --";
          textStream.skipLine(2);
-         readCisStates(textStream);
+         readCisStates(textStream, Data::ExcitedStates::CIS);
 
+      }else if (line.contains("CIS(D) Excitation Energies")) {
+         textStream.skipLine(2);
+         readCisdStates(textStream);
+ 
       }else if (line.contains("Reference values")) {
          textStream.skipLine(1);
          if (!nmr) nmr = new Data::Nmr;
@@ -420,10 +423,11 @@ qDebug() << "Reading CIS States --";
 
 
 
-void QChemOutput::readCisStates(TextStream& textStream)
+void QChemOutput::readCisStates(TextStream& textStream, 
+   Data::ExcitedStates::ExcitedStatesT type)
 {
-qDebug() << "Reading CIS States";
-   Data::ExcitedStates* states(new Data::ExcitedStates());
+   Data::ExcitedStates* states(new Data::ExcitedStates(type));
+qDebug() << "Reading" << states->typeLabel() << "States";
 
    QStringList tokens;
 
@@ -488,7 +492,7 @@ qDebug() << "Reading CIS States";
             line = textStream.nextLine();
             if (rx.indexIn(line,0) == -1) break;
             if (!transition->addAmplitude(rx.capturedTexts().mid(1), m_nAlpha, m_nBeta)) {
-               goto error;;
+               goto error;
             }
          }
      
@@ -496,12 +500,68 @@ qDebug() << "Reading CIS States";
       }
    }
 
-   states->dump();
+   //states->dump();
 
-   if (!states->isEmpty()) {
+   if (states->nTransitions() > 0) {
       m_dataBank.append(states);
    }
 
+   return;
+
+   error:
+     QString msg("Problem parsing excited states section, line number ");
+     m_errors.append(msg += QString::number(textStream.lineNumber()));
+}
+
+
+void QChemOutput::readCisdStates(TextStream& textStream)
+{
+qDebug() << "Reading CIS(D) Energies";
+   // We should already have the CIS energies lying around
+   QList<Data::ExcitedStates*> es(m_dataBank.findData<Data::ExcitedStates>());
+   if (es.isEmpty()) return;
+
+   Data::ExcitedStates* states(es.last());
+   unsigned nStates(states->nTransitions());
+   if (nStates == 0) return;
+
+   bool ok;
+   QString line;
+   double energy;
+   unsigned nFound(0);
+   QStringList tokens;
+
+   QList<double> singlets;
+   QList<double> triplets;
+
+
+   while (!textStream.atEnd() && nFound < nStates) {
+      line = textStream.seek("CIS(D) excitation energy for state");
+      tokens = TextStream::tokenize(line);
+
+	  // We need to account for the restricted and unrestricted separately as
+	  // the order in which the states are printed differs.
+      if (tokens.size() == 10) {      // Restricted case, includes "singlet"/"triplet"
+         energy = tokens[8].toDouble(&ok);
+         if (!ok) goto error;
+
+         if (tokens[6] == "triplet") {
+            triplets.append(energy);
+         }else {
+            singlets.append(energy);
+         }
+         ++nFound;
+      }else if (tokens.size() == 9) { // Unrestricted case
+         energy = tokens[7].toDouble(&ok);
+         if (!ok) goto error;
+         singlets.append(energy);
+         ++nFound;
+      }
+   }
+   
+   if (nFound != nStates) goto error;
+
+   states->setCisdEnergies(singlets, triplets);
    return;
 
    error:
@@ -679,7 +739,7 @@ void QChemOutput::setTotalEnergy(QString const& field, Data::Geometry* geometry,
    if (!ok) return;
    Data::TotalEnergy& data(geometry->getProperty<Data::TotalEnergy>());
    data.setValue(energy, Data::Energy::Hartree);
-   data.setLabel(label + " energy");
+   if (!label.isEmpty()) data.setLabel(label + " energy");
 }
 
 

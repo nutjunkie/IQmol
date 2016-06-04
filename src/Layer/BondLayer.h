@@ -25,9 +25,10 @@
 #include "PrimitiveLayer.h"
 
 
-class QColor;
-
 namespace IQmol {
+
+class PovRayGen;
+
 namespace Layer {
 
    class Atom;
@@ -48,6 +49,7 @@ namespace Layer {
          void drawSelected();
          void setOrder(int const order) { m_order = order; }
          void setIndex(int const index);
+         void povray(PovRayGen&);
 
          int getOrder() const { return m_order; }
          Atom* beginAtom() { return m_begin; }
@@ -61,6 +63,11 @@ namespace Layer {
          void drawTubes(bool selected);
          void drawWireFrame(bool selected);
          void drawPlastic(bool selected);
+
+         void povrayBallsAndSticks(PovRayGen&);
+         void povrayTubes(PovRayGen&);
+         void povrayWireFrame(PovRayGen&);
+         void povrayPlastic(PovRayGen&);
 
          // Static Data
          static GLfloat s_defaultColor[];        // Grey bonds for BallsAndSticks

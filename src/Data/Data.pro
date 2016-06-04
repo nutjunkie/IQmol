@@ -2,7 +2,7 @@ LIB = Data
 CONFIG += lib
 include(../common.pri)
 
-INCLUDEPATH += ../Util ../Parser ../Yaml
+INCLUDEPATH += ../Util ../Parser ../Yaml ../OpenMesh/src
 
 SOURCES = \
    $$PWD/Atom.C \
@@ -19,6 +19,7 @@ SOURCES = \
    $$PWD/ExcitedStates.C \
    $$PWD/File.C \
    $$PWD/Frequencies.C \
+   $$PWD/GeminalOrbitals.C \
    $$PWD/Geometry.C \
    $$PWD/GeometryList.C \
    $$PWD/GridData.C \
@@ -33,6 +34,7 @@ SOURCES = \
    $$PWD/NmrReferenceLibrary.C \
    $$PWD/OrbitalSymmetries.C \
    $$PWD/PointCharge.C \
+   $$PWD/PovRay.C \
    $$PWD/RemSectionData.C \
    $$PWD/Shell.C \
    $$PWD/Surface.C \
@@ -59,6 +61,7 @@ HEADERS = \
    $$PWD/ExcitedStates.h \
    $$PWD/File.h \
    $$PWD/Frequencies.h \
+   $$PWD/GeminalOrbitals.h \
    $$PWD/Geometry.h \
    $$PWD/GeometryList.h \
    $$PWD/GridData.h \
@@ -75,6 +78,7 @@ HEADERS = \
    $$PWD/OrbitalSymmetries.h \
    $$PWD/PointCharge.h \
    $$PWD/PointGroup.h \
+   $$PWD/PovRay.h \
    $$PWD/RemSectionData.h \
    $$PWD/Serialization.h \
    $$PWD/Shell.h \

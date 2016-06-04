@@ -32,6 +32,8 @@
 namespace IQmol {
 
 class ManipulatedFrameSetConstraint;
+class PovRayGen;
+class ClippingPlane;
 
 namespace Layer {
 
@@ -54,7 +56,8 @@ namespace Layer {
          /// Note the constructor does not allow a QObject parent.  This
          /// means the destruction of GLObjects must be taken care of 
          /// explicitly and not through the Qt mechanism.
-         explicit GLObject(QString const& text = QString()) : Base(text), m_alpha(1.0) 
+         explicit GLObject(QString const& text = QString()) : Base(text), m_alpha(1.0),
+            m_clip(false)
          { 
             setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
           }
@@ -96,10 +99,12 @@ namespace Layer {
          virtual void deselect() { unsetProperty(Selected); }
          bool isSelected() const { return hasProperty(Selected); }
 
+         virtual void povray(PovRayGen&) { }
+
          virtual void setAlpha(double alpha) { m_alpha = alpha; }
          virtual double getAlpha() const { return m_alpha; }
 
-         qglviewer::Frame getFrame() { return m_frame; }
+         qglviewer::Frame getFrame() const { return m_frame; }
 
          qglviewer::Vec getPosition() { return m_frame.position(); }
          qglviewer::Quaternion getOrientation() { return m_frame.orientation(); }
@@ -126,6 +131,11 @@ namespace Layer {
             s_cameraDirection = direction; 
          }
 
+         /// This should be called just before a draw of the whole scene.
+         static void SetCameraPivot(qglviewer::Vec const& pivot) 
+         { 
+            s_cameraPivot = pivot; 
+         }
 
 
       public Q_SLOTS:
@@ -158,11 +168,13 @@ namespace Layer {
       protected:
          static qglviewer::Vec s_cameraPosition;
          static qglviewer::Vec s_cameraDirection;
+         static qglviewer::Vec s_cameraPivot;
          qglviewer::Frame m_frame;
          double m_alpha;   
          GLuint m_callList;
          GLuint m_fastCallList;
          GLuint m_selectedCallList;
+         bool   m_clip;
    };
 
 } // end namespace Layer
