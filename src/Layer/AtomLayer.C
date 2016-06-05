@@ -92,7 +92,7 @@ void Atom::setVibrationVectorColor(QColor const& color)
 }
 
 
-Atom::Atom(int Z) : Primitive("Atom"), m_charge(0.0), m_spin(0.0),
+Atom::Atom(int Z) : Primitive("Atom"), m_charge(0.0), m_spin(0.0), m_nmr(0.0),
    m_smallerHydrogens(true), m_haveNmrShift(false), m_reorderIndex(0), 
    m_hybridization(0)
 {
