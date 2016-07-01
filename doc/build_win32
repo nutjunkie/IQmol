@@ -96,6 +96,9 @@ libraries.  The compilation of the code should be relatively straightforward.
 Compilation
 ~~~~~~~~~~~
 
+ o Use the cmd.exe prompt to compile symmol.o, maybe setting the path first
+   path %PATH%;C:\MinGW\bin
+
  o Compile the SymMol object file in src/Main
       mingw32-gfortran -c symmol.f90
 
