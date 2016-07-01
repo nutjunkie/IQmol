@@ -1,21 +1,20 @@
 #version 120
 
 // BEGIN UNIFORM
-uniform float user_Ambient;                // 0.50
-uniform float user_Diffuse;                // 0.60
-uniform float user_Highlights;             // 0.40
-uniform float user_Shininess;              // 0.90
-
-uniform float user_Saturation;             // 1.00
+uniform float user_Ambient;                // 0.75
+uniform float user_Diffuse;                // 0.75
+uniform float user_Highlights;             // 0.50
 uniform float user_Noise_Intensity;        // 0.00
+uniform float user_Saturation;             // 1.00
+uniform float user_Shininess;              // 0.50
 
-uniform bool  user_Enhance_Transparency;   // 1
 uniform bool  user_Enhance_Edges;          // 0
+uniform bool  user_Enhance_Transparency;   // 1
 uniform bool  user_Hemisphere_Lighting;    // 1
 
 uniform bool  user_light_Front;            // 1
 uniform bool  user_light_Highlight;        // 1
-uniform bool  user_light_Left;             // 0
+uniform bool  user_light_Left;             // 1
 uniform bool  user_light_Lower;            // 0
 // END UNIFORM
  
