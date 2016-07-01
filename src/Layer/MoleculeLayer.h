@@ -129,8 +129,10 @@ namespace IQmol {
             /// of that kind does not exist already.
             void appendData(IQmol::Data::Bank&);
             void appendData(Layer::List&);
-   
+
             void appendSurface(Data::Surface*);
+
+            void addProperty(SpatialProperty* property) { m_properties.append(property); }
    
             void setFile(QString const& fileName);
             QString fileName() const { return m_inputFile.fileName(); }
@@ -358,6 +360,7 @@ namespace IQmol {
             void deleteProperties();
 
             void initProperties();
+
    
             QFileInfo m_inputFile;
    

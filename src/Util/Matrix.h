@@ -23,6 +23,7 @@
 ********************************************************************************/
 
 #include "boost/numeric/ublas/matrix.hpp"
+#include "boost/numeric/ublas/matrix_proxy.hpp"
 #include "boost/numeric/ublas/vector.hpp"
 #include "boost/multi_array.hpp"
 
@@ -31,8 +32,9 @@
 
 namespace IQmol {
 
-typedef boost::numeric::ublas::matrix<double> Matrix;
-typedef boost::numeric::ublas::vector<double> Vector;
+typedef boost::numeric::ublas::matrix<double>         Matrix;
+typedef boost::numeric::ublas::vector<double>         Vector;
+typedef boost::numeric::ublas::matrix_column<Matrix const> MatrixColumn;
 typedef boost::multi_array<double, 3> Array3D;
 typedef boost::multi_array<double, 4> Array4D;
 
