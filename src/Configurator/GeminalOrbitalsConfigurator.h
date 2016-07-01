@@ -46,7 +46,7 @@ namespace Configurator {
       Q_OBJECT
 
       public:
-         enum { AlphaOrbital, BetaOrbital };
+         enum { Geminal, Correlation };
 
          explicit GeminalOrbitals(Layer::GeminalOrbitals&);
          ~GeminalOrbitals();
@@ -60,7 +60,6 @@ namespace Configurator {
          void clearQueue();
 
       private Q_SLOTS:
-         void on_surfaceType_currentIndexChanged(int);
          void on_addToQueueButton_clicked(bool);
          void on_calculateButton_clicked(bool);
          void on_cancelButton_clicked(bool);
@@ -70,20 +69,14 @@ namespace Configurator {
          void clearSelectedOrbitals(int);
 
       private:
-         void enableOrbitalSelection(bool);
-         void enableNegativeColor(bool);
-         void updateOrbitalRange(int nElectrons);
-         void updateOrbitalRange(int nElectrons, QComboBox*);
          void setPositiveColor(QColor const& color);
          void setNegativeColor(QColor const& color);
+         void initGeminalRange();
          void initPlot();
 
          Layer::GeminalOrbitals& m_geminalOrbitals;
          Ui::GeminalOrbitalsConfigurator m_configurator;
 
-         unsigned int m_nAlpha;
-         unsigned int m_nBeta;
-         unsigned int m_nOrbitals;
          CustomPlot* m_customPlot;
          QPen m_pen;
          QPen m_selectedPen;

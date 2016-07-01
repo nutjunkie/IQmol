@@ -49,6 +49,7 @@ namespace Data {
          unsigned nBasis()    const { return m_nBasis; }
          unsigned nOrbitals() const { return m_nOrbitals; }
          unsigned nGeminals() const { return m_nGeminals; }
+         QList<unsigned> const& geminalOrbitalLimits() const { return m_geminalOrbitalLimits ; }
 
          double geminalOrbitalEnergy(unsigned i) const 
          { 
@@ -63,6 +64,8 @@ namespace Data {
 
          Matrix const& alphaCoefficients() const { return m_alphaCoefficients; }
          Matrix const& betaCoefficients() const { return m_betaCoefficients; }
+         QList<double> const& geminalCoefficients() const { return  m_geminalCoefficients;}
+         QList<int> const& geminalMoMap() const { return  m_geminalMoMap;}
          ShellList const& shellList() const { return m_shellList; }
          SurfaceList& surfaceList() { return m_surfaceList; }
 
@@ -108,6 +111,7 @@ namespace Data {
          }
 
          void computeBoundingBox();
+         void computeGeminalLimits();
 
          unsigned m_nAlpha;
          unsigned m_nBeta;
@@ -122,6 +126,7 @@ namespace Data {
          QList<double> m_geminalCoefficients;
          QList<int>    m_geminalMoMap;
          ShellList     m_shellList;
+         QList<unsigned> m_geminalOrbitalLimits;
 
          Matrix m_alphaCoefficients;
          Matrix m_betaCoefficients;
