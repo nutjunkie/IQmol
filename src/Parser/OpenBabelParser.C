@@ -29,6 +29,7 @@
 #include "GeometryList.h"
 #include "QsLog.h"
 #include "GridData.h"
+#include "Preferences.h"
 
 #include <QFileInfo>
 #include <vector>
@@ -39,6 +40,7 @@
 #include "openbabel/format.h"
 #include "openbabel/obconversion.h"
 #include "openbabel/generic.h"
+#include "openbabel/forcefield.h"
 #include "openbabel/griddata.h"
 #include "openbabel/math/vector3.h"
 
@@ -167,6 +169,52 @@ bool OpenBabel::parse(QString const& string, QString const& extension)
    return m_errors.isEmpty();
 }
 
+
+void OpenBabel::buildFrom2D(::OpenBabel::OBMol& obMol)
+{
+qDebug() << "*** Building 3D coordinates ***";
+qDebug() << "***     Build    may fail   ***";
+   ::OpenBabel::OBBuilder builder;
+   builder.Build(obMol);
+
+   ::OpenBabel::OBAtomTyper atomTyper;  
+   atomTyper.AssignImplicitValence(obMol);
+   atomTyper.AssignHyb(obMol);
+
+   obMol.AddHydrogens(true, true);
+   obMol.BeginModify();
+   obMol.EndModify();
+
+   const char* obff(Preferences::DefaultForceField().toLatin1().data());
+   ::OpenBabel::OBForceField* 
+      forceField(::OpenBabel::OBForceField::FindForceField(obff));
+   if (!forceField) {
+qDebug() << "Force Field not found";
+      return;
+   }
+
+   if (!forceField->Setup(obMol)) {
+qDebug() << "Force Field failed setup";
+   }
+
+   forceField->SetLogFile(&std::cout);
+   forceField->SetLogLevel(OBFF_LOGLVL_LOW);
+
+   forceField->SetConformers(obMol);
+
+   double convergence(1e-6f);
+   int maxSteps(1000);
+
+   // We pre-optimize with conjugate gradient 
+   forceField->ConjugateGradientsInitialize(maxSteps, convergence);
+   forceField->ConjugateGradientsTakeNSteps(maxSteps);
+
+   // And finish off with steepest descent
+   forceField->SteepestDescentInitialize(maxSteps, convergence);
+   forceField->SteepestDescentTakeNSteps(maxSteps);
+}
+
+
 bool OpenBabel::parse(::OpenBabel::OBMol& obMol)
 {
    qDebug() << "Parsing OBMol";
@@ -177,10 +225,7 @@ bool OpenBabel::parse(::OpenBabel::OBMol& obMol)
    Data::GeometryList* geometries(new Data::GeometryList);
    m_dataBank.append(geometries);
 
-   if (!obMol.Has3D()) {
-      ::OpenBabel::OBBuilder builder;
-      builder.Build(obMol);
-   }
+   if (!obMol.Has3D()) buildFrom2D(obMol);
 
    int charge(obMol.GetTotalCharge());
    unsigned multiplicity(obMol.GetTotalSpinMultiplicity());

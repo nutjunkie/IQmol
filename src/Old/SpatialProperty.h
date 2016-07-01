@@ -48,6 +48,7 @@ namespace IQmol {
          virtual ~SpatialProperty() { }
 
          virtual QString text() const { return m_text; }
+         void setText(QString const& text) { m_text = text; }
 
          virtual bool isAvailable() const { return true; }
 

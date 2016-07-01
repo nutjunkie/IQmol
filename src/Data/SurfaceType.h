@@ -35,7 +35,8 @@ namespace Data {
       public:
          enum Kind { Custom = -1, AlphaOrbital, BetaOrbital, TotalDensity, 
             SpinDensity, AlphaDensity, BetaDensity, DensityCombo, CubeData, 
-            VanDerWaals, Promolecule, SolventExcluded, SID, ElectrostaticPotential };
+            VanDerWaals, Promolecule, SolventExcluded, SID, ElectrostaticPotential,
+            Geminal, Correlation };
 
          SurfaceType(Kind const kind = Custom, unsigned index = 0) 
           : m_kind(kind), m_index(index) { }
@@ -51,6 +52,7 @@ namespace Data {
          bool isDensity() const;
          bool isOrbital() const;
          bool isSigned() const;
+         bool isIndexed() const;
 
          bool operator==(SurfaceType const& that) const
          {

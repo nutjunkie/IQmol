@@ -41,7 +41,7 @@ GeminalOrbitals::GeminalOrbitals(unsigned const nAlpha, unsigned const nBeta,
    QLOG_DEBUG() << "Number of alpha electrons  :: " << m_nAlpha;
    QLOG_DEBUG() << "Number of beta  electrons  :: " << m_nBeta;
    QLOG_DEBUG() << "Number of basis functions  :: " << m_nBasis;
-   QLOG_DEBUG() << "Number of basis functions  :: " << m_nGeminals;
+   QLOG_DEBUG() << "Number of geminals         :: " << m_nGeminals;
 
    if (m_nBasis == 0) return;
 
@@ -77,8 +77,39 @@ GeminalOrbitals::GeminalOrbitals(unsigned const nAlpha, unsigned const nBeta,
    }
 
    computeBoundingBox();
+   computeGeminalLimits();
 }
 
+void GeminalOrbitals::computeGeminalLimits()
+{
+
+   QList<int> const& geminalMoMap(m_geminalMoMap);
+   unsigned Na(nAlpha());
+   unsigned Nb(nBeta());
+   unsigned nGemOrb(nOrbitals());
+   unsigned nOS=Na-Nb;
+   unsigned nGeminals(nAlpha());
+   unsigned i,j,n;
+   
+   unsigned* GemL = new unsigned[nGeminals+1];
+   //Each geminal has a subset of orbitals associated with it, with limits stored in GemL
+   // For geminal j it is from GemL[j] to GemL[j+1].  We populate GemL below by looking
+   // through MOGem which contains a geminal index of each orbital
+   GemL[0] = 0; j = 1;
+   for (i = 1; i < nGemOrb; i++) { 
+    if ( geminalMoMap[i] == j ) { GemL[j] = i; j++; }
+   }
+   GemL[nGeminals] = nGemOrb;
+   // Open-shells need a separate assignement, as they are lumped toghether in MOGem
+   if (nOS > 1) { for (i = nGeminals - nOS  + 1; i < nGeminals + 1; i++) { GemL[i] = GemL[i-1] + 1; } }
+   //std::cout<<" Debugging GemL list for "<<nGeminals<<" geminals and "<<nGemOrb<<" orbitals \n";
+   //for(i=0; i<nGeminals+1; i++){std::cout<<GemL[i]<<" ";} std::cout<<"\n";
+   
+   for (n=0; n<nGeminals+1; n++) { m_geminalOrbitalLimits.append(GemL[n]);}
+
+   delete [] GemL;
+  
+}
 
 bool GeminalOrbitals::consistent() const
 {

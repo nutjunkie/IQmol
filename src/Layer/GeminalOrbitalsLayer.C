@@ -74,9 +74,16 @@ GeminalOrbitals::GeminalOrbitals(Data::GeminalOrbitals& molecularOrbitals)
  
    m_geminalOrbitals.boundingBox(m_bbMin, m_bbMax);
    appendSurfaces(m_geminalOrbitals.surfaceList());
-   computeDensityVectors();
 }
 
+
+GeminalOrbitals::~GeminalOrbitals()
+{
+   for (int i = 0; i < m_densityVectors.size(); ++i) {
+       delete m_densityVectors[i];
+   }
+   m_densityVectors.clear();
+}
 
 
 void GeminalOrbitals::appendSurfaces(Data::SurfaceList& surfaceList)
@@ -118,67 +125,23 @@ unsigned GeminalOrbitals::nOrbitals() const
    return m_geminalOrbitals.nOrbitals(); 
 }
 
+unsigned GeminalOrbitals::nGeminals() const 
+{ 
+// Is this the most useful definition of the number of geminals?
+   return m_geminalOrbitals.nBeta(); 
+}
+
+
+unsigned GeminalOrbitals::nOpenShell() const 
+{ 
+   return m_geminalOrbitals.nAlpha()-m_geminalOrbitals.nBeta(); 
+}
+
 
 double GeminalOrbitals::geminalOrbitalEnergy(unsigned const i) const 
 { 
    return m_geminalOrbitals.geminalOrbitalEnergy(i);
 }
-
-
-
-void GeminalOrbitals::computeDensityVectors()
-{
-   using namespace boost::numeric::ublas;
-
-   unsigned N(nBasis());
-   unsigned Na(nAlpha());
-   unsigned Nb(nBeta());
-
-   Matrix const& alphaCoefficients(m_geminalOrbitals.alphaCoefficients());
-   Matrix const& betaCoefficients(m_geminalOrbitals.betaCoefficients());
-
-   Matrix coeffs(Na, N);
-   Matrix density(N, N);
-
-   for (unsigned i = 0; i < Na; ++i) {
-       for (unsigned j = 0; j < N; ++j) {
-           coeffs(i,j) = alphaCoefficients(i,j);  
-       }
-   }
-
-   noalias(density) = prod(trans(coeffs), coeffs);
-
-   unsigned ka(0);
-   m_alphaDensity.resize(N*(N+1)/2);
-   for (unsigned i = 0; i < N; ++i) {
-       m_alphaDensity[ka] = density(i,i);
-       ++ka;
-       for (unsigned j = i+1; j < N; ++j, ++ka) {
-           m_alphaDensity[ka] = 2.0*density(i,j);
-       }
-   }
-
-   coeffs.resize(Nb, N);
-
-   for (unsigned i = 0; i < Nb; ++i) {
-       for (unsigned j = 0; j < N; ++j) {
-           coeffs(i,j) = betaCoefficients(i,j);
-       }
-   }
-
-   noalias(density) = prod(trans(coeffs), coeffs);
-
-   unsigned kb(0);
-   m_betaDensity.resize(N*(N+1)/2);
-   for (unsigned i = 0; i < N; ++i) {
-       m_betaDensity[kb] = density(i,i);
-       ++kb;
-       for (unsigned j = i+1; j < N; ++j, ++kb) {
-           m_betaDensity[kb] = 2.0*density(i,j);
-       }
-   }
-}
-
 
 
 void GeminalOrbitals::addToQueue(Data::SurfaceInfo const& info) 
@@ -241,35 +204,26 @@ void GeminalOrbitals::dumpGridInfo() const
 }
 
 
-
 QString GeminalOrbitals::description(Data::SurfaceInfo const& info, bool const tooltip)
 {
    Data::SurfaceType const& type(info.type());
    QString label(type.toString());
 
-   if (type.isOrbital()) {
-      unsigned nElectrons;
+   if (type.kind() == Data::SurfaceType::Geminal) {
       unsigned index(type.index());
-      Data::SurfaceType::Kind kind(type.kind());
+      unsigned nGeminals(nBeta());
 
-      if (kind == Data::SurfaceType::AlphaOrbital) {
-         nElectrons = nAlpha();
-      }else {
-         nElectrons = nBeta();
-      }
-
-      if (index == nElectrons-1) {
-         label += " (HOMO-1)";
-      }else if (index == nElectrons) {
-         label += " (HOMO)";
-      }else if (index == nElectrons+1) {
-         label += " (LUMO)";
-      }else if (index == nElectrons+2) {
-         label += " (LUMO+1)";
+      if (index == nBeta()-1) {
+         label += " (HOG-1)";
+      }else if (index == nBeta()) {
+         label += " (HOG)";
+      }else if (index > nBeta()) {
+         label += " (OS)";
       }
 
       if (tooltip) {
-         label += "\nEnergy   = " + QString::number(0, 'f', 3);
+         double geminalEnergy(m_geminalOrbitals.geminalOrbitalEnergy(index-1));
+         label += "\nEnergy   = " + QString::number(geminalEnergy, 'f', 3);
       }
    }
 
@@ -277,7 +231,6 @@ QString GeminalOrbitals::description(Data::SurfaceInfo const& info, bool const t
       label += "\nIsovalue = " + QString::number(info.isovalue(), 'f', 3);
    }
  
-
    return label;
 }
 
@@ -379,8 +332,7 @@ bool GeminalOrbitals::processGridQueue(GridQueue const& gridQueue)
 
    for (size = sizes.begin(); size != sizes.end(); ++size) {
        std::set<Data::SurfaceType> densities;
-       std::set<Data::SurfaceType> alphaOrbitals;
-       std::set<Data::SurfaceType> betaOrbitals;
+       std::set<Data::SurfaceType> geminals;
        
        for (queued = gridQueue.begin(); queued != gridQueue.end(); ++queued) {
            if (queued->second == *size) {
@@ -388,82 +340,55 @@ bool GeminalOrbitals::processGridQueue(GridQueue const& gridQueue)
 
               if (type.isDensity()) {
                  densities.insert(type);
-              }else if (type.kind() == Data::SurfaceType::AlphaOrbital) {
-                 alphaOrbitals.insert(type);
-              }else if (type.kind() == Data::SurfaceType::BetaOrbital) {
-                 betaOrbitals.insert(type); 
+              }else if (type.kind() == Data::SurfaceType::Geminal) {
+                 geminals.insert(type);
               }else  {
-                 QLOG_WARN() << "Unknown Grid type found in processQueue";
+                 QLOG_WARN() << 
+                     "Unknown Grid type found in Layer::GeminalOrbitals::processQueue";
               }
            }
        }
 
-       if (densities.size() > 0) {
-          QLOG_TRACE() << "Computing" << densities.size() << "density grids";
-          Data::SurfaceType alpha(Data::SurfaceType::AlphaDensity);
-          Data::GridData*   alphaGrid = new Data::GridData(*size, alpha);
-          Data::SurfaceType beta(Data::SurfaceType::BetaDensity);
-          Data::GridData*   betaGrid  = new Data::GridData(*size, beta);
-
-          if (!computeDensityGrids(alphaGrid, betaGrid)) {
-             // user canceled the action
-             delete alphaGrid;
-             delete betaGrid;
-             return false;
-          }
-
-          m_availableGrids.append(alphaGrid);
-          m_availableGrids.append(betaGrid);
-
-          Data::GridData* spinGrid  = new Data::GridData(*alphaGrid);
-          *spinGrid -= *betaGrid;
-          spinGrid->setSurfaceType(Data::SurfaceType::SpinDensity);
-
-          Data::GridData* totalGrid = new Data::GridData(*alphaGrid);
-          *totalGrid += *betaGrid;
-          totalGrid->setSurfaceType(Data::SurfaceType::TotalDensity);
-
-          m_availableGrids.append(spinGrid);
-          m_availableGrids.append(totalGrid);
-       }
-
-       Data::GridDataList grids;
+       // Allocate density grids
+       Data::GridDataList densityGrids;
        std::set<Data::SurfaceType>::iterator iter;
-       for (iter = alphaOrbitals.begin(); iter != alphaOrbitals.end(); ++iter) {
+       for (iter = densities.begin(); iter != densities.end(); ++iter) {
            Data::GridData* grid = new Data::GridData(*size, *iter);
-           grids.append(grid); 
+           densityGrids.append(grid); 
        }
 
-       if (grids.count() > 0) {
-          QLOG_TRACE() << "Computing" << grids.size() << "alpha orbitals";
-          if (computeOrbitalGrids(grids)) {
-             m_availableGrids += grids;
+       if (densityGrids.count() > 0) {
+          QLOG_TRACE() << "Computing" << densityGrids.size() << "Geminal Densities";
+          if (computeDensityGrids(densityGrids)) {
+             m_availableGrids += densityGrids;
           }else {
-             for (int i = 0; i <  grids.size(); ++i) {
-                 delete grids[i];
+             for (int i = 0; i <  densityGrids.size(); ++i) {
+                 delete densityGrids[i];
              }
              return false;
           }
        }
 
-       grids.clear();
-       for (iter = betaOrbitals.begin(); iter != betaOrbitals.end(); ++iter) {
+       // Allocate geminal grids
+       Data::GridDataList geminalGrids;
+       for (iter = geminals.begin(); iter != geminals.end(); ++iter) {
            Data::GridData* grid = new Data::GridData(*size, *iter);
-           grids.append(grid); 
+           geminalGrids.append(grid); 
        }
 
-       if (grids.count() > 0) {
-          QLOG_TRACE() << "Computing" << grids.size() << "beta orbitals";
-          if (computeOrbitalGrids(grids)) {
-             m_availableGrids += grids;
+       if (geminalGrids.count() > 0) {
+          QLOG_TRACE() << "Computing" << geminalGrids.size() << "Geminals";
+          if (computeOrbitalGrids(geminalGrids)) {
+             m_availableGrids += geminalGrids;
           }else {
-             for (int i = 0; i <  grids.size(); ++i) {
-                 delete grids[i];
+             for (int i = 0; i <  geminalGrids.size(); ++i) {
+                 delete geminalGrids[i];
              }
              return false;
           }
        }
-       grids.clear();
+
+       geminalGrids.clear();
    }
 
    return true;
@@ -535,8 +460,7 @@ bool GeminalOrbitals::computeOrbitalGrids(Data::GridDataList& grids)
           QLOG_ERROR() << "Different sized grids found in molecular orbitals calculator";
           return false;
        }
-       if ( ((*iter)->surfaceType().kind() != Data::SurfaceType::AlphaOrbital) &&
-            ((*iter)->surfaceType().kind() != Data::SurfaceType::BetaOrbital) ) {
+       if ( ((*iter)->surfaceType().kind() != Data::SurfaceType::Geminal) ) {
           QLOG_ERROR() << "Incorrect grid type found in molecular orbitals calculator";
           QLOG_ERROR() << (*iter)->surfaceType().toString(); 
           return false;
@@ -547,17 +471,22 @@ bool GeminalOrbitals::computeOrbitalGrids(Data::GridDataList& grids)
    QTime time;
    time.start();
 
-   Matrix const* coefficients;
-   if (g0->surfaceType().kind() == Data::SurfaceType::AlphaOrbital) {
-      QLOG_TRACE() << "Setting MO coefficient data to Alpha";
-      coefficients = &(m_geminalOrbitals.alphaCoefficients());
-   }else {
-      QLOG_TRACE() << "Setting MO coefficient data to Beta";
-      coefficients = &(m_geminalOrbitals.betaCoefficients());
-   }
+   Matrix const* coefficientsA;
+   Matrix const* coefficientsB;
+   QList<double> const* coefficientsG;
+
+   QList<int> const* MOGem;
+      coefficientsA = &(m_geminalOrbitals.alphaCoefficients());
+      //coefficientsB = &(m_geminalOrbitals.betaCoefficients());
+      //coefficientsG = &(m_geminalOrbitals.geminalCoefficients());
+      MOGem = &(m_geminalOrbitals.geminalMoMap());
+
    
    unsigned nOrb(orbitals.size());
-   unsigned nx, ny, nz;
+   unsigned nGem = m_geminalOrbitals.nAlpha();
+   unsigned nGemOrb = m_geminalOrbitals.nOrbitals();
+   //unsigned nOS = m_geminalOrbitals.nAlpha() - m_geminalOrbitals.nBeta();
+   unsigned nx, ny, nz; 
    g0->getNumberOfPoints(nx, ny, nz);
    Vec delta(g0->delta());
    Vec origin(g0->origin());
@@ -573,9 +502,9 @@ bool GeminalOrbitals::computeOrbitalGrids(Data::GridDataList& grids)
 
    double  x, y, z;
    double* values;
-   double* tmp = new double[nOrb];
+   double* tmp = new double[nGem];
    unsigned i, j, k;
-
+   
    Data::ShellList const& shells(m_geminalOrbitals.shellList());
    Data::ShellList::const_iterator shell;
 
@@ -593,7 +522,7 @@ bool GeminalOrbitals::computeOrbitalGrids(Data::GridDataList& grids)
                    if ( (values = (*shell)->evaluate(gridPoint)) ) {
                       for (unsigned s = 0; s < (*shell)->nBasis(); ++s) {
                           for (unsigned orb = 0; orb < nOrb; ++orb) {
-                              tmp[orb] += (*coefficients)(orbitals[orb], offset) * values[s];
+                              tmp[orb] += (*coefficientsA)(orbitals[orb], offset) * values[s]; //VAR temp
                           }
                           ++offset;
                       }
@@ -620,7 +549,7 @@ bool GeminalOrbitals::computeOrbitalGrids(Data::GridDataList& grids)
        }
    }
 
-   delete [] tmp;
+   delete [] tmp; 
 
    double t = time.elapsed() / 1000.0;
    QLOG_INFO() << "Time to compute orbital grid data:" << t << "seconds";
@@ -629,136 +558,190 @@ bool GeminalOrbitals::computeOrbitalGrids(Data::GridDataList& grids)
 }
 
 
-bool GeminalOrbitals::computeDensityGrids(Data::GridData*& alpha, Data::GridData*& beta)
+// This function is in charge of computing *all* the density vectors
+void GeminalOrbitals::computeDensityVectors()
 {
+   if (!m_densityVectors.isEmpty()) return;
+   using namespace boost::numeric::ublas;
+
+   Matrix const& alphaCoefficients(m_geminalOrbitals.alphaCoefficients());
+   Matrix const& betaCoefficients(m_geminalOrbitals.betaCoefficients());
+   QList<double> const& geminalCoefficients(m_geminalOrbitals.geminalCoefficients());
+   //QList<int>    const& geminalMoMap(m_geminalOrbitals.geminalMoMap());
+   QList<unsigned> const& Limits(m_geminalOrbitals.geminalOrbitalLimits());
+
+   unsigned N(nBasis());
+   unsigned Na(nAlpha());
+   unsigned Nb(nBeta());
+   unsigned nGemOrb(nOrbitals());
+   unsigned nOS=Na-Nb;
+   unsigned nGeminals(nAlpha());
+   unsigned NV = N*(N+1)/2;
+   unsigned i,j,n1,n;
+   
+   //unsigned* GemL = new unsigned[nGeminals+1];
+   double* GemD = new double[nGemOrb];
+   //Each geminal has a subset of orbitals associated with it, with limits stored in GemL
+   // For geminal j it is from GemL[j] to GemL[j+1].  We populate GemL below by looking
+   // through MOGem which contains a geminal index of each orbital
+//    GemL[0] = 0; j = 1;
+//    for (i = 1; i < nGemOrb; i++) { 
+//     if ( geminalMoMap[i] == j ) { GemL[j] = i; j++; }
+//    }
+//    GemL[nGeminals] = nGemOrb;
+//    // Open-shells need a separate assignement, as they are lumped toghether in MOGem
+//    if (nOS > 1) { for (i = nGeminals - nOS  + 1; i < nGeminals + 1; i++) { GemL[i] = GemL[i-1] + 1; } }
+   std::cout<<" Debugging Limits list for "<<nGeminals<<" geminals and "<<nGemOrb<<" orbitals \n";
+   for(i=0; i<nGeminals+1; i++){std::cout<<Limits[i]<<" ";} std::cout<<"\n";
+   
+   //for (n=0; n<nGeminals+1; n++) { m_geminalOrbitalLimits.append(GemL[n]);}
+   for (n = 0; n<nGemOrb; n++) {GemD[n] = geminalCoefficients[n] * geminalCoefficients[n]; }
+
+   for (n = 0; n < nGeminals; ++n) {
+     
+       Vector density(N*(N+1)/2); 
+       
+       for (i = 0; i < NV; i++) { density(i) = 0.; }
+
+       for (n1 = Limits[n]; n1 < Limits[n+1]; n1++) {
+         if (n < Nb) {
+           for (i = 0; i < N; i++) {
+             for (j = 0; j <i; j++) { 
+	      density(i*(i+1)/2+j) += 2*GemD[n1]*(alphaCoefficients(n1,i)*alphaCoefficients(n1,j)+betaCoefficients(n1,i)*betaCoefficients(n1,j));
+	     }
+	     density(i*(i+3)/2) += GemD[n1]*(alphaCoefficients(n1,i)*alphaCoefficients(n1,i)+betaCoefficients(n1,i)*betaCoefficients(n1,i));
+           }
+	 } else {
+	    for (i = 0; i < N; i++) {
+             for (j = 0; j <i; j++) { 
+	       density(i*(i+1)/2+ j) += 2*alphaCoefficients(n1,i)*alphaCoefficients(n1,j);
+	     }
+	     density(i*(i+3)/2) += alphaCoefficients(n1,i)*alphaCoefficients(n1,i);
+           }
+	 }
+   
+       }
+       
+       //std::cout<<" Debug. Density matrix check for geminal "<<n+1<<"\n";
+       //for(i=0;i<N;i++){for(j=0;j<i+1;j++){std::cout<<i<<","<<j<<" "<<density(i*(i+1)/2+ j)<<"\n";}}
+
+       // copying from normal triangular to scanned-rows ordering, storing in list of densities
+       Vector* vector(new Vector(N*(N+1)/2));
+       m_densityVectors.append(vector);
+
+     for (i = 0, n1 = 0; i < N; ++i) {
+         for (j = i; j < N; ++j, ++n1) {
+           (*vector)[n1] = density(j*(j+1)/2+i);
+         }
+      }
+   }
+   
+   // While we are here we set up the GeminalOrbitalProperties for coloring the
+   // surfaces.
+   initGeminalOrbitalProperties();
+
+   //delete [] GemL; 
+   delete [] GemD; 
+ 
+}
+
+
+// This sets up the orbital SpatialProperties objects for evaluating the
+// orbitals on a surface.
+void GeminalOrbitals::initGeminalOrbitalProperties()
+{
+   if (!m_molecule) {
+      QLOG_WARN() << "Molecule uninitialized in initOrbitalProperties()";
+      return;
+   }
+
+   unsigned i;
+   for (i = 0; i < nAlpha(); ++i) {
+       m_molecule->addProperty(new GeminalOrbitalProperty(m_geminalOrbitals, i));
+   }
+   for (i = 0; i < nBeta(); ++i) {
+       m_molecule->addProperty(new GeminalOrbitalProperty(m_geminalOrbitals, i+nAlpha()));
+   }
+}
+
+
+bool GeminalOrbitals::computeDensityGrids(Data::GridDataList& grids)
+{
+   if (grids.isEmpty()) return false;;
+
    QTime time;
    time.start();
 
+   // Check that the grids are all of the same size
+   Data::GridData* g0(grids.first());
+   Data::GridDataList::iterator iter;
+
+   // Ensure the required density matrices are available
+   computeDensityVectors();
+
+   // This will contain a list of pointers to the appropriate density vectors 
+   // for each of the requested grids, in order.
+   QList<Vector*> densityVectorPointers;
+
+   for (iter = grids.begin(); iter != grids.end(); ++iter) {
+       QLOG_DEBUG() << "Computing grid" << (*iter)->surfaceType().toString() ;
+       (*iter)->size().dump();
+       if ( ((*iter)->size() != g0->size()) ) {
+          QLOG_ERROR() << "Different sized grids found in geminal calculator";
+          return false;
+       }
+       if ( !(*iter)->surfaceType().isDensity()) {
+          QLOG_ERROR() << "Incorrect grid type found in geminal calculator";
+          QLOG_ERROR() << (*iter)->surfaceType().toString(); 
+          return false;
+       }
+       unsigned index((*iter)->surfaceType().index());
+       densityVectorPointers.append(m_densityVectors[index-1]);
+   }
+
    unsigned nx, ny, nz;
-   alpha->getNumberOfPoints(nx, ny, nz);
-   Vec delta(alpha->delta());
-   Vec origin(alpha->origin());
-
-   // We take a two pass approach, the first computes data on a grid with half
-   // the number of points for each dimension (so a factor of 8 fewer points
-   // than the target grid).  We then used these values in a subsequent pass to
-   // refine only those parts with significant density.
-
-   unsigned totalProgress(8*nx);  // first and second passes
+   g0->getNumberOfPoints(nx, ny, nz);
+   Vec delta(g0->delta());
+   Vec origin(g0->origin());
+   unsigned nDensities(grids.size());
+  
+   unsigned totalProgress(nx);
    unsigned progress(0);
    unsigned i, j, k;
-   double x, y, z;
+   double   x, y, z;
 
    QProgressDialog progressDialog("Calculating density grid data", "Cancel", 0, 
        totalProgress, QApplication::activeWindow());
    progressDialog.setValue(progress);
    progressDialog.setWindowModality(Qt::WindowModal);
    progressDialog.show();
+   
+ 
+//    k=0;  std::cout<<" Debug of grids.  Assume only one is computed at a time \n";
+//    for (i = 0; i < 6; ++i) {
+//        std::cout<<i<<" "<<i<<" "<<(*densityVectorPointers[0])[k]<<"\n";
+//        ++k;
+//        for (j = i+1; j < 6; ++j, ++k) {
+//            std::cout<<i<<" "<<j<<" "<<(*densityVectorPointers[0])[k]<<"\n";
+//        }
+//    }
 
-   for (i = 0, x = origin.x; i < nx; i += 2, x += 2.0*delta.x) {
-       for (j = 0, y = origin.y; j < ny; j += 2, y += 2.0*delta.y) {
-           for (k = 0, z = origin.z; k < nz; k += 2, z += 2.0*delta.z) {
+   for (i = 0, x = origin.x; i < nx; i += 1, x += delta.x) {
+       for (j = 0, y = origin.y; j < ny; j += 1, y += delta.y) {
+           for (k = 0, z = origin.z; k < nz; k += 1, z += delta.z) {
                Vec gridPoint(x, y, z);
                computeShellPairs(gridPoint);
-               (*alpha)(i, j, k) = inner_prod(m_alphaDensity, m_shellPairValues);
-               (*beta )(i, j, k) = inner_prod(m_betaDensity,  m_shellPairValues);
+
+               for (unsigned den = 0; den < nDensities; ++den) {
+                   (*grids.at(den))(i, j, k) = sqrt(fabs(
+                       inner_prod(*densityVectorPointers[den], m_shellPairValues)       //;
+						    ));
+               }
+
            }
        }
 
        ++progress;
-       progressDialog.setValue(progress);
-       if (progressDialog.wasCanceled()) return false;
-   }
-
-   double a000, a001, a010, a011, a100, a101, a110, a111, aTot;
-   double b000, b001, b010, b011, b100, b101, b110, b111, bTot;
-   double thresh(0.125*Data::Shell::thresh());
-
-   origin += delta;
-
-   for (i = 1, x = origin.x;  i < nx-1;  i += 2, x += 2*delta.x) {
-       for (j = 1, y = origin.y;  j < ny-1;  j += 2, y += 2*delta.y) {
-           for (k = 1, z = origin.z;  k < nz-1;  k += 2, z += 2*delta.z) {
-
-               a000 = (*alpha)(i-1, j-1, k-1);
-               a001 = (*alpha)(i-1, j-1, k+1);
-               a010 = (*alpha)(i-1, j+1, k-1);
-               a011 = (*alpha)(i-1, j+1, k+1);
-               a100 = (*alpha)(i+1, j-1, k-1);
-               a101 = (*alpha)(i+1, j-1, k+1);
-               a110 = (*alpha)(i+1, j+1, k-1);
-               a111 = (*alpha)(i+1, j+1, k+1);
-               aTot = a000+a001+a010+a011+a100+a101+a110+a111;
-
-               b000 = (*beta)(i-1, j-1, k-1);
-               b001 = (*beta)(i-1, j-1, k+1);
-               b010 = (*beta)(i-1, j+1, k-1);
-               b011 = (*beta)(i-1, j+1, k+1);
-               b100 = (*beta)(i+1, j-1, k-1);
-               b101 = (*beta)(i+1, j-1, k+1);
-               b110 = (*beta)(i+1, j+1, k-1);
-               b111 = (*beta)(i+1, j+1, k+1);
-               bTot = b000+b001+b010+b011+b100+b101+b110+b111;
-
-               if (std::abs(aTot) > thresh || std::abs(bTot) > thresh) {
-
-
-                  computeShellPairs(Vec(x, y, z));
-                  (*alpha)(i,  j,  k  ) = inner_prod(m_alphaDensity, m_shellPairValues);
-                  (*beta )(i,  j,  k  ) = inner_prod(m_betaDensity,  m_shellPairValues);
-
-                  computeShellPairs(Vec(x, y, z-delta.z));
-                  (*alpha)(i,  j,  k-1) = inner_prod(m_alphaDensity, m_shellPairValues);
-                  (*beta )(i,  j,  k-1) = inner_prod(m_betaDensity,  m_shellPairValues);
-
-                  computeShellPairs(Vec(x, y-delta.y, z));
-                  (*alpha)(i,  j-1,k  ) = inner_prod(m_alphaDensity, m_shellPairValues);
-                  (*beta )(i,  j-1,k  ) = inner_prod(m_betaDensity,  m_shellPairValues);
-
-                  computeShellPairs(Vec(x, y-delta.y, z-delta.z));
-                  (*alpha)(i,  j-1,k-1) = inner_prod(m_alphaDensity, m_shellPairValues);
-                  (*beta )(i,  j-1,k-1) = inner_prod(m_betaDensity,  m_shellPairValues);
-
-                  computeShellPairs(Vec(x-delta.x, y, z));
-                  (*alpha)(i-1,j,  k  ) = inner_prod(m_alphaDensity, m_shellPairValues);
-                  (*beta )(i-1,j,  k  ) = inner_prod(m_betaDensity,  m_shellPairValues);
-
-                  computeShellPairs(Vec(x-delta.x, y, z-delta.z));
-                  (*alpha)(i-1,j,  k-1) = inner_prod(m_alphaDensity, m_shellPairValues);
-                  (*beta )(i-1,j,  k-1) = inner_prod(m_betaDensity,  m_shellPairValues);
-
-                  computeShellPairs(Vec(x-delta.x, y-delta.y, z));
-                  (*alpha)(i-1,j-1,k  ) = inner_prod(m_alphaDensity, m_shellPairValues);
-                  (*beta )(i-1,j-1,k  ) = inner_prod(m_betaDensity,  m_shellPairValues);
-                  
-               }else {
-
-                  (*alpha)(i,  j,  k  ) = 0.125*aTot;
-                  (*beta )(i,  j,  k  ) = 0.125*bTot;
-
-                  (*alpha)(i,  j,  k-1) = 0.25*(a000+a010+a100+a110);
-                  (*beta )(i,  j,  k-1) = 0.25*(b000+b010+b100+b110);
-
-                  (*alpha)(i,  j-1,k  ) = 0.25*(a000+a001+a100+a101);
-                  (*beta )(i,  j-1,k  ) = 0.25*(b000+b001+b100+b101);
-
-                  (*alpha)(i,  j-1,k-1) = 0.50*(a000+a100);
-                  (*beta )(i,  j-1,k-1) = 0.50*(b000+b100);
-
-                  (*alpha)(i-1,j,  k  ) = 0.25*(a000+a001+a010+a011);
-                  (*beta )(i-1,j,  k  ) = 0.25*(b000+b001+b010+b011);
-
-                  (*alpha)(i-1,j,  k-1) = 0.50*(a000+a010);
-                  (*beta )(i-1,j,  k-1) = 0.50*(b000+b010);
-
-                  (*alpha)(i-1,j-1,k  ) = 0.50*(a000+a001);
-                  (*beta )(i-1,j-1,k  ) = 0.50*(b000+b001);
-
-               }
-            }
-       }
-
-       progress += 7;
        progressDialog.setValue(progress);
        if (progressDialog.wasCanceled()) return false;
    }
@@ -802,5 +785,76 @@ void GeminalOrbitals::computeShellPairs(Vec const& gridPoint)
        }
    }
 }
+
+
+// ------------------------------------------------------------------------
+//  m_geminalOrerty SpatialProperty
+// ------------------------------------------------------------------------
+
+GeminalOrbitalProperty::GeminalOrbitalProperty(Data::GeminalOrbitals const& geminalOrbitals, 
+   unsigned const index)
+   : m_geminalOrbitals(geminalOrbitals), m_alpha(geminalOrbitals.alphaCoefficients()),  
+   m_beta(geminalOrbitals.betaCoefficients()),m_geminals(geminalOrbitals.geminalCoefficients()),
+   m_index(index)
+   
+{
+  
+  QList<unsigned> const& Limits(geminalOrbitals.geminalOrbitalLimits());
+  
+  if(index < geminalOrbitals.nAlpha()){
+   setText("Geminal Alpha " + QString::number(index+1));
+  } else {
+    setText("Geminal Beta " + QString::number(index+1-geminalOrbitals.nAlpha()));
+ }
+  m_function = boost::bind(&GeminalOrbitalProperty::orbital, this, _1, _2, _3);
+}
+
+
+double GeminalOrbitalProperty::orbital(double const x, double const y, double const z) const
+{
+  
+   Vec gridPoint(x,y,z);
+   unsigned offset(0),i,s;
+   double*  values;
+   double   val(0.0);
+
+   QList<unsigned> const& Limits(m_geminalOrbitals.geminalOrbitalLimits());
+   Data::ShellList const& shells(m_geminalOrbitals.shellList());
+   Data::ShellList::const_iterator shell;
+   unsigned NA = m_geminalOrbitals.nAlpha();
+   
+   //Limits[6] m_alpha(i,j) m_index
+
+   if( m_index < NA ){ 
+     for (shell = shells.begin(); shell != shells.end(); ++shell) {
+       if ( (values = (*shell)->evaluate(gridPoint)) ) {
+          for ( s = 0; s < (*shell)->nBasis(); ++s) {
+	    for (i = Limits[m_index]; i < Limits[m_index+1]; i++) {
+               val += m_alpha(i,offset) * m_geminals[i] * values[s];
+	    }
+            ++offset;
+          }
+       } else {
+          offset += (*shell)->nBasis();
+       }
+     }
+   } else {
+     for (shell = shells.begin(); shell != shells.end(); ++shell) {
+       if ( (values = (*shell)->evaluate(gridPoint)) ) {
+          for ( s = 0; s < (*shell)->nBasis(); ++s) {
+	    for (i = Limits[m_index-NA]; i < Limits[m_index+1-NA]; i++) {
+               val += m_beta(i,offset) * m_geminals[i] * values[s];
+	    }
+            ++offset;
+          }
+       } else {
+          offset += (*shell)->nBasis();
+       }
+     }
+   }
+
+   return val;
+}
+
 
 } } // end namespace IQmol::Layer

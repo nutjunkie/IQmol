@@ -224,7 +224,6 @@ IQmol 3.0
 
  * Export
    o Data for gnuplot?
-   o POVray
    o better support for images
      - no background => transparent
    o proprietary format (save session)

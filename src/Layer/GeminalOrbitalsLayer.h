@@ -28,6 +28,7 @@
 #include "GeminalOrbitalsConfigurator.h"
 #include "GridData.h"
 #include "Matrix.h"
+#include "SpatialProperty.h"
 #include <QPair>
 
 
@@ -50,8 +51,12 @@ namespace Layer {
 
       public:
          GeminalOrbitals(Data::GeminalOrbitals&);
+         ~GeminalOrbitals();
+         
+
          void setMolecule(Molecule* molecule);
          double geminalOrbitalEnergy(unsigned const i) const;
+	 //int geminalOrbitalLimits(unsigned const i) const;
 
       Q_SIGNALS:
          void progress(double);
@@ -67,6 +72,8 @@ namespace Layer {
          unsigned nBeta() const;
          unsigned nBasis() const;
          unsigned nOrbitals() const;
+         unsigned nGeminals() const;
+         unsigned nOpenShell() const;
 
       private Q_SLOTS:
          void showGridInfo();
@@ -75,8 +82,9 @@ namespace Layer {
       private:
          // Returns false if the user cancels the calculation
          bool computeOrbitalGrids(Data::GridDataList& grids);
-         bool computeDensityGrids(Data::GridData*& alpha, Data::GridData*& beta);
+         bool computeDensityGrids(Data::GridDataList& grids);
          void computeDensityVectors();
+         void initGeminalOrbitalProperties();
          void computeShellPairs(qglviewer::Vec const& gridPoint);
 
          Data::GridData* findGrid(Data::SurfaceType const& type, 
@@ -92,8 +100,8 @@ namespace Layer {
          Configurator::GeminalOrbitals m_configurator;
          Data::GeminalOrbitals& m_geminalOrbitals;
 
-         Vector m_alphaDensity;
-         Vector m_betaDensity;
+         QList<Vector*> m_densityVectors;
+         
          Vector m_shellPairValues;
          Vector m_shellValues;
 
@@ -102,5 +110,24 @@ namespace Layer {
          qglviewer::Vec     m_bbMin, m_bbMax;   // bounding box
    };
 
+
+   // This class provides a SpatialProperty interface that can be used to plot the 
+   // value of a geminal orbital on an arbitrary surface, but most likely a geminal
+   // density.
+   class GeminalOrbitalProperty : public SpatialProperty {
+      public:
+         GeminalOrbitalProperty(Data::GeminalOrbitals const&,  unsigned const index);
+
+      private:
+         Data::GeminalOrbitals const& m_geminalOrbitals;
+         double orbital(double const x, double const y, double const z) const;
+         //MatrixColumn m_coeffs;
+	 Matrix const& m_alpha;
+	 Matrix const& m_beta;
+	 QList<double> const& m_geminals; 
+	 unsigned m_index;
+   };
+
 } } // End namespace IQmol::Layer 
+
 #endif

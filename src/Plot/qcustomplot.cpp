@@ -585,8 +585,16 @@ void QCPScatterStyle::drawShape(QCPPainter *painter, double x, double y) const
       painter->setBrush(Qt::green);
       painter->drawEllipse(QPointF(x , y), w, w);
       painter->setBrush(b);
-      //painter->drawLine(QLineF(x,     y+3*w, x,     y-3*w));
-      //painter->drawLine(QLineF(x,     y+3*w, x-2*w, y+w));
+      break;
+    }
+    case ssDoublyOccupied:
+    {
+      painter->drawLine(QLineF(x-5*w, y, x+5*w, y));
+      QBrush b = painter->brush();
+      painter->setBrush(Qt::green);
+      painter->drawEllipse(QPointF(x-2*w, y), w, w);
+      painter->drawEllipse(QPointF(x+2*w, y), w, w);
+      painter->setBrush(b);
       break;
     }
     case ssCircle:

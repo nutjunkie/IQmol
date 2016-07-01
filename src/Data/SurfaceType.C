@@ -45,12 +45,19 @@ QString SurfaceType::toString() const
       case SolventExcluded:        label = "Solvent Excluded";        break;
       case SID:                    label = "SID";                     break;
       case ElectrostaticPotential: label = "Electrostatic Potential"; break;
+      case Geminal:                label = "Geminal";                 break;
+      case Correlation:            label = "Correlated Density";      break;
    }
 
-   if (m_kind == AlphaOrbital || m_kind == BetaOrbital) {
-      label += " " + QString::number(m_index);
-   }
+   if (isIndexed()) label += " " + QString::number(m_index);
    return label;
+}
+
+
+bool SurfaceType::isIndexed() const
+{
+   return (m_kind == AlphaOrbital || m_kind == BetaOrbital || 
+           m_kind == Geminal      || m_kind == Correlation);
 }
 
 
@@ -64,14 +71,15 @@ bool SurfaceType::isDensity() const
 {
    return (m_kind == AlphaDensity) || (m_kind == BetaDensity) ||
           (m_kind == TotalDensity) || (m_kind == SpinDensity) ||
-          (m_kind == DensityCombo);
+          (m_kind == DensityCombo) || (m_kind == Correlation);
 }
 
 
 bool SurfaceType::isSigned() const
 {
    return (m_kind == AlphaOrbital) || (m_kind == BetaOrbital) ||
-          (m_kind == SpinDensity)  || (m_kind == DensityCombo);
+          (m_kind == SpinDensity)  || (m_kind == DensityCombo) ||
+          (m_kind == Geminal)      || (m_kind == Correlation);
 }
 
 

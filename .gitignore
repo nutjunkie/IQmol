@@ -1,3 +1,28 @@
 bin
 build
 
+# Compiled Object files/executables
+*.o
+*.mod
+*.app
+*.exe
+
+# Makefiles
+Makefile
+Makefile.debug
+Makefile.release
+
+# Mac crap
+.DS_Store
+
+# Vim temporary files
+.*.swp
+
+# Qt stuff
+.qmake.stash
+.moc
+
+# IQmol stuf
+qrc_IQmol.cpp
+deploy
+graveyard
