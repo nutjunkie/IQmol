@@ -33,8 +33,7 @@ namespace IQmol {
 namespace Configurator {
 
 GeminalOrbitals::GeminalOrbitals(Layer::GeminalOrbitals& geminalOrbitals)
-  : m_geminalOrbitals(geminalOrbitals), m_nAlpha(0), m_nBeta(0), m_nOrbitals(0),
-    m_customPlot(0)
+  : m_geminalOrbitals(geminalOrbitals), m_customPlot(0)
 {
    m_configurator.setupUi(this);
 
@@ -42,9 +41,9 @@ GeminalOrbitals::GeminalOrbitals(Layer::GeminalOrbitals& geminalOrbitals)
       m_configurator.orbitalRangeMax, SLOT(setCurrentIndex(int)));
 
    m_configurator.surfaceType->clear();
-   m_configurator.surfaceType->addItem("Alpha Orbital", AlphaOrbital);
-   m_configurator.surfaceType->addItem("Beta Orbital",  BetaOrbital);
-   m_configurator.surfaceType->setCurrentIndex(0);
+   m_configurator.surfaceType->addItem("Geminal", Geminal);
+   m_configurator.surfaceType->addItem("Geminal Correlation", Correlation);
+   m_configurator.surfaceType->setCurrentIndex(0); 
 
    setPositiveColor(Preferences::PositiveSurfaceColor());
    setNegativeColor(Preferences::NegativeSurfaceColor());
@@ -68,11 +67,8 @@ GeminalOrbitals::~GeminalOrbitals()
 
 void GeminalOrbitals::init() 
 { 
-   m_nAlpha    = m_geminalOrbitals.nAlpha();
-   m_nBeta     = m_geminalOrbitals.nBeta();
-   m_nOrbitals = m_geminalOrbitals.nOrbitals();
-   updateOrbitalRange(m_nAlpha);
-   if (m_nOrbitals > 0) initPlot();
+   initGeminalRange();
+   if (m_geminalOrbitals.nGeminals() > 0) initPlot();
 }
 
 
@@ -92,40 +88,44 @@ void GeminalOrbitals::initPlot()
    QVector<double>  ticks;
    QVector<QString> labels;
 
-   ticks << 0.75 << 2.50;
-   labels << "Alpha" << "Beta";
+   ticks << 1.5;
+   labels << "Geminal";
 
    m_customPlot->xAxis->setAutoTicks(false);
    m_customPlot->xAxis->setAutoTickLabels(false);
    m_customPlot->xAxis->setTickVector(ticks);
    m_customPlot->xAxis->setTickVectorLabels(labels);
    m_customPlot->xAxis->setSubTickCount(0);
-   m_customPlot->xAxis->setRange(0,3.25);
+   m_customPlot->xAxis->setRange(0,3.0);
 
-   unsigned nOrbs(m_geminalOrbitals.nOrbitals());
+   unsigned nTot(m_geminalOrbitals.nGeminals() + m_geminalOrbitals.nOpenShell());
    unsigned nAlpha(m_geminalOrbitals.nAlpha());
    unsigned nBeta( m_geminalOrbitals.nBeta());
-   QVector<double>  xAlpha(nOrbs), yAlpha(nOrbs), xBeta(nOrbs), yBeta(nOrbs); 
+   //QVector<double>  xAlpha(nOrbs), yAlpha(nOrbs), xBeta(nOrbs), yBeta(nOrbs); 
    QVector<double> a(1), b(1), y(1);
    QCPGraph* graph(0);
 
    unsigned i(0), g(0);
 
-   // Alpha
-   while (i < nOrbs) {
+   while (i < nTot) {
        y[0] = m_geminalOrbitals.geminalOrbitalEnergy(i);
 
        g = 1; // degeneracy
-       while (i+g < nOrbs && 
+       while (i+g < nTot && 
               std::abs(y[0]-m_geminalOrbitals.geminalOrbitalEnergy(i+g)) < 0.001) { ++g; }
 
        for (unsigned k = i; k < i+g; ++k) {
-           a[0]  = 0.75 - 0.25*(g-1) + (k-i)*0.50;
+           a[0]  = 1.5 - 0.25*(g-1) + (k-i)*0.50;
            graph = m_customPlot->addGraph();
            graph->setData(a, y);
            graph->setName(QString::number(k));
-           graph->setScatterStyle(k<nAlpha ? QCPScatterStyle::ssOccupied 
-                                           : QCPScatterStyle::ssVirtual);
+           if (k < nBeta) {
+              graph->setScatterStyle(QCPScatterStyle::ssDoublyOccupied);
+           }else if (k < nAlpha) {
+              graph->setScatterStyle(QCPScatterStyle::ssOccupied);
+           }else {
+              graph->setScatterStyle(QCPScatterStyle::ssVirtual);
+           }
            connect(graph, SIGNAL(selectionChanged(bool)), 
               this, SLOT(plotSelectionChanged(bool)));
        }
@@ -133,26 +133,6 @@ void GeminalOrbitals::initPlot()
    }
 
    i = 0;
-   // Beta
-   while (i < nOrbs) {
-       y[0] = m_geminalOrbitals.geminalOrbitalEnergy(i);
-
-       g = 1; // degeneracy
-       while (i+g < nOrbs && 
-              std::abs(y[0]-m_geminalOrbitals.geminalOrbitalEnergy(i+g)) < 0.001) { ++g; }
-
-       for (unsigned k = i; k < i+g; ++k) {
-           a[0]  = 2.50 - 0.25*(g-1) + (k-i)*0.50;
-           graph = m_customPlot->addGraph();
-           graph->setData(a, y);
-           graph->setName(QString::number(k+nOrbs));
-           graph->setScatterStyle(k<nBeta ? QCPScatterStyle::ssOccupied 
-                                           : QCPScatterStyle::ssVirtual);
-           connect(graph, SIGNAL(selectionChanged(bool)), 
-              this, SLOT(plotSelectionChanged(bool)));
-       }
-       i += g;
-   }
 
    m_customPlot->yAxis->setLabel("Energy/Hartree");
    m_customPlot->yAxis->setNumberPrecision(3);
@@ -161,21 +141,34 @@ void GeminalOrbitals::initPlot()
    // Show 5 occupied and virtual orbitals to start with
    unsigned index, nShow(5);
    
-   if (nBeta > nAlpha) {
-      // Use the beta energies instead
-      index = nBeta < nShow ? 0 : nBeta-nShow;
-      yMin  = m_geminalOrbitals.geminalOrbitalEnergy(index);
-      index = nOrbs > nBeta+nShow ? nBeta+nShow : nOrbs;
-      yMax  = m_geminalOrbitals.geminalOrbitalEnergy(index);
-   }else {
-      index = nAlpha < nShow ? 0 : nAlpha-nShow;
-      yMin  = m_geminalOrbitals.geminalOrbitalEnergy(index);
-      index = nOrbs > nAlpha+nShow ? nAlpha+nShow : nOrbs;
-      yMax  = m_geminalOrbitals.geminalOrbitalEnergy(index);
-   }
+   index = nAlpha < nShow ? 0 : nAlpha-nShow;
+   yMin  = m_geminalOrbitals.geminalOrbitalEnergy(index);
+   index = nTot> nAlpha+nShow ? nAlpha+nShow : nTot;
+   yMax  = m_geminalOrbitals.geminalOrbitalEnergy(index);
 
    yMax = std::min(yMax, 0.5*std::abs(yMin));
    m_customPlot->yAxis->setRange(1.05*yMin,1.05*yMax);
+}
+
+
+void GeminalOrbitals::initGeminalRange() 
+{
+   QComboBox* min(m_configurator.orbitalRangeMin);
+   QComboBox* max(m_configurator.orbitalRangeMax);
+
+   min->clear();
+   max->clear();
+   unsigned nAlpha(m_geminalOrbitals.nAlpha());
+   unsigned nBeta( m_geminalOrbitals.nBeta());
+
+   for (unsigned int i = 1; i <= nBeta; ++i) { 
+       min->addItem(QString::number(i));
+       max->addItem(QString::number(i));
+   }
+   for (unsigned int i = nBeta+1; i <= nAlpha; ++i) { 
+       min->addItem(QString::number(i) + " OS");
+       max->addItem(QString::number(i) + " OS");
+   }
 }
 
 
@@ -194,23 +187,15 @@ void GeminalOrbitals::plotSelectionChanged(bool tf)
 
    bool ok;
    unsigned orb(graph->name().toUInt(&ok));
-   unsigned nOrbs(m_geminalOrbitals.nOrbitals());
+  // unsigned nOrbs(m_geminalOrbitals.nAlpha());
    if (!ok) return;
 
    double energy(0.0);
    QString label;
-   if (orb < nOrbs) {  //alpha
-      energy = m_geminalOrbitals.geminalOrbitalEnergy(orb);
-      label  = "Alpha orbital ";
-      updateOrbitalRange(m_nAlpha);
-   }else {  // beta
-      orb -= nOrbs;
-      energy = m_geminalOrbitals.geminalOrbitalEnergy(orb);
-      label  = "Beta orbital ";
-      updateOrbitalRange(m_nBeta);
-   }
+   energy = m_geminalOrbitals.geminalOrbitalEnergy(orb);
+   label  = "Geminal ";
 
-   m_configurator.surfaceType->setCurrentIndex(0);
+   //m_configurator.surfaceType->setCurrentIndex(0);
    m_configurator.orbitalRangeMin->setCurrentIndex(orb);
    m_configurator.orbitalRangeMax->setCurrentIndex(orb);
 
@@ -228,31 +213,6 @@ void GeminalOrbitals::clearSelectedOrbitals(int)
    QList<QCPGraph*>::iterator iter;
    for (iter = selection.begin(); iter != selection.end(); ++iter) {
        (*iter)->setSelected(false);
-   }
-}
-
-
-void GeminalOrbitals::on_surfaceType_currentIndexChanged(int index) 
-{
-   QVariant qvar(m_configurator.surfaceType->itemData(index));
-
-   switch (qvar.toUInt()) {
-      case AlphaOrbital:
-
-         enableOrbitalSelection(true);
-         enableNegativeColor(true);
-         updateOrbitalRange(m_nAlpha);
-         break;
-
-      case BetaOrbital:
-         enableOrbitalSelection(true);
-         enableNegativeColor(true);
-         updateOrbitalRange(m_nBeta);
-         break;
-
-      default:
-         enableOrbitalSelection(false);
-         break;
    }
 }
 
@@ -316,7 +276,6 @@ void GeminalOrbitals::on_addToQueueButton_clicked(bool)
    bool simplifyMesh(m_configurator.simplifyMeshCheckBox->isChecked());
 
    int index(m_configurator.surfaceType->currentIndex());
-   QVariant qvar(m_configurator.surfaceType->itemData(index));
    bool isSigned(true);
 
    int op(m_configurator.opacity->value());
@@ -325,75 +284,21 @@ void GeminalOrbitals::on_addToQueueButton_clicked(bool)
    Data::SurfaceInfo info(Data::SurfaceType::Custom, quality, isovalue, 
      positive, negative, isSigned, simplifyMesh, opacity);
 
+   QVariant qvar(m_configurator.surfaceType->itemData(index));
    switch (qvar.toUInt()) {
+      case Geminal: info.type().setKind(Data::SurfaceType::Geminal); break;
+      case Correlation: info.type().setKind(Data::SurfaceType::Correlation); break;
+    }
 
-      case AlphaOrbital: {
-         info.type().setKind(Data::SurfaceType::AlphaOrbital);
-         int orb1(m_configurator.orbitalRangeMin->currentIndex()+1);
-         int orb2(m_configurator.orbitalRangeMax->currentIndex()+1);
+    int orb1(m_configurator.orbitalRangeMin->currentIndex()+1);
+    int orb2(m_configurator.orbitalRangeMax->currentIndex()+1);
 
-         for (int i = std::min(orb1,orb2); i <= std::max(orb1, orb2); ++i) {
-             info.type().setIndex(i);
-             queueSurface(info);
-         }
-      } break;
-
-      case BetaOrbital: {
-         info.type().setKind(Data::SurfaceType::BetaOrbital);
-         int orb1(m_configurator.orbitalRangeMin->currentIndex()+1);
-         int orb2(m_configurator.orbitalRangeMax->currentIndex()+1);
-
-         for (int i = std::min(orb1,orb2); i <= std::max(orb1, orb2); ++i) {
-             info.type().setIndex(i);
-             queueSurface(info);
-         }
-      } break;
-   }
+    for (int i = std::min(orb1,orb2); i <= std::max(orb1, orb2); ++i) {
+        info.type().setIndex(i);
+        queueSurface(info);
+    }
 }
 
 
-void GeminalOrbitals::enableOrbitalSelection(bool tf)
-{
-   m_configurator.orbitalRangeMin->setEnabled(tf);
-   m_configurator.orbitalRangeMax->setEnabled(tf);
-}
-
-
-void GeminalOrbitals::enableNegativeColor(bool tf)
-{
-   m_configurator.negativeColorButton->setVisible(tf);
-   m_configurator.negativeLabel->setVisible(tf);
-}
-
-
-void GeminalOrbitals::updateOrbitalRange(int nElectrons) 
-{
-   int index;
-   QComboBox* combo;
-
-   combo = m_configurator.orbitalRangeMin;
-   index = combo->currentIndex();
-   updateOrbitalRange(nElectrons, combo);
-   if (index < 0 || index >= (int)m_nOrbitals) index = nElectrons-1;
-   combo->setCurrentIndex(index);
-
-   combo = m_configurator.orbitalRangeMax;
-   index = combo->currentIndex();
-   updateOrbitalRange(nElectrons, combo);
-   if (index < 0 || index >= (int)m_nOrbitals) index = nElectrons;
-   combo->setCurrentIndex(index);
-}
-
-
-void GeminalOrbitals::updateOrbitalRange(int nElectrons, QComboBox* combo) 
-{
-   combo->clear();
-   for (unsigned int i = 1; i <= m_nOrbitals; ++i) {
-       combo->addItem(QString::number(i));
-   }
-   
-   combo->setItemText(nElectrons-1, QString::number(nElectrons) + " (HOMO)");
-   combo->setItemText(nElectrons,   QString::number(nElectrons+1) + " (LUMO)");
-}
 
 } } // end namespace IQmol::Configurator

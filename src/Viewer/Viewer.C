@@ -175,6 +175,7 @@ void Viewer::editShaders()
       connect(m_shaderDialog, SIGNAL(updated()), this, SLOT(updateGL()));
    }
    m_shaderDialog->show();
+   m_shaderDialog->raise();
 }
 
 
@@ -187,6 +188,7 @@ void Viewer::editCamera()
    }
    m_cameraDialog->sync();
    m_cameraDialog->show();
+   m_cameraDialog->raise();
 }
 
 

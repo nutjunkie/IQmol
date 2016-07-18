@@ -49,6 +49,7 @@ namespace Parser {
          static QStringList s_obFormats;
          static bool s_formatsLoaded;
 
+         void buildFrom2D(::OpenBabel::OBMol& mol);
          void appendGridData(::OpenBabel::OBGridData const&);
          void appendVibrationData(::OpenBabel::OBVibrationData const&);
    };
