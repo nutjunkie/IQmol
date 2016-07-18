@@ -17,7 +17,7 @@
             <desktopShortcutList>
                 <shortcut>
                     <comment>Molecular builder and visualization package</comment>
-                    <exec>${installdir}/cde-root/opt/IQmol/bin/iqmol.sh</exec>
+                    <exec>${installdir}/cde-root/opt/IQmol/iqmol.sh</exec>
                     <icon>${installdir}/cde-root/opt/IQmol/share/IQmol.png</icon>
                     <name>IQmol</name>
                     <path>${installdir}</path>
@@ -66,7 +66,7 @@
                     <shortcutList>
                         <shortcut>
                             <comment>Launch IQmol</comment>
-                            <exec>${installdir}/cde-root/opt/IQmol/bin/iqmol.sh</exec>
+                            <exec>${installdir}/cde-root/opt/IQmol/iqmol.sh</exec>
                             <icon>${installdir}/cde-root/opt/IQmol/share/IQmol.png</icon>
                             <name>iqmol.sh</name>
                             <path>${installdir}</path>
