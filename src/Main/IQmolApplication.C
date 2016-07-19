@@ -89,18 +89,33 @@ void IQmolApplication::queueOpenFiles(QStringList const& files)
 void IQmolApplication::initOpenBabel()
 {
    QDir dir(QApplication::applicationDirPath());
-   dir.cdUp();  
-   QString path(dir.absolutePath());
+   QString path;
 
 #ifdef Q_OS_MAC
    // Assumed directory structure: IQmol.app/Contents/MacOS/IQmol
+   dir.cdUp();  
+   path = dir.absolutePath();
    QApplication::addLibraryPath(path + "/Frameworks");
    QApplication::addLibraryPath(path + "/PlugIns");
-#else
-   // Assumed directory structure: IQmol-xx/bin/IQmol
+#endif
+
+#ifdef Q_OS_WIN32
+   // Assumed directory structure: IQmol/bin/IQmol
+   dir.cdUp();  
+   path = dir.absolutePath();
    QApplication::addLibraryPath(path + "/lib");
    QApplication::addLibraryPath(path + "/lib/plugins");
 #endif
+
+#ifdef Q_OS_LINUX
+   // Assumed directory structure: IQmol/IQmol
+   // This is so that when the executable is created it can be 
+   // run from the main IQmol directory 
+   path = dir.absolutePath();
+   QApplication::addLibraryPath(path + "/lib");
+   QApplication::addLibraryPath(path + "/lib/plugins");
+#endif
+   
 
    QString env(qgetenv("BABEL_LIBDIR"));
    if (env.isEmpty()) {

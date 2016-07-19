@@ -1,0 +1,4 @@
+1) Open the starburst in gimp and add a text layer, fontsize 72, remove Sans
+2) Layer -> Transform -> Arbitrary Rotation
+3) Tools -> Selection Tools -> Rectangle Selection (to move to center)
+4) Colors -> Hue/Saturation (to adjust the color)
