@@ -31,8 +31,9 @@
 #include "Hessian.h"
 #include "Energy.h"
 #include "QsLog.h"
-#include <QtDebug>
 #include <cmath>
+
+#include <QtDebug>
 
 
 namespace IQmol {
@@ -49,6 +50,10 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
    ShellData shellData;
    MoData    moData;
    GmoData   gmoData;
+   MoData    boysData;
+   MoData    erData;
+
+   moData.label   = "Cannonical MOs";
 
    while (!textStream.atEnd()) {
 
@@ -102,10 +107,9 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          geometryList->append(geometry);
 
       }else if (key == "Number of basis functions") {
+         moData.nBasis  = list.at(1).toUInt(&ok);
          gmoData.nBasis = list.at(1).toUInt(&ok);
          if (!ok) goto error;
-         // Also determined from the size of the MO coefficient matrices 
-         // for MolecularOrbitals
 
       }else if (key == "Shell types") {
          unsigned n(list.at(2).toUInt(&ok));
@@ -155,6 +159,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          moData.alphaCoefficients = readDoubleArray(textStream, n);
+         // Copy the alpha coefficients in case the job is restricted
          moData.betaCoefficients  = moData.alphaCoefficients;
 
       }else if (key == "Beta MO coefficients") {
@@ -172,6 +177,34 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok || !geometry) goto error;
          moData.betaEnergies = readDoubleArray(textStream, n);
+
+      }else if (key == "Localized Alpha MO Coefficients (ER)") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok || !geometry) goto error;
+         erData = moData;
+         erData.label = "Localized MOs (ER)";
+         //erData.alphaEnergies.clear();
+         erData.alphaCoefficients = readDoubleArray(textStream, n);
+
+      }else if (key == "Localized Beta  MO Coefficients (ER)") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok || !geometry) goto error;
+         //erData.betaEnergies.clear();
+         erData.betaCoefficients = readDoubleArray(textStream, n);
+
+      }else if (key == "Localized Alpha MO Coefficients (Boys)") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok || !geometry) goto error;
+         boysData = moData;
+         boysData.label = "Localized MOs (Boys)";
+         //boysData.alphaEnergies.clear();
+         boysData.alphaCoefficients = readDoubleArray(textStream, n);
+
+      }else if (key == "Localized Beta  MO Coefficients (Boys)") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok || !geometry) goto error;
+         //boysData.betaEnergies.clear();
+         boysData.betaCoefficients = readDoubleArray(textStream, n);
 
       }else if (key == "Alpha GMO coefficients") {
          unsigned n(list.at(2).toUInt(&ok));
@@ -218,8 +251,16 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
    }
 
    if (geometry) {
-      Data::MolecularOrbitals* mos(makeMolecularOrbitals(moData, shellData, *geometry)); 
+      Data::MolecularOrbitals* mos(0);
+      mos = makeMolecularOrbitals(moData, shellData, *geometry); 
       if (mos) molecularOrbitalsList->append(mos);
+
+      mos = makeMolecularOrbitals( boysData, shellData, *geometry); 
+      if (mos) molecularOrbitalsList->append(mos);
+
+      mos = makeMolecularOrbitals( erData, shellData, *geometry); 
+      if (mos) molecularOrbitalsList->append(mos);
+
       Data::GeminalOrbitals* gmos(makeGeminalOrbitals(gmoData, shellData, *geometry)); 
       if (gmos) m_dataBank.append(gmos);
    }
@@ -337,8 +378,10 @@ Data::MolecularOrbitals* FormattedCheckpoint::makeMolecularOrbitals(MoData const
    Data::ShellList* shellList = makeShellList(shellData, geometry);
    if (!shellList) return 0;
    Data::MolecularOrbitals* mos = new Data::MolecularOrbitals(
+      moData.label,
       moData.nAlpha, 
       moData.nBeta,
+      moData.nBasis,
       moData.alphaCoefficients,
       moData.alphaEnergies,
       moData.betaCoefficients,

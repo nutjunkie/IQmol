@@ -46,7 +46,7 @@ namespace IQmol {
 namespace Layer {
 
 MolecularOrbitals::MolecularOrbitals(Data::MolecularOrbitals& molecularOrbitals)
- : Base("MO Surfaces"), m_configurator(*this), m_molecularOrbitals(molecularOrbitals)
+ : Base(molecularOrbitals.label()), m_configurator(*this), m_molecularOrbitals(molecularOrbitals)
 {
    connect(&m_configurator, SIGNAL(queueSurface(Data::SurfaceInfo const&)),
       this, SLOT(addToQueue(Data::SurfaceInfo const&)));

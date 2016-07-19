@@ -60,8 +60,10 @@ namespace Parser {
          };
 
          struct MoData {
+            QString  label;
             unsigned nAlpha;
             unsigned nBeta;
+            unsigned nBasis;
             QList<double> alphaCoefficients;
             QList<double> betaCoefficients;
             QList<double> alphaEnergies;
@@ -86,8 +88,8 @@ namespace Parser {
          QList<double> readDoubleArray(TextStream&, unsigned nTokens);
          QList<unsigned> readUnsignedArray(TextStream&, unsigned nTokens);
 
-         Data::MolecularOrbitals* makeMolecularOrbitals(MoData const&, ShellData const&,
-            Data::Geometry const&);
+         Data::MolecularOrbitals* makeMolecularOrbitals(MoData const&, ShellData const&, 
+            Data::Geometry const&); 
          Data::GeminalOrbitals* makeGeminalOrbitals(GmoData const&, ShellData const&,
             Data::Geometry const&);
          Data::ShellList* makeShellList(ShellData const&, Data::Geometry const& geometry);

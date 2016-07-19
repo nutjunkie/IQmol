@@ -28,23 +28,21 @@
 namespace IQmol {
 namespace Data {
 
-MolecularOrbitals::MolecularOrbitals(unsigned const nAlpha, unsigned const nBeta, 
-   QList<double> const& alphaCoefficients, QList<double> const& alphaEnergies,  
-   QList<double> const& betaCoefficients, QList<double> const& betaEnergies,
-   ShellList const& shells) : m_nAlpha(nAlpha), m_nBeta(nBeta), 
+MolecularOrbitals::MolecularOrbitals(QString const& label, unsigned const nAlpha, 
+   unsigned const nBeta, unsigned const nBasis, QList<double> const& alphaCoefficients, 
+   QList<double> const& alphaEnergies, QList<double> const& betaCoefficients, 
+   QList<double> const& betaEnergies, ShellList const& shells) 
+ : m_label(label), m_nAlpha(nAlpha), m_nBeta(nBeta), m_nBasis(nBasis),
    m_alphaEnergies(alphaEnergies), m_betaEnergies(betaEnergies), m_shellList(shells)
 {
-
-
-   m_nOrbitals = m_alphaEnergies.size();
    QLOG_DEBUG() << "Number of alpha electrons :: " << m_nAlpha;
    QLOG_DEBUG() << "Number of beta  electrons :: " << m_nBeta;
-   QLOG_DEBUG() << "Number of orbitals        :: " << m_nOrbitals;
-
-   if (m_nOrbitals == 0) return;
-
-   m_nBasis    = alphaCoefficients.size()/m_nOrbitals;
    QLOG_DEBUG() << "Number of basis functions :: " << m_nBasis;
+
+   if (m_nBasis == 0) return;
+
+   m_nOrbitals = alphaCoefficients.size()/m_nBasis;
+   QLOG_DEBUG() << "Number of orbitals        :: " << m_nOrbitals;
    QLOG_DEBUG() << "Alpha MO coefficient size :: " << alphaCoefficients.size();
    QLOG_DEBUG() << "Alpha MO energies    size :: " << alphaEnergies.size();
    QLOG_DEBUG() << "Beta  MO coefficient size :: " << betaCoefficients.size();
@@ -58,6 +56,8 @@ MolecularOrbitals::MolecularOrbitals(unsigned const nAlpha, unsigned const nBeta
                    << betaCoefficients.size()  << "!=" <<(int)m_nOrbitals*(int)m_nBasis;
        return;
    }
+
+   if (m_nOrbitals == 0) return;
 
    m_alphaCoefficients.resize(m_nOrbitals, m_nBasis);
    unsigned ka(0);

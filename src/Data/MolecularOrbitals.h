@@ -37,13 +37,15 @@ namespace Data {
 
       public:
          MolecularOrbitals() { }
-         MolecularOrbitals(unsigned const nAlpha, unsigned const nBeta, 
+         MolecularOrbitals(QString const& label, unsigned const nAlpha, unsigned const nBeta, 
+            unsigned const nBasis,
             QList<double> const& alphaCoefficients, QList<double> const& alphaEnergies,  
             QList<double> const& betaCoefficients, QList<double> const& betaEnergies,
             ShellList const& shells);
 
          Type::ID typeID() const { return Type::MolecularOrbitals; }
 
+         QString const& label() { return m_label; }
          unsigned nAlpha() const { return m_nAlpha; }
          unsigned nBeta()  const { return m_nBeta; }
          unsigned nBasis() const { return m_nBasis; }
@@ -68,12 +70,14 @@ namespace Data {
 
          double alphaOrbitalEnergy(unsigned i) const 
          { 
-            return (i < m_nOrbitals) ? m_alphaEnergies[i] : 0.0;
+            // Note the energies array may be empty if the orbitals are localized
+            return (i < m_alphaEnergies.size()) ? m_alphaEnergies[i] : 0.0;
          }
 
          double betaOrbitalEnergy(unsigned i) const 
          { 
-            return (i < m_nOrbitals) ? m_betaEnergies[i] : 0.0;
+            // Note the energies array may be empty if the orbitals are localized
+            return (i < m_betaEnergies.size()) ? m_betaEnergies[i] : 0.0;
          }
 
          bool consistent() const;
@@ -111,6 +115,7 @@ namespace Data {
 
          void computeBoundingBox();
 
+         QString  m_label;
          unsigned m_nAlpha;
          unsigned m_nBeta;
          unsigned m_nBasis;

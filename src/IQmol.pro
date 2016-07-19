@@ -16,11 +16,11 @@ CONFIG  += ordered
 TEMPLATE = subdirs
 
 SUBDIRS  = QGLViewer \
-           OpenBabel \
-#          OpenMesh \
-#          OpenMesh/src/OpenMesh/Core \
-#          OpenMesh/src/OpenMesh/Tools \
-           Util \
+           OpenMesh \
+           OpenMesh/src/OpenMesh/Core \
+           OpenMesh/src/OpenMesh/Tools \
+
+SUBDIRS += Util \
            Data \
            Qui \
            Parser \
@@ -33,3 +33,5 @@ SUBDIRS  = QGLViewer \
            Process \
            Viewer \
            Main \
+
+win32:SUBDIRS += OpenBabel
