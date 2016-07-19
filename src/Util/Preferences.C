@@ -249,9 +249,12 @@ QString QChemDatabaseFilePath()
 
    if (value.isNull() || value.toString().isEmpty()) {
       QDir dir(QApplication::applicationDirPath());
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MAC 
       dir.cdUp();
       dir.cd("Resources");
+#elif defined(Q_OS_WIN32)
+      dir.cdUp();
+      dir.cd("share");
 #else
       dir.cd("share");
 #endif
@@ -276,7 +279,7 @@ QString ShaderDirectory()
 
    if (value.isNull()) {
       QDir dir(QApplication::applicationDirPath());
-#ifdef Q_OS_MAC
+#if  defined(Q_OS_MAC) || defined(Q_OS_WIN32)
       dir.cdUp();
 #endif
       dir.cd("share/shaders");
@@ -299,7 +302,7 @@ void ShaderDirectory(QString const& filePath)
 QString DefaultShader()
 {
    QVariant value(Get("DefaultShader"));
-   return value.isNull() ? "None" : value.value<QString>();
+   return value.isNull() ? "Phong" : value.value<QString>();
 }
 
 void DefaultShader(QString const& shader)
@@ -369,7 +372,7 @@ QString FragmentDirectory()
 
    if (value.isNull() || value.toString().isEmpty()) {
       QDir dir(QApplication::applicationDirPath());
-#ifdef Q_OS_MAC
+#if defined(Q_OS_MAC) || defined(Q_OS_WIN32)
       dir.cdUp();
 #endif
       dir.cd("share/fragments");

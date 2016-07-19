@@ -15,6 +15,10 @@ Makefile.release
 # Mac crap
 .DS_Store
 
+# Windows crap
+object_script.*
+
+
 # Vim temporary files
 .*.swp
 

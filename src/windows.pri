@@ -27,7 +27,7 @@ win32 {
    LIBS        += -lssh2 -lssl -lcrypto -lgdi32
 
    # QGLViewer
-   INCLUDEPATH += C:\Users\agilbert\Development\libQGLViewer-2.5.2
+   #INCLUDEPATH += C:\Users\agilbert\Development\libQGLViewer-2.5.2
    LIBS       += C:\Users\agilbert\Development\extlib\lib\libQGLViewer2.a
    #LIBS        += -lQGLViewer 
 

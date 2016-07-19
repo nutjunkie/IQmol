@@ -246,11 +246,13 @@ win32 {
 	# Needed by Intel C++, (icl.exe) so that WINGDIAPI is a defined symbol in gl.h.
 	DEFINES *= WIN32
 
-	staticlib {
-		DEFINES *= QGLVIEWER_STATIC
-	} else {
-		DEFINES *= CREATE_QGLVIEWER_DLL
-	}
+	DEFINES *= QGLVIEWER_STATIC
+
+#staticlib {
+#	DEFINES *= QGLVIEWER_STATIC
+#} else {
+#	DEFINES *= CREATE_QGLVIEWER_DLL
+#}
 
 	CONFIG *= embed_manifest_dll
 

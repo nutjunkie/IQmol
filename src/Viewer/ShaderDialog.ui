@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>352</width>
-    <height>554</height>
+    <width>480</width>
+    <height>749</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -47,7 +47,7 @@ QToolButton:pressed {
    <item>
     <widget class="QTabWidget" name="shaderFilterTabWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -625,10 +625,6 @@ QToolButton:pressed {
       <zorder>label_4</zorder>
       <zorder>groupBox</zorder>
       <zorder>verticalSpacer_3</zorder>
-      <zorder>label_11</zorder>
-      <zorder>gamma</zorder>
-      <zorder>horizontalSpacer_3</zorder>
-      <zorder>generatePovRay</zorder>
      </widget>
     </widget>
    </item>

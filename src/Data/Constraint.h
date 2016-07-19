@@ -33,7 +33,7 @@ namespace Data {
       friend class boost::serialization::access;
 
       public:
-         Type::ID typeID() const { return Type::Constraint; }
+         Type::ID typeID() const; 
 
          Constraint() : m_value(0.0) { }
 
@@ -59,6 +59,7 @@ namespace Data {
          }
 
       protected:
+         virtual void destroy() { }
          QList<unsigned> m_atomIndices;
          double m_value;
    };
