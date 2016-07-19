@@ -5,6 +5,26 @@ QT += sql
 
 INCLUDEPATH += ../Util ../QMsgBox ../Old ../Process ../Parser ../Data
 
+SOURCES += \
+   $$PWD/Actions.C \
+   $$PWD/ExternalChargesSection.C \
+   $$PWD/GeometryConstraint.C \
+   $$PWD/InputDialog.C \
+   $$PWD/InputDialogLogic.C \
+   $$PWD/KeywordSection.C \
+   $$PWD/LJParametersSection.C \
+   $$PWD/MoleculeSection.C \
+   $$PWD/Option.C \
+   $$PWD/OptionDatabase.C \
+   $$PWD/OptionDatabaseForm.C \
+   $$PWD/OptionEditors.C \
+   $$PWD/OptSection.C \
+   $$PWD/QCJob.C \
+   $$PWD/Qui.C \
+   $$PWD/QuiMolecule.C \
+   $$PWD/RemSection.C \
+   $$PWD/ReadInput.C \
+
 HEADERS += \
    $$PWD/Actions.h \
    $$PWD/Conditions.h \
@@ -26,26 +46,6 @@ HEADERS += \
    $$PWD/QtNode.h \
    $$PWD/Register.h \
    $$PWD/RemSection.h \
-
-SOURCES += \
-   $$PWD/Actions.C \
-   $$PWD/ExternalChargesSection.C \
-   $$PWD/GeometryConstraint.C \
-   $$PWD/InputDialog.C \
-   $$PWD/InputDialogLogic.C \
-   $$PWD/KeywordSection.C \
-   $$PWD/LJParametersSection.C \
-   $$PWD/MoleculeSection.C \
-   $$PWD/Option.C \
-   $$PWD/OptionDatabase.C \
-   $$PWD/OptionDatabaseForm.C \
-   $$PWD/OptionEditors.C \
-   $$PWD/OptSection.C \
-   $$PWD/QCJob.C \
-   $$PWD/Qui.C \
-   $$PWD/QuiMolecule.C \
-   $$PWD/RemSection.C \
-   $$PWD/ReadInput.C \
 
 FORMS += \
    $$PWD/GeometryConstraintDialog.ui \
