@@ -1,12 +1,12 @@
 <project>
     <shortName>IQmol</shortName>
     <fullName>IQmol</fullName>
-    <version>2.6</version>
-    <readmeFile>README</readmeFile>
-    <licenseFile>LICENSE</licenseFile>
-    <leftImage>src/Main/resources/Installer-lhs.png</leftImage>
-    <logoImage>src/Main/resources/Installer-header.png</logoImage>
-    <splashImage>src/Main/resources/Installer-splash.png</splashImage>
+    <version>2.8</version>
+    <readmeFile>../README</readmeFile>
+    <licenseFile>../LICENSE</licenseFile>
+    <leftImage>../src/Main/resources/Installer-lhs.png</leftImage>
+    <logoImage>../src/Main/resources/Installer-header.png</logoImage>
+    <splashImage>../src/Main/resources/Installer-splash.png</splashImage>
     <componentList>
         <component>
             <name>default</name>
@@ -38,8 +38,11 @@
                     <platforms>all</platforms>
                     <distributionFileList>
                         <distributionDirectory>
-                            <origin>deploy/IQmol/cde-root</origin>
+                            <origin>../../deploy/IQmol/cde-root</origin>
                         </distributionDirectory>
+                        <distributionFile>
+                            <origin>../doc/IQmolUserGuide.pdf</origin>
+                        </distributionFile>
                     </distributionFileList>
                     <shortcutList>
                         <shortcut>
