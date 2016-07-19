@@ -17,9 +17,9 @@ win32 {
    LIBS        += C:\Users\agilbert\Development\extlib\lib\libopenbabel.a 
 
    # OpenMesh
-   INCLUDEPATH += C:\Users\agilbert\Development\OpenMesh-2.4\src
-   LIBS        += C:\Users\agilbert\Development\extlib\lib\libOpenMeshToolsd.a 
-   LIBS        += C:\Users\agilbert\Development\extlib\lib\libOpenMeshCored.a 
+   #INCLUDEPATH += C:\Users\agilbert\Development\OpenMesh-2.4\src
+   #LIBS        += C:\Users\agilbert\Development\extlib\lib\libOpenMeshToolsd.a 
+   #LIBS        += C:\Users\agilbert\Development\extlib\lib\libOpenMeshCored.a 
 
    # SSH2
    INCLUDEPATH += C:\Users\agilbert\Development\extlib\include
