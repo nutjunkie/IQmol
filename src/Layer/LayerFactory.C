@@ -117,7 +117,7 @@ Layer::List Factory::toLayers(Data::Base& data)
          case Data::Type::MolecularOrbitals: {
             Data::MolecularOrbitals& 
                molecularOrbitals(dynamic_cast<Data::MolecularOrbitals&>(data));
-            layers.append(new MolecularOrbitals(molecularOrbitals));
+            layers.append(new MolecularOrbitals(molecularOrbitals, molecularOrbitals.moTitle));
          } break;
 
          case Data::Type::GeminalOrbitals: {
@@ -301,7 +301,7 @@ List Factory::convert(Data::MolecularOrbitalsList& molecularOrbitalsList)
 
    if (nDataSets == 1) {
       Data::MolecularOrbitals* mos(molecularOrbitalsList.first()); 
-      if (mos) list.append(new MolecularOrbitals(*mos));
+      if (mos) list.append(new MolecularOrbitals(*mos, mos->moTitle));
    }else if (nDataSets > 1) {
       Base* base(new Base("Molecular Orbitals"));
       list.append(base);
@@ -309,7 +309,7 @@ List Factory::convert(Data::MolecularOrbitalsList& molecularOrbitalsList)
       base->setCheckState(Qt::Checked);
       Data::MolecularOrbitalsList::iterator iter;
       for (iter = molecularOrbitalsList.begin(); iter != molecularOrbitalsList.end(); ++iter) {
-          base->appendLayer(new MolecularOrbitals(**iter));
+          base->appendLayer(new MolecularOrbitals(**iter, (**iter).moTitle));
       }
    }
 

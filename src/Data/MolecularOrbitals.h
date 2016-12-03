@@ -43,6 +43,9 @@ namespace Data {
             ShellList const& shells);
 
          Type::ID typeID() const { return Type::MolecularOrbitals; }
+	 int moTypeID;
+	 QString moTitle;
+	 void setOrbTitle(QString const& text){ moTitle = text; }
 
          unsigned nAlpha() const { return m_nAlpha; }
          unsigned nBeta()  const { return m_nBeta; }

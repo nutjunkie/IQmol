@@ -34,7 +34,7 @@ MolecularOrbitals::MolecularOrbitals(unsigned const nAlpha, unsigned const nBeta
    ShellList const& shells) : m_nAlpha(nAlpha), m_nBeta(nBeta), 
    m_alphaEnergies(alphaEnergies), m_betaEnergies(betaEnergies), m_shellList(shells)
 {
-
+   moTypeID = moType::Undefined;
 
    m_nOrbitals = m_alphaEnergies.size();
    QLOG_DEBUG() << "Number of alpha electrons :: " << m_nAlpha;
@@ -83,11 +83,13 @@ MolecularOrbitals::MolecularOrbitals(unsigned const nAlpha, unsigned const nBeta
 bool MolecularOrbitals::consistent() const
 {
    bool ok(true);
-   ok = ok && m_nOrbitals > 0;
+if(moTypeID != moType::NTOs){
+      ok = ok && m_nOrbitals > 0;
    ok = ok && m_nAlpha <= m_nOrbitals;
    ok = ok && m_nBeta  <= m_nOrbitals;
    ok = ok && m_alphaEnergies.size() == (int)m_nOrbitals;
    ok = ok && m_betaEnergies.size()  == (int)m_nOrbitals;
+}
 
    unsigned nBasis(0);
    ShellList::const_iterator iter;

@@ -2,7 +2,7 @@
 #define IQMOL_PARSER_H
 /*******************************************************************************
 
-  Copyright (C) 2011-2015ndrew Gilbert
+  Copyright (C) 2011-2015 Andrew Gilbert
  
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
@@ -35,10 +35,10 @@ namespace Parser {
          Base() { }
          virtual ~Base() { }
 
-		 /// The default implementation performs basic checks on the file
-		 /// bfore handing the work off to the parse() function. Returns
+	 /// The default implementation performs basic checks on the file
+	 /// bfore handing the work off to the parse() function. Returns
          /// true only if no errors were encountered.
-		 virtual bool parseFile(QString const& filePath);
+	 virtual bool parseFile(QString const& filePath);
 
          /// This function does the actual work of parsing the file contents 
          /// and must be reimplemented for a specific file type.  Returns

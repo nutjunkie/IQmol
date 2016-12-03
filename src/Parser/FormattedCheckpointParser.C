@@ -33,6 +33,7 @@
 #include "QsLog.h"
 #include <QtDebug>
 #include <cmath>
+#include "Data.h"
 
 
 namespace IQmol {
@@ -48,6 +49,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
    GeomData  geomData;
    ShellData shellData;
    MoData    moData;
+   MoData    ntoData;
    GmoData   gmoData;
 
    while (!textStream.atEnd()) {
@@ -62,11 +64,13 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
 
       if (key == "Number of alpha electrons") {            // This should only appear once
          moData.nAlpha  = list.at(1).toInt(&ok);
+         ntoData.nAlpha = list.at(1).toInt(&ok);
          gmoData.nAlpha = list.at(1).toInt(&ok);
          if (!ok) goto error;
 
       }else if (key == "Number of beta electrons") {       // This should only appear once
          moData.nBeta  = list.at(1).toInt(&ok);
+         ntoData.nBeta = list.at(1).toInt(&ok);
          gmoData.nBeta = list.at(1).toInt(&ok);
          if (!ok) goto error;
 
@@ -151,16 +155,31 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          Data::TotalEnergy& total(geometry->getProperty<Data::TotalEnergy>());
          total.setValue(energy, Data::Energy::Hartree);
 
-      }else if (key == "Alpha MO coefficients") {
+      }else if (key == "Alpha MO coefficients" ||
+		key == "Alpha NTO coefficients" ) {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
-         moData.alphaCoefficients = readDoubleArray(textStream, n);
-         moData.betaCoefficients  = moData.alphaCoefficients;
+	 if(key == "Alpha NTO coefficients") {
+           ntoData.alphaCoefficients = readDoubleArray(textStream, n);
+           ntoData.betaCoefficients  = ntoData.alphaCoefficients;
+	   ntoData.moTypeID = Data::moType::NTOs;
+	 }else{
+           moData.alphaCoefficients = readDoubleArray(textStream, n);
+           moData.betaCoefficients  = moData.alphaCoefficients;
+	   moData.moTypeID = Data::moType::MOs;
+	 }
 
-      }else if (key == "Beta MO coefficients") {
+      }else if (key == "Beta MO coefficients" ||
+		key == "Beta NTO coefficients" ) {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
-         moData.betaCoefficients = readDoubleArray(textStream, n);
+	 if(key == "Beta NTO coefficients"){
+           ntoData.betaCoefficients = readDoubleArray(textStream, n);
+	   ntoData.moTypeID = Data::moType::NTOs;
+	 }else{
+           moData.betaCoefficients = readDoubleArray(textStream, n);
+	   moData.moTypeID = Data::moType::MOs;
+	 }
 
       }else if (key == "Alpha Orbital Energies") {
          unsigned n(list.at(2).toUInt(&ok));
@@ -171,7 +190,18 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       }else if (key == "Beta Orbital Energies") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok || !geometry) goto error;
-         moData.betaEnergies = readDoubleArray(textStream, n);
+	 moData.betaEnergies = readDoubleArray(textStream, n);
+
+      }else if (key == "Alpha NTO amplitudes") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok) goto error;
+         ntoData.alphaEnergies = readDoubleArray(textStream, n);
+         ntoData.betaEnergies  = ntoData.alphaEnergies;
+
+      }else if (key == "Beta NTO amplitudes") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok || !geometry) goto error;
+  	 ntoData.betaEnergies = readDoubleArray(textStream, n);
 
       }else if (key == "Alpha GMO coefficients") {
          unsigned n(list.at(2).toUInt(&ok));
@@ -213,9 +243,18 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          QList<double> data(readDoubleArray(textStream, n));
          Data::Hessian& hessian(geometry->getProperty<Data::Hessian>());
          hessian.setData(geometry->nAtoms(), data);
+
+      }else if (key.contains("excited state")) {
+         unsigned n(list.at(1).toUInt(&ok));
+	 if (!ok || !geometry) goto error;
+	 ntoData.which_state = n;
+         Data::MolecularOrbitals* ntos(makeMolecularOrbitals(ntoData, shellData, *geometry)); 
+         clear(ntoData);
+         if (ntos) molecularOrbitalsList->append(ntos);
+	 qDebug() << "Append one NTO to MO lists";
       }
 
-   }
+   } // end of parsing text stream 
 
    if (geometry) {
       Data::MolecularOrbitals* mos(makeMolecularOrbitals(moData, shellData, *geometry)); 
@@ -345,12 +384,26 @@ Data::MolecularOrbitals* FormattedCheckpoint::makeMolecularOrbitals(MoData const
       moData.betaEnergies,
       *shellList
    );
+   mos->moTypeID = moData.moTypeID;
 
    if (!mos->consistent()) {
       QString msg("Data are inconsistent. Check shell types.");
       m_errors.append(msg);
       delete mos;
       mos = 0;
+   }
+
+   switch(mos->moTypeID){
+      case Data::moType::MOs: {
+         qDebug() << "Add one MO: " << mos->moTypeID;
+	 mos->setOrbTitle("MO Surfaces");
+      } break;
+      case Data::moType::NTOs: {
+         qDebug() << "Add one NTO: " << mos->moTypeID;
+	 QString surfaceTag = QString("State ") + QString::number(moData.which_state) + QString(" NTO Surfaces");
+	 //mos->setOrbTitle("NTO Surfaces");
+	 mos->setOrbTitle(surfaceTag);
+      } break;
    }
 
    return mos;
