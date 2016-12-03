@@ -299,11 +299,23 @@ List Factory::convert(Data::MolecularOrbitalsList& molecularOrbitalsList)
    List list;
    unsigned nDataSets(molecularOrbitalsList.size());
 
-   if (nDataSets == 1) {
-      Data::MolecularOrbitals* mos(molecularOrbitalsList.first()); 
-      if (mos) list.append(new MolecularOrbitals(*mos, mos->moTitle));
-   }else if (nDataSets > 1) {
-      Base* base(new Base("Molecular Orbitals"));
+// if (nDataSets == 1) {
+//    Data::MolecularOrbitals* mos(molecularOrbitalsList.first()); 
+//    if (mos) list.append(new MolecularOrbitals(*mos, mos->moTitle));
+// }else if (nDataSets > 1) {
+      //Base* base(new Base("Molecular Orbitals"));
+      Base *base;
+      switch(molecularOrbitalsList.moTypeID) {
+      case Data::moType::NTOs: {
+         base = new Base("Natural Transition Orbitals");
+      } break;
+      case Data::moType::NBOs: {
+         base = new Base("Natural Bond Orbitals");
+      } break;
+      default:
+         base = new Base("Molecular Orbitals");
+	 break;
+      }
       list.append(base);
       base->setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
       base->setCheckState(Qt::Checked);
@@ -311,7 +323,7 @@ List Factory::convert(Data::MolecularOrbitalsList& molecularOrbitalsList)
       for (iter = molecularOrbitalsList.begin(); iter != molecularOrbitalsList.end(); ++iter) {
           base->appendLayer(new MolecularOrbitals(**iter, (**iter).moTitle));
       }
-   }
+// }
 
    return list;
 }

@@ -83,13 +83,13 @@ MolecularOrbitals::MolecularOrbitals(unsigned const nAlpha, unsigned const nBeta
 bool MolecularOrbitals::consistent() const
 {
    bool ok(true);
-if(moTypeID != moType::NTOs){
-      ok = ok && m_nOrbitals > 0;
-   ok = ok && m_nAlpha <= m_nOrbitals;
-   ok = ok && m_nBeta  <= m_nOrbitals;
+   ok = ok && m_nOrbitals > 0;
+   if(moTypeID != moType::NTOs){
+      ok = ok && m_nAlpha <= m_nOrbitals;
+      ok = ok && m_nBeta  <= m_nOrbitals;
+   }
    ok = ok && m_alphaEnergies.size() == (int)m_nOrbitals;
    ok = ok && m_betaEnergies.size()  == (int)m_nOrbitals;
-}
 
    unsigned nBasis(0);
    ShellList::const_iterator iter;

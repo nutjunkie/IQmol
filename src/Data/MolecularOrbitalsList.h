@@ -31,10 +31,11 @@ namespace Data {
    class MolecularOrbitalsList : public Data::List<Data::MolecularOrbitals> {
       public:
 
+	 int moTypeID;
          MolecularOrbitalsList() : m_defaultIndex(0) { }
 
-		 /// Sets which set of data should be considered the default in the
-		 /// list.  An index of -1 corresponds to the final geometry.
+         /// Sets which set of data should be considered the default in the
+	 /// list.  An index of -1 corresponds to the final geometry.
          void setDefaultIndex(int index);
 
          unsigned defaultIndex() const { return m_defaultIndex; }
