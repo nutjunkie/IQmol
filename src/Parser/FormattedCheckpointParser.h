@@ -66,6 +66,9 @@ namespace Parser {
             QList<double> betaCoefficients;
             QList<double> alphaEnergies;
             QList<double> betaEnergies;
+	    int moTypeID;
+	    int which_state;
+	    QString stateTag;
          };
 
          struct GmoData {

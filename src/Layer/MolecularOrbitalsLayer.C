@@ -45,8 +45,8 @@ using namespace qglviewer;
 namespace IQmol {
 namespace Layer {
 
-MolecularOrbitals::MolecularOrbitals(Data::MolecularOrbitals& molecularOrbitals)
- : Base("MO Surfaces"), m_configurator(*this), m_molecularOrbitals(molecularOrbitals)
+MolecularOrbitals::MolecularOrbitals(Data::MolecularOrbitals& molecularOrbitals, QString const& moTitle)
+ : Base(moTitle), m_configurator(*this), m_molecularOrbitals(molecularOrbitals)
 {
    connect(&m_configurator, SIGNAL(queueSurface(Data::SurfaceInfo const&)),
       this, SLOT(addToQueue(Data::SurfaceInfo const&)));
@@ -74,7 +74,8 @@ MolecularOrbitals::MolecularOrbitals(Data::MolecularOrbitals& molecularOrbitals)
  
    m_molecularOrbitals.boundingBox(m_bbMin, m_bbMax);
    appendSurfaces(m_molecularOrbitals.surfaceList());
-   computeDensityVectors();
+   if(m_molecularOrbitals.moTypeID == Data::moType::MOs)
+     computeDensityVectors();
 }
 
 
