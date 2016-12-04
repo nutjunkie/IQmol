@@ -364,6 +364,7 @@ void FormattedCheckpoint::clear(MoData& moData)
    moData.betaCoefficients.clear();
    moData.alphaEnergies.clear();
    moData.betaEnergies.clear();
+   moData.moTypeID = Data::moType::Undefined;
 }
 
 
