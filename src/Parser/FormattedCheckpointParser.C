@@ -470,7 +470,8 @@ Data::MolecularOrbitals* FormattedCheckpoint::makeMolecularOrbitals(MoData const
       case Data::moType::NBOs: {
          qDebug() << "Add one NBO: " << mos->moTypeID;
 	 //QString surfaceTag = QString("State ") + QString::number(moData.which_state) + QString(" NBO Surfaces");
-	 QString surfaceTag = QString(moData.stateTag) + QString::number(moData.which_state);
+	 QString surfaceTag = QString(moData.stateTag);
+	 if(moData.which_state != 0) surfaceTag +=  QString::number(moData.which_state);
 	 mos->setOrbTitle(surfaceTag);
       } break;
    }
