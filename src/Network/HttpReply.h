@@ -115,6 +115,7 @@ namespace Network {
          QStringList m_fileList;
          QString m_destinationPath;
          QList<HttpGet*> m_replies;
+         int  m_totalReplies;
          bool m_allOk;
    };
 

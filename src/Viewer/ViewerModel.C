@@ -268,22 +268,27 @@ void ViewerModel::processParsedData(ParseJobFiles* parser)
 
    void* moleculePointer(parser->moleculePointer());
 
+qDebug() << "======= QJI ====== ViewerModel *moleculePointer" << moleculePointer;
+qDebug() << "======= QJI ====== ViewerModel *molecule       " << molecule;
    if (overwrite && moleculePointer) {
       for (int row = 0; row < root->rowCount(); ++row) {
           child = root->child(row);
           if (child->text() == name) {
              Layer::Base* base = QVariantPointer<Layer::Base>::toPointer(child->data());
              Layer::Molecule* mol = qobject_cast<Layer::Molecule*>(base);
+qDebug() << "======= QJI ====== ViewerModel *mol            " << mol;
 
              if (mol && mol == moleculePointer) {
+                qDebug() << "found existing molecule";
+qDebug() << "replacing " << mol << "with" << molecule;
                 molecule->setCheckState(mol->checkState());
                 // makeActive = makeActive || (mol->checkState() == Qt::Checked);
                 // This may result in a memory leak, but we need the Molecule
                 // to remain lying around in case of an undo action.
+                disconnectMolecule(mol);
                 takeRow(row);
                 insertRow(row, molecule);
                 found = true;
-                qDebug() << "found existing molecule";
                 break;
              }
           }
@@ -300,6 +305,7 @@ void ViewerModel::processParsedData(ParseJobFiles* parser)
          makeActive = makeActive || (mol->checkState() == Qt::Checked);
          // This may result in a memory leak, but we need the Molecule
          // to remain lying around in case of an undo action.
+         disconnectMolecule(mol);
          takeRow(child->row());
       }
 
@@ -308,13 +314,16 @@ void ViewerModel::processParsedData(ParseJobFiles* parser)
    }
 
    if (makeActive) {
+qDebug() << "QJI: making molecules inactive";
       forAllMolecules(boost::bind(&Layer::Molecule::setCheckState, _1, Qt::Unchecked));
+qDebug() << "QJI: making new molecule active";
       molecule->setCheckState(Qt::Checked);
       sceneRadiusChanged(sceneRadius());
       changeActiveViewerMode(Viewer::Manipulate);
    }
 
    fileOpened(parser->filePath());
+qDebug() << "QJI: finished process parse data";
 }
 
 
@@ -411,7 +420,13 @@ void ViewerModel::newMoleculeMenu()
 Layer::Molecule* ViewerModel::newMolecule()
 {
    Layer::Molecule* molecule = new Layer::Molecule(m_parent);
+   connectMolecule(molecule);
+   return molecule;
+}
 
+
+void ViewerModel::connectMolecule(Layer::Molecule* molecule)
+{
    connect(molecule, SIGNAL(updated()), 
       this, SLOT(updateVisibleObjects()));
    connect(molecule, SIGNAL(softUpdate()), 
@@ -428,8 +443,27 @@ Layer::Molecule* ViewerModel::newMolecule()
       this, SLOT(removeMolecule(Layer::Molecule*)));
    connect(molecule, SIGNAL(select(QModelIndex const&, QItemSelectionModel::SelectionFlags)), 
       this, SIGNAL(select(QModelIndex const&, QItemSelectionModel::SelectionFlags)));
+}
 
-   return molecule;
+
+void ViewerModel::disconnectMolecule(Layer::Molecule* molecule)
+{
+   disconnect(molecule, SIGNAL(updated()), 
+      this, SLOT(updateVisibleObjects()));
+   disconnect(molecule, SIGNAL(softUpdate()), 
+     this, SIGNAL(updated()));
+   disconnect(molecule, SIGNAL(postMessage(QString const&)), 
+      this, SIGNAL(displayMessage(QString const&)));
+   disconnect(molecule, SIGNAL(postCommand(QUndoCommand*)), 
+      this, SIGNAL(postCommand(QUndoCommand*)));
+   disconnect(molecule, SIGNAL(pushAnimators(AnimatorList const&)), 
+      this, SIGNAL(pushAnimators(AnimatorList const&)));
+   disconnect(molecule, SIGNAL(popAnimators(AnimatorList const&)), 
+      this, SIGNAL(popAnimators(AnimatorList const&)));
+   disconnect(molecule, SIGNAL(removeMolecule(Layer::Molecule*)), 
+      this, SLOT(removeMolecule(Layer::Molecule*)));
+   disconnect(molecule, SIGNAL(select(QModelIndex const&,QItemSelectionModel::SelectionFlags)), 
+      this, SIGNAL(select(QModelIndex const&, QItemSelectionModel::SelectionFlags)));
 }
 
 

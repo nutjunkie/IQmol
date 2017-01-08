@@ -4,9 +4,8 @@
 ################################################################################
 
 defineTest( qt ) {
-  CONFIG *= uitools
   export(CONFIG)
-  QT += opengl network script sql
+  QT += opengl network script sql uitools
   export(QT)
 }
 

@@ -26,6 +26,7 @@
 #include "QsLog.h"
 #include "XyzParser.h"
 #include "CubeParser.h"
+#include "GdmaParser.h"
 #include "IQmolParser.h"
 #include "MeshParser.h"
 #include "PovRayParser.h"
@@ -169,6 +170,10 @@ bool ParseFile::parse(QString const& filePath, bool& addToFileList)
 
    if (extension == "efp") {
       parser = new EfpFragment;
+   }
+
+   if (extension == "dma") {
+      parser = new Gdma;
    }
 
    if (extension == "esp" || extension == "mo" || extension == "hf") {

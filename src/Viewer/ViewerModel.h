@@ -145,6 +145,8 @@ namespace IQmol {
 		 /// ViewerModel, but does not append the Molecule.  In most cases the
 		 /// Molecule should be appended via an AddMolecule Command.
          Layer::Molecule* newMolecule();
+         void connectMolecule(Layer::Molecule*);
+         void disconnectMolecule(Layer::Molecule*);
 
          void processConfigData(ParseJobFiles*);
          void processParsedData(ParseJobFiles*);

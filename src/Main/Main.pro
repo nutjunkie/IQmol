@@ -4,6 +4,7 @@ TARGET  = IQmol
 # This is redefined in common.pri, but for linux we need to worry about the
 # ordering of the libraries.
 
+
 BUILD_DIR  = $$PWD/../../build
 
 LIBS += $$BUILD_DIR/libQui.a \
@@ -33,11 +34,16 @@ INCLUDEPATH += . ../Util ../Data ../Parser ../Qui ../Layer \
                 ../OpenMesh/src
 INCLUDEPATH += $$BUILD_DIR/Qui   # Required for the ui_QuiMainWindow.h header
 
+
+symmol.target = $$BUILD_DIR/symmol.o
+symmol.commands = gfortran -c $$PWD/symmol.f90 -o $$BUILD_DIR/symmol.o
+OBJECTS += $$BUILD_DIR/symmol.o
+QMAKE_EXTRA_TARGETS += symmol
+
 macx:FORMS       += $$PWD/PeriodicTableMac.ui
 win32:FORMS      += $$PWD/PeriodicTable.ui
 unix:!macx:FORMS += $$PWD/PeriodicTable.ui
 
-OBJECTS += $$PWD/symmol.o
 
 SOURCES += \
    $$PWD/FragmentTable.C \

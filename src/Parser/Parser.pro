@@ -12,6 +12,7 @@ SOURCES += \
    $$PWD/EfpFragmentParser.C \
    $$PWD/ExternalChargesParser.C \
    $$PWD/FormattedCheckpointParser.C \
+   $$PWD/GdmaParser.C \
    $$PWD/IQmolParser.C \
    $$PWD/MeshParser.C \
    $$PWD/OpenBabelParser.C \
@@ -31,6 +32,7 @@ HEADERS += \
    $$PWD/EfpFragmentParser.h \
    $$PWD/ExternalChargesParser.h \
    $$PWD/FormattedCheckpointParser.h \
+   $$PWD/GdmaParser.h \
    $$PWD/IQmolParser.h \
    $$PWD/MeshParser.h \
    $$PWD/OpenBabelParser.h \

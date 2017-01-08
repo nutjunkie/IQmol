@@ -402,7 +402,6 @@ bool JobMonitor::getRemoteWorkingDirectory(Server* server, QString& name)
 
 bool JobMonitor::getLocalWorkingDirectory(QString& dirName, bool allowSpace)
 {
-qDebug() << "JobMonitor::getLocalWorkingDirectory called with DIR" << dirName;
    QDir dir(dirName);
    dir.setFilter(QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs);
 

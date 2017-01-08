@@ -33,7 +33,7 @@ HttpReply::HttpReply(HttpConnection* connection) : m_connection(connection), m_n
 { 
    m_timeout = m_connection->timeout();
    m_timer.setInterval(m_timeout);
-   m_timer.setSingleShot(true);
+   //m_timer.setSingleShot(true);
 
    connect(this, SIGNAL(finished()), &m_timer, SLOT(stop()));
    connect(&m_timer, SIGNAL(timeout()), this, SLOT(timeout()));
@@ -245,7 +245,7 @@ void HttpGet::readToFile()
 
 HttpGetFiles::HttpGetFiles(HttpConnection* connection, QStringList const& fileList, 
    QString const& destinationPath) : HttpReply(connection), m_fileList(fileList), 
-   m_destinationPath(destinationPath), m_allOk(true)
+   m_destinationPath(destinationPath), m_totalReplies(0), m_allOk(true)
 {
 }
 
@@ -265,11 +265,12 @@ void HttpGetFiles::run()
           m_replies.append(reply);
           connect(this, SIGNAL(interrupted()), this, SLOT(interrupt()));
           connect(reply, SIGNAL(finished()), this, SLOT(replyFinished()));
-          connect(reply, SIGNAL(copyProgress()), this, SLOT(copyProgress()));
+          //connect(reply, SIGNAL(copyProgress()), this, SIGNAL(copyProgress()));
        }
    }
 
    QList<HttpGet*> replies(m_replies);
+   m_totalReplies = replies.size();
    QList<HttpGet*>::iterator reply;
    for (reply = replies.begin(); reply != replies.end(); ++reply) {
        (*reply)->run();
@@ -281,6 +282,8 @@ void HttpGetFiles::replyFinished()
 {
    HttpGet* reply(qobject_cast<HttpGet*>(sender()));
    m_replies.removeAll(reply);
+   double progress(m_totalReplies-m_replies.size());
+   if (m_totalReplies > 0) copyProgress(progress/m_totalReplies);
    m_allOk = m_allOk && reply->status() == Finished;
    reply->deleteLater();
 

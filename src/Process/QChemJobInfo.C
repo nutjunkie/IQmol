@@ -196,6 +196,7 @@ void QChemJobInfo::dump() const
    QLOG_DEBUG() << "   ServerName            " << get(ServerName);
    QLOG_DEBUG() << "   LocalWorkingDirectory " << get(LocalWorkingDirectory);
    QLOG_DEBUG() << "   RemoteWorkingDirectory" << get(RemoteWorkingDirectory);
+   QLOG_DEBUG() << "   Molecule pointer      " << m_moleculePointer;
 }
 
 void QChemJobInfo::copy(QChemJobInfo const& that)

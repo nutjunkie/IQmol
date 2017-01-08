@@ -66,6 +66,7 @@ namespace Network {
          Status  m_status;
          QString m_message;
          bool    m_interrupt;
+         int     m_totalReplies;
    };
 
 } } // end namespace IQmol::Network

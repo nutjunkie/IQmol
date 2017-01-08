@@ -943,11 +943,11 @@ void MainWindow::showQChemUI()
    if (serverList.isEmpty()) serverList.append("(none)");
    m_quiInputDialog->setServerList(serverList);
 
+   m_viewer->setActiveViewerMode(Viewer::Manipulate);
+
    m_quiInputDialog->showMessage("");
    m_quiInputDialog->setWindowModality(Qt::WindowModal);
    m_quiInputDialog->show();
-
-   m_viewer->setActiveViewerMode(Viewer::Manipulate);
 }
 
 

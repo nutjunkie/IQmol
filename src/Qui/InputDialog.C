@@ -57,8 +57,7 @@
 #include <QInputDialog>
 #include <QRegExpValidator>
 
-#include <QDebug>
-
+#include "Debug.h"
 
 #define TAINT(t) (setTaint(t, __LINE__))
 
@@ -131,8 +130,6 @@ InputDialog::~InputDialog()
 
 void InputDialog::initializeToolBoxOptions() 
 {
-   qDebug() << "Initializing ToolBoxOptions";
-
    int numberOfUndeletedPages(2);
    while (m_ui.toolBoxOptions->count() > numberOfUndeletedPages) {
       QWidget* widget(m_ui.toolBoxOptions->widget(0)); 
