@@ -20,14 +20,14 @@ LIBS += $$BUILD_DIR/libQui.a \
         $$BUILD_DIR/libUtil.a \
         $$BUILD_DIR/libQGLViewer.a
 
-#LIBS += $$PWD/../OpenMesh/lib/libOpenMeshCore.a \
-#        $$PWD/../OpenMesh/lib/libOpenMeshTools.a
+LIBS += $$PWD/../OpenMesh/lib/libOpenMeshCore.a \
+        $$PWD/../OpenMesh/lib/libOpenMeshTools.a
 
 include(../common.pri)
 
 INCLUDEPATH += . ../Util ../Data ../Parser ../Qui ../Layer \
                 ../Configurator ../Network ../Yaml ../Process ../Old ../Viewer \
-#               ../OpenMesh/src
+               ../OpenMesh/src
 INCLUDEPATH += $$BUILD_DIR/Qui   # Required for the ui_QuiMainWindow.h header
 
 macx:FORMS       += $$PWD/PeriodicTableMac.ui

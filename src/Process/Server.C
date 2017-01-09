@@ -309,8 +309,6 @@ qDebug() << "queueJob() called";
 
       QString workingDirectory(job->jobInfo().get(QChemJobInfo::RemoteWorkingDirectory));
 
-      QLOG_DEBUG() << "Executing submit command:     " << submit << "in directory" << workingDirectory;
-
       reply = m_connection->execute(submit, workingDirectory);
       connect(reply, SIGNAL(finished()), this, SLOT(submitFinished()));
       m_activeRequests.insert(reply, job);

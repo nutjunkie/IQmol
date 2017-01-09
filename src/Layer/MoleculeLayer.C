@@ -2375,7 +2375,7 @@ void Molecule::initProperties()
       chargeTypes->addAction(action);
       connect(action, SIGNAL(triggered()), this, SLOT(updateAtomicCharges()));
       m_properties 
-        << new PointChargePotential(Data::Type::MultipoleDerivedCharge, "ESP (CHELPG)", this);
+        << new PointChargePotential(Data::Type::ChelpgCharge, "ESP (CHELPG)", this);
    }
 
 

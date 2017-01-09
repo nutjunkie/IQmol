@@ -237,7 +237,7 @@ void Viewer::draw()
    makeCurrent();
    Layer::GLObject::SetCameraPosition(camera()->position());
    Layer::GLObject::SetCameraDirection(camera()->viewDirection());
-   Layer::GLObject::SetCameraPivot(camera()->pivotPoint());
+//   Layer::GLObject::SetCameraPivot(camera()->pivotPoint());
 
    QString shader(m_shaderLibrary->currentShader());
 
