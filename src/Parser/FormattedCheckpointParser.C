@@ -42,14 +42,18 @@ namespace Parser {
 bool FormattedCheckpoint::parse(TextStream& textStream)
 {
    Data::GeometryList* geometryList(new Data::GeometryList);
-   Data::MolecularOrbitalsList* molecularOrbitalsList(new Data::MolecularOrbitalsList);
-   Data::MolecularOrbitalsList* naturaltransOrbitalList(new Data::MolecularOrbitalsList);
-   Data::MolecularOrbitalsList* naturalbondOrbitalList(new Data::MolecularOrbitalsList);
+   Data::MolecularOrbitalsList* 
+      molecularOrbitalsList(new Data::MolecularOrbitalsList(Data::MolecularOrbitals::Canonical));
+   Data::MolecularOrbitalsList* 
+      naturaltransOrbitalList(new Data::MolecularOrbitalsList(Data::MolecularOrbitals::NaturalTransition));
+
+   Data::MolecularOrbitalsList* 
+      naturalbondOrbitalList(new Data::MolecularOrbitalsList(Data::MolecularOrbitals::NaturalBond));
    Data::Geometry* geometry(0);
 
-   molecularOrbitalsList->moTypeID = Data::moType::MOs;
-   naturaltransOrbitalList->moTypeID = Data::moType::NTOs;
-   naturalbondOrbitalList->moTypeID = Data::moType::NBOs;
+   //molecularOrbitalsList->moTypeID = Data::moType::MOs;
+   //naturaltransOrbitalList->moTypeID = Data::moType::NTOs;
+   //naturalbondOrbitalList->moTypeID = Data::moType::NBOs;
 
    bool ok(true);
    GeomData  geomData;
@@ -164,40 +168,41 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          Data::TotalEnergy& total(geometry->getProperty<Data::TotalEnergy>());
          total.setValue(energy, Data::Energy::Hartree);
 
-      }else if (key == "Alpha MO coefficients"  ||
-		key == "Alpha NTO coefficients" ||
-		key == "Alpha NBO coefficients") {
+      }else if (key == "Alpha MO coefficients") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
-	 if (key == "Alpha MO coefficients") {
-           moData.alphaCoefficients = readDoubleArray(textStream, n);
-           moData.betaCoefficients  = moData.alphaCoefficients;
-	   moData.moTypeID = Data::moType::MOs;
-	 }else if (key == "Alpha NTO coefficients") {
-            ntoData.alphaCoefficients = readDoubleArray(textStream, n);
-            ntoData.betaCoefficients  = ntoData.alphaCoefficients;
-	    ntoData.moTypeID = Data::moType::NTOs;
-	 }else if (key == "Alpha NBO coefficients") {
-            nboData.alphaCoefficients = readDoubleArray(textStream, n);
-            nboData.betaCoefficients  = nboData.alphaCoefficients;
-	    nboData.moTypeID = Data::moType::NBOs;
-	 }
+         moData.alphaCoefficients = readDoubleArray(textStream, n);
+         moData.betaCoefficients  = moData.alphaCoefficients;
+         moData.orbitalType       = Data::MolecularOrbitals::Canonical;
 
-      }else if (key == "Beta MO coefficients"  ||
-		key == "Beta NTO coefficients" ||
-		key == "Beta NBO coefficients" ) {
+	  }else if (key == "Alpha NTO coefficients") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
-	 if (key == "Beta MO coefficients") {
-           moData.betaCoefficients = readDoubleArray(textStream, n);
-	   moData.moTypeID = Data::moType::MOs;
-	 }else if (key == "Beta NTO coefficients") {
-            ntoData.betaCoefficients = readDoubleArray(textStream, n);
-	    ntoData.moTypeID = Data::moType::NTOs;
-	 }else if (key == "Beta NBO coefficients") {
-            nboData.betaCoefficients = readDoubleArray(textStream, n);
-	    nboData.moTypeID = Data::moType::NBOs;
-	 }
+         ntoData.alphaCoefficients = readDoubleArray(textStream, n);
+         ntoData.betaCoefficients  = ntoData.alphaCoefficients;
+         ntoData.orbitalType       = Data::MolecularOrbitals::NaturalTransition;
+
+	  }else if (key == "Alpha NBO coefficients") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok) goto error;
+         nboData.alphaCoefficients = readDoubleArray(textStream, n);
+         nboData.betaCoefficients  = nboData.alphaCoefficients;
+         nboData.orbitalType       = Data::MolecularOrbitals::NaturalBond;
+
+      }else if (key == "Beta MO coefficients") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok) goto error;
+         moData.betaCoefficients = readDoubleArray(textStream, n);
+
+      }else if (key == "Beta NTO coefficients") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok) goto error;
+         ntoData.betaCoefficients = readDoubleArray(textStream, n);
+
+	  }else if (key == "Beta NBO coefficients") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok) goto error;
+         nboData.betaCoefficients = readDoubleArray(textStream, n);
 
       }else if (key == "Alpha Orbital Energies") {
          unsigned n(list.at(2).toUInt(&ok));
@@ -208,7 +213,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       }else if (key == "Beta Orbital Energies") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok || !geometry) goto error;
-	 moData.betaEnergies = readDoubleArray(textStream, n);
+         moData.betaEnergies = readDoubleArray(textStream, n);
 
       }else if (key == "Alpha NTO amplitudes") {
          unsigned n(list.at(2).toUInt(&ok));
@@ -219,7 +224,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       }else if (key == "Beta NTO amplitudes") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok || !geometry) goto error;
-  	 ntoData.betaEnergies = readDoubleArray(textStream, n);
+         ntoData.betaEnergies = readDoubleArray(textStream, n);
 
       }else if (key == "Alpha NBO occupancies") {
          unsigned n(list.at(2).toUInt(&ok));
@@ -230,7 +235,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       }else if (key == "Beta NBO occupancies") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok || !geometry) goto error;
-  	 nboData.betaEnergies = readDoubleArray(textStream, n);
+         nboData.betaEnergies = readDoubleArray(textStream, n);
 
       }else if (key == "Alpha GMO coefficients") {
          unsigned n(list.at(2).toUInt(&ok));
@@ -273,28 +278,31 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          Data::Hessian& hessian(geometry->getProperty<Data::Hessian>());
          hessian.setData(geometry->nAtoms(), data);
 
-      }else if (key.endsWith("excited state") ||
-		key == "NBO Ground State" ) {
+      }else if (key.endsWith("excited state") || key == "NBO Ground State" ) {
          unsigned n(list.at(1).toUInt(&ok));
-	 if (!ok || !geometry) goto error;
-	 if(ntoData.moTypeID == Data::moType::NTOs){
-  	    ntoData.which_state = n;
-	    ntoData.stateTag = QString(key.replace("excited state",""));
-            Data::MolecularOrbitals* ntos(makeMolecularOrbitals(ntoData, shellData, *geometry)); 
+         if (!ok || !geometry) goto error;
+
+         if (ntoData.orbitalType == Data::MolecularOrbitals::NaturalTransition) {
+            ntoData.whichState = n;
+            ntoData.stateTag = QString(key.replace("excited state",""));
+            Data::MolecularOrbitals* ntos(makeMolecularOrbitals(nboData, shellData, *geometry)); 
             clear(ntoData);
             if (ntos) naturaltransOrbitalList->append(ntos);
-	    qDebug() << "Append one NTO to MO lists";
-	 }else if(nboData.moTypeID == Data::moType::NBOs){
-  	    nboData.which_state = n;
-	    if (key == "NBO Ground State")
-	       nboData.stateTag = QString("Ground Sate");
-	    else
-	       nboData.stateTag = QString(key.replace("excited state",""));
+	        qDebug() << "Append one NTO to MO lists";
+
+         }else if (nboData.orbitalType == Data::MolecularOrbitals::NaturalBond) {
+  	        nboData.whichState = n;
+            if (key == "NBO Ground State") {
+	           nboData.stateTag = QString("Ground Sate");
+	        }else {
+	           nboData.stateTag = QString(key.replace("excited state",""));
+            }
+
             Data::MolecularOrbitals* nbos(makeMolecularOrbitals(nboData, shellData, *geometry)); 
             clear(nboData);
             if (nbos) naturalbondOrbitalList->append(nbos);
-	    qDebug() << "Append one NBO to MO lists";
-	 }
+	        qDebug() << "Append one NBO to MO lists";
+         }
       }
 
    } // end of parsing text stream 
@@ -364,7 +372,7 @@ void FormattedCheckpoint::clear(MoData& moData)
    moData.betaCoefficients.clear();
    moData.alphaEnergies.clear();
    moData.betaEnergies.clear();
-   moData.moTypeID = Data::moType::Undefined;
+   moData.orbitalType = Data::MolecularOrbitals::Undefined;
 }
 
 
@@ -439,7 +447,9 @@ Data::MolecularOrbitals* FormattedCheckpoint::makeMolecularOrbitals(MoData const
    if (moData.alphaEnergies.isEmpty()) return 0;
    Data::ShellList* shellList = makeShellList(shellData, geometry);
    if (!shellList) return 0;
+
    Data::MolecularOrbitals* mos = new Data::MolecularOrbitals(
+      moData.orbitalType,
       moData.nAlpha, 
       moData.nBeta,
       moData.alphaCoefficients,
@@ -448,7 +458,6 @@ Data::MolecularOrbitals* FormattedCheckpoint::makeMolecularOrbitals(MoData const
       moData.betaEnergies,
       *shellList
    );
-   mos->moTypeID = moData.moTypeID;
 
    if (!mos->consistent()) {
       QString msg("Data are inconsistent. Check shell types.");
@@ -457,24 +466,34 @@ Data::MolecularOrbitals* FormattedCheckpoint::makeMolecularOrbitals(MoData const
       mos = 0;
    }
 
-   switch(mos->moTypeID){
-      case Data::moType::MOs: {
-         qDebug() << "Add one MO: " << mos->moTypeID;
-	 mos->setOrbTitle("MO Surfaces");
+   switch (moData.orbitalType) {
+      case Data::MolecularOrbitals::Canonical: 
+      case Data::MolecularOrbitals::Localized: 
+         qDebug() << "Add one MO: " << mos->orbitalType();
+         mos->setOrbTitle("MO Surfaces");
+         break;
+
+      case Data::MolecularOrbitals::NaturalTransition: {
+         qDebug() << "Add one NTO: " << mos->orbitalType();
+         // QString surfaceTag = QString("State ") + QString::number(moData.whichState) + 
+         //   QString(" NTO Surfaces");
+         QString surfaceTag = QString(moData.stateTag) + QString::number(moData.whichState);
+         mos->setOrbTitle(surfaceTag);
+         } break;
+
+      case Data::MolecularOrbitals::NaturalBond: {
+         qDebug() << "Add one NBO: " << mos->orbitalType();
+         // QString surfaceTag = QString("State ") + QString::number(moData.whichState) + 
+         //   QString(" NBO Surfaces");
+	     QString surfaceTag = QString(moData.stateTag);
+	     if (moData.whichState != 0) surfaceTag += QString::number(moData.whichState);
+         mos->setOrbTitle(surfaceTag);
       } break;
-      case Data::moType::NTOs: {
-         qDebug() << "Add one NTO: " << mos->moTypeID;
-	 //QString surfaceTag = QString("State ") + QString::number(moData.which_state) + QString(" NTO Surfaces");
-	 QString surfaceTag = QString(moData.stateTag) + QString::number(moData.which_state);
-	 mos->setOrbTitle(surfaceTag);
-      } break;
-      case Data::moType::NBOs: {
-         qDebug() << "Add one NBO: " << mos->moTypeID;
-	 //QString surfaceTag = QString("State ") + QString::number(moData.which_state) + QString(" NBO Surfaces");
-	 QString surfaceTag = QString(moData.stateTag);
-	 if(moData.which_state != 0) surfaceTag +=  QString::number(moData.which_state);
-	 mos->setOrbTitle(surfaceTag);
-      } break;
+
+      case Data::MolecularOrbitals::Undefined: 
+         qDebug() << "Undefined molecular orbtal type requested";
+         break;
+
    }
 
    return mos;

@@ -74,8 +74,12 @@ MolecularOrbitals::MolecularOrbitals(Data::MolecularOrbitals& molecularOrbitals,
  
    m_molecularOrbitals.boundingBox(m_bbMin, m_bbMax);
    appendSurfaces(m_molecularOrbitals.surfaceList());
-   if(m_molecularOrbitals.moTypeID == Data::moType::MOs)
-     computeDensityVectors();
+
+   Data::MolecularOrbitals::OrbitalType type(m_molecularOrbitals.orbitalType());
+   if (type == Data::MolecularOrbitals::Canonical ||
+       type == Data::MolecularOrbitals::Localized) {
+       computeDensityVectors();
+   }
 }
 
 

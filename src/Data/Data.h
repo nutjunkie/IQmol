@@ -77,13 +77,6 @@ namespace Data {
 
       QString toString(ID const);
    }
-   namespace moType {
-      enum ID { Undefined = 0, 
-                MOs,	NTOs,	NBOs
-      };
-
-      QString toString(ID const);
-   }
 
    /// Base class for all data classes that can be serialized.
    class Base {
@@ -101,7 +94,6 @@ namespace Data {
 		 /// Data classes must have their TypeID added to the Factory::create()
 		 /// method before they can be used by the Factory.
 		 virtual Type::ID typeID() const { return Type::Undefined; }
-		 virtual moType::ID motypeID() const { return moType::Undefined; }
 
 		 /// This can't be a template function as templates and virtual
 		 /// functions don't play nicely together.
