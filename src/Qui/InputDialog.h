@@ -66,7 +66,7 @@ class InputDialog : public QMainWindow {
 
 	  /// The JobInfo object encapsulates the communication 
 	  /// between the QUI and IQmol.
-      void setQChemJobInfo(IQmol::Process2::QChemJobInfo const&);
+      void setQChemJobInfo(IQmol::Process::QChemJobInfo const&);
 
       /// Allows the update of the servers in the server ComboBox
       void setServerList(QStringList const& servers);
@@ -75,7 +75,7 @@ class InputDialog : public QMainWindow {
       void showMessage(QString const& msg);
 
    Q_SIGNALS:
-      void submitJobRequest(IQmol::Process2::QChemJobInfo&);
+      void submitJobRequest(IQmol::Process::QChemJobInfo&);
 
 
    private Q_SLOTS:
@@ -138,7 +138,7 @@ class InputDialog : public QMainWindow {
    private:
       // ---------- Data ----------
       Ui::MainWindow  m_ui;
-      IQmol::Process2::QChemJobInfo m_qchemJobInfo;
+      IQmol::Process::QChemJobInfo m_qchemJobInfo;
 
       OptionDatabase& m_db;
       OptionRegister& m_reg;

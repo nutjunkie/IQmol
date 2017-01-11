@@ -36,7 +36,7 @@
 
 
 namespace IQmol {
-namespace Process2 {
+namespace Process {
 
 Server::Server(ServerConfiguration const& configuration) : m_configuration(configuration),
    m_connection(0)

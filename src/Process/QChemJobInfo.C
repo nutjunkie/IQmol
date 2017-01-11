@@ -25,7 +25,7 @@
 
 
 namespace IQmol {
-namespace Process2 {
+namespace Process {
 
 
 QVariantList QChemJobInfo::toQVariantList() const

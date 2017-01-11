@@ -26,7 +26,7 @@
 
 
 namespace IQmol {
-namespace Process2 {
+namespace Process {
 
 QueueOptionsDialog::QueueOptionsDialog(ServerConfiguration* configuration, QWidget* parent) : 
    QDialog(parent),  m_configuration(configuration)

@@ -30,7 +30,7 @@ class QCloseEvent;
 class QShowEvent;
 
 namespace IQmol {
-namespace Process2 {
+namespace Process {
 
    class Job;
    class Server;
@@ -49,7 +49,7 @@ namespace Process2 {
 
       public Q_SLOTS:
          // Namespace qualification is required as we call this from QUI
-         void submitJob(IQmol::Process2::QChemJobInfo&);
+         void submitJob(IQmol::Process::QChemJobInfo&);
          void jobSubmissionSuccessful(Job*);
          void jobSubmissionFailed(Job*);
          void loadJobListFromPreferences();

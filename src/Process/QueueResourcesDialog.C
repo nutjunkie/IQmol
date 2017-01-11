@@ -30,7 +30,7 @@
 
 
 namespace IQmol {
-namespace Process2 {
+namespace Process {
 
 QueueResourcesDialog::QueueResourcesDialog(QueueResourcesList* queueResourcesList, 
    QWidget* parent) : QDialog(parent), m_queueResourcesList(queueResourcesList), 

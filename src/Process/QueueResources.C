@@ -26,7 +26,7 @@
 
 
 namespace IQmol {
-namespace Process2 {
+namespace Process {
 
 QVariant QueueResources::toQVariant() const
 {

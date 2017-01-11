@@ -30,7 +30,7 @@
 class QProcess;
 
 namespace IQmol {
-namespace Process2 {
+namespace Process {
 
    class JobMonitor;
 

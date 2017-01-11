@@ -28,7 +28,7 @@
 
 
 namespace IQmol {
-namespace Process2 {
+namespace Process {
 
    /// Dialog that allows the user to select which queue to submit a job to on
    /// a PBS or SGE server.

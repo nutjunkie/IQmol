@@ -28,7 +28,7 @@
 
 
 namespace IQmol {
-namespace Process2 {
+namespace Process {
 
 ServerRegistry* ServerRegistry::s_instance = 0;
 QList<Server*>  ServerRegistry::s_servers;

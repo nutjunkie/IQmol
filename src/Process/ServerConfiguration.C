@@ -27,7 +27,7 @@
 
 
 namespace IQmol {
-namespace Process2 {
+namespace Process {
 
 void ServerConfiguration::dump() const 
 {

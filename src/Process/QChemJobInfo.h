@@ -28,7 +28,7 @@
 
 
 namespace IQmol {
-namespace Process2 {
+namespace Process {
 
    /// QChemJobInfo holds information about the job to be run and forms the
    /// interface between the options editor (QUI) and the JobMonitor.

@@ -45,7 +45,7 @@
 
 
 namespace IQmol {
-namespace Process2 {
+namespace Process {
 
 
 JobMonitor* JobMonitor::s_instance = 0;
