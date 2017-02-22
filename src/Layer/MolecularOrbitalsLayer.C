@@ -130,6 +130,10 @@ unsigned MolecularOrbitals::nOrbitals() const
    return m_molecularOrbitals.nOrbitals(); 
 }
 
+Data::moType::ID MolecularOrbitals::moTypeID() const 
+{ 
+   return (Data::moType::ID)m_molecularOrbitals.moTypeID;
+}
 
 void MolecularOrbitals::computeDensityVectors()
 {

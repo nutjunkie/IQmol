@@ -68,6 +68,7 @@ namespace Layer {
          unsigned nBeta() const;
          unsigned nBasis() const;
          unsigned nOrbitals() const;
+	 Data::moType::ID moTypeID() const;
 
       private Q_SLOTS:
          void showGridInfo();

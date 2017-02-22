@@ -273,13 +273,14 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          Data::Hessian& hessian(geometry->getProperty<Data::Hessian>());
          hessian.setData(geometry->nAtoms(), data);
 
-      }else if (key.endsWith("excited state") ||
+      //}else if (key.endsWith("excited state") ||
+      }else if (key.endsWith("Surface Title") ||
 		key == "NBO Ground State" ) {
          unsigned n(list.at(1).toUInt(&ok));
 	 if (!ok || !geometry) goto error;
 	 if(ntoData.moTypeID == Data::moType::NTOs){
   	    ntoData.which_state = n;
-	    ntoData.stateTag = QString(key.replace("excited state",""));
+	    ntoData.stateTag = QString(key.replace("Surface Title",""));
             Data::MolecularOrbitals* ntos(makeMolecularOrbitals(ntoData, shellData, *geometry)); 
             clear(ntoData);
             if (ntos) naturaltransOrbitalList->append(ntos);
@@ -289,7 +290,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
 	    if (key == "NBO Ground State")
 	       nboData.stateTag = QString("Ground Sate");
 	    else
-	       nboData.stateTag = QString(key.replace("excited state",""));
+	       nboData.stateTag = QString(key.replace("Surface Title",""));
             Data::MolecularOrbitals* nbos(makeMolecularOrbitals(nboData, shellData, *geometry)); 
             clear(nboData);
             if (nbos) naturalbondOrbitalList->append(nbos);
@@ -464,13 +465,12 @@ Data::MolecularOrbitals* FormattedCheckpoint::makeMolecularOrbitals(MoData const
       } break;
       case Data::moType::NTOs: {
          qDebug() << "Add one NTO: " << mos->moTypeID;
-	 //QString surfaceTag = QString("State ") + QString::number(moData.which_state) + QString(" NTO Surfaces");
-	 QString surfaceTag = QString(moData.stateTag) + QString::number(moData.which_state);
+	 QString surfaceTag = QString(moData.stateTag);
+	 if(moData.which_state != 0) surfaceTag +=  QString::number(moData.which_state);
 	 mos->setOrbTitle(surfaceTag);
       } break;
       case Data::moType::NBOs: {
          qDebug() << "Add one NBO: " << mos->moTypeID;
-	 //QString surfaceTag = QString("State ") + QString::number(moData.which_state) + QString(" NBO Surfaces");
 	 QString surfaceTag = QString(moData.stateTag);
 	 if(moData.which_state != 0) surfaceTag +=  QString::number(moData.which_state);
 	 mos->setOrbTitle(surfaceTag);
