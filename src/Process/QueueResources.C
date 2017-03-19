@@ -34,12 +34,15 @@ QVariant QueueResources::toQVariant() const
    list << m_name
         << m_maxWallTime
         << m_defaultWallTime
+
         << m_maxMemory
         << m_minMemory
         << m_defaultMemory
+
         << m_maxScratch
         << m_minScratch
         << m_defaultScratch
+
         << m_maxCpus
         << m_minCpus
         << m_defaultCpus;
@@ -74,142 +77,6 @@ bool QueueResources::fromQVariant(QVariant const& qvar)
 
    return allOk;
 }
-
-
-// ---------- QueueResourcesList ----------
-
-
-QueueResourcesList::~QueueResourcesList()
-{
-   QueueResourcesList::const_iterator iter;
-   for (iter = begin(); iter != end(); ++iter) {
-       delete (*iter);
-   }
-}
-
-
-QVariantList QueueResourcesList::toQVariantList() const
-{
-   QVariantList list;
-   QueueResourcesList::const_iterator iter;
-   for (iter = begin(); iter != end(); ++iter) {
-       list.append((*iter)->toQVariant());
-   }
-   return list;
-}
-
-
-void QueueResourcesList::fromQVariantList(QVariantList const& list)
-{
-   QVariantList::const_iterator iter;
-   for (iter = list.begin(); iter != list.end(); ++iter) {
-       QueueResources* queue(new QueueResources());
-       if (queue->fromQVariant(*iter)) {
-          append(queue);
-       } else {
-          delete queue;
-       }
-   }
-}
-
-
-void QueueResourcesList::fromPbsQueueInfoString(QString const& queueInfo)
-{
-   QueueResources* queue(0);
-
-   QStringList lines(queueInfo.split(QRegExp("\\n"), QString::SkipEmptyParts));
-   QStringList tokens;
-   QString line;
-   bool ok;
-   int n;
-
-   QStringList::iterator iter;
-   for (iter = lines.begin(); iter != lines.end(); ++iter) {
-       line = *iter; 
-       tokens = line.split(QRegExp("\\s+"), QString::SkipEmptyParts);
-   
-       if (line.contains("Queue: ")) {
-          queue = new QueueResources(tokens[1]);
-          append(queue);
-       }   
-
-       if (!queue) break;
-   
-       if (line.contains("resources_max.walltime")) {
-           queue->m_maxWallTime = tokens[2];
-       }else if (line.contains("resources_default.walltime")) {
-           queue->m_defaultWallTime = tokens[2];
-       }else if (line.contains("resources_max.vmem")) {
-           queue->m_maxMemory = parseResource(tokens[2]);
-       }else if (line.contains("resources_min.vmem")) {
-           queue->m_minMemory = parseResource(tokens[2]);
-       }else if (line.contains("resources_default.vmem")) {
-           queue->m_defaultMemory = parseResource(tokens[2]);
-       }else if (line.contains("resources_max.jobfs")) {
-           queue->m_maxScratch = parseResource(tokens[2]);
-       }else if (line.contains("resources_min.jobfs")) {
-           queue->m_minScratch = parseResource(tokens[2]);
-       }else if (line.contains("resources_default.jobfs")) {
-           queue->m_defaultScratch = parseResource(tokens[2]);
-       }else if (line.contains("resources_max.ncpus")) {
-          n = tokens[2].toInt(&ok);
-          if (ok) queue->m_maxCpus = n;
-       }else if (line.contains("resources_min.ncpus")) {
-          n = tokens[2].toInt(&ok); 
-          if (ok) queue->m_minCpus = n;
-       }else if (line.contains("resources_default.ncpus")) {
-          n = tokens[2].toInt(&ok);
-          if (ok) queue->m_defaultCpus = n;
-       }   
-   }       
-}
-
-
-// I can't figure out how to get much information from the SGE qstat, so we
-// just settle on a list of queue names and rely on the default limits given
-// in ServerQueue.h
-void QueueResourcesList::fromSgeQueueInfoString(QString const& queueInfo)
-{  
-   QString info(queueInfo);
-   QStringList tokens;
-   Parser::TextStream textStream(&info);
-   
-   // The list of queues comes after the header line
-   textStream.seek("--------------------");
-      
-   while (!textStream.atEnd()) {
-      tokens = textStream.nextLineAsTokens();
-      if (tokens.size() > 1) append(new QueueResources(tokens.first()));
-   }     
-}
-
-
-void QueueResourcesList::copy(QueueResourcesList const& list) 
-{ 
-   QueueResourcesList::const_iterator iter;
-   for (iter = list.begin(); iter != list.end(); ++iter) {
-       append(new QueueResources(*(*iter)));
-   }
-}
-
-
-int QueueResourcesList::parseResource(QString& r)
-{
-   int  Mb(0);
-   bool ok(false);
-
-   if (r.contains("gb", Qt::CaseInsensitive)) {
-      Mb = r.remove("gb").toInt(&ok);
-      Mb *= 1024;
-   }else if (r.contains("mb", Qt::CaseInsensitive)) {
-      Mb = r.remove("mb").toInt(&ok);
-   }
-
-   if (!ok) { QLOG_DEBUG() << "Failed to parse:" << r; }
-
-   return Mb;
-}
-
 
 
 } } // end namespace IQmol::Process

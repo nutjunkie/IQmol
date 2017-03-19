@@ -23,8 +23,7 @@
 ********************************************************************************/
 
 #include "ui_QueueResourcesDialog.h"
-#include "QueueResources.h"
-#include <QVariant>
+#include "QueueResourcesList.h"
 
 
 namespace IQmol {
@@ -52,6 +51,7 @@ namespace Process {
       private:
          void setQueueResources(QueueResources*);
          void saveAsDefaults();
+
          Ui::QueueResourcesDialog m_dialog;
          QueueResourcesList* m_queueResourcesList;
          QRegExpValidator m_timeValidator;
