@@ -1576,10 +1576,10 @@ Process::QChemJobInfo Molecule::qchemJobInfo()
    if (m_inputFile.filePath().isEmpty()) {
       QFileInfo fileInfo(Preferences::LastFileAccessed());
       jobInfo.set(Process::QChemJobInfo::LocalWorkingDirectory, fileInfo.path());
-      jobInfo.set(Process::QChemJobInfo::BaseName, text());
+      jobInfo.setBaseName(text());
    }else {
       jobInfo.set(Process::QChemJobInfo::LocalWorkingDirectory, m_inputFile.path());
-      jobInfo.set(Process::QChemJobInfo::BaseName, m_inputFile.completeBaseName());
+      jobInfo.setBaseName(m_inputFile.completeBaseName());
       name =  + "/" + m_inputFile.completeBaseName() + ".inp";
    }
 
@@ -1591,7 +1591,7 @@ Process::QChemJobInfo Molecule::qchemJobInfo()
 void Molecule::qchemJobInfoChanged(Process::QChemJobInfo const& qchemJobInfo)
 { 
    if (text() == DefaultMoleculeName) {
-      setText(qchemJobInfo.get(Process::QChemJobInfo::BaseName)); 
+      setText(qchemJobInfo.baseName());
       m_info.setCharge(qchemJobInfo.getCharge());
       m_info.setMultiplicity(qchemJobInfo.getMultiplicity());
    }

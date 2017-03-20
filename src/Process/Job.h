@@ -122,8 +122,6 @@ namespace Process {
 		 /// time when it is known.
          void resetTimer(unsigned const seconds);
 
-         //QChemJobInfo& infoObject() { return m_jobInfo; }
-
          QString const& copyProgressString() const { return m_copyProgress; }
 
       private:

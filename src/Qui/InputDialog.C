@@ -131,8 +131,6 @@ InputDialog::~InputDialog()
 
 void InputDialog::initializeToolBoxOptions() 
 {
-   qDebug() << "Initializing ToolBoxOptions";
-
    int numberOfUndeletedPages(2);
    while (m_ui.toolBoxOptions->count() > numberOfUndeletedPages) {
       QWidget* widget(m_ui.toolBoxOptions->widget(0)); 
@@ -140,7 +138,6 @@ void InputDialog::initializeToolBoxOptions()
       widget->hide();
       m_ui.toolBoxOptions->removeItem(0);
       m_toolBoxOptions.insert(name, widget);
-      //qDebug() << "Saving widget" << name << widget;
    }
 }
 
@@ -148,11 +145,12 @@ void InputDialog::initializeToolBoxOptions()
 void InputDialog::setQChemJobInfo(IQmol::Process::QChemJobInfo const& jobInfo)
 {
    m_qchemJobInfo = jobInfo;
-   m_fileIn.setFile(m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::BaseName) + ".inp");
+
+   m_fileIn.setFile(m_qchemJobInfo.baseName() + ".inp");
 
    m_ui.jobList->setCurrentIndex(0);
    if (!m_currentJob) {
-      qDebug() << "Attempt to set JobInfo with no current Job";
+      QLOG_DEBUG() << "Attempt to set JobInfo with no current Job";
       return;
    }
 
@@ -489,7 +487,6 @@ void InputDialog::changePreviewFont(QFont const& font)
 void InputDialog::updatePreviewText(JobList const& jobs, Job const* currentJob) 
 {
    if (m_taint) {
-      qDebug() << "Updating tainted preview text in QUI";
       QLOG_WARN() << "Updating tainted preview text in QUI";
    }
    // Make sure we don't print extraneous bumf for the current job.
@@ -822,8 +819,7 @@ void InputDialog::submitJob()
 
    m_qchemJobInfo.set(
       IQmol::Process::QChemJobInfo::InputString, generateInputString());
-   m_qchemJobInfo.set(
-      IQmol::Process::QChemJobInfo::ServerName, m_ui.serverCombo->currentText());
+   m_qchemJobInfo.setServerName(m_ui.serverCombo->currentText());
    submitJobRequest(m_qchemJobInfo);
 }
 
@@ -917,8 +913,8 @@ void InputDialog::on_advancedOptionsTree_itemClicked(QTreeWidgetItem* item, int)
       if (widget) {
          m_ui.advancedOptionsStack->setCurrentWidget(widget);
       }else {
-         qDebug() << "InputDialog::on_advancedOptionsTree_itemClicked:\n"
-                  << "  Widget not found: " << label;
+         QLOG_DEBUG() << "InputDialog::on_advancedOptionsTree_itemClicked:\n"
+                      << "  Widget not found: " << label;
       }
    }
 }

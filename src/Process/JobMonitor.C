@@ -24,7 +24,7 @@
 #include "Job.h"
 #include "QChemJobInfo.h"
 #include "QChemOutputParser.h"
-#include "QueueResources.h"
+#include "QueueResourcesList.h"
 #include "QueueResourcesDialog.h"
 #include "Server.h"
 #include "ServerRegistry.h"
@@ -40,6 +40,7 @@
 #include <QShowEvent>
 #include <QHeaderView>
 #include <QFileDialog>
+#include <QProgressBar>
 #include <QDir>
 #include <QDebug>
 
@@ -261,9 +262,8 @@ void JobMonitor::reconnectServers()
 void JobMonitor::submitJob(QChemJobInfo& qchemJobInfo)
 {
    Job* job(0);
-   qchemJobInfo.dump();
 
-   QString serverName(qchemJobInfo.get(QChemJobInfo::ServerName));
+   QString serverName(qchemJobInfo.serverName());
    Server* server(ServerRegistry::instance().find(serverName));
 
    if (!server) {
@@ -327,18 +327,18 @@ bool JobMonitor::getWorkingDirectory(Server* server, QChemJobInfo& qchemJobInfo)
       QFileInfo info(dirPath);
       if (info.isFile()) dirPath = info.path();
 #ifndef Q_OS_WIN32
-      dirPath += "/" + qchemJobInfo.get(QChemJobInfo::BaseName);
+      dirPath += "/" + qchemJobInfo.baseName();
 #endif
       bool allowSpace(false);
       if (!getLocalWorkingDirectory(dirPath, allowSpace)) return false;
    }else {
-      dirPath = qchemJobInfo.get(QChemJobInfo::BaseName);
+      dirPath = qchemJobInfo.baseName();
       if (!getRemoteWorkingDirectory(server, dirPath)) return false;
    }
 
    QDir dir(dirPath);
 
-   qchemJobInfo.set(QChemJobInfo::BaseName, dir.dirName());
+   qchemJobInfo.setBaseName(dir.dirName());
    qchemJobInfo.set(QChemJobInfo::RemoteWorkingDirectory, dirPath);
    if (server->isLocal()) {
       qchemJobInfo.set(QChemJobInfo::LocalWorkingDirectory, dirPath);
@@ -484,11 +484,11 @@ bool JobMonitor::getQueueResources(Server* server, QChemJobInfo& qchemJobInfo)
    configuration.setValue(ServerConfiguration::QueueResources,list.toQVariantList());
    ServerRegistry::save();
 
-   qchemJobInfo.set(QChemJobInfo::Queue,    dialog.queue());
-   qchemJobInfo.set(QChemJobInfo::Walltime, dialog.walltime());
-   qchemJobInfo.set(QChemJobInfo::Memory,   dialog.memory());
-   qchemJobInfo.set(QChemJobInfo::Scratch,  dialog.scratch());
-   qchemJobInfo.set(QChemJobInfo::Ncpus,    dialog.ncpus());
+   qchemJobInfo.setQueueName(dialog.queue());
+   qchemJobInfo.setWallTime(dialog.walltime());
+   qchemJobInfo.setMemory(dialog.memory());
+   qchemJobInfo.setScratch(dialog.scratch());
+   qchemJobInfo.setNcpus(dialog.ncpus());
 
    return true;
 }
@@ -639,6 +639,9 @@ void JobMonitor::reloadJob(Job* job)
    unsigned time(job->runTime());
    if (time) table->item(item->row(), 3)->setText(Util::Timer::formatTime(time));
    if (job->status() == Job::Copying) {
+      //QProgressBar* bar = new QProgressBar();
+      //bar->setValue(50);
+      //table->setCellWidget(item->row(), 4, bar);
       table->item(item->row(), 4)->setText(job->copyProgressString());
    }else {
       QString status(Job::toString(job->status()));
@@ -680,7 +683,7 @@ void JobMonitor::jobFinished()
          QMsgBox::warning(0, "IQmol", msg);
       }else {
          resultsAvailable(job->jobInfo().get(QChemJobInfo::LocalWorkingDirectory),
-                          job->jobInfo().get(QChemJobInfo::BaseName),
+                          job->jobInfo().baseName(),
                           job->jobInfo().moleculePointer());
       }
      
@@ -887,7 +890,7 @@ void JobMonitor::openResults(Job* job)
 {
    if (!job) return;
    resultsAvailable(job->jobInfo().get(QChemJobInfo::LocalWorkingDirectory),
-                    job->jobInfo().get(QChemJobInfo::BaseName),
+                    job->jobInfo().baseName(),
                     job->jobInfo().moleculePointer());
 }
 
