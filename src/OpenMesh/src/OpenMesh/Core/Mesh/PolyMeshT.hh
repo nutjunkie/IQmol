@@ -247,7 +247,7 @@ public:
   Point calc_face_centroid(FaceHandle _fh) const;
 
   /// Update normal for halfedge _heh
-  void update_normal(HalfedgeHandle _heh, const double _feature_angle = 0.8)
+  void update_normal(HalfedgeHandle _heh, const double /*_feature_angle = 0.8*/)
   { this->set_normal(_heh, calc_halfedge_normal(_heh)); }
 
   /** \brief Update normal vectors for all halfedges.

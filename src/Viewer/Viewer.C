@@ -513,6 +513,8 @@ void Viewer::drawLabels(GLObjectList const& objects)
    Layer::Charge* charge;
    bool selectedOnly = (m_selectedObjects.count() > 0);
 
+   glDisable(GL_LIGHTING);
+
    GLObjectList::const_iterator object;
    for (object = objects.begin(); object!= objects.end(); ++object) {
        if ( (atom = qobject_cast<Layer::Atom*>(*object)) ) {
@@ -525,7 +527,6 @@ void Viewer::drawLabels(GLObjectList const& objects)
    }
 
    
-   glDisable(GL_LIGHTING);
    qglColor(foregroundColor());
 
    QString msg = selectedOnly ? "Selection " : "Total ";
