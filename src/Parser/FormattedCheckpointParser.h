@@ -25,6 +25,7 @@
 #include "Parser.h"
 #include "Geometry.h"
 #include "Shell.h"
+#include "Orbitals.h"
 
 
 namespace IQmol {
@@ -68,6 +69,10 @@ namespace Parser {
             QList<double> betaCoefficients;
             QList<double> alphaEnergies;
             QList<double> betaEnergies;
+            Data::Orbitals::OrbitalType orbitalType;
+//int moTypeID;
+int which_state;
+QString stateTag;
          };
 
          struct GmoData {

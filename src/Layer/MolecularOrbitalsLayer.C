@@ -46,7 +46,8 @@ namespace IQmol {
 namespace Layer {
 
 MolecularOrbitals::MolecularOrbitals(Data::MolecularOrbitals& molecularOrbitals)
- : Base(molecularOrbitals.label()), m_configurator(*this), m_molecularOrbitals(molecularOrbitals)
+ : Base(molecularOrbitals.label()), m_configurator(*this), 
+   m_molecularOrbitals(molecularOrbitals)
 {
    connect(&m_configurator, SIGNAL(queueSurface(Data::SurfaceInfo const&)),
       this, SLOT(addToQueue(Data::SurfaceInfo const&)));
@@ -74,7 +75,10 @@ MolecularOrbitals::MolecularOrbitals(Data::MolecularOrbitals& molecularOrbitals)
  
    m_molecularOrbitals.boundingBox(m_bbMin, m_bbMax);
    appendSurfaces(m_molecularOrbitals.surfaceList());
-   computeDensityVectors();
+
+   if (m_molecularOrbitals.orbitalType()== Data::Orbitals::MOs) {
+      computeDensityVectors();
+   }
 }
 
 

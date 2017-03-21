@@ -31,10 +31,12 @@ namespace Data {
 MolecularOrbitals::MolecularOrbitals(QString const& label, unsigned const nAlpha, 
    unsigned const nBeta, unsigned const nBasis, QList<double> const& alphaCoefficients, 
    QList<double> const& alphaEnergies, QList<double> const& betaCoefficients, 
-   QList<double> const& betaEnergies, ShellList const& shells) 
+   QList<double> const& betaEnergies, ShellList const& shells, OrbitalType const type) 
  : m_label(label), m_nAlpha(nAlpha), m_nBeta(nBeta), m_nBasis(nBasis),
-   m_alphaEnergies(alphaEnergies), m_betaEnergies(betaEnergies), m_shellList(shells)
+   m_alphaEnergies(alphaEnergies), m_betaEnergies(betaEnergies), m_shellList(shells),
+   m_orbitalType(type)
 {
+
    QLOG_DEBUG() << "Number of alpha electrons :: " << m_nAlpha;
    QLOG_DEBUG() << "Number of beta  electrons :: " << m_nBeta;
    QLOG_DEBUG() << "Number of basis functions :: " << m_nBasis;
@@ -84,8 +86,10 @@ bool MolecularOrbitals::consistent() const
 {
    bool ok(true);
    ok = ok && m_nOrbitals > 0;
-   ok = ok && m_nAlpha <= m_nOrbitals;
-   ok = ok && m_nBeta  <= m_nOrbitals;
+   if (m_orbitalType != NTOs){
+      ok = ok && m_nAlpha <= m_nOrbitals;
+      ok = ok && m_nBeta  <= m_nOrbitals;
+   }
    ok = ok && m_alphaEnergies.size() == (int)m_nOrbitals;
    ok = ok && m_betaEnergies.size()  == (int)m_nOrbitals;
 

@@ -1,5 +1,5 @@
-#ifndef IQMOL_DATA_MOLECULARORBITALSLIST_H
-#define IQMOL_DATA_MOLECULARORBITALSLIST_H
+#ifndef IQMOL_DATA_ORBITALS_H
+#define IQMOL_DATA_ORBITALS_H
 /*******************************************************************************
 
   Copyright (C) 2011-2015 Andrew Gilbert
@@ -22,40 +22,42 @@
 
 ********************************************************************************/
 
-#include "MolecularOrbitals.h"
+#include "Data.h"
 
 
 namespace IQmol {
 namespace Data {
 
-   class MolecularOrbitalsList : public Data::List<Data::MolecularOrbitals> {
+   /// Base class for orbital types
+   class Orbitals : public Base {
+
+      friend class boost::serialization::access;
+
       public:
+         enum OrbitalType { Undefined = 0, MOs, NTOs,  NBOs };
+
+         Orbitals() :  m_orbitalType(Undefined) { }
+
+         void setOrbitalType(OrbitalType const orbitalType) { m_orbitalType = orbitalType; }
+         OrbitalType orbitalType() const { return m_orbitalType; }
+
 
 // int moTypeID;
-         MolecularOrbitalsList() : m_defaultIndex(0) { }
+// QString moTitle;
+// void setOrbTitle(QString const& text){ moTitle = text; }
 
-         /// Sets which set of data should be considered the default in the
-         /// list.  An index of -1 corresponds to the final geometry.
-         void setDefaultIndex(int index);
-
-         unsigned defaultIndex() const { return m_defaultIndex; }
-
-         virtual void serialize(InputArchive& ar, unsigned int const version = 0) 
-         {
-            serializeList(ar, version);
-            ar & m_defaultIndex;
-         }
-
-         virtual void serialize(OutputArchive& ar, unsigned int const version = 0) 
-         {
-            serializeList(ar, version);
-            ar & m_defaultIndex;
-         }
-
-         void dump() const;
+         QString const& label() const { return m_label; }
+         void setLabel(QString const& label) { m_label = label; }
 
       private:
-         unsigned m_defaultIndex; 
+         template <class Archive>
+         void privateSerialize(Archive& ar, unsigned const /* version */) 
+         {
+            ar & m_orbitalType;
+         }
+
+         OrbitalType m_orbitalType;
+         QString m_label;
    };
 
 } } // end namespace IQmol::Data

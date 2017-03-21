@@ -22,6 +22,7 @@
 
 ********************************************************************************/
 
+#include "Orbitals.h"
 #include "Matrix.h"
 #include "Shell.h"
 #include "Surface.h"
@@ -31,21 +32,27 @@ namespace IQmol {
 namespace Data {
 
    /// Data class for molecular orbital information
-   class MolecularOrbitals : public Base {
+   class MolecularOrbitals : public Orbitals {
 
       friend class boost::serialization::access;
 
       public:
-         MolecularOrbitals() { }
+         MolecularOrbitals() : m_orbitalType(Undefined) { }
          MolecularOrbitals(QString const& label, unsigned const nAlpha, unsigned const nBeta, 
             unsigned const nBasis,
             QList<double> const& alphaCoefficients, QList<double> const& alphaEnergies,  
-            QList<double> const& betaCoefficients, QList<double> const& betaEnergies,
-            ShellList const& shells);
+            QList<double> const& betaCoefficients,  QList<double> const& betaEnergies,
+            ShellList const& shells, OrbitalType const orbitalType = MOs);
 
          Type::ID typeID() const { return Type::MolecularOrbitals; }
 
-         QString const& label() { return m_label; }
+// int moTypeID;
+// QString moTitle;
+// void setOrbTitle(QString const& text){ moTitle = text; }
+
+//         QString const& label() { return m_label; }
+//         OrbitalType const& orbitalType() { return m_orbitalType; }
+
          unsigned nAlpha() const { return m_nAlpha; }
          unsigned nBeta()  const { return m_nBeta; }
          unsigned nBasis() const { return m_nBasis; }
@@ -98,6 +105,7 @@ namespace Data {
          template <class Archive>
          void privateSerialize(Archive& ar, unsigned const /* version */) 
          {
+            ar & m_orbitalType;
             ar & m_nAlpha;
             ar & m_nBeta;
             ar & m_nBasis;
@@ -114,6 +122,8 @@ namespace Data {
          }
 
          void computeBoundingBox();
+
+         OrbitalType m_orbitalType;
 
          QString  m_label;
          unsigned m_nAlpha;
