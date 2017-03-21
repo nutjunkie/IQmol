@@ -2267,7 +2267,7 @@ Alpha NTO coefficients                     R   N=         232
  -3.48025188E-16 -4.00088861E-02
 Alpha NTO amplitudes                       R   N=           4
  -1.28921386E-02 -9.99848324E-01  9.99848324E-01  1.28921386E-02
-TDA singlet excited state                  I                1
+TDA singlet Surface Title                  I                1
 Alpha NTO coefficients                     R   N=         232
  -1.96865976E-01  4.99911068E-01  1.37008398E-01  3.07630086E-01  1.66524872E-14
  -1.37235222E-17 -1.45297484E-02  3.26065658E-14 -2.93804001E-16 -2.66616021E-02
@@ -2318,7 +2318,7 @@ Alpha NTO coefficients                     R   N=         232
  -1.26488273E-15 -6.43822094E-02
 Alpha NTO amplitudes                       R   N=           4
  -1.09335071E-02 -9.99917812E-01  9.99917812E-01  1.09335071E-02
-TDA singlet excited state                  I                2
+TDA singlet Surface Title                  I                2
 Alpha NTO coefficients                     R   N=         232
   1.17205342E-01 -1.37847999E-01 -2.96288711E-02  6.61272092E-02 -1.39213071E-13
  -5.11326670E-12  2.81870953E-01 -1.66323150E-13 -6.36202354E-12  3.49593537E-01
@@ -2369,7 +2369,7 @@ Alpha NTO coefficients                     R   N=         232
  -1.37152853E-12  1.44092697E-02
 Alpha NTO amplitudes                       R   N=           4
  -2.61508392E-02 -9.81698434E-01  9.81698434E-01  2.61508392E-02
-RPA singlet excited state                  I                1
+RPA singlet Surface Title                  I                1
 Alpha NTO coefficients                     R   N=         232
  -9.14217080E-14  3.12327457E-13  9.72932327E-14  1.15557325E-13  2.83412786E-01
  -2.28326210E-14  1.01486011E-13  3.39194958E-01 -2.84520102E-14  1.45022571E-13
@@ -2420,7 +2420,7 @@ Alpha NTO coefficients                     R   N=         232
  -1.87196046E-14 -6.37360455E-03
 Alpha NTO amplitudes                       R   N=           4
  -3.16572314E-02 -9.89954792E-01  9.89954792E-01  3.16572314E-02
-RPA singlet excited state                  I                2
+RPA singlet Surface Title                  I                2
 Dipole_Data                                R   N=           3
  -1.27408589E-14 -3.17849685E-15 -2.01937635E+00
 Quadrupole_Data                            R   N=           6
@@ -2914,7 +2914,7 @@ Alpha NBO occupancies                      R   N=          10
 Beta NBO occupancies                       R   N=          10
   9.99766543E-01  9.99766543E-01  9.99932790E-01  9.99402424E-01  4.99673833E-01
   1.06841102E-02  7.85505430E-05  4.13300406E-05  1.46937017E-05  5.41420055E-16
-TDA excited state                          I                1
+TDA Surface Title                          I                1
 Alpha NBO coefficients                     R   N=         580
   3.80438903E-02 -2.09565540E-01 -5.59623012E-02 -3.70101921E-02  1.98065428E-01
   2.90836556E-15  1.46512326E-01  2.61753935E-01 -1.27306014E-14  1.77166596E-01
@@ -3155,7 +3155,7 @@ Alpha NBO occupancies                      R   N=          10
 Beta NBO occupancies                       R   N=          10
   9.99694951E-01  9.99694951E-01  9.99921410E-01  9.98840006E-01  4.99613305E-01
   2.86702787E-03  1.85294365E-05  2.91563271E-15  0.00000000E+00  8.62142226E-17
-TDA excited state                          I                2
+TDA Surface Title                          I                2
 Alpha NBO coefficients                     R   N=         580
  -4.99884538E-02  2.11492694E-01  6.71297709E-02  3.98850134E-02 -2.00148411E-01
   2.52826310E-13 -1.40076782E-01 -2.57646289E-01  3.21533045E-13 -1.64986562E-01
@@ -3396,7 +3396,7 @@ Alpha NBO occupancies                      R   N=          10
 Beta NBO occupancies                       R   N=          10
   9.99641781E-01  9.99641781E-01  9.99930622E-01  9.99224775E-01  4.98713298E-01
   1.08017618E-02  4.32919802E-04  5.86596655E-05  5.23726654E-05  1.95893277E-05
-RPA excited state                          I                1
+RPA Surface Title                          I                1
 Alpha NBO coefficients                     R   N=         580
   3.80159796E-02 -2.09326424E-01 -5.58606241E-02 -3.63585078E-02  1.98153446E-01
   2.24840293E-16  1.46597279E-01  2.62077663E-01 -7.95828673E-16  1.77070548E-01
@@ -3637,4 +3637,4 @@ Alpha NBO occupancies                      R   N=          10
 Beta NBO occupancies                       R   N=          10
   9.99333932E-01  9.99333932E-01  9.99921346E-01  9.98805660E-01  4.98685649E-01
   2.73850017E-03  6.55652312E-04  1.90183138E-05  0.00000000E+00  1.00464284E-09
-RPA excited state                          I                2
+RPA Surface Title                          I                2

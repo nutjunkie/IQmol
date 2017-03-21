@@ -308,8 +308,7 @@ List Factory::convert(Data::MolecularOrbitalsList& molecularOrbitalsList)
    }else if (nDataSets > 1) {
       Base* base(new Base(label));
       list.append(base);
-      base->setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-      base->setCheckState(Qt::Checked);
+      base->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
       Data::MolecularOrbitalsList::iterator iter;
       for (iter = molecularOrbitalsList.begin(); iter != molecularOrbitalsList.end(); ++iter) {
           base->appendLayer(new MolecularOrbitals(**iter, (**iter).moTitle));

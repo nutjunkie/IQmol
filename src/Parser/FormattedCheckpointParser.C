@@ -278,13 +278,13 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          Data::Hessian& hessian(geometry->getProperty<Data::Hessian>());
          hessian.setData(geometry->nAtoms(), data);
 
-      }else if (key.endsWith("excited state") || key == "NBO Ground State" ) {
+      }else if (key.endsWith("Surface Title") || key == "NBO Ground State" ) {
          unsigned n(list.at(1).toUInt(&ok));
          if (!ok || !geometry) goto error;
 
          if (ntoData.orbitalType == Data::MolecularOrbitals::NaturalTransition) {
             ntoData.whichState = n;
-            ntoData.stateTag = QString(key.replace("excited state",""));
+            ntoData.stateTag = QString(key.replace("Surface Title",""));
             Data::MolecularOrbitals* ntos(makeMolecularOrbitals(nboData, shellData, *geometry)); 
             clear(ntoData);
             if (ntos) naturaltransOrbitalList->append(ntos);
@@ -295,7 +295,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
             if (key == "NBO Ground State") {
 	           nboData.stateTag = QString("Ground Sate");
 	        }else {
-	           nboData.stateTag = QString(key.replace("excited state",""));
+	           nboData.stateTag = QString(key.replace("Surface Title",""));
             }
 
             Data::MolecularOrbitals* nbos(makeMolecularOrbitals(nboData, shellData, *geometry)); 
@@ -467,6 +467,7 @@ Data::MolecularOrbitals* FormattedCheckpoint::makeMolecularOrbitals(MoData const
    }
 
    switch (moData.orbitalType) {
+
       case Data::MolecularOrbitals::Canonical: 
       case Data::MolecularOrbitals::Localized: 
          qDebug() << "Add one MO: " << mos->orbitalType();
@@ -488,6 +489,7 @@ Data::MolecularOrbitals* FormattedCheckpoint::makeMolecularOrbitals(MoData const
 	     QString surfaceTag = QString(moData.stateTag);
 	     if (moData.whichState != 0) surfaceTag += QString::number(moData.whichState);
          mos->setOrbTitle(surfaceTag);
+
       } break;
 
       case Data::MolecularOrbitals::Undefined: 

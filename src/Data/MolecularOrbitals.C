@@ -34,10 +34,10 @@ QString MolecularOrbitals::toString(OrbitalType const type)
 
    switch (type) {
       case Undefined:          s = "Undefined";                    break;
-      case Canonical:          s = "Canonical";                    break;
-      case Localized:          s = "Localized";                    break;
+      case Canonical:          s = "Canonical Orbitals";           break;
+      case Localized:          s = "Localized Orbitals";           break;
       case NaturalTransition:  s = "Natural Transition Orbitals";  break;
-      case NaturalBond:        s = "Natural Bond";                 break;
+      case NaturalBond:        s = "Natural Bond Orbitals";        break;
    }
 
    return s;

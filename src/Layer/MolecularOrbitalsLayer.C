@@ -134,7 +134,6 @@ unsigned MolecularOrbitals::nOrbitals() const
    return m_molecularOrbitals.nOrbitals(); 
 }
 
-
 void MolecularOrbitals::computeDensityVectors()
 {
    using namespace boost::numeric::ublas;
