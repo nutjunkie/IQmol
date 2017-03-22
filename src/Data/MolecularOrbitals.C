@@ -28,14 +28,35 @@
 namespace IQmol {
 namespace Data {
 
-MolecularOrbitals::MolecularOrbitals(unsigned const nAlpha, unsigned const nBeta, 
-   QList<double> const& alphaCoefficients, QList<double> const& alphaEnergies,  
-   QList<double> const& betaCoefficients, QList<double> const& betaEnergies,
-   ShellList const& shells) : m_nAlpha(nAlpha), m_nBeta(nBeta), 
-   m_alphaEnergies(alphaEnergies), m_betaEnergies(betaEnergies), m_shellList(shells)
+QString MolecularOrbitals::toString(OrbitalType const type)
 {
-   moTypeID = moType::Undefined;
+   QString s;
 
+   switch (type) {
+      case Undefined:          s = "Undefined";                    break;
+      case Canonical:          s = "Canonical Orbitals";           break;
+      case Localized:          s = "Localized Orbitals";           break;
+      case NaturalTransition:  s = "Natural Transition Orbitals";  break;
+      case NaturalBond:        s = "Natural Bond Orbitals";        break;
+   }
+
+   return s;
+}
+
+
+
+MolecularOrbitals::MolecularOrbitals(
+   OrbitalType const type, 
+   unsigned const nAlpha, 
+   unsigned const nBeta, 
+   QList<double> const& alphaCoefficients, 
+   QList<double> const& alphaEnergies,  
+   QList<double> const& betaCoefficients, 
+   QList<double> const& betaEnergies,
+   ShellList const& shells) : 
+   m_orbitalType(type), m_nAlpha(nAlpha), m_nBeta(nBeta), m_alphaEnergies(alphaEnergies), 
+   m_betaEnergies(betaEnergies), m_shellList(shells)
+{
    m_nOrbitals = m_alphaEnergies.size();
    QLOG_DEBUG() << "Number of alpha electrons :: " << m_nAlpha;
    QLOG_DEBUG() << "Number of beta  electrons :: " << m_nBeta;
@@ -84,7 +105,7 @@ bool MolecularOrbitals::consistent() const
 {
    bool ok(true);
    ok = ok && m_nOrbitals > 0;
-   if(moTypeID != moType::NTOs){
+   if (m_orbitalType != NaturalTransition) {
       ok = ok && m_nAlpha <= m_nOrbitals;
       ok = ok && m_nBeta  <= m_nOrbitals;
    }

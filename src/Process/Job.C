@@ -26,7 +26,7 @@
 
 
 namespace IQmol {
-namespace Process2 {
+namespace Process {
 
 QString Job::toString(Status const& status) 
 {
@@ -49,8 +49,8 @@ QString Job::toString(Status const& status)
 
 Job::Job(QChemJobInfo const& qchemJobInfo) : m_qchemJobInfo(qchemJobInfo)
 {
-   m_jobName    = m_qchemJobInfo.get(QChemJobInfo::BaseName);
-   m_serverName = m_qchemJobInfo.get(QChemJobInfo::ServerName);
+   m_jobName    = m_qchemJobInfo.baseName();
+   m_serverName = m_qchemJobInfo.serverName();
    m_status     = NotRunning;
 }
 
@@ -137,15 +137,16 @@ QString Job::substituteMacros(QString const& input) const
    QString output(input);
    output.replace("${JOB_ID}",   m_jobId);
    output.replace("${JOB_DIR}",  m_qchemJobInfo.get(QChemJobInfo::RemoteWorkingDirectory));
+   output.replace("${JOB_NAME}", m_qchemJobInfo.baseName());
 
-   output.replace("${JOB_NAME}", m_qchemJobInfo.get(QChemJobInfo::BaseName));
-   output.replace("${QUEUE}",    m_qchemJobInfo.get(QChemJobInfo::Queue));
-   output.replace("${WALLTIME}", m_qchemJobInfo.get(QChemJobInfo::Walltime));
-   output.replace("${MEMORY}",   m_qchemJobInfo.get(QChemJobInfo::Memory));
-   output.replace("${JOBFS}",    m_qchemJobInfo.get(QChemJobInfo::Scratch));
-   output.replace("${SCRATCH}",  m_qchemJobInfo.get(QChemJobInfo::Scratch));
-   output.replace("${NCPUS}",    m_qchemJobInfo.get(QChemJobInfo::Ncpus));
+   output.replace("${QUEUE}",    m_qchemJobInfo.queueName());
+   output.replace("${WALLTIME}", m_qchemJobInfo.wallTime());
+   output.replace("${MEMORY}",   QString::number(m_qchemJobInfo.memory()));
+   output.replace("${JOBFS}",    QString::number(m_qchemJobInfo.scratch()));
+   output.replace("${SCRATCH}",  QString::number(m_qchemJobInfo.scratch()));
+   output.replace("${NCPUS}",    QString::number(m_qchemJobInfo.ncpus()));
 
+   // Check all the macros have been expanded
    if (output.contains("${")) {
       QLOG_WARN() << "Unmatched macros found in string:";
       QLOG_WARN() << input;

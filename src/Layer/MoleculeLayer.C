@@ -1555,18 +1555,18 @@ Charge* Molecule::createCharge(double const Q, Vec const& position)
 }
 
 
-Process2::QChemJobInfo Molecule::qchemJobInfo()
+Process::QChemJobInfo Molecule::qchemJobInfo()
 {
-   Process2::QChemJobInfo jobInfo;
+   Process::QChemJobInfo jobInfo;
 
-   jobInfo.set(Process2::QChemJobInfo::Charge,          totalCharge());
-   jobInfo.set(Process2::QChemJobInfo::Multiplicity,    multiplicity());
-   jobInfo.set(Process2::QChemJobInfo::Coordinates,     coordinatesAsString());
-   jobInfo.set(Process2::QChemJobInfo::Constraints,     constraintsAsString());
-   jobInfo.set(Process2::QChemJobInfo::ScanCoordinates, scanCoordinatesAsString());
-   jobInfo.set(Process2::QChemJobInfo::EfpFragments,    efpFragmentsAsString());
-   jobInfo.set(Process2::QChemJobInfo::EfpParameters,   efpParametersAsString());
-   jobInfo.set(Process2::QChemJobInfo::ExternalCharges, externalChargesAsString());
+   jobInfo.set(Process::QChemJobInfo::Charge,          totalCharge());
+   jobInfo.set(Process::QChemJobInfo::Multiplicity,    multiplicity());
+   jobInfo.set(Process::QChemJobInfo::Coordinates,     coordinatesAsString());
+   jobInfo.set(Process::QChemJobInfo::Constraints,     constraintsAsString());
+   jobInfo.set(Process::QChemJobInfo::ScanCoordinates, scanCoordinatesAsString());
+   jobInfo.set(Process::QChemJobInfo::EfpFragments,    efpFragmentsAsString());
+   jobInfo.set(Process::QChemJobInfo::EfpParameters,   efpParametersAsString());
+   jobInfo.set(Process::QChemJobInfo::ExternalCharges, externalChargesAsString());
 
    AtomList atomList(findLayers<Atom>(Children | Visible));
    if (atomList.isEmpty()) jobInfo.setEfpOnlyJob(true);
@@ -1575,11 +1575,11 @@ Process2::QChemJobInfo Molecule::qchemJobInfo()
 
    if (m_inputFile.filePath().isEmpty()) {
       QFileInfo fileInfo(Preferences::LastFileAccessed());
-      jobInfo.set(Process2::QChemJobInfo::LocalWorkingDirectory, fileInfo.path());
-      jobInfo.set(Process2::QChemJobInfo::BaseName, text());
+      jobInfo.set(Process::QChemJobInfo::LocalWorkingDirectory, fileInfo.path());
+      jobInfo.setBaseName(text());
    }else {
-      jobInfo.set(Process2::QChemJobInfo::LocalWorkingDirectory, m_inputFile.path());
-      jobInfo.set(Process2::QChemJobInfo::BaseName, m_inputFile.completeBaseName());
+      jobInfo.set(Process::QChemJobInfo::LocalWorkingDirectory, m_inputFile.path());
+      jobInfo.setBaseName(m_inputFile.completeBaseName());
       name =  + "/" + m_inputFile.completeBaseName() + ".inp";
    }
 
@@ -1588,10 +1588,10 @@ Process2::QChemJobInfo Molecule::qchemJobInfo()
 }
 
 
-void Molecule::qchemJobInfoChanged(Process2::QChemJobInfo const& qchemJobInfo)
+void Molecule::qchemJobInfoChanged(Process::QChemJobInfo const& qchemJobInfo)
 { 
    if (text() == DefaultMoleculeName) {
-      setText(qchemJobInfo.get(Process2::QChemJobInfo::BaseName)); 
+      setText(qchemJobInfo.baseName());
       m_info.setCharge(qchemJobInfo.getCharge());
       m_info.setMultiplicity(qchemJobInfo.getMultiplicity());
    }
@@ -2375,7 +2375,7 @@ void Molecule::initProperties()
       chargeTypes->addAction(action);
       connect(action, SIGNAL(triggered()), this, SLOT(updateAtomicCharges()));
       m_properties 
-        << new PointChargePotential(Data::Type::MultipoleDerivedCharge, "ESP (CHELPG)", this);
+        << new PointChargePotential(Data::Type::ChelpgCharge, "ESP (CHELPG)", this);
    }
 
 

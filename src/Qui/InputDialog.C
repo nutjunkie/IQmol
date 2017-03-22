@@ -131,8 +131,6 @@ InputDialog::~InputDialog()
 
 void InputDialog::initializeToolBoxOptions() 
 {
-   qDebug() << "Initializing ToolBoxOptions";
-
    int numberOfUndeletedPages(2);
    while (m_ui.toolBoxOptions->count() > numberOfUndeletedPages) {
       QWidget* widget(m_ui.toolBoxOptions->widget(0)); 
@@ -140,34 +138,34 @@ void InputDialog::initializeToolBoxOptions()
       widget->hide();
       m_ui.toolBoxOptions->removeItem(0);
       m_toolBoxOptions.insert(name, widget);
-      //qDebug() << "Saving widget" << name << widget;
    }
 }
 
 
-void InputDialog::setQChemJobInfo(IQmol::Process2::QChemJobInfo const& jobInfo)
+void InputDialog::setQChemJobInfo(IQmol::Process::QChemJobInfo const& jobInfo)
 {
    m_qchemJobInfo = jobInfo;
-   m_fileIn.setFile(m_qchemJobInfo.get(IQmol::Process2::QChemJobInfo::BaseName) + ".inp");
+
+   m_fileIn.setFile(m_qchemJobInfo.baseName() + ".inp");
 
    m_ui.jobList->setCurrentIndex(0);
    if (!m_currentJob) {
-      qDebug() << "Attempt to set JobInfo with no current Job";
+      QLOG_DEBUG() << "Attempt to set JobInfo with no current Job";
       return;
    }
 
    m_currentJob->setCoordinates(
-      m_qchemJobInfo.get(IQmol::Process2::QChemJobInfo::Coordinates));
+      m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::Coordinates));
    m_currentJob->setEfpFragments(
-      m_qchemJobInfo.get(IQmol::Process2::QChemJobInfo::EfpFragments));
+      m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::EfpFragments));
    m_currentJob->setConstraints(
-      m_qchemJobInfo.get(IQmol::Process2::QChemJobInfo::Constraints));
+      m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::Constraints));
    m_currentJob->setScanCoordinates(
-      m_qchemJobInfo.get(IQmol::Process2::QChemJobInfo::ScanCoordinates));
+      m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::ScanCoordinates));
    m_currentJob->setEfpParameters(
-      m_qchemJobInfo.get(IQmol::Process2::QChemJobInfo::EfpParameters));
+      m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::EfpParameters));
    m_currentJob->setExternalCharges(
-      m_qchemJobInfo.get(IQmol::Process2::QChemJobInfo::ExternalCharges));
+      m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::ExternalCharges));
 
    if (m_qchemJobInfo.efpOnlyJob()) {
       m_ui.basis->setEnabled(false);
@@ -190,7 +188,7 @@ void InputDialog::setQChemJobInfo(IQmol::Process2::QChemJobInfo const& jobInfo)
       m_currentJob->setOption("GUI",  "2");
       m_currentJob->setOption("EFP_FRAGMENTS_ONLY", "false");
 
-      QString frag(m_qchemJobInfo.get(IQmol::Process2::QChemJobInfo::EfpFragments));
+      QString frag(m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::EfpFragments));
       m_ui.efp_fragments_only->setEnabled(!frag.isEmpty());
    }
 
@@ -489,7 +487,6 @@ void InputDialog::changePreviewFont(QFont const& font)
 void InputDialog::updatePreviewText(JobList const& jobs, Job const* currentJob) 
 {
    if (m_taint) {
-      qDebug() << "Updating tainted preview text in QUI";
       QLOG_WARN() << "Updating tainted preview text in QUI";
    }
    // Make sure we don't print extraneous bumf for the current job.
@@ -821,9 +818,8 @@ void InputDialog::submitJob()
    updatePreviewText();
 
    m_qchemJobInfo.set(
-      IQmol::Process2::QChemJobInfo::InputString, generateInputString());
-   m_qchemJobInfo.set(
-      IQmol::Process2::QChemJobInfo::ServerName, m_ui.serverCombo->currentText());
+      IQmol::Process::QChemJobInfo::InputString, generateInputString());
+   m_qchemJobInfo.setServerName(m_ui.serverCombo->currentText());
    submitJobRequest(m_qchemJobInfo);
 }
 
@@ -917,8 +913,8 @@ void InputDialog::on_advancedOptionsTree_itemClicked(QTreeWidgetItem* item, int)
       if (widget) {
          m_ui.advancedOptionsStack->setCurrentWidget(widget);
       }else {
-         qDebug() << "InputDialog::on_advancedOptionsTree_itemClicked:\n"
-                  << "  Widget not found: " << label;
+         QLOG_DEBUG() << "InputDialog::on_advancedOptionsTree_itemClicked:\n"
+                      << "  Widget not found: " << label;
       }
    }
 }

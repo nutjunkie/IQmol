@@ -74,8 +74,12 @@ MolecularOrbitals::MolecularOrbitals(Data::MolecularOrbitals& molecularOrbitals,
  
    m_molecularOrbitals.boundingBox(m_bbMin, m_bbMax);
    appendSurfaces(m_molecularOrbitals.surfaceList());
-   if(m_molecularOrbitals.moTypeID == Data::moType::MOs)
-     computeDensityVectors();
+
+   Data::MolecularOrbitals::OrbitalType type(m_molecularOrbitals.orbitalType());
+   if (type == Data::MolecularOrbitals::Canonical ||
+       type == Data::MolecularOrbitals::Localized) {
+       computeDensityVectors();
+   }
 }
 
 
@@ -128,11 +132,6 @@ unsigned MolecularOrbitals::nBasis() const
 unsigned MolecularOrbitals::nOrbitals() const 
 { 
    return m_molecularOrbitals.nOrbitals(); 
-}
-
-Data::moType::ID MolecularOrbitals::moTypeID() const 
-{ 
-   return (Data::moType::ID)m_molecularOrbitals.moTypeID;
 }
 
 void MolecularOrbitals::computeDensityVectors()

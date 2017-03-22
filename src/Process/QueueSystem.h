@@ -24,7 +24,7 @@
 
 
 namespace IQmol {
-namespace Process2 {
+namespace Process {
 
    /// Base class for queueing systems on a server.
    class QueueSystem {

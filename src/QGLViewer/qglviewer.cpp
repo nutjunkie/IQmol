@@ -750,6 +750,9 @@ void QGLViewer::drawText(int x, int y, const QString& text, const QFont& fnt)
 		renderText(x, y, text, fnt);
 }
 
+
+// http://stackoverflow.com/questions/28216001/how-to-render-text-with-qopenglwidget
+
 /*! Briefly displays a message in the lower left corner of the widget. Convenient to provide
 feedback to the user.
 

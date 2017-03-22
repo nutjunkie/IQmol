@@ -23,34 +23,50 @@
 ********************************************************************************/
 
 #include <QStringList>
-#include <QVariant>
 #include <QMap>
+#include "JobInfo.h"
 
 
 namespace IQmol {
-namespace Process2 {
+namespace Process {
 
    /// QChemJobInfo holds information about the job to be run and forms the
    /// interface between the options editor (QUI) and the JobMonitor.
-   class QChemJobInfo {
+   class QChemJobInfo : public JobInfo {
 
       public:
-         /// BaseName       - the complete file basename, no directory, no extension
          /// InputFileName  - the input file name, no path
          /// InputString    - the entire input file as a string 
          /// RunFileName    - the name of the submission script
          /// Note that not all these are serialized
-         enum Field { BaseName, InputFileName, OutputFileName, AuxFileName, 
-            EspFileName, MoFileName, DensityFileName, ErrorFileName, BatchFileName,
-            RunFileName, ServerName, LocalWorkingDirectory, RemoteWorkingDirectory, 
-            InputString, Charge, Multiplicity, Coordinates, Constraints, ScanCoordinates,
-            EfpFragments, EfpParameters, ExternalCharges,
-            Queue, Walltime, Memory, Scratch, Ncpus };
+         enum Field { 
+                 InputFileName,    // 0
+                 OutputFileName, 
+                 AuxFileName, 
+                 EspFileName, 
+                 MoFileName, 
+                 DensityFileName,  // 5
+                 ErrorFileName, 
+                 BatchFileName, 
+                 RunFileName, 
+                 LocalWorkingDirectory, 
+                 RemoteWorkingDirectory,  // 10
+                 InputString, 
+                 Charge, 
+                 Multiplicity, 
+                 Coordinates, 
+                 Constraints, 
+                 ScanCoordinates,
+                 EfpFragments, 
+                 EfpParameters, 
+                 ExternalCharges 
+              };
             
+
          QChemJobInfo() : m_charge(0), m_multiplicity(1), m_localFilesExist(false),
            m_promptOnOverwrite(true), m_efpOnlyJob(false), m_moleculePointer(0) { }
 
-         QChemJobInfo(QChemJobInfo const& that) { copy(that); }
+         QChemJobInfo(QChemJobInfo const& that) : JobInfo(that) { copy(that); }
 
          /// Serialization functions that are used to reconstruct the contents of the 
          /// ProcessMonitor on restarting IQmol.  Note that it is assumed that the

@@ -6,11 +6,13 @@ INCLUDEPATH += ../Util ../Yaml ../Data  ../Parser ../Network ../Layer ../Configu
 
 SOURCES = \
    $$PWD/Job.C \
+   $$PWD/JobInfo.C \
    $$PWD/JobMonitor.C \
    $$PWD/QChemJobInfo.C \
    $$PWD/QueueOptionsDialog.C \
    $$PWD/QueueResources.C \
    $$PWD/QueueResourcesDialog.C \
+   $$PWD/QueueResourcesList.C \
    $$PWD/Server.C \
    $$PWD/ServerConfiguration.C \
    $$PWD/ServerConfigurationDialog.C \
@@ -21,11 +23,13 @@ SOURCES = \
 
 HEADERS = \
    $$PWD/Job.h \
+   $$PWD/JobInfo.h \
    $$PWD/JobMonitor.h \
    $$PWD/QChemJobInfo.h \
    $$PWD/QueueOptionsDialog.h \
    $$PWD/QueueResources.h \
    $$PWD/QueueResourcesDialog.h \
+   $$PWD/QueueResourcesList.h \
    $$PWD/Server.h \
    $$PWD/ServerConfiguration.h \
    $$PWD/ServerConfigurationDialog.h \

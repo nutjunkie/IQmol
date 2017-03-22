@@ -31,12 +31,17 @@ namespace Data {
    class MolecularOrbitalsList : public Data::List<Data::MolecularOrbitals> {
       public:
 
-	 int moTypeID;
-         MolecularOrbitalsList() : m_defaultIndex(0) { }
+//	 int moTypeID;
+         MolecularOrbitalsList(
+            MolecularOrbitals::OrbitalType const type = MolecularOrbitals::Undefined
+         ) 
+          : m_defaultIndex(0), m_orbitalType(type)  { }
 
          /// Sets which set of data should be considered the default in the
-	 /// list.  An index of -1 corresponds to the final geometry.
+         /// list.  An index of -1 corresponds to the final geometry.
          void setDefaultIndex(int index);
+
+         MolecularOrbitals::OrbitalType orbitalType() const { return m_orbitalType; }
 
          unsigned defaultIndex() const { return m_defaultIndex; }
 
@@ -56,6 +61,7 @@ namespace Data {
 
       private:
          unsigned m_defaultIndex; 
+         MolecularOrbitals::OrbitalType m_orbitalType;
    };
 
 } } // end namespace IQmol::Data

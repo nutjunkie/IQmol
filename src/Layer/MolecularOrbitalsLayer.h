@@ -28,14 +28,12 @@
 #include "MolecularOrbitalsConfigurator.h"
 #include "GridData.h"
 #include "Matrix.h"
+#include "MolecularOrbitals.h"
 #include <QPair>
 
 
 namespace IQmol {
 
-namespace Data {
-   class MolecularOrbitals;
-}
 
 namespace Layer {
 
@@ -68,7 +66,9 @@ namespace Layer {
          unsigned nBeta() const;
          unsigned nBasis() const;
          unsigned nOrbitals() const;
-	 Data::moType::ID moTypeID() const;
+         Data::MolecularOrbitals::OrbitalType orbitalType() const {
+            return m_molecularOrbitals.orbitalType();
+         }
 
       private Q_SLOTS:
          void showGridInfo();

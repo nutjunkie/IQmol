@@ -34,7 +34,7 @@ namespace Network {
    class Reply;
 }
 
-namespace Process2 {
+namespace Process {
 
    class Server : public QObject {
 

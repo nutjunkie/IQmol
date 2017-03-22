@@ -25,12 +25,12 @@
 #include "Parser.h"
 #include "Geometry.h"
 #include "Shell.h"
+#include "MolecularOrbitals.h"
 
 
 namespace IQmol {
 
 namespace Data {
-   class MolecularOrbitals;
    class GeminalOrbitals;
 }
 
@@ -66,8 +66,9 @@ namespace Parser {
             QList<double> betaCoefficients;
             QList<double> alphaEnergies;
             QList<double> betaEnergies;
-	    int moTypeID;
-	    int which_state;
+            Data::MolecularOrbitals::OrbitalType orbitalType;
+//	    int moTypeID;
+	    int whichState;
 	    QString stateTag;
          };
 

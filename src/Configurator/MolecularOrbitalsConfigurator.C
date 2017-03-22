@@ -86,8 +86,9 @@ void MolecularOrbitals::init()
    m_nOrbitals = m_molecularOrbitals.nOrbitals();
    m_AlphaHOMO = m_nAlpha;
    m_BetaHOMO  = m_nBeta;
-   if (m_molecularOrbitals.moTypeID() == Data::moType::NTOs)
-     m_AlphaHOMO = m_BetaHOMO = m_nOrbitals/2;
+   if (m_molecularOrbitals.orbitalType() == Data::MolecularOrbitals::NaturalTransition) {
+      m_AlphaHOMO = m_BetaHOMO = m_nOrbitals/2;
+   }
 
    //updateOrbitalRange(m_nAlpha);
    updateOrbitalRange(m_AlphaHOMO);
@@ -124,7 +125,7 @@ void MolecularOrbitals::initPlot()
    unsigned nOrbs(m_molecularOrbitals.nOrbitals());
    unsigned nAlpha(m_molecularOrbitals.nAlpha());
    unsigned nBeta(m_molecularOrbitals.nBeta());
-   unsigned moTypeID(m_molecularOrbitals.moTypeID());
+   //unsigned moTypeID(m_molecularOrbitals.moTypeID());
    QVector<double>  xAlpha(nOrbs), yAlpha(nOrbs), xBeta(nOrbs), yBeta(nOrbs); 
    QVector<double> a(1), b(1), y(1);
    QCPGraph* graph(0);
@@ -132,7 +133,7 @@ void MolecularOrbitals::initPlot()
    unsigned i(0), g(0);
 
    // For NTOs
-   if (moTypeID == Data::moType::NTOs) {
+   if (m_molecularOrbitals.orbitalType() == Data::MolecularOrbitals::NaturalTransition) {
      if (nBeta == nAlpha) {
        nAlpha = nOrbs/2;
        nBeta = 0;
@@ -209,7 +210,7 @@ void MolecularOrbitals::initPlot()
    }
    yMax = std::min(yMax, 0.5*std::abs(yMin));
    // For NTOs
-   if (moTypeID == Data::moType::NTOs) {
+   if (m_molecularOrbitals.orbitalType() == Data::MolecularOrbitals::NaturalTransition) {
      m_customPlot->yAxis->setLabel("Occupation");
      m_customPlot->yAxis->setRange(-1.1,1.1);
    } else
@@ -257,8 +258,9 @@ void MolecularOrbitals::plotSelectionChanged(bool tf)
    label += QString::number(orb+1);
    label += ": ";
    label += QString::number(energy, 'f', 3);
-   if (m_molecularOrbitals.moTypeID() != Data::moType::NTOs) 
-     label += " Eh";
+   if (m_molecularOrbitals.orbitalType() != Data::MolecularOrbitals::NaturalTransition) {
+      label += " Eh";
+   }
    m_configurator.energyLabel->setText(label);
 }
 

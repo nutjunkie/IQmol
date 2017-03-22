@@ -36,14 +36,24 @@ namespace Data {
       friend class boost::serialization::access;
 
       public:
-         MolecularOrbitals() { }
-         MolecularOrbitals(unsigned const nAlpha, unsigned const nBeta, 
+         enum OrbitalType { Undefined = 0, 
+                            Canonical, 
+                            Localized, 
+                            NaturalTransition, 
+                            NaturalBond 
+                          };
+
+         MolecularOrbitals() : m_orbitalType(Undefined) { }
+         MolecularOrbitals(OrbitalType const, unsigned const nAlpha, unsigned const nBeta, 
             QList<double> const& alphaCoefficients, QList<double> const& alphaEnergies,  
             QList<double> const& betaCoefficients, QList<double> const& betaEnergies,
             ShellList const& shells);
 
          Type::ID typeID() const { return Type::MolecularOrbitals; }
-	 int moTypeID;
+
+         OrbitalType orbitalType() { return m_orbitalType; }
+         static QString toString(OrbitalType const);
+
 	 QString moTitle;
 	 void setOrbTitle(QString const& text){ moTitle = text; }
 
@@ -97,6 +107,7 @@ namespace Data {
          template <class Archive>
          void privateSerialize(Archive& ar, unsigned const /* version */) 
          {
+            ar & m_orbitalType;
             ar & m_nAlpha;
             ar & m_nBeta;
             ar & m_nBasis;
@@ -128,6 +139,7 @@ namespace Data {
          Matrix m_alphaCoefficients;
          Matrix m_betaCoefficients;
          ShellList m_shellList;
+         OrbitalType m_orbitalType; 
 
          SurfaceList m_surfaceList;
    };
