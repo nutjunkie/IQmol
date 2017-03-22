@@ -25,6 +25,7 @@
 #include "Orbitals.h"
 #include "Matrix.h"
 #include "Shell.h"
+#include "ShellList.h"
 #include "Surface.h"
 
 
@@ -113,8 +114,6 @@ namespace Data {
             ar & m_betaCoefficients;
             ar & m_surfaceList;
          }
-
-         void computeBoundingBox();
 
          QString  m_label;
          unsigned m_nAlpha;

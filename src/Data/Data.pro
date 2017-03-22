@@ -38,6 +38,7 @@ SOURCES = \
    $$PWD/PovRay.C \
    $$PWD/RemSectionData.C \
    $$PWD/Shell.C \
+   $$PWD/ShellList.C \
    $$PWD/Surface.C \
    $$PWD/SurfaceInfo.C \
    $$PWD/SurfaceType.C \
@@ -84,6 +85,7 @@ HEADERS = \
    $$PWD/RemSectionData.h \
    $$PWD/Serialization.h \
    $$PWD/Shell.h \
+   $$PWD/ShellList.h \
    $$PWD/Surface.h \
    $$PWD/SurfaceInfo.h \
    $$PWD/SurfaceType.h \

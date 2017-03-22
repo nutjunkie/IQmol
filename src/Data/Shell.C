@@ -30,8 +30,6 @@ using qglviewer::Vec;
 namespace IQmol {
 namespace Data {
 
-template<> const Type::ID ShellList::TypeID = Type::ShellList;
-
 double Shell::s_values[15];
 double Shell::s_thresh = 0.001;
 

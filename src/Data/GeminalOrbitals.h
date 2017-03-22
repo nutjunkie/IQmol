@@ -24,6 +24,7 @@
 
 #include "Matrix.h"
 #include "Shell.h"
+#include "ShellList.h"
 #include "Surface.h"
 
 

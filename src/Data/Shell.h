@@ -100,7 +100,6 @@ namespace Data {
          double          m_significantRadiusSquared;
    };
 
-   typedef Data::List<Data::Shell> ShellList;
 
 } } // end namespace IQmol::Data
 

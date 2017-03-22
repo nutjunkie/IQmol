@@ -28,7 +28,7 @@
 namespace IQmol {
 namespace Data {
 
-   /// Base class for orbital types
+   /// Base class for different orbital types
    class Orbitals : public Base {
 
       friend class boost::serialization::access;
@@ -43,6 +43,7 @@ namespace Data {
 
          Orbitals() : m_orbitalType(Undefined) { }
 
+// This should be fixed so that the orbitalType function is declared virtual
          //OrbitalType orbitalType() const = 0;
          void setOrbitalType(OrbitalType const& orbitalType) { m_orbitalType = orbitalType; }
          OrbitalType orbitalType() const { return m_orbitalType; }
@@ -59,6 +60,7 @@ namespace Data {
             ar & m_label;
          }
 
+// Virtual
          OrbitalType m_orbitalType;
          QString m_label;
    };

@@ -82,7 +82,8 @@ MolecularOrbitals::MolecularOrbitals(
    }
 
    m_restricted = (m_nAlpha == m_nBeta) && (m_alphaEnergies == m_betaEnergies);
-   computeBoundingBox();
+
+   m_shellList.boundingBox(m_bbMin, m_bbMax);
 }
 
 
@@ -106,25 +107,6 @@ bool MolecularOrbitals::consistent() const
    ok = ok && m_nBasis == nBasis;
 
    return ok; 
-}
-
-
-void MolecularOrbitals::computeBoundingBox()
-{     
-   if (m_shellList.isEmpty()) return;
-   m_shellList[0]->boundingBox(m_bbMin, m_bbMax);
-
-   qglviewer::Vec tmin, tmax;
-   ShellList::const_iterator iter;
-   for (iter = m_shellList.begin(); iter != m_shellList.end(); ++iter) {
-       (*iter)->boundingBox(tmin, tmax);
-       m_bbMin.x = std::min(tmin.x, m_bbMin.x);
-       m_bbMin.y = std::min(tmin.y, m_bbMin.y);
-       m_bbMin.z = std::min(tmin.z, m_bbMin.z);
-       m_bbMax.x = std::max(tmax.x, m_bbMax.x);
-       m_bbMax.y = std::max(tmax.y, m_bbMax.y);
-       m_bbMax.z = std::max(tmax.z, m_bbMax.z);
-   }
 }
 
 
