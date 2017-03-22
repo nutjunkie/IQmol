@@ -53,7 +53,7 @@ namespace OpenBabel {
 
 namespace IQmol {
 
-   namespace Process2 {
+   namespace Process {
       class  QChemJobInfo;
    }
 
@@ -137,8 +137,8 @@ namespace IQmol {
             void setFile(QString const& fileName);
             QString fileName() const { return m_inputFile.fileName(); }
    
-            Process2::QChemJobInfo qchemJobInfo();
-            void qchemJobInfoChanged(Process2::QChemJobInfo const&);
+            Process::QChemJobInfo qchemJobInfo();
+            void qchemJobInfoChanged(Process::QChemJobInfo const&);
    
             /// Attempts to determine the best axis for the functional group when
             /// converting an atom to a functional group (click on atom event)

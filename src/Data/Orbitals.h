@@ -34,17 +34,20 @@ namespace Data {
       friend class boost::serialization::access;
 
       public:
-         enum OrbitalType { Undefined = 0, MOs, NTOs,  NBOs };
+         enum OrbitalType { Undefined = 0, 
+                            Canonical, 
+                            Localized, 
+                            NaturalTransition, 
+                            NaturalBond 
+                          };
 
-         Orbitals() :  m_orbitalType(Undefined) { }
+         Orbitals() : m_orbitalType(Undefined) { }
 
-         void setOrbitalType(OrbitalType const orbitalType) { m_orbitalType = orbitalType; }
+         //OrbitalType orbitalType() const = 0;
+         void setOrbitalType(OrbitalType const& orbitalType) { m_orbitalType = orbitalType; }
          OrbitalType orbitalType() const { return m_orbitalType; }
 
-
-// int moTypeID;
-// QString moTitle;
-// void setOrbTitle(QString const& text){ moTitle = text; }
+         static QString toString(OrbitalType const);
 
          QString const& label() const { return m_label; }
          void setLabel(QString const& label) { m_label = label; }
@@ -53,7 +56,7 @@ namespace Data {
          template <class Archive>
          void privateSerialize(Archive& ar, unsigned const /* version */) 
          {
-            ar & m_orbitalType;
+            ar & m_label;
          }
 
          OrbitalType m_orbitalType;

@@ -36,7 +36,7 @@
 
 
 namespace IQmol {
-namespace Process2 {
+namespace Process {
 
 Server::Server(ServerConfiguration const& configuration) : m_configuration(configuration),
    m_connection(0)
@@ -311,8 +311,6 @@ qDebug() << "QJI - trace Server::queueJob()";
       submit = job->substituteMacros(submit);
 
       QString workingDirectory(job->jobInfo().get(QChemJobInfo::RemoteWorkingDirectory));
-
-      QLOG_DEBUG() << "Executing submit command:     " << submit << "in directory" << workingDirectory;
 
       reply = m_connection->execute(submit, workingDirectory);
       connect(reply, SIGNAL(finished()), this, SLOT(submitFinished()));

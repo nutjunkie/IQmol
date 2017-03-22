@@ -4,7 +4,7 @@ include(../common.pri)
 
 INCLUDEPATH += . ../Util ../Data ../Parser ../Qui ../Layer \
                 ../Configurator ../Network ../Yaml ../Process ../Main ../Old \
-                ../OpenMesh/src
+                ../OpenMesh/src ../QGLViewer
 INCLUDEPATH +=  $$BUILD_DIR/Qui   # Required for the ui_QuiMainWindow.h header
 
 

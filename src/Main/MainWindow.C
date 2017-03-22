@@ -222,7 +222,7 @@ void MainWindow::createConnections()
    connect(&m_viewerModel, SIGNAL(fileOpened(QString const&)),
       this, SLOT(fileOpened(QString const&)));
 
-   connect(&(Process2::JobMonitor::instance()), 
+   connect(&(Process::JobMonitor::instance()), 
        SIGNAL(resultsAvailable(QString const&, QString const&, void*)),
        &m_viewerModel, SLOT(open(QString const&, QString const&, void*)));
 
@@ -706,7 +706,7 @@ void MainWindow::createMenus()
 
 void MainWindow::editNewServers()
 {
-   Process2::ServerConfigurationListDialog dialog(this);
+   Process::ServerConfigurationListDialog dialog(this);
    dialog.exec();  
 }
 
@@ -722,8 +722,8 @@ void MainWindow::showLogMessages()
 
 
 void MainWindow::showJobMonitor() { 
-   Process2::JobMonitor::instance().show(); 
-   Process2::JobMonitor::instance().raise();
+   Process::JobMonitor::instance().show(); 
+   Process::JobMonitor::instance().raise();
 }
 
 
@@ -922,24 +922,24 @@ void MainWindow::showQChemUI()
          return;
       }
 
-      connect(m_quiInputDialog, SIGNAL(submitJobRequest(IQmol::Process2::QChemJobInfo&)),
-         this, SLOT(submitJob(IQmol::Process2::QChemJobInfo&)));
+      connect(m_quiInputDialog, SIGNAL(submitJobRequest(IQmol::Process::QChemJobInfo&)),
+         this, SLOT(submitJob(IQmol::Process::QChemJobInfo&)));
  
-      connect(&(Process2::JobMonitor::instance()), SIGNAL(jobAccepted()),
+      connect(&(Process::JobMonitor::instance()), SIGNAL(jobAccepted()),
          m_quiInputDialog, SLOT(close()));
 
-      connect(&(Process2::JobMonitor::instance()), SIGNAL(postUpdateMessage(QString const&)),
+      connect(&(Process::JobMonitor::instance()), SIGNAL(postUpdateMessage(QString const&)),
          m_quiInputDialog, SLOT(showMessage(QString const&)));
    }
 
    Layer::Molecule* mol(m_viewerModel.activeMolecule());
    if (!mol) return;
    
-   Process2::QChemJobInfo jobInfo(mol->qchemJobInfo());
+   Process::QChemJobInfo jobInfo(mol->qchemJobInfo());
    m_quiInputDialog->setQChemJobInfo(jobInfo);
 
    // (Re-)Load the servers here in case the user has made any modifications
-   QStringList serverList(Process2::ServerRegistry::instance().availableServers());
+   QStringList serverList(Process::ServerRegistry::instance().availableServers());
    if (serverList.isEmpty()) serverList.append("(none)");
    m_quiInputDialog->setServerList(serverList);
 
@@ -951,9 +951,9 @@ void MainWindow::showQChemUI()
 }
 
 
-void MainWindow::submitJob(IQmol::Process2::QChemJobInfo& qchemJobInfo)
+void MainWindow::submitJob(IQmol::Process::QChemJobInfo& qchemJobInfo)
 {
-   Process2::JobMonitor::instance().submitJob(qchemJobInfo);
+   Process::JobMonitor::instance().submitJob(qchemJobInfo);
    Layer::Molecule* mol(m_viewerModel.activeMolecule());
    if (!mol) return;
    mol->qchemJobInfoChanged(qchemJobInfo);

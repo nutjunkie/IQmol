@@ -1,5 +1,3 @@
-#ifndef IQMOL_DATA_MOLECULARORBITALSLIST_H
-#define IQMOL_DATA_MOLECULARORBITALSLIST_H
 /*******************************************************************************
 
   Copyright (C) 2011-2015 Andrew Gilbert
@@ -22,41 +20,25 @@
 
 ********************************************************************************/
 
-#include "MolecularOrbitals.h"
+#include "Orbitals.h"
 
 
 namespace IQmol {
 namespace Data {
 
-   class MolecularOrbitalsList : public Data::List<Data::MolecularOrbitals> {
-      public:
+QString Orbitals::toString(OrbitalType const type)
+{
+   QString s;
 
-         MolecularOrbitalsList() : m_defaultIndex(0) { }
+   switch (type) {
+      case Undefined:          s = "Undefined";                    break;
+      case Canonical:          s = "Canonical Orbitals";           break;
+      case Localized:          s = "Localized Orbitals";           break;
+      case NaturalTransition:  s = "Natural Transition Orbitals";  break;
+      case NaturalBond:        s = "Natural Bond Orbitals";        break;
+   }
 
-         /// Sets which set of data should be considered the default in the
-         /// list.  An index of -1 corresponds to the final geometry.
-         void setDefaultIndex(int index);
-
-         unsigned defaultIndex() const { return m_defaultIndex; }
-
-         virtual void serialize(InputArchive& ar, unsigned int const version = 0) 
-         {
-            serializeList(ar, version);
-            ar & m_defaultIndex;
-         }
-
-         virtual void serialize(OutputArchive& ar, unsigned int const version = 0) 
-         {
-            serializeList(ar, version);
-            ar & m_defaultIndex;
-         }
-
-         void dump() const;
-
-      private:
-         unsigned m_defaultIndex; 
-   };
+   return s;
+}
 
 } } // end namespace IQmol::Data
-
-#endif

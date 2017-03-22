@@ -93,19 +93,11 @@ bool MeshDecimator::decimate(double const edgeThreshold)
        //decimateEdgeLength(mesh);
        //decimateAspectRatio(mesh);
 
-       QLOG_INFO() << "Mesh decimation statistics:";
-       QLOG_INFO() << QString("  Vertices %1 -> %2 (%3\% removed)")
-                    .arg(nVertices, 7)
-                    .arg(mesh.n_vertices(), 7) 
-                    .arg(100.0-mesh.n_vertices()*100.0/nVertices, 4);
-       QLOG_INFO() << QString("  Edges    %1 -> %2 (%3\% removed)")
-                    .arg(nEdges, 7)
-                    .arg(mesh.n_edges(), 7) 
-                    .arg(100.0-mesh.n_edges()*100.0/nEdges, 4);
-       QLOG_INFO() << QString("  Faces    %1 -> %2 (%3\% removed)")
-                    .arg(nFaces, 7)
-                    .arg(mesh.n_faces(), 7) 
-                    .arg(100.0-mesh.n_faces()*100.0/nFaces, 4);
+       double decimated(100.0-mesh.n_vertices()*100.0/nVertices);
+       QString pc;
+       pc.setNum(decimated, 'f', 1);
+       pc += "% removed";
+       QLOG_INFO() << "Mesh decimation: " << pc;
    }
 
    return true;

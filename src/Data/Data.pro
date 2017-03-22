@@ -32,6 +32,7 @@ SOURCES = \
    $$PWD/NmrData.C \
    $$PWD/NmrReference.C \
    $$PWD/NmrReferenceLibrary.C \
+   $$PWD/Orbitals.C \
    $$PWD/OrbitalSymmetries.C \
    $$PWD/PointCharge.C \
    $$PWD/PovRay.C \
@@ -75,6 +76,7 @@ HEADERS = \
    $$PWD/NmrReference.C \
    $$PWD/NmrReference.h \
    $$PWD/NmrReferenceLibrary.h \
+   $$PWD/Orbitals.h \
    $$PWD/OrbitalSymmetries.h \
    $$PWD/PointCharge.h \
    $$PWD/PointGroup.h \

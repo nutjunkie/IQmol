@@ -237,8 +237,8 @@ void ViewerModel::processConfigData(ParseJobFiles* parser)
    QList<Data::YamlNode*> yaml(bank.takeData<Data::YamlNode>());
    for (int i = 0; i < yaml.size(); ++i) {
        yaml[i]->dump();
-       Process2::ServerConfiguration config(*(yaml[i]));
-       Process2::ServerConfigurationDialog dialog(config); 
+       Process::ServerConfiguration config(*(yaml[i]));
+       Process::ServerConfigurationDialog dialog(config); 
        dialog.exec();
    }
 }

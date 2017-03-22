@@ -30,7 +30,7 @@
 
 
 namespace IQmol {
-namespace Process2 {
+namespace Process {
 
 ServerConfigurationListDialog::ServerConfigurationListDialog(QWidget* parent) : QDialog(parent)
 {

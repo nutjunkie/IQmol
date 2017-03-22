@@ -28,7 +28,7 @@
 
 
 namespace IQmol {
-namespace Process2 {
+namespace Process {
 
    class QueueResourcesList;
    class QueueResourcesDialog;
@@ -41,6 +41,7 @@ namespace Process2 {
          friend class QueueResourcesList;
          friend class QueueResourcesDialog;
 
+         // This sets the default values for a new queue
          explicit QueueResources(QString const& name = QString()) : m_name(name),
             m_maxWallTime("72:00:00"), 
             m_defaultWallTime("1:00:00"), 
@@ -74,41 +75,6 @@ namespace Process2 {
          int m_minCpus;
          int m_defaultCpus;
    };
-
-
-   class QueueResourcesList : public QList<QueueResources*> {
-   
-      public:
-         QueueResourcesList() : QList<QueueResources*>() { }
-
-         QueueResourcesList(QueueResourcesList const& list) 
-          : QList<QueueResources*>() { copy(list); }
-
-         explicit QueueResourcesList(QVariant const& qvar)
-          : QList<QueueResources*>() { fromQVariantList(qvar.toList()); }
-
-         explicit QueueResourcesList(QVariantList const& qvar)
-          : QList<QueueResources*>() { fromQVariantList(qvar); }
-
-         ~QueueResourcesList();
-
-         QVariantList toQVariantList() const;
-         void fromQVariantList(QVariantList const&);
-
-         void fromPbsQueueInfoString(QString const&);
-         void fromSgeQueueInfoString(QString const&);
-
-         QueueResourcesList& operator=(QueueResourcesList const& that) {
-            if (this != &that) copy(that);  return *this;
-         }
-
-      private:
-         // Parses a resource limit and ensures it is in megabytes
-         int parseResource(QString&);
-
-         void copy(QueueResourcesList const&);
-   };
-
 
 } } // end namespace IQmol::Process
 

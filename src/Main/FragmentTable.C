@@ -89,6 +89,8 @@ void FragmentTable::loadFragments()
 }
 
 
+// Parses a directory structure for valid molecules for the adding fragments from the
+// ToolBar.  Can be called recursively.
 QList<QTreeWidgetItem*> FragmentTable::loadFragments(QDir const& dir, QTreeWidgetItem* parent)
 {
    QList<QTreeWidgetItem*> items;
@@ -106,13 +108,9 @@ QList<QTreeWidgetItem*> FragmentTable::loadFragments(QDir const& dir, QTreeWidge
        name = name.replace("_", " ");
  
        if (info.isDir()) {
-          if (parent == 0) {
-             item = new QTreeWidgetItem(QStringList(name));
-             loadFragments(QDir(info.filePath()), item);
-             items.append(item);
-          }else {
-             item = new QTreeWidgetItem(parent, QStringList(name));
-          }
+          item = new QTreeWidgetItem(parent, QStringList(name));
+          loadFragments(QDir(info.filePath()), item);
+          items.append(item);
           item->setData(0, s_fileRole, s_invalidFile);
           item->setData(0, s_imageRole, s_invalidFile);
 
@@ -137,6 +135,7 @@ QList<QTreeWidgetItem*> FragmentTable::loadFragments(QDir const& dir, QTreeWidge
           }
        }
    }
+
    return items;
 }
 

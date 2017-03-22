@@ -161,7 +161,7 @@ void IQmolApplication::open(QString const& file)
 
    // Now we can load jobs from the preferences, if we try to do it 
    // before now, the dialog appears under the splash screen
-   Process2::JobMonitor::instance().loadJobListFromPreferences();
+   Process::JobMonitor::instance().loadJobListFromPreferences();
 
    static bool connected(false);
    if (!connected) {
@@ -201,7 +201,7 @@ bool IQmolApplication::event(QEvent* event)
 
 void IQmolApplication::quitRequest()
 {
-   Process2::ServerRegistry::instance().closeAllConnections();
+   Process::ServerRegistry::instance().closeAllConnections();
    QApplication::quit();  
 }
 

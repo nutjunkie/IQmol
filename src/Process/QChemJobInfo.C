@@ -25,14 +25,14 @@
 
 
 namespace IQmol {
-namespace Process2 {
+namespace Process {
 
 
 QVariantList QChemJobInfo::toQVariantList() const
 {
    QVariantList list;
-   list << QVariant(m_data[BaseName]);
-   list << QVariant(m_data[ServerName]);
+   list << QVariant(baseName());
+   list << QVariant(serverName());
    list << QVariant(m_data[LocalWorkingDirectory]);
    list << QVariant(m_data[RemoteWorkingDirectory]);
    list << QVariant(m_data[InputString]);
@@ -57,8 +57,8 @@ bool QChemJobInfo::fromQVariantList(QVariantList const& list)
              list[7].canConvert<bool>();
 
    if (ok) {
-      m_data.insert(BaseName,              list[0].toString());
-      m_data.insert(ServerName,            list[1].toString());
+      setBaseName(list[0].toString());
+      setServerName(list[1].toString());
       m_data.insert(LocalWorkingDirectory, list[2].toString());
       m_data.insert(RemoteWorkingDirectory,list[3].toString());
       m_data.insert(InputString,           list[4].toString());
@@ -73,11 +73,10 @@ bool QChemJobInfo::fromQVariantList(QVariantList const& list)
 
 void QChemJobInfo::set(Field const field, QString const& value) 
 {
+   qDebug() << "Setting QChemJobInfo field" << field << "to" << value;
    switch (field) {
       case LocalWorkingDirectory:
       case RemoteWorkingDirectory:
-      case BaseName:
-      case ServerName:
       case InputString:
       case Coordinates:
       case Constraints:
@@ -85,8 +84,6 @@ void QChemJobInfo::set(Field const field, QString const& value)
       case ExternalCharges:
       case EfpFragments:
       case EfpParameters:
-      case Queue:
-      case Walltime:
          m_data[field] = value;
          break;
       default:
@@ -136,35 +133,35 @@ QString QChemJobInfo::getRemoteFilePath(Field const field) const
 
 QString QChemJobInfo::get(Field const field) const
 { 
-   QString value;
-            
+   QString value(baseName());
+
    switch (field) {
       case InputFileName:
-         value = m_data[BaseName] + ".inp";
+         value += ".inp";
          break;
       case OutputFileName:
-         value = m_data[BaseName] + ".out";
+         value += ".out";
          break;
       case AuxFileName:
-         value = m_data[BaseName] + ".FChk";
+         value += ".FChk";
          break;
       case EspFileName:
-         value = m_data[BaseName] + ".esp";
+         value += ".esp";
          break;
       case MoFileName:
-         value = m_data[BaseName] + ".mo";
+         value += ".mo";
          break;
       case DensityFileName:
-         value = m_data[BaseName] + ".hf";
+         value += ".hf";
          break;
       case RunFileName:
-         value = m_data[BaseName] + ".run";
+         value += ".run";
          break;
       case BatchFileName:
-         value = m_data[BaseName] + ".bat";
+         value += ".bat";
          break;
       case ErrorFileName:
-         value = m_data[BaseName] + ".err";
+         value += ".err";
          break;
 
       default:
@@ -188,19 +185,23 @@ QStringList QChemJobInfo::outputFiles() const
 void QChemJobInfo::dump() const
 {
    QLOG_DEBUG() << "QChemJobInfo info:";
-   QLOG_DEBUG() << "   BaseName              " << get(BaseName);
+   QLOG_DEBUG() << "   BaseName              " << baseName();
    QLOG_DEBUG() << "   InputFileName         " << get(InputFileName);
    QLOG_DEBUG() << "   OutputFileName        " << get(OutputFileName);
    QLOG_DEBUG() << "   AuxFileName           " << get(AuxFileName);
    QLOG_DEBUG() << "   RunFileName           " << get(RunFileName);
-   QLOG_DEBUG() << "   ServerName            " << get(ServerName);
+   QLOG_DEBUG() << "   ServerName            " << serverName();
    QLOG_DEBUG() << "   LocalWorkingDirectory " << get(LocalWorkingDirectory);
    QLOG_DEBUG() << "   RemoteWorkingDirectory" << get(RemoteWorkingDirectory);
    QLOG_DEBUG() << "   Molecule pointer      " << m_moleculePointer;
+   JobInfo::dump();
 }
+
 
 void QChemJobInfo::copy(QChemJobInfo const& that)
 {
+   JobInfo::copy(that);
+   qDebug() << "QChemJobInfo copy constuctor called" << m_data;
    m_data              = that.m_data;
    m_charge            = that.m_charge;
    m_multiplicity      = that.m_multiplicity;

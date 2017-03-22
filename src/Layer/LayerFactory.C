@@ -302,38 +302,36 @@ List Factory::convert(Data::MolecularOrbitalsList& molecularOrbitalsList)
    Base* nbos(0);
    Base* canonical(0);
 
-   Qt::ItemFlags flags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+   //Qt::ItemFlags flags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+   Qt::ItemFlags flags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
    Data::MolecularOrbitalsList::iterator iter;
    for (iter = molecularOrbitalsList.begin(); iter != molecularOrbitalsList.end(); ++iter) {
 
        switch((*iter)->orbitalType()) {
 
-          case Data::Orbitals::NTOs: {
+          case Data::Orbitals::NaturalTransition: {
              if (!ntos) {
                 ntos = new Base("Natural Transition Orbitals");
                 ntos->setFlags(flags);
-                ntos->setCheckState(Qt::Checked);
                 list.append(ntos);
              }
              ntos->appendLayer(new MolecularOrbitals(**iter));
           } break;
 
-          case Data::Orbitals::NBOs: {
+          case Data::Orbitals::NaturalBond: {
              if (!nbos) {
                 nbos = new Base("Natural Bond Orbitals");
                 nbos->setFlags(flags);
-                nbos->setCheckState(Qt::Checked);
                 list.append(nbos);
              }
              nbos->appendLayer(new MolecularOrbitals(**iter));
           } break;
  
-          case Data::Orbitals::MOs: {
+          case Data::Orbitals::Canonical: {
              if (!canonical) {
                 canonical = new Base("Canonical Orbitals");
                 canonical->setFlags(flags);
-                canonical->setCheckState(Qt::Checked);
                 list.append(canonical);
              }
              canonical->appendLayer(new MolecularOrbitals(**iter));
@@ -342,37 +340,8 @@ List Factory::convert(Data::MolecularOrbitalsList& molecularOrbitalsList)
           default: {
              qDebug() << "Undefined orbitals in Layer::Factory";
           } break;
-
        }
    }
-
-/*
-// if (nDataSets == 1) {
-//    Data::MolecularOrbitals* mos(molecularOrbitalsList.first()); 
-//    if (mos) list.append(new MolecularOrbitals(*mos, mos->moTitle));
-// }else if (nDataSets > 1) {
-      //Base* base(new Base("Molecular Orbitals"));
-      Base *base;
-      switch(molecularOrbitalsList.orbitalType()) {
-      case Data::Orbitals::NTOs: {
-         base = new Base("Natural Transition Orbitals");
-      } break;
-      case Data::Orbitals::NBOs: {
-         base = new Base("Natural Bond Orbitals");
-      } break;
-      default:
-         base = new Base("Molecular Orbitals");
-	 break;
-      }
-      list.append(base);
-      base->setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-      base->setCheckState(Qt::Checked);
-      Data::MolecularOrbitalsList::iterator iter;
-      for (iter = molecularOrbitalsList.begin(); iter != molecularOrbitalsList.end(); ++iter) {
-          base->appendLayer(new MolecularOrbitals(**iter, (**iter).moTitle));
-      }
-// }
-*/
 
    return list;
 }

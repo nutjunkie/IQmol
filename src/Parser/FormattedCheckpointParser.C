@@ -43,14 +43,15 @@ namespace Parser {
 bool FormattedCheckpoint::parse(TextStream& textStream)
 {
    Data::GeometryList* geometryList(new Data::GeometryList);
-   Data::MolecularOrbitalsList* molecularOrbitalsList(new Data::MolecularOrbitalsList);
-   Data::MolecularOrbitalsList* naturaltransOrbitalList(new Data::MolecularOrbitalsList);
-   Data::MolecularOrbitalsList* naturalbondOrbitalList(new Data::MolecularOrbitalsList);
    Data::Geometry* geometry(0);
 
-//   molecularOrbitalsList->moTypeID = Data::moType::MOs;
-//   naturaltransOrbitalList->moTypeID = Data::moType::NTOs;
-//   naturalbondOrbitalList->moTypeID = Data::moType::NBOs;
+   Data::MolecularOrbitalsList* 
+      molecularOrbitalsList(new Data::MolecularOrbitalsList()); //Data::MolecularOrbitals::Canonical));
+   Data::MolecularOrbitalsList* 
+      naturaltransOrbitalList(new Data::MolecularOrbitalsList()); //Data::MolecularOrbitals::NaturalTransition));
+   Data::MolecularOrbitalsList* 
+      naturalbondOrbitalList(new Data::MolecularOrbitalsList()); //Data::MolecularOrbitals::NaturalBond));
+
 
    bool ok(true);
    GeomData  geomData;
@@ -122,8 +123,11 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          geometryList->append(geometry);
 
       }else if (key == "Number of basis functions") {
-         moData.nBasis  = list.at(1).toUInt(&ok);
-         gmoData.nBasis = list.at(1).toUInt(&ok);
+         unsigned int nBasis(list.at(1).toUInt(&ok));
+         moData.nBasis  = nBasis;
+         gmoData.nBasis = nBasis;
+         ntoData.nBasis = nBasis;
+         nboData.nBasis = nBasis;
          if (!ok) goto error;
 
       }else if (key == "Shell types") {
@@ -170,34 +174,34 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          Data::TotalEnergy& total(geometry->getProperty<Data::TotalEnergy>());
          total.setValue(energy, Data::Energy::Hartree);
 
-	  }else if (key == "Alpha MO coefficients") {
+      }else if (key == "Alpha MO coefficients") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          moData.alphaCoefficients = readDoubleArray(textStream, n);
          // Copy the alpha coefficients in case the job is restricted
          moData.betaCoefficients  = moData.alphaCoefficients;
-         moData.orbitalType       = Data::Orbitals::MOs;
+         moData.orbitalType       = Data::Orbitals::Canonical;
 
 	  }else if (key == "Alpha NTO coefficients") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          ntoData.alphaCoefficients = readDoubleArray(textStream, n);
          ntoData.betaCoefficients  = ntoData.alphaCoefficients;
-         moData.orbitalType        = Data::Orbitals::NTOs;
+         ntoData.orbitalType       = Data::Orbitals::NaturalTransition;
 
 	  }else if (key == "Alpha NBO coefficients") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          nboData.alphaCoefficients = readDoubleArray(textStream, n);
          nboData.betaCoefficients  = nboData.alphaCoefficients;
-         moData.orbitalType        = Data::Orbitals::NBOs;
+         nboData.orbitalType       = Data::Orbitals::NaturalBond;
 
 	  }else if (key == "Beta MO coefficients") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          moData.betaCoefficients = readDoubleArray(textStream, n);
 
-	  }else if (key == "Beta NTO coefficients") {
+      }else if (key == "Beta NTO coefficients") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          ntoData.betaCoefficients = readDoubleArray(textStream, n);
@@ -305,30 +309,28 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          Data::Hessian& hessian(geometry->getProperty<Data::Hessian>());
          hessian.setData(geometry->nAtoms(), data);
 
-      }else if (key.endsWith("excited state") || key == "NBO Ground State" ) {
+      }else if (key.endsWith("Surface Title") || key == "NBO Ground State" ) {
+
+         key.replace("NBO ","");
+         key.replace("Surface Title","");
+	     nboData.stateTag = key;
+    
          unsigned n(list.at(1).toUInt(&ok));
          if (!ok || !geometry) goto error;
 
-         if (ntoData.orbitalType == Data::Orbitals::NTOs) {
+         if (ntoData.orbitalType == Data::Orbitals::NaturalTransition) {
   	         ntoData.which_state = n;
-	         ntoData.stateTag = QString(key.replace("excited state",""));
              Data::MolecularOrbitals* ntos(makeMolecularOrbitals(ntoData, shellData, *geometry)); 
              clear(ntoData);
-
              if (ntos) naturaltransOrbitalList->append(ntos);
              qDebug() << "Append one NTO to MO lists";
 
-	     }else if (nboData.orbitalType == Data::Orbitals::NBOs) {
+	     }else if (nboData.orbitalType == Data::Orbitals::NaturalBond) {
              nboData.which_state = n;
-	         if (key == "NBO Ground State")
-	            nboData.stateTag = QString("Ground Sate");
-	         else
-	            nboData.stateTag = QString(key.replace("excited state",""));
-
              Data::MolecularOrbitals* nbos(makeMolecularOrbitals(nboData, shellData, *geometry)); 
-            clear(nboData);
-            if (nbos) naturalbondOrbitalList->append(nbos);
-	        qDebug() << "Append one NBO to MO lists";
+             clear(nboData);
+             if (nbos) naturalbondOrbitalList->append(nbos);
+	         qDebug() << "Append one NBO to MO lists";
 	     }
       }
 
@@ -482,8 +484,8 @@ Data::MolecularOrbitals* FormattedCheckpoint::makeMolecularOrbitals(MoData const
    if (moData.alphaEnergies.isEmpty()) return 0;
    Data::ShellList* shellList = makeShellList(shellData, geometry);
    if (!shellList) return 0;
+
    Data::MolecularOrbitals* mos = new Data::MolecularOrbitals(
-      moData.label,
       moData.nAlpha, 
       moData.nBeta,
       moData.nBasis,
@@ -493,33 +495,44 @@ Data::MolecularOrbitals* FormattedCheckpoint::makeMolecularOrbitals(MoData const
       moData.betaEnergies,
       *shellList
    );
+
    mos->setOrbitalType(moData.orbitalType);
 
-   if (!mos->consistent()) {
+   if (mos->consistent()) {
+      switch(mos->orbitalType()){
+         case Data::MolecularOrbitals::Localized: 
+         case Data::Orbitals::Canonical: {
+            qDebug() << "Add one MO: " << mos->orbitalType();;
+            mos->setLabel("MO Surfaces");
+         } break;
+
+         case Data::Orbitals::NaturalTransition: {
+            qDebug() << "Add one NTO: " << mos->orbitalType();
+            //QString surfaceTag = QString("State ") + 
+            // QString::number(moData.which_state) + QString(" NTO Surfaces");
+            QString surfaceTag(QString(moData.stateTag) + QString::number(moData.which_state));
+            mos->setLabel(surfaceTag);
+         } break;
+
+         case Data::Orbitals::NaturalBond: {
+            qDebug() << "Add one NBO: " << mos->orbitalType();
+            //QString surfaceTag = QString("State ") + 
+            // QString::number(moData.which_state) + QString(" NBO Surfaces");
+            QString surfaceTag = QString(moData.stateTag);
+            if (moData.which_state != 0) surfaceTag +=  QString::number(moData.which_state);
+            mos->setLabel(surfaceTag);
+         } break;
+
+         case Data::MolecularOrbitals::Undefined: 
+            qDebug() << "Undefined molecular orbtal type requested";
+           break;
+      }
+
+   }else {
       QString msg("Data are inconsistent. Check shell types.");
       m_errors.append(msg);
       delete mos;
       mos = 0;
-   }
-
-   switch(mos->orbitalType()){
-      case Data::Orbitals::MOs: {
-         qDebug() << "Add one MO: " << mos->orbitalType();;
-	 mos->setLabel("MO Surfaces");
-      } break;
-      case Data::Orbitals::NTOs: {
-         qDebug() << "Add one NTO: " << mos->orbitalType();
-	 //QString surfaceTag = QString("State ") + QString::number(moData.which_state) + QString(" NTO Surfaces");
-	 QString surfaceTag = QString(moData.stateTag) + QString::number(moData.which_state);
-	 mos->setLabel(surfaceTag);
-      } break;
-      case Data::Orbitals::NBOs: {
-         qDebug() << "Add one NBO: " << mos->orbitalType();
-	 //QString surfaceTag = QString("State ") + QString::number(moData.which_state) + QString(" NBO Surfaces");
-	 QString surfaceTag = QString(moData.stateTag);
-	 if(moData.which_state != 0) surfaceTag +=  QString::number(moData.which_state);
-	 mos->setLabel(surfaceTag);
-      } break;
    }
 
    return mos;

@@ -30,7 +30,7 @@
 class QProcess;
 
 namespace IQmol {
-namespace Process2 {
+namespace Process {
 
    class JobMonitor;
 
@@ -121,8 +121,6 @@ namespace Process2 {
          /// This function can be used to set the timer to the actual run 
 		 /// time when it is known.
          void resetTimer(unsigned const seconds);
-
-         //QChemJobInfo& infoObject() { return m_jobInfo; }
 
          QString const& copyProgressString() const { return m_copyProgress; }
 

@@ -21,16 +21,13 @@
 ********************************************************************************/
 
 #include "QueueResourcesDialog.h"
-#include "Preferences.h"
 #include "QMsgBox.h"
 #include "QsLog.h"
 #include <cmath>
 
-#include <QDebug>
-
 
 namespace IQmol {
-namespace Process2 {
+namespace Process {
 
 QueueResourcesDialog::QueueResourcesDialog(QueueResourcesList* queueResourcesList, 
    QWidget* parent) : QDialog(parent), m_queueResourcesList(queueResourcesList), 
@@ -116,7 +113,6 @@ void QueueResourcesDialog::verify()
 
 void QueueResourcesDialog::saveAsDefaults()
 {
-   qDebug() << "Saving QueueResource defaults";
    int index(m_dialog.queue->currentIndex());
    if (0 <= index && index < m_queueResourcesList->size()) {
        QueueResources* queue((*m_queueResourcesList)[index]);
