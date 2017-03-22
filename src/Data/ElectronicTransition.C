@@ -29,6 +29,39 @@ namespace Data {
 
 template<> const Type::ID ElectronicTransitionList::TypeID = Type::ElectronicTransitionList;
 
+bool ElectronicTransition::addAmplitude(QList<double> &list,
+    QList<int> &indexJ, QList<int> &indexI,
+    unsigned const state, unsigned const NO, unsigned const NV, Spin spin)
+{
+   double thresh(15.0/100.0), amp(0.0);
+   int occ(0), vir(0);
+   for (int k = indexJ[state-1] ; k < indexJ[state] ; k++) { 
+     amp = list[k]; 
+     if (std::fabs(amp) >= thresh) {
+       vir = (indexI[k] % NV) + 1;
+       occ = (int)((indexI[k]+1) / NV);
+       qDebug() << "Adding amplitude:" << occ << "->" << NO+vir << "     " << amp;
+       m_amplitudes.append(Amplitude(spin, occ, NO+vir, amp, spin));
+     }
+   }
+}
+bool ElectronicTransition::addAmplitude(QList<double> &list, unsigned const state,
+    unsigned const NO, unsigned const NV, Spin spin)
+{
+   double thresh(15.0/100.0);
+
+   QList<double>::iterator amp = list.begin() + (state-1)*NO*NV;
+   for (int i = 0 ; i < NO; i++) {
+      for (int a = 0; a < NV; a++) {
+         if (std::fabs(*amp) >= thresh) {
+           qDebug() << "Adding amplitude:" << i+1 << "->" << NO+a+1 << "     " << *amp;
+           m_amplitudes.append(Amplitude(spin, i+1, NO+a+1, *amp, spin));
+         }
+         ++amp;
+      } 
+   }
+   return true;
+}
 
 bool ElectronicTransition::addAmplitude(QStringList const& list, 
    unsigned const nAlpha, unsigned const nBeta)

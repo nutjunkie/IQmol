@@ -149,9 +149,9 @@ void parse(int argc, char* argv[])
    if (debugLogFile) {
       fileDestination = QsLogging::DestinationFactory::MakeFileDestination(logFile);
       logger.addDestination(fileDestination.get());
-      qInstallMsgHandler(myMessageHandler);
+      fileDestination->handle();
    }
-  
+
    initOpenBabel();
    
    Parser::ParseFile parseFile(input);
@@ -175,7 +175,7 @@ void parse(int argc, char* argv[])
    if (archiveFile) {
       QString output(input + ".iqmol");
       Parser::IQmol iqmol;
-      iqmol.saveData(output, const_cast<Data::Bank&>(data));
+      iqmol.save(output, const_cast<Data::Bank&>(data));
    }
 }
 
