@@ -34,7 +34,9 @@
 #include <QtDebug>
 #include <cmath>
 #include "Data.h"
-
+#include "Spin.h"
+#include "ExcitedStates.h"
+#include "Constants.h"
 
 namespace IQmol {
 namespace Parser {
@@ -58,6 +60,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
    MoData    ntoData;
    MoData    nboData;
    GmoData   gmoData;
+   ExtData   extData;
 
    while (!textStream.atEnd()) {
 
@@ -164,9 +167,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          Data::TotalEnergy& total(geometry->getProperty<Data::TotalEnergy>());
          total.setValue(energy, Data::Energy::Hartree);
 
-      }else if (key == "Alpha MO coefficients"  ||
-		key == "Alpha NTO coefficients" ||
-		key == "Alpha NBO coefficients") {
+      }else if (key.contains(QRegExp("Alpha (MO|NTO|NBO) coefficients"))) {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
 	 if (key == "Alpha MO coefficients") {
@@ -174,18 +175,16 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
            moData.betaCoefficients  = moData.alphaCoefficients;
 	   moData.moTypeID = Data::moType::MOs;
 	 }else if (key == "Alpha NTO coefficients") {
-            ntoData.alphaCoefficients = readDoubleArray(textStream, n);
-            ntoData.betaCoefficients  = ntoData.alphaCoefficients;
-	    ntoData.moTypeID = Data::moType::NTOs;
+           ntoData.alphaCoefficients = readDoubleArray(textStream, n);
+           ntoData.betaCoefficients  = ntoData.alphaCoefficients;
+	   ntoData.moTypeID = Data::moType::NTOs;
 	 }else if (key == "Alpha NBO coefficients") {
-            nboData.alphaCoefficients = readDoubleArray(textStream, n);
-            nboData.betaCoefficients  = nboData.alphaCoefficients;
-	    nboData.moTypeID = Data::moType::NBOs;
+           nboData.alphaCoefficients = readDoubleArray(textStream, n);
+           nboData.betaCoefficients  = nboData.alphaCoefficients;
+	   nboData.moTypeID = Data::moType::NBOs;
 	 }
 
-      }else if (key == "Beta MO coefficients"  ||
-		key == "Beta NTO coefficients" ||
-		key == "Beta NBO coefficients" ) {
+      }else if (key.contains(QRegExp("Beta (MO|NTO|NBO) coefficients"))) {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
 	 if (key == "Beta MO coefficients") {
@@ -273,9 +272,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          Data::Hessian& hessian(geometry->getProperty<Data::Hessian>());
          hessian.setData(geometry->nAtoms(), data);
 
-      //}else if (key.endsWith("excited state") ||
-      }else if (key.endsWith("Surface Title") ||
-		key == "NBO Ground State" ) {
+      }else if (key.endsWith("Surface Title") || key == "NBO Ground State" ) {
          unsigned n(list.at(1).toUInt(&ok));
 	 if (!ok || !geometry) goto error;
 	 if(ntoData.moTypeID == Data::moType::NTOs){
@@ -296,8 +293,55 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
             if (nbos) naturalbondOrbitalList->append(nbos);
 	    qDebug() << "Append one NBO to MO lists";
 	 }
-      }
 
+      //
+      // Parsing CIS/TDDFT data
+      //
+      }else if (key == "Number of Excited States") {
+         extData.nState  = list.at(1).toInt(&ok);
+         if (!ok) goto error;
+
+      }else if (key == "Excitation Energies") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok) goto error;
+         extData.excitationEnergies = readDoubleArray(textStream, n);
+
+      }else if (key == "Oscillator Strengths") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok) goto error;
+         extData.oscillatorStrengths = readDoubleArray(textStream, n);
+
+      }else if (key == "Alpha Amplitudes") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok) goto error;
+         extData.alphaAmplitudes = readDoubleArray(textStream, n);
+      
+      }else if (key == "Beta Amplitudes") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok) goto error;
+         extData.betaAmplitudes = readDoubleArray(textStream, n);
+
+      }else if (key == "Alpha J Indexes") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok) goto error;
+         extData.alphaSparseJ = readIntegerArray(textStream, n);
+
+      }else if (key == "Alpha I Indexes") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok) goto error;
+         extData.alphaSparseI = readIntegerArray(textStream, n);
+
+      }else if (key == "Beta J Indexes") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok) goto error;
+         extData.betaSparseJ = readIntegerArray(textStream, n);
+
+      }else if (key == "Beta I Indexes") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok) goto error;
+         extData.betaSparseI = readIntegerArray(textStream, n);
+      }
+         
    } // end of parsing text stream 
 
    if (geometry) {
@@ -305,6 +349,12 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       if (mos) molecularOrbitalsList->append(mos);
       Data::GeminalOrbitals* gmos(makeGeminalOrbitals(gmoData, shellData, *geometry)); 
       if (gmos) m_dataBank.append(gmos);
+
+      // install excitation 
+      if (extData.nState > 0) {
+         ok = installExcitedStates(extData,moData);
+         if (!ok) goto error;
+      }
    }
 
    if (geometryList) {
@@ -463,14 +513,9 @@ Data::MolecularOrbitals* FormattedCheckpoint::makeMolecularOrbitals(MoData const
          qDebug() << "Add one MO: " << mos->moTypeID;
 	 mos->setOrbTitle("MO Surfaces");
       } break;
-      case Data::moType::NTOs: {
-         qDebug() << "Add one NTO: " << mos->moTypeID;
-	 QString surfaceTag = QString(moData.stateTag);
-	 if(moData.which_state != 0) surfaceTag +=  QString::number(moData.which_state);
-	 mos->setOrbTitle(surfaceTag);
-      } break;
+      case Data::moType::NTOs: 
       case Data::moType::NBOs: {
-         qDebug() << "Add one NBO: " << mos->moTypeID;
+         qDebug() << "Add one NTO(2)/NBO(3). Code = " << mos->moTypeID;
 	 QString surfaceTag = QString(moData.stateTag);
 	 if(moData.which_state != 0) surfaceTag +=  QString::number(moData.which_state);
 	 mos->setOrbTitle(surfaceTag);
@@ -586,6 +631,64 @@ Data::ShellList* FormattedCheckpoint::makeShellList(ShellData const& shellData,
    }
 
    return shellList;
+}
+
+bool FormattedCheckpoint::installExcitedStates(ExtData &extData, MoData const& moData)
+{
+   //bool ok = (extData.alphaAmplitudes.size() % extData.nState  == 0);
+   //if (!ok) return ok;
+
+   Data::ExcitedStates* states(new Data::ExcitedStates(Data::ExcitedStates::CIS));
+      qDebug() << "Reading" << states->typeLabel() << "States";
+
+   qglviewer::Vec moment;
+   double strength(0.0), energy(0.0), s2(0.0);
+   int NOa = moData.nAlpha;
+   int NOb = moData.nBeta;
+   int NVa = moData.alphaEnergies.size() - NOa;
+   int NVb = moData.betaEnergies.size() - NOb;
+   for (int i = 0; i < extData.nState; i++) {
+      energy = extData.excitationEnergies[i] * Constants::HartreeToEv;
+      strength = extData.oscillatorStrengths[i];
+      Data::ElectronicTransition* transition(
+          new Data::ElectronicTransition(energy, strength, moment, s2));
+      if (extData.alphaSparseJ.size() > 0) {
+         if (!transition->addAmplitude(extData.alphaAmplitudes,
+               extData.alphaSparseJ, extData.alphaSparseI,
+               i+1,NOa, NVa, Data::Alpha)) return false;
+         if (!transition->addAmplitude(extData.betaAmplitudes,
+               extData.betaSparseJ, extData.betaSparseI,
+               i+1,NOb, NVb, Data::Beta)) return false;
+      } 
+      else {
+         if (!transition->addAmplitude(extData.alphaAmplitudes,i+1,
+               NOa, NVa, Data::Alpha)) return false;
+         if (!transition->addAmplitude(extData.betaAmplitudes,i+1,
+               NOb, NVb, Data::Beta)) return false;
+      }
+      states->append(transition);
+      qDebug() << "Add transitions to state: " << i + 1;
+   }
+   if (states->nTransitions() > 0) m_dataBank.append(states);
+
+   // set up orbital symmetry
+   QList<Data::ExcitedStates*> es(m_dataBank.findData<Data::ExcitedStates>());
+   if (es.isEmpty()) return false;
+   Data::OrbitalSymmetries& data(es.last()->orbitalSymmetries());
+
+   QString symmetry = "A";
+   data.setOccupied(Data::Alpha,moData.nAlpha);
+   for (int n = 0; n < NOa+NVa ; n++) {
+      energy = moData.alphaEnergies[n];
+      data.append(Data::Alpha, energy, symmetry);
+   }
+   data.setOccupied(Data::Beta,moData.nBeta);
+   for (int n = 0; n < NOb+NVb; n++) {
+      energy = moData.betaEnergies[n];
+      data.append(Data::Beta, energy, symmetry);
+   }
+
+   return true;
 }
 
 

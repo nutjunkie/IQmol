@@ -82,8 +82,22 @@ namespace Parser {
             QList<int>    geminalMoMap;
          };
 
+         struct ExtData {
+           unsigned nState;
+           QList<double> excitationEnergies;
+           QList<double> oscillatorStrengths;
+           QList<double> alphaAmplitudes;
+           QList<double> betaAmplitudes;
+           QList<int> alphaSparseJ;
+           QList<int> alphaSparseI;
+           QList<int> betaSparseJ;
+           QList<int> betaSparseI;
+         };
+
          void clear(MoData&);
          void clear(GmoData&);
+         void clear(ExtData&);
+
 
          QList<int> readIntegerArray(TextStream&, unsigned nTokens);
          QList<double> readDoubleArray(TextStream&, unsigned nTokens);
@@ -97,6 +111,8 @@ namespace Parser {
          Data::Geometry* makeGeometry(GeomData const&);
 
          bool dataAreConsistent(ShellData const&, unsigned const nAtoms);
+
+         bool installExcitedStates(ExtData &extData, MoData const& moData);
    };
 
 } } // end namespace IQmol::Parser
