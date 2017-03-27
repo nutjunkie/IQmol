@@ -17,9 +17,9 @@ TEMPLATE = subdirs
 
 SUBDIRS  = QGLViewer \
 #          OpenBabel \
-           OpenMesh \
-           OpenMesh/src/OpenMesh/Core \
-           OpenMesh/src/OpenMesh/Tools \
+#          OpenMesh \
+#          OpenMesh/src/OpenMesh/Core \
+#          OpenMesh/src/OpenMesh/Tools \
            Util \
            Data \
            Qui \

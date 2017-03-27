@@ -15,7 +15,9 @@
 
 #include <map>
 #include <QString>
-
+#ifdef Q_OS_MACOS
+#include <cstdlib>
+#endif
 
 namespace Qui {
 

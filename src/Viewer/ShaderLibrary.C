@@ -80,7 +80,7 @@ bool ShaderLibrary::setMaterialParameters(QVariantMap const& map)
    double specular = map.contains("Shininess") ? 
        map.value("Shininess").toDouble() : 0.9;
 
-   GLfloat mat_specular[] = {specular, specular, specular, 1.0};
+   GLfloat mat_specular[] = {(GLfloat)specular, (GLfloat)specular, (GLfloat)specular, 1.0};
    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
 
    double shininess = map.contains("Highlights") ? 

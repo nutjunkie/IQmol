@@ -27,6 +27,9 @@
 #include "QMsgBox.h"
 #include "QsLog.h"
 
+#ifdef Q_OS_MACOS
+#include <cstdlib>
+#endif
 
 using namespace IQmol;
 
