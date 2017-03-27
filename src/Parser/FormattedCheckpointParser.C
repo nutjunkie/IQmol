@@ -284,7 +284,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          if (ntoData.orbitalType == Data::MolecularOrbitals::NaturalTransition) {
             ntoData.whichState = n;
             ntoData.stateTag = QString(key.replace("Surface Title",""));
-            Data::MolecularOrbitals* ntos(makeMolecularOrbitals(nboData, shellData, *geometry)); 
+            Data::MolecularOrbitals* ntos(makeMolecularOrbitals(ntoData, shellData, *geometry)); 
             clear(ntoData);
             if (ntos) naturaltransOrbitalList->append(ntos);
 	        qDebug() << "Append one NTO to MO lists";
@@ -307,7 +307,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       //
       // Parsing CIS/TDDFT data
       //
-      }else if (key == "Number of Excited States") {
+      else if (key == "Number of Excited States") {
          extData.nState  = list.at(1).toInt(&ok);
          if (!ok) goto error;
 
@@ -519,6 +519,7 @@ Data::MolecularOrbitals* FormattedCheckpoint::makeMolecularOrbitals(MoData const
       mos = 0;
    }
 
+   QString surfaceTag;
    switch (moData.orbitalType) {
 
       case Data::MolecularOrbitals::Canonical: 
@@ -528,13 +529,13 @@ Data::MolecularOrbitals* FormattedCheckpoint::makeMolecularOrbitals(MoData const
          break;
 
       case Data::MolecularOrbitals::NaturalTransition:
-      case Data::MolecularOrbitals::NaturalBond: {
+      case Data::MolecularOrbitals::NaturalBond:
          qDebug() << "Add one NTO(3)/NBO(4). Code = " << mos->orbitalType();
-         QString surfaceTag = QString(moData.stateTag);
+         surfaceTag = QString(moData.stateTag);
          if (moData.whichState != 0) surfaceTag += QString::number(moData.whichState);
-         QString surfaceTag = QString(moData.stateTag) + QString::number(moData.whichState);
+         //surfaceTag = QString(moData.stateTag) + QString::number(moData.whichState);
          mos->setOrbTitle(surfaceTag);
-         } break;
+         break;
 
       case Data::MolecularOrbitals::Undefined: 
          qDebug() << "Undefined molecular orbtal type requested";

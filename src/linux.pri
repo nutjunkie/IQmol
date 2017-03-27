@@ -1,6 +1,7 @@
 unix:!macx {
 
    CONFIG += DISTRIB
+#  CONFIG += DEVELOP
 
    contains(CONFIG, DEVELOP){
       #message("---- DEVELOP set ----")
@@ -12,14 +13,19 @@ unix:!macx {
       LIBS        += -lboost_iostreams -lboost_serialization
    
       # OpenBabel
-      INCLUDEPATH += /usr/local/include/openbabel-2.0
+      INCLUDEPATH += /usr/include/openbabel-2.0
       LIBS        += -lopenbabel
+
+      # OpenMesh
+#     LIBS        += /work/iqmol/IQmol/src/OpenMesh/lib/libOpenMeshCore.a
+#     LIBS        += /work/iqmol/IQmol/src/OpenMesh/lib/libOpenMeshTools.a
 
       # SSH2/libssl/crypto
       LIBS        += -lssh2 -lssl -lcrypto
 
       # gfortran
-      LIBS        += /usr/lib/gcc/x86_64-linux-gnu/4.7.3/libgfortran.a
+      LIBS        += /usr/lib/gcc/x86_64-linux-gnu/5/libgfortran.a
+      LIBS        += /usr/lib/gcc/x86_64-linux-gnu/5/libquadmath.a # required for gfortran 5
 
       # Misc
       LIBS        += -lz -ldl
@@ -37,26 +43,23 @@ unix:!macx {
       LIBS        += -L/usr/local/lib
 
       # Boost
-      LIBS        += /usr/lib/libboost_serialization.a
-      LIBS        += /usr/lib/libboost_iostreams.a
+      LIBS        += /usr/lib/x86_64-linux-gnu/libboost_serialization.a
+      LIBS        += /usr/lib/x86_64-linux-gnu/libboost_iostreams.a
    
       # OpenBabel
-      OPENBABEL    = $(DEV)/openbabel-2.3.2
-      INCLUDEPATH += $${OPENBABEL}/include
-      LIBS        += -L$${OPENBABEL}/build/lib/ -lopenbabel
-
-      # SSH2
-      LIBSSH2      = $(DEV)/libssh2-1.6.0
-      INCLUDEPATH += $${LIBSSH2}/include
-      LIBS        += $$LIBSSH2/src/.libs/libssh2.a
+      INCLUDEPATH += /usr/include/openbabel-2.0
+      LIBS        += -lopenbabel
 
       # libssl/crypto
-      LIBSSL       = $(DEV)/openssl-1.0.2d
-      INCLUDEPATH += $${LIBSSL}/include
-      LIBS        += $${LIBSSL}/libssl.a $${LIBSSL}/libcrypto.a
+      LIBS        += /usr/lib/x86_64-linux-gnu/libcrypto.a /usr/lib/x86_64-linux-gnu/libssl.a 
+
+      # SSH2/gcrypt
+      LIBS        += /usr/lib/x86_64-linux-gnu/libssh2.a
+      LIBS        += /usr/lib/x86_64-linux-gnu/libgcrypt.a /usr/lib/x86_64-linux-gnu/libgpg-error.a
 
       # gfortran
-      LIBS        += /usr/lib/gcc/x86_64-linux-gnu/4.7.3/libgfortran.a
+      LIBS        += /usr/lib/gcc/x86_64-linux-gnu/5/libgfortran.a
+      LIBS        += /usr/lib/gcc/x86_64-linux-gnu/5/libquadmath.a # required for gfortran 5
 
       # Misc
       LIBS        += -lz -ldl
