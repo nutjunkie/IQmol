@@ -3,7 +3,7 @@ CONFIG += lib
 include(../common.pri)
 
 INCLUDEPATH += ../Data ../Util ../Configurator ../Parser ../Process ../Main ../Viewer ../Old \
-               ../OpenMesh/src
+               ../OpenMesh/src ../Grid
      
 
 SOURCES = \

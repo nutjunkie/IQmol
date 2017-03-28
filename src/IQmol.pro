@@ -25,6 +25,7 @@ SUBDIRS += Util \
            Qui \
            Parser \
            Configurator \
+           Grid \
            Old \
            Layer \
            Network \

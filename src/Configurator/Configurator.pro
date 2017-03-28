@@ -2,7 +2,8 @@ LIB = Configurator
 CONFIG += lib
 include(../common.pri)
 
-INCLUDEPATH += ../Layer ../Data ../Util ../Plot ../Viewer ../Main ../Old ../OpenMesh/src
+INCLUDEPATH += ../Layer ../Data ../Util ../Plot ../Viewer \
+               ../Main ../Grid ../Old ../OpenMesh/src
 
 SOURCES = \
    $$PWD/AxesMeshConfigurator.C \
