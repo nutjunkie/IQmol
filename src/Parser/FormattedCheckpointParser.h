@@ -26,6 +26,7 @@
 #include "Geometry.h"
 #include "Shell.h"
 #include "MolecularOrbitals.h"
+#include "ExcitedStates.h"
 
 
 namespace IQmol {
@@ -67,7 +68,6 @@ namespace Parser {
             QList<double> alphaEnergies;
             QList<double> betaEnergies;
             Data::MolecularOrbitals::OrbitalType orbitalType;
-//	    int moTypeID;
 	    int whichState;
 	    QString stateTag;
          };
@@ -85,6 +85,7 @@ namespace Parser {
 
          struct ExtData {
            unsigned nState;
+           Data::ExcitedStates::ExcitedStatesT extType;
            QList<double> excitationEnergies;
            QList<double> oscillatorStrengths;
            QList<double> alphaAmplitudes;

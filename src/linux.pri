@@ -16,10 +16,6 @@ unix:!macx {
       INCLUDEPATH += /usr/include/openbabel-2.0
       LIBS        += -lopenbabel
 
-      # OpenMesh
-#     LIBS        += /work/iqmol/IQmol/src/OpenMesh/lib/libOpenMeshCore.a
-#     LIBS        += /work/iqmol/IQmol/src/OpenMesh/lib/libOpenMeshTools.a
-
       # SSH2/libssl/crypto
       LIBS        += -lssh2 -lssl -lcrypto
 
@@ -30,7 +26,7 @@ unix:!macx {
       # Misc
       LIBS        += -lz -ldl
 
-      #QMAKE_LFLAGS += '-Wl,-rpath,\'\$$ORIGIN/../lib\''
+      QMAKE_LFLAGS += '-Wl,-rpath,\'\$$ORIGIN/../lib\''
    }
 
 

@@ -105,7 +105,8 @@ void OrbitalSymmetries::dump() const
 {
    qDebug() << "(alpha, beta) = " << m_nAlpha << m_nBeta;
    for (int i = 0; i < m_alphaEnergies.size(); ++i) {
-       qDebug() << energy(Alpha, i) << symmetry(Alpha, i);
+       //qDebug() << energy(Alpha, i) << symmetry(Alpha, i);
+       qDebug() << energy(Alpha, i);
    }
 }
 

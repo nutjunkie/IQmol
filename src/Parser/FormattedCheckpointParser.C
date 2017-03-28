@@ -302,19 +302,22 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
             if (nbos) naturalbondOrbitalList->append(nbos);
 	        qDebug() << "Append one NBO to MO lists";
          }
-      }
-
       //
       // Parsing CIS/TDDFT data
       //
-      else if (key == "Number of Excited States") {
-         extData.nState  = list.at(1).toInt(&ok);
-         if (!ok) goto error;
+      //}else if (key == "Number of Excited States") {
+      //   extData.nState  = list.at(1).toInt(&ok);
+      //   if (!ok) goto error;
 
-      }else if (key == "Excitation Energies") {
+      //}else if (key == "Excitation Energies") {
+      }else if (key.endsWith("Excitation Energies")) {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          extData.excitationEnergies = readDoubleArray(textStream, n);
+         extData.nState = n;
+         //if (key.contains("EOMEE")) extData.extType = Data::ExcitedStates::EOM;
+         if (key.contains("EOMEE")) extData.extType = Data::ExcitedStates::CIS;
+         else                       extData.extType = Data::ExcitedStates::CIS;
 
       }else if (key == "Oscillator Strengths") {
          unsigned n(list.at(2).toUInt(&ok));
@@ -325,6 +328,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          extData.alphaAmplitudes = readDoubleArray(textStream, n);
+         extData.betaAmplitudes  = extData.alphaAmplitudes;
       
       }else if (key == "Beta Amplitudes") {
          unsigned n(list.at(2).toUInt(&ok));
@@ -335,11 +339,13 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          extData.alphaSparseJ = readIntegerArray(textStream, n);
+         extData.betaSparseJ = extData.alphaSparseJ;
 
       }else if (key == "Alpha I Indexes") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          extData.alphaSparseI = readIntegerArray(textStream, n);
+         extData.betaSparseI = extData.alphaSparseI;
 
       }else if (key == "Beta J Indexes") {
          unsigned n(list.at(2).toUInt(&ok));
@@ -658,7 +664,8 @@ bool FormattedCheckpoint::installExcitedStates(ExtData &extData, MoData const& m
    //bool ok = (extData.alphaAmplitudes.size() % extData.nState  == 0);
    //if (!ok) return ok;
 
-   Data::ExcitedStates* states(new Data::ExcitedStates(Data::ExcitedStates::CIS));
+   //Data::ExcitedStates* states(new Data::ExcitedStates(Data::ExcitedStates::CIS));
+   Data::ExcitedStates* states(new Data::ExcitedStates(extData.extType));
       qDebug() << "Reading" << states->typeLabel() << "States";
 
    qglviewer::Vec moment;
@@ -696,16 +703,16 @@ bool FormattedCheckpoint::installExcitedStates(ExtData &extData, MoData const& m
    if (es.isEmpty()) return false;
    Data::OrbitalSymmetries& data(es.last()->orbitalSymmetries());
 
-   QString symmetry = "A";
+   QString sym = "A";
    data.setOccupied(Data::Alpha,moData.nAlpha);
    for (int n = 0; n < NOa+NVa ; n++) {
       energy = moData.alphaEnergies[n];
-      data.append(Data::Alpha, energy, symmetry);
+      data.append(Data::Alpha, energy, sym);
    }
    data.setOccupied(Data::Beta,moData.nBeta);
    for (int n = 0; n < NOb+NVb; n++) {
       energy = moData.betaEnergies[n];
-      data.append(Data::Beta, energy, symmetry);
+      data.append(Data::Beta, energy, sym);
    }
 
    return true;

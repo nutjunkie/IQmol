@@ -35,7 +35,7 @@ QString ExcitedStates::typeLabel() const
       case CIS:    type = "CIS";     break;
       case CISD:   type = "CIS(D)";  break;
       case TDDFT:  type = "TDDFT";   break;
-      case EOM:    type = "CIS";     break;
+      case EOM:    type = "EOM";     break;
    }
    return type;
 }
