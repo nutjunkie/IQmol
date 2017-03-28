@@ -21,10 +21,6 @@
 ********************************************************************************/
 
 #include "BoundingBoxDialog.h"
-#include "MoleculeLayer.h"
-#include "Preferences.h"
-#include <QMenu>
-#include <QDebug>
 
 
 using namespace qglviewer;
