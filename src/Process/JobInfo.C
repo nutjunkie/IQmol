@@ -78,6 +78,7 @@ QVariantList JobInfo::toQVariantList() const
    list << QVariant((int)m_jobStatus);
    list << QVariant(m_baseName);
    list << QVariant(m_serverName);
+   list << QVariant(m_jobId);
    list << QVariant(m_message);
    list << QVariant(m_queueName);
    list << QVariant(m_wallTime);
@@ -92,7 +93,7 @@ QVariantList JobInfo::toQVariantList() const
 
 bool JobInfo::fromQVariantList(QVariantList const& list)
 {
-   bool ok(list.size() == 10);      if (!ok) return false;
+   bool ok(list.size() == 11);      if (!ok) return false;
 
    ok = list[0].canConvert<int>();  if (!ok) return false;
    m_jobStatus = static_cast<Status>(list[0].toInt());
@@ -104,25 +105,28 @@ bool JobInfo::fromQVariantList(QVariantList const& list)
    m_serverName = list[2].toString();
 
    ok = list[3].canConvert<QString>();  if (!ok) return false;
-   m_message = list[3].toString();
+   m_jobId = list[3].toString();
 
    ok = list[4].canConvert<QString>();  if (!ok) return false;
-   m_queueName = list[4].toString();
+   m_message = list[4].toString();
 
    ok = list[5].canConvert<QString>();  if (!ok) return false;
-   m_wallTime = list[5].toString();
+   m_queueName = list[5].toString();
 
-   ok = list[6].canConvert<qint64>();   if (!ok) return false;
-   m_submitTime = list[6].toLongLong();
+   ok = list[6].canConvert<QString>();  if (!ok) return false;
+   m_wallTime = list[6].toString();
 
-   ok = list[7].canConvert<unsigned>(); if (!ok) return false;
-   m_memory = list[7].toUInt();
+   ok = list[7].canConvert<qint64>();   if (!ok) return false;
+   m_submitTime = list[7].toLongLong();
 
    ok = list[8].canConvert<unsigned>(); if (!ok) return false;
-   m_scratch = list[8].toUInt();
+   m_memory = list[8].toUInt();
 
    ok = list[9].canConvert<unsigned>(); if (!ok) return false;
-   m_ncpus = list[9].toUInt();
+   m_scratch = list[9].toUInt();
+
+   ok = list[10].canConvert<unsigned>(); if (!ok) return false;
+   m_ncpus = list[10].toUInt();
 
    return ok;
 }
@@ -130,9 +134,17 @@ bool JobInfo::fromQVariantList(QVariantList const& list)
 
 void JobInfo::copy(JobInfo const& that)
 {
-   // Note: new data members should be added to the to/fromQVariantList
-   //       functions to ensure this works correctly.
-   fromQVariantList(that.toQVariantList());
+   m_jobStatus  = that.m_jobStatus;
+   m_baseName   = that.m_baseName;
+   m_serverName = that.m_serverName;
+   m_jobId      = that.m_jobId;
+   m_message    = that.m_message;
+   m_queueName  = that.m_queueName;
+   m_wallTime   = that.m_wallTime;
+   m_submitTime = that.m_submitTime;
+   m_memory     = that.m_memory;
+   m_scratch    = that.m_scratch;
+   m_ncpus      = that.m_ncpus;
 }
 
 
@@ -142,6 +154,7 @@ void JobInfo::dump() const
    QLOG_DEBUG() << "jobStatus  = " << m_jobStatus;
    QLOG_DEBUG() << "baseName   = " << m_baseName;
    QLOG_DEBUG() << "serverName = " << m_serverName;
+   QLOG_DEBUG() << "job ID     = " << m_jobId;
    QLOG_DEBUG() << "message    = " << m_message;
    QLOG_DEBUG() << "queueName  = " << m_queueName;
    QLOG_DEBUG() << "wallTime   = " << m_wallTime;
