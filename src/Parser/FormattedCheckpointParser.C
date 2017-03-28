@@ -46,16 +46,17 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
    Data::Geometry* geometry(0);
 
    Data::MolecularOrbitalsList* 
-      molecularOrbitalsList(new Data::MolecularOrbitalsList()); //Data::MolecularOrbitals::Canonical));
+      molecularOrbitalsList(new Data::MolecularOrbitalsList()); 
    Data::MolecularOrbitalsList* 
-      naturaltransOrbitalList(new Data::MolecularOrbitalsList()); //Data::MolecularOrbitals::NaturalTransition));
+      naturaltransOrbitalList(new Data::MolecularOrbitalsList()); 
    Data::MolecularOrbitalsList* 
-      naturalbondOrbitalList(new Data::MolecularOrbitalsList()); //Data::MolecularOrbitals::NaturalBond));
+      naturalbondOrbitalList(new Data::MolecularOrbitalsList()); 
 
 
    bool ok(true);
    GeomData  geomData;
    ShellData shellData;
+
    MoData    moData;
    MoData    ntoData;
    MoData    nboData;
@@ -63,9 +64,9 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
    MoData    boysData;
    MoData    erData;
 
-   moData.label   = "Cannonical MOs";
-   ntoData.label  = "Natural Transition Orbitals";
-   ntoData.label  = "Natural Bond Orbitals";
+//   moData.label   = "Cannonical MOs";
+//   ntoData.label  = "Natural Transition Orbitals";
+//   ntoData.label  = "Natural Bond Orbitals";
 
    while (!textStream.atEnd()) {
 
@@ -319,14 +320,14 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          if (!ok || !geometry) goto error;
 
          if (ntoData.orbitalType == Data::Orbitals::NaturalTransition) {
-  	         ntoData.which_state = n;
+  	         ntoData.stateNumber = n;
              Data::MolecularOrbitals* ntos(makeMolecularOrbitals(ntoData, shellData, *geometry)); 
              clear(ntoData);
              if (ntos) naturaltransOrbitalList->append(ntos);
              qDebug() << "Append one NTO to MO lists";
 
 	     }else if (nboData.orbitalType == Data::Orbitals::NaturalBond) {
-             nboData.which_state = n;
+             nboData.stateNumber = n;
              Data::MolecularOrbitals* nbos(makeMolecularOrbitals(nboData, shellData, *geometry)); 
              clear(nboData);
              if (nbos) naturalbondOrbitalList->append(nbos);
@@ -508,18 +509,14 @@ Data::MolecularOrbitals* FormattedCheckpoint::makeMolecularOrbitals(MoData const
 
          case Data::Orbitals::NaturalTransition: {
             qDebug() << "Add one NTO: " << mos->orbitalType();
-            //QString surfaceTag = QString("State ") + 
-            // QString::number(moData.which_state) + QString(" NTO Surfaces");
-            QString surfaceTag(QString(moData.stateTag) + QString::number(moData.which_state));
+            QString surfaceTag(QString(moData.stateTag) + QString::number(moData.stateNumber));
             mos->setLabel(surfaceTag);
          } break;
 
          case Data::Orbitals::NaturalBond: {
             qDebug() << "Add one NBO: " << mos->orbitalType();
-            //QString surfaceTag = QString("State ") + 
-            // QString::number(moData.which_state) + QString(" NBO Surfaces");
             QString surfaceTag = QString(moData.stateTag);
-            if (moData.which_state != 0) surfaceTag +=  QString::number(moData.which_state);
+            if (moData.stateNumber != 0) surfaceTag +=  QString::number(moData.stateNumber);
             mos->setLabel(surfaceTag);
          } break;
 

@@ -21,6 +21,7 @@
 ********************************************************************************/
 
 #include "ShellList.h"
+#include <QDebug>
 #include <cmath>
 
 
@@ -63,7 +64,33 @@ void ShellList::boundingBox(qglviewer::Vec& min, qglviewer::Vec& max)
 
 void ShellList::dump() const
 {
-   for (int i = 0; i < size(); ++i) at(i)->dump();
+   unsigned n(0), s(0), p(0), d5(0), d6(0), f7(0), f10(0), g9(0), g15(0);
+
+   ShellList::const_iterator iter;
+   for (iter = begin(); iter != end(); ++iter) {
+       switch ((*iter)->angularMomentum()) {
+          case  Data::Shell::S:    ++s;    n +=  1;  break;
+          case  Data::Shell::P:    ++p;    n +=  3;  break;   
+          case  Data::Shell::D5:   ++d5;   n +=  5;  break;
+          case  Data::Shell::D6:   ++d6;   n +=  6;  break;   
+          case  Data::Shell::F7:   ++f7;   n +=  7;  break;
+          case  Data::Shell::F10:  ++f10;  n += 10;  break;   
+          case  Data::Shell::G9:   ++g9;   n +=  9;  break;
+          case  Data::Shell::G15:  ++g15;  n += 15;  break;   
+       }   
+   }   
+
+   QString check("OK");
+   if (n != nBasis()) check.prepend("NOT ");
+   qDebug() << "Basis function check:     " << check;
+
+   QString types("   S    P   D5   D6   F7  F10");
+   QString tally = QString("%1 %2 %3 %4 %5 %6").arg( s,4).arg( p,4).arg( d5,4)
+                                                  .arg(d6,4).arg(f7,4).arg(f10,4);
+   qDebug() << "Shell types:              " << types;
+   qDebug() << "                          " << tally;
+   
+   //List<Shell>::dump();
 }
 
 } } // end namespace IQmol::Data

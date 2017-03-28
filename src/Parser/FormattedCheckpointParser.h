@@ -51,12 +51,12 @@ namespace Parser {
          };
 
          struct ShellData {
-               QList<int> shellTypes;
+               QList<int>      shellTypes;
                QList<unsigned> shellToAtom;
                QList<unsigned> shellPrimitives;
-               QList<double> exponents;
-               QList<double> contractionCoefficients;
-               QList<double> contractionCoefficientsSP;
+               QList<double>   exponents;
+               QList<double>   contractionCoefficients;
+               QList<double>   contractionCoefficientsSP;
          };
 
          struct MoData {
@@ -69,8 +69,8 @@ namespace Parser {
             QList<double> alphaEnergies;
             QList<double> betaEnergies;
             Data::Orbitals::OrbitalType orbitalType;
-int which_state;
-QString stateTag;
+            int stateNumber;
+           QString stateTag;
          };
 
          struct GmoData {

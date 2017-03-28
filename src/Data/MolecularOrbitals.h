@@ -23,9 +23,6 @@
 ********************************************************************************/
 
 #include "Orbitals.h"
-#include "Matrix.h"
-#include "Shell.h"
-#include "ShellList.h"
 #include "Surface.h"
 
 
@@ -38,7 +35,7 @@ namespace Data {
       friend class boost::serialization::access;
 
       public:
-         MolecularOrbitals() { }
+         MolecularOrbitals() : Orbitals() { }
 
          MolecularOrbitals(unsigned const nAlpha, unsigned const nBeta, unsigned const nBasis,
             QList<double> const& alphaCoefficients, QList<double> const& alphaEnergies,  
@@ -47,22 +44,7 @@ namespace Data {
 
          Type::ID typeID() const { return Type::MolecularOrbitals; }
 
-
-         unsigned nAlpha() const { return m_nAlpha; }
-         unsigned nBeta()  const { return m_nBeta; }
-         unsigned nBasis() const { return m_nBasis; }
-         unsigned nOrbitals() const { return m_nOrbitals; }
-         bool     restricted() const { return m_restricted; }
-
-         void boundingBox(qglviewer::Vec& min, qglviewer::Vec& max) const 
-         {
-            min = m_bbMin;
-            max = m_bbMax;
-         }
-
-         Matrix const& alphaCoefficients() const { return m_alphaCoefficients; }
-         Matrix const& betaCoefficients() const { return m_betaCoefficients; }
-         ShellList const& shellList() const { return m_shellList; }
+         bool restricted() const { return m_restricted; }
          SurfaceList& surfaceList() { return m_surfaceList; }
 
          void appendSurface(Data::Surface* surfaceData)
@@ -100,37 +82,16 @@ namespace Data {
          template <class Archive>
          void privateSerialize(Archive& ar, unsigned const /* version */) 
          {
-            ar & m_nAlpha;
-            ar & m_nBeta;
-            ar & m_nBasis;
-            ar & m_nOrbitals;
+            ar & boost::serialization::base_object<Orbitals>(*this);
             ar & m_restricted;
-            ar & m_bbMin;
-            ar & m_bbMax;
-            ar & m_shellList;
             ar & m_alphaEnergies;
             ar & m_betaEnergies;
-            ar & m_alphaCoefficients;
-            ar & m_betaCoefficients;
             ar & m_surfaceList;
          }
 
-         QString  m_label;
-         unsigned m_nAlpha;
-         unsigned m_nBeta;
-         unsigned m_nBasis;
-         unsigned m_nOrbitals;
-         bool     m_restricted;
-
-         qglviewer::Vec m_bbMin;
-         qglviewer::Vec m_bbMax;
-
+         bool m_restricted;
          QList<double> m_alphaEnergies;
          QList<double> m_betaEnergies;
-         Matrix m_alphaCoefficients;
-         Matrix m_betaCoefficients;
-         ShellList m_shellList;
-
          SurfaceList m_surfaceList;
    };
 

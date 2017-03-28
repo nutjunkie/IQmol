@@ -302,7 +302,6 @@ List Factory::convert(Data::MolecularOrbitalsList& molecularOrbitalsList)
    Base* nbos(0);
    Base* canonical(0);
 
-   //Qt::ItemFlags flags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
    Qt::ItemFlags flags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
    Data::MolecularOrbitalsList::iterator iter;

@@ -23,6 +23,8 @@
 ********************************************************************************/
 
 #include "Data.h"
+#include "ShellList.h"
+#include "Matrix.h"
 
 
 namespace IQmol {
@@ -41,28 +43,82 @@ namespace Data {
                             NaturalBond 
                           };
 
-         Orbitals() : m_orbitalType(Undefined) { }
+         static QString toString(OrbitalType const);
+
+         Orbitals();
+         Orbitals(unsigned const nAlpha, unsigned const nBeta, 
+            QList<double> const& alphaCoefficients, QList<double> const& betaCoefficients,
+            ShellList const& shells, QString const& label = QString() );
+
 
 // This should be fixed so that the orbitalType function is declared virtual
          //OrbitalType orbitalType() const = 0;
          void setOrbitalType(OrbitalType const& orbitalType) { m_orbitalType = orbitalType; }
          OrbitalType orbitalType() const { return m_orbitalType; }
+         OrbitalType m_orbitalType;
 
-         static QString toString(OrbitalType const);
+         unsigned nAlpha() const { return m_nAlpha; }
+         unsigned nBeta()  const { return m_nBeta; }
+         unsigned nBasis() const { return m_nBasis; }
+         unsigned nOrbitals() const { return m_nOrbitals; }
+
+         Matrix const& alphaCoefficients() const { return m_alphaCoefficients; }
+         Matrix const& betaCoefficients()  const { return m_betaCoefficients; }
+         ShellList const& shellList() const { return m_shellList; }
 
          QString const& label() const { return m_label; }
          void setLabel(QString const& label) { m_label = label; }
 
-      private:
+         virtual bool consistent() const { return true; }
+
+         void boundingBox(qglviewer::Vec& min, qglviewer::Vec& max) const
+         {
+            min = m_bbMin;
+            max = m_bbMax;
+         }
+
+         void serialize(InputArchive& ar, unsigned const version = 0)
+         {
+            privateSerialize(ar, version);
+         }
+ 
+         void serialize(OutputArchive& ar, unsigned const version = 0)
+         {
+            privateSerialize(ar, version);
+         }
+
+         void dump() const;
+
+      protected:
          template <class Archive>
          void privateSerialize(Archive& ar, unsigned const /* version */) 
          {
             ar & m_label;
+            ar & m_nAlpha;
+            ar & m_nBeta;
+            ar & m_nBasis;
+            ar & m_nOrbitals;
+            ar & m_bbMin;
+            ar & m_bbMax;
+            ar & m_alphaCoefficients;
+            ar & m_betaCoefficients;
+            ar & m_shellList;
          }
 
-// Virtual
-         OrbitalType m_orbitalType;
          QString m_label;
+
+         unsigned m_nAlpha;
+         unsigned m_nBeta;
+         unsigned m_nBasis;
+         unsigned m_nOrbitals;
+         bool     m_restricted;
+
+         qglviewer::Vec m_bbMin;
+         qglviewer::Vec m_bbMax;
+
+         Matrix m_alphaCoefficients;
+         Matrix m_betaCoefficients;
+         ShellList m_shellList;
    };
 
 } } // end namespace IQmol::Data
