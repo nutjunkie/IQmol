@@ -31,14 +31,13 @@ namespace Process {
 QVariantList QChemJobInfo::toQVariantList() const
 {
    QVariantList list;
-   list << QVariant(baseName());
-   list << QVariant(serverName());
    list << QVariant(m_data[LocalWorkingDirectory]);
    list << QVariant(m_data[RemoteWorkingDirectory]);
    list << QVariant(m_data[InputString]);
    list << QVariant(m_charge);
    list << QVariant(m_multiplicity);
    list << QVariant(m_localFilesExist);
+   list << JobInfo::toQVariantList();
 
    return list;
 }
@@ -46,28 +45,27 @@ QVariantList QChemJobInfo::toQVariantList() const
 
 bool QChemJobInfo::fromQVariantList(QVariantList const& list)
 {
-   bool ok = (list.size() == 8)            &&
-             list[0].canConvert<QString>() &&
-             list[1].canConvert<QString>() &&
-             list[2].canConvert<QString>() &&
-             list[3].canConvert<QString>() &&
-             list[4].canConvert<QString>() &&
-             list[5].canConvert<int>()     &&
-             list[5].canConvert<int>()     &&
-             list[7].canConvert<bool>();
+   bool ok(list.size() >= 6);            if (!ok) return false;
 
-   if (ok) {
-      setBaseName(list[0].toString());
-      setServerName(list[1].toString());
-      m_data.insert(LocalWorkingDirectory, list[2].toString());
-      m_data.insert(RemoteWorkingDirectory,list[3].toString());
-      m_data.insert(InputString,           list[4].toString());
-      m_charge          = list[5].toInt();
-      m_multiplicity    = list[6].toInt();
-      m_localFilesExist = list[7].toBool();
-   }
+   ok = list[0].canConvert<QString>();   if (!ok) return false;
+   m_data.insert(LocalWorkingDirectory,  list[0].toString());
 
-   return ok;
+   ok = list[1].canConvert<QString>();   if (!ok) return false;
+   m_data.insert(RemoteWorkingDirectory, list[1].toString());
+
+   ok = list[2].canConvert<QString>();   if (!ok) return false;
+   m_data.insert(InputString,            list[2].toString());
+             
+   ok = list[3].canConvert<int>();       if (!ok) return false;
+   m_multiplicity = list[3].toInt();
+             
+   ok = list[4].canConvert<int>();       if (!ok) return false;
+   m_multiplicity = list[4].toInt();
+             
+   ok = list[5].canConvert<bool>();      if (!ok) return false;
+   m_localFilesExist = list[5].toInt();
+             
+   return JobInfo::fromQVariantList(list.mid(6)); 
 }
 
 
@@ -185,12 +183,10 @@ QStringList QChemJobInfo::outputFiles() const
 void QChemJobInfo::dump() const
 {
    QLOG_DEBUG() << "QChemJobInfo info:";
-   QLOG_DEBUG() << "   BaseName              " << baseName();
    QLOG_DEBUG() << "   InputFileName         " << get(InputFileName);
    QLOG_DEBUG() << "   OutputFileName        " << get(OutputFileName);
    QLOG_DEBUG() << "   AuxFileName           " << get(AuxFileName);
    QLOG_DEBUG() << "   RunFileName           " << get(RunFileName);
-   QLOG_DEBUG() << "   ServerName            " << serverName();
    QLOG_DEBUG() << "   LocalWorkingDirectory " << get(LocalWorkingDirectory);
    QLOG_DEBUG() << "   RemoteWorkingDirectory" << get(RemoteWorkingDirectory);
    JobInfo::dump();
@@ -200,7 +196,6 @@ void QChemJobInfo::dump() const
 void QChemJobInfo::copy(QChemJobInfo const& that)
 {
    JobInfo::copy(that);
-   qDebug() << "QChemJobInfo copy constuctor called" << m_data;
    m_data              = that.m_data;
    m_charge            = that.m_charge;
    m_multiplicity      = that.m_multiplicity;

@@ -62,14 +62,14 @@ namespace Process {
          Status jobStatus() const { return m_jobStatus; }
          void setJobStatus(Status const jobStatus) { m_jobStatus = jobStatus; }
 
-         QString const& jobId() const { return m_jobId; }
-         void setJobId(QString const& jobId) { m_jobId = jobId; }
-
          QString const& baseName() const { return m_baseName; }
          void setBaseName(QString const& baseName) { m_baseName = baseName; }
 
          QString const& serverName() const { return m_serverName; }
          void setServerName(QString const& serverName) { m_serverName = serverName; }
+
+         QString const& jobId() const { return m_jobId; }
+         void setJobId(QString const& jobId) { m_jobId = jobId; }
 
          QString const& message() const { return m_message; }
          void setMessage(QString const& message) { m_message = message; }
@@ -101,10 +101,11 @@ namespace Process {
          virtual void dump() const;
 
       protected:
-         void copy(JobInfo const&);
+         virtual void copy(JobInfo const&);
 
 
       private:
+         // Not the ordering of these is needed for the to/fromQVarientList functions.
          Status    m_jobStatus;                        // 0
          QString   m_baseName;                         // 1
          QString   m_serverName;                       // 2
