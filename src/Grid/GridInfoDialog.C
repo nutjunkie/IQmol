@@ -21,11 +21,12 @@
 ********************************************************************************/
 
 #include "GridInfoDialog.h"
-#include "QMsgBox.h"
-#include "MoleculeLayer.h"
 #include "Preferences.h"
-#include <QMenu>
+#include "QMsgBox.h"
 #include <QHeaderView>
+#include <QFileInfo>
+#include <QDir>
+#include <QMenu>
 #include <QDebug>
 
 
@@ -33,17 +34,15 @@ using namespace qglviewer;
 
 namespace IQmol {
 
-GridInfoDialog::GridInfoDialog(Data::GridDataList* availableGrids, Layer::Molecule* molecule) 
-   : QDialog(0), m_gridDataList(availableGrids), m_molecule(molecule)
+GridInfoDialog::GridInfoDialog(Data::GridDataList* availableGrids, 
+   QString const& moleculeName, QStringList const& coordinates) 
+ : QDialog(0), m_gridDataList(availableGrids), m_moleculeName(moleculeName),
+   m_coordinates(coordinates)
 {
    m_dialog.setupUi(this);
 
    QTableWidget* table(m_dialog.gridTable);
-#if QT_VERSION >= 0x050000
    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
-#else
-   table->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
-#endif
 
    table->horizontalHeader()->setStretchLastSection(true);
    table->setColumnWidth(0,120);
@@ -144,22 +143,17 @@ void GridInfoDialog::deleteGrid()
 
 void GridInfoDialog::exportCubeFile(bool const invertSign)
 {
-   if (!m_molecule) {
-      QMsgBox::warning(this, "IQmol", "Unable to determine parent molecule");
-      return;
-   }
-
    Data::GridDataList grids(getSelectedGrids());
    Data::GridDataList::iterator iter;
    for (iter = grids.begin(); iter != grids.end(); ++iter) {
        QFileInfo fileInfo(Preferences::LastFileAccessed());
-       QString name(m_molecule->text());
+       QString name(m_moleculeName);
        name += "." + (*iter)->surfaceType().toString() + ".cube";
        name.replace(" ","_");
        fileInfo.setFile(fileInfo.dir(), name);
        name = fileInfo.filePath();
-       QStringList coordinates(m_molecule->coordinatesForCubeFile());
-       if ((*iter)->saveToCubeFile(name, coordinates, invertSign)) {
+
+       if ((*iter)->saveToCubeFile(name, m_coordinates, invertSign)) {
           Preferences::LastFileAccessed(name);
           QString msg("Cube data saved to ");
           msg += name;

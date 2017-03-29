@@ -17,6 +17,7 @@ SOURCES += \
    $$PWD/LogMessageDialog.C \
    $$PWD/ParseJobFiles.C \
    $$PWD/ProgressDialog.C \
+   $$PWD/SpatialProperty.C \
    $$PWD/SurfaceAnimatorDialog.C \
    $$PWD/SymmetryToleranceDialog.C \
    $$PWD/UndoCommands.C \
@@ -28,6 +29,7 @@ HEADERS += \
    $$PWD/LogMessageDialog.h \
    $$PWD/ParseJobFiles.h \
    $$PWD/ProgressDialog.h \
+   $$PWD/SpatialProperty.h \
    $$PWD/SurfaceAnimatorDialog.h \
    $$PWD/SymmetryToleranceDialog.h \
    $$PWD/UndoCommands.h \

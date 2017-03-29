@@ -29,16 +29,15 @@
 
 namespace IQmol {
 
-namespace Layer {
-   class Molecule;
-}
-
    class GridInfoDialog : public QDialog {
 
       Q_OBJECT
 
       public:
-         GridInfoDialog(Data::GridDataList*, Layer::Molecule*);
+		 // We pass the molecule name and coordinates so that 
+		 // we can export a cube file if requested.
+         GridInfoDialog(Data::GridDataList*, QString const& moleculeName,
+            QStringList const& coordinates);
 
       Q_SIGNALS:
          void updated();  // to trigger a redraw
@@ -52,7 +51,8 @@ namespace Layer {
       private:
          void exportCubeFile(bool const invertSign);
         Data::GridDataList* m_gridDataList;
-        Layer::Molecule* m_molecule;
+        QString m_moleculeName;
+        QStringList m_coordinates;
         Data::GridDataList getSelectedGrids();
         Ui::GridInfoDialog m_dialog;
         void loadGridInfo();

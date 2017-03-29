@@ -204,7 +204,9 @@ void MolecularOrbitals::clearSurfaceQueue()
 
 void MolecularOrbitals::showGridInfo()
 {
-   GridInfoDialog dialog(&m_availableGrids, m_molecule);
+   //GridInfoDialog dialog(&m_availableGrids, m_molecule);
+   GridInfoDialog dialog(&m_availableGrids, m_molecule->text(), 
+       m_molecule->coordinatesForCubeFile());
    dialog.exec();
 }
 
