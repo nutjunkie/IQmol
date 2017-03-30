@@ -158,15 +158,15 @@ std::vector<KeywordSection*> ReadKeywordSections(QString input) {
    while ( (i = input.indexOf("$")) != -1) {
       j = input.indexOf("$end",0,Qt::CaseInsensitive);
       
-	  tmp  = input.mid(i+1,j-i-1);
+      tmp = input.mid(i+1,j-i-1);
       k = tmp.indexOf(QRegExp("\\W"));
       name = tmp.left(k);
       tmp.remove(0,k);
 
-	  // This allocates a KeywordSection, we rely on the Job distructor to free
+      // This allocates a KeywordSection, we rely on the Job distructor to free
       // this up.  That is, the KeywordSection object must be associated with a
       // Job object.
-      //qDebug() << "finding section" << name;
+      qDebug() << "finding section" << name;
       KeywordSection* ks = KeywordSectionFactory(name);
       ks->read(tmp);
       ks->print(true);

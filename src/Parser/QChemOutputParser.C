@@ -347,11 +347,11 @@ bool QChemOutput::parse(TextStream& textStream)
 
       }else if (line.contains("TDDFT/TDA Excitation Energies")) {
          textStream.skipLine(2);
-         readCisStates(textStream, Data::ExcitedStates::TDDFT);
+         //readCisStates(textStream, Data::ExcitedStates::TDDFT);
 
       }else if (line.contains("CIS Excitation Energies")) {
          textStream.skipLine(2);
-         readCisStates(textStream, Data::ExcitedStates::CIS);
+         //readCisStates(textStream, Data::ExcitedStates::CIS);
 
       }else if (line.contains("CIS(D) Excitation Energies")) {
          textStream.skipLine(2);

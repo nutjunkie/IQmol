@@ -887,17 +887,17 @@ void InputDialog::on_qui_solvent_none_toggled(bool on)
    toggleStack(m_ui.solventStack, on, "SolventNone");
 }
 
-void InputDialog::on_chemsol_toggled(bool on) 
+void InputDialog::on_qui_solvent_chemsol_toggled(bool on) 
 {
    toggleStack(m_ui.solventStack, on, "SolventChemSol");
 }
 
-void InputDialog::on_smx_solvation_toggled(bool on) 
+void InputDialog::on_qui_solvent_smx_toggled(bool on) 
 {
-   toggleStack(m_ui.solventStack, on, "SolventSM8");
+   toggleStack(m_ui.solventStack, on, "SolventSMx");
 }
 
-void InputDialog::on_svp_toggled(bool on) 
+void InputDialog::on_qui_solvent_svp_toggled(bool on) 
 {
    toggleStack(m_ui.solventStack, on, "SolventSVP");
 }

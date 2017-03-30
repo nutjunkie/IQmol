@@ -89,7 +89,9 @@ namespace Parser {
            QList<double> excitationEnergies;
            QList<double> oscillatorStrengths;
            QList<double> alphaAmplitudes;
+           QList<double> alphaYAmplitudes;
            QList<double> betaAmplitudes;
+           QList<double> betaYAmplitudes;
            QList<int> alphaSparseJ;
            QList<int> alphaSparseI;
            QList<int> betaSparseJ;

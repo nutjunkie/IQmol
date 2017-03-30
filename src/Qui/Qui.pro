@@ -19,6 +19,7 @@ SOURCES += \
    $$PWD/OptionDatabaseForm.C \
    $$PWD/OptionEditors.C \
    $$PWD/OptSection.C \
+   $$PWD/PcmSection.C \
    $$PWD/QCJob.C \
    $$PWD/Qui.C \
    $$PWD/QuiMolecule.C \
@@ -40,6 +41,7 @@ HEADERS += \
    $$PWD/OptionDatabaseForm.h \
    $$PWD/OptionEditors.h \
    $$PWD/OptSection.h \
+   $$PWD/PcmSection.h \
    $$PWD/QCJob.h \
    $$PWD/Qui.h \
    $$PWD/QuiMolecule.h \
