@@ -50,6 +50,14 @@ bool isCompoundFunctional()
           (value != "PW91")   && (value != "revPBE") && (value != "rPW86");
 }
 
+bool isTDDFT() 
+{
+   OptionRegister& reg(OptionRegister::instance());
+   QString cis_n_roots(reg.get("CIS_N_ROOTS").getValue().toUpper());
+   QString method(reg.get("METHOD").getValue().toUpper());
+   //qDebug() << "isDFT" <<  method << cis_n_roots;
+   return (method == "HF") && (cis_n_roots != "0" );
+}
 
 bool isPostHF() 
 {
@@ -257,7 +265,12 @@ void InputDialog::initializeQuiLogic()
 
    QtNode& method(reg.get("METHOD"));
 
-    method.addRule(
+   // Possible hack to keep TD-DFT job setting  due to tainted preview text 
+   method.addRule(
+      If (isTDDFT, method.shouldBe("TD-DFT"))
+   );
+
+   method.addRule(
       If (method == "Custom" || method == "TD-DFT",
          Enable( m_ui.exchange)     + Enable( m_ui.label_exchange) +
          Enable( m_ui.correlation)  + Enable( m_ui.label_correlation),
@@ -269,7 +282,6 @@ void InputDialog::initializeQuiLogic()
    method.addRule(
       If (method == "TD-DFT", exchange.shouldBe("B3LYP"))
    );
-
 
    QtNode& mp2v(reg.get("MP2V"));
    QtNode& qui_primary_basis(reg.get("QUI_PRIMARY_BASIS"));
