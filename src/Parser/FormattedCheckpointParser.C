@@ -327,15 +327,15 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          extData.alphaAmplitudes = readDoubleArray(textStream, n);
-         extData.betaAmplitudes  = extData.alphaAmplitudes;
+         //extData.betaAmplitudes  = extData.alphaAmplitudes;
       
       }else if (key == "Alpha Y Amplitudes") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          extData.alphaYAmplitudes = readDoubleArray(textStream, n);
-         extData.betaYAmplitudes  = extData.alphaYAmplitudes;
+         //extData.betaYAmplitudes  = extData.alphaYAmplitudes;
          extData.extType = Data::ExcitedStates::TDDFT;
-      
+
       }else if (key == "Beta Amplitudes" || key == "Beta X Amplitudes") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
@@ -350,13 +350,13 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          extData.alphaSparseJ = readIntegerArray(textStream, n);
-         extData.betaSparseJ = extData.alphaSparseJ;
+         //extData.betaSparseJ = extData.alphaSparseJ;
 
       }else if (key == "Alpha I Indexes") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          extData.alphaSparseI = readIntegerArray(textStream, n);
-         extData.betaSparseI = extData.alphaSparseI;
+         //extData.betaSparseI = extData.alphaSparseI;
 
       }else if (key == "Beta J Indexes") {
          unsigned n(list.at(2).toUInt(&ok));
@@ -367,8 +367,8 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          extData.betaSparseI = readIntegerArray(textStream, n);
+
       }
-         
    } // end of parsing text stream 
 
    if (geometry) {
@@ -672,9 +672,6 @@ Data::ShellList* FormattedCheckpoint::makeShellList(ShellData const& shellData,
 
 bool FormattedCheckpoint::installExcitedStates(ExtData &extData, MoData const& moData)
 {
-   //bool ok = (extData.alphaAmplitudes.size() % extData.nState  == 0);
-   //if (!ok) return ok;
-
    Data::ExcitedStates* states(new Data::ExcitedStates(extData.extType));
       qDebug() << "Reading" << states->typeLabel() << "States";
 
@@ -693,20 +690,26 @@ bool FormattedCheckpoint::installExcitedStates(ExtData &extData, MoData const& m
          if (!transition->addAmplitude(extData.alphaAmplitudes,
                extData.alphaSparseJ, extData.alphaSparseI,
                i+1,NOa, NVa, Data::Alpha)) return false;
-         if (!transition->addAmplitude(extData.betaAmplitudes,
+         if (extData.betaAmplitudes.size() > 0) {
+           if (!transition->addAmplitude(extData.betaAmplitudes,
                extData.betaSparseJ, extData.betaSparseI,
                i+1,NOb, NVb, Data::Beta)) return false;
+         }
       } 
       else {
          if (!transition->addAmplitude(extData.alphaAmplitudes,i+1,
                NOa, NVa, Data::Alpha)) return false;
-         if (!transition->addAmplitude(extData.betaAmplitudes,i+1,
+         if (extData.betaAmplitudes.size() > 0) {
+           if (!transition->addAmplitude(extData.betaAmplitudes,i+1,
                NOb, NVb, Data::Beta)) return false;
+         }
          if (extData.alphaYAmplitudes.size() > 0) {
            if (!transition->addAmplitude(extData.alphaYAmplitudes,i+1,
                  NOa, NVa, Data::Alpha)) return false;
-           if (!transition->addAmplitude(extData.betaYAmplitudes,i+1,
+           if (extData.betaYAmplitudes.size() > 0) {
+             if (!transition->addAmplitude(extData.betaYAmplitudes,i+1,
                  NOb, NVb, Data::Beta)) return false;
+           }
          }
       }
       states->append(transition);
