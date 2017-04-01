@@ -20,10 +20,8 @@ LIBS += $$BUILD_DIR/libQui.a \
         $$BUILD_DIR/libUtil.a \
         $$BUILD_DIR/libQGLViewer.a
 
-unix:LIBS  += $$PWD/../OpenMesh/lib/libOpenMeshCore.a \
-              $$PWD/../OpenMesh/lib/libOpenMeshTools.a
-win32:LIBS += $$PWD/../OpenMesh/lib/libOpenMeshCored.a \
-              $$PWD/../OpenMesh/lib/libOpenMeshToolsd.a
+LIBS += $$PWD/../OpenMesh/lib/libOpenMeshCore.a \
+        $$PWD/../OpenMesh/lib/libOpenMeshTools.a
 
 include(../common.pri)
 
