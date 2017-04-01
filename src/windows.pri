@@ -33,6 +33,11 @@ win32 {
    #LIBS        += -LC:\MinGW\msys\1.0\local\lib
    #LIBS        += -LC:\MinGW\msys\1.0\local\bin
    #LIBS        += -lssh2 -lssl -lcrypto -lgdi32
+   
+   # QGLViewer
+   QGLVIEWER    = D:\QGLViewer\2.6.4\QGLViewer
+   #INCLUDEPATH += $${QGLVIEWER}
+   LIBS        += $${QGLVIEWER}\libQGLViewer2.a
 
    #LIBS += -lws2_32 -lOpenGL32 
    LIBS        += C:\MinGW\lib\libws2_32.a
