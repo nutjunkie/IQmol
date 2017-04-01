@@ -2,8 +2,9 @@ win32 {
 #  CONFIG += debug exceptions rtti
    CONFIG += release exceptions rtti
 
-   INCLUDEPATH += C:\Qt\5.8\mingw53_32\include
-   INCLUDEPATH += C:\Qt\Tools\mingw530_32\include
+   #INCLUDEPATH += C:\Qt\5.8\mingw53_32\include
+   #INCLUDEPATH += C:\Qt\Tools\mingw530_32\include
+   INCLUDEPATH += C:\Qt\Tools\mingw530_32\i686-w64-mingw32\include
    INCLUDEPATH += C:\Qt\Tools\mingw530_32\i686-w64-mingw32\include\c++\i686-w64-mingw32
 
    # Boost
@@ -13,10 +14,9 @@ win32 {
    LIBS        += $${BOOST}\stage\lib\libboost_iostreams-mgw53-mt-1_58.a
 
    # gfortran
-   #LIBS += C:\MinGW\lib\gcc\mingw32\5.3.0\libgfortran.a
-   #LIBS += C:\MinGW\lib\gcc\mingw32\5.3.0\libquadmath.a
-   LIBS += D:\GFortran\lib\gcc\mingw32\4.10.0\libgfortran.a
-   LIBS += D:\GFortran\lib\gcc\mingw32\4.10.0\libquadmath.a
+   LIBS += C:\MinGW\lib\gcc\mingw32\5.3.0\libgfortran.a
+   LIBS += C:\MinGW\lib\gcc\mingw32\5.3.0\libquadmath.a
+   LIBS += C:\MinGW\lib\libmingwex.a
 
    # OpenBabel
    OPENBABEL    = D:\OpenBabel\2.4.1
@@ -26,9 +26,13 @@ win32 {
 
    # SSH2
    INCLUDEPATH += C:\MinGW\msys\1.0\local\include
-   LIBS        += -LC:\MinGW\msys\1.0\local\lib
+   LIBS        += C:\MinGW\msys\1.0\local\lib\libssh2.a
+   LIBS        += C:\MinGW\msys\1.0\local\lib\libssl.a
+   LIBS        += C:\MinGW\msys\1.0\local\lib\libcrypto.a
+   LIBS        += C:\MinGW\lib\libgdi32.a
+   #LIBS        += -LC:\MinGW\msys\1.0\local\lib
    #LIBS        += -LC:\MinGW\msys\1.0\local\bin
-   LIBS        += -lssh2 -lssl -lcrypto -lgdi32
+   #LIBS        += -lssh2 -lssl -lcrypto -lgdi32
 
    #LIBS += -lws2_32 -lOpenGL32 
    LIBS        += C:\MinGW\lib\libws2_32.a
