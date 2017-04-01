@@ -280,7 +280,8 @@ void InputDialog::initializeQuiLogic()
    );
 
    method.addRule(
-      If (method == "TD-DFT", exchange.shouldBe("B3LYP"))
+      //If (method == "TD-DFT", exchange.shouldBe("B3LYP"))
+      If (method == "TD-DFT" && exchange == "HF", exchange.shouldBe("B3LYP"))
    );
 
    QtNode& mp2v(reg.get("MP2V"));
