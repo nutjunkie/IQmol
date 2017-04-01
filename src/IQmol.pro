@@ -15,9 +15,10 @@ CONFIG  += ordered
 
 TEMPLATE = subdirs
 
-!win32: SUBDIRS = QGLViewer \
+win32: SUBDIRS =
+else:  SUBDIRS = QGLViewer
 
-SUBDIRS + = \
+SUBDIRS += \
            Util \
            Data \
            Qui \

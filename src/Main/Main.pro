@@ -19,7 +19,8 @@ LIBS += $$BUILD_DIR/libQui.a \
         $$BUILD_DIR/libOld.a \
         $$BUILD_DIR/libUtil.a
 
-!win32: LIBS += $$BUILD_DIR/libQGLViewer.a
+win32:  
+else:   LIBS += $$BUILD_DIR/libQGLViewer.a
 
 LIBS += $$PWD/../OpenMesh/lib/libOpenMeshCore.a \
         $$PWD/../OpenMesh/lib/libOpenMeshTools.a
