@@ -376,12 +376,13 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       if (mos) molecularOrbitalsList->append(mos);
       Data::GeminalOrbitals* gmos(makeGeminalOrbitals(gmoData, shellData, *geometry)); 
       if (gmos) m_dataBank.append(gmos);
-
+/*
       // install excitation 
       if (extData.nState > 0) {
          ok = installExcitedStates(extData,moData);
          if (!ok) goto error;
       }
+*/
    }
 
    if (geometryList) {

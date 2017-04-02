@@ -345,13 +345,14 @@ bool QChemOutput::parse(TextStream& textStream)
          bool readSymmetries(false);
          readOrbitalSymmetries(textStream, readSymmetries);
 
-      }else if (line.contains("TDDFT/TDA Excitation Energies")) {
+      }else if (line.contains("TDDFT Excitation Energies")) {
          textStream.skipLine(2);
-         //readCisStates(textStream, Data::ExcitedStates::TDDFT);
+         readCisStates(textStream, Data::ExcitedStates::TDDFT);
 
-      }else if (line.contains("CIS Excitation Energies")) {
+      }else if (line.contains("CIS Excitation Energies") ||
+                line.contains("TDDFT/TDA Excitation Energies")) {
          textStream.skipLine(2);
-         //readCisStates(textStream, Data::ExcitedStates::CIS);
+         readCisStates(textStream, Data::ExcitedStates::CIS);
 
       }else if (line.contains("CIS(D) Excitation Energies")) {
          textStream.skipLine(2);
