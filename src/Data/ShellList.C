@@ -49,9 +49,9 @@ void ShellList::boundingBox(qglviewer::Vec& min, qglviewer::Vec& max)
    at(0)->boundingBox(min, max);
 
    qglviewer::Vec tmin, tmax;
-   ShellList::const_iterator iter;
-   for (iter = begin(); iter != end(); ++iter) {
-       (*iter)->boundingBox(tmin, tmax);
+   ShellList::const_iterator shell;
+   for (shell = begin(); shell != end(); ++shell) {
+       (*shell)->boundingBox(tmin, tmax);
        min.x = std::min(tmin.x, min.x);
        min.y = std::min(tmin.y, min.y);
        min.z = std::min(tmin.z, min.z);
@@ -66,9 +66,9 @@ void ShellList::dump() const
 {
    unsigned n(0), s(0), p(0), d5(0), d6(0), f7(0), f10(0), g9(0), g15(0);
 
-   ShellList::const_iterator iter;
-   for (iter = begin(); iter != end(); ++iter) {
-       switch ((*iter)->angularMomentum()) {
+   ShellList::const_iterator shell;
+   for (shell = begin(); shell != end(); ++shell) {
+       switch ((*shell)->angularMomentum()) {
           case  Data::Shell::S:    ++s;    n +=  1;  break;
           case  Data::Shell::P:    ++p;    n +=  3;  break;   
           case  Data::Shell::D5:   ++d5;   n +=  5;  break;
@@ -92,5 +92,55 @@ void ShellList::dump() const
    
    //List<Shell>::dump();
 }
+
+
+void ShellList::resize()
+{
+   m_nBasis = nBasis();
+   m_shellValues.resize(m_nBasis);
+   m_shellPairValues.resize(m_nBasis*(m_nBasis+1)/2);
+}
+
+
+// TODO: this could be batched over grid points so that matrix multiplications
+// can be used later on.  Also, auxilary data structures could be employed to 
+// make the computation more efficient.
+Vector const& ShellList::shellValues(qglviewer::Vec const& gridPoint)
+{
+   double* values;
+   unsigned offset(0);
+
+   ShellList::const_iterator shell;
+   for (shell = begin(); shell != end(); ++shell) {
+       values = (*shell)->evaluate(gridPoint);
+       for (unsigned s = 0; s < (*shell)->nBasis(); ++s, ++offset) {
+           m_shellValues[offset] = values[s];
+       }
+   }
+
+   return m_shellValues;
+}
+
+
+Vector const& ShellList::shellPairValues(qglviewer::Vec const& gridPoint)
+{
+   shellValues(gridPoint);
+
+   unsigned k(0);
+   double xi, xj; 
+   for (unsigned i = 0; i < m_nBasis; ++i) {
+       xi = m_shellValues[i];
+       m_shellPairValues[k] = xi*xi;
+       ++k;
+       for (unsigned j = i+1; j < m_nBasis; ++j, ++k) {
+           xj = m_shellValues[j];
+           m_shellPairValues[k] = xi*xj;
+       }   
+   }
+
+   return m_shellPairValues;
+
+}
+
 
 } } // end namespace IQmol::Data

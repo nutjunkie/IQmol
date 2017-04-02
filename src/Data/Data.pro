@@ -12,6 +12,7 @@ SOURCES = \
    $$PWD/Constraint.C \
    $$PWD/Data.C \
    $$PWD/DataFactory.C \
+   $$PWD/Density.C \
    $$PWD/EfpFragment.C \
    $$PWD/EfpFragmentLibrary.C \
    $$PWD/ElectronicTransition.C \
@@ -56,6 +57,7 @@ HEADERS = \
    $$PWD/Data.h \
    $$PWD/DataFactory.h \
    $$PWD/DataList.h \
+   $$PWD/Density.h \
    $$PWD/DipoleMoment.h \
    $$PWD/EfpFragment.h \
    $$PWD/EfpFragmentLibrary.h \

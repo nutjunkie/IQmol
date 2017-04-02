@@ -1,5 +1,3 @@
-#ifndef IQMOL_UTIL_MATRIX_H
-#define IQMOL_UTIL_MATRIX_H
 /*******************************************************************************
 
   Copyright (C) 2011-2015 Andrew Gilbert
@@ -22,34 +20,33 @@
 
 ********************************************************************************/
 
-#include "boost/numeric/ublas/matrix.hpp"
-#include "boost/numeric/ublas/matrix_proxy.hpp"
-#include "boost/numeric/ublas/vector.hpp"
-#include "boost/multi_array.hpp"
-
-#include <QStringList>
+#include "OrbitalsList.h"
+#include <QDebug>
 
 
 namespace IQmol {
+namespace Data {
 
-typedef boost::numeric::ublas::matrix<double>         Matrix;
-typedef boost::numeric::ublas::vector<double>         Vector;
-typedef boost::numeric::ublas::matrix_column<Matrix const> MatrixColumn;
-typedef boost::numeric::ublas::matrix_row<Matrix const> MatrixRow;
-typedef boost::multi_array<double, 3> Array3D;
-typedef boost::multi_array<double, 4> Array4D;
+//template<> const Type::ID MolecularOrbitalsList::TypeID = Type::MolecularOrbitalsList;
+template<> const 
+  Type::ID Data::List<Data::Orbitals>::TypeID = Type::OrbitalsList;
 
-template <size_t N>
-struct Array {
-    typedef boost::multi_array<double, N> type;
-};
 
-// Invoke:
-// Array<size_t>::type  myArray;
+void OrbitalsList::setDefaultIndex(int index) 
+{ 
+   if (index < 0) {
+      m_defaultIndex = size()-1;
+   }else if (index < size()) {
+      m_defaultIndex = index; 
+   }
+   qDebug() << "Setting default index in OrbitalsList" << index << "->" << m_defaultIndex;
+}
 
-QStringList PrintMatrix(Matrix const&, unsigned const columns = 6);
-QString PrintVector(Vector const&);
 
-} // end namespace IQmol
+void OrbitalsList::dump() const
+{
+   qDebug() << "OrbitalsList of length" << size() << "default index:" << m_defaultIndex;
+   List<Orbitals>::dump();
+}
 
-#endif
+} } // end namespace IQmol::Data

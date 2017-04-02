@@ -31,6 +31,7 @@ namespace IQmol {
 namespace Data {
 
 double Shell::s_values[15];
+double Shell::s_zeroValues[15] = {  };
 double Shell::s_thresh = 0.001;
 
 
@@ -178,7 +179,7 @@ double* Shell::evaluate(Vec const& gridPoint) const
    // bail early if the basis function does not reach the grid point.
    Vec delta(gridPoint-m_position);
    double  r2(delta*delta);
-   if (r2 > m_significantRadiusSquared) return 0;
+   if (r2 > m_significantRadiusSquared) return s_zeroValues;
 
    double x(delta.x);
    double y(delta.y);

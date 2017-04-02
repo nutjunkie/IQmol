@@ -1,5 +1,3 @@
-#ifndef IQMOL_UTIL_MATRIX_H
-#define IQMOL_UTIL_MATRIX_H
 /*******************************************************************************
 
   Copyright (C) 2011-2015 Andrew Gilbert
@@ -22,34 +20,35 @@
 
 ********************************************************************************/
 
-#include "boost/numeric/ublas/matrix.hpp"
-#include "boost/numeric/ublas/matrix_proxy.hpp"
-#include "boost/numeric/ublas/vector.hpp"
-#include "boost/multi_array.hpp"
-
-#include <QStringList>
+#include "Density.h"
+#include "QsLog.h"
+#include <QDebug>
 
 
 namespace IQmol {
+namespace Data {
 
-typedef boost::numeric::ublas::matrix<double>         Matrix;
-typedef boost::numeric::ublas::vector<double>         Vector;
-typedef boost::numeric::ublas::matrix_column<Matrix const> MatrixColumn;
-typedef boost::numeric::ublas::matrix_row<Matrix const> MatrixRow;
-typedef boost::multi_array<double, 3> Array3D;
-typedef boost::multi_array<double, 4> Array4D;
 
-template <size_t N>
-struct Array {
-    typedef boost::multi_array<double, N> type;
-};
+Density::Density(QString const& label, QList<double> const&  elements) : m_label(label)
+{
+   m_nBasis = round((std::sqrt(1.0+8.0*elements.size()) -1.0)/2.0);
+   if (m_nBasis*(m_nBasis+1)/2 != elements.size()) {
+      qDebug() << "Incorrect number of density matrix elements";
+      return;
+   }
+   
+   m_elements.resize(m_nBasis, m_nBasis);
+   unsigned k(0);
+   for (unsigned i = 0; i < m_nBasis; ++i) {
+       for (unsigned j = i; j < m_nBasis; ++j, ++k) {
+           m_elements(i,j) = m_elements(j,i) = elements[k];
+       }
+   }
+}
 
-// Invoke:
-// Array<size_t>::type  myArray;
 
-QStringList PrintMatrix(Matrix const&, unsigned const columns = 6);
-QString PrintVector(Vector const&);
+void Density::dump() const
+{
+}
 
-} // end namespace IQmol
-
-#endif
+} } // end namespace IQmol::Data

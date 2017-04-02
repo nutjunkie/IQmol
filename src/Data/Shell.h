@@ -23,7 +23,7 @@
 ********************************************************************************/
 
 #include "QGLViewer/vec.h"
-#include "DataList.h"
+#include "Data.h"
 
 
 namespace IQmol {
@@ -52,6 +52,8 @@ namespace Data {
 		 /// significance is determined by s_thresh.  
          void boundingBox(qglviewer::Vec& min, qglviewer::Vec& max);
 
+		 // Returns a pointer to an array containing the values of the basis
+		 // functions at the given position.
          double* evaluate(qglviewer::Vec const& position) const;
          AngularMomentum angularMomentum() const { return m_angularMomentum; }
          unsigned nBasis() const;
@@ -79,6 +81,7 @@ namespace Data {
 		 /// is sufficient for up to g angular momentum.
          /// This could cause problems if Shells are ever used in parallel
          static double s_values[15];
+         static double s_zeroValues[15];
 
          double computeSignificantRadius(double const thresh);
          QString toString(AngularMomentum const) const;

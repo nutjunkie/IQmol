@@ -333,6 +333,12 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
              if (nbos) naturalbondOrbitalList->append(nbos);
 	         qDebug() << "Append one NBO to MO lists";
 	     }
+
+      }else if (key.contains("Density")) {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok || !geometry) goto error;
+         QList<double> density(readDoubleArray(textStream, n));
+//         Density(key,density);
       }
 
    } // end of parsing text stream 

@@ -24,11 +24,14 @@
 
 #include "boost/bind.hpp"
 #include "boost/function.hpp"
+#include "Matrix.h"
 
 
 namespace IQmol {
 
 typedef boost::function<double (double const, double const, double const)> Function3D;
+
+typedef boost::function<Vector const& (double const, double const, double const)> MultiFunction3D;
 
 static Function3D NullFunction3D;
 

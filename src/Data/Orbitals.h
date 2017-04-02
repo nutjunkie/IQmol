@@ -64,7 +64,7 @@ namespace Data {
 
          Matrix const& alphaCoefficients() const { return m_alphaCoefficients; }
          Matrix const& betaCoefficients()  const { return m_betaCoefficients; }
-         ShellList const& shellList() const { return m_shellList; }
+         ShellList& shellList() { return m_shellList; }
 
          QString const& label() const { return m_label; }
          void setLabel(QString const& label) { m_label = label; }

@@ -66,6 +66,7 @@ namespace IQmol {
          /// if an error occured.
          void finished(); 
 
+         // done <= m_totalProgress
          void progress(int done);
 
 

@@ -69,9 +69,7 @@ MolecularOrbitals::MolecularOrbitals(Data::MolecularOrbitals& molecularOrbitals)
    m_configurator.sync();
    setConfigurator(&m_configurator);
 
-   unsigned N(nBasis());
-   m_shellValues.resize(N);
-   m_shellPairValues.resize(N*(N+1)/2);
+   m_molecularOrbitals.shellList().resize();
  
    m_molecularOrbitals.boundingBox(m_bbMin, m_bbMax);
    appendSurfaces(m_molecularOrbitals.surfaceList());
@@ -82,6 +80,7 @@ MolecularOrbitals::MolecularOrbitals(Data::MolecularOrbitals& molecularOrbitals)
        computeDensityVectors();
    }
 }
+
 
 
 double MolecularOrbitals::alphaOrbitalEnergy(unsigned const i) const 
@@ -120,20 +119,24 @@ unsigned MolecularOrbitals::nAlpha() const
    return m_molecularOrbitals.nAlpha(); 
 }
 
+
 unsigned MolecularOrbitals::nBeta() const 
 { 
    return m_molecularOrbitals.nBeta(); 
 }
+
 
 unsigned MolecularOrbitals::nBasis() const 
 { 
    return m_molecularOrbitals.nBasis(); 
 }
 
+
 unsigned MolecularOrbitals::nOrbitals() const 
 { 
    return m_molecularOrbitals.nOrbitals(); 
 }
+
 
 void MolecularOrbitals::computeDensityVectors()
 {
@@ -204,7 +207,6 @@ void MolecularOrbitals::clearSurfaceQueue()
 
 void MolecularOrbitals::showGridInfo()
 {
-   //GridInfoDialog dialog(&m_availableGrids, m_molecule);
    GridInfoDialog dialog(&m_availableGrids, m_molecule->text(), 
        m_molecule->coordinatesForCubeFile());
    dialog.exec();
@@ -230,7 +232,6 @@ Data::GridData* MolecularOrbitals::findGrid(Data::SurfaceType const& type,
    qDebug() << "List";
    gridList.dump();
   
-
    for (iter = gridList.begin(); iter != gridList.end(); ++iter) {
        if ( type == (*iter)->surfaceType() && size == (*iter)->size() ) {
           grid = (*iter);
@@ -240,6 +241,7 @@ Data::GridData* MolecularOrbitals::findGrid(Data::SurfaceType const& type,
    }
    return grid;
 }
+
 
 
 void MolecularOrbitals::dumpGridInfo() const
@@ -370,7 +372,7 @@ qDebug() << "Grid already exists";
 #ifndef Q_OS_WIN32
    // Deleting this under Windows causes a crash, go figure.
    // actually it is not just windows.
-   //delete progressDialog;
+   // delete progressDialog;
 #endif
 
    clearSurfaceQueue();
@@ -420,12 +422,14 @@ bool MolecularOrbitals::processGridQueue(GridQueue const& gridQueue)
           Data::SurfaceType beta(Data::SurfaceType::BetaDensity);
           Data::GridData*   betaGrid  = new Data::GridData(*size, beta);
 
-          if (!computeDensityGrids(alphaGrid, betaGrid)) {
+
+          if (!computeDensityGrids2(alphaGrid, betaGrid)) {
              // user canceled the action
              delete alphaGrid;
              delete betaGrid;
              return false;
           }
+
 
           m_availableGrids.append(alphaGrid);
           m_availableGrids.append(betaGrid);
@@ -532,8 +536,200 @@ Data::Surface* MolecularOrbitals::generateSurface(Data::SurfaceInfo const& surfa
 }
 
 
+Vector const& MolecularOrbitals::orbitalEvaluator(Matrix const& coefficients, 
+   QList<int> const& indices, double const x, double const y, double const z)
+{
+   Data::ShellList& shellList(m_molecularOrbitals.shellList());
+   Vector const& s1(shellList.shellValues(Vec(x,y,z)));
+
+   for (unsigned i = 0; i < indices.size(); ++i) {
+       MatrixRow col(coefficients, indices[i]);
+       m_evaluatorReturn[i] = inner_prod(col , s1);
+   }
+   return m_evaluatorReturn;
+}
+
+
+
 // This requires all the Grids be of the same size and all the orbitals to be
 // of the same spin.  Returns true only if something was calculated.
+bool MolecularOrbitals::computeOrbitalGrids2(Data::GridDataList& grids)
+{
+   if (grids.isEmpty()) return false;;
+
+   // Check that the grids are all of the same size and Spin
+   Data::GridData* g0(grids[0]);
+   Data::GridDataList::iterator iter;
+   m_orbitalIndices.clear();
+
+   for (iter = grids.begin(); iter != grids.end(); ++iter) {
+       QLOG_DEBUG() << "Computing grid" << (*iter)->surfaceType().toString() ;
+       (*iter)->size().dump();
+       if ( ((*iter)->size() != g0->size()) ) {
+          QLOG_ERROR() << "Different sized grids found in molecular orbitals calculator";
+          return false;
+       }
+       if ( ((*iter)->surfaceType().kind() != Data::SurfaceType::AlphaOrbital) &&
+            ((*iter)->surfaceType().kind() != Data::SurfaceType::BetaOrbital) ) {
+          QLOG_ERROR() << "Incorrect grid type found in molecular orbitals calculator";
+          QLOG_ERROR() << (*iter)->surfaceType().toString(); 
+          return false;
+       }
+       m_orbitalIndices.append((*iter)->surfaceType().index()-1);
+   }
+
+   m_evaluatorReturn.resize(m_orbitalIndices.size());
+
+   if (g0->surfaceType().kind() == Data::SurfaceType::AlphaOrbital) {
+      QLOG_TRACE() << "Setting MO coefficient data to Alpha";
+      m_function = boost::bind(&MolecularOrbitals::orbitalEvaluator, this, 
+         m_molecularOrbitals.alphaCoefficients(), m_orbitalIndices, _1, _2, _3);
+   }else {
+      QLOG_TRACE() << "Setting MO coefficient data to Beta";
+   m_function = boost::bind(&MolecularOrbitals::orbitalEvaluator, this, 
+       m_molecularOrbitals.betaCoefficients(), m_orbitalIndices, _1, _2, _3);
+   }
+
+   m_grids = grids;
+   double thresh(0.001);
+   m_evaluator = new MultiGridEvaluator(m_grids, m_function, thresh);
+   connect(m_evaluator, SIGNAL(finished()), this, SLOT(evaluatorFinished()));
+   m_evaluator->start();
+   m_evaluator->wait();
+   qDebug() << "*** Time to compute MO grid data" << m_evaluator->timeTaken();
+
+
+/*
+  
+   unsigned nOrb(orbitals.size());
+   unsigned nx, ny, nz;
+   g0->getNumberOfPoints(nx, ny, nz);
+   Vec delta(g0->delta());
+   Vec origin(g0->origin());
+
+   QProgressDialog* progressDialog(new QProgressDialog("Calculating orbital grid data", 
+       "Cancel", 0, nx));
+       
+   int progress(0);
+
+   progressDialog->setValue(progress);
+   progressDialog->setWindowModality(Qt::WindowModal);
+   progressDialog->show();
+
+   double  x, y, z;
+   double* values;
+   double* tmp = new double[nOrb];
+   unsigned i, j, k;
+
+   Data::ShellList const& shells(m_molecularOrbitals.shellList());
+   Data::ShellList::const_iterator shell;
+
+// TODO this should be moved to the ShellList class
+   for (i = 0, x = origin.x;  i < nx;  ++i, x += delta.x) {
+       for (j = 0, y = origin.y;  j < ny;  ++j, y += delta.y) {
+           for (k = 0, z = origin.z;  k < nz;  ++k, z += delta.z) {
+   
+               Vec gridPoint(x,y,z);
+
+               for (unsigned orb = 0; orb < nOrb; ++orb) tmp[orb] = 0.0;
+               unsigned offset(0);
+
+               //-----------------------------------------------------
+               for (shell = shells.begin(); shell != shells.end(); ++shell) {
+                   if ( (values = (*shell)->evaluate(gridPoint)) ) {
+                      for (unsigned s = 0; s < (*shell)->nBasis(); ++s) {
+                          for (unsigned orb = 0; orb < nOrb; ++orb) {
+                              tmp[orb] += (*coefficients)(orbitals[orb], offset) * values[s];
+                          }
+                          ++offset;
+                      }
+                   }else {
+                      offset += (*shell)->nBasis();
+                   }
+               }
+
+               for (unsigned orb = 0; orb < nOrb; ++orb) {
+                   (*grids.at(orb))(i, j, k) = tmp[orb];
+               }
+               //-----------------------------------------------------
+           }
+       }
+
+       ++progress;
+       progressDialog->setValue(progress);
+       if (progressDialog->wasCanceled()) {
+          delete [] tmp;
+#ifndef Q_OS_WIN32
+          //delete progressDialog;
+#endif
+          return false;
+       }
+   }
+
+   delete [] tmp;
+
+   double t = time.elapsed() / 1000.0;
+   QLOG_INFO() << "Time to compute orbital grid data:" << t << "seconds";
+*/
+
+   return true;
+}
+
+
+Vector const& MolecularOrbitals::densityEvaluator(QList<Vector*> const& densities,
+    double const x, double const y, double const z)
+{
+   Data::ShellList& shellList(m_molecularOrbitals.shellList());
+   Vector const& s2(shellList.shellPairValues(Vec(x,y,z)));
+   for (unsigned i = 0; i < densities.size(); ++i) {
+       m_evaluatorReturn[i] = inner_prod(*(densities[i]), s2);
+   }
+   return m_evaluatorReturn;
+}
+
+
+
+bool MolecularOrbitals::computeDensityGrids2(Data::GridData* alpha, Data::GridData* beta)
+{
+   m_densities.clear();
+   m_densities << &m_alphaDensity << &m_betaDensity;
+   m_evaluatorReturn.resize(m_densities.size());  // alpha and beta
+
+   m_function = boost::bind(&MolecularOrbitals::densityEvaluator, this, m_densities, _1, _2, _3);
+
+   m_grids.clear();
+   m_grids << alpha << beta;
+   qDebug() << "Grid Pointers in MOLayer" << alpha << beta;
+   
+   double thresh(0.001);
+   m_evaluator = new MultiGridEvaluator(m_grids, m_function, thresh);
+
+   connect(m_evaluator, SIGNAL(finished()), this, SLOT(evaluatorFinished()));
+   m_evaluator->start();
+   m_evaluator->wait();
+qDebug() << "Time to compute grid data" << m_evaluator->timeTaken();
+
+/*
+   QProgressDialog progressDialog("Calculating density grid data", "Cancel", 0, 
+       totalProgress, QApplication::activeWindow());
+   progressDialog.setValue(progress);
+   progressDialog.setWindowModality(Qt::WindowModal);
+   progressDialog.show();
+*/
+   return true;
+}
+
+
+void MolecularOrbitals::evaluatorFinished()
+{
+   qDebug() << "EVALUATION FINISHED";
+   delete m_evaluator;
+   m_evaluator = 0;
+}
+
+
+
+// TODO: deprecate
 bool MolecularOrbitals::computeOrbitalGrids(Data::GridDataList& grids)
 {
    if (grids.isEmpty()) return false;;
@@ -594,6 +790,7 @@ bool MolecularOrbitals::computeOrbitalGrids(Data::GridDataList& grids)
    Data::ShellList const& shells(m_molecularOrbitals.shellList());
    Data::ShellList::const_iterator shell;
 
+// TODO this should be moved to the ShellList class
    for (i = 0, x = origin.x;  i < nx;  ++i, x += delta.x) {
        for (j = 0, y = origin.y;  j < ny;  ++j, y += delta.y) {
            for (k = 0, z = origin.z;  k < nz;  ++k, z += delta.z) {
@@ -642,8 +839,6 @@ bool MolecularOrbitals::computeOrbitalGrids(Data::GridDataList& grids)
 
    return true;
 }
-
-
 bool MolecularOrbitals::computeDensityGrids(Data::GridData*& alpha, Data::GridData*& beta)
 {
    QTime time;
@@ -663,6 +858,7 @@ bool MolecularOrbitals::computeDensityGrids(Data::GridData*& alpha, Data::GridDa
    unsigned progress(0);
    unsigned i, j, k;
    double x, y, z;
+   Data::ShellList& shellList(m_molecularOrbitals.shellList());
 
    QProgressDialog progressDialog("Calculating density grid data", "Cancel", 0, 
        totalProgress, QApplication::activeWindow());
@@ -674,9 +870,9 @@ bool MolecularOrbitals::computeDensityGrids(Data::GridData*& alpha, Data::GridDa
        for (j = 0, y = origin.y; j < ny; j += 2, y += 2.0*delta.y) {
            for (k = 0, z = origin.z; k < nz; k += 2, z += 2.0*delta.z) {
                Vec gridPoint(x, y, z);
-               computeShellPairs(gridPoint);
-               (*alpha)(i, j, k) = inner_prod(m_alphaDensity, m_shellPairValues);
-               (*beta )(i, j, k) = inner_prod(m_betaDensity,  m_shellPairValues);
+               Vector const& s2(shellList.shellPairValues(gridPoint));
+               (*alpha)(i, j, k) = inner_prod(m_alphaDensity, s2);
+               (*beta )(i, j, k) = inner_prod(m_betaDensity,  s2);
            }
        }
 
@@ -717,34 +913,33 @@ bool MolecularOrbitals::computeDensityGrids(Data::GridData*& alpha, Data::GridDa
 
                if (std::abs(aTot) > thresh || std::abs(bTot) > thresh) {
 
+                  Vector const& s0(shellList.shellPairValues(Vec(x, y, z)));
+                  (*alpha)(i,  j,  k  ) = inner_prod(m_alphaDensity, s0);
+                  (*beta )(i,  j,  k  ) = inner_prod(m_betaDensity,  s0);
 
-                  computeShellPairs(Vec(x, y, z));
-                  (*alpha)(i,  j,  k  ) = inner_prod(m_alphaDensity, m_shellPairValues);
-                  (*beta )(i,  j,  k  ) = inner_prod(m_betaDensity,  m_shellPairValues);
+                  Vector const& s1(shellList.shellPairValues(Vec(x, y, z-delta.z)));
+                  (*alpha)(i,  j,  k-1) = inner_prod(m_alphaDensity, s1);
+                  (*beta )(i,  j,  k-1) = inner_prod(m_betaDensity,  s1);
 
-                  computeShellPairs(Vec(x, y, z-delta.z));
-                  (*alpha)(i,  j,  k-1) = inner_prod(m_alphaDensity, m_shellPairValues);
-                  (*beta )(i,  j,  k-1) = inner_prod(m_betaDensity,  m_shellPairValues);
+                  Vector const& s2(shellList.shellPairValues(Vec(x, y-delta.y, z)));
+                  (*alpha)(i,  j-1,k  ) = inner_prod(m_alphaDensity, s2);
+                  (*beta )(i,  j-1,k  ) = inner_prod(m_betaDensity,  s2);
 
-                  computeShellPairs(Vec(x, y-delta.y, z));
-                  (*alpha)(i,  j-1,k  ) = inner_prod(m_alphaDensity, m_shellPairValues);
-                  (*beta )(i,  j-1,k  ) = inner_prod(m_betaDensity,  m_shellPairValues);
+                  Vector const& s3(shellList.shellPairValues(Vec(x, y-delta.y, z-delta.z)));
+                  (*alpha)(i,  j-1,k-1) = inner_prod(m_alphaDensity, s3);
+                  (*beta )(i,  j-1,k-1) = inner_prod(m_betaDensity,  s3);
 
-                  computeShellPairs(Vec(x, y-delta.y, z-delta.z));
-                  (*alpha)(i,  j-1,k-1) = inner_prod(m_alphaDensity, m_shellPairValues);
-                  (*beta )(i,  j-1,k-1) = inner_prod(m_betaDensity,  m_shellPairValues);
+                  Vector const& s4(shellList.shellPairValues(Vec(x-delta.x, y, z)));
+                  (*alpha)(i-1,j,  k  ) = inner_prod(m_alphaDensity, s4);
+                  (*beta )(i-1,j,  k  ) = inner_prod(m_betaDensity,  s4);
 
-                  computeShellPairs(Vec(x-delta.x, y, z));
-                  (*alpha)(i-1,j,  k  ) = inner_prod(m_alphaDensity, m_shellPairValues);
-                  (*beta )(i-1,j,  k  ) = inner_prod(m_betaDensity,  m_shellPairValues);
+                  Vector const& s5(shellList.shellPairValues(Vec(x-delta.x, y, z-delta.z)));
+                  (*alpha)(i-1,j,  k-1) = inner_prod(m_alphaDensity, s5);
+                  (*beta )(i-1,j,  k-1) = inner_prod(m_betaDensity,  s5);
 
-                  computeShellPairs(Vec(x-delta.x, y, z-delta.z));
-                  (*alpha)(i-1,j,  k-1) = inner_prod(m_alphaDensity, m_shellPairValues);
-                  (*beta )(i-1,j,  k-1) = inner_prod(m_betaDensity,  m_shellPairValues);
-
-                  computeShellPairs(Vec(x-delta.x, y-delta.y, z));
-                  (*alpha)(i-1,j-1,k  ) = inner_prod(m_alphaDensity, m_shellPairValues);
-                  (*beta )(i-1,j-1,k  ) = inner_prod(m_betaDensity,  m_shellPairValues);
+                  Vector const& s6(shellList.shellPairValues(Vec(x-delta.x, y-delta.y, z)));
+                  (*alpha)(i-1,j-1,k  ) = inner_prod(m_alphaDensity, s6);
+                  (*beta )(i-1,j-1,k  ) = inner_prod(m_betaDensity,  s6);
                   
                }else {
 
@@ -782,40 +977,6 @@ bool MolecularOrbitals::computeDensityGrids(Data::GridData*& alpha, Data::GridDa
    QLOG_INFO() << "Time to compute density grid data:" << t << "seconds";
 
    return true;
-}
-
-
-void MolecularOrbitals::computeShellPairs(Vec const& gridPoint)
-{
-   Data::ShellList const& shells(m_molecularOrbitals.shellList());
-
-   double* values;
-   Data::ShellList::const_iterator shell;
-   unsigned k(0);
-   for (shell = shells.begin(); shell != shells.end(); ++shell) {
-       if ( (values = (*shell)->evaluate(gridPoint)) ) {
-          for (unsigned j = 0; j < (*shell)->nBasis(); ++j, ++k) {
-              m_shellValues[k] = values[j];
-          }
-       }else {
-          for (unsigned j = 0; j < (*shell)->nBasis(); ++j, ++k) {
-              m_shellValues[k] = 0.0;
-          }
-       }
-   }
-
-   k = 0;
-   double xi, xj;
-   unsigned N(nBasis());
-   for (unsigned i = 0; i < N; ++i) {
-       xi = m_shellValues[i];
-       m_shellPairValues[k] = xi*xi;
-       ++k;
-       for (unsigned j = i+1; j < N; ++j, ++k) {
-           xj = m_shellValues[j];
-           m_shellPairValues[k] = xi*xj;
-       }
-   }
 }
 
 } } // end namespace IQmol::Layer

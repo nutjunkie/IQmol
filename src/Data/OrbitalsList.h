@@ -1,5 +1,5 @@
-#ifndef IQMOL_UTIL_MATRIX_H
-#define IQMOL_UTIL_MATRIX_H
+#ifndef IQMOL_DATA_ORBITALSLIST_H
+#define IQMOL_DATA_ORBITALSLIST_H
 /*******************************************************************************
 
   Copyright (C) 2011-2015 Andrew Gilbert
@@ -22,34 +22,40 @@
 
 ********************************************************************************/
 
-#include "boost/numeric/ublas/matrix.hpp"
-#include "boost/numeric/ublas/matrix_proxy.hpp"
-#include "boost/numeric/ublas/vector.hpp"
-#include "boost/multi_array.hpp"
-
-#include <QStringList>
+#include "Orbitals.h"
 
 
 namespace IQmol {
+namespace Data {
 
-typedef boost::numeric::ublas::matrix<double>         Matrix;
-typedef boost::numeric::ublas::vector<double>         Vector;
-typedef boost::numeric::ublas::matrix_column<Matrix const> MatrixColumn;
-typedef boost::numeric::ublas::matrix_row<Matrix const> MatrixRow;
-typedef boost::multi_array<double, 3> Array3D;
-typedef boost::multi_array<double, 4> Array4D;
+   class OrbitalsList : public Data::List<Data::Orbitals> {
+      public:
 
-template <size_t N>
-struct Array {
-    typedef boost::multi_array<double, N> type;
-};
+         OrbitalsList() : m_defaultIndex(0) { }
 
-// Invoke:
-// Array<size_t>::type  myArray;
+         /// Sets which set of data should be considered the default in the
+         /// list.  An index of -1 corresponds to the final geometry.
+         void setDefaultIndex(int index);
+         unsigned defaultIndex() const { return m_defaultIndex; }
 
-QStringList PrintMatrix(Matrix const&, unsigned const columns = 6);
-QString PrintVector(Vector const&);
+         virtual void serialize(InputArchive& ar, unsigned int const version = 0) 
+         {
+            serializeList(ar, version);
+            ar & m_defaultIndex;
+         }
 
-} // end namespace IQmol
+         virtual void serialize(OutputArchive& ar, unsigned int const version = 0) 
+         {
+            serializeList(ar, version);
+            ar & m_defaultIndex;
+         }
+
+         void dump() const;
+
+      private:
+         unsigned m_defaultIndex; 
+   };
+
+} } // end namespace IQmol::Data
 
 #endif

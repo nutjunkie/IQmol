@@ -29,6 +29,8 @@
 #include "GridData.h"
 #include "Matrix.h"
 #include "MolecularOrbitals.h"
+#include "Function.h"
+#include "GridEvaluator.h"
 #include <QPair>
 
 
@@ -73,13 +75,13 @@ namespace Layer {
       private Q_SLOTS:
          void showGridInfo();
          void editBoundingBox();
+         void evaluatorFinished();
 
       private:
          // Returns false if the user cancels the calculation
          bool computeOrbitalGrids(Data::GridDataList& grids);
          bool computeDensityGrids(Data::GridData*& alpha, Data::GridData*& beta);
          void computeDensityVectors();
-         void computeShellPairs(qglviewer::Vec const& gridPoint);
 
          Data::GridData* findGrid(Data::SurfaceType const& type, 
             Data::GridSize const& size, Data::GridDataList const& gridList);
@@ -96,8 +98,22 @@ namespace Layer {
 
          Vector m_alphaDensity;
          Vector m_betaDensity;
-         Vector m_shellPairValues;
-         Vector m_shellValues;
+
+         // grid evaluations stuff, should be encapsulated
+         bool computeDensityGrids2(Data::GridData* alpha, Data::GridData* beta);
+         Vector const& densityEvaluator(QList<Vector*> const& densities,
+            double const x, double const y, double const z);
+         Vector m_evaluatorReturn;
+         MultiFunction3D m_function;
+         MultiGridEvaluator* m_evaluator;
+         QList<Vector*> m_densities;
+         QList<Data::GridData*> m_grids;
+         bool computeOrbitalGrids2(Data::GridDataList& grids);
+         Vector const& orbitalEvaluator(Matrix const& coefficients, 
+            QList<int> const& orbitalIndices, double const x, double const y, double const z);
+         QList<int> m_orbitalIndices;
+
+
 
          SurfaceInfoQueue   m_surfaceInfoQueue;
          Data::GridDataList m_availableGrids;

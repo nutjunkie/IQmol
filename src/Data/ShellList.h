@@ -24,6 +24,7 @@
 
 #include "QGLViewer/vec.h"
 #include "DataList.h"
+#include "Matrix.h"
 #include "Shell.h"
 
 
@@ -45,6 +46,16 @@ namespace Data {
 
          unsigned nBasis() const;
 
+		 /// Allocates the memory for evaluating the shells/shell pairs on a grid
+		 /// point.  This should be called after the last Shell has been appended
+		 /// to the list and before shellValues or shellPairValues is called.
+		 void resize();
+
+         Vector const& shellValues(qglviewer::Vec const& gridPoint);
+         // Returns the vectorized upper triangular array of unique shell 
+         // values at the grid point pairs.
+         Vector const& shellPairValues(qglviewer::Vec const& gridPoint);
+
          void serialize(InputArchive& ar, unsigned int const version = 0) {
             serializeList(ar, version);
          }  
@@ -54,6 +65,11 @@ namespace Data {
          }  
 
          void dump() const;
+
+      private:
+         unsigned m_nBasis;
+         Vector   m_shellValues;
+         Vector   m_shellPairValues;
    };
 
 } } // end namespace IQmol::Data

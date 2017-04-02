@@ -42,8 +42,34 @@ namespace IQmol {
          void run();
 
       private:
-         Data::GridData& m_grid;
+         Data::GridData&  m_grid;
          Function3D const& m_function;
+   };
+
+
+   /// GridEvaluator for cases where it is more efficient to generate multiple
+   /// grid data at a time.  For example, several molecular orbitals requiring
+   /// only one evaluation of the shell data at each point
+   class MultiGridEvaluator : public Task {
+
+      Q_OBJECT
+
+      public:
+         // Note we don't check for size consistency between the number of 
+         // grids and the return on the MultiFunction3D object.
+         MultiGridEvaluator(QList<Data::GridData*> grids, MultiFunction3D const& function,
+            double const thresh, bool const coarseGrain = true);
+
+      protected:
+         void run();
+
+      private:
+         void runCoarseGrain();
+
+         double m_thresh;
+         bool m_coarseGrain;
+         QList<Data::GridData*> m_grids;
+         MultiFunction3D const& m_function;
    };
 
 } // end namespace IQmol

@@ -55,7 +55,7 @@ namespace Data {
                 DipoleMoment,           VibrationalMode,        VibrationalModeList, 
                 PointGroup,
                 Frequencies,            MolecularOrbitals,      MolecularOrbitalsList,
-                Orbitals,               OrbitalsList,
+                Orbitals,               OrbitalsList,           Density,
                 Shell,                  ShellList,              Mesh,
                 MeshList,               Surface,                SurfaceList,
                 SurfaceInfo,            SurfaceInfoList,        SurfaceType, 
