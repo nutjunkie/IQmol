@@ -120,23 +120,30 @@ void MolecularOrbitals::initPlot()
    QCPGraph* graph(0);
 
    unsigned i(0), g(0);
+   bool isNTO = (m_molecularOrbitals.orbitalType() == Data::MolecularOrbitals::NaturalTransition) ? true : false;
 
-   // For NTOs
-   if (m_molecularOrbitals.orbitalType() == Data::MolecularOrbitals::NaturalTransition) {
+   // NTOs are paired occ & vir orbitals
+   if (isNTO) {
      if (nBeta == nAlpha) {
-       nAlpha = nOrbs/2;
-       nBeta = 0;
-     } else 
+       nAlpha = nOrbs/2; nBeta = 0;
+     } else
        nAlpha = nBeta = nOrbs/2;
    }
 
    // Alpha
-   while (i < nOrbs) {
+   while (i < nOrbs) 
+   {
        y[0] = m_molecularOrbitals.alphaOrbitalEnergy(i);
 
        g = 1; // degeneracy
        while (i+g < nOrbs && 
               std::abs(y[0]-m_molecularOrbitals.alphaOrbitalEnergy(i+g)) < 0.001) { ++g; }
+
+       // NTOs
+       if (isNTO) {
+         if (i > nAlpha) break;
+         y[0] = -y[0];
+       }
 
        for (unsigned k = i; k < i+g; ++k) {
            a[0]  = 0.75 - 0.25*(g-1) + (k-i)*0.50;
@@ -158,10 +165,14 @@ void MolecularOrbitals::initPlot()
    // Beta
    while (i < nOrbs) {
        y[0] = m_molecularOrbitals.betaOrbitalEnergy(i);
-
        g = 1; // degeneracy
        while (i+g < nOrbs && 
               std::abs(y[0]-m_molecularOrbitals.betaOrbitalEnergy(i+g)) < 0.001) { ++g; }
+
+       if (isNTO) {
+         if (i > nBeta) break;
+         y[0] = -y[0];
+       }
 
        for (unsigned k = i; k < i+g; ++k) {
            a[0]  = 2.50 - 0.25*(g-1) + (k-i)*0.50;
@@ -198,10 +209,10 @@ void MolecularOrbitals::initPlot()
       yMax  = m_molecularOrbitals.alphaOrbitalEnergy(index);
    }
    yMax = std::min(yMax, 0.5*std::abs(yMin));
-   // For NTOs
+   // NTO in occupation order, not energy
    if (m_molecularOrbitals.orbitalType() == Data::MolecularOrbitals::NaturalTransition) {
      m_customPlot->yAxis->setLabel("Occupation");
-     m_customPlot->yAxis->setRange(-1.1,1.1);
+     m_customPlot->yAxis->setRange(0.0,1.1);
    } else
      m_customPlot->yAxis->setRange(1.05*yMin,1.05*yMax);
 }

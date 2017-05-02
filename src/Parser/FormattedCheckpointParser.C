@@ -60,7 +60,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
    MoData    ntoData;
    MoData    nboData;
    GmoData   gmoData;
-   ExtData   extData;
+   ExtData   extData;   extData.nState = 0;
 
    while (!textStream.atEnd()) {
 
@@ -309,7 +309,6 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       //   extData.nState  = list.at(1).toInt(&ok);
       //   if (!ok) goto error;
 
-      //}else if (key == "Excitation Energies") {
       }else if (key.endsWith("Excitation Energies")) {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
@@ -327,13 +326,11 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          extData.alphaAmplitudes = readDoubleArray(textStream, n);
-         //extData.betaAmplitudes  = extData.alphaAmplitudes;
       
       }else if (key == "Alpha Y Amplitudes") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          extData.alphaYAmplitudes = readDoubleArray(textStream, n);
-         //extData.betaYAmplitudes  = extData.alphaYAmplitudes;
          extData.extType = Data::ExcitedStates::TDDFT;
 
       }else if (key == "Beta Amplitudes" || key == "Beta X Amplitudes") {
@@ -350,13 +347,11 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          extData.alphaSparseJ = readIntegerArray(textStream, n);
-         //extData.betaSparseJ = extData.alphaSparseJ;
 
       }else if (key == "Alpha I Indexes") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          extData.alphaSparseI = readIntegerArray(textStream, n);
-         //extData.betaSparseI = extData.alphaSparseI;
 
       }else if (key == "Beta J Indexes") {
          unsigned n(list.at(2).toUInt(&ok));
@@ -376,13 +371,13 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       if (mos) molecularOrbitalsList->append(mos);
       Data::GeminalOrbitals* gmos(makeGeminalOrbitals(gmoData, shellData, *geometry)); 
       if (gmos) m_dataBank.append(gmos);
-/*
+//*
       // install excitation 
       if (extData.nState > 0) {
          ok = installExcitedStates(extData,moData);
          if (!ok) goto error;
       }
-*/
+//*/
    }
 
    if (geometryList) {
