@@ -29,6 +29,7 @@
 
 
 using namespace IQmol;
+using namespace std;   // for atexit
 
 namespace Qui {
 
@@ -39,11 +40,7 @@ bool OptionDatabase::s_okay;
 OptionDatabase& OptionDatabase::instance() {
    if (s_instance == 0) {
       s_instance = new OptionDatabase();
-#ifdef Q_OS_LINUX
       atexit(OptionDatabase::destroy);
-#else
-      std::atexit(OptionDatabase::destroy);
-#endif
    }
 
    return *s_instance;

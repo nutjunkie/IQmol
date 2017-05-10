@@ -16,6 +16,7 @@
 #include <map>
 #include <QString>
 
+using namespace std;
 
 namespace Qui {
 
@@ -26,11 +27,7 @@ class Register {
       static Register& instance() {
          if (s_instance == 0) {
             s_instance = new Register();
-#ifdef Q_OS_LINUX
             atexit(Register::destroy);
-#else
-            ::std::atexit(Register::destroy);
-#endif
          }
          return *s_instance;
       }
