@@ -2,22 +2,20 @@ macx {
    CONFIG += release
 
    # Boost
-   BOOST        = $(DEV)/boost_1_56_0
+   BOOST        = $(DEV)/boost_1_64_0
    INCLUDEPATH += $${BOOST}
    LIBS        += $${BOOST}/stage/lib/libboost_iostreams.a
    LIBS        += $${BOOST}/stage/lib/libboost_serialization.a
    LIBS        += $${BOOST}/stage/lib/libboost_exception.a
 
    # OpenBabel
-   #INCLUDEPATH += /usr/local/include/openbabel-2.0
-   #LIBS        += -L/usr/local/lib -lopenbabel
-   OPENBABEL    = $(DEV)/openbabel-2.3.2
+   OPENBABEL    = $(DEV)/openbabel-2.4.1
    INCLUDEPATH += $${OPENBABEL}/include
    LIBS        += $${OPENBABEL}/build/src/libopenbabel.a
 
    # SSH2
    INCLUDEPATH += $(DEV)/extlib/include
-   LIBS        += $(DEV)/extlib/lib//libssh2.a
+   LIBS        += $(DEV)/extlib/lib/libssh2.a
 
    # libssl/libcrypto
    INCLUDEPATH += $(DEV)/extlib/include
@@ -34,6 +32,6 @@ macx {
    LIBS += -framework GLUT
    LIBS += -L/usr/lib -lz
 
-   QMAKE_LFLAGS   += -Wl,-no_compact_unwind -stdlib=libstdc++
+   QMAKE_LFLAGS   += -Wl,-no_compact_unwind -stdlib=libc++ #-stdlib=libstdc++
    QMAKE_RPATHDIR += @executable_path/../Frameworks
 }
