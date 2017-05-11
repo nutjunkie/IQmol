@@ -21,6 +21,7 @@ SOURCES = \
    $$PWD/InfoConfigurator.C \
    $$PWD/MoleculeConfigurator.C \
    $$PWD/MolecularOrbitalsConfigurator.C \
+   $$PWD/MolecularSurfacesConfigurator.C \
    $$PWD/NmrConfigurator.C \
    $$PWD/SurfaceConfigurator.C
 
@@ -41,6 +42,7 @@ HEADERS = \
    $$PWD/InfoConfigurator.h \
    $$PWD/MoleculeConfigurator.h \
    $$PWD/MolecularOrbitalsConfigurator.h \
+   $$PWD/MolecularSurfacesConfigurator.h \
    $$PWD/NmrConfigurator.h \
    $$PWD/SurfaceConfigurator.h
 
@@ -59,6 +61,7 @@ FORMS = \
    $$PWD/InfoConfigurator.ui \
    $$PWD/MoleculeConfigurator.ui \
    $$PWD/MolecularOrbitalsConfigurator.ui \
+   $$PWD/MolecularSurfacesConfigurator.ui \
    $$PWD/NmrConfigurator.ui \
    $$PWD/ScalarConstraintConfigurator.ui \
    $$PWD/SurfaceConfigurator.ui \
