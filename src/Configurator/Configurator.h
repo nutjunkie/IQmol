@@ -50,13 +50,16 @@ namespace Configurator {
 		 /// only needs to be done once.  In most cases this does not need to
 		 /// be called explicitly as it will be called the first time display()
 		 /// is called.
-		 virtual void init() { }
+		 virtual void init() { m_initialized = true; }
          
 		 /// Displays the configurator dialog.  The dialog will appear
 		 /// initially in the middle of the MainWindow and subsequently where 
 		 /// the user closed it.
 		 void display() {
-            if (!m_initialized) init();
+            if (!m_initialized) {
+               init();
+               m_initialized = true;
+            }
             if (!m_geometry.isNull()) setGeometry(m_geometry);
             sync();
             show();

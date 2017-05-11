@@ -29,6 +29,7 @@
 #include "TextStream.h"
 #include "Constants.h"
 #include "Hessian.h"
+#include "Density.h"
 #include "Energy.h"
 #include "QsLog.h"
 #include "Data.h"
@@ -44,6 +45,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
 {
    Data::GeometryList* geometryList(new Data::GeometryList);
    Data::Geometry* geometry(0);
+   Data::DensityList densityList;
 
    Data::MolecularOrbitalsList* 
       molecularOrbitalsList(new Data::MolecularOrbitalsList()); 
@@ -75,6 +77,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       key.resize(42);
       key = key.trimmed();
       QString tmp(line.mid(43, 37));
+
 
       QStringList list(TextStream::tokenize(tmp));
 
@@ -113,7 +116,11 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
             // create the MOs for the previous one.
             Data::MolecularOrbitals* mos(makeMolecularOrbitals(moData, shellData, *geometry)); 
             clear(moData);
-            if (mos) molecularOrbitalsList->append(mos);
+            if (mos) {
+               mos->appendDensities(densityList);
+               densityList.clear();
+               molecularOrbitalsList->append(mos);
+            }
          }
 
          unsigned n(list.at(2).toUInt(&ok));
@@ -336,9 +343,13 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
 
       }else if (key.contains("Density")) {
          unsigned n(list.at(2).toUInt(&ok));
-         if (!ok || !geometry) goto error;
-         QList<double> density(readDoubleArray(textStream, n));
-//         Density(key,density);
+         if (!ok) goto error;
+         QList<double> data(readDoubleArray(textStream, n));
+         Data::SurfaceType type(Data::SurfaceType::Custom);
+         type.setLabel(key);
+         Data::Density* density(new Data::Density(type, data, key));
+         density->dump();
+         densityList.append(density);
       }
 
    } // end of parsing text stream 
@@ -346,12 +357,16 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
    if (geometry) {
       Data::MolecularOrbitals* mos(0);
       mos = makeMolecularOrbitals(moData, shellData, *geometry); 
+      if (mos) {
+         mos->appendDensities(densityList);
+         densityList.clear();
+         molecularOrbitalsList->append(mos);
+      }
+
+      mos = makeMolecularOrbitals(boysData, shellData, *geometry); 
       if (mos) molecularOrbitalsList->append(mos);
 
-      mos = makeMolecularOrbitals( boysData, shellData, *geometry); 
-      if (mos) molecularOrbitalsList->append(mos);
-
-      mos = makeMolecularOrbitals( erData, shellData, *geometry); 
+      mos = makeMolecularOrbitals(erData, shellData, *geometry); 
       if (mos) molecularOrbitalsList->append(mos);
 
       Data::GeminalOrbitals* gmos(makeGeminalOrbitals(gmoData, shellData, *geometry)); 
@@ -393,7 +408,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          m_dataBank.append(naturalbondOrbitalList);
       }
    }
-   
+
    return m_errors.isEmpty();
  
    error:
@@ -507,10 +522,12 @@ Data::MolecularOrbitals* FormattedCheckpoint::makeMolecularOrbitals(MoData const
 
    if (mos->consistent()) {
       switch(mos->orbitalType()){
-         case Data::MolecularOrbitals::Localized: 
+         case Data::MolecularOrbitals::Localized: {
+            mos->setLabel("Localized Orbitals");
+         } break;
          case Data::Orbitals::Canonical: {
-            qDebug() << "Add one MO: " << mos->orbitalType();;
-            mos->setLabel("MO Surfaces");
+            //qDebug() << "Add one MO: " << mos->orbitalType();;
+            mos->setLabel("Canonical Orbitals");
          } break;
 
          case Data::Orbitals::NaturalTransition: {

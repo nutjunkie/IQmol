@@ -22,14 +22,15 @@
 
 ********************************************************************************/
 
-#include "Data.h"
+#include "DataList.h"
+#include "SurfaceType.h"
 
 
 namespace IQmol {
 namespace Data {
 
    /// Data class for density matrices.  Note these are read in as upper
-   /// triangular, but stored as a dense matrix.
+   /// triangular and stored in a vectorized form.
    class Density : public Base {
 
       friend class boost::serialization::access;
@@ -37,9 +38,19 @@ namespace Data {
       public:
          Density() { }
 
-         Density(QString const& label, QList<double> const& Elements);
+         Density(SurfaceType const& surfaceType, QList<double> const& vectorElements,
+            QString const& label = QString());
+
+         Density(SurfaceType const& surfaceType, Matrix const& matrix,
+            QString const& label = QString());
 
          Type::ID typeID() const { return Type::Density; }
+
+         SurfaceType const& surfaceType() const { return m_surfaceType; }
+
+         QString const& label() const { return m_label; }
+
+         Vector* vector() { return &m_elements; }
 
          void serialize(InputArchive& ar, unsigned const version = 0) 
          {
@@ -57,15 +68,19 @@ namespace Data {
          template <class Archive>
          void privateSerialize(Archive& ar, unsigned const /* version */) 
          {
-            ar & m_nBasis;
+            ar & m_surfaceType;
             ar & m_label;
+            ar & m_nBasis;
             ar & m_elements;
          }
 
-         unsigned m_nBasis;
-         QString m_label;
-         Matrix m_elements;
+         SurfaceType m_surfaceType;
+         QString     m_label;
+         unsigned    m_nBasis;
+         Vector      m_elements;
    };
+
+   typedef Data::List<Data::Density> DensityList;
 
 } } // end namespace IQmol::Data
 

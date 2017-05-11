@@ -36,7 +36,13 @@ namespace Data {
          enum Kind { Custom = -1, AlphaOrbital, BetaOrbital, TotalDensity, 
             SpinDensity, AlphaDensity, BetaDensity, DensityCombo, CubeData, 
             VanDerWaals, Promolecule, SolventExcluded, SID, ElectrostaticPotential,
-            Geminal, Correlation };
+            Geminal, Correlation
+// TODO
+//            AlphaHole Density, BetaHole Density,
+//            AlphaExcitationDensity, BetaExcitationDensity,
+//            AlphaAttachmentDensity, BetaAttachmentDensity,
+//            AlphaDetachmentDensity, BetaDetachmentDensity
+         };
 
          SurfaceType(Kind const kind = Custom, unsigned index = 0) 
           : m_kind(kind), m_index(index) { }
@@ -46,18 +52,20 @@ namespace Data {
          Kind const& kind() const { return m_kind; }
          void setKind(Kind const kind) { m_kind = kind; }
 
+         // used for custom surfaces
+         QString const& label() const { return m_label; }
+         void setLabel(QString const& label) { m_label = label; }
+
          unsigned const& index() const { return m_index; }
          void setIndex(unsigned const index) { m_index = index; }
 
          bool isDensity() const;
+         bool isRegularDensity() const;
          bool isOrbital() const;
          bool isSigned() const;
          bool isIndexed() const;
 
-         bool operator==(SurfaceType const& that) const
-         {
-            return m_kind == that.m_kind && m_index == that.m_index;
-         }
+         bool operator==(SurfaceType const& that) const;
 
          bool operator!=(SurfaceType const& that) const
          {
@@ -87,6 +95,7 @@ namespace Data {
       private:
          Kind m_kind;
          unsigned m_index;
+         QString m_label;
    };
 
 } } // end namespace IQmol::Data

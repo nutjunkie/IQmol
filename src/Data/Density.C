@@ -21,6 +21,7 @@
 ********************************************************************************/
 
 #include "Density.h"
+#include "Matrix.h"
 #include "QsLog.h"
 #include <QDebug>
 
@@ -29,19 +30,40 @@ namespace IQmol {
 namespace Data {
 
 
-Density::Density(QString const& label, QList<double> const&  elements) : m_label(label)
+template<> const Type::ID DensityList::TypeID = Type::DensityList;
+
+Density::Density(SurfaceType const& surfaceType, QList<double> const& elements, 
+   QString const& label) : m_surfaceType(surfaceType), m_label(label)
 {
-   m_nBasis = round((std::sqrt(1.0+8.0*elements.size()) -1.0)/2.0);
-   if (m_nBasis*(m_nBasis+1)/2 != elements.size()) {
-      qDebug() << "Incorrect number of density matrix elements";
+   unsigned nElements(elements.size());
+   m_nBasis = round((std::sqrt(1.0+8.0*nElements) -1.0)/2.0);
+   if (m_nBasis*(m_nBasis+1)/2 != nElements) {
+      qDebug() << "Invalid number of density matrix elements";
       return;
    }
    
-   m_elements.resize(m_nBasis, m_nBasis);
+   m_elements.resize(nElements);
+   for (unsigned i = 0; i < nElements; ++i) {
+       m_elements[i] = elements[i];
+   }
+}
+
+
+Density::Density(SurfaceType const& surfaceType, Matrix const& matrix, 
+   QString const& label) : m_surfaceType(surfaceType), m_label(label)
+{
+   m_nBasis = 0;
+   if (matrix.size1() != matrix.size2()) {
+      QLOG_ERROR() << "Non-square matrix passed to Density constructor";
+   }
+
+   m_nBasis = matrix.size1();
+   m_elements.resize(m_nBasis*(m_nBasis+1)/2);
+
    unsigned k(0);
    for (unsigned i = 0; i < m_nBasis; ++i) {
-       for (unsigned j = i; j < m_nBasis; ++j, ++k) {
-           m_elements(i,j) = m_elements(j,i) = elements[k];
+       for (unsigned j = 0; j <= i; ++j, ++k) {
+           m_elements[k] = matrix(i,j);
        }
    }
 }
@@ -49,6 +71,10 @@ Density::Density(QString const& label, QList<double> const&  elements) : m_label
 
 void Density::dump() const
 {
+   qDebug() << "Density dump:" << m_label;
+   qDebug() << m_nBasis << "basis functions and" << m_elements.size() << "elements";
+   qDebug() << "Number of basis functions" << m_nBasis;
+   m_surfaceType.dump();
 }
 
 } } // end namespace IQmol::Data

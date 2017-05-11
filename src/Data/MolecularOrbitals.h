@@ -24,10 +24,13 @@
 
 #include "Orbitals.h"
 #include "Surface.h"
+#include "Density.h"
 
 
 namespace IQmol {
 namespace Data {
+
+   class Density;
 
    /// Data class for molecular orbital information
    class MolecularOrbitals : public Orbitals {
@@ -47,9 +50,16 @@ namespace Data {
          bool restricted() const { return m_restricted; }
          SurfaceList& surfaceList() { return m_surfaceList; }
 
+         DensityList& densityList() { return m_densityList; }
+
          void appendSurface(Data::Surface* surfaceData)
          {
             m_surfaceList.append(surfaceData);
+         }
+
+         void appendDensities(Data::DensityList densities)
+         {
+            m_densityList << densities;
          }
 
          double alphaOrbitalEnergy(unsigned i) const 
@@ -93,6 +103,8 @@ namespace Data {
          QList<double> m_alphaEnergies;
          QList<double> m_betaEnergies;
          SurfaceList m_surfaceList;
+
+         Data::DensityList m_densityList;
    };
 
 } } // end namespace IQmol::Data

@@ -328,12 +328,15 @@ List Factory::convert(Data::MolecularOrbitalsList& molecularOrbitalsList)
           } break;
  
           case Data::Orbitals::Canonical: {
+/*
              if (!canonical) {
                 canonical = new Base("Canonical Orbitals");
                 canonical->setFlags(flags);
                 list.append(canonical);
              }
              canonical->appendLayer(new MolecularOrbitals(**iter));
+*/
+             list.append(new MolecularOrbitals(**iter));
           } break;
  
           default: {

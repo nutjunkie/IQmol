@@ -29,7 +29,7 @@
 #include "Frequencies.h"
 #include "Geometry.h"
 #include "GeometryList.h"
-#include "GridData.h"
+//#include "GridData.h"
 //#include "MolecularOrbitals.h"
 #include "MultipoleExpansion.h"
 #include "PointGroup.h"
@@ -48,7 +48,7 @@
 #include "EfpFragmentLayer.h"
 #include "GroupLayer.h"
 #include "MoleculeLayer.h"
-//#include "MolecularOrbitalsLayer.h"
+#include "MolecularOrbitalsLayer.h"
 #include "SurfaceLayer.h"
 
 
@@ -60,7 +60,7 @@
 #include "QChemJobInfo.h" 
 #include "ProgressDialog.h"
 #include "Preferences.h"
-#include "GridEvaluator.h"
+//#include "GridEvaluator.h"
 #include "IQmolParser.h"
 
 #include "openbabel/mol.h"
@@ -204,6 +204,7 @@ void Molecule::appendData(Layer::List& list)
    Charges*      charges(0);
    CubeData*     cubeData(0);
    EfpFragments* efpFragments(0);
+   MolecularOrbitals* molecularOrbitals(0);
 
    QString text;
    PrimitiveList primitiveList;
@@ -223,6 +224,9 @@ qDebug() << "Layer text" << text;
               files->removeLayer(*file);
               m_fileList.appendLayer(*file);
           }
+
+       }else if ((molecularOrbitals = qobject_cast<MolecularOrbitals*>(*iter))) {
+          m_molecularSurfaces.appendLayer(molecularOrbitals);
 
 // This is currently preventing the addition of primivees to an exisiting molecule
        }else if (!labels.contains(text)) {

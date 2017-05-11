@@ -212,7 +212,7 @@ QString GeminalOrbitals::description(Data::SurfaceInfo const& info, bool const t
 
    if (type.kind() == Data::SurfaceType::Geminal) {
       unsigned index(type.index());
-      unsigned nGeminals(nBeta());
+      //unsigned nGeminals(nBeta());
 
       if (index == nBeta()-1) {
          label += " (HOG-1)";
@@ -473,8 +473,8 @@ bool GeminalOrbitals::computeOrbitalGrids(Data::GridDataList& grids)
    time.start();
 
    Matrix const* coefficientsA;
-   Matrix const* coefficientsB;
-   QList<double> const* coefficientsG;
+   //Matrix const* coefficientsB;
+   //QList<double> const* coefficientsG;
 
    QList<int> const* MOGem;
       coefficientsA = &(m_geminalOrbitals.alphaCoefficients());
@@ -485,7 +485,7 @@ bool GeminalOrbitals::computeOrbitalGrids(Data::GridDataList& grids)
    
    unsigned nOrb(orbitals.size());
    unsigned nGem = m_geminalOrbitals.nAlpha();
-   unsigned nGemOrb = m_geminalOrbitals.nOrbitals();
+   //unsigned nGemOrb = m_geminalOrbitals.nOrbitals();
    //unsigned nOS = m_geminalOrbitals.nAlpha() - m_geminalOrbitals.nBeta();
    unsigned nx, ny, nz; 
    g0->getNumberOfPoints(nx, ny, nz);
@@ -575,7 +575,7 @@ void GeminalOrbitals::computeDensityVectors()
    unsigned Na(nAlpha());
    unsigned Nb(nBeta());
    unsigned nGemOrb(nOrbitals());
-   unsigned nOS=Na-Nb;
+   //unsigned nOS=Na-Nb;
    unsigned nGeminals(nAlpha());
    unsigned NV = N*(N+1)/2;
    unsigned i,j,n1,n;
@@ -800,7 +800,7 @@ GeminalOrbitalProperty::GeminalOrbitalProperty(Data::GeminalOrbitals const& gemi
    
 {
   
-  QList<unsigned> const& Limits(geminalOrbitals.geminalOrbitalLimits());
+  //QList<unsigned> const& Limits(geminalOrbitals.geminalOrbitalLimits());
   
   if(index < geminalOrbitals.nAlpha()){
    setText("Geminal Alpha " + QString::number(index+1));

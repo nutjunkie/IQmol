@@ -22,20 +22,28 @@
 
 ********************************************************************************/
 
-#include "Surface.h"
 #include "SurfaceLayer.h"
 #include "SurfaceInfo.h"
 #include "MolecularOrbitalsConfigurator.h"
-#include "GridData.h"
+#include "Surface.h"
 #include "Matrix.h"
-#include "MolecularOrbitals.h"
+#include "GridData.h"
 #include "Function.h"
 #include "GridEvaluator.h"
+#include "MolecularOrbitals.h"
 #include <QPair>
 
 
+class QProgressDialog;
+
 namespace IQmol {
 
+class MolecularGridEvaluator;
+
+namespace Data {
+   class Density;
+   class GridData;
+}
 
 namespace Layer {
 
@@ -50,6 +58,8 @@ namespace Layer {
 
       public:
          MolecularOrbitals(Data::MolecularOrbitals&);
+         ~MolecularOrbitals() { }
+
          void setMolecule(Molecule* molecule);
          double alphaOrbitalEnergy(unsigned const i) const;
          double betaOrbitalEnergy(unsigned const i) const;
@@ -72,52 +82,36 @@ namespace Layer {
             return m_molecularOrbitals.orbitalType();
          }
 
+         Data::DensityList densityList() { return m_availableDensities; }
+
       private Q_SLOTS:
          void showGridInfo();
          void editBoundingBox();
-         void evaluatorFinished();
+         void gridEvaluatorFinished();
+         void gridEvaluatorCanceled();
+         void calculateSurfaces();
 
       private:
          // Returns false if the user cancels the calculation
-         bool computeOrbitalGrids(Data::GridDataList& grids);
-         bool computeDensityGrids(Data::GridData*& alpha, Data::GridData*& beta);
          void computeDensityVectors();
 
          Data::GridData* findGrid(Data::SurfaceType const& type, 
             Data::GridSize const& size, Data::GridDataList const& gridList);
-
-         bool processGridQueue(GridQueue const&);
          Data::Surface* generateSurface(Data::SurfaceInfo const&);
          void dumpGridInfo() const;
          void appendSurfaces(Data::SurfaceList&);
-
          QString description(Data::SurfaceInfo const&, bool const tooltip);
 
          Configurator::MolecularOrbitals m_configurator;
          Data::MolecularOrbitals& m_molecularOrbitals;
 
-         Vector m_alphaDensity;
-         Vector m_betaDensity;
+         Data::DensityList       m_availableDensities;
+         SurfaceInfoQueue        m_surfaceInfoQueue;
+         Data::GridDataList      m_availableGrids;
+         qglviewer::Vec          m_bbMin, m_bbMax;   // bounding box
+         MolecularGridEvaluator* m_molecularGridEvaluator;
 
-         // grid evaluations stuff, should be encapsulated
-         bool computeDensityGrids2(Data::GridData* alpha, Data::GridData* beta);
-         Vector const& densityEvaluator(QList<Vector*> const& densities,
-            double const x, double const y, double const z);
-         Vector m_evaluatorReturn;
-         MultiFunction3D m_function;
-         MultiGridEvaluator* m_evaluator;
-         QList<Vector*> m_densities;
-         QList<Data::GridData*> m_grids;
-         bool computeOrbitalGrids2(Data::GridDataList& grids);
-         Vector const& orbitalEvaluator(Matrix const& coefficients, 
-            QList<int> const& orbitalIndices, double const x, double const y, double const z);
-         QList<int> m_orbitalIndices;
-
-
-
-         SurfaceInfoQueue   m_surfaceInfoQueue;
-         Data::GridDataList m_availableGrids;
-         qglviewer::Vec     m_bbMin, m_bbMax;   // bounding box
+         QProgressDialog* m_progressDialog;
    };
 
 } } // End namespace IQmol::Layer 

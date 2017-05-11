@@ -85,26 +85,26 @@ void QChemInput::readMoleculeSection(TextStream& textStream)
    unsigned multiplicity(1);
    bool ok;
 
-   // First line
+   // First line can only contain the charge and multiplicity or 'read'
    QString line(textStream.nextLine());
    line = line.replace(',', ' ');
    QStringList tokens(TextStream::tokenize(line));
 
    switch (tokens.size()) {
-      case 0:
+      case 0:  // Error
          m_errors.append(msg + QString::number(textStream.lineNumber()));
          return;
       break;
 
-      case 1:
+      case 1:  // Could be reading in previous geometry
          if (tokens[0].contains("read", Qt::CaseInsensitive)) {
             if (m_geometryList->size() > 0) {
                 // copy previous geometry
                 Data::Geometry* geometry(new Data::Geometry(*(m_geometryList->last()))); 
                 m_geometryList->append(geometry);
              }else {
-				// We assume we are reading an input section 
-				// from an output file, so don't cause a stir
+				// We assume we are reading an input section from
+				// an output file, so there is no new geometry.
              }
           }else {
              m_errors.append(msg + QString::number(textStream.lineNumber()));
@@ -122,7 +122,7 @@ void QChemInput::readMoleculeSection(TextStream& textStream)
       break;
    }
 
-   // Second line
+   // Second line could be a 'read' token or the first atom
    line = textStream.nextLine();
    int offset(textStream.lineNumber()-1);
 
@@ -144,7 +144,7 @@ void QChemInput::readMoleculeSection(TextStream& textStream)
       return;
    }
 
-   // Special case: EFP fragments
+   // Special case: EFP only fragments
    if (line.contains("--")) {
 	  // Check for an existing list which may have been created if the
 	  // $efp_fragments section was parsed before $molecule.

@@ -56,6 +56,7 @@ namespace Data {
                 PointGroup,
                 Frequencies,            MolecularOrbitals,      MolecularOrbitalsList,
                 Orbitals,               OrbitalsList,           Density,
+                DensityList,
                 Shell,                  ShellList,              Mesh,
                 MeshList,               Surface,                SurfaceList,
                 SurfaceInfo,            SurfaceInfoList,        SurfaceType, 

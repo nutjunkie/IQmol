@@ -89,6 +89,7 @@ namespace Data {
 
          void dump() const;
 
+
       protected:
          template <class Archive>
          void privateSerialize(Archive& ar, unsigned const /* version */) 

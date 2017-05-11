@@ -47,7 +47,7 @@ namespace Configurator {
 
       public:
          enum { AlphaOrbital, BetaOrbital, TotalDensity, SpinDensity, 
-            AlphaDensity, BetaDensity };
+            AlphaDensity, BetaDensity, CustomDensity };
 
          explicit MolecularOrbitals(Layer::MolecularOrbitals&);
          ~MolecularOrbitals();

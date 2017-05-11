@@ -32,9 +32,6 @@ namespace IQmol {
 namespace Layer {
    class Molecule;
 }
-namespace Data {
-   class SurfaceInfo;
-}
 
 namespace Configurator {
 
@@ -47,9 +44,6 @@ namespace Configurator {
       public:
          explicit Molecule(Layer::Molecule& molecule);
 
-      Q_SIGNALS:
-         void surfaceRequest(Data::SurfaceInfo const&);
-
       private Q_SLOTS:
          void on_resetButton_clicked(bool);
          void on_ballsAndSticks_clicked(bool);
@@ -61,8 +55,6 @@ namespace Configurator {
          void on_atomRadiusScale_valueChanged(int);
          void on_bondRadiusScale_valueChanged(int);
          void on_chargeRadiusScale_valueChanged(int);
-         void on_surfaceCombo_currentIndexChanged(int);
-         void on_addButton_clicked(bool);
 
       private:
          Ui::MoleculeConfigurator m_moleculeConfigurator;

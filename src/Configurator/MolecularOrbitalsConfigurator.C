@@ -90,6 +90,22 @@ void MolecularOrbitals::init()
       m_AlphaHOMO = m_BetaHOMO = m_nOrbitals/2;
    }
 
+
+   // TODO
+//   static bool densitiesAppended(false);
+//   if (!densitiesAppended) {
+//      densitiesAppended = true;
+      Data::DensityList densities(m_molecularOrbitals.densityList());
+      qDebug() << "Appending additional densities" << densities.size();
+      Data::DensityList::iterator density;
+      for (density = densities.begin(); density != densities.end(); ++density) {
+          (*density)->surfaceType().dump();
+          if ((*density)->surfaceType().kind() == Data::SurfaceType::Custom) {
+             m_configurator.surfaceType->addItem((*density)->label(),  CustomDensity);
+          }
+      }
+//   }
+
    //updateOrbitalRange(m_nAlpha);
    updateOrbitalRange(m_AlphaHOMO);
    if (m_nOrbitals > 0) initPlot();
@@ -106,6 +122,7 @@ void MolecularOrbitals::initPlot()
    
    QFrame* frame(m_configurator.energyFrame);
    QVBoxLayout* layout(new QVBoxLayout());
+   // TODO: energyFrame already has a layout, apparently
    frame->setLayout(layout);
    layout->addWidget(m_customPlot);
 
@@ -281,7 +298,6 @@ void MolecularOrbitals::on_surfaceType_currentIndexChanged(int index)
 
    switch (qvar.toUInt()) {
       case AlphaOrbital:
-
          enableOrbitalSelection(true);
          enableNegativeColor(true);
          //updateOrbitalRange(m_nAlpha);
@@ -311,6 +327,11 @@ void MolecularOrbitals::on_surfaceType_currentIndexChanged(int index)
          break;
 
       case BetaDensity:
+         enableOrbitalSelection(false);
+         enableNegativeColor(false);
+         break;
+
+      case CustomDensity:
          enableOrbitalSelection(false);
          enableNegativeColor(false);
          break;
@@ -434,6 +455,13 @@ void MolecularOrbitals::on_addToQueueButton_clicked(bool)
       case BetaDensity: {
          info.setIsSigned(false);
          info.type().setKind(Data::SurfaceType::BetaDensity);
+         queueSurface(info);
+      } break;
+
+      case CustomDensity: {
+         info.setIsSigned(false);
+         info.type().setKind(Data::SurfaceType::Custom);
+         info.type().setLabel(m_configurator.surfaceType->currentText());
          queueSurface(info);
       } break;
    }

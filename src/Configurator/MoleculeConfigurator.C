@@ -37,13 +37,6 @@ Molecule::Molecule(Layer::Molecule& molecule) : m_molecule(molecule)
    m_moleculeConfigurator.bondRadiusScale->setValue(10*m_molecule.m_bondScale);
    m_moleculeConfigurator.chargeRadiusScale->setValue(10*m_molecule.m_chargeScale);
    m_moleculeConfigurator.smallerHydrogens->setChecked(m_molecule.m_smallerHydrogens);
-   
-   m_moleculeConfigurator.surfaceCombo->clear();
-   m_moleculeConfigurator.surfaceCombo->addItem("van der Waals", Data::SurfaceType::VanDerWaals);
-   m_moleculeConfigurator.surfaceCombo->addItem("Promolecule", Data::SurfaceType::Promolecule);
-   //m_moleculeConfigurator.surfaceCombo->addItem("SolventExcluded", SolventExcluded);
-   m_moleculeConfigurator.surfaceCombo->addItem("SID", Data::SurfaceType::SID);
-   m_moleculeConfigurator.surfaceCombo->setCurrentIndex(0);
 }
 
 
@@ -147,77 +140,6 @@ void Molecule::on_bondRadiusScale_valueChanged(int value)
 void Molecule::on_chargeRadiusScale_valueChanged(int value)
 {
    m_molecule.updateChargeScale(value/10.0);
-}
-
-
-void Molecule::on_surfaceCombo_currentIndexChanged(int index)
-{
-   QVariant qvar(m_moleculeConfigurator.surfaceCombo->itemData(index));
-
-   switch (qvar.toUInt()) {
-      case Data::SurfaceType::VanDerWaals:
-         m_moleculeConfigurator.isovalueSpin->setSuffix("  ");
-         m_moleculeConfigurator.isovalueSpin->setValue(1.000);
-         m_moleculeConfigurator.surfaceLabel->setText("Scale");
-         break;
-
-      case Data::SurfaceType::Promolecule:
-         m_moleculeConfigurator.isovalueSpin->setSuffix("  ");
-         m_moleculeConfigurator.isovalueSpin->setValue(0.020);
-         m_moleculeConfigurator.surfaceLabel->setText("Isovalue");
-         break;
-
-      case Data::SurfaceType::SolventExcluded: 
-         m_moleculeConfigurator.isovalueSpin->setSuffix(QString(" ") + QChar(0x00c5));
-         m_moleculeConfigurator.isovalueSpin->setValue(1.400);
-         m_moleculeConfigurator.surfaceLabel->setText("Radius"); 
-         break;
-
-      case Data::SurfaceType::SID:
-         m_moleculeConfigurator.isovalueSpin->setSuffix("  ");
-         m_moleculeConfigurator.isovalueSpin->setValue(0.020);
-         m_moleculeConfigurator.surfaceLabel->setText("Isovalue");
-         break;
-   }
-}
-
-
-void Molecule::on_addButton_clicked(bool) 
-{
-   unsigned quality(m_moleculeConfigurator.qualitySlider->value());
-   double isovalue(m_moleculeConfigurator.isovalueSpin->value());
-   QColor positive(Preferences::PositiveSurfaceColor());
-   QColor negative(Preferences::NegativeSurfaceColor());
-
-   int index(m_moleculeConfigurator.surfaceCombo->currentIndex());
-   QVariant qvar(m_moleculeConfigurator.surfaceCombo->itemData(index));
-   bool simplifyMesh(m_moleculeConfigurator.simplifyMeshCheckBox->isChecked());
-   bool isSigned(false);
-
-   Data::SurfaceType surfaceType;
-
-   switch (qvar.toUInt()) {
-      case Data::SurfaceType::VanDerWaals:
-         surfaceType.setKind(Data::SurfaceType::VanDerWaals);
-         break;
-         
-      case Data::SurfaceType::Promolecule:
-         surfaceType.setKind(Data::SurfaceType::Promolecule);
-         break;
-
-      case Data::SurfaceType::SolventExcluded:
-         surfaceType.setKind(Data::SurfaceType::SolventExcluded);
-         break;
-
-      case Data::SurfaceType::SID:
-         surfaceType.setKind(Data::SurfaceType::SID);
-         break;
-   }
-  
-   Data::SurfaceInfo surfaceInfo(surfaceType, quality, isovalue, positive, negative, 
-      isSigned, simplifyMesh);
-      
-   surfaceRequest(surfaceInfo);
 }
 
 } } // end namespace IQmol::Configurator

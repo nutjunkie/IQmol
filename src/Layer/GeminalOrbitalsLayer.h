@@ -40,10 +40,10 @@ namespace Data {
 
 namespace Layer {
 
-   typedef QList<QPair<Data::SurfaceType, Data::GridSize> > GridQueue;
-   typedef QList<Data::SurfaceInfo> SurfaceInfoQueue;
 
    class GeminalOrbitals : public Base {
+   typedef QList<QPair<Data::SurfaceType, Data::GridSize> > GridQueue;
+   typedef QList<Data::SurfaceInfo> SurfaceInfoQueue;
 
       Q_OBJECT
 
