@@ -32,6 +32,7 @@
 #include "ContainerLayer.h"
 #include "EfpFragmentListLayer.h"
 #include "MoleculeConfigurator.h"
+#include "MolecularSurfacesLayer.h"
 #include "SurfaceAnimatorDialog.h"
 #include "Animator.h"
 #include <QFileInfo>
@@ -225,7 +226,6 @@ namespace IQmol {
    
    
          public Q_SLOTS:
-            void surfaceRequest(Data::SurfaceInfo const&);
             void groupSelection();
             void ungroupSelection();
             void applyConstraint(Constraint*);
@@ -352,15 +352,9 @@ namespace IQmol {
 
             void clearData();
    
-            template <class T>
-            void calculateSuperposition(Data::SurfaceInfo const&, bool const doCharges = false);
-   
-            void calculateVanDerWaals(Data::SurfaceInfo const&, bool const solvent = false);
-
             void deleteProperties();
 
             void initProperties();
-
    
             QFileInfo m_inputFile;
    
@@ -400,6 +394,7 @@ namespace IQmol {
             Layer::Container m_groupList;
    
             Layer::EfpFragmentList m_efpFragmentList;
+            Layer::MolecularSurfaces m_molecularSurfaces;
    
             QList<SpatialProperty*> m_properties;
             qglviewer::Frame m_frame;
