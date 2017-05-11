@@ -1,5 +1,5 @@
-#ifndef IQMOL_LEBEDEV_H
-#define IQMOL_LEBEDEV_H
+#ifndef IQMOL_GRID_LEBEDEV_H
+#define IQMOL_GRID_LEBEDEV_H
 /*******************************************************************************
          
   Copyright (C) 2011-2015 Andrew Gilbert

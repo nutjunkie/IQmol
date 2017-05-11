@@ -1,5 +1,5 @@
-#ifndef IQMOL_MARCHING_CUBES_H
-#define IQMOL_MARCHING_CUBES_H
+#ifndef IQMOL_GRID_MARCHING_CUBES_H
+#define IQMOL_GRID_MARCHING_CUBES_H
 /*******************************************************************************
        
   Copyright (C) 2011-2015 Andrew Gilbert

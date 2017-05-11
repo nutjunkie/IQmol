@@ -1,5 +1,5 @@
-#ifndef IQMOL_MESHDECIMATOR_H
-#define IQMOL_MESHDECIMATOR_H
+#ifndef IQMOL_GRID_MESHDECIMATOR_H
+#define IQMOL_GRID_MESHDECIMATOR_H
 /*******************************************************************************
 
   Copyright (C) 2011-2015ndrew Gilbert

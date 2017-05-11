@@ -1,5 +1,5 @@
-#ifndef IQMOL_GRID_GRIDINFODIALOG_H
-#define IQMOL_GRID_GRIDINFODIALOG_H
+#ifndef IQMOL_GRID_SURFACEGENERATOR_H
+#define IQMOL_GRID_SURFACEGENERATOR_H
 /*******************************************************************************
          
   Copyright (C) 2011-2015 Andrew Gilbert
@@ -22,42 +22,38 @@
    
 ********************************************************************************/
 
-#include "ui_GridInfoDialog.h"
-#include "GridData.h"
-#include <QPoint>
+#include "Task.h"
 
 
 namespace IQmol {
 
-   class GridInfoDialog : public QDialog {
+namespace Data {
+   class GridData;
+   class SurfaceInfo;
+   class Surface;
+}
+
+namespace Grid {
+
+
+   class SurfaceGenerator : public Task {
 
       Q_OBJECT
 
       public:
-		 // We pass the molecule name and coordinates so that 
-		 // we can export a cube file if requested.
-         GridInfoDialog(Data::GridDataList*, QString const& moleculeName,
-            QStringList const& coordinates);
+         SurfaceGenerator(Data::GridData const& grid, Data::SurfaceInfo const&);
+         
+         Data::Surface* getSurface() const;
 
-      Q_SIGNALS:
-         void updated();  // to trigger a redraw
-
-      private Q_SLOTS:
-         void contextMenu(QPoint const&);
-         void deleteGrid();
-         void exportCubeFilePositive() { exportCubeFile(false); }
-         void exportCubeFileNegative() { exportCubeFile(true); }
+      protected:
+         void run();
 
       private:
-         void exportCubeFile(bool const invertSign);
-        Data::GridDataList* m_gridDataList;
-        QString m_moleculeName;
-        QStringList m_coordinates;
-        Data::GridDataList getSelectedGrids();
-        Ui::GridInfoDialog m_dialog;
-        void loadGridInfo();
+         Data::GridData const&     m_grid;
+         Data::SurfaceInfo const&  m_surfaceInfo;
+         Data::Surface*            m_surface;
    };
 
-} // end namespace IQmol
+} } // end namespace IQmol::Grid
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef IQMOL_GRID_GRIDINFODIALOG_H
-#define IQMOL_GRID_GRIDINFODIALOG_H
+#ifndef IQMOL_GRID_ORBITAL_EVALUATOR_H
+#define IQMOL_GRID_ORBITAL_EVALUATOR_H
 /*******************************************************************************
          
   Copyright (C) 2011-2015 Andrew Gilbert
@@ -22,40 +22,50 @@
    
 ********************************************************************************/
 
-#include "ui_GridInfoDialog.h"
+#include "Task.h"
+#include "Function.h"
+#include "Matrix.h"
 #include "GridData.h"
-#include <QPoint>
 
 
 namespace IQmol {
 
-   class GridInfoDialog : public QDialog {
+   class MultiGridEvaluator;
+
+   namespace Data {
+      class ShellList;
+   }
+
+   class OrbitalEvaluator : public Task {
 
       Q_OBJECT
 
       public:
-		 // We pass the molecule name and coordinates so that 
-		 // we can export a cube file if requested.
-         GridInfoDialog(Data::GridDataList*, QString const& moleculeName,
-            QStringList const& coordinates);
+         OrbitalEvaluator(Data::GridDataList& grids, Data::ShellList& shellList, 
+            Matrix const& coefficients, QList<int> indices);
 
       Q_SIGNALS:
-         void updated();  // to trigger a redraw
+         void progress(int);
+
+      protected:
+         void run();
 
       private Q_SLOTS:
-         void contextMenu(QPoint const&);
-         void deleteGrid();
-         void exportCubeFilePositive() { exportCubeFile(false); }
-         void exportCubeFileNegative() { exportCubeFile(true); }
+         void evaluatorFinished();
 
       private:
-         void exportCubeFile(bool const invertSign);
-        Data::GridDataList* m_gridDataList;
-        QString m_moleculeName;
-        QStringList m_coordinates;
-        Data::GridDataList getSelectedGrids();
-        Ui::GridInfoDialog m_dialog;
-        void loadGridInfo();
+		 // Fills the m_returnValues vector with the value of each requested
+		 // orbital at the given point.
+         Vector const& evaluate(double const x, double const y, double const z);
+         
+         MultiFunction3D     m_function;
+         Data::GridDataList  m_grids;
+         Data::ShellList&    m_shellList;
+         Matrix const&       m_coefficients;
+         QList<int>          m_indices;
+         Vector              m_returnValues;
+         MultiGridEvaluator* m_evaluator;
+         
    };
 
 } // end namespace IQmol

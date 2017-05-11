@@ -23,6 +23,7 @@
 #include "GridEvaluator.h"
 #include "GridData.h"
 #include "QsLog.h"
+#include <QApplication>
 
 
 namespace IQmol {
@@ -73,7 +74,7 @@ MultiGridEvaluator::MultiGridEvaluator(QList<Data::GridData*> grids,
    unsigned nx, ny, nz;
    Data::GridData* g0(m_grids.first());
    g0->getNumberOfPoints(nx, ny, nz);
-   m_totalProgress = m_coarseGrain ? 8*nx : nx;
+   m_totalProgress = m_coarseGrain ? 4*nx : nx;
 
    Data::GridDataList::iterator iter;
    for (iter = m_grids.begin(); iter != m_grids.end(); ++iter) {
@@ -113,6 +114,7 @@ void MultiGridEvaluator::run()
        progress(i); 
        if (m_terminate) break;
    }
+   progress(m_totalProgress); 
 }
 
 
@@ -133,8 +135,7 @@ void MultiGridEvaluator::runCoarseGrain()
    // either using interpolation (where the values are insignificant) or explicit
    // evaluation
 
-   m_totalProgress = 8*nx; // first and second passes
-   unsigned prog(0);
+   int prog(0);
    double x, y, z;
 
    // Just use the maximum function value at each grid point for screenting
@@ -227,7 +228,7 @@ void MultiGridEvaluator::runCoarseGrain()
        progress(prog); 
        if (m_terminate) return;
    }
-
+   progress(m_totalProgress); 
 }
 
 } // end namespace IQmol

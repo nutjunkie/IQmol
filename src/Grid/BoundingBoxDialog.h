@@ -1,5 +1,5 @@
-#ifndef IQMOL_BOUNDINGBOXDIALOG_H
-#define IQMOL_BOUNDINGBOXDIALOG_H
+#ifndef IQMOL_GRID_BOUNDINGBOXDIALOG_H
+#define IQMOL_GRID_BOUNDINGBOXDIALOG_H
 /*******************************************************************************
          
   Copyright (C) 2011-2015 Andrew Gilbert

@@ -1,5 +1,5 @@
-#ifndef IQMOL_MARCHINGCUBES_DATA_H
-#define IQMOL_MARCHINGCUBES_DATA_H
+#ifndef IQMOL_GRID_MARCHINGCUBES_DATA_H
+#define IQMOL_GRID_MARCHINGCUBES_DATA_H
 /* ---------------------------------------------------------------------------
  *  Copyright (C) 2011-2015 Andrew Gilbert
  *

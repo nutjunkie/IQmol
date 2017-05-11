@@ -1,5 +1,5 @@
-#ifndef IQMOL_GRID_GRIDINFODIALOG_H
-#define IQMOL_GRID_GRIDINFODIALOG_H
+#ifndef IQMOL_GRID_MOLECULAR_GRID_EVALUATOR_H
+#define IQMOL_GRID_MOLECULAR_GRID_EVALUATOR_H
 /*******************************************************************************
          
   Copyright (C) 2011-2015 Andrew Gilbert
@@ -22,40 +22,44 @@
    
 ********************************************************************************/
 
-#include "ui_GridInfoDialog.h"
+#include "Task.h"
+#include "Matrix.h"
 #include "GridData.h"
-#include <QPoint>
 
 
 namespace IQmol {
 
-   class GridInfoDialog : public QDialog {
+   namespace Data {
+      class ShellList;
+      class Density;
+   }
+
+   class MolecularGridEvaluator : public Task {
 
       Q_OBJECT
 
       public:
-		 // We pass the molecule name and coordinates so that 
-		 // we can export a cube file if requested.
-         GridInfoDialog(Data::GridDataList*, QString const& moleculeName,
-            QStringList const& coordinates);
+         MolecularGridEvaluator(Data::GridDataList& grids, Data::ShellList& shellList, 
+            Matrix const& alphaCoefficients, Matrix const& betaCoefficients, 
+            QList<Data::Density*> const& densities);
+
+         Data::GridDataList const& getGrids() const { return m_grids; }
 
       Q_SIGNALS:
-         void updated();  // to trigger a redraw
+         void progressLabelText(QString const& label);
+         void progressMaximum(int max);
+         void progressValue(int progress);
 
-      private Q_SLOTS:
-         void contextMenu(QPoint const&);
-         void deleteGrid();
-         void exportCubeFilePositive() { exportCubeFile(false); }
-         void exportCubeFileNegative() { exportCubeFile(true); }
+      protected:
+         void run();
 
       private:
-         void exportCubeFile(bool const invertSign);
-        Data::GridDataList* m_gridDataList;
-        QString m_moleculeName;
-        QStringList m_coordinates;
-        Data::GridDataList getSelectedGrids();
-        Ui::GridInfoDialog m_dialog;
-        void loadGridInfo();
+         Data::GridDataList m_grids;
+         Data::ShellList&   m_shellList;
+         Matrix const&      m_alphaCoefficients;
+         Matrix const&      m_betaCoefficients;
+
+         QList<Data::Density*> m_densities;
    };
 
 } // end namespace IQmol

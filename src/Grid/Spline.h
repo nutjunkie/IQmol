@@ -1,5 +1,5 @@
-#ifndef IQMOL_SPLINE_H
-#define IQMOL_SPLINE_H
+#ifndef IQMOL_GRID_SPLINE_H
+#define IQMOL_GRID_SPLINE_H
 /*******************************************************************************
          
   Copyright (C) 2011-2015 Andrew Gilbert

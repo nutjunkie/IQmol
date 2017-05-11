@@ -1,5 +1,5 @@
-#ifndef IQMOL_GRIDEVALUATOR_H
-#define IQMOL_GRIDEVALUATOR_H
+#ifndef IQMOL_GRID_GRIDEVALUATOR_H
+#define IQMOL_GRID_GRIDEVALUATOR_H
 /*******************************************************************************
          
   Copyright (C) 2011-2015 Andrew Gilbert
@@ -25,6 +25,7 @@
 #include "Task.h"
 #include "Function.h"
 
+
 namespace IQmol {
 
    namespace Data {
@@ -42,7 +43,7 @@ namespace IQmol {
          void run();
 
       private:
-         Data::GridData&  m_grid;
+         Data::GridData&   m_grid;
          Function3D const& m_function;
    };
 
