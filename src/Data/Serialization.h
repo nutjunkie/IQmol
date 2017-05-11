@@ -30,6 +30,7 @@
 #include <QGLViewer/quaternion.h>
 #include <boost/archive/xml_iarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
+#include <boost/serialization/serialization.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/list.hpp>
 #include <boost/version.hpp>
@@ -163,20 +164,36 @@ inline void serialize(Archive& ar, IQmol::Matrix& m, unsigned const version)
 
 // ---------- QList ----------
 template<class Archive, class U >
-inline void save(Archive& ar, const QList<U>& t, const unsigned /* version */)
+inline void save(Archive& ar, const QList<U>& list, const unsigned /* version */)
 {
-   boost::serialization::stl::save_collection< Archive, QList<U> >(ar, t);
+    //   boost::serialization::stl::save_collection< Archive, QList<U> >(ar, list);
+    unsigned count = list.size (); 
+    ar << BOOST_SERIALIZATION_NVP (count); 
+    for (unsigned i = 0; i <count; ++ i) {
+        U item = list.value (i); 
+        ar << boost::serialization::make_nvp("item", item); 
+    }
 }
 
 
 template<class Archive, class U>
-inline void load(Archive& ar, QList<U>& t, unsigned const /* version */)
+inline void load(Archive& ar, QList<U>& list, unsigned const /* version */)
 {
+/*
    boost::serialization::stl::load_collection< 
       Archive, 
       QList<U>, 
       boost::serialization::stl::archive_input_seq<Archive, QList<U> >,
-      boost::serialization::stl::no_reserve_imp< QList<U> > >(ar, t);
+      boost::serialization::stl::no_reserve_imp< QList<U> > >(ar, list);
+*/
+    unsigned count(0); 
+    ar >> BOOST_SERIALIZATION_NVP (count); 
+    list.clear(); 
+    for (unsigned i = 0; i <count; ++ i) {
+        U item; 
+        ar >> boost::serialization::make_nvp("item", item); 
+        list.push_back(item); 
+    }
 }
 
 
