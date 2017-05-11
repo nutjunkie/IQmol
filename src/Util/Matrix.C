@@ -32,6 +32,7 @@ QString PrintVector(Vector const& vector)
    unsigned n(vector.size());
    for (unsigned i = 0; i < n; ++i) {
        output += QString::number(vector(i), 'f', 8);       
+       output += " ";
    }
    output.chop(1);
    return output;
