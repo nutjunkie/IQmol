@@ -50,9 +50,16 @@ namespace IQmol {
             if (m_deleteThread) delete m_thread;
          }
 
+         // time in milliseconds
          bool wait(unsigned long time = ULONG_MAX) {
             return m_thread->wait(time);
          }
+
+         void msleep(unsigned long time) {
+            m_thread->msleep(time);
+         }
+
+         bool isRunning() const { return (m_status == Pending || m_status == Running); }
 
          QString info() const { return m_info; } 
          Status  status() const { return m_status; }
