@@ -130,12 +130,12 @@ Vector const& ShellList::shellPairValues(qglviewer::Vec const& gridPoint)
    double xi, xj; 
    for (unsigned i = 0; i < m_nBasis; ++i) {
        xi = m_shellValues[i];
+       for (unsigned j = 0; j < i; ++j, ++k) {
+           xj = m_shellValues[j];
+           m_shellPairValues[k] = 2.0*xi*xj;
+       }   
        m_shellPairValues[k] = xi*xi;
        ++k;
-       for (unsigned j = i+1; j < m_nBasis; ++j, ++k) {
-           xj = m_shellValues[j];
-           m_shellPairValues[k] = xi*xj;
-       }   
    }
 
    return m_shellPairValues;
