@@ -7,7 +7,7 @@ unix {
 	QMAKE_CXX = g++
 	macx {
 		QMAKE_CC  = gcc
-		QMAKE_CXX = g++
+		QMAKE_CXX = clang++
 	}
 
 	QMAKE_CFLAGS_RELEASE = -O3 -DINCLUDE_TEMPLATES -W -Wall -Wno-unused -DNDEBUG
