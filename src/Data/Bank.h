@@ -38,6 +38,7 @@ namespace Data {
    /// dtor.  
    class Bank : public Base, public QList<Base*> {
 
+      using Base::copy;
 	  friend class boost::serialization::access;
 
 	  public: 

@@ -185,7 +185,7 @@ void ExcitedStates::plotSpectrum(Profile const profile, double const width)
 
    QVector<double> x(bins), y(bins);
 
-   for (int xi = 0; xi < bins; ++xi) {
+   for (unsigned xi = 0; xi < bins; ++xi) {
        x[xi] = xi*delta;
        y[xi] = 0.0;
    }
@@ -221,11 +221,11 @@ void ExcitedStates::plotSpectrum(Profile const profile, double const width)
    }
 
    double maxIntensity(0.0);
-   for (int xi = 0; xi < bins; ++xi) {
+   for (unsigned xi = 0; xi < bins; ++xi) {
        if (y[xi] > maxIntensity) maxIntensity = y[xi];
    }
 
-   for (int xi = 0; xi < bins; ++xi) {
+   for (unsigned xi = 0; xi < bins; ++xi) {
        y[xi] /= maxIntensity;
    }
 
@@ -330,7 +330,7 @@ void ExcitedStates::on_energyTable_itemSelectionChanged()
 void ExcitedStates::updateMoPlot(int const index)
 {
    clearTransitionLines();
-   QList<Data::Amplitude>  amplitudes(m_excitedStates.data().amplitudes(index));
+   QList<Data::Amplitude>  amplitudes(m_excitedStates.stateData().amplitudes(index));
 
    qDebug() << "Number of amplitudes" << amplitudes.size();
 
@@ -394,7 +394,7 @@ void ExcitedStates::initMoPlot()
    m_moPlot->xAxis->setSubTickCount(0);
    m_moPlot->xAxis->setRange(0,3.25);
 
-   Data::OrbitalSymmetries const& orbitals(m_excitedStates.data().orbitalSymmetries());
+   Data::OrbitalSymmetries const& orbitals(m_excitedStates.stateData().orbitalSymmetries());
 
    unsigned nOrbs(orbitals.nOrbitals());
    unsigned nAlpha(orbitals.nAlpha());
@@ -513,7 +513,7 @@ void ExcitedStates::moSelectionChanged(bool tf)
    bool ok;
    unsigned orb(graph->name().toUInt(&ok));
 
-   Data::OrbitalSymmetries const& orbitals(m_excitedStates.data().orbitalSymmetries());
+   Data::OrbitalSymmetries const& orbitals(m_excitedStates.stateData().orbitalSymmetries());
 
    unsigned nOrbs(orbitals.nOrbitals());
    if (!ok) return;

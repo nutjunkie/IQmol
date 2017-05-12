@@ -45,6 +45,7 @@ namespace Layer {
 
       Q_OBJECT
 
+      using Primitive::drawLabel;
       friend class Molecule;
       friend class Bond;
       friend class Constraint;

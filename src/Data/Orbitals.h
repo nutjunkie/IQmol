@@ -45,31 +45,39 @@ namespace Data {
 
          static QString toString(OrbitalType const);
 
-         Orbitals();
-         Orbitals(unsigned const nAlpha, unsigned const nBeta, 
+         // Required for serialization
+         Orbitals() : m_nAlpha(0), m_nBeta(0), m_nBasis(0), m_nOrbitals(0), 
+            m_restricted(false), m_orbitalType(Undefined) { }
+
+         // Restricted
+         Orbitals(unsigned const nAlpha, unsigned const nBeta, ShellList const& shells,
+            QList<double> const& alphaCoefficients, QString const& label = QString());
+
+         // Unrestricted
+         Orbitals(unsigned const nAlpha, unsigned const nBeta, ShellList const& shells,
             QList<double> const& alphaCoefficients, QList<double> const& betaCoefficients,
-            ShellList const& shells, QString const& label = QString() );
+            QString const& label = QString());
 
-
-// This should be fixed so that the orbitalType function is declared virtual
+         // TODO This should be fixed so that the orbitalType function is declared virtual
          //OrbitalType orbitalType() const = 0;
          void setOrbitalType(OrbitalType const& orbitalType) { m_orbitalType = orbitalType; }
          OrbitalType orbitalType() const { return m_orbitalType; }
-         OrbitalType m_orbitalType;
 
          unsigned nAlpha() const { return m_nAlpha; }
          unsigned nBeta()  const { return m_nBeta; }
          unsigned nBasis() const { return m_nBasis; }
          unsigned nOrbitals() const { return m_nOrbitals; }
 
-         Matrix const& alphaCoefficients() const { return m_alphaCoefficients; }
-         Matrix const& betaCoefficients()  const { return m_betaCoefficients; }
-         ShellList& shellList() { return m_shellList; }
+         Matrix const& alphaCoefficients() const;
+         Matrix const& betaCoefficients() const; 
+         ShellList& shellList();
 
          QString const& label() const { return m_label; }
          void setLabel(QString const& label) { m_label = label; }
 
-         virtual bool consistent() const { return true; }
+         bool restricted() const { return m_restricted; }
+
+         virtual bool consistent() const;
 
          void boundingBox(qglviewer::Vec& min, qglviewer::Vec& max) const
          {
@@ -99,14 +107,13 @@ namespace Data {
             ar & m_nBeta;
             ar & m_nBasis;
             ar & m_nOrbitals;
-            ar & m_bbMin;
-            ar & m_bbMax;
+            ar & m_restricted;
             ar & m_alphaCoefficients;
             ar & m_betaCoefficients;
             ar & m_shellList;
+            ar & m_bbMin;
+            ar & m_bbMax;
          }
-
-         QString m_label;
 
          unsigned m_nAlpha;
          unsigned m_nBeta;
@@ -114,12 +121,15 @@ namespace Data {
          unsigned m_nOrbitals;
          bool     m_restricted;
 
-         qglviewer::Vec m_bbMin;
-         qglviewer::Vec m_bbMax;
-
-         Matrix m_alphaCoefficients;
-         Matrix m_betaCoefficients;
+         QString   m_label;
          ShellList m_shellList;
+         Matrix    m_alphaCoefficients;
+         Matrix    m_betaCoefficients;
+
+         qglviewer::Vec m_bbMin, m_bbMax; // bounding box
+
+         // TODO Should be deprecated
+         OrbitalType m_orbitalType;
    };
 
 } } // end namespace IQmol::Data

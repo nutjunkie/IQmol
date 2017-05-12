@@ -572,9 +572,11 @@ void GeminalOrbitals::computeDensityVectors()
    QList<unsigned> const& Limits(m_geminalOrbitals.geminalOrbitalLimits());
 
    unsigned N(nBasis());
-   unsigned Na(nAlpha());
+   // unused (?)
+   // unsigned Na(nAlpha());
    unsigned Nb(nBeta());
    unsigned nGemOrb(nOrbitals());
+   // unused (?)
    //unsigned nOS=Na-Nb;
    unsigned nGeminals(nAlpha());
    unsigned NV = N*(N+1)/2;

@@ -40,7 +40,6 @@ Frequencies::Frequencies(Data::Frequencies const& frequencies) : Base("Frequenci
 {
    Data::VibrationalModeList::const_iterator iter;
    Data::VibrationalModeList const& modes(m_frequencies.modes());
-   double intensity, frequency;
 
    for (iter = modes.begin(); iter != modes.end(); ++iter) {
        Mode* mode = new Mode(**iter);
@@ -100,7 +99,7 @@ void Frequencies::setActiveMode(Mode const& mode)
    if (!m_molecule) return;
 
    AtomList atoms(m_molecule->findLayers<Atom>(Children));
-   QList<qglviewer::Vec> const& eigenvector(mode.data().eigenvector());
+   QList<qglviewer::Vec> const& eigenvector(mode.modeData().eigenvector());
 
    if (atoms.size() != eigenvector.size()) return;
 

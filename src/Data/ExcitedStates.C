@@ -70,7 +70,7 @@ QList<Amplitude> ExcitedStates::amplitudes(unsigned const transition) const
 {
    QList<Amplitude> amplitudes;
 
-   if (transition < m_transitions.size()) {
+   if ((int)transition < m_transitions.size()) {
       amplitudes = m_transitions[transition]->amplitudes();
 
 //      unsigned nAlpha(m_orbitalSymmetries.nAlpha());

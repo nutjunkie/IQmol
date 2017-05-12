@@ -115,7 +115,7 @@ void Frequencies::load()
        frequency->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
        frequency->setData(Qt::UserRole, QVariantPointer<Layer::Mode>::toQVariant(*iter));
 
-       text = QString::number((*iter)->data().intensity(), 'f', 3);
+       text = QString::number((*iter)->modeData().intensity(), 'f', 3);
        intensity = new QTableWidgetItem(text + "     ");
        intensity->setData(Qt::UserRole, QVariantPointer<Layer::Mode>::toQVariant(*iter));
        intensity->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
@@ -124,16 +124,16 @@ void Frequencies::load()
        table->setItem(row, 1, intensity);
 
        if (m_frequencies.haveRaman()) {
-          text = QString::number((*iter)->data().ramanIntensity(), 'f', 3);
+          text = QString::number((*iter)->modeData().ramanIntensity(), 'f', 3);
           raman = new QTableWidgetItem(text + "     ");
           raman->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
           table->setItem(row, 2, raman);
        }
 
-       m_rawIrData.append(qMakePair((*iter)->data().frequency(),
-          (*iter)->data().intensity()));
-       m_rawRamanData.append(qMakePair((*iter)->data().frequency(),
-          (*iter)->data().ramanIntensity()));
+       m_rawIrData.append(qMakePair((*iter)->modeData().frequency(),
+          (*iter)->modeData().intensity()));
+       m_rawRamanData.append(qMakePair((*iter)->modeData().frequency(),
+          (*iter)->modeData().ramanIntensity()));
 
    }
 
@@ -270,7 +270,7 @@ void Frequencies::plotSpectrum(Profile const profile, double const scaleFactor, 
 
    QVector<double> x(bins), y(bins);
 
-   for (int xi = 0; xi < bins; ++xi) {
+   for (unsigned xi = 0; xi < bins; ++xi) {
        x[xi] = xi*delta;
        y[xi] = 0.0;
    }
@@ -282,9 +282,9 @@ void Frequencies::plotSpectrum(Profile const profile, double const scaleFactor, 
          double A(std::sqrt(4.0*std::log(2.0)/(g*M_PI)));
          double a(-4.0*std::log(2.0)/g);
          for (int mode = 0; mode < m_rawData.size(); ++mode) {
-             double nu(m_rawData[mode].first);
+             double nu(scaleFactor*m_rawData[mode].first);
              double I(m_rawData[mode].second);
-             for (int xi = 0; xi < bins; ++xi) {
+             for (unsigned xi = 0; xi < bins; ++xi) {
                  y[xi] += I*A*std::exp(a*(x[xi]-nu)*(x[xi]-nu));
              }
          }
@@ -295,9 +295,9 @@ void Frequencies::plotSpectrum(Profile const profile, double const scaleFactor, 
          double g(0.5*width);
          double g2(g*g);
          for (int mode = 0; mode < m_rawData.size(); ++mode) {
-             double nu(m_rawData[mode].first);
+             double nu(scaleFactor*m_rawData[mode].first);
              double I(m_rawData[mode].second);
-             for (int xi = 0; xi < bins; ++xi) {
+             for (unsigned xi = 0; xi < bins; ++xi) {
                  y[xi] += I*A*g / (g2+(x[xi]-nu)*(x[xi]-nu));
              }
          }
@@ -306,11 +306,11 @@ void Frequencies::plotSpectrum(Profile const profile, double const scaleFactor, 
    }
 
    double maxIntensity(0.0);
-   for (int xi = 0; xi < bins; ++xi) {
+   for (unsigned xi = 0; xi < bins; ++xi) {
        if (y[xi] > maxIntensity) maxIntensity = y[xi];
    }
 
-   for (int xi = 0; xi < bins; ++xi) {
+   for (unsigned xi = 0; xi < bins; ++xi) {
        y[xi] /= maxIntensity;
    }
 

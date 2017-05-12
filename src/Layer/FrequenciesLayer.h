@@ -92,20 +92,21 @@ namespace Layer {
 
 
    class Mode : public Base {
-       Q_OBJECT
 
-       public:
-          Mode(Data::VibrationalMode const& mode);
-          Data::VibrationalMode const& data() const { return m_mode; }
+      Q_OBJECT
+
+      public:
+         Mode(Data::VibrationalMode const& mode);
+         Data::VibrationalMode const& modeData() const { return m_mode; }
              
-       Q_SIGNALS:
-          void playMode(Mode const&);
+      Q_SIGNALS:
+         void playMode(Mode const&);
 
-       public Q_SLOTS:
-          void configure() { playMode(*this); }
+      public Q_SLOTS:
+         void configure() { playMode(*this); }
 
-       private:
-          Data::VibrationalMode const& m_mode;
+      private:
+         Data::VibrationalMode const& m_mode;
    };
 
 

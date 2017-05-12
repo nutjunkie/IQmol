@@ -29,15 +29,9 @@ namespace IQmol {
 namespace Data {
 
 
-Type::ID Constraint::typeID() const 
-{ 
-   return Type::Constraint; 
-}
-
-
-void Constraint::dump()
+void Constraint::dump() const
 {
-   qDebug() << " - value:" << m_value; 
+   qDebug() << " - value:" << m_value;
 }
 
 

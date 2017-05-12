@@ -40,7 +40,7 @@ namespace Data {
       public:
          MolecularOrbitals() : Orbitals() { }
 
-         MolecularOrbitals(unsigned const nAlpha, unsigned const nBeta, unsigned const nBasis,
+         MolecularOrbitals(unsigned const nAlpha, unsigned const nBeta,
             QList<double> const& alphaCoefficients, QList<double> const& alphaEnergies,  
             QList<double> const& betaCoefficients,  QList<double> const& betaEnergies,
             ShellList const& shells);
@@ -65,13 +65,13 @@ namespace Data {
          double alphaOrbitalEnergy(unsigned i) const 
          { 
             // Note the energies array may be empty if the orbitals are localized
-            return (i < m_alphaEnergies.size()) ? m_alphaEnergies[i] : 0.0;
+            return ((int)i < m_alphaEnergies.size()) ? m_alphaEnergies[i] : 0.0;
          }
 
          double betaOrbitalEnergy(unsigned i) const 
          { 
             // Note the energies array may be empty if the orbitals are localized
-            return (i < m_betaEnergies.size()) ? m_betaEnergies[i] : 0.0;
+            return ((int)i < m_betaEnergies.size()) ? m_betaEnergies[i] : 0.0;
          }
 
          bool consistent() const;

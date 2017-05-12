@@ -47,7 +47,7 @@ namespace Data {
          unsigned nBeta()  const { return m_nBeta; }
 
          double energy(Spin const, unsigned const n) const;
-         QString const& symmetry(Spin const, unsigned const n) const;
+         QString symmetry(Spin const, unsigned const n) const;
 
          void serialize(InputArchive& ar, unsigned int const version = 0) {
             privateSerialize(ar, version);

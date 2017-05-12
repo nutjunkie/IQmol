@@ -38,8 +38,7 @@ using namespace qglviewer;
 namespace IQmol {
 namespace Layer {
 
-// label looks like it needs deprecating
-GeometryList::GeometryList(Data::GeometryList const& geometryList, QString const& label)
+GeometryList::GeometryList(Data::GeometryList const& geometryList)
  : Base(geometryList.label()), m_configurator(*this), m_geometryList(geometryList),
    m_speed(0.125), m_reperceiveBonds(false), m_bounce(false), m_loop(false)
 {

@@ -35,6 +35,8 @@ namespace Layer {
 
       Q_OBJECT
 
+      using Base::appendLayer;
+
       friend class Configurator::EfpFragmentList;
 
       public:

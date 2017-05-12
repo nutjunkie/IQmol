@@ -44,41 +44,57 @@ QString Orbitals::toString(OrbitalType const type)
 }
 
 
-Orbitals::Orbitals() : m_nAlpha(0), m_nBeta(0), m_nBasis(0), m_nOrbitals(0)
-{
-}
-
-
+// Restricted
 Orbitals::Orbitals(
    unsigned const nAlpha, 
    unsigned const nBeta, 
+   ShellList const& shells,
    QList<double> const& alphaCoefficients, 
-   QList<double> const& betaCoefficients, 
-   ShellList const& shells, 
-   QString const& label) :
-   m_label(label), m_nAlpha(nAlpha), m_nBeta(nBeta), m_shellList(shells)
+   QString const& label)
+ : m_nAlpha(nAlpha), m_nBeta(nBeta), m_nBasis(0), m_nOrbitals(0), m_restricted(true),
+   m_label(label), m_shellList(shells)
 {
    if (m_shellList.isEmpty()) {
-      QLOG_WARN() << "Empty shell list in Orbitals constructor";
+      QLOG_WARN() << "Empty shell list in Orbitals constructor";  return;
+   }
+
+   m_nBasis    = m_shellList.nBasis();
+   m_nOrbitals = alphaCoefficients.size() / m_nBasis;
+   m_shellList.boundingBox(m_bbMin, m_bbMax);
+
+   m_alphaCoefficients.resize(m_nOrbitals, m_nBasis);
+   unsigned ka(0);
+   for (unsigned i = 0; i < m_nOrbitals; ++i) {
+       for (unsigned j = 0; j < m_nBasis; ++j, ++ka) {
+           m_alphaCoefficients(i,j) = alphaCoefficients[ka];
+       }
+   }
+}
+
+
+// Unrestricted
+Orbitals::Orbitals(
+   unsigned const nAlpha, 
+   unsigned const nBeta, 
+   ShellList const& shells,
+   QList<double> const& alphaCoefficients, 
+   QList<double> const& betaCoefficients,
+   QString const& label)
+ : m_nAlpha(nAlpha), m_nBeta(nBeta), m_nBasis(0), m_nOrbitals(0), m_restricted(false),
+   m_label(label), m_shellList(shells)
+{
+   if (m_shellList.isEmpty()) {
+      QLOG_WARN() << "Empty shell list in Orbitals constructor";  return;
+   }else if (alphaCoefficients.size() != betaCoefficients.size()) {
+      QLOG_WARN() << "Inconsistent coefficient matrix dimensions in Orbitals constructor:";  
+      QLOG_WARN() << "  Alpha:" << alphaCoefficients.size() 
+                  << "  Beta:"  << betaCoefficients.size();
       return;
    }
 
-   m_nBasis = m_shellList.nBasis();
-   
-   unsigned nao(alphaCoefficients.size() / m_nBasis);
-   unsigned nbo(betaCoefficients.size() / m_nBasis);
-
-   if (nao == 0 || nao != nbo ||
-       nao*m_nBasis != alphaCoefficients.size() ||
-       nbo*m_nBasis != betaCoefficients.size() ) {
-      QLOG_WARN() << "Inconsistent coefficient data in Orbitals constructor:";
-      QLOG_WARN() << "Basis functions:" << m_nBasis << "orbitals:" << nao << nbo;
-      QLOG_WARN() << "Coefficients:   " << alphaCoefficients.size() << betaCoefficients.size();
-      m_nOrbitals = 0;
-      return;
-   }
-
-   m_nOrbitals = nao;
+   m_nBasis    = m_shellList.nBasis();
+   m_nOrbitals = alphaCoefficients.size() / m_nBasis;
+   m_shellList.boundingBox(m_bbMin, m_bbMax);
 
    m_alphaCoefficients.resize(m_nOrbitals, m_nBasis);
    unsigned ka(0);
@@ -95,10 +111,36 @@ Orbitals::Orbitals(
            m_betaCoefficients(i,j) = betaCoefficients[kb];
        }
    }
-
-   m_shellList.boundingBox(m_bbMin, m_bbMax);
 }
 
+
+bool Orbitals::consistent() const 
+{ 
+   return
+   m_nOrbitals > 0 && 
+   m_nBasis    > 0 && 
+   m_nOrbitals <= m_nBasis     && 
+   m_nAlpha    <= m_nOrbitals  &&
+   m_nBeta     <= m_nOrbitals;
+}
+
+
+Matrix const& Orbitals::alphaCoefficients() const 
+{ 
+   return m_alphaCoefficients; 
+}
+
+
+Matrix const& Orbitals::betaCoefficients()  const 
+{ 
+   return restricted() ? m_alphaCoefficients :  m_betaCoefficients;
+}
+
+
+ShellList& Orbitals::shellList() 
+{ 
+   return m_shellList; 
+}
 
 
 void Orbitals::dump() const 

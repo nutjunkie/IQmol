@@ -47,7 +47,7 @@ namespace Layer {
          ExcitedStates(Data::ExcitedStates const&);
          ~ExcitedStates();
 
-         Data::ExcitedStates const& data() const { return m_excitedStates; }
+         Data::ExcitedStates const& stateData() const { return m_excitedStates; }
       
          void configure();
 

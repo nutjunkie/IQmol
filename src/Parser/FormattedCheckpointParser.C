@@ -510,7 +510,6 @@ Data::MolecularOrbitals* FormattedCheckpoint::makeMolecularOrbitals(MoData const
    Data::MolecularOrbitals* mos = new Data::MolecularOrbitals(
       moData.nAlpha, 
       moData.nBeta,
-      moData.nBasis,
       moData.alphaCoefficients,
       moData.alphaEnergies,
       moData.betaCoefficients,

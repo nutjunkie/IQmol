@@ -50,7 +50,7 @@ void BuildAtom::leftMousePressEvent(QMouseEvent* e)
    int nObjects(m_viewer->m_objects.size());
    if ((m_beginAtom == 0) && 
        (nObjects > 0)     && 
-       (e->modifiers() != int(Viewer::s_buildModifier))) {
+       (e->modifiers() != Viewer::s_buildModifier)) {
       // Manipulating in Build mode
       e->ignore();
       return;
@@ -81,7 +81,7 @@ void BuildAtom::rightMousePressEvent(QMouseEvent* e)
    int nObjects(m_viewer->m_objects.size());
    if ((m_beginAtom == 0) && 
        (nObjects > 0) && 
-       (e->modifiers() != int(Viewer::s_buildModifier))) {
+       (e->modifiers() != Viewer::s_buildModifier)) {
       // Manipulating in Build mode
       e->ignore();
       return;

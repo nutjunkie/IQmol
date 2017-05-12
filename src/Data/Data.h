@@ -103,7 +103,7 @@ namespace Data {
          virtual void serialize(OutputArchive&, unsigned int const version = 0) = 0;
 
          /// This is only meant for debugging;
-		 virtual void dump() const { };
+		 virtual void dump() const = 0;
 
       protected:
          /// This should delete any resources owned by the data object.

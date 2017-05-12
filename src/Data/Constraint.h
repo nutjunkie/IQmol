@@ -33,18 +33,15 @@ namespace Data {
       friend class boost::serialization::access;
 
       public:
-         Type::ID typeID() const; 
+         Type::ID typeID() const { return Type::Constraint; }
 
          Constraint() : m_value(0.0) { }
-
          virtual ~Constraint() { }
 
          QList<unsigned> const& atomIndices() const { return m_atomIndices; }
 
          void setValue(double const value) { m_value = value; }
          double value() const { return m_value; }
-
-         virtual void dump();
 
          virtual void serialize(OutputArchive& ar, unsigned const /* version = 0 */) 
          {
@@ -57,6 +54,8 @@ namespace Data {
             ar & m_atomIndices;
             ar & m_value;
          }
+
+         virtual void dump() const;
 
       protected:
          virtual void destroy() { }

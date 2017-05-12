@@ -54,6 +54,7 @@ namespace Data {
    /// Wrapper around the OpenMesh TriMesh class to provide serialization functionality.
    class Mesh : public Base {
 
+      using Base::copy;
       friend class boost::serialization::access;
       friend class IQmol::Parser::Mesh;
       friend class IQmol::MeshDecimator;

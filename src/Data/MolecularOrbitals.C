@@ -32,15 +32,13 @@ namespace Data {
 MolecularOrbitals::MolecularOrbitals(
    unsigned const nAlpha, 
    unsigned const nBeta, 
-   unsigned const nBasis,
    QList<double> const& alphaCoefficients, 
    QList<double> const& alphaEnergies,  
    QList<double> const& betaCoefficients, 
    QList<double> const& betaEnergies,
    ShellList const& shells) : 
-   Orbitals(nAlpha, nBeta, alphaCoefficients, betaCoefficients, shells),
+   Orbitals(nAlpha, nBeta, shells, alphaCoefficients, betaCoefficients),
    m_alphaEnergies(alphaEnergies),  m_betaEnergies(betaEnergies)
-   
 {
    m_restricted = (m_nAlpha == m_nBeta) && (m_alphaEnergies == m_betaEnergies);
 }

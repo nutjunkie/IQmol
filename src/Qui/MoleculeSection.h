@@ -20,9 +20,8 @@ class Molecule;
 class MoleculeSection : public KeywordSection {
    public:
       MoleculeSection(QString const& coordinates = "read", int const charge = 0,
-         int multiplicity = 1) : KeywordSection("molecule"), m_zmatrix(false),
-         m_charge(charge), m_multiplicity(multiplicity), m_totalNuclearCharge(0),
-         m_coordinates(coordinates), m_molecule(0) 
+         int multiplicity = 1) : KeywordSection("molecule"), m_charge(charge), 
+         m_multiplicity(multiplicity), m_coordinates(coordinates), m_molecule(0) 
       {
          parseCoordinates();
       }
@@ -49,11 +48,9 @@ class MoleculeSection : public KeywordSection {
 
 
    private:
-      bool m_zmatrix;  // set if we want the coordinates to be in zmatrix format
       int  m_charge;
       int  m_multiplicity;
       int  m_numberOfAtoms;
-      int  m_totalNuclearCharge;
       QString m_coordinates;
 
       Molecule* m_molecule;

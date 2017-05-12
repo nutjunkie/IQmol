@@ -145,7 +145,7 @@ void BuildFunctionalGroup::leftMouseMoveEvent(QMouseEvent* e)
             m_bond = 0;
          }
 
-         Vec pos(m_viewer->worldCoordinatesOf(e, m_beginAtom->getPosition()));
+         //Vec pos(m_viewer->worldCoordinatesOf(e, m_beginAtom->getPosition()));
          m_group = new Layer::Group;
          m_group->loadFromFile(m_filePath);
          Layer::Atom* rootAtom(m_group->rootAtom());

@@ -97,7 +97,7 @@ void GeminalOrbitals::computeGeminalLimits()
    // through MOGem which contains a geminal index of each orbital
    GemL[0] = 0; j = 1;
    for (i = 1; i < nGemOrb; i++) { 
-    if ( geminalMoMap[i] == j ) { GemL[j] = i; j++; }
+    if ( geminalMoMap[i] == (int)j ) { GemL[j] = i; j++; }
    }
    GemL[nGeminals] = nGemOrb;
    // Open-shells need a separate assignement, as they are lumped toghether in MOGem
