@@ -54,6 +54,15 @@ QString toString(ID const id)
       case VibrationalModeList:      s = "Data::VibrationalModeList";       break;
       case MolecularOrbitals:        s = "Data::MolecularOrbitals";         break;
       case MolecularOrbitalsList:    s = "Data::MolecularOrbitalsList";     break;
+
+      case Orbitals:                 s = "Data::Orbitals";                  break;
+      case OrbitalsList:             s = "Data::OrbitalsList";              break;
+      case LocalizedOrbitals:        s = "Data::LocalizedOrbitals";         break;
+      case CanonicalOrbitals:        s = "Data::CanonicalOrbitals";         break;
+
+      case Density:                  s = "Data::Density";                   break;
+      case DensityList:              s = "Data::DensityList";               break;
+
       case Shell:                    s = "Data::Shell";                     break;
       case ShellList:                s = "Data::ShellList";                 break;
       case Energy:                   s = "Data::Energy";                    break;
@@ -64,7 +73,7 @@ QString toString(ID const id)
       case AtomicSymbol:             s = "Data::AtomicSymbol";              break;
       case AtomicNumber:             s = "Data::AtomicNumber";              break;
       case AtomColor:                s = "Data::AtomColor";                 break;
-      case NmrShielding:            s = "Data::NmrShielding";               break;
+      case NmrShielding:             s = "Data::NmrShielding";              break;
       case NmrShift:                 s = "Data::NmrShift";                  break;
       case Mass:                     s = "Data::Mass";                      break;
       case AtomicCharge:             s = "Data::AtomicCharge";              break;

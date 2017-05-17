@@ -21,20 +21,19 @@
 ********************************************************************************/
 
 #include "FormattedCheckpointParser.h"
-#include "MolecularOrbitalsList.h"
-#include "MolecularOrbitals.h"
+//#include "MolecularOrbitalsList.h"
+#include "CanonicalOrbitals.h"
 #include "GeminalOrbitals.h"
 #include "DipoleMoment.h"
 #include "GeometryList.h"
+#include "OrbitalsList.h"
 #include "TextStream.h"
 #include "Constants.h"
 #include "Hessian.h"
-#include "Density.h"
 #include "Energy.h"
 #include "QsLog.h"
 #include "Data.h"
 #include <cmath>
-
 #include <QtDebug>
 
 
@@ -45,30 +44,50 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
 {
    Data::GeometryList* geometryList(new Data::GeometryList);
    Data::Geometry* geometry(0);
+
+   Data::OrbitalsList* orbitalsList(new Data::OrbitalsList()); 
+
+   OrbitalData hfData;
+   hfData.orbitalType = Data::Orbitals::Canonical;
+   hfData.label = "Canonical Orbitals";
+
+   OrbitalData erData;
+   erData.orbitalType = Data::Orbitals::Localized;
+   erData.label = "Localized MOs (ER)";
+
+   OrbitalData boysData;
+   boysData.orbitalType = Data::Orbitals::Localized;
+   boysData.label = "Localized MOs (Boys)";
+
+   OrbitalData ntoData;
+   ntoData.orbitalType = Data::Orbitals::NaturalTransition;
+   ntoData.label = "Natural Transition Orbitals";
+
+   OrbitalData nboData;
+   nboData.orbitalType = Data::Orbitals::NaturalBond;
+   nboData.label = "Natural Bond Orbitals";
+
+   unsigned nAlpha(0);
+   unsigned nBeta(0);
+   bool     ok(true);
+
+   GeomData  geomData;
+   ShellData shellData;
+   GmoData   gmoData;
+
    Data::DensityList densityList;
 
+
+// DEPRECATE
+/*
    Data::MolecularOrbitalsList* 
       molecularOrbitalsList(new Data::MolecularOrbitalsList()); 
    Data::MolecularOrbitalsList* 
       naturaltransOrbitalList(new Data::MolecularOrbitalsList()); 
    Data::MolecularOrbitalsList* 
       naturalbondOrbitalList(new Data::MolecularOrbitalsList()); 
-
-
-   bool ok(true);
-   GeomData  geomData;
-   ShellData shellData;
-
-   MoData    moData;
-   MoData    ntoData;
-   MoData    nboData;
-   GmoData   gmoData;
-   MoData    boysData;
-   MoData    erData;
-
-//   moData.label   = "Cannonical MOs";
-//   ntoData.label  = "Natural Transition Orbitals";
-//   ntoData.label  = "Natural Bond Orbitals";
+*/
+// END DEPRECATE
 
    while (!textStream.atEnd()) {
 
@@ -82,17 +101,11 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       QStringList list(TextStream::tokenize(tmp));
 
       if (key == "Number of alpha electrons") {            // This should only appear once
-         moData.nAlpha  = list.at(1).toInt(&ok);
-         ntoData.nAlpha = list.at(1).toInt(&ok);
-         nboData.nAlpha = list.at(1).toInt(&ok);
-         gmoData.nAlpha = list.at(1).toInt(&ok);
+         nAlpha = list.at(1).toInt(&ok);
          if (!ok) goto error;
 
       }else if (key == "Number of beta electrons") {       // This should only appear once
-         moData.nBeta  = list.at(1).toInt(&ok);
-         ntoData.nBeta = list.at(1).toInt(&ok);
-         nboData.nBeta = list.at(1).toInt(&ok);
-         gmoData.nBeta = list.at(1).toInt(&ok);
+         nBeta = list.at(1).toInt(&ok);
          if (!ok) goto error;
 
       }else if (key == "Multiplicity") { 
@@ -108,19 +121,16 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          if (!ok) goto error;
          geomData.atomicNumbers = readUnsignedArray(textStream, n);
 
-
       }else if (key == "Current cartesian coordinates") { // This triggers a new geometry
 
          if (geometry) {
-            // We are on a subsequent geometry, so we should have everything we need to
-            // create the MOs for the previous one.
-            Data::MolecularOrbitals* mos(makeMolecularOrbitals(moData, shellData, *geometry)); 
-            clear(moData);
-            if (mos) {
-               mos->appendDensities(densityList);
-               densityList.clear();
-               molecularOrbitalsList->append(mos);
-            }
+            // We are on a subsequent geometry, so we should have everything we 
+            // need to create the MOs for the previous one.
+            Data::Orbitals* orbitals(makeOrbitals(nAlpha, nBeta, hfData, shellData,
+               *geometry, densityList));
+            if (orbitals) orbitalsList->append(orbitals);
+            densityList.clear();
+            clear(hfData);
          }
 
          unsigned n(list.at(2).toUInt(&ok));
@@ -131,12 +141,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          geometryList->append(geometry);
 
       }else if (key == "Number of basis functions") {
-         unsigned int nBasis(list.at(1).toUInt(&ok));
-         moData.nBasis  = nBasis;
-         gmoData.nBasis = nBasis;
-         ntoData.nBasis = nBasis;
-         nboData.nBasis = nBasis;
-         if (!ok) goto error;
+         // This is determined from the shell data
 
       }else if (key == "Shell types") {
          unsigned n(list.at(2).toUInt(&ok));
@@ -182,81 +187,92 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          Data::TotalEnergy& total(geometry->getProperty<Data::TotalEnergy>());
          total.setValue(energy, Data::Energy::Hartree);
 
+      }else if (key == "Dipole_Data") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok || !geometry) goto error;
+         QList<double> data(readDoubleArray(textStream, n));
+         if (data.size() != 3) goto error;
+         Data::DipoleMoment& dipole(geometry->getProperty<Data::DipoleMoment>());
+         dipole.setValue(data[0],data[1],data[2]);
+
+      }else if (key == "Cartesian Force Constants") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok || !geometry) goto error;
+         QList<double> data(readDoubleArray(textStream, n));
+         Data::Hessian& hessian(geometry->getProperty<Data::Hessian>());
+         hessian.setData(geometry->nAtoms(), data);
+
+      // Canonical Orbitals
+
       }else if (key == "Alpha MO coefficients") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
-         moData.alphaCoefficients = readDoubleArray(textStream, n);
-         // Copy the alpha coefficients in case the job is restricted
-         moData.betaCoefficients  = moData.alphaCoefficients;
-         moData.orbitalType       = Data::Orbitals::Canonical;
+         hfData.alphaCoefficients = readDoubleArray(textStream, n);
+
+	  }else if (key == "Beta MO coefficients") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok) goto error;
+         hfData.betaCoefficients = readDoubleArray(textStream, n);
+
+      }else if (key == "Alpha Orbital Energies") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok) goto error;
+         hfData.alphaEnergies = readDoubleArray(textStream, n);
+
+      }else if (key == "Beta Orbital Energies") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok || !geometry) goto error;
+         hfData.betaEnergies = readDoubleArray(textStream, n);
+
+      // Natural Transition Orbitals
 
 	  }else if (key == "Alpha NTO coefficients") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          ntoData.alphaCoefficients = readDoubleArray(textStream, n);
-         ntoData.betaCoefficients  = ntoData.alphaCoefficients;
-         ntoData.orbitalType       = Data::Orbitals::NaturalTransition;
-
-	  }else if (key == "Alpha NBO coefficients") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
-         nboData.alphaCoefficients = readDoubleArray(textStream, n);
-         nboData.betaCoefficients  = nboData.alphaCoefficients;
-         nboData.orbitalType       = Data::Orbitals::NaturalBond;
-
-	  }else if (key == "Beta MO coefficients") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
-         moData.betaCoefficients = readDoubleArray(textStream, n);
 
       }else if (key == "Beta NTO coefficients") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          ntoData.betaCoefficients = readDoubleArray(textStream, n);
 
-	  }else if (key == "Beta NBO coefficients") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
-         nboData.betaCoefficients = readDoubleArray(textStream, n);
-
-      }else if (key == "Alpha Orbital Energies") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
-         moData.alphaEnergies = readDoubleArray(textStream, n);
-         moData.betaEnergies  = moData.alphaEnergies;
-
-      }else if (key == "Beta Orbital Energies") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok || !geometry) goto error;
-         moData.betaEnergies = readDoubleArray(textStream, n);
-
       }else if (key == "Alpha NTO amplitudes") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          ntoData.alphaEnergies = readDoubleArray(textStream, n);
-         ntoData.betaEnergies  = ntoData.alphaEnergies;
 
       }else if (key == "Beta NTO amplitudes") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok || !geometry) goto error;
          ntoData.betaEnergies = readDoubleArray(textStream, n);
 
+      // Natural Bond Orbitals
+
+	  }else if (key == "Alpha NBO coefficients") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok) goto error;
+         nboData.alphaCoefficients = readDoubleArray(textStream, n);
+
+	  }else if (key == "Beta NBO coefficients") {
+         unsigned n(list.at(2).toUInt(&ok));
+         if (!ok) goto error;
+         nboData.betaCoefficients = readDoubleArray(textStream, n);
+
       }else if (key == "Alpha NBO occupancies") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok) goto error;
          nboData.alphaEnergies = readDoubleArray(textStream, n);
-         nboData.betaEnergies  = nboData.alphaEnergies;
 
       }else if (key == "Beta NBO occupancies") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok || !geometry) goto error;
          nboData.betaEnergies = readDoubleArray(textStream, n);
 
+      // Localized Orbitals
+
       }else if (key == "Localized Alpha MO Coefficients (ER)") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok || !geometry) goto error;
-         erData = moData;
-         erData.label = "Localized MOs (ER)";
          erData.alphaCoefficients = readDoubleArray(textStream, n);
 
       }else if (key == "Localized Beta  MO Coefficients (ER)") {
@@ -267,14 +283,14 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       }else if (key == "Localized Alpha MO Coefficients (Boys)") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok || !geometry) goto error;
-         boysData = moData;
-         boysData.label = "Localized MOs (Boys)";
          boysData.alphaCoefficients = readDoubleArray(textStream, n);
 
       }else if (key == "Localized Beta  MO Coefficients (Boys)") {
          unsigned n(list.at(2).toUInt(&ok));
          if (!ok || !geometry) goto error;
          boysData.betaCoefficients = readDoubleArray(textStream, n);
+
+      // Geminals
 
       }else if (key == "Alpha GMO coefficients") {
          unsigned n(list.at(2).toUInt(&ok));
@@ -302,42 +318,28 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          if (!ok) goto error;
          gmoData.geminalEnergies = readDoubleArray(textStream, n);
 
-      }else if (key == "Dipole_Data") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok || !geometry) goto error;
-         QList<double> data(readDoubleArray(textStream, n));
-         if (data.size() != 3) goto error;
-         Data::DipoleMoment& dipole(geometry->getProperty<Data::DipoleMoment>());
-         dipole.setValue(data[0],data[1],data[2]);
-
-      }else if (key == "Cartesian Force Constants") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok || !geometry) goto error;
-         QList<double> data(readDoubleArray(textStream, n));
-         Data::Hessian& hessian(geometry->getProperty<Data::Hessian>());
-         hessian.setData(geometry->nAtoms(), data);
-
       }else if (key.endsWith("Surface Title") || key == "NBO Ground State" ) {
-
-         key.replace("NBO ","");
-         key.replace("Surface Title","");
-	     nboData.stateTag = key;
-    
          unsigned n(list.at(1).toUInt(&ok));
          if (!ok || !geometry) goto error;
 
+         key.replace("NBO ","");
+         key.replace("Surface Title","");
+	     nboData.label = key;
+    
          if (ntoData.orbitalType == Data::Orbitals::NaturalTransition) {
-  	         ntoData.stateNumber = n;
-             Data::MolecularOrbitals* ntos(makeMolecularOrbitals(ntoData, shellData, *geometry)); 
+  	         ntoData.label += "State: " + QString::number(n);
+             Data::Orbitals* ntos(makeOrbitals(nAlpha, nBeta, ntoData, 
+                shellData, *geometry)); 
              clear(ntoData);
-             if (ntos) naturaltransOrbitalList->append(ntos);
+             if (ntos) orbitalsList->append(ntos);
              qDebug() << "Append one NTO to MO lists";
 
 	     }else if (nboData.orbitalType == Data::Orbitals::NaturalBond) {
-             nboData.stateNumber = n;
-             Data::MolecularOrbitals* nbos(makeMolecularOrbitals(nboData, shellData, *geometry)); 
+  	         nboData.label += "State: " + QString::number(n);
+             Data::Orbitals* nbos(makeOrbitals(nAlpha, nBeta, nboData, 
+                shellData, *geometry)); 
              clear(nboData);
-             if (nbos) naturalbondOrbitalList->append(nbos);
+             if (nbos) orbitalsList->append(nbos);
 	         qDebug() << "Append one NBO to MO lists";
 	     }
 
@@ -355,33 +357,40 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
    } // end of parsing text stream 
 
    if (geometry) {
-      Data::MolecularOrbitals* mos(0);
-      mos = makeMolecularOrbitals(moData, shellData, *geometry); 
-      if (mos) {
-         mos->appendDensities(densityList);
-         densityList.clear();
-         molecularOrbitalsList->append(mos);
-      }
+      Data::Orbitals* orbitals(0);
 
-      mos = makeMolecularOrbitals(boysData, shellData, *geometry); 
-      if (mos) molecularOrbitalsList->append(mos);
+      // We append the additional densities to the canonical orbitals 
+      orbitals = makeOrbitals(nAlpha, nBeta, hfData, shellData, *geometry, densityList); 
+      if (orbitals) orbitalsList->append(orbitals);
+      densityList.clear();
+         
+      orbitals = makeOrbitals(nAlpha, nBeta, erData, shellData, *geometry); 
+      if (orbitals) orbitalsList->append(orbitals);
 
-      mos = makeMolecularOrbitals(erData, shellData, *geometry); 
-      if (mos) molecularOrbitalsList->append(mos);
+      orbitals = makeOrbitals(nAlpha, nBeta, boysData, shellData, *geometry); 
+      if (orbitals) orbitalsList->append(orbitals);
 
-      Data::GeminalOrbitals* gmos(makeGeminalOrbitals(gmoData, shellData, *geometry)); 
+      Data::GeminalOrbitals* gmos(makeGeminalOrbitals(nAlpha, nBeta, gmoData, 
+         shellData, *geometry)); 
       if (gmos) m_dataBank.append(gmos);
    }
 
-   if (geometryList) {
-      if (geometryList->isEmpty()) {
-         delete geometryList;
-      }else {
-         geometryList->setDefaultIndex(-1);
-         m_dataBank.append(geometryList);
-      }
+   if (geometryList->isEmpty()) {
+      delete geometryList;
+   }else {
+      geometryList->setDefaultIndex(-1);
+      m_dataBank.append(geometryList);
    }
 
+   if (orbitalsList->isEmpty()) {
+      delete orbitalsList;
+   }else {
+      m_dataBank.append(orbitalsList);    
+   }
+
+
+// DEPRECATE   
+/*
    if (molecularOrbitalsList) {
       if (molecularOrbitalsList->isEmpty()) {
          delete molecularOrbitalsList;
@@ -408,6 +417,8 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          m_dataBank.append(naturalbondOrbitalList);
       }
    }
+*/
+// END DEPRECATE   
 
    return m_errors.isEmpty();
  
@@ -417,21 +428,21 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       m_errors.append(msg);
 
    delete geometryList;
-   delete molecularOrbitalsList;
-   delete naturaltransOrbitalList;
-   delete naturalbondOrbitalList;
+   delete orbitalsList;
 
    return false;
 }
 
 
-void FormattedCheckpoint::clear(MoData& moData)
+void FormattedCheckpoint::clear(OrbitalData& orbitalData)
 {
-   moData.alphaCoefficients.clear();
-   moData.betaCoefficients.clear();
-   moData.alphaEnergies.clear();
-   moData.betaEnergies.clear();
-   moData.orbitalType = Data::Orbitals::Undefined;
+   orbitalData.orbitalType = Data::Orbitals::Undefined;
+   orbitalData.label.clear();
+   orbitalData.alphaCoefficients.clear();
+   orbitalData.betaCoefficients.clear();
+   orbitalData.alphaEnergies.clear();
+   orbitalData.betaEnergies.clear();
+   orbitalData.stateIndex = 0;
 }
 
 
@@ -498,68 +509,56 @@ bool FormattedCheckpoint::dataAreConsistent(ShellData const& shellData, unsigned
 
 
 
-Data::MolecularOrbitals* FormattedCheckpoint::makeMolecularOrbitals(MoData const& moData, 
-   ShellData const& shellData, Data::Geometry const& geometry)
+Data::Orbitals* FormattedCheckpoint::makeOrbitals(unsigned const nAlpha, 
+   unsigned const nBeta, OrbitalData const& orbitalData, ShellData const& shellData, 
+   Data::Geometry const& geometry, Data::DensityList densityList)
 {
-   // This needs fixing.  Newer versions of QChem only print the orbitals for the
-   // final geometry, so the first ones are just for the geometries
-   if (moData.alphaEnergies.isEmpty()) return 0;
+   if (orbitalData.alphaCoefficients.isEmpty()) return 0;
+   // TODO: This needs to move to avoid duplication 
    Data::ShellList* shellList = makeShellList(shellData, geometry);
    if (!shellList) return 0;
 
-   Data::MolecularOrbitals* mos = new Data::MolecularOrbitals(
-      moData.nAlpha, 
-      moData.nBeta,
-      moData.alphaCoefficients,
-      moData.alphaEnergies,
-      moData.betaCoefficients,
-      moData.betaEnergies,
-      *shellList
-   );
+   Data::Orbitals* orbitals(0);
 
-   mos->setOrbitalType(moData.orbitalType);
+   switch (orbitalData.orbitalType) {
 
-   if (mos->consistent()) {
-      switch(mos->orbitalType()){
-         case Data::MolecularOrbitals::Localized: {
-            mos->setLabel("Localized Orbitals");
-         } break;
-         case Data::Orbitals::Canonical: {
-            //qDebug() << "Add one MO: " << mos->orbitalType();;
-            mos->setLabel("Canonical Orbitals");
-         } break;
+      case Data::Orbitals::Canonical: {
+         Data::CanonicalOrbitals* canonical = 
+            new Data::CanonicalOrbitals(nAlpha, nBeta, *shellList,
+                orbitalData.alphaCoefficients, orbitalData.alphaEnergies, 
+                orbitalData.betaCoefficients,  orbitalData.betaEnergies, orbitalData.label);
+         canonical->appendDensities(densityList); 
+         orbitals = canonical;
+      } break;
 
-         case Data::Orbitals::NaturalTransition: {
-            qDebug() << "Add one NTO: " << mos->orbitalType();
-            QString surfaceTag(QString(moData.stateTag) + QString::number(moData.stateNumber));
-            mos->setLabel(surfaceTag);
-         } break;
+      case Data::Orbitals::Localized:
+      case Data::Orbitals::NaturalTransition: 
+      case Data::Orbitals::NaturalBond: {
+         orbitals = new Data::Orbitals(orbitalData.orbitalType, nAlpha, nBeta, 
+            *shellList, orbitalData.alphaCoefficients, orbitalData.betaCoefficients, 
+            orbitalData.label);
+      } break;
 
-         case Data::Orbitals::NaturalBond: {
-            qDebug() << "Add one NBO: " << mos->orbitalType();
-            QString surfaceTag = QString(moData.stateTag);
-            if (moData.stateNumber != 0) surfaceTag +=  QString::number(moData.stateNumber);
-            mos->setLabel(surfaceTag);
-         } break;
-
-         case Data::MolecularOrbitals::Undefined: 
-            qDebug() << "Undefined molecular orbtal type requested";
-           break;
-      }
-
-   }else {
-      QString msg("Data are inconsistent. Check shell types.");
-      m_errors.append(msg);
-      delete mos;
-      mos = 0;
+      default:
+         QLOG_WARN() << "Unknown oribital type in FormattedCheckpoint::makeOrbitals";
+         break;
    }
 
-   return mos;
-}
-            
+   if (orbitals && !orbitals->consistent()) {
+      QString msg(Data::Orbitals::toString(orbitalData.orbitalType));
+      msg += " orbital data are inconsistent. Check shell types.";
+      m_errors.append(msg);
+      delete orbitals;
+      orbitals = 0;
+   }
 
-Data::GeminalOrbitals* FormattedCheckpoint::makeGeminalOrbitals(GmoData const& gmoData, 
-   ShellData const& shellData, Data::Geometry const& geometry)
+   return orbitals;
+}
+
+
+Data::GeminalOrbitals* FormattedCheckpoint::makeGeminalOrbitals(unsigned const nAlpha,
+   unsigned const nBeta, GmoData const& gmoData, ShellData const& shellData, 
+   Data::Geometry const& geometry)
 {
    // This needs fixing.  Newer versions of QChem only print the orbitals for the
    // final geometry, so the first ones are just for the geometries
@@ -567,9 +566,9 @@ Data::GeminalOrbitals* FormattedCheckpoint::makeGeminalOrbitals(GmoData const& g
    Data::ShellList* shellList = makeShellList(shellData, geometry);
    if (!shellList) return 0;
    Data::GeminalOrbitals* gmos = new Data::GeminalOrbitals(
-      gmoData.nAlpha, 
-      gmoData.nBeta,
-      gmoData.nBasis,
+      nAlpha, 
+      nBeta,
+      shellList->nBasis(),
       gmoData.alphaCoefficients,
       gmoData.betaCoefficients,
       gmoData.geminalEnergies,

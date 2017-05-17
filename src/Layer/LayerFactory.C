@@ -21,24 +21,28 @@
 ********************************************************************************/
 
 #include "LayerFactory.h"
+#include "File.h"
 #include "Data.h"
 #include "Bank.h"
 #include "Mesh.h"
 #include "NmrData.h"
 #include "PointCharge.h"
+#include "EfpFragment.h"
 #include "ExcitedStates.h"
 
 #include "Surface.h"
 #include "CubeData.h"
 #include "Frequencies.h"
-#include "MolecularOrbitals.h"
+#include "OrbitalsList.h"
 #include "GeminalOrbitals.h"
+#include "MolecularOrbitalsList.h"
 
 #include "AtomLayer.h"
 #include "BondLayer.h"
+#include "CanonicalOrbitalsLayer.h"
 #include "ChargeLayer.h"
-#include "FileLayer.h"
 #include "CubeDataLayer.h"
+#include "FileLayer.h"
 #include "DipoleLayer.h"
 #include "GeometryLayer.h"
 #include "GeometryListLayer.h"
@@ -47,6 +51,7 @@
 #include "FrequenciesLayer.h"
 #include "ExcitedStatesLayer.h"
 #include "MolecularOrbitalsLayer.h"
+#include "OrbitalsLayer.h"
 #include "GeminalOrbitalsLayer.h"
 #include "NmrLayer.h"
 #include "QsLog.h"
@@ -119,6 +124,19 @@ Layer::List Factory::toLayers(Data::Base& data)
                molecularOrbitals(dynamic_cast<Data::MolecularOrbitals&>(data));
             layers.append(new MolecularOrbitals(molecularOrbitals));
          } break;
+
+
+         case Data::Type::OrbitalsList: {
+            Data::OrbitalsList& list(dynamic_cast<Data::OrbitalsList&>(data));
+            layers << convert(list);
+         } break;
+
+         case Data::Type::Orbitals: {
+            Data::Orbitals& orbitals(dynamic_cast<Data::Orbitals&>(data));
+            layers.append(new Orbitals(orbitals));
+         } break;
+
+
 
          case Data::Type::GeminalOrbitals: {
             Data::GeminalOrbitals& 
@@ -294,13 +312,73 @@ List Factory::convert(Data::PointChargeList& pointCharges)
 }
 
 
+
+List Factory::convert(Data::OrbitalsList& orbitalsList)
+{
+   List list;
+
+   Qt::ItemFlags flags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+
+   Data::OrbitalsList::iterator iter;
+   for (iter = orbitalsList.begin(); iter != orbitalsList.end(); ++iter) {
+
+       Data::CanonicalOrbitals* canonical =
+          dynamic_cast<Data::CanonicalOrbitals*>(*iter);
+
+       if (canonical) {
+          list.append(new CanonicalOrbitals(*canonical));
+       }else {
+          list.append(new Orbitals(**iter));
+       }
+
+/*
+       switch((*iter)->orbitalType()) {
+
+          case Data::Orbitals::NaturalTransition: {
+             if (!ntos) {
+                ntos = new Base("Natural Transition Orbitals");
+                ntos->setFlags(flags);
+                list.append(ntos);
+             }
+             ntos->appendLayer(new MolecularOrbitals(**iter));
+          } break;
+
+          case Data::Orbitals::NaturalBond: {
+             if (!nbos) {
+                nbos = new Base("Natural Bond Orbitals");
+                nbos->setFlags(flags);
+                list.append(nbos);
+             }
+             nbos->appendLayer(new MolecularOrbitals(**iter));
+          } break;
+ 
+          case Data::Orbitals::Canonical: {
+             if (!canonical) {
+                canonical = new Base("Canonical Orbitals");
+                canonical->setFlags(flags);
+                list.append(canonical);
+             }
+             canonical->appendLayer(new MolecularOrbitals(**iter));
+          } break;
+ 
+          default: {
+             qDebug() << "Undefined orbitals in Layer::Factory";
+          } break;
+       }
+*/
+   }
+
+   return list;
+}
+
+
+
 List Factory::convert(Data::MolecularOrbitalsList& molecularOrbitalsList)
 {
    List list;
 
    Base* ntos(0);
    Base* nbos(0);
-   Base* canonical(0);
 
    Qt::ItemFlags flags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
@@ -336,6 +414,7 @@ List Factory::convert(Data::MolecularOrbitalsList& molecularOrbitalsList)
              }
              canonical->appendLayer(new MolecularOrbitals(**iter));
 */
+             qDebug() << "appending canonical orbitals in Layer::Factory";
              list.append(new MolecularOrbitals(**iter));
           } break;
  

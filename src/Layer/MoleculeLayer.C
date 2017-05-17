@@ -29,8 +29,6 @@
 #include "Frequencies.h"
 #include "Geometry.h"
 #include "GeometryList.h"
-//#include "GridData.h"
-//#include "MolecularOrbitals.h"
 #include "MultipoleExpansion.h"
 #include "PointGroup.h"
 #include "SurfaceInfo.h"
@@ -49,6 +47,7 @@
 #include "GroupLayer.h"
 #include "MoleculeLayer.h"
 #include "MolecularOrbitalsLayer.h"
+#include "OrbitalsLayer.h"
 #include "SurfaceLayer.h"
 
 
@@ -203,6 +202,7 @@ void Molecule::appendData(Layer::List& list)
    Bonds*        bonds(0);
    Charges*      charges(0);
    CubeData*     cubeData(0);
+   Orbitals*     orbitals(0);
    EfpFragments* efpFragments(0);
    MolecularOrbitals* molecularOrbitals(0);
 
@@ -227,6 +227,11 @@ qDebug() << "Layer text" << text;
 
        }else if ((molecularOrbitals = qobject_cast<MolecularOrbitals*>(*iter))) {
           m_molecularSurfaces.appendLayer(molecularOrbitals);
+
+       }else if ((orbitals = qobject_cast<Orbitals*>(*iter))) {
+          m_molecularSurfaces.appendLayer(orbitals);
+          //toSet.append(*iter);
+          orbitals->setMolecule(this);
 
 // This is currently preventing the addition of primivees to an exisiting molecule
        }else if (!labels.contains(text)) {

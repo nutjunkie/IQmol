@@ -23,8 +23,9 @@
 ********************************************************************************/
 
 #include "Parser.h"
-#include "Geometry.h"
 #include "Shell.h"
+#include "Density.h"
+#include "Geometry.h"
 #include "MolecularOrbitals.h"
 
 
@@ -59,6 +60,21 @@ namespace Parser {
                QList<double>   contractionCoefficientsSP;
          };
 
+         struct OrbitalData {
+            Data::Orbitals::OrbitalType orbitalType;
+            int stateIndex;
+            QString label;
+
+            QList<double> alphaCoefficients;
+            QList<double> betaCoefficients;
+            QList<double> alphaEnergies;
+            QList<double> betaEnergies;
+         };
+
+         void clear(OrbitalData&);
+
+// DEPRECATE
+/*
          struct MoData {
             QString  label;
             unsigned nAlpha;
@@ -73,10 +89,13 @@ namespace Parser {
            QString stateTag;
          };
 
+         void clear(MoData&);
+         Data::MolecularOrbitals* makeMolecularOrbitals(unsigned const nAlpha, 
+            unsigned const nBeta, MoData const&, ShellData const&, Data::Geometry const&);
+*/
+// END DEPRECATE
+
          struct GmoData {
-            unsigned nAlpha;
-            unsigned nBeta;
-            unsigned nBasis;
             QList<double> alphaCoefficients;
             QList<double> betaCoefficients;
             QList<double> geminalEnergies;
@@ -84,17 +103,20 @@ namespace Parser {
             QList<int>    geminalMoMap;
          };
 
-         void clear(MoData&);
          void clear(GmoData&);
+
 
          QList<int> readIntegerArray(TextStream&, unsigned nTokens);
          QList<double> readDoubleArray(TextStream&, unsigned nTokens);
          QList<unsigned> readUnsignedArray(TextStream&, unsigned nTokens);
 
-         Data::MolecularOrbitals* makeMolecularOrbitals(MoData const&, ShellData const&, 
-            Data::Geometry const&); 
-         Data::GeminalOrbitals* makeGeminalOrbitals(GmoData const&, ShellData const&,
-            Data::Geometry const&);
+         Data::Orbitals* makeOrbitals(unsigned const nAlpha, unsigned const nBeta,
+            OrbitalData const&, ShellData const&, Data::Geometry const&,
+            Data::DensityList densities = Data::DensityList()); 
+
+         Data::GeminalOrbitals* makeGeminalOrbitals(unsigned const nAlpha, 
+            unsigned const nBeta, GmoData const&, ShellData const&, Data::Geometry const&);
+            
          Data::ShellList* makeShellList(ShellData const&, Data::Geometry const& geometry);
          Data::Geometry* makeGeometry(GeomData const&);
 

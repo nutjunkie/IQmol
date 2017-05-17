@@ -1,5 +1,5 @@
-#ifndef IQMOL_DATA_MOLECULARORBITALS_H
-#define IQMOL_DATA_MOLECULARORBITALS_H
+#ifndef IQMOL_DATA_CANONICALORBITALS_H
+#define IQMOL_DATA_CANONICALORBITALS_H
 /*******************************************************************************
 
   Copyright (C) 2011-2015 Andrew Gilbert
@@ -31,56 +31,43 @@ namespace IQmol {
 namespace Data {
 
    /// Data class for molecular orbital information
-   class MolecularOrbitals : public Orbitals {
+   class CanonicalOrbitals : public Orbitals {
 
       friend class boost::serialization::access;
 
       public:
-         MolecularOrbitals() : Orbitals() { }
+         Type::ID typeID() const { return Type::CanonicalOrbitals; }
 
-         MolecularOrbitals(unsigned const nAlpha, unsigned const nBeta,
-            QList<double> const& alphaCoefficients, QList<double> const& alphaEnergies,  
-            QList<double> const& betaCoefficients,  QList<double> const& betaEnergies,
-            ShellList const& shells);
+         CanonicalOrbitals(unsigned const nAlpha, unsigned const nBeta, 
+            ShellList const& shells, QList<double> const& alphaCoefficients, 
+            QList<double> const& alphaEnergies, QList<double> const& betaCoefficients,  
+            QList<double> const& betaEnergies, QString const& label);
 
-         Type::ID typeID() const { return Type::MolecularOrbitals; }
-
+         // TODO: Not sure why this is here or even required, perhaps move it to Orbitals.
          SurfaceList& surfaceList() { return m_surfaceList; }
 
-         DensityList& densityList() { return m_densityList; }
-
-         void appendSurface(Data::Surface* surfaceData)
-         {
+         void appendSurface(Data::Surface* surfaceData) {
             m_surfaceList.append(surfaceData);
          }
 
-         void appendDensities(Data::DensityList densities)
-         {
+         DensityList const& densityList() const { return m_densityList; }
+         void appendDensities(Data::DensityList const& densities) {
             m_densityList << densities;
          }
 
-         double alphaOrbitalEnergy(unsigned i) const 
-         { 
-            return ((int)i < alphaEnergies().size()) ? alphaEnergies()[i] : 0.0;
-         }
-
-         double betaOrbitalEnergy(unsigned i) const 
-         { 
-            return ((int)i < betaEnergies().size()) ? betaEnergies()[i] : 0.0;
-         }
-
-         QList<double> const& alphaEnergies() const;
-         QList<double> const& betaEnergies()  const;
-
-         bool consistent() const;
+         double alphaOrbitalEnergy(unsigned i) const;
+         double betaOrbitalEnergy(unsigned i) const;
+         bool   consistent() const;
 
          void serialize(InputArchive& ar, unsigned const version = 0) 
          {
+            Orbitals::serialize(ar, version);
             privateSerialize(ar, version);
          }
 
          void serialize(OutputArchive& ar, unsigned const version = 0) 
          {
+            Orbitals::serialize(ar, version);
             privateSerialize(ar, version);
          }
 
@@ -90,7 +77,6 @@ namespace Data {
          template <class Archive>
          void privateSerialize(Archive& ar, unsigned const /* version */) 
          {
-            ar & boost::serialization::base_object<Orbitals>(*this);
             ar & m_alphaEnergies;
             ar & m_betaEnergies;
             ar & m_surfaceList;
@@ -98,9 +84,8 @@ namespace Data {
 
          QList<double> m_alphaEnergies;
          QList<double> m_betaEnergies;
-         SurfaceList m_surfaceList;
-
-         Data::DensityList m_densityList;
+         SurfaceList   m_surfaceList;
+         DensityList   m_densityList;
    };
 
 } } // end namespace IQmol::Data

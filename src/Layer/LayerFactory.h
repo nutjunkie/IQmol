@@ -23,21 +23,20 @@
 ********************************************************************************/
 
 #include "Layer.h"
-#include "Geometry.h"
-#include "GeometryList.h"
-#include "MolecularOrbitalsList.h"
-#include "File.h"
-#include "EfpFragment.h"
-#include "PointCharge.h"
-
 
 namespace IQmol {
 
 namespace Data {
    class Base;
    class Bank;
+   class FileList;
+   class Geometry;
    class Frequencies;
-   class MolecularOrbitals;
+   class OrbitalsList;
+   class GeometryList;
+   class PointChargeList;
+   class EfpFragmentList;
+   class MolecularOrbitalsList;
 }
 
 namespace Layer {
@@ -55,9 +54,10 @@ namespace Layer {
          Layer::List convert(Data::Geometry&);
          Layer::List convert(Data::FileList&);
          Layer::List convert(Data::GeometryList&);
-         Layer::List convert(Data::MolecularOrbitalsList&);
+         Layer::List convert(Data::OrbitalsList&);
          Layer::List convert(Data::EfpFragmentList&);
          Layer::List convert(Data::PointChargeList&);
+         Layer::List convert(Data::MolecularOrbitalsList&);
 
          static void destroy();
          explicit Factory(Factory const&) { }

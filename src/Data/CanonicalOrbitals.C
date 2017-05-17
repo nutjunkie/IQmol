@@ -20,8 +20,7 @@
 
 ********************************************************************************/
 
-#include "MolecularOrbitals.h"
-#include "QsLog.h"
+#include "CanonicalOrbitals.h"
 #include <QDebug>
 
 
@@ -29,56 +28,51 @@ namespace IQmol {
 namespace Data {
 
 
-MolecularOrbitals::MolecularOrbitals(
+CanonicalOrbitals::CanonicalOrbitals(
    unsigned const nAlpha, 
    unsigned const nBeta, 
+   ShellList const& shells, 
    QList<double> const& alphaCoefficients, 
    QList<double> const& alphaEnergies,  
-   QList<double> const& betaCoefficients, 
+   QList<double> const& betaCoefficients,  
    QList<double> const& betaEnergies,
-   ShellList const& shells) : 
-   Orbitals(Orbitals::Canonical, nAlpha, nBeta, shells, alphaCoefficients, betaCoefficients,
-   "Canonical MOs"), m_alphaEnergies(alphaEnergies),  m_betaEnergies(betaEnergies)
+   QString const& label)
+ : Orbitals(Orbitals::Canonical, nAlpha, nBeta, shells, alphaCoefficients, 
+      betaCoefficients, label), m_alphaEnergies(alphaEnergies), m_betaEnergies(betaEnergies)
 {
 }
 
 
-bool MolecularOrbitals::consistent() const
+double CanonicalOrbitals::alphaOrbitalEnergy(unsigned i) const 
 {
-   bool ok(true);
-   ok = ok && m_nOrbitals > 0;
-   if (orbitalType() != NaturalTransition) {
-      ok = ok && m_nAlpha <= m_nOrbitals;
-      ok = ok && m_nBeta  <= m_nOrbitals;
+   return ((int)i < m_alphaEnergies.size()) ? m_alphaEnergies[i] : 0.0;
+}
+
+
+double CanonicalOrbitals::betaOrbitalEnergy(unsigned i) const 
+{
+   double energy(0.0);
+   if (m_restricted) {
+      energy = alphaOrbitalEnergy(i);
+   }else if ((int)i < m_betaEnergies.size()) {
+      energy = m_betaEnergies[i];
    }
-   ok = ok && alphaEnergies().size() == (int)m_nOrbitals;
-   ok = ok && betaEnergies().size()  == (int)m_nOrbitals;
+   return energy;
+}
 
-   unsigned nBasis(0);
-   ShellList::const_iterator iter;
-   for (iter = m_shellList.begin(); iter != m_shellList.end(); ++iter) {
-       nBasis += (*iter)->nBasis();
-   }
 
-   ok = ok && m_nBasis == nBasis;
+bool CanonicalOrbitals::consistent() const
+{
+   bool ok(Orbitals::consistent());
 
+   ok = ok && m_alphaEnergies.size() == (int)m_nOrbitals;
+   if (!m_restricted) ok = ok && m_betaEnergies.size() == (int)m_nOrbitals;
+      
    return ok; 
 }
 
 
-QList<double> const& MolecularOrbitals::alphaEnergies() const
-{
-   return m_alphaEnergies;
-}
-
-
-QList<double> const& MolecularOrbitals::betaEnergies() const
-{
-   return m_restricted ? m_alphaEnergies : m_betaEnergies;
-}
-
-
-void MolecularOrbitals::dump() const
+void CanonicalOrbitals::dump() const
 {
    Orbitals::dump();
 

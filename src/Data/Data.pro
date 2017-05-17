@@ -8,6 +8,7 @@ SOURCES = \
    $$PWD/Atom.C \
    $$PWD/AtomicProperty.C \
    $$PWD/Bank.C \
+   $$PWD/CanonicalOrbitals.C \
    $$PWD/ChargeMultiplicity.C \
    $$PWD/Constraint.C \
    $$PWD/Data.C \
@@ -51,6 +52,7 @@ HEADERS = \
    $$PWD/Atom.h \
    $$PWD/AtomicProperty.h \
    $$PWD/Bank.h \
+   $$PWD/CanonicalOrbitals.h \
    $$PWD/ChargeMultiplicity.h \
    $$PWD/Constraint.h \
    $$PWD/CubeData.h \
