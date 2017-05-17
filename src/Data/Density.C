@@ -30,8 +30,6 @@ namespace IQmol {
 namespace Data {
 
 
-template<> const Type::ID DensityList::TypeID = Type::DensityList;
-
 Density::Density(SurfaceType const& surfaceType, QList<double> const& elements, 
    QString const& label) : m_surfaceType(surfaceType), m_label(label)
 {

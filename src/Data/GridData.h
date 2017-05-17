@@ -129,7 +129,10 @@ namespace Data {
    };
 
 
-   typedef Data::List<Data::GridData> GridDataList;
+   class GridDataList : public Data::List<Data::GridData> {
+      public:
+         Type::ID typeID() const { return Type::GridDataList; }
+   };
 
 } } // end namespace IQmol::Data
 

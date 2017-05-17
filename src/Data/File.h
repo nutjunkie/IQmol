@@ -53,7 +53,10 @@ namespace Data {
          QString m_filePath;
    };
 
-   typedef Data::List<Data::File> FileList;
+   class FileList : public Data::List<Data::File> { 
+      public:
+         Type::ID typeID() const { return Type::FileList; }
+   };
 
 } } // end namespace IQmol::Data
 

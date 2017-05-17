@@ -109,7 +109,9 @@ namespace Data {
          double m_max;
    };
 
-   typedef Data::List<Data::Surface> SurfaceList;
+   class SurfaceList : public Data::List<Data::Surface>  {
+         Type::ID typeID() const { return Type::SurfaceList; }
+   };
 
 } } // end namespace IQmol::Data
 

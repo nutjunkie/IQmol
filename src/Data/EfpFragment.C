@@ -31,7 +31,7 @@
 namespace IQmol {
 namespace Data {
 
-template<> const Type::ID EfpFragmentList::TypeID = Type::EfpFragmentList;
+//template<> const Type::ID EfpFragmentList::TypeID = Type::EfpFragmentList;
 
 
 EfpFragment::EfpFragment(QString const& name, Vec const& position, double const alpha, 

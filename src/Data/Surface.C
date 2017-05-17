@@ -32,7 +32,6 @@ namespace IQmol {
 namespace Data {
 
 
-template<> const Type::ID SurfaceList::TypeID = Type::SurfaceList;
 
 Surface::Surface(SurfaceInfo const& info) : m_min(0.0), m_max(0.0)
 {

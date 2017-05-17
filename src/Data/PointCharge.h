@@ -64,7 +64,11 @@ namespace Data {
          qglviewer::Vec m_position;
    };
 
-   typedef Data::List<Data::PointCharge> PointChargeList;
+
+   class PointChargeList : public Data::List<PointCharge> { 
+      public:
+         Type::ID typeID() const { return Type::PointChargeList; }
+   };
 
 } } // end namespace IQmol::Data
 

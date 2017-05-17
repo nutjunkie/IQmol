@@ -27,7 +27,7 @@
 namespace IQmol {
 namespace Data {
 
-template<> const Type::ID PointChargeList::TypeID = Type::PointChargeList;
+//template<> const Type::ID PointChargeList::TypeID = Type::PointChargeList;
 
 void PointCharge::dump() const
 {

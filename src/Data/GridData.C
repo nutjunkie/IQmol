@@ -33,8 +33,6 @@
 namespace IQmol {
 namespace Data {
 
-template<> const Type::ID GridDataList::TypeID = Type::GridDataList;
-
 
 GridData::GridData(GridSize const& size, SurfaceType const& type) : m_surfaceType(type),
    m_origin(size.origin()), m_delta(size.delta())

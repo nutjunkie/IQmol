@@ -36,6 +36,8 @@ namespace Data {
       friend class boost::serialization::access;
 
       public:
+         Type::ID typeID() const { return Type::Density; }
+
          Density() { }
 
          Density(SurfaceType const& surfaceType, QList<double> const& vectorElements,
@@ -44,7 +46,6 @@ namespace Data {
          Density(SurfaceType const& surfaceType, Matrix const& matrix,
             QString const& label = QString());
 
-         Type::ID typeID() const { return Type::Density; }
 
          SurfaceType const& surfaceType() const { return m_surfaceType; }
 
@@ -80,7 +81,10 @@ namespace Data {
          Vector      m_elements;
    };
 
-   typedef Data::List<Data::Density> DensityList;
+   class DensityList : public Data::List<Data::Density> { 
+      public:
+         Type::ID typeID() const { return Type::Density; }
+   };
 
 } } // end namespace IQmol::Data
 
