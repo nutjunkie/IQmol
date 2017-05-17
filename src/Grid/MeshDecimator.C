@@ -84,8 +84,6 @@ bool MeshDecimator::decimate(double const edgeThreshold)
        Data::OMMesh& mesh(*(*iter));
 
        unsigned nVertices(mesh.n_vertices());
-       unsigned nEdges(mesh.n_edges());
-       unsigned nFaces(mesh.n_faces());
 
        //decimateQuadric(mesh);
        decimateQuadricAndEdge(mesh, edgeThreshold);

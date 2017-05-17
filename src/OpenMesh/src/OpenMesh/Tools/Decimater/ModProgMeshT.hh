@@ -177,7 +177,7 @@ public: // specific methods
 private:
 
   // hide this method form user
-  void set_binary(bool _b) {}
+  void set_binary(bool /*_b*/) {}
 
   InfoList          pmi_;
   VPropHandleT<size_t> idx_;

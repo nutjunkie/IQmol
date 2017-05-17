@@ -45,8 +45,8 @@ void Nmr::dump() const
 
 bool Nmr::haveCouplings()
 {
-   return m_couplings.size1() == m_shieldings.size() &&
-          m_couplings.size2() == m_shieldings.size();
+   return (int)m_couplings.size1() == m_shieldings.size() &&
+          (int)m_couplings.size2() == m_shieldings.size();
 }
 
 

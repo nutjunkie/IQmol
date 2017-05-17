@@ -96,7 +96,7 @@ class ModIndependentSetsT: public ModBaseT<MeshT> {
   private:
 
     /// hide this method
-    void set_binary(bool _b) { }
+    void set_binary(bool /*_b*/) { }
 };
 
 //=============================================================================

@@ -79,7 +79,7 @@ void DensityEvaluator::evaluatorFinished()
 Vector const& DensityEvaluator::evaluate(double const x, double const y, double const z)
 {
    Vector const& s2(m_shellList.shellPairValues(Vec(x,y,z)));
-   for (unsigned i = 0; i < m_densities.size(); ++i) {
+   for (int i = 0; i < m_densities.size(); ++i) {
        m_returnValues[i] = inner_prod(*(m_densities[i]), s2);
    }  
     

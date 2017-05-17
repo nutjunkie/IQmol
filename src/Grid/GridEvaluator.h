@@ -67,10 +67,10 @@ namespace IQmol {
       private:
          void runCoarseGrain();
 
-         double m_thresh;
-         bool m_coarseGrain;
          QList<Data::GridData*> m_grids;
          MultiFunction3D const& m_function;
+         double m_thresh;
+         bool m_coarseGrain;
    };
 
 } // end namespace IQmol

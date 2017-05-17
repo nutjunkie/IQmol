@@ -62,6 +62,8 @@ namespace IQmol {
 
       Q_OBJECT
 
+      using QGLViewer::select;
+
       friend class Handler::Select;
       friend class Handler::Manipulate;
       friend class Handler::ReindexAtoms;

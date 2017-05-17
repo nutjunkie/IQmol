@@ -69,7 +69,7 @@ double OrbitalSymmetries::energy(Spin const spin, unsigned const n) const
       case Beta:
          if ((int)n < m_betaEnergies.size()) {
             nrg = m_betaEnergies.at(n);
-          }else if (m_betaEnergies.isEmpty() && n < m_alphaEnergies.size()) {
+          }else if (m_betaEnergies.isEmpty() && (int)n < m_alphaEnergies.size()) {
              nrg = m_alphaEnergies.at(n);  
          }
          break;
@@ -91,7 +91,7 @@ QString OrbitalSymmetries::symmetry(Spin const spin, unsigned const n) const
       case Beta:   
           if ((int)n < m_betaSymmetries.size()) {
              sym = m_betaSymmetries.at(n);  
-          }else if (m_betaSymmetries.isEmpty() && n < m_alphaSymmetries.size()) {
+          }else if (m_betaSymmetries.isEmpty() && (int)n < m_alphaSymmetries.size()) {
              sym = m_alphaSymmetries.at(n);  
           }
           break; 
