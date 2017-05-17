@@ -18,7 +18,6 @@ Makefile.release
 # Windows crap
 object_script.*
 
-
 # Vim temporary files
 .*.swp
 
@@ -26,7 +25,19 @@ object_script.*
 .qmake.stash
 .moc
 
-# IQmol stuf
+# IQmol stuff
 qrc_IQmol.cpp
 deploy
 graveyard
+
+# tex crap
+doc/IQmolUserGuide.aux
+doc/IQmolUserGuide.bbl
+doc/IQmolUserGuide.blg
+doc/IQmolUserGuide.log
+doc/IQmolUserGuide.out
+doc/IQmolUserGuide.synctex.gz
+doc/IQmolUserGuide.toc
+
+# my stuff
+doc/notes
