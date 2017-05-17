@@ -278,7 +278,7 @@ void Nmr::plotSpectrum(QList<double> const& data, QPair<double, double> const& d
    double x0;
    QVector<double> x(bins), y(bins);
 
-   for (int i = 0; i < bins; ++i) {
+   for (unsigned i = 0; i < bins; ++i) {
        x[i] = domain.first + i*delta;
        y[i] = 0.0;
        for (int s = 0; s < data.size(); ++s) {
@@ -289,10 +289,10 @@ void Nmr::plotSpectrum(QList<double> const& data, QPair<double, double> const& d
 
    // Normalize
    double maxIntensity(0.0);
-   for (int i = 0; i < bins; ++i) {
+   for (unsigned i = 0; i < bins; ++i) {
        if (y[i] > maxIntensity) maxIntensity = y[i];
    }
-   for (int i = 0; i < bins; ++i) {
+   for (unsigned i = 0; i < bins; ++i) {
        y[i] /= maxIntensity;
    }
    maxIntensity = 1.0;
@@ -359,7 +359,7 @@ void Nmr::on_systemCombo_currentIndexChanged(QString const& text)
    updatePlot();
 }
 
-void Nmr::on_methodCombo_currentIndexChanged(QString const& text)
+void Nmr::on_methodCombo_currentIndexChanged(QString const& /*text*/)
 {
    loadShifts(currentReference(), currentIsotope());
    updatePlot();
@@ -382,7 +382,7 @@ void Nmr::on_lorentzianButton_clicked(bool)
 }
 
 
-void Nmr::on_widthSlider_valueChanged(int value)
+void Nmr::on_widthSlider_valueChanged(int /*value*/)
 {
    updatePlot();
 }
