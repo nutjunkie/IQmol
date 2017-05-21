@@ -47,6 +47,7 @@ QString SurfaceType::toString() const
       case ElectrostaticPotential: label = "Electrostatic Potential"; break;
       case Geminal:                label = "Geminal";                 break;
       case Correlation:            label = "Correlated Density";      break;
+      case CustomDensity:          label = "Custom Density";          break;
    }
 
    if (isIndexed()) label += " " + QString::number(m_index);

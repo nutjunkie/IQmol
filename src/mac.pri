@@ -1,5 +1,6 @@
 macx {
-   CONFIG += release
+   CONFIG += debug
+   #CONFIG += release
 
    # Boost
    BOOST        = $(DEV)/boost_1_64_0
@@ -14,13 +15,24 @@ macx {
    LIBS        += $${OPENBABEL}/build/src/libopenbabel.a
 
    # SSH2
-   INCLUDEPATH += $(DEV)/extlib/include
-   LIBS        += $(DEV)/extlib/lib/libssh2.a
+#  INCLUDEPATH += $(DEV)/extlib/include
+#  LIBS        += $(DEV)/extlib/lib/libssh2.a
 
    # libssl/libcrypto
-   INCLUDEPATH += $(DEV)/extlib/include
-   LIBS        += $(DEV)/extlib/lib/libssl.a 
-   LIBS        += $(DEV)/extlib/lib/libcrypto.a
+#  INCLUDEPATH += $(DEV)/extlib/include
+#  LIBS        += $(DEV)/extlib/lib/libssl.a 
+#  LIBS        += $(DEV)/extlib/lib/libcrypto.a
+
+   # SSH2
+   INCLUDEPATH += $(DEV)/libssh2-1.8.0/include
+   LIBS        += $(DEV)/libssh2-1.8.0/build/src/libssh2.a
+
+   # libssl/libcrypto
+   INCLUDEPATH += $(DEV)/openssl/include
+   LIBS        += $(DEV)/openssl/libssl.a
+   LIBS        += $(DEV)/openssl/libcrypto.a
+
+
 
    # gfortran
    LIBS += /usr/local/gfortran/lib/libgfortran.a

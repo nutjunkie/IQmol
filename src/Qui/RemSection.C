@@ -251,7 +251,6 @@ bool RemSection::fixOptionForQui(QString& name, QString& value) {
 bool RemSection::fixOptionForQChem(QString& name, QString& value) {
    //qDebug() << "Fixing option for QChem" << name << "=" << value;
    bool shouldPrint(true);
-   bool isInt;
    Option opt;
    OptionDatabase& db = OptionDatabase::instance();
    bool inDatabase(db.get(name, opt));

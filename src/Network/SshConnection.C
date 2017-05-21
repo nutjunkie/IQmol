@@ -310,7 +310,7 @@ void SshConnection::authenticate(AuthenticationT const authentication, QString& 
          break;
 
       case LIBSSH2_ERROR_METHOD_NOT_SUPPORTED:
-         msg  = "Authentication method not supported\n\n";
+         msg  = toString(authentication) + " authentication not supported\n\n";
          msg += "Supported methods: ";
          msg += QString(authenticationMethods).replace(",",", ");
          throw Exception(msg);

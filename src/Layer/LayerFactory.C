@@ -317,7 +317,7 @@ List Factory::convert(Data::OrbitalsList& orbitalsList)
 {
    List list;
 
-   Qt::ItemFlags flags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+   //Qt::ItemFlags flags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
    Data::OrbitalsList::iterator iter;
    for (iter = orbitalsList.begin(); iter != orbitalsList.end(); ++iter) {

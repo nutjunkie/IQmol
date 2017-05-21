@@ -78,7 +78,7 @@ Vec& Align::translation()
 
 bool Align::computeAlignment()
 {
-   Vec comA = centerCoords(m_reference);
+   //Vec comA = centerCoords(m_reference);
    Vec comB = centerCoords(m_current);
    m_translation = comB;
 
