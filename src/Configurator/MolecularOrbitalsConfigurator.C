@@ -42,21 +42,12 @@ MolecularOrbitals::MolecularOrbitals(Layer::MolecularOrbitals& molecularOrbitals
       m_configurator.orbitalRangeMax, SLOT(setCurrentIndex(int)));
 
    m_configurator.surfaceType->clear();
-   //if (m_molecularOrbitals.moTypeID() == Data::moType::NTOs)
-   //{
-   //m_configurator.surfaceType->addItem("Alpha Orbital", AlphaOrbital);
-   //m_configurator.surfaceType->addItem("Beta Orbital",  BetaOrbital);
-   //m_configurator.surfaceType->addItem("Transition Density", TotalDensity);
-   //}
-   //else
-   //{
    m_configurator.surfaceType->addItem("Alpha Orbital", AlphaOrbital);
    m_configurator.surfaceType->addItem("Beta Orbital",  BetaOrbital);
    m_configurator.surfaceType->addItem("Total Density", TotalDensity);
    m_configurator.surfaceType->addItem("Spin Density",  SpinDensity);
    m_configurator.surfaceType->addItem("Alpha Density", AlphaDensity);
    m_configurator.surfaceType->addItem("Beta Density",  BetaDensity);
-   //}
    m_configurator.surfaceType->setCurrentIndex(0);
 
    setPositiveColor(Preferences::PositiveSurfaceColor());
@@ -89,7 +80,6 @@ void MolecularOrbitals::init()
    if (m_molecularOrbitals.orbitalType() == Data::MolecularOrbitals::NaturalTransition) {
       m_AlphaHOMO = m_BetaHOMO = m_nOrbitals/2;
    }
-
 
    // TODO
 //   static bool densitiesAppended(false);
@@ -142,29 +132,35 @@ void MolecularOrbitals::initPlot()
    unsigned nOrbs(m_molecularOrbitals.nOrbitals());
    unsigned nAlpha(m_molecularOrbitals.nAlpha());
    unsigned nBeta(m_molecularOrbitals.nBeta());
-   //unsigned moTypeID(m_molecularOrbitals.moTypeID());
    QVector<double>  xAlpha(nOrbs), yAlpha(nOrbs), xBeta(nOrbs), yBeta(nOrbs); 
    QVector<double> a(1), b(1), y(1);
    QCPGraph* graph(0);
 
    unsigned i(0), g(0);
+   bool isNTO = (m_molecularOrbitals.orbitalType() == Data::MolecularOrbitals::NaturalTransition) ? true : false;
 
-   // For NTOs
-   if (m_molecularOrbitals.orbitalType() == Data::MolecularOrbitals::NaturalTransition) {
+   // NTOs are paired occ & vir orbitals
+   if (isNTO) {
      if (nBeta == nAlpha) {
-       nAlpha = nOrbs/2;
-       nBeta = 0;
-     } else 
+       nAlpha = nOrbs/2; nBeta = 0;
+     } else
        nAlpha = nBeta = nOrbs/2;
    }
 
    // Alpha
-   while (i < nOrbs) {
+   while (i < nOrbs) 
+   {
        y[0] = m_molecularOrbitals.alphaOrbitalEnergy(i);
 
        g = 1; // degeneracy
        while (i+g < nOrbs && 
               std::abs(y[0]-m_molecularOrbitals.alphaOrbitalEnergy(i+g)) < 0.001) { ++g; }
+
+       // NTOs
+       if (isNTO) {
+         if (i > nAlpha) break;
+         y[0] = -y[0];
+       }
 
        for (unsigned k = i; k < i+g; ++k) {
            a[0]  = 0.75 - 0.25*(g-1) + (k-i)*0.50;
@@ -186,10 +182,14 @@ void MolecularOrbitals::initPlot()
    // Beta
    while (i < nOrbs) {
        y[0] = m_molecularOrbitals.betaOrbitalEnergy(i);
-
        g = 1; // degeneracy
        while (i+g < nOrbs && 
               std::abs(y[0]-m_molecularOrbitals.betaOrbitalEnergy(i+g)) < 0.001) { ++g; }
+
+       if (isNTO) {
+         if (i > nBeta) break;
+         y[0] = -y[0];
+       }
 
        for (unsigned k = i; k < i+g; ++k) {
            a[0]  = 2.50 - 0.25*(g-1) + (k-i)*0.50;
@@ -226,10 +226,10 @@ void MolecularOrbitals::initPlot()
       yMax  = m_molecularOrbitals.alphaOrbitalEnergy(index);
    }
    yMax = std::min(yMax, 0.5*std::abs(yMin));
-   // For NTOs
+   // NTO in occupation order, not energy
    if (m_molecularOrbitals.orbitalType() == Data::MolecularOrbitals::NaturalTransition) {
      m_customPlot->yAxis->setLabel("Occupation");
-     m_customPlot->yAxis->setRange(-1.1,1.1);
+     m_customPlot->yAxis->setRange(0.0,1.1);
    } else
      m_customPlot->yAxis->setRange(1.05*yMin,1.05*yMax);
 }
@@ -258,13 +258,11 @@ void MolecularOrbitals::plotSelectionChanged(bool tf)
    if (orb < nOrbs) {  //alpha
       energy = m_molecularOrbitals.alphaOrbitalEnergy(orb);
       label  = "Alpha orbital ";
-      //updateOrbitalRange(m_nAlpha);
       updateOrbitalRange(m_AlphaHOMO);
    }else {  // beta
       orb -= nOrbs;
       energy = m_molecularOrbitals.betaOrbitalEnergy(orb);
       label  = "Beta orbital ";
-      //updateOrbitalRange(m_nBeta);
       updateOrbitalRange(m_BetaHOMO);
    }
 
@@ -300,14 +298,12 @@ void MolecularOrbitals::on_surfaceType_currentIndexChanged(int index)
       case AlphaOrbital:
          enableOrbitalSelection(true);
          enableNegativeColor(true);
-         //updateOrbitalRange(m_nAlpha);
          updateOrbitalRange(m_AlphaHOMO);
          break;
 
       case BetaOrbital:
          enableOrbitalSelection(true);
          enableNegativeColor(true);
-         //updateOrbitalRange(m_nBeta);
          updateOrbitalRange(m_BetaHOMO);
          break;
 

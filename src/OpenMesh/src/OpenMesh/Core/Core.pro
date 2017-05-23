@@ -2,7 +2,8 @@
 #
 ################################################################################
 
-include( $$TOPDIR/qmake/all.include )
+TOPDIR=../../../
+include( $${TOPDIR}/qmake/all.include )
 
 Library()
 

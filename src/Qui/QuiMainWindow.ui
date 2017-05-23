@@ -445,9 +445,9 @@ QToolButton:checked {
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>0</y>
+             <y>-105</y>
              <width>517</width>
-             <height>450</height>
+             <height>463</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -457,7 +457,7 @@ QToolButton:checked {
                <bool>true</bool>
               </property>
               <property name="currentIndex">
-               <number>4</number>
+               <number>11</number>
               </property>
               <property name="tabSpacing">
                <number>6</number>
@@ -467,8 +467,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>159</width>
-                 <height>48</height>
+                 <width>499</width>
+                 <height>68</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -522,8 +522,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>105</width>
-                 <height>48</height>
+                 <width>499</width>
+                 <height>68</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -570,8 +570,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>146</width>
-                 <height>48</height>
+                 <width>499</width>
+                 <height>68</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -629,8 +629,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>150</width>
-                 <height>48</height>
+                 <width>499</width>
+                 <height>68</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -685,7 +685,7 @@ QToolButton:checked {
                  <x>0</x>
                  <y>0</y>
                  <width>485</width>
-                 <height>154</height>
+                 <height>159</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -826,8 +826,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>383</width>
-                 <height>134</height>
+                 <width>485</width>
+                 <height>138</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -997,8 +997,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>373</width>
-                 <height>208</height>
+                 <width>485</width>
+                 <height>215</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1139,8 +1139,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>404</width>
-                 <height>132</height>
+                 <width>485</width>
+                 <height>136</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1269,8 +1269,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>289</width>
-                 <height>48</height>
+                 <width>499</width>
+                 <height>68</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1334,8 +1334,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>413</width>
-                 <height>152</height>
+                 <width>485</width>
+                 <height>157</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1433,8 +1433,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>163</width>
-                 <height>74</height>
+                 <width>485</width>
+                 <height>76</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1494,9 +1494,9 @@ QToolButton:checked {
                <property name="geometry">
                 <rect>
                  <x>0</x>
-                 <y>0</y>
-                 <width>357</width>
-                 <height>130</height>
+                 <y>-66</y>
+                 <width>485</width>
+                 <height>134</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1641,8 +1641,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>407</width>
-                 <height>100</height>
+                 <width>485</width>
+                 <height>103</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1958,7 +1958,7 @@ QToolButton:checked {
            <enum>QFrame::Sunken</enum>
           </property>
           <property name="currentIndex">
-           <number>14</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="AdvancedSCFControl">
            <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -5513,14 +5513,21 @@ widgets.</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="1" column="0">
+                 <item row="2" column="1">
+                  <widget class="QRadioButton" name="qui_solvent_svp">
+                   <property name="text">
+                    <string>SVP</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
                   <widget class="QRadioButton" name="qui_solvent_cosmo">
                    <property name="text">
                     <string>COSMO</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="3" column="0">
+                 <item row="1" column="0">
                   <widget class="QRadioButton" name="qui_solvent_onsager">
                    <property name="text">
                     <string>Onsager</string>
@@ -5528,30 +5535,23 @@ widgets.</string>
                   </widget>
                  </item>
                  <item row="2" column="0">
-                  <widget class="QRadioButton" name="chemsol">
-                   <property name="text">
-                    <string>ChemSol</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="1">
                   <widget class="QRadioButton" name="qui_solvent_pcm">
                    <property name="text">
                     <string>PCM</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="2" column="1">
-                  <widget class="QRadioButton" name="smx_solvation">
+                 <item row="6" column="0">
+                  <widget class="QRadioButton" name="qui_solvent_smx">
                    <property name="text">
-                    <string>SM8</string>
+                    <string>SMx</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="3" column="1">
-                  <widget class="QRadioButton" name="svp">
+                 <item row="6" column="1">
+                  <widget class="QRadioButton" name="qui_solvent_chemsol">
                    <property name="text">
-                    <string>SVP</string>
+                    <string>ChemSol</string>
                    </property>
                   </widget>
                  </item>
@@ -6041,25 +6041,36 @@ widgets.</string>
                 </item>
                </layout>
               </widget>
-              <widget class="QWidget" name="SolventSM8">
+              <widget class="QWidget" name="SolventSMx">
                <layout class="QVBoxLayout">
+                <item>
+                 <layout class="QGridLayout" name="gridLayout_18" rowstretch="0,0" columnstretch="0,0">
+                  <property name="horizontalSpacing">
+                   <number>6</number>
+                  </property>
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_54">
+                    <property name="text">
+                     <string>SMx Model</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QComboBox" name="qui_solvent_smx_model"/>
+                  </item>
+                 </layout>
+                </item>
                 <item>
                  <layout class="QHBoxLayout">
                   <item>
-                   <widget class="QComboBox" name="smx_solvent"/>
+                   <widget class="QLabel" name="label_65">
+                    <property name="text">
+                     <string>Solvent</string>
+                    </property>
+                   </widget>
                   </item>
                   <item>
-                   <spacer>
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
+                   <widget class="QComboBox" name="smx_solvent"/>
                   </item>
                  </layout>
                 </item>
@@ -6659,7 +6670,7 @@ Eventually this should go.</string>
      <x>0</x>
      <y>0</y>
      <width>931</width>
-     <height>19</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -6814,7 +6825,6 @@ Eventually this should go.</string>
   <tabstop>gaussian_blur</tabstop>
   <tabstop>link_atom_projection</tabstop>
   <tabstop>qmmm_full_hessian</tabstop>
-  <tabstop>smx_solvent</tabstop>
   <tabstop>geom_opt_tol_energy</tabstop>
   <tabstop>cancelButton</tabstop>
   <tabstop>meteco</tabstop>
@@ -6826,8 +6836,6 @@ Eventually this should go.</string>
   <tabstop>xopt_state_2</tabstop>
   <tabstop>xopt_seam_only</tabstop>
   <tabstop>qui_solvent_none</tabstop>
-  <tabstop>qui_solvent_cosmo</tabstop>
-  <tabstop>qui_solvent_onsager</tabstop>
   <tabstop>sol_order</tabstop>
   <tabstop>solvent_method</tabstop>
   <tabstop>solvent_dielectric</tabstop>

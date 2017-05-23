@@ -20,7 +20,9 @@ LIBS += $$BUILD_DIR/libQui.a \
         $$BUILD_DIR/libOld.a \
         $$BUILD_DIR/libGrid.a \
         $$BUILD_DIR/libUtil.a \
-        $$BUILD_DIR/libQGLViewer.a
+
+win32:  
+else:   LIBS += $$BUILD_DIR/libQGLViewer.a
 
 # Cannot get the embbed OpenMesh working under windows.
 !win32 {

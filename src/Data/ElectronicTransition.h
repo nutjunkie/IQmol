@@ -54,6 +54,10 @@ namespace Data {
 
          void setEnergy(double const energy) { m_energy = energy; }
          bool addAmplitude(QStringList const&, unsigned const nAlpha, unsigned const nBeta);
+         bool addAmplitude(QList<double> &list, unsigned const state,
+             unsigned const NO, unsigned const NV, Spin spin);
+         bool addAmplitude(QList<double> &list,  QList<int> &indexJ, QList<int> &indexI,
+             unsigned const state, unsigned const NO, unsigned const NV, Spin spin);
          QList<Amplitude>& amplitudes() { return m_amplitudes; }
 
          void dump() const;

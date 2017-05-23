@@ -99,9 +99,9 @@ class InputDialog : public QMainWindow {
       void on_qui_solvent_pcm_toggled(bool);
       void on_qui_solvent_onsager_toggled(bool);
       void on_qui_solvent_none_toggled(bool);
-      void on_smx_solvation_toggled(bool on);
-      void on_svp_toggled(bool);
-      void on_chemsol_toggled(bool);
+      void on_qui_solvent_smx_toggled(bool);
+      void on_qui_solvent_svp_toggled(bool);
+      void on_qui_solvent_chemsol_toggled(bool);
 
       void on_readChargesButton_clicked(bool);
 

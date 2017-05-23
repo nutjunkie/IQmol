@@ -12,6 +12,7 @@
 #include "OptSection.h"
 #include "MoleculeSection.h"
 #include "ExternalChargesSection.h"
+#include "PcmSection.h"
 
 
 namespace Qui {
@@ -30,6 +31,8 @@ KeywordSection* KeywordSectionFactory(QString const& type) {
       return new OptSection();
    }else if (t == "external_charges") {
       return new ExternalChargesSection();
+   }else if (t == "pcm") {
+      return new PcmSection();
    }else {
       return new GenericSection(t);
    }

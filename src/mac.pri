@@ -12,6 +12,7 @@ macx {
    # OpenBabel
    OPENBABEL    = $(DEV)/openbabel-2.4.1
    INCLUDEPATH += $${OPENBABEL}/include
+   INCLUDEPATH += $${OPENBABEL}/build/include
    LIBS        += $${OPENBABEL}/build/src/libopenbabel.a
 
    # SSH2
@@ -32,8 +33,6 @@ macx {
    LIBS        += $(DEV)/openssl/libssl.a
    LIBS        += $(DEV)/openssl/libcrypto.a
 
-
-
    # gfortran
    LIBS += /usr/local/gfortran/lib/libgfortran.a
    LIBS += /usr/local/gfortran/lib/libquadmath.a
@@ -44,6 +43,6 @@ macx {
    LIBS += -framework GLUT
    LIBS += -L/usr/lib -lz
 
-   QMAKE_LFLAGS   += -Wl,-no_compact_unwind -stdlib=libc++ #-stdlib=libstdc++
+   QMAKE_LFLAGS   += -Wl,-no_compact_unwind -stdlib=libc++ 
    QMAKE_RPATHDIR += @executable_path/../Frameworks
 }

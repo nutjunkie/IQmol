@@ -32,10 +32,10 @@ QString ExcitedStates::typeLabel() const
 {
    QString type("Unknown");
    switch (m_type) {
-      case CIS:    type = "CIS";     break;
-      case CISD:   type = "CIS(D)";  break;
-      case TDDFT:  type = "TDDFT";   break;
-      case EOM:    type = "CIS";     break;
+      case CIS:    type = "CIS/TDA";   break;
+      case CISD:   type = "CIS(D)";    break;
+      case TDDFT:  type = "RPA/TDDFT"; break;
+      case EOM:    type = "EOM";       break;
    }
    return type;
 }

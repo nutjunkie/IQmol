@@ -63,7 +63,8 @@ void Build::mousePressEvent(QMouseEvent* e)
    }
 
    if (!m_molecule) {
-      QMsgBox::warning(0, "IQmol", "No molecule available");
+      QMsgBox::warning(0, "IQmol", "No molecule available.\n"
+          "Please select one in the Model View");
       return;
    }
 

@@ -50,6 +50,14 @@ bool isCompoundFunctional()
           (value != "PW91")   && (value != "revPBE") && (value != "rPW86");
 }
 
+bool isTDDFT() 
+{
+   OptionRegister& reg(OptionRegister::instance());
+   QString cis_n_roots(reg.get("CIS_N_ROOTS").getValue().toUpper());
+   QString method(reg.get("METHOD").getValue().toUpper());
+   //qDebug() << "isDFT" <<  method << cis_n_roots;
+   return (method == "HF") && (cis_n_roots != "0" );
+}
 
 bool isPostHF() 
 {
@@ -257,7 +265,12 @@ void InputDialog::initializeQuiLogic()
 
    QtNode& method(reg.get("METHOD"));
 
-    method.addRule(
+   // Possible hack to keep TD-DFT job setting  due to tainted preview text 
+   method.addRule(
+      If (isTDDFT, method.shouldBe("TD-DFT"))
+   );
+
+   method.addRule(
       If (method == "Custom" || method == "TD-DFT",
          Enable( m_ui.exchange)     + Enable( m_ui.label_exchange) +
          Enable( m_ui.correlation)  + Enable( m_ui.label_correlation),
@@ -267,9 +280,9 @@ void InputDialog::initializeQuiLogic()
    );
 
    method.addRule(
-      If (method == "TD-DFT", exchange.shouldBe("B3LYP"))
+      //If (method == "TD-DFT", exchange.shouldBe("B3LYP"))
+      If (method == "TD-DFT" && exchange == "HF", exchange.shouldBe("B3LYP"))
    );
-
 
    QtNode& mp2v(reg.get("MP2V"));
    QtNode& qui_primary_basis(reg.get("QUI_PRIMARY_BASIS"));
@@ -1111,14 +1124,14 @@ void InputDialog::initializeQuiLogic()
    node->addRule(rule);
    node2->addRule(rule);
 
-
+/* This option is gone
    node  = &reg.get("QUI_SECTION_EXTERNAL_CHARGES");
    node->addRule(
       If(*node == QtTrue, 
         reg.get("SYMMETRY_INTEGRAL").shouldBe(QtFalse)
         + reg.get("SYMMETRY_IGNORE").shouldBe(QtTrue)
       )
-   );
+   );*/
 
    node2 = &reg.get("JOB_TYPE");
    rule = If(*node == QtTrue && *node2 == S("Geometry"),
@@ -1196,7 +1209,7 @@ void InputDialog::initializeQuiLogic()
 
    // Advanced -> Excited States -> EOM -> Properties
 
- /*  node = &reg.get("CC_EOM_PROPERTIES");
+   /*node = &reg.get("CC_EOM_PROPERTIES");
    node->addRule(
       If(*node == QtTrue, 
          Enable(m_ui.cc_eom_transition_properties)
@@ -1239,22 +1252,56 @@ void InputDialog::initializeQuiLogic()
       )
    );*/
 
-
-   // Advanced -> Solvation Models -> ChemSol
-   node = &reg.get("CHEMSOL");
+   // Advanced -> Solvation - this keeps solvation setup while the preview text is tainted
+   node = &reg.get("SOLVENT_METHOD");
+   //QString solvent_method(node->getValue().toUpper());
+   node->addRule(If(*node == "PCM", reg.get("QUI_SOLVENT_PCM").shouldBe(QtTrue)));
+   node->addRule(If(*node == "COSMO", reg.get("QUI_SOLVENT_COSMO").shouldBe(QtTrue)));
+   node->addRule(If(*node == "ONSAGER", reg.get("QUI_SOLVENT_ONSAGER").shouldBe(QtTrue)));
+   node->addRule(If(*node == "CHEM_SOL", reg.get("QUI_SOLVENT_CHEMSOL").shouldBe(QtTrue)));
    node->addRule(
-      If(*node == QtTrue, 
-         Enable(m_ui.chemsol_nn)
-         + Enable(m_ui.chemsol_print)
-         + Enable(m_ui.chemsol_efield)
-         + Enable(m_ui.chemsol_read_vdw), 
-         Disable(m_ui.chemsol_nn) 
-         + Disable(m_ui.chemsol_print)
-         + Disable(m_ui.chemsol_efield)
-         + Disable(m_ui.chemsol_read_vdw) 
-      )
+       If(*node == "SM8" || *node == "SM12" || *node == "SMD",
+          reg.get("QUI_SOLVENT_SMX").shouldBe(QtTrue)
+       )
    );
 
+   // Advanced -> Solvation Models -> ChemSol
+   node = &reg.get("QUI_SOLVENT_CHEMSOL");
+   node->addRule(
+      If(*node == QtTrue, 
+         reg.get("SOLVENT_METHOD").shouldBe("CHEM_SOL")
+         + Enable(m_ui.solvent_method), Disable(m_ui.solvent_method)
+      )
+   );
+   
+   // Advanced -> Solvation Models -> ChemSol
+   node = &reg.get("QUI_SOLVENT_CHEMSOL");
+   node->addRule(
+      If(*node == QtTrue, 
+         reg.get("SOLVENT_METHOD").shouldBe("CHEM_SOL")
+         + Enable(m_ui.solvent_method), Disable(m_ui.solvent_method)
+      )
+   );
+   
+   // Advanced -> Solvation Models -> SMx
+   QtNode* smx(&reg.get("QUI_SOLVENT_SMX"));
+   rule = If(*smx == QtTrue,
+       reg.get("SOLVENT_METHOD").shouldBe("SM8")
+       + reg.get("QUI_SOLVENT_SMX_MODEL").shouldBe("SM8")
+       + Enable(m_ui.solvent_method), Disable(m_ui.solvent_method)
+   );
+   smx->addRule(rule);
+   QtNode* smx_model(&reg.get("QUI_SOLVENT_SMX_MODEL"));
+   // Why smx_model.getValue() can not return the correct value ...
+   smx_model->addRule(
+      If(*smx_model == "SM12", reg.get("SOLVENT_METHOD").shouldBe("SM12"))
+   );
+   smx_model->addRule(
+      If(*smx_model == "SM12", reg.get("SOLVENT_METHOD").shouldBe("SM12"))
+   );
+   smx_model->addRule(
+      If(*smx_model == "SMD", reg.get("SOLVENT_METHOD").shouldBe("SMD"))
+   );
 
    QtNode& dielectricOnsager(reg.get("QUI_SOLVENT_DIELECTRIC_ONSAGER"));
    QtNode& dielectricCosmo(reg.get("QUI_SOLVENT_DIELECTRIC_COSMO"));
@@ -1273,16 +1320,20 @@ void InputDialog::initializeQuiLogic()
    rule = If(*pcm == QtTrue, reg.get("SOLVENT_METHOD").shouldBe("PCM"));
    pcm->addRule(rule);
 
+   QtNode* svp(&reg.get("QUI_SOLVENT_SVP"));
+   rule = If(*svp == QtTrue, reg.get("SOLVENT_METHOD").shouldBe("ISOSVP"));
+   svp->addRule(rule);
+
    QtNode* onsager(&reg.get("QUI_SOLVENT_ONSAGER"));
-   rule = If(*onsager == QtTrue, reg.get("SOLVENT_METHOD").shouldBe("SCRF"));
+   rule = If(*onsager == QtTrue, reg.get("SOLVENT_METHOD").shouldBe("ONSAGER"));
    onsager->addRule(rule);
 
-
-   rule = If(*cosmo == QtTrue || *pcm == QtTrue || *onsager == QtTrue,
+   rule = If(*cosmo == QtTrue || *pcm == QtTrue || *onsager == QtTrue || *svp == QtTrue,
             Enable(m_ui.solvent_method), Disable(m_ui.solvent_method));
 
    cosmo->addRule(rule);
    pcm->addRule(rule);
+   svp->addRule(rule);
    onsager->addRule(rule);
    
    rule = If(*cosmo == QtTrue || *onsager == QtTrue,
