@@ -46,15 +46,15 @@ namespace Data {
          ~Bank();
          Type::ID typeID() const { return Type::Bank; }
 
-         Bank(Bank const& that) { copy(that); }
+         Bank(Bank const& that) : Base(), QList<Base*>() { copy(that); }
 
          Bank& operator=(Bank const& that) {
             if (this != &that) copy(that);
             return *this;
          }
 
-		 /// Moves the data from that Bank to this Bank.  After a merge, that
-		 /// will have no data.
+         /// Moves the data from that Bank to this Bank.  After a merge, that
+         /// will have no data.
          void merge(Bank& that) {
             while (!that.isEmpty()) { append(that.takeFirst()); }
          }
@@ -82,7 +82,8 @@ namespace Data {
             return list;
          }
 
-         /// Used to remove and delete all Data objects of a given type from the Bank
+	 /// Used to remove and delete all Data objects of a given type from
+          //the Bank
          template <class T>
          void deleteData() {
             QList<T*> list(findData<T>());

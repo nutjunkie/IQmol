@@ -19,7 +19,7 @@ win32: {
    SUBDIRS += OpenBabel
 }
 
-macx: {
+unix: {
    SUBDIRS = QGLViewer \
              OpenMesh \
              OpenMesh/src/OpenMesh/Core \

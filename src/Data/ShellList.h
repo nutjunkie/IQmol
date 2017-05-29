@@ -36,20 +36,17 @@ namespace Data {
       friend class boost::serialization::access;
 
       public:
-
-         Type::ID typeID() const { return Type::ShellList; }
-
-		 /// Returns the (-1,-1,-1) and (1,1,1) octant corners of a rectangular
-		 /// box that encloses the significant region of the Shells where 
-		 /// significance is determined by thresh.  
+         /// Returns the (-1,-1,-1) and (1,1,1) octant corners of a rectangular
+         /// box that encloses the significant region of the Shells where 
+         /// significance is determined by thresh.  
          void boundingBox(qglviewer::Vec& min, qglviewer::Vec& max);
 
          unsigned nBasis() const;
 
-		 /// Allocates the memory for evaluating the shells/shell pairs on a grid
-		 /// point.  This should be called after the last Shell has been appended
-		 /// to the list and before shellValues or shellPairValues is called.
-		 void resize();
+         /// Allocates the memory for evaluating the shells/shell pairs on a grid
+         /// point.  This should be called after the last Shell has been appended
+          /// to the list and before shellValues or shellPairValues is called.
+          void resize();
 
          Vector const& shellValues(qglviewer::Vec const& gridPoint);
          // Returns the vectorized upper triangular array of unique shell 

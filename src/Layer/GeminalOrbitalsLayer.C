@@ -476,11 +476,13 @@ bool GeminalOrbitals::computeOrbitalGrids(Data::GridDataList& grids)
    //Matrix const* coefficientsB;
    //QList<double> const* coefficientsG;
 
+/* MOGem is never used
    QList<int> const* MOGem;
       coefficientsA = &(m_geminalOrbitals.alphaCoefficients());
       //coefficientsB = &(m_geminalOrbitals.betaCoefficients());
       //coefficientsG = &(m_geminalOrbitals.geminalCoefficients());
       MOGem = &(m_geminalOrbitals.geminalMoMap());
+*/
 
    
    unsigned nOrb(orbitals.size());

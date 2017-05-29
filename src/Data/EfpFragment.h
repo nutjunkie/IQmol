@@ -78,10 +78,7 @@ namespace Data {
          Quaternion m_orientation;
    };
 
-   class EfpFragmentList : public Data::List<Data::EfpFragment> { 
-      public:
-         Type::ID typeID() const { return Type::EfpFragmentList; }
-   };
+   class EfpFragmentList : public Data::List<Data::EfpFragment> { };
 
 } } // end namespace IQmol::Data
 

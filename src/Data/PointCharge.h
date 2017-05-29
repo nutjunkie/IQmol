@@ -65,10 +65,7 @@ namespace Data {
    };
 
 
-   class PointChargeList : public Data::List<PointCharge> { 
-      public:
-         Type::ID typeID() const { return Type::PointChargeList; }
-   };
+   class PointChargeList : public Data::List<PointCharge> { };
 
 } } // end namespace IQmol::Data
 

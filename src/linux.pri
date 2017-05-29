@@ -1,7 +1,7 @@
 unix:!macx {
 
-   CONFIG += DISTRIB
-#  CONFIG += DEVELOP
+#  CONFIG += DISTRIB
+   CONFIG += DEVELOP
 
    contains(CONFIG, DEVELOP){
       #message("---- DEVELOP set ----")
