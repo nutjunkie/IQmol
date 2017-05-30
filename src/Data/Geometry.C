@@ -91,6 +91,29 @@ qglviewer::Vec Geometry::position(unsigned const i) const
 }
 
 
+QString Geometry::coordinatesAsString() const
+{
+   QString coords;
+
+   if (m_atoms.size() == m_coordinates.size()) {
+      unsigned nAtoms(m_atoms.size());
+      for (unsigned i = 0; i <nAtoms; ++i) {
+          qglviewer::Vec const& position(m_coordinates[i]);
+          coords += QString("%1").arg(atomicSymbol(i), 3);
+          coords += QString("%1").arg(position.x, 13, 'f', 7);
+          coords += QString("%1").arg(position.y, 13, 'f', 7);
+          coords += QString("%1").arg(position.z, 13, 'f', 7) + "\n";
+      }
+
+   }else {
+      QLOG_WARN() << "Coordinate mismatch in Geometry::coordinatesAsString()";
+   }
+
+   coords.chop(1);
+   return coords;
+}
+
+
 bool Geometry::sameAtoms(Geometry const& that) const
 {
    bool same(m_atoms.size() == that.m_atoms.size());
@@ -103,14 +126,32 @@ bool Geometry::sameAtoms(Geometry const& that) const
 
 bool Geometry::sameAtoms(QStringList const& symbols) const
 {
-   unsigned nAtoms(m_atoms.size());
-   bool same(nAtoms == (unsigned)symbols.size());
-   for (unsigned i = 0; i < nAtoms; ++i) {
-       //same = same && (m_atoms[i]->getLabel<AtomicSymbol>() == symbols[i]);
-       same = same && (m_atoms[i]->getLabel<AtomicSymbol>().compare(symbols[i], Qt::CaseInsensitive) == 0);
+   bool same(m_atoms.size() == symbols.size());
+   if (same) {
+      unsigned nAtoms(m_atoms.size());
+
+      for (unsigned i = 0; i < nAtoms; ++i) {
+          same = same && 
+             (m_atoms[i]->getLabel<AtomicSymbol>().compare(symbols[i], 
+                 Qt::CaseInsensitive) == 0);
+      }
    }
    return same;
 }
+
+
+bool Geometry::sameAtoms(QList<unsigned> const& atomicNumbers) const
+{
+   bool same(m_atoms.size() == atomicNumbers.size());
+   if (same) {
+      unsigned nAtoms(m_atoms.size());
+      for (unsigned i = 0; i < nAtoms; ++i) {
+          same = same && (m_atoms[i]->atomicNumber() == atomicNumbers[i]);
+      }
+   }
+   return same;
+}
+
 
 
 void Geometry::append(unsigned const z, qglviewer::Vec const& position)
@@ -189,6 +230,7 @@ unsigned Geometry::totalNuclearCharge() const
    }
    return totalNuclearCharge;
 }
+
 
 void Geometry::computeGasteigerCharges()
 {

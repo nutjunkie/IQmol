@@ -44,6 +44,8 @@
 #include "DipoleLayer.h"
 #include "FrequenciesLayer.h"
 #include "EfpFragmentLayer.h"
+#include "GeometryLayer.h"
+#include "GeometryListLayer.h"
 #include "GroupLayer.h"
 #include "MoleculeLayer.h"
 #include "MolecularOrbitalsLayer.h"
@@ -135,6 +137,11 @@ Molecule::Molecule(QObject* parent) : Base(DefaultMoleculeName, parent),
    connect(newAction("Reperceive Bonds"), SIGNAL(triggered()), 
       this, SLOT(reperceiveBonds()));
 
+   m_addGeometryMenu = newAction("Duplicate Geometry");
+
+   connect(m_addGeometryMenu, SIGNAL(triggered()), 
+      this, SLOT(createGeometryList()));
+
    m_atomicChargesMenu = newAction("Atomic Charges");
 
    connect(newAction("Remove"), SIGNAL(triggered()), 
@@ -176,6 +183,7 @@ void Molecule::appendData(IQmol::Data::Bank& bank)
 
    QList<Data::GeometryList*> list(m_bank.findData<Data::GeometryList>());
    if (!list.isEmpty()) {
+      m_addGeometryMenu->setEnabled(false);
       unsigned index(list.first()->defaultIndex());
       setGeometry(*(list.first()->at(index)));
    }
@@ -212,7 +220,7 @@ void Molecule::appendData(Layer::List& list)
 
    for (iter = list.begin(); iter != list.end(); ++iter) {
        text = (*iter)->text();
-qDebug() << "Layer text" << text;
+//qDebug() << "Layer text" << text;
        // Hack to allow multiple cube data files and frequencies
        if (text == "Cube Data") text = "cubedata";
        if (text == "Frequencies") text = "frequencies";
@@ -239,7 +247,7 @@ qDebug() << "Layer text" << text;
 
           if ((atoms = qobject_cast<Atoms*>(*iter))) {
              AtomList atomList(atoms->getAtoms());
-qDebug() << "Atoms size" << atomList.size();
+//qDebug() << "Atoms size" << atomList.size();
              AtomList::iterator atom;
              for (atom = atomList.begin(); atom != atomList.end(); ++atom) {
                  atoms->removeLayer(*atom);
@@ -247,7 +255,7 @@ qDebug() << "Atoms size" << atomList.size();
              }
           }else if ((bonds = qobject_cast<Bonds*>(*iter))) {
              BondList bondList(bonds->findLayers<Bond>(Children));
-qDebug() << "Bonds size" << bondList.size();
+//qDebug() << "Bonds size" << bondList.size();
              BondList::iterator bond;
              for (bond = bondList.begin(); bond != bondList.end(); ++bond) {
                  bonds->removeLayer(*bond);
@@ -281,7 +289,7 @@ qDebug() << "Bonds size" << bondList.size();
        }
    }
 
-qDebug() << "Calling appendPrimitives()" << primitiveList.size();
+//qDebug() << "Calling appendPrimitives()" << primitiveList.size();
    appendPrimitives(primitiveList);
    BondList bondList(findLayers<Bond>(Children));
    if (bondList.isEmpty()) reperceiveBonds();
@@ -674,8 +682,22 @@ QString Molecule::coordinatesAsString(bool const selectedOnly)
       }
    }
 
-   coords.chop(1);
-   return coords;
+   return coords.trimmed();
+}
+
+
+QString Molecule::coordinatesAsStringFsm()
+{
+   QString coords;
+   QList<Geometry*> geometryList(findLayers<Geometry>(Children));
+   if (geometryList.size() < 2) return coords;
+   qDebug() << "Number of Geometries = " << geometryList.size();
+
+   coords  = geometryList[0]->data().coordinatesAsString();
+   coords += "\n****\n";
+   coords += geometryList[1]->data().coordinatesAsString();
+
+   return coords.trimmed();
 }
 
 
@@ -1417,15 +1439,38 @@ void Molecule::updateAtomOrder()
 }
 
 
+// Allows the user to specify more than one geometry for the same molecule.
+// This is useful for the frozen string method.
+void Molecule::createGeometryList()
+{
+   QList<GeometryList*> list(findLayers<GeometryList>(Children));
+   if (list.isEmpty()) {
+      Data::GeometryList* gld(new Data::GeometryList());
+      saveToCurrentGeometry();
+      if (m_currentGeometry) {
+         gld->append(m_currentGeometry); 
+
+         Data::Bank bank;
+         bank.append(gld);
+         appendData(bank);
+      }
+   }
+
+   list = findLayers<GeometryList>(Children);
+   if (!list.isEmpty()) list.last()->cloneLastGeometry();
+}
+
+
 void Molecule::setGeometry(IQmol::Data::Geometry& geometry)
 {
-   m_currentGeometry = &geometry;
    AtomList atoms(findLayers<Atom>(Children));
    unsigned nAtoms(atoms.size());
    if (nAtoms != geometry.nAtoms()) {
       QLOG_DEBUG() << "Invalid Geometry passed to Molecule::setGeometry";
       return;
    }
+
+   m_currentGeometry = &geometry;
 
    for (unsigned i = 0; i < nAtoms; ++i) {
        atoms[i]->setTranslation(geometry.position(i));
@@ -1481,27 +1526,38 @@ void Molecule::setGeometry(IQmol::Data::Geometry& geometry)
 }
 
 
-void Molecule::saveToCurrentGeometry()
-{
-   if (!m_currentGeometry) return;
 
+// This saves the nuclear coordinates and element types,
+// but not the geometry properties.
+void Molecule::saveToGeometry(Data::Geometry& geometry)
+{
+   AtomList::iterator iter;
    AtomList atomList(findLayers<Atom>(Children));
-   unsigned nAtoms(atomList.size());
-   if (nAtoms != m_currentGeometry->nAtoms()) {
-      QLOG_DEBUG() << "Invalid Geometry passed to Molecule::saveToCurrentGeometry";
-      return;
-   }
-   qDebug() << "Saving current geometry";
 
    QList<qglviewer::Vec> coordinates;
-   AtomList::iterator iter;
+   QList<unsigned> atomicNumbers;
    for (iter = atomList.begin(); iter != atomList.end(); ++iter) {
        coordinates.append( (*iter)->getPosition() );
+       atomicNumbers.append( (*iter)->getAtomicNumber() );
    }
 
-   m_currentGeometry->setCoordinates(coordinates);
+   if (geometry.nAtoms() == 0) {
+      geometry.append(atomicNumbers, coordinates);
+   }else if (geometry.sameAtoms(atomicNumbers)) {
+      geometry.setCoordinates(coordinates);
+   }else {
+      QLOG_WARN() << "Invalid Geometry passed to Molecule::saveToGeometry";
+   }
+
+   geometry.setChargeAndMultiplicity(totalCharge(), multiplicity());
 }
 
+
+void Molecule::saveToCurrentGeometry()
+{
+   if (!m_currentGeometry) m_currentGeometry = new Data::Geometry();
+   saveToGeometry(*m_currentGeometry);
+}
 
 
 void Molecule::reindexAtomsAndBonds()
@@ -1570,6 +1626,7 @@ Process::QChemJobInfo Molecule::qchemJobInfo()
    jobInfo.set(Process::QChemJobInfo::Charge,          totalCharge());
    jobInfo.set(Process::QChemJobInfo::Multiplicity,    multiplicity());
    jobInfo.set(Process::QChemJobInfo::Coordinates,     coordinatesAsString());
+   jobInfo.set(Process::QChemJobInfo::CoordinatesFsm,  coordinatesAsStringFsm());
    jobInfo.set(Process::QChemJobInfo::Constraints,     constraintsAsString());
    jobInfo.set(Process::QChemJobInfo::ScanCoordinates, scanCoordinatesAsString());
    jobInfo.set(Process::QChemJobInfo::EfpFragments,    efpFragmentsAsString());

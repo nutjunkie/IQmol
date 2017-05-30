@@ -40,11 +40,7 @@ GeometryList::GeometryList(Layer::GeometryList& geometryList) : m_geometryList(g
    m_customPlot(0)
 {
    m_configurator.setupUi(this);
-#if QT_VERSION >= 0x050000
    m_configurator.energyTable->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-#else
-   m_configurator.energyTable->verticalHeader()->setResizeMode(QHeaderView::ResizeToContents);
-#endif
 
    m_customPlot = new CustomPlot();
 

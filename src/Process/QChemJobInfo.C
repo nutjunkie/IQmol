@@ -71,12 +71,13 @@ bool QChemJobInfo::fromQVariantList(QVariantList const& list)
 
 void QChemJobInfo::set(Field const field, QString const& value) 
 {
-   qDebug() << "Setting QChemJobInfo field" << field << "to" << value;
+   //qDebug() << "Setting QChemJobInfo field" << field << "to" << value;
    switch (field) {
       case LocalWorkingDirectory:
       case RemoteWorkingDirectory:
       case InputString:
       case Coordinates:
+      case CoordinatesFsm:
       case Constraints:
       case ScanCoordinates:
       case ExternalCharges:

@@ -155,6 +155,8 @@ void InputDialog::setQChemJobInfo(IQmol::Process::QChemJobInfo const& jobInfo)
 
    m_currentJob->setCoordinates(
       m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::Coordinates));
+   m_currentJob->setCoordinatesFsm(
+      m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::CoordinatesFsm));
    m_currentJob->setEfpFragments(
       m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::EfpFragments));
    m_currentJob->setConstraints(

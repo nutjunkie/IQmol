@@ -25,6 +25,7 @@
 #include "Geometry.h"
 #include "Energy.h"
 #include "GeometryList.h"
+#include "GeometryListConfigurator.h"
 #include "InfoLayer.h"
 #include "AtomLayer.h"
 #include "IQmol.h"
@@ -38,27 +39,40 @@ using namespace qglviewer;
 namespace IQmol {
 namespace Layer {
 
-GeometryList::GeometryList(Data::GeometryList const& geometryList)
- : Base(geometryList.label()), m_configurator(*this), m_geometryList(geometryList),
-   m_speed(0.125), m_reperceiveBonds(false), m_bounce(false), m_loop(false)
+
+GeometryList::GeometryList(Data::GeometryList& geometryList)
+ : Base(geometryList.label()), m_configurator(0), m_geometryList(geometryList),
+   m_speed(0.125), m_reperceiveBonds(false), m_bounce(false), m_loop(false), 
+   m_allowModifications(false)
 {
+   setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
    m_defaultIndex = m_geometryList.defaultIndex();
 
    Data::GeometryList::const_iterator iter;
    for (iter = m_geometryList.begin(); iter != m_geometryList.end(); ++iter) {
        Data::Geometry* geometry(const_cast<Data::Geometry*>(*iter));
-
        if (geometry) appendRow(new Layer::Geometry(*geometry));
    }
 
-   m_configurator.load();
-   setConfigurator(&m_configurator);
+   // This logic may not be correct.  We assume we only want a configurator if
+   // we have more than one geometry, and only allow adding additional
+   // geometries if we start with at most one.
+   if (geometryList.size() < 2) {
+      connect(newAction("Copy Geometry"), SIGNAL(triggered()), 
+         this, SLOT(cloneLastGeometry()));
+      m_allowModifications = true;
+   }else {
+      m_configurator = new Configurator::GeometryList(*this);
+      m_configurator->load();
+      setConfigurator(m_configurator);
+   }
 }
 
 
 GeometryList::~GeometryList()
 {
    deleteAnimators();
+   if (m_configurator) delete m_configurator;
 }
 
 
@@ -80,34 +94,70 @@ void GeometryList::setMolecule(Molecule* molecule)
 }
 
 
+// Copies the last geometry and appends it to the list
+void GeometryList::cloneLastGeometry()
+{
+   if (m_geometryList.isEmpty()) return; 
+
+   // First copy the Data object
+   Data::Geometry* last(m_geometryList.last());
+   Data::Geometry* geom(new Data::Geometry(*last));
+   m_geometryList.append(geom);
+   
+   // Now create the new layer
+   Geometry* geometry(new Geometry(*geom));
+
+   QString label("Geom ");
+   label += QString::number(m_geometryList.size());
+   geometry->setText(label);
+
+   QAction* remove(geometry->newAction("Remove"));
+   connect(remove, SIGNAL(triggered()), this, SLOT(removeGeometry()));
+   appendRow(geometry);
+}
+
+
+
+void GeometryList::removeGeometry()
+{
+    if (m_molecule == 0) return;
+    Data::Geometry* target(0);
+
+    Data::GeometryList::iterator iter;
+    for (iter = m_geometryList.begin(); iter != m_geometryList.end(); ++iter) {
+        if (m_molecule->isCurrentGeometry(*iter)) {
+           target = *iter;
+qDebug() << "Data::Geometry Match found"<< target;
+           QList<Geometry*> geometryLayers(findLayers<Geometry>(Children));
+           QList<Geometry*>::iterator geom;
+           for (geom = geometryLayers.begin(); geom != geometryLayers.end(); ++geom) {
+               if (&((*geom)->data()) == target) {
+                  qDebug() << "Layer::Geometry Match found"<< target;
+                  removeLayer(*geom);
+                  m_geometryList.removeAll(target);
+                  return;
+                  delete target;
+                  delete (*geom);
+               }
+           }
+        }
+    }
+}
+
+
+
 void GeometryList::setCurrentGeometry(unsigned const index)
 {
-//qDebug() << "Layer::GeometryList::setCurrentGeometry with index" << index;
+   //qDebug() << "Layer::GeometryList::setCurrentGeometry with index" << index;
    if (!m_molecule || index >= (unsigned)m_geometryList.size()) return;
 
    Base* ptr(QVariantPointer<Base>::toPointer(child(index)->data()));
    Layer::Geometry* geometry(dynamic_cast<Layer::Geometry*>(ptr));
-
    if (!geometry) return;
 
-   unsigned nAtoms(geometry->nAtoms());
-   AtomList atoms(m_molecule->findLayers<Atom>(Children));
+   if (m_allowModifications) m_molecule->saveToCurrentGeometry();
+   m_molecule->setGeometry(geometry->data());
 
-   if ((unsigned)atoms.size() != nAtoms) {
-      QLOG_DEBUG() << "Invalid atomList passed to GeometryList::updateAtomPositions"
-                   << atoms.size() << "!=" << nAtoms;
-      return;
-   }
-
-   for (unsigned i = 0; i < nAtoms; ++i) {
-       atoms[i]->setPosition(geometry->atomicPosition(i));
-       atoms[i]->setCharge(geometry->atomicCharge(i));
-       atoms[i]->setSpinDensity(geometry->atomicSpin(i));
-   }
-
-   m_molecule->energyAvailable(geometry->energy(), Info::Hartree);
-   m_molecule->dipoleAvailable(geometry->dipole(), false);
-      
    if (m_reperceiveBonds) {
       m_molecule->reperceiveBonds();
    }else {
@@ -151,7 +201,7 @@ qDebug() << "GeometryList::makeAnimators()";
    setLoop(m_loop);
 
    if (!m_animatorList.isEmpty()) {
-      connect(m_animatorList.last(), SIGNAL(finished()), &m_configurator, SLOT(reset()));
+      connect(m_animatorList.last(), SIGNAL(finished()), m_configurator, SLOT(reset()));
    }
 }
 
@@ -229,15 +279,16 @@ void GeometryList::configure()
 {
    if (m_geometryList.size() > 1) {
       resetGeometry();
-      m_configurator.reset();
-      m_configurator.display();
+      if (m_configurator) {
+         m_configurator->reset();
+         m_configurator->display();
+      }
    }
 }
 
 
 void GeometryList::resetGeometry() 
 { 
-   qDebug() << "GeometryList::reset with index:" << m_defaultIndex;
    setCurrentGeometry(m_defaultIndex);
 }
 

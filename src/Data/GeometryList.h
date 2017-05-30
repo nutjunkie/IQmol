@@ -31,7 +31,8 @@ namespace Data {
    class GeometryList : public Data::List<Data::Geometry> {
       public:
 
-         GeometryList(QString const& label = "Geometries") : m_defaultIndex(0), m_label(label) { }
+         GeometryList(QString const& label = "Geometries") :
+             m_defaultIndex(0), m_label(label) { }
 
 		 /// Sets which geometry should be considered the default geometry in a
 		 /// list.  An index of -1 corresponds to the final geometry.

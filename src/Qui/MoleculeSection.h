@@ -21,7 +21,8 @@ class MoleculeSection : public KeywordSection {
    public:
       MoleculeSection(QString const& coordinates = "read", int const charge = 0,
          int multiplicity = 1) : KeywordSection("molecule"), m_charge(charge), 
-         m_multiplicity(multiplicity), m_coordinates(coordinates), m_molecule(0) 
+         m_multiplicity(multiplicity), m_coordinates(coordinates), m_molecule(0),
+         m_isFsm(false)
       {
          parseCoordinates();
       }
@@ -32,7 +33,10 @@ class MoleculeSection : public KeywordSection {
       void setCharge(int charge);
       void setMultiplicity(int multiplicity);
       void setCoordinates(QString const& coordinates);
+      void setCoordinatesFsm(QString const& coordinates);
       bool isReadCoordinates();
+
+      void setFsm(bool tf) { m_isFsm = tf; }
 
       int getCharge() const { return m_charge; }
       int getMultiplicity() const { return m_multiplicity; }
@@ -52,8 +56,10 @@ class MoleculeSection : public KeywordSection {
       int  m_multiplicity;
       int  m_numberOfAtoms;
       QString m_coordinates;
+      QString m_coordinatesFsm;
 
       Molecule* m_molecule;
+      bool m_isFsm;
 
       QString myDump();
       void parseCoordinates();

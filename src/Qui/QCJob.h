@@ -57,6 +57,7 @@ class Job {
       void setCharge(int);
       void setMultiplicity(int);
       void setCoordinates(QString const&);
+      void setCoordinatesFsm(QString const&);
       void setConstraints(QString const&);
       void setScanCoordinates(QString const&);
       void setEfpFragments(QString const&);

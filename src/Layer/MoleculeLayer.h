@@ -198,6 +198,7 @@ namespace IQmol {
             /// Converts the Molecule to an XYZ format and uses OpenBabel to parse this.  
             /// Useful for, e.g., reperceiving bonds.
             QString coordinatesAsString(bool const selectedOnly = false);
+            QString coordinatesAsStringFsm();
             QStringList coordinatesForCubeFile();
    
             /// Assigns the atom indices based on the ordering selected by 
@@ -211,6 +212,12 @@ namespace IQmol {
             QList<qglviewer::Vec> coordinates();
             QList<double> atomicCharges(Data::Type::ID type);
             void setGeometry(IQmol::Data::Geometry&);
+
+            // There must be a better way of doing this, but this is used
+            // in Layer::GeometryList for de
+            bool isCurrentGeometry(Data::Geometry const* geometry) const { 
+               return m_currentGeometry == geometry;
+            }
    
       		 // This is needed for fchk-file based surfaces and only covers ridgid
       		 // body motions of the molecule.
@@ -233,6 +240,7 @@ namespace IQmol {
             void removeConstraint();
             void selectAll();
             void selectAtoms(QList<int> const& indices);
+            void createGeometryList();
 
             void openSurfaceAnimator();
 
@@ -355,6 +363,8 @@ namespace IQmol {
             void deleteProperties();
 
             void initProperties();
+
+            void saveToGeometry(Data::Geometry&);
    
             QFileInfo m_inputFile;
    
@@ -404,6 +414,7 @@ namespace IQmol {
             Data::Type::ID m_chargeType;
             QAction* m_atomicChargesMenu;
             unsigned m_maxAtomicNumber;
+            QAction* m_addGeometryMenu;;
       };
    
    } // end namespace Layer

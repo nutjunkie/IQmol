@@ -91,11 +91,12 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       naturalbondOrbitalList(new Data::MolecularOrbitalsList()); 
 */
 // END DEPRECATE
+   QString key;
 
    while (!textStream.atEnd()) {
 
       QString line(textStream.nextLine());
-      QString key(line);
+      key = line;
       key.resize(42);
       key = key.trimmed();
       QString tmp(line.mid(43, 37));
@@ -493,7 +494,8 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
    return m_errors.isEmpty();
  
    error:
-      QString msg("Error parsing checkpoint data around line number ");
+      QString msg("Error in data section '");
+      msg += key + "' around line number ";
       msg += QString::number(textStream.lineNumber());
       m_errors.append(msg);
 

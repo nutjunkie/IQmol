@@ -25,10 +25,14 @@
 #include "Layer.h"
 #include "GeometryList.h"
 #include "Animator.h"
-#include "GeometryListConfigurator.h"
 
 
 namespace IQmol {
+
+namespace Configurator {
+   class GeometryList;
+}
+
 namespace Layer {
 
    class GeometryList : public Base {
@@ -38,7 +42,7 @@ namespace Layer {
       friend class Configurator::GeometryList;
 
       public:
-         GeometryList(Data::GeometryList const&);
+         GeometryList(Data::GeometryList&);
          ~GeometryList();
          void setMolecule(Molecule*);
 
@@ -51,6 +55,7 @@ namespace Layer {
          void configure();
          void setCurrentGeometry(unsigned const index);
          void resetGeometry();
+         void cloneLastGeometry();
 
       protected:
          void setPlay(bool const play);
@@ -59,12 +64,15 @@ namespace Layer {
          void setSpeed(double const speed);
          void setReperceiveBonds(bool const tf);
 
+      private Q_SLOTS:
+         void removeGeometry();
+
       private:
          void makeAnimators();
          void deleteAnimators();
 
-         Configurator::GeometryList m_configurator;
-         Data::GeometryList const& m_geometryList;  // for convenience
+         Configurator::GeometryList* m_configurator;
+         Data::GeometryList& m_geometryList;
          AnimatorList m_animatorList;
 
          unsigned m_defaultIndex;
@@ -72,6 +80,7 @@ namespace Layer {
          bool m_reperceiveBonds;
          bool m_bounce;
          bool m_loop;
+         bool m_allowModifications;
    };
 
 } } // end namespace IQmol::Layer

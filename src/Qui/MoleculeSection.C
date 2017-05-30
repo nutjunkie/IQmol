@@ -22,7 +22,8 @@ namespace Qui {
 
 
 //! Takes a the text from between the $molecule-$end tags and parses it.
-void MoleculeSection::read(QString const& input) {
+void MoleculeSection::read(QString const& input) 
+{
    QStringList lines( input.trimmed().split(QRegExp("\\n")) );
    bool okay(false);
 
@@ -79,7 +80,8 @@ Molecule* MoleculeSection::getMolecule() {
 }
 
 
-QString MoleculeSection::myDump() {
+QString MoleculeSection::myDump() 
+{
    QString s;
    if (isReadCoordinates()) {
       s += "read\n";
@@ -89,8 +91,12 @@ QString MoleculeSection::myDump() {
    }else {
       s += QString::number(m_charge) + " ";
       s += QString::number(m_multiplicity) + "\n";
-      if (m_coordinates != "") {
-         s += "  " + m_coordinates + "\n";
+      if (m_isFsm) {
+         s += "  " + m_coordinatesFsm + "\n";
+      }else {
+         if (m_coordinates != "") {
+            s += "  " + m_coordinates + "\n";
+         }
       }
    }
    return s;
@@ -115,6 +121,14 @@ void MoleculeSection::setCoordinates(QString const& coordinates) {
    m_coordinates = coordinates; 
    parseCoordinates();
 }
+
+
+void MoleculeSection::setCoordinatesFsm(QString const& coordinates) { 
+qDebug() << "Fsm coordinates set to " << coordinates;
+   m_coordinatesFsm = coordinates; 
+}
+
+
 
 
 void MoleculeSection::setMolecule(Molecule* mol) { 

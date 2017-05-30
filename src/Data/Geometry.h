@@ -53,14 +53,15 @@ namespace Data {
 
          /// Use to convert between Bohr and Angstrom
          void scaleCoordinates(double const);
-         // don't think this is used.
-         //void translate(qglviewer::Vec const&);
+
+         QString coordinatesAsString() const;
 
          /// Two geometries are considered the same if their AtomLists contain
          /// the same atoms in the same order.  Everything else could be
          /// different.  This allows, for example, the structures of a geometry
          /// optimization to be considered the same.
          bool sameAtoms(Geometry const&) const;
+         bool sameAtoms(QList<unsigned> const& symbols) const;
          bool sameAtoms(QStringList const& symbols) const;
 
          void append(unsigned const z, qglviewer::Vec const& position);

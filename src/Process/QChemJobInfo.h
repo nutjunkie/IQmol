@@ -40,12 +40,12 @@ namespace Process {
          /// RunFileName    - the name of the submission script
          /// Note that not all these are serialized
          enum Field { 
-                 InputFileName,    // 0
+                 InputFileName,           // 0
                  OutputFileName, 
                  AuxFileName, 
                  EspFileName, 
                  MoFileName, 
-                 DensityFileName,  // 5
+                 DensityFileName,         // 5
                  ErrorFileName, 
                  BatchFileName, 
                  RunFileName, 
@@ -55,11 +55,12 @@ namespace Process {
                  Charge, 
                  Multiplicity, 
                  Coordinates, 
+                 CoordinatesFsm,          // 15
                  Constraints, 
                  ScanCoordinates,
                  EfpFragments, 
                  EfpParameters, 
-                 ExternalCharges 
+                 ExternalCharges          // 20
               };
             
 

@@ -51,6 +51,7 @@
 #include "FrequenciesLayer.h"
 #include "ExcitedStatesLayer.h"
 #include "MolecularOrbitalsLayer.h"
+#include "MoleculeLayer.h"
 #include "OrbitalsLayer.h"
 #include "GeminalOrbitalsLayer.h"
 #include "NmrLayer.h"
