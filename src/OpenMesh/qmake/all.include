@@ -9,7 +9,7 @@ include (../../common.pri )
 # Needed Qt packages and build plugin
 ################################################################################
 
-CONFIG += qt uitools opengl thread debug_and_release 
+CONFIG += qt opengl thread debug_and_release 
 
 QT += opengl
 

@@ -28,6 +28,8 @@
 namespace IQmol {
 namespace Data {
 
+template<> const Type::ID List<Shell>::TypeID = Type::ShellList;
+
 unsigned ShellList::nBasis() const
 {
     unsigned n(0);

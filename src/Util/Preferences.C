@@ -248,15 +248,17 @@ QString QChemDatabaseFilePath()
    QString databaseFilePath;
 
    if (value.isNull() || value.toString().isEmpty()) {
-      QDir dir(QApplication::applicationDirPath());
-#ifdef Q_OS_MAC 
+      QDir dir;
+#if defined(Q_OS_MAC)
+      dir.setPath(QApplication::applicationDirPath());
       dir.cdUp();
       dir.cd("Resources");
 #elif defined(Q_OS_WIN32)
+      dir.setPath(QApplication::applicationDirPath());
       dir.cdUp();
       dir.cd("share");
-#else
-      dir.cd("share");
+#else  
+      dir.setPath("/usr/share/iqmol");
 #endif
       databaseFilePath = dir.absolutePath() + "/qchem_option.db";
    }else {
@@ -278,11 +280,14 @@ QString ShaderDirectory()
    QVariant value(Get("ShaderDirectory"));
 
    if (value.isNull()) {
-      QDir dir(QApplication::applicationDirPath());
+      QDir dir;
 #if  defined(Q_OS_MAC) || defined(Q_OS_WIN32)
+      dir.setPath(QApplication::applicationDirPath());
       dir.cdUp();
-#endif
       dir.cd("share/shaders");
+#else
+      dir.setPath("/usr/share/iqmol/shaders");
+#endif
       shaderDir = dir.absolutePath();
    }else {
       shaderDir = value.value<QString>();
@@ -371,11 +376,14 @@ QString FragmentDirectory()
    QVariant value(Get("FragmentDirectory"));
 
    if (value.isNull() || value.toString().isEmpty()) {
-      QDir dir(QApplication::applicationDirPath());
+      QDir dir;
 #if defined(Q_OS_MAC) || defined(Q_OS_WIN32)
+      dir.setPath(QApplication::applicationDirPath());
       dir.cdUp();
-#endif
       dir.cd("share/fragments");
+#else
+      dir.setPath("/usr/share/iqmol/fragments");
+#endif
       fragDir = dir.absolutePath();
    }else {
       fragDir = value.value<QString>();

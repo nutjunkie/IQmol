@@ -81,10 +81,7 @@ namespace Data {
          Vector      m_elements;
    };
 
-   class DensityList : public Data::List<Data::Density> { 
-      public:
-         Type::ID typeID() const { return Type::Density; }
-   };
+   class DensityList : public Data::List<Data::Density> { };
 
 } } // end namespace IQmol::Data
 

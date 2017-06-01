@@ -27,8 +27,8 @@
 namespace IQmol {
 namespace Data {
 
-//template<> const Type::ID FileList::TypeID = Type::FileList;
 
+template<> const Type::ID List<File>::TypeID = Type::FileList;
 
 void File::dump() const 
 {
