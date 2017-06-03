@@ -60,10 +60,13 @@ namespace Process {
 
          /// This is an external handle for the process, either a
          /// PID or PBS/SGE job number.
-         QString const& jobId()      const { return m_jobId; }
-         QString const& jobName()    const { return m_jobName; }
-         QString const& serverName() const { return m_serverName; }
-         QString const& submitTime() const { return m_submitTime; }
+         QString  const& jobId()      const { return m_jobId; }
+         QString  const& jobName()    const { return m_jobName; }
+         QString  const& serverName() const { return m_serverName; }
+         QString  const& submitTime() const { return m_submitTime; }
+         unsigned julianDay()  const { return m_julianDay; }
+
+         void setSubmitTime(QString const& string) { m_submitTime = string; }
 
          bool localFilesExist() const;
 
@@ -133,6 +136,7 @@ namespace Process {
          QString  m_message;
          QString  m_submitTime;
          QString  m_jobId;
+         qint64   m_julianDay;
 
          Util::Timer m_timer;
 

@@ -178,10 +178,16 @@ void JobMonitor::loadJobListFromPreferences()
 
    try {
       QVariantList::iterator iter;
+      qint64 currentJulianDay(QDate::currentDate().toJulianDay());
+      qint64 cutOffDay(currentJulianDay - Preferences::DaysToRememberJobs());
 
       for (iter = list.begin(); iter != list.end(); ++iter) {
           job = new Job();
-          if (job->fromQVariant(*iter)) {
+          if (job->fromQVariant(*iter) && job->julianDay() >= cutOffDay ) {
+             if (job->julianDay() != currentJulianDay) {
+                QDate date(QDate::fromJulianDay(job->julianDay()));
+                job->setSubmitTime(date.toString("d MMM"));
+             }
              addToTable(job);
 
              if (job->isActive()) {

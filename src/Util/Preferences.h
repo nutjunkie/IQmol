@@ -140,6 +140,9 @@ namespace Preferences {
 
    QString ServerQueryJobFinished();
    void    ServerQueryJobFinished(QString const& repsonse);
+
+   int  DaysToRememberJobs();
+   void DaysToRememberJobs(int const& numberOfDays);
    
    QMap<QString,QString> PasswordVaultContents();
    void PasswordVaultContents(QMap<QString,QString> const&);
