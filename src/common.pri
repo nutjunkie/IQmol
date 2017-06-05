@@ -9,9 +9,9 @@ QMAKE_CXXFLAGS += -O2 -g -ggdb
 # the packages.  To simplify distribution, we use static libraries wherever
 # possible.
 
-include(mac.pri)
-include(windows.pri)
-include(linux.pri)
+win32:     include(windows.pri)
+macx:      include(mac.pri)
+unix:!macx include(linux.pri)
 
 
 # Path to the build directory ($$PWD contains IQmol.pro)
