@@ -7,7 +7,7 @@ QMAKE_CXXFLAGS += -O2 -g -ggdb
 
 # Set the $DEV environment variable to the top directory used to compile all
 # the packages.  To simplify distribution, we use static libraries wherever
-# possible.
+# possible.  Platform dependent settings are made in the following files:
 
 win32:     include(windows.pri)
 macx:      include(mac.pri)
