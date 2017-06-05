@@ -20,6 +20,8 @@
    
 ********************************************************************************/
 
+
+#define _USE_MATH_DEFINES
 #include "ShaderLibrary.h"
 #include "Preferences.h"
 #include "TextStream.h"
