@@ -32,7 +32,7 @@ SOURCES = qglviewer.cpp \
 	  manipulatedCameraFrame.cpp \
 	  frame.cpp \
 	  saveSnapshot.cpp \
-	  constraint.cpp \
+	  constraint-qglviewer.cpp \
 	  keyFrameInterpolator.cpp \
 	  mouseGrabber.cpp \
 	  quaternion.cpp \

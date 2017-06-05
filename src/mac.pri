@@ -1,4 +1,7 @@
-macx {
+CONFIG += DEPLOY
+
+
+contains(CONFIG, DEPLOY) {
    CONFIG += debug
    #CONFIG += release
 
@@ -16,15 +19,6 @@ macx {
    LIBS        += $${OPENBABEL}/build/src/libopenbabel.a
 
    # SSH2
-#  INCLUDEPATH += $(DEV)/extlib/include
-#  LIBS        += $(DEV)/extlib/lib/libssh2.a
-
-   # libssl/libcrypto
-#  INCLUDEPATH += $(DEV)/extlib/include
-#  LIBS        += $(DEV)/extlib/lib/libssl.a 
-#  LIBS        += $(DEV)/extlib/lib/libcrypto.a
-
-   # SSH2
    INCLUDEPATH += $(DEV)/libssh2-1.8.0/include
    LIBS        += $(DEV)/libssh2-1.8.0/build/src/libssh2.a
 
@@ -34,14 +28,14 @@ macx {
    LIBS        += $(DEV)/openssl/libcrypto.a
 
    # gfortran
-   LIBS += /usr/local/gfortran/lib/libgfortran.a
-   LIBS += /usr/local/gfortran/lib/libquadmath.a
-   LIBS += -L/usr/local/gfortran/lib -lgcc_ext.10.5
+   LIBS        += /usr/local/gfortran/lib/libgfortran.a
+   LIBS        += /usr/local/gfortran/lib/libquadmath.a
+   LIBS        += -L/usr/local/gfortran/lib -lgcc_ext.10.5
 
    # Misc
-   LIBS += -L/usr/X11/lib  
-   LIBS += -framework GLUT
-   LIBS += -L/usr/lib -lz
+   LIBS        += -L/usr/X11/lib  
+   LIBS        += -framework GLUT
+   LIBS        += -L/usr/lib -lz
 
    QMAKE_LFLAGS   += -Wl,-no_compact_unwind -stdlib=libc++ 
    QMAKE_RPATHDIR += @executable_path/../Frameworks

@@ -7,16 +7,17 @@ QMAKE_CXXFLAGS += -O2 -g -ggdb
 
 # Set the $DEV environment variable to the top directory used to compile all
 # the packages.  To simplify distribution, we use static libraries wherever
-# possible.
+# possible.  Platform dependent settings are made in the following files:
 
-include(mac.pri)
-include(windows.pri)
-include(linux.pri)
+win32:     { include(windows.pri) }
+macx:      { include(mac.pri)   }
+unix:!macx { include(linux.pri) }
 
 
 # Path to the build directory ($$PWD contains IQmol.pro)
-BUILD_DIR       = $$PWD/../build
-INCLUDEPATH    += $$PWD  $$BUILD_DIR
+BUILD_DIR     = $$PWD/../build
+INCLUDEPATH  += $$PWD  $$BUILD_DIR
+
 
 lib {
    CONFIG      += staticlib

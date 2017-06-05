@@ -20,9 +20,7 @@ LIBS += $$BUILD_DIR/libQui.a \
         $$BUILD_DIR/libOld.a \
         $$BUILD_DIR/libGrid.a \
         $$BUILD_DIR/libUtil.a \
-
-win32:  
-else:   LIBS += $$BUILD_DIR/libQGLViewer.a
+        $$BUILD_DIR/libQGLViewer.a
 
 # Cannot get the embbed OpenMesh working under windows.
 !win32 {
@@ -33,8 +31,8 @@ LIBS += $$PWD/../OpenMesh/lib/libOpenMeshCore.a \
 include(../common.pri)
 
 INCLUDEPATH += . ../Util ../Data ../Parser ../Qui ../Layer \
-                ../Configurator ../Network ../Yaml ../Process ../Old ../Viewer \
-                ../OpenMesh/src
+               ../Configurator ../Network ../Yaml ../Process ../Old ../Viewer \
+               ../OpenMesh/src
 INCLUDEPATH += $$BUILD_DIR/Qui   # Required for the ui_QuiMainWindow.h header
 
 

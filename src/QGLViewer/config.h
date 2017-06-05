@@ -72,6 +72,7 @@ Error : libQGLViewer requires a minimum Qt version of 4.0
 #ifndef QGLVIEWER_EXPORT
 # define QGLVIEWER_EXPORT
 #endif
+#define QGLVIEWER_EXPORT
 
 // OpenGL includes - Included here and hence shared by all the files that need OpenGL headers.
 # include <QGLWidget>

@@ -47,25 +47,36 @@ libraries.  The compilation of the code should be relatively straightforward.
 
 
  o OpenBabel:
-   - Download: http://openbabel.org/wiki/Get_Open_Babel (2.3.1)
+   - Download: http://openbabel.org/wiki/Get_Open_Babel (2.4.1)
 
-   - I compiled the libraries within the bash.exe shell, but Cmake complained
-     that sh.exe was on the path.  Simply resetting the PATH before running
-     the cmake command seemed to work:
+   - It is important to compile the OpenBabel libraries with the same
+     tool chain as IQmol (i.e. the one distributed with Qt), otherwise
+     you can encounter ABI incompatibilities.  I added the following to
+     openbabel-2.4.1/CMakeLists.txt:
 
-       export PATH=/c/Program\ Files/CMake/bin:/c/MinGW/bin
+     set(CMAKE_CXX_COMPILER C:/Qt/Qt5.8.0/Tools/mingw530_32/bin/g++.exe)
+     set(CMAKE_C_COMPILER   C:/Qt/Qt5.8.0/Tools/mingw530_32/bin/gcc.exe)
 
-       cmake ../ -G "MinGW Makefiles" 
-        -DZLIB_INCLUDE_DIR=/usr/local/include -DZLIB_LIBRARY=/usr/local/lib/libz.a 
-        -DLIBXML2_INCLUDE_DIR=/usr/local/include -DLIBXML2_LIBRARIES=/usr/local/lib/libxml2.a
-        -DBUILD_SHARED=OFF
+     set(CMAKE_MAKE_PROGRAM C:/Qt/Qt5.8.0/Tools/mingw530_32/bin/mingw32-make.exe)
+     set(ZLIB_INCLUDE_DIR   C:/Qt/Qt5.8.0/Tools/mingw530_32/i686-w64-mingw32/include)
+     set(ZLIB_LIBRARY       C:/Qt/Qt5.8.0/Tools/mingw530_32/i686-w64-mingw32/lib/libz.a)
 
-     this presupposes the libxml2 and libz libraries are in C:/MinGW/msys/1.0/local/lib 
-     which is mapped to /usr/local/lib, go figure.  Compile with mingw32-make:
-     
-        mingw32-make
+     make sure these values are carried over into the CMakeCache file.
+
+   - Compile a satic library with 
+
+     #> cmake ../ -G "MinGW Makefiles" -DBUILD_SHARED=FALSE
+     #> mingw32-make
+
+   - I have not built it with xml support
+        -DLIBXML2_INCLUDE_DIR=/usr/local/include 
+        -DLIBXML2_LIBRARIES=/usr/local/lib/libxml2.a
+
 
  o QGLViewer:  
+   - This has now been bundled with IQmol to reduce the number of dependencies,
+     but the following may still be useful:
+
    - Download: http://libqglviewer.com/download.html
    - Compile (inside C:\MinGW\msys\1.0\bin\bash.exe):
 
@@ -80,12 +91,11 @@ libraries.  The compilation of the code should be relatively straightforward.
    - Download: http://www.openmesh.org/download/ 
    - Complie (within the Qt command prompt):
    - Compile:
+
     
  o Boost:
-   - Download: http://sourceforge.net/projects/boost/files/boost/1.56.0/
-     Later versions of boost seem to have removed the load_collection function which
-     is part of the serialization routines and there are reports of problems with the
-     build for MinGW
+   - Download: http://sourceforge.net/projects/boost/files/boost/1.59.0/
+     Later versions of boost seem to have removed support for the mingw option.
    - Compile (inside the Qt cmd prompt): 
 
        bootstrap.bat mingw

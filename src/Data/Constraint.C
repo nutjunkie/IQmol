@@ -29,9 +29,32 @@ namespace IQmol {
 namespace Data {
 
 
+Constraint::~Constraint() { }
+
+void Constraint::serialize(OutputArchive& ar, unsigned const /* version = 0 */)
+{
+   ar & m_atomIndices;
+   ar & m_value;
+}
+
+
+void Constraint::serialize(InputArchive& ar, unsigned const /* version = 0 */)
+{
+   ar & m_atomIndices;
+   ar & m_value;
+}
+
+
+
 void Constraint::dump() const
 {
    qDebug() << " - value:" << m_value;
+}
+
+
+double Constraint::value() const 
+{ 
+   return m_value;
 }
 
 

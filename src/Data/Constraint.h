@@ -36,29 +36,18 @@ namespace Data {
          Type::ID typeID() const { return Type::Constraint; }
 
          Constraint() : m_value(0.0) { }
-         virtual ~Constraint() { }
+         virtual ~Constraint();
 
          QList<unsigned> const& atomIndices() const { return m_atomIndices; }
 
          void setValue(double const value) { m_value = value; }
-         double value() const { return m_value; }
+         double value() const;
 
-         virtual void serialize(OutputArchive& ar, unsigned const /* version = 0 */) 
-         {
-            ar & m_atomIndices;
-            ar & m_value;
-         }
-
-         virtual void serialize(InputArchive& ar, unsigned const /* version = 0 */) 
-         {
-            ar & m_atomIndices;
-            ar & m_value;
-         }
-
+         virtual void serialize(OutputArchive& ar, unsigned const /* version = 0 */);
+         virtual void serialize(InputArchive& ar, unsigned const /* version = 0 */);
          virtual void dump() const;
 
       protected:
-         virtual void destroy() { }
          QList<unsigned> m_atomIndices;
          double m_value;
    };
