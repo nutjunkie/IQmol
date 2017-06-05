@@ -15,18 +15,19 @@ CONFIG  += ordered
 TEMPLATE = subdirs
 
 
-win32: {
-   SUBDIRS += OpenBabel
+# Cannot get the included OpenMesh working. Libraries are specifed 
+# in windows.pri.  See also Main.pri for the final link order for 
+# the subdirectory library (important for dependancies).
+
+!win32: {
+SUBDIRS += OpenMesh \
+           OpenMesh/src/OpenMesh/Core \
+           OpenMesh/src/OpenMesh/Tools \
 }
 
-unix: {
-   SUBDIRS = QGLViewer \
-             OpenMesh \
-             OpenMesh/src/OpenMesh/Core \
-             OpenMesh/src/OpenMesh/Tools \
-}
-
-SUBDIRS += Util \
+SUBDIRS += \
+           QGLViewer \
+           Util \
            Data \
            Qui \
            Parser \
