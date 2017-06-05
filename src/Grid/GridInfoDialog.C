@@ -147,9 +147,21 @@ void GridInfoDialog::exportCubeFile(bool const invertSign)
    Data::GridDataList::iterator iter;
    for (iter = grids.begin(); iter != grids.end(); ++iter) {
        QFileInfo fileInfo(Preferences::LastFileAccessed());
-       QString name(m_moleculeName);
-       name += "." + (*iter)->surfaceType().toString() + ".cube";
-       name.replace(" ","_");
+       QString basename(m_moleculeName);
+       basename += "." + (*iter)->surfaceType().toString();
+       basename.replace(" ","_");
+
+       QString name;
+       bool exists(true);
+       unsigned count(0);
+
+       while (exists && count < 1000) {
+           name = basename + "." + QString::number(count) + ".cube";
+           fileInfo.setFile(fileInfo.dir(), name);
+           exists = fileInfo.exists();
+           ++count;
+       }
+
        fileInfo.setFile(fileInfo.dir(), name);
        name = fileInfo.filePath();
 

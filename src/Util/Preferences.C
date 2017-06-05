@@ -727,6 +727,17 @@ void ServerQueryJobFinished(QString const& repsonse) {
 
 // ---------
 
+int DaysToRememberJobs() {
+   QVariant value(Get("DaysToRememberJobs"));
+   return value.isNull() ? 7 : value.value<int>();
+}
+
+void DaysToRememberJobs(int days) {
+   Set("DaysToRememberJobs", QVariant::fromValue(days));
+}
+
+
+// ---------
 
 QVariantList JobMonitorList()
 {

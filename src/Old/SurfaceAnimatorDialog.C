@@ -247,7 +247,6 @@ void SurfaceAnimatorDialog::computeIsovalueAnimation()
    bool isSigned(true);
    bool simplifyMesh(m_dialog.simplifyMesh->isChecked());
 
-
    QProgressDialog* progressDialog(new QProgressDialog("Calculating surfaces", "Cancel", 0, 
       nFrames));
    progressDialog->setWindowModality(Qt::WindowModal);
@@ -269,9 +268,9 @@ void SurfaceAnimatorDialog::computeIsovalueAnimation()
        }
        isovalue1 += dIso;
 
+       QApplication::processEvents();
        ++totalProgress;
        progressDialog->setValue(totalProgress);
-       QApplication::processEvents();
        if (progressDialog->wasCanceled()) {
 #ifndef Q_OS_WIN32
  //         delete progressDialog;
@@ -279,6 +278,8 @@ void SurfaceAnimatorDialog::computeIsovalueAnimation()
           return;
        }
    }
+
+   //if (progressDialog) progressDialog->hide();
 
    m_animator = new Animator::Combo(m_molecule, frames, interpolationFrames, m_speed);
    connect(m_animator, SIGNAL(finished()), this, SLOT(animationStopped()));
@@ -311,7 +312,7 @@ void SurfaceAnimatorDialog::computeMultiGridAnimation()
    QString label;
 
    int totalProgress(0);
-   int totalSurfaces(m_referenceFrames + (m_referenceFrames-1)*interpolationFrames);
+   int totalSurfaces(m_referenceFrames + (m_referenceFrames-1)*interpolationFrames -1);
    QProgressDialog* progressDialog(new QProgressDialog("Calculating surfaces", 
       "Cancel", 0, totalSurfaces, this));
       

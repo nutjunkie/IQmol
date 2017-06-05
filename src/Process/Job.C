@@ -49,6 +49,7 @@ QString Job::toString(Status const& status)
 
 Job::Job(QChemJobInfo const& qchemJobInfo) : m_qchemJobInfo(qchemJobInfo)
 {
+   m_julianDay  = QDate::currentDate().toJulianDay();
    m_jobName    = m_qchemJobInfo.baseName();
    m_serverName = m_qchemJobInfo.serverName();
    m_status     = NotRunning;
@@ -73,6 +74,7 @@ QVariant Job::toQVariant() const
    map.insert("SubmitTime",   m_submitTime);  
    map.insert("RunTime",      runTime());  
    map.insert("Status",       (int)m_status);  
+   map.insert("JulianDay",    m_julianDay);
    map.insert("QChemJobInfo", m_qchemJobInfo.toQVariantList());
 
    return QVariant(map);
@@ -108,6 +110,10 @@ bool Job::fromQVariant(QVariant const& qvar)
 
    if (map.contains("RunTime")) {
       resetTimer(map.value("RunTime").toUInt()); 
+   }
+
+   if (map.contains("JulianDay")) {
+      m_julianDay = map.value("JulianDay").toUInt(); 
    }
 
    if (map.contains("QChemJobInfo")) {

@@ -144,6 +144,23 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          if (!geometry) goto error;
          geometryList->append(geometry);
 
+      }else if (key == "SCF Iteration") {
+         unsigned n(list.at(1).toUInt(&ok));
+         if (!ok) goto error;
+         hfData.label = "SCF Iter " +  QString::number(n-1);
+
+      }else if (key == "SCF Iteration Energy") {
+         double energy(list.at(1).toDouble(&ok));
+         if (!ok) goto error;
+         hfData.label += " (" + QString::number(energy, 'f', 6) + ")";
+
+         if (geometry) {
+            // The user may have requested orbitals for each SCF cycle, 
+            Data::Orbitals* orbitals(makeOrbitals(nAlpha, nBeta, hfData, shellData,
+               *geometry, densityList));
+            if (orbitals) orbitalsList->append(orbitals);
+         }
+
       }else if (key == "Number of basis functions") {
          // This is determined from the shell data
 
@@ -425,6 +442,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       Data::Orbitals* orbitals(0);
 
       // We append the additional densities to the canonical orbitals 
+      hfData.label = "Canonical Orbitals";
       orbitals = makeOrbitals(nAlpha, nBeta, hfData, shellData, *geometry, densityList); 
       if (orbitals) {
          orbitalsList->append(orbitals);
@@ -610,7 +628,16 @@ Data::Orbitals* FormattedCheckpoint::makeOrbitals(unsigned const nAlpha,
             orbitalData.label);
       } break;
 
-      case Data::Orbitals::NaturalTransition:
+      case Data::Orbitals::NaturalTransition: {
+         //TODO: create new derived orbitals classes for these
+         Data::CanonicalOrbitals* canonical = 
+            new Data::CanonicalOrbitals(nAlpha, nBeta, *shellList,
+                orbitalData.alphaCoefficients, orbitalData.alphaEnergies, 
+                orbitalData.betaCoefficients,  orbitalData.betaEnergies, orbitalData.label);
+         orbitals = canonical;
+         orbitals->setOrbitalType(Data::Orbitals::NaturalTransition);
+      } break;
+
       case Data::Orbitals::NaturalBond: {
 
          //TODO: create new derived orbitals classes for these
@@ -619,6 +646,7 @@ Data::Orbitals* FormattedCheckpoint::makeOrbitals(unsigned const nAlpha,
                 orbitalData.alphaCoefficients, orbitalData.alphaEnergies, 
                 orbitalData.betaCoefficients,  orbitalData.betaEnergies, orbitalData.label);
          orbitals = canonical;
+         orbitals->setOrbitalType(Data::Orbitals::NaturalBond);
 
 //       qDebug() << "Add one NTO(3)/NBO(4). Code = " << mos->orbitalType();
 //       surfaceTag = QString(moData.stateTag);
