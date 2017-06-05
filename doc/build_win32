@@ -65,14 +65,12 @@ libraries.  The compilation of the code should be relatively straightforward.
 
    - Compile a satic library with 
 
-     cmake ../ -G "MinGW Makefiles" -DBUILD_SHARED=FALSE
+     #> cmake ../ -G "MinGW Makefiles" -DBUILD_SHARED=FALSE
+     #> mingw32-make
 
    - I have not built it with xml support
         -DLIBXML2_INCLUDE_DIR=/usr/local/include 
         -DLIBXML2_LIBRARIES=/usr/local/lib/libxml2.a
-
-     
-     mingw32-make
 
 
  o QGLViewer:  

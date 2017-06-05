@@ -1,13 +1,17 @@
 ######################################################################
 #
-#  This is the main IQmol project file.  To use this file type one of
-#  the following commands:
+#  This is the main IQmol project file.  To use this file it should be
+#  sufficient to type:
 #
-#     OS X:     qmake -spec macx-g++ -o Makefile IQmol.pro
-#     Linux:    qmake -unix -o Makefile IQmol.pro
-#     Windows:  qmake.exe -win32 -o Makefile IQmol.pro
+#     qmake IQmol.pro
+#     make  (mingw32-make under windows)
 #
-#  Note changes to settings should be made to the common.pri file
+#  Several libraries are required and the compliation of these is
+#  discussed in the doc/build* files.
+#
+#  This top-level file should only contain the project subdirectories.
+#  Global configuration should be done in common.pri and platform-
+#  specific configuration should be done in {mac,windows,linux}.pri
 #
 ######################################################################
 
@@ -15,9 +19,10 @@ CONFIG  += ordered
 TEMPLATE = subdirs
 
 
-# Cannot get the included OpenMesh working. Libraries are specifed 
-# in windows.pri.  See also Main.pri for the final link order for 
-# the subdirectory library (important for dependancies).
+# Cannot get the included OpenMesh working under Windows.  For
+# win32 the OpenMesh libraries are specifed in windows.pri.  See
+# also Main.pri for the final link order for the subdirectory 
+# libraries (this is important for resolving symbol dependancies).
 
 !win32: {
 SUBDIRS += OpenMesh \
@@ -26,18 +31,18 @@ SUBDIRS += OpenMesh \
 }
 
 SUBDIRS += \
-           QGLViewer \
-           Util \
-           Data \
-           Qui \
-           Parser \
-           Configurator \
-           Grid \
-           Old \
-           Layer \
-           Network \
-           Yaml \
-           Plot \
-           Process \
-           Viewer \
-           Main \
+   QGLViewer \
+   Util \
+   Data \
+   Qui \
+   Parser \
+   Configurator \
+   Grid \
+   Old \
+   Layer \
+   Network \
+   Yaml \
+   Plot \
+   Process \
+   Viewer \
+   Main \
