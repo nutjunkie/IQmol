@@ -56,6 +56,8 @@ namespace Data {
             QString const& label = QString());
 
          OrbitalType orbitalType() const { return m_orbitalType; }
+         // TODO: get rid of this with proper subclassing of NTOs/NBOs 
+         void setOrbitalType(OrbitalType orbitalType) { m_orbitalType = orbitalType; }
 
          unsigned nAlpha() const { return m_nAlpha; }
          unsigned nBeta()  const { return m_nBeta; }

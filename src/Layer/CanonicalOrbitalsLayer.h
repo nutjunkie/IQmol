@@ -52,7 +52,7 @@ namespace Layer {
 
       private:
          void computeDensityVectors();
-         Data::CanonicalOrbitals& m_canonicalOrbitals;
+         Data::CanonicalOrbitals& m_canonicalOrbitals;  // true cast of Orbitals::m_orbitals
    };
 
 } } // End namespace IQmol::Layer 

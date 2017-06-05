@@ -31,7 +31,9 @@ namespace Layer {
 CanonicalOrbitals::CanonicalOrbitals(Data::CanonicalOrbitals& canonicalOrbitals)
  : Orbitals(canonicalOrbitals), m_canonicalOrbitals(canonicalOrbitals)
 {
-   computeDensityVectors();
+   if (orbitalType() == Data::Orbitals::Canonical) {
+      computeDensityVectors();
+   }
    m_availableDensities.append(m_canonicalOrbitals.densityList());
    qDebug() << "Number of available densities" << m_availableDensities.size();
 }

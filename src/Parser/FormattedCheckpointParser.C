@@ -628,7 +628,16 @@ Data::Orbitals* FormattedCheckpoint::makeOrbitals(unsigned const nAlpha,
             orbitalData.label);
       } break;
 
-      case Data::Orbitals::NaturalTransition:
+      case Data::Orbitals::NaturalTransition: {
+         //TODO: create new derived orbitals classes for these
+         Data::CanonicalOrbitals* canonical = 
+            new Data::CanonicalOrbitals(nAlpha, nBeta, *shellList,
+                orbitalData.alphaCoefficients, orbitalData.alphaEnergies, 
+                orbitalData.betaCoefficients,  orbitalData.betaEnergies, orbitalData.label);
+         orbitals = canonical;
+         orbitals->setOrbitalType(Data::Orbitals::NaturalTransition);
+      } break;
+
       case Data::Orbitals::NaturalBond: {
 
          //TODO: create new derived orbitals classes for these
@@ -637,6 +646,7 @@ Data::Orbitals* FormattedCheckpoint::makeOrbitals(unsigned const nAlpha,
                 orbitalData.alphaCoefficients, orbitalData.alphaEnergies, 
                 orbitalData.betaCoefficients,  orbitalData.betaEnergies, orbitalData.label);
          orbitals = canonical;
+         orbitals->setOrbitalType(Data::Orbitals::NaturalBond);
 
 //       qDebug() << "Add one NTO(3)/NBO(4). Code = " << mos->orbitalType();
 //       surfaceTag = QString(moData.stateTag);
