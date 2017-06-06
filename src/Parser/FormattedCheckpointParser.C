@@ -362,7 +362,6 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
             shellData, *geometry));   // returns 0 if no alpha coefficients exist
          if (ntos) {
             orbitalsList->append(ntos);
-            qDebug() << "Append one NTO to MO lists";
          }
          clear(ntoData);
 
@@ -370,7 +369,6 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
             shellData, *geometry));   // returns 0 if no alpha coefficients exist
          if (nbos) {
             orbitalsList->append(nbos);
-	        qDebug() << "Append one NBO to MO lists";
          }
          clear(nboData);
 
@@ -526,7 +524,6 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
 
 void FormattedCheckpoint::clear(OrbitalData& orbitalData)
 {
-   orbitalData.orbitalType = Data::Orbitals::Undefined;
    orbitalData.label.clear();
    orbitalData.alphaCoefficients.clear();
    orbitalData.betaCoefficients.clear();
