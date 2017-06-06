@@ -65,8 +65,11 @@ bool CanonicalOrbitals::consistent() const
 {
    bool ok(Orbitals::consistent());
 
-   ok = ok && m_alphaEnergies.size() == (int)m_nOrbitals;
-   if (!m_restricted) ok = ok && m_betaEnergies.size() == (int)m_nOrbitals;
+   //TODO: remove when NTOs/NBOs properly subclassed.
+   if (orbitalType() == Orbitals::Canonical) {
+      ok = ok && m_alphaEnergies.size() == (int)m_nOrbitals;
+      if (!m_restricted) ok = ok && m_betaEnergies.size() == (int)m_nOrbitals;
+   }
       
    return ok; 
 }
