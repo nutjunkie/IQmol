@@ -157,6 +157,7 @@ void InputDialog::setQChemJobInfo(IQmol::Process::QChemJobInfo const& jobInfo)
       m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::Coordinates));
    m_currentJob->setCoordinatesFsm(
       m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::CoordinatesFsm));
+
    m_currentJob->setEfpFragments(
       m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::EfpFragments));
    m_currentJob->setConstraints(
@@ -167,6 +168,37 @@ void InputDialog::setQChemJobInfo(IQmol::Process::QChemJobInfo const& jobInfo)
       m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::EfpParameters));
    m_currentJob->setExternalCharges(
       m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::ExternalCharges));
+
+   // Solvent sections
+   QString solvent("CavityRadius    <float>\n"
+                   "Dialectic       78.39\n"
+                   "MultipoleOrder  15\n");
+   m_currentJob->setGenericSection("solvent", solvent);
+
+   QString pcm("Theory  CPCM\n"
+               "Method  SWIG\n"
+               "Radii   BONDI\n");
+   m_currentJob->setGenericSection("pcm", pcm);
+
+   QString svp("RHOISO=0.001, DIELST=78.36, NPTLEB=1202,\n"
+               " ITRNGR=2, IROTGR=2, IPNRF=1, IDEFESR=1\n");
+   m_currentJob->setGenericSection("svp", svp);
+
+   QString pcm_nonels("A         -0.006736\n"
+                      "B          0.032698\n"
+                      "C      -1249.6 \n"
+                      "D        -21.405\n"
+                      "Delt a     7.0\n"
+                      "Gamma      3.7\n"
+                      "SolvRho    0.05\n"
+                      "GauLag_N  40\n");
+   m_currentJob->setGenericSection("pcm_nonels", pcm_nonels);
+
+   QString smx("water");
+   m_currentJob->setGenericSection("smx", smx);
+   
+   QString chemsol("EField   1");
+   m_currentJob->setGenericSection("chemsol", chemsol);
 
    if (m_qchemJobInfo.efpOnlyJob()) {
       m_ui.basis->setEnabled(false);

@@ -200,6 +200,13 @@ void Job::setExternalCharges(QString const& charges)
 }
 
 
+void Job::setGenericSection(QString const& name, QString const& contents)
+{
+   KeywordSection* section = addSection(name, contents);
+   section->print(false);
+}
+
+
 void Job::setMolecule(Molecule* mol) 
 {
    if (m_moleculeSection) m_moleculeSection->setMolecule(mol);
@@ -211,7 +218,7 @@ void Job::setOption(QString const& name, QString const& value)
    if (m_remSection) {
       m_remSection->setOption(name, value);
       if (name.toUpper() == "JOB_TYPE" && m_moleculeSection) {
-         m_moleculeSection->setFsm(value.toLower().contains("force"));
+         m_moleculeSection->setFsm(value.toLower().contains("freezing string"));
       }
    }
 }
