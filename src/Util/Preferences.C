@@ -249,11 +249,7 @@ QString QChemDatabaseFilePath()
 
    if (value.isNull() || value.toString().isEmpty()) {
       QDir dir;
-#if defined(Q_OS_MAC)
-      dir.setPath(QApplication::applicationDirPath());
-      dir.cdUp();
-      dir.cd("Resources");
-#elif defined(Q_OS_WIN32)
+#if defined(Q_OS_MAC) || defined(Q_OS_WIN32)
       dir.setPath(QApplication::applicationDirPath());
       dir.cdUp();
       dir.cd("share");

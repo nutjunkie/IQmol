@@ -183,6 +183,7 @@ bool QChemOutput::parse(TextStream& textStream)
             // Remove the input geometry list
             Data::Bank& bank(parser.data());
             bank.deleteData<Data::GeometryList>();
+            bank.deleteData<Data::Geometry>();
             m_dataBank.merge(bank);
          }else {
             m_errors << parser.errors();

@@ -46,12 +46,18 @@ GeometryList::GeometryList(Data::GeometryList& geometryList)
    m_allowModifications(false)
 {
    setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+   setProperty(RemoveWhenChildless);
    m_defaultIndex = m_geometryList.defaultIndex();
 
    Data::GeometryList::const_iterator iter;
    for (iter = m_geometryList.begin(); iter != m_geometryList.end(); ++iter) {
        Data::Geometry* geometry(const_cast<Data::Geometry*>(*iter));
-       if (geometry) appendRow(new Layer::Geometry(*geometry));
+       if (geometry) {
+          Layer::Geometry* layer(new Layer::Geometry(*geometry));
+          appendRow(layer);
+          QAction* remove(layer->newAction("Remove"));
+          connect(remove, SIGNAL(triggered()), this, SLOT(removeGeometry()));
+       }
    }
 
    // This logic may not be correct.  We assume we only want a configurator if
@@ -63,7 +69,6 @@ GeometryList::GeometryList(Data::GeometryList& geometryList)
       m_allowModifications = true;
    }else {
       m_configurator = new Configurator::GeometryList(*this);
-      m_configurator->load();
       setConfigurator(m_configurator);
    }
 }
@@ -280,6 +285,7 @@ void GeometryList::configure()
    if (m_geometryList.size() > 1) {
       resetGeometry();
       if (m_configurator) {
+         m_configurator->load();
          m_configurator->reset();
          m_configurator->display();
       }

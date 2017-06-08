@@ -345,6 +345,14 @@ void InputDialog::initializeQuiLogic()
       )
    );
 
+   s = "Freezing String";
+   job_type.addRule(
+      If(job_type == s,
+         RemovePages(m_ui.toolBoxOptions, pages)
+          + AddPage(m_ui.toolBoxOptions, m_toolBoxOptions.value(s), s)
+      )
+   );
+
    s = "Reaction Path";
    job_type.addRule(
       If(job_type == s,
@@ -1252,9 +1260,11 @@ void InputDialog::initializeQuiLogic()
       )
    );*/
 
+
+/*
    // Advanced -> Solvation - this keeps solvation setup while the preview text is tainted
-   node = &reg.get("SOLVENT_METHOD");
    //QString solvent_method(node->getValue().toUpper());
+   node = &reg.get("SOLVENT_METHOD");
    node->addRule(If(*node == "PCM", reg.get("QUI_SOLVENT_PCM").shouldBe(QtTrue)));
    node->addRule(If(*node == "COSMO", reg.get("QUI_SOLVENT_COSMO").shouldBe(QtTrue)));
    node->addRule(If(*node == "ONSAGER", reg.get("QUI_SOLVENT_ONSAGER").shouldBe(QtTrue)));
@@ -1341,10 +1351,57 @@ void InputDialog::initializeQuiLogic()
 
    cosmo->addRule(rule);
    onsager->addRule(rule);
+*/
 
 
 
    // Section logic ----------------------------------------------------------
+
+   node = &reg.get("SOLVENT_METHOD");
+   node->addRule(
+      If(*node == S("ONSAGER") || *node == S("PCM") || *node == S("COSMO"), 
+         boost::bind(&InputDialog::printSection, this, "solvent", true),
+         boost::bind(&InputDialog::printSection, this, "solvent", false)
+      )
+   );
+   node->addRule(
+      If(*node == S("PCM"), 
+         boost::bind(&InputDialog::printSection, this, "pcm", true),
+         boost::bind(&InputDialog::printSection, this, "pcm", false)
+      )
+   );
+   node->addRule(
+      If(*node == S("ISOSVP"), 
+         boost::bind(&InputDialog::printSection, this, "pcm_nonels", true),
+         boost::bind(&InputDialog::printSection, this, "pcm_nonels", false)
+      )
+   );
+   node->addRule(
+      If(*node == S("ISOSVP"), 
+         boost::bind(&InputDialog::printSection, this, "svp", true),
+         boost::bind(&InputDialog::printSection, this, "svp", false)
+      )
+   );
+   node->addRule(
+      If(*node == S("SM8") || *node == S("SM12") || *node == S("SMD"), 
+         boost::bind(&InputDialog::printSection, this, "smx", true),
+         boost::bind(&InputDialog::printSection, this, "smx", false)
+      )
+   );
+   node->addRule(
+      If(*node == S("CHEM_SOL"),
+         boost::bind(&InputDialog::printSection, this, "chemsol", true),
+         boost::bind(&InputDialog::printSection, this, "chemsol", false)
+      )
+   );
+
+
+
+
+
+
+
+
    node = &reg.get("QUI_TITLE");
    node->addRule(
       If(*node == S(""), 
