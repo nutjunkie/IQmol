@@ -73,6 +73,7 @@ GeometryList::~GeometryList()
 void GeometryList::load()
 {
    QTableWidget* table(m_configurator.energyTable);
+   table->clearContents();
    QList<Layer::Geometry*> 
       geometries(m_geometryList.findLayers<Layer::Geometry>(Layer::Children));
    table->setRowCount(geometries.size());

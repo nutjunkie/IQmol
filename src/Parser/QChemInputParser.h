@@ -41,6 +41,7 @@ namespace Parser {
          void readExternalChargesSection(TextStream&);
          void readEfpParamsSection(TextStream&);
          void readMoleculeSection(TextStream&);
+         void parseGeometry(QStringList const& lines, int offset, bool zmat);
 
          Data::GeometryList* m_geometryList;
    };

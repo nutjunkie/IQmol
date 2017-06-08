@@ -124,6 +124,8 @@ void QChemInput::readMoleculeSection(TextStream& textStream)
 
    // Second line could be a 'read' token or the first atom
    line = textStream.nextLine();
+   // offset is passed to the CartesianCoordinates parser to give
+   // an accurate line number if an error occurs.
    int offset(textStream.lineNumber()-1);
 
    if (line.isEmpty()) {
@@ -195,12 +197,26 @@ void QChemInput::readMoleculeSection(TextStream& textStream)
 
    QStringList lines;
    while (!textStream.atEnd() && !line.contains("$end", Qt::CaseInsensitive)) {
-      lines.append(line); 
+      // Account for the possibility of a FSM job, which has two geometries
+      // separated by the **** token.
+      if (line.contains("****")) {
+         parseGeometry(lines, offset, zmat);
+         offset = textStream.lineNumber();
+         lines.clear();
+      }else {
+         lines.append(line); 
+      }
       line = textStream.nextLine();
    }
    
+   parseGeometry(lines, offset, zmat);
+}
+
+
+void QChemInput::parseGeometry(QStringList const& lines, int offset, bool zmat)
+{
    Data::Geometry* geom(0);
-   line = lines.join("\n");
+   QString line(lines.join("\n"));
 
    if (zmat) {
      ZMatrixCoordinates parser;
@@ -221,7 +237,6 @@ void QChemInput::readMoleculeSection(TextStream& textStream)
         m_errors.append(parser.error());
       }
    }
-
 }
 
  
