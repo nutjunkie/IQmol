@@ -170,9 +170,7 @@ void InputDialog::setQChemJobInfo(IQmol::Process::QChemJobInfo const& jobInfo)
       m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::ExternalCharges));
 
    // Solvent sections
-   QString solvent("CavityRadius    <float>\n"
-                   "Dialectic       78.39\n"
-                   "MultipoleOrder  15\n");
+   QString solvent("Dielectic       78.39\n");
    m_currentJob->setGenericSection("solvent", solvent);
 
    QString pcm("Theory  CPCM\n"
