@@ -48,6 +48,7 @@ QString SurfaceType::toString() const
       case Geminal:                label = "Geminal";                 break;
       case Correlation:            label = "Correlated Density";      break;
       case CustomDensity:          label = "Custom Density";          break;
+      case BasisFunction:          label = "Basis Function";          break;
    }
 
    if (isIndexed()) label += " " + QString::number(m_index);
@@ -64,12 +65,11 @@ bool SurfaceType::operator==(SurfaceType const& that) const
 }
 
 
-
-
 bool SurfaceType::isIndexed() const
 {
-   return (m_kind == AlphaOrbital || m_kind == BetaOrbital || 
-           m_kind == Geminal      || m_kind == Correlation);
+   return (m_kind == AlphaOrbital   || m_kind == BetaOrbital  || 
+           m_kind == Geminal        || m_kind == Correlation) ||
+           m_kind == BasisFunction;
 }
 
 
@@ -78,6 +78,11 @@ bool SurfaceType::isOrbital() const
    return (m_kind == AlphaOrbital) || (m_kind == BetaOrbital);
 }
 
+
+bool SurfaceType::isBasis() const
+{
+   return (m_kind == BasisFunction);
+}
 
 bool SurfaceType::isDensity() const
 {
@@ -98,9 +103,10 @@ bool SurfaceType::isRegularDensity() const
 
 bool SurfaceType::isSigned() const
 {
-   return (m_kind == AlphaOrbital) || (m_kind == BetaOrbital) ||
+   return (m_kind == AlphaOrbital) || (m_kind == BetaOrbital)  ||
           (m_kind == SpinDensity)  || (m_kind == DensityCombo) ||
-          (m_kind == Geminal)      || (m_kind == Correlation);
+          (m_kind == Geminal)      || (m_kind == Correlation)  ||
+          (m_kind == BasisFunction);
 }
 
 

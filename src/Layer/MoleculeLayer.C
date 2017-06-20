@@ -48,7 +48,6 @@
 #include "GeometryListLayer.h"
 #include "GroupLayer.h"
 #include "MoleculeLayer.h"
-#include "MolecularOrbitalsLayer.h"
 #include "OrbitalsLayer.h"
 #include "SurfaceLayer.h"
 
@@ -212,7 +211,6 @@ void Molecule::appendData(Layer::List& list)
    CubeData*     cubeData(0);
    Orbitals*     orbitals(0);
    EfpFragments* efpFragments(0);
-   MolecularOrbitals* molecularOrbitals(0);
 
    QString text;
    PrimitiveList primitiveList;
@@ -232,9 +230,6 @@ void Molecule::appendData(Layer::List& list)
               files->removeLayer(*file);
               m_fileList.appendLayer(*file);
           }
-
-       }else if ((molecularOrbitals = qobject_cast<MolecularOrbitals*>(*iter))) {
-          m_molecularSurfaces.appendLayer(molecularOrbitals);
 
        }else if ((orbitals = qobject_cast<Orbitals*>(*iter))) {
           m_molecularSurfaces.appendLayer(orbitals);

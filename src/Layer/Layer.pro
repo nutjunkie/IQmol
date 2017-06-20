@@ -32,7 +32,6 @@ SOURCES = \
    $$PWD/Layer.C \
    $$PWD/LayerFactory.C \
    $$PWD/MoleculeLayer.C \
-   $$PWD/MolecularOrbitalsLayer.C \
    $$PWD/MolecularSurfacesLayer.C \
    $$PWD/NmrLayer.C \
    $$PWD/OrbitalsLayer.C \
@@ -68,7 +67,6 @@ HEADERS = \
    $$PWD/Layer.h \
    $$PWD/LayerFactory.h \
    $$PWD/MoleculeLayer.h \
-   $$PWD/MolecularOrbitalsLayer.h \
    $$PWD/MolecularSurfacesLayer.h \
    $$PWD/NmrLayer.h \
    $$PWD/OrbitalsLayer.h \

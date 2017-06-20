@@ -41,8 +41,7 @@
 #include "NmrReference.h"
 #include "NmrReferenceLibrary.h"
 #include "MultipoleExpansion.h"
-#include "MolecularOrbitals.h"
-#include "MolecularOrbitalsList.h"
+#include "OrbitalsList.h"
 #include "PointCharge.h"
 #include "PovRay.h"
 #include "YamlNode.h"
@@ -100,15 +99,15 @@ Base* Factory::create(Type::ID const id)
       case Type::VibrationalMode:         data = new VibrationalMode();         break;
       case Type::Frequencies:             data = new Frequencies();             break;
       case Type::VibrationalModeList:     data = new VibrationalModeList();     break;
-      case Type::MolecularOrbitals:       data = new MolecularOrbitals();       break;
-      case Type::MolecularOrbitalsList:   data = new MolecularOrbitalsList();   break;
       case Type::Energy:                  data = new Energy();                  break;
+      case Type::Orbitals:                data = new Orbitals();                break;
+      case Type::OrbitalsList:            data = new OrbitalsList();                break;
 
       // ---------- Atomic Properties ---------
       case Type::AtomicSymbol:            data = new AtomicSymbol();            break;
       case Type::AtomicNumber:            data = new AtomicNumber();            break;
       case Type::AtomColor:               data = new AtomColor();               break;
-      case Type::NmrShielding:            data = new NmrShielding();             break;
+      case Type::NmrShielding:            data = new NmrShielding();            break;
       case Type::NmrShift:                data = new NmrShift();                break;
       case Type::Mass:                    data = new Mass();                    break;
       case Type::AtomicCharge:            data = new AtomicCharge();            break;

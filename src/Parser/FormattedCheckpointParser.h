@@ -85,30 +85,6 @@ namespace Parser {
             OrbitalData const&, ShellData const&, Data::Geometry const&,
             Data::DensityList densities = Data::DensityList()); 
 
-
-// DEPRECATE
-/*
-         struct MoData {
-            QString  label;
-            unsigned nAlpha;
-            unsigned nBeta;
-            unsigned nBasis;
-            QList<double> alphaCoefficients;
-            QList<double> betaCoefficients;
-            QList<double> alphaEnergies;
-            QList<double> betaEnergies;
-	    
-            int stateNumber;
-            QString stateTag;
-            Data::Orbitals::OrbitalType orbitalType;
-         };
-
-         void clear(MoData&);
-         Data::MolecularOrbitals* makeMolecularOrbitals(unsigned const nAlpha, 
-            unsigned const nBeta, MoData const&, ShellData const&, Data::Geometry const&);
-*/
-// END DEPRECATE
-
          struct GmoData {
             QList<double> alphaCoefficients;
             QList<double> betaCoefficients;

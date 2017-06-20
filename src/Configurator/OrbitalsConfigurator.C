@@ -42,9 +42,10 @@ Orbitals::Orbitals(Layer::Orbitals& orbitals)
       m_configurator.orbitalRangeMax, SLOT(setCurrentIndex(int)));
 
    m_configurator.surfaceType->clear();
+   m_configurator.surfaceType->addItem("Basis Function", Data::SurfaceType::BasisFunction);
    m_configurator.surfaceType->addItem("Alpha Orbital", Data::SurfaceType::AlphaOrbital);
    m_configurator.surfaceType->addItem("Beta Orbital",  Data::SurfaceType::BetaOrbital);
-   m_configurator.surfaceType->setCurrentIndex(0);
+   m_configurator.surfaceType->setCurrentIndex(1);
 
    //if (m_orbitals.moTypeID() == Data::moType::NTOs)
    //{
@@ -320,17 +321,21 @@ void Orbitals::on_surfaceType_currentIndexChanged(int index)
    QVariant qvar(m_configurator.surfaceType->itemData(index));
 
    switch (qvar.toUInt()) {
+      case Data::SurfaceType::BasisFunction:
+         enableOrbitalSelection(true);
+         enableNegativeColor(true);
+         updateBasisRange();
+         break;
+
       case Data::SurfaceType::AlphaOrbital:
          enableOrbitalSelection(true);
          enableNegativeColor(true);
-         //updateOrbitalRange(m_nAlpha);
          updateOrbitalRange(m_AlphaHOMO);
          break;
 
       case Data::SurfaceType::BetaOrbital:
          enableOrbitalSelection(true);
          enableNegativeColor(true);
-         //updateOrbitalRange(m_nBeta);
          updateOrbitalRange(m_BetaHOMO);
          break;
 
@@ -436,6 +441,17 @@ void Orbitals::on_addToQueueButton_clicked(bool)
 
    switch (qvar.toUInt()) {
 
+      case Data::SurfaceType::BasisFunction: {
+         info.type().setKind(Data::SurfaceType::BasisFunction);
+         int fn1(m_configurator.orbitalRangeMin->currentIndex()+1);
+         int fn2(m_configurator.orbitalRangeMax->currentIndex()+1);
+
+         for (int i = std::min(fn1,fn2); i <= std::max(fn1, fn2); ++i) {
+             info.type().setIndex(i);
+             queueSurface(info);
+         }
+      } break;
+
       case Data::SurfaceType::AlphaOrbital: {
          info.type().setKind(Data::SurfaceType::AlphaOrbital);
          int orb1(m_configurator.orbitalRangeMin->currentIndex()+1);
@@ -507,19 +523,31 @@ void Orbitals::enableNegativeColor(bool tf)
 
 void Orbitals::updateOrbitalRange(int nElectrons) 
 {
+   m_configurator.orbitalLabel->setText("Orbital(s):");
+
    int index;
    QComboBox* combo;
 
    combo = m_configurator.orbitalRangeMin;
    index = combo->currentIndex();
    updateOrbitalRange(nElectrons, combo);
-   if (index < 0 || index >= (int)m_nOrbitals) index = nElectrons-1;
+   if (nElectrons == 0 ) {
+      index = 0;
+   }else {
+      if (index < 0 || index >= (int)m_nOrbitals) index = nElectrons-1;
+   }
+
    combo->setCurrentIndex(index);
 
    combo = m_configurator.orbitalRangeMax;
    index = combo->currentIndex();
    updateOrbitalRange(nElectrons, combo);
-   if (index < 0 || index >= (int)m_nOrbitals) index = nElectrons;
+    if (nElectrons == 0 ) {
+      index = 0;
+   }else {
+      if (index < 0 || index >= (int)m_nOrbitals) index = nElectrons;
+   }
+
    combo->setCurrentIndex(index);
 }
 
@@ -531,8 +559,37 @@ void Orbitals::updateOrbitalRange(int nElectrons, QComboBox* combo)
        combo->addItem(QString::number(i));
    }
    
-   combo->setItemText(nElectrons-1, QString::number(nElectrons) + " (HOMO)");
-   combo->setItemText(nElectrons,   QString::number(nElectrons+1) + " (LUMO)");
+   if (nElectrons > 0) {
+      combo->setItemText(nElectrons-1, QString::number(nElectrons) + " (HOMO)");
+      combo->setItemText(nElectrons,   QString::number(nElectrons+1) + " (LUMO)");
+   }
+}
+
+
+
+void Orbitals::updateBasisRange() 
+{
+   m_configurator.orbitalLabel->setText("Function(s):");
+   Data::ShellList& shellList(m_orbitals.m_orbitals.shellList());
+
+   QComboBox* comboMin(m_configurator.orbitalRangeMin);
+   QComboBox* comboMax(m_configurator.orbitalRangeMax);
+
+   comboMin->clear();
+   comboMax->clear();
+
+   for (unsigned i = 0; i < shellList.size(); ++i) {
+       Data::Shell* shell(shellList[i]);
+       QString label(QString::number(shell->atomIndex()+1));
+       label += " : ";
+
+       for (unsigned j = 0; j < shell->nBasis(); ++j) {
+           comboMin->addItem(label+ shell->label(j));
+           comboMax->addItem(label+ shell->label(j));
+       }
+   }
+   comboMin->setCurrentIndex(0);
+   comboMin->setCurrentIndex(0);
 }
 
 } } // end namespace IQmol::Configurator

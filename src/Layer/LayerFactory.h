@@ -36,7 +36,6 @@ namespace Data {
    class GeometryList;
    class PointChargeList;
    class EfpFragmentList;
-   class MolecularOrbitalsList;
 }
 
 namespace Layer {
@@ -57,7 +56,6 @@ namespace Layer {
          Layer::List convert(Data::OrbitalsList&);
          Layer::List convert(Data::EfpFragmentList&);
          Layer::List convert(Data::PointChargeList&);
-         Layer::List convert(Data::MolecularOrbitalsList&);
 
          static void destroy();
          explicit Factory(Factory const&) { }

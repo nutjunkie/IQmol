@@ -718,12 +718,12 @@ Data::ShellList* FormattedCheckpoint::makeShellList(ShellData const& shellData,
        QList<double> coefsSP;
 
        unsigned atom(shellData.shellToAtom.at(shell)-1);
-       qglviewer::Vec position(geometry.position(atom));
+       qglviewer::Vec pos(geometry.position(atom));
 
        for (unsigned i = 0; i < shellData.shellPrimitives.at(shell); ++i, ++cnt) {
 		   // Convert exponents from bohr to angstrom.  The conversion factor
 		   // for the coefficients depends on the angular momentum and the 
-           // conversion is effectively done Shell constructor
+           // conversion is effectively done in the  Shell constructor
            expts.append(shellData.exponents.at(cnt)*convExponents);
 
            coefs.append(shellData.contractionCoefficients.at(cnt));
@@ -734,32 +734,32 @@ Data::ShellList* FormattedCheckpoint::makeShellList(ShellData const& shellData,
 
        switch (shellData.shellTypes.at(shell)) {
           case 0:
-             shellList->append( new Data::Shell(Data::Shell::S, position, expts, coefs) );
+             shellList->append( new Data::Shell(Data::Shell::S, atom, pos, expts, coefs) );
              break;
           case -1:
-             shellList->append( new Data::Shell(Data::Shell::S, position, expts, coefs)   );
-             shellList->append( new Data::Shell(Data::Shell::P, position, expts, coefsSP) );
+             shellList->append( new Data::Shell(Data::Shell::S, atom, pos, expts, coefs) );
+             shellList->append( new Data::Shell(Data::Shell::P, atom, pos, expts, coefsSP) );
              break;
           case 1:
-             shellList->append( new Data::Shell(Data::Shell::P, position, expts, coefs) );
+             shellList->append( new Data::Shell(Data::Shell::P, atom, pos, expts, coefs) );
              break;
           case -2:
-             shellList->append( new Data::Shell(Data::Shell::D5, position, expts, coefs) );
+             shellList->append( new Data::Shell(Data::Shell::D5, atom, pos, expts, coefs) );
              break;
           case 2:
-             shellList->append( new Data::Shell(Data::Shell::D6, position, expts, coefs) );
+             shellList->append( new Data::Shell(Data::Shell::D6, atom, pos, expts, coefs) );
              break;
           case -3:
-             shellList->append( new Data::Shell(Data::Shell::F7, position, expts, coefs) );
+             shellList->append( new Data::Shell(Data::Shell::F7, atom, pos, expts, coefs) );
              break;
           case 3:
-             shellList->append( new Data::Shell(Data::Shell::F10, position, expts, coefs) );
+             shellList->append( new Data::Shell(Data::Shell::F10, atom, pos, expts, coefs) );
              break;
           case -4:
-             shellList->append( new Data::Shell(Data::Shell::G9, position, expts, coefs) );
+             shellList->append( new Data::Shell(Data::Shell::G9, atom, pos, expts, coefs) );
              break;
           case 4:
-             shellList->append( new Data::Shell(Data::Shell::G15, position, expts, coefs) );
+             shellList->append( new Data::Shell(Data::Shell::G15, atom, pos, expts, coefs) );
              break;
 
           default:
@@ -770,7 +770,6 @@ Data::ShellList* FormattedCheckpoint::makeShellList(ShellData const& shellData,
              m_errors.append(msg);
              return 0;
              break;
-
        }
    }
 

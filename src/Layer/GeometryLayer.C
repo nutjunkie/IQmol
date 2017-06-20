@@ -23,8 +23,6 @@
 #include "GeometryLayer.h"
 #include "DipoleMoment.h"
 #include "AtomicProperty.h"
-#include "MolecularOrbitals.h"
-#include "MolecularOrbitalsLayer.h"
 #include "Geometry.h"
 #include "Energy.h"
 

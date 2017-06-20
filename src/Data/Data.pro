@@ -28,8 +28,6 @@ SOURCES = \
    $$PWD/GridSize.C \
    $$PWD/Hessian.C \
    $$PWD/Mesh.C \
-   $$PWD/MolecularOrbitals.C \
-   $$PWD/MolecularOrbitalsList.C \
    $$PWD/MultipoleExpansion.C \
    $$PWD/NmrData.C \
    $$PWD/NmrReference.C \
@@ -75,8 +73,6 @@ HEADERS = \
    $$PWD/GridSize.h \
    $$PWD/Hessian.h \
    $$PWD/Mesh.h \
-   $$PWD/MolecularOrbitals.h \
-   $$PWD/MolecularOrbitalsList.h \
    $$PWD/MultipoleExpansion.h \
    $$PWD/NmrData.h \
    $$PWD/NmrReference.C \

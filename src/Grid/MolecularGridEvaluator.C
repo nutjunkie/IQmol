@@ -23,6 +23,7 @@
 #include "MolecularGridEvaluator.h"
 #include "DensityEvaluator.h"
 #include "OrbitalEvaluator.h"
+#include "BasisEvaluator.h"
 #include "ShellList.h"
 #include "Density.h"
 #include "QsLog.h"
@@ -78,10 +79,12 @@ void MolecularGridEvaluator::run()
        Data::GridDataList densityGrids;
        Data::GridDataList alphaGrids;
        Data::GridDataList betaGrids;
+       Data::GridDataList basisGrids;
 
        QList<Vector*> densityVectors;
-       QList<int> alphaOrbitals;
-       QList<int> betaOrbitals;
+       QList<int>     alphaOrbitals;
+       QList<int>     betaOrbitals;
+       QList<int>     basisFunctions;
 
        for (iter = m_grids.begin(); iter != m_grids.end(); ++iter) {
            if ((*iter)->size() == *size) {
@@ -99,6 +102,11 @@ void MolecularGridEvaluator::run()
                         break;
                      }
                  }
+         
+              }else if (type.kind() == Data::SurfaceType::BasisFunction) {
+                 found = true;
+                 basisGrids.append(*iter);
+                 basisFunctions.append(type.index()-1);
 
               }else if (type.kind() == Data::SurfaceType::AlphaOrbital) {
                  found = true;
@@ -130,6 +138,32 @@ qDebug() << "Pairing successful" << type.label() << m_densities[i]->label();
                  type.dump();
               }
            }
+       }
+
+       if (!basisFunctions.isEmpty() && !m_terminate) {
+          QString s("Computing basis functions on grid ");
+          s += QString::number(sizeCount);
+          progressLabelText(s);
+
+          QLOG_TRACE() << "MGE: Computing" << basisFunctions.size() << "basis function grids";
+          BasisEvaluator evaluator(basisGrids, m_shellList, basisFunctions);
+
+          progressMaximum(evaluator.totalProgress());
+          progressValue(0);
+          connect(&evaluator, SIGNAL(progress(int)), this, SIGNAL(progressValue(int)));  
+
+          evaluator.start();
+          while (evaluator.isRunning()) {
+             msleep(100);
+             QApplication::processEvents();
+             if (m_terminate) {
+                evaluator.stopWhatYouAreDoing();
+                evaluator.wait();
+             }
+          }
+          
+          QLOG_TRACE() << "Time taken to compute basis function grids:" 
+                       << evaluator.timeTaken();
        }
 
        if (!alphaOrbitals.isEmpty() && !m_terminate) {
