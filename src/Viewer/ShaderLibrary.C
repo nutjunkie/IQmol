@@ -70,10 +70,8 @@ void ShaderLibrary::init()
    QLOG_INFO() << "Vendor   " << QString((char*)vendor);
    QLOG_INFO() << "Renderer " << QString((char*)renderer);
 
-//#ifdef IQMOL_SHADERS
    const GLubyte* shading  = glGetString(GL_SHADING_LANGUAGE_VERSION);
    QLOG_INFO() << "GLSL     " << QString((char*)shading);
-//#endif
 }
 
 
@@ -99,9 +97,7 @@ bool ShaderLibrary::bindShader(QString const& shader)
 {
    bool okay(false);
    if (m_shaders.contains(shader)) {
-//#ifdef IQMOL_SHADERS
       m_glFunctions->glUseProgram(m_shaders.value(shader));
-//#endif
       m_currentShader = shader;
       okay = true;
    }
@@ -161,7 +157,6 @@ void ShaderLibrary::loadShaders()
    defaultParameters.insert("Highlights", QVariant(0.5));
    setUniformVariables(NoShader, defaultParameters);
 
-//#ifdef IQMOL_SHADERS
    QDir dir(Preferences::ShaderDirectory());
    if (!dir.exists() || !dir.isReadable()) {
       QLOG_WARN() << "Could not access shader directory: " + dir.path();
@@ -192,7 +187,6 @@ void ShaderLibrary::loadShaders()
           }
        }
    }
-//#endif
 }
 
 
@@ -403,12 +397,16 @@ unsigned ShaderLibrary::loadShader(QString const& path, unsigned const mode)
       m_glFunctions->glCompileShader(shader);
 
       // Check if things compiled okay
-      unsigned buflen(1000);
-      GLsizei msgLength;
-      char msg[buflen];
-      m_glFunctions->glGetShaderInfoLog(shader, buflen, &msgLength, msg);
+      GLint status(0);
+      m_glFunctions->glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
 
-      if (msgLength != 0) {
+      if (status == GL_FALSE) {
+         unsigned buflen(1000);
+         char msg[buflen];
+         GLsizei msgLength;
+
+         m_glFunctions->glGetShaderInfoLog(shader, buflen, &msgLength, msg);
+
          QLOG_WARN() << "Failed to compile shader " << path;
          QLOG_WARN() << QString(msg);
          m_glFunctions->glDeleteShader(shader);  // required?
