@@ -22,7 +22,7 @@
 
 #include "DipoleLayer.h"
 #include "MoleculeLayer.h"
-#include "IQmol.h"
+#include "Preferences.h"
 #include <cmath>
 
 #include <QDebug>
@@ -35,7 +35,7 @@ namespace Layer {
 
 Dipole::Dipole(qglviewer::Vec const& dipoleMoment) : GLObject("Dipole"), 
    m_color(Qt::cyan), m_scale(0.25), m_configurator(*this), m_dipoleMoment(dipoleMoment), 
-   m_sceneRadius(DefaultSceneRadius)
+   m_sceneRadius(Preferences::DefaultSceneRadius())
 {
    setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable);
    setCheckState(Qt::Unchecked);
@@ -65,7 +65,7 @@ void Dipole::setMolecule(Molecule* molecule)
 
 void Dipole::setRadius(double const radius) 
 { 
-   m_sceneRadius = std::max(radius, DefaultSceneRadius);
+   m_sceneRadius = std::max(radius, Preferences::DefaultSceneRadius());
 }
 
 

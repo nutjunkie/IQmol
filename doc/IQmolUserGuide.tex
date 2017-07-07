@@ -1,9 +1,32 @@
 \documentclass[a4paper,12pt]{article}
 
-\usepackage{epsf,psfrag,graphicx}
+\usepackage{epsf,psfrag,graphicx,color}
 \usepackage{hyperref,amssymb}
 \usepackage{verbatim}
 \usepackage{fancybox}
+\usepackage{tcolorbox}
+
+\newcommand{\mybox}[1]{\fcolorbox{black}{blue}{\parbox{\textwidth}{\color{white}#1%
+}}}
+
+\definecolor{mycolor}{rgb}{0.122, 0.435, 0.698}% Rule colour
+\makeatletter
+\newcommand{\myboxx}[1]{%
+  \setbox0=\hbox{#1}%
+  \setlength{\@tempdima}{\dimexpr\wd0+13pt}%
+  \begin{tcolorbox}[colframe=mycolor,boxrule=0.5pt,arc=4pt,
+      left=6pt,right=6pt,top=6pt,bottom=6pt,boxsep=0pt,width=\@tempdima]
+    #1
+  \end{tcolorbox}
+}
+\makeatother
+
+\definecolor{bt}{rgb}{0.23, 0.55, 0.96}
+
+\newtcbox{\myovalbox}{colback=bt,%
+  fontupper=\footnotesize\sffamily\color{white},%
+  boxrule=0pt,arc=5pt,%
+  boxsep=2pt,left=3pt,right=3pt,top=3pt,bottom=3pt}%
 
 \newcommand{\qchem}{\href{http://q-chem.com}{{\scshape Q-Chem}}}
 \newcommand{\iqmol}{\href{http://iqmol.org}{{\scshape IQmol}}}
@@ -41,6 +64,8 @@
 \setlength{\parindent}{0cm}
 \setlength{\parskip}{1em}
 \setlength{\unitlength}{1mm}
+\usepackage{chngcntr}
+\counterwithin{figure}{section}
 
 %\pagestyle{empty}
 
@@ -95,7 +120,7 @@ atomic charges, dipole moments and normal modes.  Several surface types can be
 displayed including molecular orbitals, (spin) densities and van der Waals
 surfaces. These surfaces can be colored according to an arbitrary scalar field,
 such as the electrostatic potential.  Animations are also available for
-vibrational frequencies and reaction and optimization pathways.
+vibrational frequencies, and reaction and optimization pathways.
 
 \iqmol{} can operate as a stand-alone package, but has also been written to
 work seamlessly with the \qchem{} (\url{http://www.q-chem.com}) computational
@@ -127,20 +152,26 @@ For Windows an installer is provided that will guide you through the
 installation process and will also create a shortcut to the application on your
 desktop.
 
-For Linux .deb and .rpm packages are available that can be installed using dpkg
-or yum.  For example:\\
+For Linux .deb and .rpm packages are now available that can be installed using
+either dpkg or yum:
+
 \hspace*{2em}{\tt \#>  sudo dpkg -i iqmol\_2.9.0.deb}\\
-\hspace*{2em}{\tt \#> sudo apt-get install -f }\\
-The second command is required to resolve the dependencies.
+\hspace*{2em}{\tt \#> sudo apt-get install -f }
+
+The second command is required to resolve the dependency on the Qt libraries,
+which you may not have installed.
+
+\hspace*{2em}{\tt \#>  sudo yum install iqmol-2.9.9-2.x86\_64.rpm}
+
+Note that in either case you will need root permission.
 
 
-\newpage
 \subsection{Overview}
 \label{sec:overview}
 
 \begin{figure}[ht]
 \begin{center}
-\includegraphics[scale=0.40]{figures/Viewer.png}
+\includegraphics[scale=0.35]{figures/Viewer.png}
 \caption{The main \iqmol{} window.}
 \label{fig:main}
 \end{center}
@@ -171,30 +202,26 @@ in the hierarchy.
 
 The appearance of many objects can be configured by double-clicking the item in
 the MV.  For example, double-clicking the molecule name brings up the Configure
-Molecule dialog:
-\begin{figure}[h]
+Molecule dialog which allows you to change the appearance of the molecular
+structure:
 \begin{center}
-\includegraphics[scale=0.39]{figures/MoleculeConfigurator.png}
-\caption{The Molecule Configurator dialog.}
-\label{fig:config}
+\includegraphics[scale=0.25]{figures/MoleculeConfigurator.png}
 \end{center}
-\end{figure}
-Along with selecting different rendering options (see Fig.~\ref{fig:styles}),
-this dialog also allows several types of surface plot to be generated including
-van der Waals, pro-molecule and superposition of ionic densities (SID).  These
-pseudo density surfaces are available for any molecule draw in \iqmol{}, for
-other surfaces (such as molecular orbitals) see \S\ \ref{sec:mos}.
 Note that several molecules can be viewed concurrently in the same Viewer
-and each of these can be configured separately.  
+and the appearance of each can be configured separately.  
 \begin{figure}[h]
 \begin{center}
-\includegraphics[scale=0.20]{figures/CHF3-tubes.png}\hspace{-15mm}~
-\includegraphics[scale=0.20]{figures/CHF3-moly.png}\hspace{-15mm}~
-\includegraphics[scale=0.20]{figures/CHF3-space.png}
-\caption{Rendering styles for molecular structures: tubes, plastic and space filling.}
+\includegraphics[scale=0.18]{figures/CHF3-balls.png}\hspace{-3mm}~
+\includegraphics[scale=0.20]{figures/CHF3-wire.png}\hspace{-3mm}~
+\includegraphics[scale=0.18]{figures/CHF3-space.png}\hspace{-3mm}~
+\includegraphics[scale=0.18]{figures/CHF3-tubes.png}\hspace{-3mm}~
+\includegraphics[scale=0.18]{figures/CHF3-moly.png}
+\caption{Rendering styles for molecular structures: balls and sticks, wire frame,
+space filling, tubes and plastic.}
 \label{fig:styles}
 \end{center}
 \end{figure}
+
 
 
 %----------------------------------------------------------------------%
@@ -376,6 +403,27 @@ It is also possible to select all, select none and invert the selection via
 the options under the Edit menu.
 
 
+\subsection{Adding Additional Conformers}
+
+For setting up jobs that use the Freezing String Method (FSM), two conformers
+are required corresponding to the initial and final geometries of the string.
+Having built the first geometry, a second geometry can be added to the molecule
+by right-clicking the molecule name in the MV.  This brings up a context menu
+with the option `Duplicate Geometry'.  
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.4]{figures/MoleculeContext.png}
+\end{center}
+\end{figure}
+Selecting this menu option creates a Geometries item in the MV with two
+(identical) geometries.  The second of these can be modified by selecting it in
+the MV and manipulating selected atoms in the viewer using the \emph{ctrl}
+(\emph{command} on Mac) modifier key.  If `Freezing String' is chosen for the Calculate
+option in the QUI (see the next section) then both geometries will be included
+in the \$molecule section of the input deck, separated by ****.
+
+
+
 
 
 %----------------------------------------------------------------------%
@@ -476,9 +524,10 @@ be considered:
 \end{itemize}
 
 
-\newpage
 %----------------------------------------------------------------------%
+\newpage
 \section{Analyzing Results}
+\label{sec:anal}
 %----------------------------------------------------------------------%
 
 \iqmol{} reads in a wide variety of file types and allows the user to visualize
@@ -502,13 +551,30 @@ MV.  The notes.txt file will be ignored as it has a different base name.}
 \end{figure}
 
 
+\subsection{Molecular Surfaces}
+
+Several molecular surfaces can be generated without first performing a quantum
+chemical calculation. These include: van der Waals, pro-molecule and
+superposition of ionic densities (SID).  The SID surface is similar to the
+pro-molecule surface except that it scales the densities based on the atomic
+charges of the atoms and may provide a more accurate representation of the
+density of charged systems.
+
+To plot one of these pseudo-density surfaces, double-click the `Surfaces'
+item in the MV associated with the molecule.
+
+
+
+
 \subsection{Plotting Molecular Orbitals From a Checkpoint File}
+
 \label{sec:mos}
 Plotting molecular orbitals (MOs) requires a formatted checkpoint file (.fchk
 file extension) which is generated by default when running \qchem{}
 calculations from \iqmol{} (GUI rem variable should be set to 2).  After
-opening the fchk file, a MO Surfaces item will be available in the MV,
-double-clicking this brings up the Add Surface dialog:
+opening the fchk file, a `Canonical Orbitals' item will appear in the MV under
+the Surfaces item.
+Double-clicking this brings up the Add Surface dialog:
 \begin{figure}[h]
 \begin{center}
 \includegraphics[scale=0.25]{figures/MolecularOrbitalsConfigurator.png}
@@ -522,7 +588,7 @@ double-clicking this brings up the Add Surface dialog:
 
 The Add Surface dialog allows MOs, total densities, and spin densities  to be
 computed.  Several surfaces can be queued and computed at the same time, which
-is more efficient as the shell data only needs to be computed once.  The
+is more efficient as the shell data only need to be computed once.  The
 quality, colors and opacity of the surfaces can be be set in the dialog, and
 changes to these settings are saved to the preferences as default values for
 any subsequent surfaces generated.
@@ -532,8 +598,8 @@ number of grid points as the previous one, and will therefore take roughly four
 times as long to compute.  Also note that densities require evaluating
 shell-pair values and are significantly more expensive to compute that MOs,
 which only require shell values.  For most purposes, the pseudo densities (such
-as the pro-molecule density) available via the Molecule Configurator dialog will
-provide an almost identical density surface at a much cheaper cost.
+as the pro-molecule density) available by double-clicking the Surfaces item
+provide an almost identical density surface, but at a much cheaper cost.
 
 \begin{figure}[h]
 \begin{center}
@@ -552,6 +618,24 @@ scroll wheel (or equivalent) on the mouse.  The scale can also be translated by
 a left click-and-drag.  Individual orbitals can be selected with a left-click
 and this will cause the energy of the selected orbital to appear below the
 diagram, as shown in Fig.~\ref{fig:addsurface}.
+
+
+\subsection{Other Orbitals and Densities}
+
+Orbitals and densities other than those based on the canonical orbitals can
+also be visualized, if the appropriate calculation has been performed.  Localized
+orbitals, natural transition orbitals, natural bond orbitals and
+attachment/detachment densities are all possible.
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.25]{figures/LocalizedBonds.png}
+\caption{Localised $\sigma$-bonding orbitals in ethene.}
+\label{fig:mo}
+\end{center}
+\end{figure}
+
+
 
 
 \subsection{Exporting Cube File Data}
@@ -579,7 +663,6 @@ recompute the data, or for reading into another plotting package.  This is
 described in the following section.
 
 
-\newpage
 \subsection{Visualizing Cube File Data}
 
 Cube files contain volumetric data such as electron densities, molecular
@@ -625,6 +708,45 @@ The gradient colors can be altered by clicking inside the gradient box.
 \end{figure}
 
 
+\newpage
+\subsection{Orbital Animations}
+
+Orbital animations can be created \eg{}, for watching the evolution of the
+frontier orbitals during a reaction, or watching the relaxation of an orbital
+during a self-consistent field (SCF) calculation.  Key frames should be saved
+as cube file data in a single directory.  The base name of the cube files needs
+to match the directory name, \eg{}
+
+\begin{center}
+\hspace*{2em}{\tt  relaxation/relaxation.Frame.1.cube}\\
+\hspace*{2em}{\tt  relaxation/relaxation.Frame.2.cube}\\
+\end{center}
+Open the directory, as described in Sec. \ref{sec:anal}, and right-click on the
+first cube file item which appears in the MV, this will allow you to access the 
+Surface Animator dialog:
+\begin{center}
+\includegraphics[scale=0.40]{figures/SurfaceAnimationMenu.png}
+\end{center}
+The dialog is shown in Fig. \ref{fig:SurfaceAnimationDialog} and can be used to
+adjust the key frame order and the settings for the animation, including the
+number of interpolation frames (higher values give smoother results, but take
+longer).  Pressing \Ovalbox{Calculate} generates each frame and individual
+frames can be accessed in the MV.  Use the playback options to run the
+animation, recording it with the
+\includegraphics[scale=0.40]{figures/RecordButton.png} button, if desired.
+
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.20]{figures/AnimationDialog.png}
+\end{center}
+\caption{The surface animation dialog.}
+\label{fig:SurfaceAnimationDialog}
+\end{figure}
+
+
+
+\newpage
 \subsection{Potential Energy Surfaces}
 
 Several calculation types provide information about the potential energy
@@ -670,7 +792,6 @@ The first line gives the number of atoms, the second (comment) line must have
 the corresponding energy and then the following lines have the xyz coordinates
 of each atom in the system.  This pattern repeats for as many frames as you have
 available.
-
 
 
 \subsection{Vibrational Frequencies}
@@ -720,7 +841,6 @@ in the viewer by selecting the Display \bt\ Atom Labels \bt\ NMR option.
 \end{center}
 \end{figure}
 
-\newpage
 An NMR item will appear on in the MV and double-clicking this brings up the NMR
 Spectrum dialog.
 \begin{figure}[h]
@@ -741,8 +861,10 @@ As with the vibrational frequencies spectra, NMR spectra can be exported
 by right-clicking on the image to bring up the context menu.
 
 
+%----------------------------------------------------------------------%
 \newpage
 \section{Appearance}
+%----------------------------------------------------------------------%
 
 \subsection{Viewer Camera}
 
@@ -845,8 +967,10 @@ shader options) may be required depending on if a light or dark background is
 selected for the scene.
 
 
+%----------------------------------------------------------------------%
 \newpage
-\subsection{Sample Images}
+\section{Sample Images}
+%----------------------------------------------------------------------%
 
 Here are some examples of the kinds of images that can be generated using
 \iqmol{}'s shader and rendering options.  Most of these are simply screen
@@ -893,11 +1017,6 @@ running POV-Ray on the \iqmol{} generated scene file.
 %----------------------------------------------------------------------%
 
 \subsection{Reaction Pathways}
-
-\subsection{DMA}
-
-\subsection{Orbital Animations}
-requires cube files
 
 \subsection{Making Movies}
 

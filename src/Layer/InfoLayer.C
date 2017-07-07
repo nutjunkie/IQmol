@@ -24,6 +24,8 @@
 #include "DipoleLayer.h"
 #include "MoleculeLayer.h"
 #include "Numerical.h"
+#include "SymmetryLayer.h"
+#include "StringFormat.h"
 
 
 using namespace qglviewer;
@@ -31,11 +33,13 @@ using namespace qglviewer;
 namespace IQmol {
 namespace Layer {
 
-Info::Info(Molecule* molecule) : m_dipoleEstimated(true), m_configurator(*this)
+Info::Info(Molecule* molecule) : m_dipoleEstimated(true), m_configurator(*this),
+   m_symmetry(m_pointGroup)
 {
    clear();
    setText("Info");
    setMolecule(molecule);
+   //appendLayer(&m_symmetry);
    appendLayer(&m_dipoleLayer);
    setConfigurator(&m_configurator);
 }
@@ -46,8 +50,8 @@ void Info::setMolecule(Molecule* molecule)
    m_molecule = molecule;
 
    if (m_molecule) {
-      connect(m_molecule, SIGNAL(pointGroupAvailable(QString const&)), 
-         this, SLOT(setPointGroup(QString const&)));
+      connect(m_molecule, SIGNAL(pointGroupAvailable(Data::PointGroup const&)), 
+         this, SLOT(setPointGroup(Data::PointGroup const&)));
 
       connect(m_molecule, SIGNAL(energyAvailable(double const, Info::EnergyUnit)), 
          this, SLOT(setEnergy(double const, Info::EnergyUnit)));
@@ -63,6 +67,8 @@ void Info::setMolecule(Molecule* molecule)
 
       connect(m_molecule, SIGNAL(dipoleAvailable(qglviewer::Vec const&, bool const)), 
          this, SLOT(setDipole(qglviewer::Vec const&, bool const)));
+
+      connect(this, SIGNAL(updated()), &m_symmetry, SLOT(update()));
 
       m_dipoleLayer.setMolecule(m_molecule);
    }
@@ -105,7 +111,7 @@ void Info::clear()
    m_formula.clear();
    m_pointGroup.clear();
    setDipoleValid(false);
-   m_suspendUpdate   = false;
+   m_suspendUpdate = false;
 }
 
 
@@ -141,7 +147,6 @@ void Info::removeAtom(Atom const* atom)
    m_nuclearCharge  -= z;
    m_mass           -= m;
    m_formula[s]     -= 1;
-   m_pointGroup      = "";
    m_energy          = 0.0;
    m_pointGroup.clear();
    setDipoleValid(false);
@@ -165,13 +170,13 @@ QString Info::formula() const
    n = m_formula["C"];
    if (n > 0) {
       formula += "C";
-      if (n>1) formula += subscript(QString::number(n));
+      if (n>1) formula += Util::subscript(QString::number(n));
    }
 
    n = m_formula["H"];
    if (n > 0) {
       formula += "H";
-      if (n>1) formula += subscript(QString::number(n));
+      if (n>1) formula += Util::subscript(QString::number(n));
    }
 
    QStringList::iterator iter;
@@ -179,7 +184,7 @@ QString Info::formula() const
        n = m_formula[*iter];
        if (n > 0) {
           formula += *iter;
-          if (n>1) formula += subscript(QString::number(n));
+          if (n>1) formula += Util::subscript(QString::number(n));
        }
    }
 
@@ -271,7 +276,7 @@ void Info::setDipoleValid(bool tf)
 }
 
 
-void Info::setPointGroup(QString const& pointGroup) 
+void Info::setPointGroup(Data::PointGroup const& pointGroup) 
 { 
    m_pointGroup = pointGroup;
    updated();

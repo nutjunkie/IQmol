@@ -23,7 +23,6 @@
 ********************************************************************************/
 
 #include "Data.h"
-#include <QDebug>
 
 
 namespace IQmol {
@@ -34,28 +33,44 @@ namespace Data {
       friend class boost::serialization::access;
 
       public:
+         enum Group { undef = 0,
+            C1, C2,  C3,  C4,  C5,  C6,  C7,  C8, 
+            Cs, C2h, C3h, C4h, C5h, C6h, C7h, C8h,
+                C2v, C3v, C4v, C5v, C6v, C7v, C8v,
+                D2,  D3,  D4,  D5,  D6,  D7,  D8, 
+                D2d, D3d, D4d, D5d, D6d, D7d, D8d,
+                D2h, D3h, D4h, D5h, D6h, D7h, D8h,
+                Ci,       S4,       S6,       S8, 
+                T,   Td,  Th,  O,   Oh,  I,   Ih, 
+                Civ, Dih, MaxPG
+         }; 
+
          Type::ID typeID() const { return Type::PointGroup; }
 
-         PointGroup(QString const& pointGroup = "C1") : m_pointGroup(pointGroup) { }
+         PointGroup(Group group = undef) : m_group(group) { }
+         // Used to initialize from the return value from symmol
+         PointGroup(QString const&);
 
-         void setValue(QString const& pointGroup) { m_pointGroup = pointGroup; }
-         QString value() const { return m_pointGroup; }
+         QString toString() const;  
+         QString toGLString() const;  // sans subscripts
+
+         void clear() { m_group = undef; }
+         void setPointGroup(Group const group) { m_group = group; }
+         void setPointGroup(QString const& pg);
 
          void serialize(InputArchive& ar, unsigned int const version = 0) {
             Q_UNUSED(version);
-            ar & m_pointGroup;
+            ar & m_group;
          }
          void serialize(OutputArchive& ar, unsigned int const version = 0) {
             Q_UNUSED(version);
-            ar & m_pointGroup;
+            ar & m_group;
          }
 
-         void dump() const {
-            qDebug() << "  " << m_pointGroup;
-         }
+         void dump() const;
 
       private:
-         QString m_pointGroup;
+         Group m_group;
    };
 
 } } // end namespace IQmol::Data

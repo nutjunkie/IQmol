@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>285</width>
-    <height>345</height>
+    <height>340</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,7 +22,7 @@
      <property name="title">
       <string>Render</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="1" column="1">
@@ -65,16 +65,18 @@
         </item>
        </layout>
       </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Radii</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_4">
-        <item>
-         <widget class="QLabel" name="label_12">
-          <property name="text">
-           <string>Atom Radius</string>
-          </property>
-         </widget>
-        </item>
-        <item>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="1">
          <widget class="QSlider" name="atomRadiusScale">
           <property name="minimum">
            <number>1</number>
@@ -93,18 +95,7 @@
           </property>
          </widget>
         </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
-        <item>
-         <widget class="QLabel" name="label_13">
-          <property name="text">
-           <string>Bond Radius</string>
-          </property>
-         </widget>
-        </item>
-        <item>
+        <item row="1" column="1">
          <widget class="QSlider" name="bondRadiusScale">
           <property name="minimum">
            <number>1</number>
@@ -123,18 +114,14 @@
           </property>
          </widget>
         </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_7">
-        <item>
+        <item row="2" column="0">
          <widget class="QLabel" name="label_14">
           <property name="text">
-           <string>Charge Radius</string>
+           <string>Charges</string>
           </property>
          </widget>
         </item>
-        <item>
+        <item row="2" column="1">
          <widget class="QSlider" name="chargeRadiusScale">
           <property name="minimum">
            <number>1</number>
@@ -153,38 +140,24 @@
           </property>
          </widget>
         </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_8">
-        <item>
-         <widget class="QCheckBox" name="smallerHydrogens">
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_13">
           <property name="text">
-           <string>Smaller Hydrogen Atoms</string>
+           <string>Bonds</string>
           </property>
          </widget>
         </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_9">
-        <item>
-         <spacer name="horizontalSpacer_4">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QPushButton" name="resetButton">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_12">
           <property name="text">
-           <string>Reset</string>
+           <string>Atoms</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0" colspan="2">
+         <widget class="QCheckBox" name="smallerHydrogens">
+          <property name="text">
+           <string>Smaller Hydrogen Atoms</string>
           </property>
          </widget>
         </item>
@@ -207,6 +180,13 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="resetButton">
+       <property name="text">
+        <string>Reset</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="okButton">

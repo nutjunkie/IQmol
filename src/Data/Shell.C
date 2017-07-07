@@ -35,8 +35,9 @@ double Shell::s_zeroValues[15] = {  };
 double Shell::s_thresh = 0.001;
 
 
-Shell::Shell(AngularMomentum L, Vec const& position, QList<double> const& exponents, 
-   QList<double> const& contractionCoefficients) : m_angularMomentum(L), m_position(position), 
+Shell::Shell(AngularMomentum L, unsigned const atomIndex, Vec const& position, 
+   QList<double> const& exponents, QList<double> const& contractionCoefficients) : 
+   m_angularMomentum(L), m_atomIndex(atomIndex), m_position(position), 
    m_exponents(exponents), m_contractionCoefficients(contractionCoefficients)
 {
    if (m_exponents.size() > m_contractionCoefficients.size()) {
@@ -131,7 +132,7 @@ double Shell::computeSignificantRadius(double const thresh)
 }
 
 
-QString Shell::toString(AngularMomentum const L) const
+QString Shell::toString(AngularMomentum const L)
 {
    QString s;
    switch (L) {
@@ -145,6 +146,108 @@ QString Shell::toString(AngularMomentum const L) const
       case G15:  s = "G15";  break;
    }
    return s;
+}
+
+
+QString Shell::label(unsigned const index) const
+{
+   QString label;
+
+   switch (m_angularMomentum) {
+
+      case S:
+         switch (index) {
+            case 0: label = "s";  break;
+         }
+         break;
+
+      case P:
+         switch (index) {
+            case 0:  label = "px";  break;
+            case 1:  label = "py";  break;
+            case 2:  label = "pz";  break;
+         }
+         break;
+
+      case D5:
+         // 3ZZ-RR  XZ  YZ  XX-YY  XY
+         switch (index) {
+            case 0:  label = QString::fromWCharArray(L"dz\x00B2"); break;
+            case 1:  label = QString::fromWCharArray(L"dxz"); break;
+            case 2:  label = QString::fromWCharArray(L"dyz"); break;
+            case 3:  label = QString::fromWCharArray(L"dx\x00B2-y\x00B2"); break;
+            case 4:  label = QString::fromWCharArray(L"dxy"); break;
+         }
+         break;
+
+      case D6:
+         // XX  YY  ZZ  XY  XZ  YZ
+         switch (index) {
+            case 0:  label = QString::fromWCharArray(L"dx\x00B2"); break;
+            case 1:  label = QString::fromWCharArray(L"dy\x00B2"); break;
+            case 2:  label = QString::fromWCharArray(L"dz\x00B2"); break;
+            case 3:  label = QString::fromWCharArray(L"dxy"); break;
+            case 4:  label = QString::fromWCharArray(L"dxz"); break;
+            case 5:  label = QString::fromWCharArray(L"dyz"); break;
+         }
+         break;
+
+      case F7:
+         // ZZZ-ZRR  XZZ-XRR  YZZ-YRR  XXZ-YYZ  XYZ  XXX-XYY  XXY-YYY
+         switch (index) {
+            case 0:  label = QString::fromWCharArray(L"fz(z\x00B2-r\x00B2)"); break;
+            case 1:  label = QString::fromWCharArray(L"fx(z\x00B2-r\x00B2)"); break;
+            case 2:  label = QString::fromWCharArray(L"fy(z\x00B2-r\x00B2)"); break;
+            case 3:  label = QString::fromWCharArray(L"fz(x\x00B2-y\x00B2)"); break;
+            case 4:  label = QString::fromWCharArray(L"fxyz");                break;
+            case 5:  label = QString::fromWCharArray(L"fx(x\x00B2-y\x00B2)"); break;
+            case 6:  label = QString::fromWCharArray(L"fy(x\x00B2-y\x00B2)"); break;
+         }
+         break;
+
+      case F10:
+         // XXX  YYY  ZZZ  XYY  XXY  XXZ  XZZ  YZZ  YYZ  XYZ
+         switch (index) {
+            case 0:  label = QString::fromWCharArray(L"fx\x00B3");  break;
+            case 1:  label = QString::fromWCharArray(L"fy\x00B3");  break;
+            case 2:  label = QString::fromWCharArray(L"fz\x00B3");  break;
+            case 3:  label = QString::fromWCharArray(L"fxy\x00B2"); break;
+            case 4:  label = QString::fromWCharArray(L"fx\x00B2y"); break;
+            case 5:  label = QString::fromWCharArray(L"fx\x00B2z"); break;
+            case 6:  label = QString::fromWCharArray(L"fxz\x00B2"); break;
+            case 7:  label = QString::fromWCharArray(L"fyz\x00B2"); break;
+            case 8:  label = QString::fromWCharArray(L"fy\x00B2z"); break;
+            case 9:  label = QString::fromWCharArray(L"fxyz");      break;
+         }
+         break;
+
+      case G9:
+         label = "g";
+         break;
+
+      case G15:
+         // XXXX YYYY ZZZZ   XXXY XXXZ  XYYY YYYZ ZZZX ZZZY XXYY XXZZ YYZZ XXYZ XYYZ XYZZ
+         switch (index) {
+            case  0:  label = QString::fromWCharArray(L"gx\x2074");         break;
+            case  1:  label = QString::fromWCharArray(L"gy\x2074");         break;
+            case  2:  label = QString::fromWCharArray(L"gz\x2074");         break;
+            case  3:  label = QString::fromWCharArray(L"gx\x00B3y");        break;
+            case  4:  label = QString::fromWCharArray(L"gx\x00B3z");        break;
+            case  5:  label = QString::fromWCharArray(L"gxy\x00B3");        break;
+            case  6:  label = QString::fromWCharArray(L"gy\x00B3z");        break;
+            case  7:  label = QString::fromWCharArray(L"gxz\x00B3");        break;
+            case  8:  label = QString::fromWCharArray(L"gyz\x00B3");        break;
+            case  9:  label = QString::fromWCharArray(L"gx\x00B2y\x00B2");  break;
+            case 10:  label = QString::fromWCharArray(L"gx\x00B2z\x00B2");  break;
+            case 11:  label = QString::fromWCharArray(L"gy\x00B2z\x00B2");  break;
+            case 12:  label = QString::fromWCharArray(L"gx\x00B2yz");       break;
+            case 13:  label = QString::fromWCharArray(L"gxy\x00B2z");       break;
+            case 14:  label = QString::fromWCharArray(L"gxyz\x00B2");       break;
+         }
+         break;
+   }
+
+   return label;
 }
 
 

@@ -438,6 +438,7 @@ void InputDialog::initializeQuiLogic()
       )
    );
  
+
    s = "ADC";
    method.addRule(
       If(isADC,
@@ -1394,12 +1395,6 @@ void InputDialog::initializeQuiLogic()
          boost::bind(&InputDialog::printSection, this, "chemsol", false)
       )
    );
-
-
-
-
-
-
 
 
    node = &reg.get("QUI_TITLE");

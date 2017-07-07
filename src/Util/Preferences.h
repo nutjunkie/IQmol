@@ -42,8 +42,10 @@ namespace Preferences {
 
    void ResetBrowserPreferences();
 
+   double DefaultSceneRadius();
+
    QSize ViewerWindowSize();
-   void   ViewerWindowSize(QSize const&);
+   void  ViewerWindowSize(QSize const&);
    
    bool  ShowModelView();
    void  ShowModelView(bool const);

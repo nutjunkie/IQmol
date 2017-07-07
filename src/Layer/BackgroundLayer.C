@@ -25,6 +25,7 @@
 #include "Preferences.h"
 
 #include <QDebug>
+#include <cmath>
 
 namespace IQmol {
 namespace Layer {

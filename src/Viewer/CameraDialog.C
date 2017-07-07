@@ -101,7 +101,7 @@ void CameraDialog::on_fieldOfView_valueChanged(int angle)
 
 
 
-void CameraDialog::on_perspectiveButton_clicked(bool tf)
+void CameraDialog::on_perspectiveButton_clicked(bool)
 {
    m_camera.setType(Camera::PERSPECTIVE);
    m_dialog.fieldOfViewLabel->setEnabled(true);
@@ -110,7 +110,7 @@ void CameraDialog::on_perspectiveButton_clicked(bool tf)
 }
 
 
-void CameraDialog::on_orthographicButton_clicked(bool tf)
+void CameraDialog::on_orthographicButton_clicked(bool)
 {
    m_camera.setType(Camera::ORTHOGRAPHIC);
    m_dialog.fieldOfViewLabel->setEnabled(false);

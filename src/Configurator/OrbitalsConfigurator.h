@@ -75,6 +75,7 @@ namespace Configurator {
          void enableNegativeColor(bool);
          void updateOrbitalRange(int nElectrons);
          void updateOrbitalRange(int nElectrons, QComboBox*);
+         void updateBasisRange();
          void setPositiveColor(QColor const& color);
          void setNegativeColor(QColor const& color);
          void initPlot();
@@ -85,8 +86,8 @@ namespace Configurator {
          unsigned int m_nAlpha;
          unsigned int m_nBeta;
          unsigned int m_nOrbitals;
-	 unsigned int m_AlphaHOMO;
-	 unsigned int m_BetaHOMO;
+         unsigned int m_AlphaHOMO;
+         unsigned int m_BetaHOMO;
          CustomPlot* m_customPlot;
          QPen m_pen;
          QPen m_selectedPen;

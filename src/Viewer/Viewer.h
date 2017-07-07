@@ -22,19 +22,23 @@
 
 ********************************************************************************/
 
-#include "SelectHandler.h"
+#include <limits>
+#define FOREVER ( std::numeric_limits<int>::max() )
+
+#include "Animator.h"
+#include "AtomLayer.h"
 #include "BuildEfpFragmentHandler.h"
 #include "BuildAtomHandler.h"
 #include "BuildMoleculeFragmentHandler.h"
 #include "BuildFunctionalGroupHandler.h"
+#include "Cursors.h"
 #include "ManipulateHandler.h"
 #include "ReindexAtomsHandler.h"
 #include "ManipulateSelectionHandler.h"
-#include "Cursors.h"
-#include "AtomLayer.h"
-#include "Animator.h"
+#include "Preferences.h"
+#include "SelectHandler.h"
 #include "Snapshot.h"
-#include "IQmol.h"
+
 #include "QGLViewer/qglviewer.h"
 #include "QGLViewer/manipulatedFrame.h"
 #include <QFontMetrics>
@@ -103,7 +107,7 @@ namespace IQmol {
          void animationStep();
 
       public Q_SLOTS:
-         void setDefaultSceneRadius() { setSceneRadius(DefaultSceneRadius); }
+         void setDefaultSceneRadius() { setSceneRadius(Preferences::DefaultSceneRadius()); }
          void setSceneRadius(double const);
          void resetView();
 

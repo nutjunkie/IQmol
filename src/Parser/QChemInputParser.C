@@ -200,7 +200,11 @@ void QChemInput::readMoleculeSection(TextStream& textStream)
       // Account for the possibility of a FSM job, which has two geometries
       // separated by the **** token.
       if (line.contains("****")) {
-         parseGeometry(lines, offset, zmat);
+         Data::Geometry* geom(parseGeometry(lines, offset, zmat));
+         if (geom) {
+            geom->setChargeAndMultiplicity(charge, multiplicity);
+            m_geometryList->append(geom);
+         }
          offset = textStream.lineNumber();
          lines.clear();
       }else {
@@ -209,11 +213,15 @@ void QChemInput::readMoleculeSection(TextStream& textStream)
       line = textStream.nextLine();
    }
    
-   parseGeometry(lines, offset, zmat);
+   Data::Geometry* geom(parseGeometry(lines, offset, zmat));
+   if (geom) {
+      geom->setChargeAndMultiplicity(charge, multiplicity);
+      m_geometryList->append(geom);
+   }
 }
 
 
-void QChemInput::parseGeometry(QStringList const& lines, int offset, bool zmat)
+Data::Geometry* QChemInput::parseGeometry(QStringList const& lines, int offset, bool zmat)
 {
    Data::Geometry* geom(0);
    QString line(lines.join("\n"));
@@ -221,9 +229,7 @@ void QChemInput::parseGeometry(QStringList const& lines, int offset, bool zmat)
    if (zmat) {
      ZMatrixCoordinates parser;
      geom = parser.parse(line);
-     if (parser.error().isEmpty()) {
-        m_geometryList->append(geom);
-      }else {
+     if (!parser.error().isEmpty()) {
         m_errors.append(parser.error());
       }
    }else {
@@ -231,12 +237,12 @@ void QChemInput::parseGeometry(QStringList const& lines, int offset, bool zmat)
      molecule.setOffset(offset);
      CartesianCoordinates parser(lines.size());
      geom = parser.parse(molecule);
-     if (parser.error().isEmpty()) {
-        m_geometryList->append(geom);
-      }else {
+     if (!parser.error().isEmpty()) {
         m_errors.append(parser.error());
-      }
+     }
    }
+
+   return geom;
 }
 
  

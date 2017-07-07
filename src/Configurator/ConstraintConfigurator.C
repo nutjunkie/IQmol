@@ -23,6 +23,7 @@
 #include "ConstraintConfigurator.h"
 #include "ConstraintLayer.h"
 #include "QGLViewer/vec.h"
+#include "Axes.h"
 
 
 using namespace qglviewer;

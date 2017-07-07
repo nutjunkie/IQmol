@@ -98,7 +98,7 @@ ViewerModel::ViewerModel(QWidget* parent) : QStandardItemModel(0, 1, parent),
    Layer::Molecule* mol(newMolecule());
    appendRow(mol);
    changeActiveViewerMode(Viewer::BuildAtom);
-   sceneRadiusChanged(DefaultSceneRadius);
+   sceneRadiusChanged(Preferences::DefaultSceneRadius());
 }
 
 
@@ -891,7 +891,7 @@ void ViewerModel::insertMoleculeById(QString identifier)
 
 double ViewerModel::sceneRadius(bool visibleOnly)
 {
-   double radius(DefaultSceneRadius);
+   double radius(Preferences::DefaultSceneRadius());
    MoleculeList molecules(moleculeList(visibleOnly));
    MoleculeList::iterator iter;
    for (iter = molecules.begin(); iter != molecules.end(); ++iter) {

@@ -196,15 +196,15 @@ QVariantMap ShaderDialog::getPovRayParametersFromDialog()
 
 void ShaderDialog::copyPovRayParametersToDialog(QVariantMap const& map)
 {
-   int    dim;
-   double value;
+   int     dim;
+   double  value;
    QString name;
    
    dim = map.contains("height") ? map.value("height").toInt() : 480;
    m_dialog.height->setValue(dim);
    dim = map.contains("width") ? map.value("width").toInt() : 640;
    m_dialog.width->setValue(dim);
-   dim = map.contains("gamma") ? map.value("gamma").toDouble() : 2.2;
+   value = map.contains("gamma") ? map.value("gamma").toDouble() : 2.2;
    m_dialog.gamma->setValue(dim);
    name = map.contains("background") ? map.value("background").toString() : "Black";
    m_dialog.background->setCurrentText(name);

@@ -6,6 +6,7 @@ INCLUDEPATH += ../Util ../Data ../OpenMesh/src  ../Old
                
 
 SOURCES += \
+   $$PWD/BasisEvaluator.C \
    $$PWD/BoundingBoxDialog.C \
    $$PWD/DensityEvaluator.C \
    $$PWD/GridEvaluator.C \
@@ -20,6 +21,7 @@ SOURCES += \
 
 
 HEADERS += \
+   $$PWD/BasisEvaluator.h \
    $$PWD/BoundingBoxDialog.h \
    $$PWD/DensityEvaluator.h \
    $$PWD/GridEvaluator.h \

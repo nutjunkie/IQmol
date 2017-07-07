@@ -36,7 +36,7 @@ namespace Data {
          enum Kind { Custom = -1, AlphaOrbital, BetaOrbital, TotalDensity, 
             SpinDensity, AlphaDensity, BetaDensity, DensityCombo, CubeData, 
             VanDerWaals, Promolecule, SolventExcluded, SID, ElectrostaticPotential,
-            Geminal, Correlation, CustomDensity
+            Geminal, Correlation, CustomDensity, BasisFunction
 // TODO
 //            AlphaHole Density, BetaHole Density,
 //            AlphaExcitationDensity, BetaExcitationDensity,
@@ -62,6 +62,7 @@ namespace Data {
          bool isDensity() const;
          bool isRegularDensity() const;
          bool isOrbital() const;
+         bool isBasis() const;
          bool isSigned() const;
          bool isIndexed() const;
 

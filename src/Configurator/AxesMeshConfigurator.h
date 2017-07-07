@@ -1,5 +1,5 @@
-#ifndef IQMOL_AXESMESHCONFIGURATOR_H
-#define IQMOL_AXESMESHCONFIGURATOR_H
+#ifndef IQMOL_CONFIGURATOR_AXESMESH_H
+#define IQMOL_CONFIGURATOR_AXESMESH_H
 /*******************************************************************************
 
   Copyright (C) 2011-2015 Andrew Gilbert

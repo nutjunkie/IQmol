@@ -22,8 +22,8 @@
 
 ********************************************************************************/
 
-#include "IQmol.h"
 #include "Layer.h"
+#include "Preferences.h"
 
 namespace IQmol {
 namespace Layer {
@@ -36,7 +36,7 @@ namespace Layer {
 
       public:
          explicit Global(QString const& text = QString(), QObject* parent = 0) 
-            : Base(text, parent), m_sceneRadius(DefaultSceneRadius)
+            : Base(text, parent), m_sceneRadius(Preferences::DefaultSceneRadius())
          { 
             setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
             setCheckState(Qt::Unchecked);

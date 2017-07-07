@@ -39,8 +39,10 @@ namespace Data {
 
       public:
          enum AngularMomentum { S, P, D5, D6, F7, F10, G9, G15 };
+         static QString toString(AngularMomentum const);
 
          Shell(AngularMomentum const angularMomentum = S, 
+            unsigned const atomIndex = 0,
             qglviewer::Vec const& position = qglviewer::Vec(), 
             QList<double> const& exponents = QList<double>(), 
             QList<double> const& contractionCoefficients = QList<double>());
@@ -56,7 +58,9 @@ namespace Data {
 		 // functions at the given position.
          double* evaluate(qglviewer::Vec const& position) const;
          AngularMomentum angularMomentum() const { return m_angularMomentum; }
+         unsigned atomIndex() const { return m_atomIndex; }
          unsigned nBasis() const;
+         QString label(unsigned const) const;
 
          void serialize(InputArchive& ar, unsigned int const version = 0) {
             privateSerialize(ar, version);
@@ -84,12 +88,12 @@ namespace Data {
          static double s_zeroValues[15];
 
          double computeSignificantRadius(double const thresh);
-         QString toString(AngularMomentum const) const;
          void normalize();
 
          template <class Archive>
          void privateSerialize(Archive& ar, unsigned const) {
             ar & m_angularMomentum;
+            ar & m_atomIndex;
             ar & m_position;
             ar & m_exponents;
             ar & m_contractionCoefficients;
@@ -97,6 +101,7 @@ namespace Data {
          }
 
          AngularMomentum m_angularMomentum;
+         unsigned        m_atomIndex;
          qglviewer::Vec  m_position;
          QList<double>   m_exponents;
          QList<double>   m_contractionCoefficients;

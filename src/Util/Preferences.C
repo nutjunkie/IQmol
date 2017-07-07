@@ -131,6 +131,14 @@ void ShowModelView(bool const tf)
 
 // ---------
 
+double DefaultSceneRadius()
+{
+   return 4.0;
+}
+
+
+// ---------
+
 int UndoLimit() 
 {
    QVariant value(Get("UndoLimit"));

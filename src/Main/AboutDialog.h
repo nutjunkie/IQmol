@@ -23,7 +23,7 @@
 ********************************************************************************/
 
 #include "ui_AboutDialog.h"
-#include "IQmol.h"
+#include "Version.h"
 
 
 namespace IQmol {
@@ -37,6 +37,7 @@ namespace IQmol {
             m_aboutDialog.setupUi(this);
             m_aboutDialog.versionLabel->setText(IQMOL_VERSION);
             m_aboutDialog.yearLabel->setText(IQMOL_YEAR);
+            resize(sizeHint());
          }
 
       private:

@@ -25,6 +25,8 @@
 #include "InfoConfigurator.h"
 #include "AtomLayer.h"
 #include "DipoleLayer.h"
+#include "SymmetryLayer.h"
+#include "PointGroup.h"
 #include <QMap>
 #include <QRect>
 
@@ -61,7 +63,7 @@ namespace Layer {
          void setMultiplicity(unsigned int const multiplicity);
          void setEnergy(double const energy, Info::EnergyUnit unit);
          void setDipole(qglviewer::Vec const& dipole, bool const estimated = false);
-         void setPointGroup(QString const& pointGroup);
+         void setPointGroup(Data::PointGroup const&);
 
       protected:
          unsigned int numberOfElectrons() const;
@@ -81,7 +83,7 @@ namespace Layer {
 
          EnergyUnit m_energyUnit;
          QMap<QString, int> m_formula;
-         QString m_pointGroup;
+         Data::PointGroup m_pointGroup;
 
          bool m_dipoleEstimated;
          bool m_suspendUpdate;
@@ -90,6 +92,7 @@ namespace Layer {
          void setDipoleValid(bool);
          Configurator::Info m_configurator;
          Dipole m_dipoleLayer;
+         Symmetry m_symmetry;
    };
 
 } } // end namespace IQmol::Layer

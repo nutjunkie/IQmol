@@ -29,8 +29,6 @@ namespace IQmol {
 
    enum Spin { Alpha, Beta };
 
-   enum Axes { XAxis = 0x1, YAxis = 0x2, ZAxis = 0x4 };
-
    inline QString SpinLabel(Spin spin) {
       return (spin == Alpha) ? QString("Alpha") : QString("Beta");
    }

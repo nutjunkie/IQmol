@@ -22,14 +22,14 @@
 
 #include "ClippingPlaneLayer.h"
 #include "OpenGL.h"
-#include "IQmol.h"
+#include "Preferences.h"
 
 
 namespace IQmol {
 namespace Layer {
 
 ClippingPlane::ClippingPlane() : GLObject ("Clipping Plane"), 
-   m_sceneRadius(DefaultSceneRadius), m_configurator(0)
+   m_sceneRadius(Preferences::DefaultSceneRadius()), m_configurator(0)
 {
    setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
    setCheckState(Qt::Unchecked);

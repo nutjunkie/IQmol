@@ -21,7 +21,6 @@
 ********************************************************************************/
 
 #include "FormattedCheckpointParser.h"
-//#include "MolecularOrbitalsList.h"
 #include "CanonicalOrbitals.h"
 #include "GeminalOrbitals.h"
 #include "DipoleMoment.h"
@@ -41,6 +40,24 @@
 
 namespace IQmol {
 namespace Parser {
+
+
+
+bool FormattedCheckpoint::toInt(unsigned& n, QStringList const& list, unsigned const index)
+{
+   bool ok(false);
+   if (list.size() > (int)index) n = list.at(index).toInt(&ok);
+   return ok;
+}
+
+bool FormattedCheckpoint::toDouble(double& x, QStringList const& list, unsigned const index)
+{
+   bool ok(false);
+   if (list.size() > (int)index) x = list.at(index).toDouble(&ok);
+   return ok;
+}
+
+
 
 bool FormattedCheckpoint::parse(TextStream& textStream)
 {
@@ -72,6 +89,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
    unsigned nAlpha(0);
    unsigned nBeta(0);
    bool     ok(true);
+   unsigned n(0);
 
    GeomData  geomData;
    ShellData shellData;
@@ -81,16 +99,6 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
 
    Data::DensityList densityList;
 
-// DEPRECATE
-/*
-   Data::MolecularOrbitalsList* 
-      molecularOrbitalsList(new Data::MolecularOrbitalsList()); 
-   Data::MolecularOrbitalsList* 
-      naturaltransOrbitalList(new Data::MolecularOrbitalsList()); 
-   Data::MolecularOrbitalsList* 
-      naturalbondOrbitalList(new Data::MolecularOrbitalsList()); 
-*/
-// END DEPRECATE
    QString key;
 
    while (!textStream.atEnd()) {
@@ -105,24 +113,21 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       QStringList list(TextStream::tokenize(tmp));
 
       if (key == "Number of alpha electrons") {            // This should only appear once
-         nAlpha = list.at(1).toInt(&ok);
-         if (!ok) goto error;
+         if (!toInt(nAlpha, list, 1)) goto error;
 
       }else if (key == "Number of beta electrons") {       // This should only appear once
-         nBeta = list.at(1).toInt(&ok);
-         if (!ok) goto error;
+         if (!toInt(nBeta, list, 1)) goto error;
 
       }else if (key == "Multiplicity") { 
-         geomData.multiplicity = list.at(1).toUInt(&ok);  
-         if (!ok) goto error;
+         if (!toInt(n, list, 1)) goto error;
+         geomData.multiplicity = n;
 
       }else if (key == "Charge") { 
-         geomData.charge = list.at(1).toInt(&ok);  
-         if (!ok) goto error;
+         if (!toInt(n, list, 1)) goto error;
+         geomData.charge = n;
 
       }else if (key == "Atomic numbers") {                 // This should only appear once
-         unsigned n(list.at(2).toUInt(&ok));  
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          geomData.atomicNumbers = readUnsignedArray(textStream, n);
 
       }else if (key == "Current cartesian coordinates") { // This triggers a new geometry
@@ -137,20 +142,19 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
             clear(hfData);
          }
 
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          geomData.coordinates = readDoubleArray(textStream, n);
          geometry = makeGeometry(geomData);
          if (!geometry) goto error;
          geometryList->append(geometry);
 
       }else if (key == "SCF Iteration") {
-         unsigned n(list.at(1).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 1)) goto error;
          hfData.label = "SCF Iter " +  QString::number(n-1);
 
       }else if (key == "SCF Iteration Energy") {
-         double energy(list.at(1).toDouble(&ok));
+         double energy(0.0);
+         if (!toDouble(energy, list, 1)) goto error;
          if (!ok) goto error;
          hfData.label += " (" + QString::number(energy, 'f', 6) + ")";
 
@@ -165,60 +169,53 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          // This is determined from the shell data
 
       }else if (key == "Shell types") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          shellData.shellTypes = readIntegerArray(textStream, n);
          
       }else if (key == "Number of primitives per shell") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          shellData.shellPrimitives = readUnsignedArray(textStream, n);
 
       }else if (key == "Shell to atom map") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          shellData.shellToAtom = readUnsignedArray(textStream, n);
 
       }else if (key == "Primitive exponents") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          shellData.exponents = readDoubleArray(textStream, n);
 
       }else if (key == "Contraction coefficients") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          shellData.contractionCoefficients = readDoubleArray(textStream, n);
 
       }else if (key == "P(S=P) Contraction coefficients") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          shellData.contractionCoefficientsSP = readDoubleArray(textStream, n);
 
       }else if (key == "SCF Energy") {
-         double energy(list.at(1).toDouble(&ok));
-         if (!ok || !geometry) goto error;
+         double energy(0.0);
+         if (!geometry || !toDouble(energy, list, 1)) goto error;
          Data::ScfEnergy& scf(geometry->getProperty<Data::ScfEnergy>());
          scf.setValue(energy, Data::Energy::Hartree);
          Data::TotalEnergy& total(geometry->getProperty<Data::TotalEnergy>());
          total.setValue(energy, Data::Energy::Hartree);
 
       }else if (key == "Total Energy") {
-         double energy(list.at(1).toDouble(&ok));
+         double energy(0.0);
+         if (!geometry || !toDouble(energy, list, 1)) goto error;
          if (!ok || !geometry) goto error;
          Data::TotalEnergy& total(geometry->getProperty<Data::TotalEnergy>());
          total.setValue(energy, Data::Energy::Hartree);
 
       }else if (key == "Dipole_Data") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok || !geometry) goto error;
+         if (!geometry || !toInt(n, list, 2)) goto error;
          QList<double> data(readDoubleArray(textStream, n));
          if (data.size() != 3) goto error;
          Data::DipoleMoment& dipole(geometry->getProperty<Data::DipoleMoment>());
          dipole.setValue(data[0],data[1],data[2]);
 
       }else if (key == "Cartesian Force Constants") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok || !geometry) goto error;
+         if (!geometry || !toInt(n, list, 2)) goto error;
          QList<double> data(readDoubleArray(textStream, n));
          Data::Hessian& hessian(geometry->getProperty<Data::Hessian>());
          hessian.setData(geometry->nAtoms(), data);
@@ -226,122 +223,103 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       // Canonical Orbitals
 
       }else if (key == "Alpha MO coefficients") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          hfData.alphaCoefficients = readDoubleArray(textStream, n);
 
 	  }else if (key == "Beta MO coefficients") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          hfData.betaCoefficients = readDoubleArray(textStream, n);
 
       }else if (key == "Alpha Orbital Energies") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          hfData.alphaEnergies = readDoubleArray(textStream, n);
 
       }else if (key == "Beta Orbital Energies") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok || !geometry) goto error;
+         if (!toInt(n, list, 2)) goto error;
          hfData.betaEnergies = readDoubleArray(textStream, n);
 
       // Natural Transition Orbitals
 
 	  }else if (key == "Alpha NTO coefficients") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          ntoData.alphaCoefficients = readDoubleArray(textStream, n);
 
       }else if (key == "Beta NTO coefficients") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          ntoData.betaCoefficients = readDoubleArray(textStream, n);
 
       }else if (key == "Alpha NTO amplitudes") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          ntoData.alphaEnergies = readDoubleArray(textStream, n);
 
       }else if (key == "Beta NTO amplitudes") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok || !geometry) goto error;
+         if (!toInt(n, list, 2)) goto error;
          ntoData.betaEnergies = readDoubleArray(textStream, n);
 
       // Natural Bond Orbitals
 
 	  }else if (key == "Alpha NBO coefficients") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          nboData.alphaCoefficients = readDoubleArray(textStream, n);
 
 	  }else if (key == "Beta NBO coefficients") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          nboData.betaCoefficients = readDoubleArray(textStream, n);
 
       }else if (key == "Alpha NBO occupancies") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          nboData.alphaEnergies = readDoubleArray(textStream, n);
 
       }else if (key == "Beta NBO occupancies") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok || !geometry) goto error;
+         if (!toInt(n, list, 2)) goto error;
          nboData.betaEnergies = readDoubleArray(textStream, n);
 
       // Localized Orbitals
 
       }else if (key == "Localized Alpha MO Coefficients (ER)") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok || !geometry) goto error;
+         if (!toInt(n, list, 2)) goto error;
          erData.alphaCoefficients = readDoubleArray(textStream, n);
 
       }else if (key == "Localized Beta  MO Coefficients (ER)") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok || !geometry) goto error;
+         if (!toInt(n, list, 2)) goto error;
          erData.betaCoefficients = readDoubleArray(textStream, n);
 
       }else if (key == "Localized Alpha MO Coefficients (Boys)") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok || !geometry) goto error;
+         if (!toInt(n, list, 2)) goto error;
          boysData.alphaCoefficients = readDoubleArray(textStream, n);
 
       }else if (key == "Localized Beta  MO Coefficients (Boys)") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok || !geometry) goto error;
+         if (!toInt(n, list, 2)) goto error;
          boysData.betaCoefficients = readDoubleArray(textStream, n);
 
       // Geminals
 
       }else if (key == "Alpha GMO coefficients") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          gmoData.alphaCoefficients = readDoubleArray(textStream, n);
          gmoData.betaCoefficients  = gmoData.alphaCoefficients;
 
       }else if (key == "Beta GMO coefficients") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          gmoData.betaCoefficients = readDoubleArray(textStream, n);
 
       }else if (key == "MO to geminal map") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          gmoData.geminalMoMap = readIntegerArray(textStream, n);
 
       }else if (key == "Geminal Coefficients") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          gmoData.geminalCoefficients = readDoubleArray(textStream, n);
 
       }else if (key == "Energies of Geminals") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          gmoData.geminalEnergies = readDoubleArray(textStream, n);
 
+      }else if (key.contains("RMS Density")) {
+         // Skip this
+
       }else if (key.contains("Density")) {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          QList<double> data(readDoubleArray(textStream, n));
          Data::SurfaceType type(Data::SurfaceType::Custom);
          type.setLabel(key);
@@ -350,8 +328,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          densityList.append(density);
 
       }else if (key.endsWith("Surface Title") || key == "NBO Ground State" ) {
-         unsigned n(list.at(1).toUInt(&ok));
-         if (!ok || !geometry) goto error;
+         if (!geometry || !toInt(n, list, 1)) goto error;
 
          key.replace("NBO ","");
          key.replace("Surface Title","");
@@ -379,56 +356,46 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       //   if (!ok) goto error;
 
       }else if (key.endsWith("Excitation Energies")) {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          extData.excitationEnergies = readDoubleArray(textStream, n);
          extData.nState = n;
          extData.extType = key.contains("EOMEE") ? Data::ExcitedStates::EOM
                                                  : Data::ExcitedStates::CIS;
       }else if (key == "Oscillator Strengths") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          extData.oscillatorStrengths = readDoubleArray(textStream, n);
 
       }else if (key == "Alpha Amplitudes" || key == "Alpha X Amplitudes") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          extData.alphaAmplitudes = readDoubleArray(textStream, n);
       
       }else if (key == "Alpha Y Amplitudes") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          extData.alphaYAmplitudes = readDoubleArray(textStream, n);
          extData.extType = Data::ExcitedStates::TDDFT;
 
       }else if (key == "Beta Amplitudes" || key == "Beta X Amplitudes") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          extData.betaAmplitudes = readDoubleArray(textStream, n);
 
       }else if (key == "Beta Y Amplitudes") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          extData.betaYAmplitudes = readDoubleArray(textStream, n);
 
       }else if (key == "Alpha J Indexes") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          extData.alphaSparseJ = readIntegerArray(textStream, n);
 
       }else if (key == "Alpha I Indexes") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          extData.alphaSparseI = readIntegerArray(textStream, n);
 
       }else if (key == "Beta J Indexes") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          extData.betaSparseJ = readIntegerArray(textStream, n);
 
       }else if (key == "Beta I Indexes") {
-         unsigned n(list.at(2).toUInt(&ok));
-         if (!ok) goto error;
+         if (!toInt(n, list, 2)) goto error;
          extData.betaSparseI = readIntegerArray(textStream, n);
 
       }
@@ -718,12 +685,12 @@ Data::ShellList* FormattedCheckpoint::makeShellList(ShellData const& shellData,
        QList<double> coefsSP;
 
        unsigned atom(shellData.shellToAtom.at(shell)-1);
-       qglviewer::Vec position(geometry.position(atom));
+       qglviewer::Vec pos(geometry.position(atom));
 
        for (unsigned i = 0; i < shellData.shellPrimitives.at(shell); ++i, ++cnt) {
 		   // Convert exponents from bohr to angstrom.  The conversion factor
 		   // for the coefficients depends on the angular momentum and the 
-           // conversion is effectively done Shell constructor
+           // conversion is effectively done in the  Shell constructor
            expts.append(shellData.exponents.at(cnt)*convExponents);
 
            coefs.append(shellData.contractionCoefficients.at(cnt));
@@ -734,32 +701,32 @@ Data::ShellList* FormattedCheckpoint::makeShellList(ShellData const& shellData,
 
        switch (shellData.shellTypes.at(shell)) {
           case 0:
-             shellList->append( new Data::Shell(Data::Shell::S, position, expts, coefs) );
+             shellList->append( new Data::Shell(Data::Shell::S, atom, pos, expts, coefs) );
              break;
           case -1:
-             shellList->append( new Data::Shell(Data::Shell::S, position, expts, coefs)   );
-             shellList->append( new Data::Shell(Data::Shell::P, position, expts, coefsSP) );
+             shellList->append( new Data::Shell(Data::Shell::S, atom, pos, expts, coefs) );
+             shellList->append( new Data::Shell(Data::Shell::P, atom, pos, expts, coefsSP) );
              break;
           case 1:
-             shellList->append( new Data::Shell(Data::Shell::P, position, expts, coefs) );
+             shellList->append( new Data::Shell(Data::Shell::P, atom, pos, expts, coefs) );
              break;
           case -2:
-             shellList->append( new Data::Shell(Data::Shell::D5, position, expts, coefs) );
+             shellList->append( new Data::Shell(Data::Shell::D5, atom, pos, expts, coefs) );
              break;
           case 2:
-             shellList->append( new Data::Shell(Data::Shell::D6, position, expts, coefs) );
+             shellList->append( new Data::Shell(Data::Shell::D6, atom, pos, expts, coefs) );
              break;
           case -3:
-             shellList->append( new Data::Shell(Data::Shell::F7, position, expts, coefs) );
+             shellList->append( new Data::Shell(Data::Shell::F7, atom, pos, expts, coefs) );
              break;
           case 3:
-             shellList->append( new Data::Shell(Data::Shell::F10, position, expts, coefs) );
+             shellList->append( new Data::Shell(Data::Shell::F10, atom, pos, expts, coefs) );
              break;
           case -4:
-             shellList->append( new Data::Shell(Data::Shell::G9, position, expts, coefs) );
+             shellList->append( new Data::Shell(Data::Shell::G9, atom, pos, expts, coefs) );
              break;
           case 4:
-             shellList->append( new Data::Shell(Data::Shell::G15, position, expts, coefs) );
+             shellList->append( new Data::Shell(Data::Shell::G15, atom, pos, expts, coefs) );
              break;
 
           default:
@@ -770,7 +737,6 @@ Data::ShellList* FormattedCheckpoint::makeShellList(ShellData const& shellData,
              m_errors.append(msg);
              return 0;
              break;
-
        }
    }
 

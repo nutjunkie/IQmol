@@ -47,6 +47,8 @@ namespace Parser {
          QList<int> readIntegerArray(TextStream&, unsigned nTokens);
          QList<double> readDoubleArray(TextStream&, unsigned nTokens);
          QList<unsigned> readUnsignedArray(TextStream&, unsigned nTokens);
+         bool toInt(unsigned& n, QStringList const&, unsigned const index);
+         bool toDouble(double& x, QStringList const&, unsigned const index);
 
          struct GeomData {
                QList<unsigned> atomicNumbers;
@@ -84,30 +86,6 @@ namespace Parser {
          Data::Orbitals* makeOrbitals(unsigned const nAlpha, unsigned const nBeta,
             OrbitalData const&, ShellData const&, Data::Geometry const&,
             Data::DensityList densities = Data::DensityList()); 
-
-
-// DEPRECATE
-/*
-         struct MoData {
-            QString  label;
-            unsigned nAlpha;
-            unsigned nBeta;
-            unsigned nBasis;
-            QList<double> alphaCoefficients;
-            QList<double> betaCoefficients;
-            QList<double> alphaEnergies;
-            QList<double> betaEnergies;
-	    
-            int stateNumber;
-            QString stateTag;
-            Data::Orbitals::OrbitalType orbitalType;
-         };
-
-         void clear(MoData&);
-         Data::MolecularOrbitals* makeMolecularOrbitals(unsigned const nAlpha, 
-            unsigned const nBeta, MoData const&, ShellData const&, Data::Geometry const&);
-*/
-// END DEPRECATE
 
          struct GmoData {
             QList<double> alphaCoefficients;

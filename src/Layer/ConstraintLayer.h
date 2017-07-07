@@ -24,7 +24,7 @@
 
 #include "QGLViewer/vec.h"
 #include "AtomLayer.h"
-#include "IQmol.h"
+#include "Axes.h"
 #include "openbabel/forcefield.h"
 
 
