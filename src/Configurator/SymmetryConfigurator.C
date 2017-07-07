@@ -14,11 +14,29 @@
   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
   FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
   details.
-
+      
   You should have received a copy of the GNU General Public License along
   with IQmol.  If not, see <http://www.gnu.org/licenses/>.
-
+      
 ********************************************************************************/
 
-#define IQMOL_VERSION "2.9.1"
-#define IQMOL_YEAR "2017"
+#include "SymmetryConfigurator.h"
+#include "SymmetryLayer.h"
+
+#include <QDebug>
+
+namespace IQmol {
+namespace Configurator { 
+
+Symmetry::Symmetry(Layer::Symmetry& symmetry) : m_symmetry(symmetry)
+{
+   m_configurator.setupUi(this);
+}
+
+
+void Symmetry::sync()
+{
+   qDebug() << "Symmetry::sync called";
+}
+
+} } // end namespace IQmol::Configurator

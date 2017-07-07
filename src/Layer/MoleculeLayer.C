@@ -1504,7 +1504,7 @@ void Molecule::setGeometry(IQmol::Data::Geometry& geometry)
    }
 
    if (geometry.hasProperty<Data::PointGroup>()) {
-      pointGroupAvailable(geometry.getProperty<Data::PointGroup>().value());
+      pointGroupAvailable(geometry.getProperty<Data::PointGroup>());
    }
 
    if (geometry.hasProperty<Data::DipoleMoment>()) {
@@ -1816,7 +1816,7 @@ void Molecule::autoDetectSymmetry()
 
 void Molecule::invalidateSymmetry()
 {
-   pointGroupAvailable("?");
+   pointGroupAvailable(Data::PointGroup());
    postMessage("");
 }
 
@@ -1870,13 +1870,12 @@ void Molecule::symmetrize(double tolerance, bool updateCoordinates)
       int cnt(0);
 
       AtomList::iterator iter;
-      for (iter = atomList.begin(); iter != atomList.end(); ++iter) {
+      for (iter = atomList.begin(); iter != atomList.end(); ++iter, ++cnt) {
           position = (*iter)->getPosition();
           atomicNumbers[cnt] = (*iter)->getAtomicNumber();
           coordinates[3*cnt  ] = position.x;
           coordinates[3*cnt+1] = position.y;
           coordinates[3*cnt+2] = position.z;
-          ++cnt;
       }
 
       symmol_(&nAtoms, &tolerance, coordinates, atomicNumbers, pg);
@@ -1897,16 +1896,12 @@ void Molecule::symmetrize(double tolerance, bool updateCoordinates)
       delete[] atomicNumbers;
    }
 
-   pointGroupAvailable(pointGroup);
+
+   Data::PointGroup pg(pointGroup);
+   pointGroupAvailable(pg);
 
    if (updateCoordinates) {
-      QChar ch(0x221E); // infinity
-      if (pointGroup == "Civ") {
-         pointGroup = "C" + QString(ch) + "v";
-      }else if (pointGroup == "Dih") {
-         pointGroup = "D" + QString(ch) + "h";
-      }
-      cmd->setMessage("Point group: " + pointGroup);
+      cmd->setMessage("Point group: " + pg.toGLString());
       postCommand(cmd);
       m_modified = true;
       softUpdate();
@@ -1916,14 +1911,13 @@ void Molecule::symmetrize(double tolerance, bool updateCoordinates)
       setAtomicCharges(Data::Type::GasteigerCharge);
       bool estimated(true);
       dipoleAvailable(dipoleFromPointCharges(), estimated); 
-      // invalidate the energy
-      energyAvailable(0.0, Info::KJMol);
+      energyAvailable(0.0, Info::KJMol);  // invalidate the energy
    }else {
       delete cmd;
    }
 
    double t = time.elapsed() / 1000.0;
-   QLOG_TRACE() << "Point group symmetry set to" << pointGroup << " time taken:" << t << "s";
+   QLOG_TRACE() << "Point group symmetry set to" << pg.toGLString() << " time:" << t << "s";
 }
 
 

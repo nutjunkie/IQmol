@@ -47,6 +47,8 @@ namespace Parser {
          QList<int> readIntegerArray(TextStream&, unsigned nTokens);
          QList<double> readDoubleArray(TextStream&, unsigned nTokens);
          QList<unsigned> readUnsignedArray(TextStream&, unsigned nTokens);
+         bool toInt(unsigned& n, QStringList const&, unsigned const index);
+         bool toDouble(double& x, QStringList const&, unsigned const index);
 
          struct GeomData {
                QList<unsigned> atomicNumbers;

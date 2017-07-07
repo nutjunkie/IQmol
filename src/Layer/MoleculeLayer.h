@@ -22,7 +22,6 @@
    
 ********************************************************************************/
 
-#include "IQmol.h"
 #include "Bank.h"
 #include "InfoLayer.h"
 #include "FileLayer.h"
@@ -54,6 +53,8 @@ namespace OpenBabel {
 
 namespace IQmol {
 
+   QString const DefaultMoleculeName = "Untitled";
+
    namespace Process {
       class  QChemJobInfo;
    }
@@ -74,6 +75,7 @@ namespace IQmol {
       class Geometry;
       class Bank;
       class SurfaceInfo;
+      class PointGroup;
    }
 
    class SpatialProperty;
@@ -266,7 +268,7 @@ namespace IQmol {
    
             void multiplicityAvailable(unsigned);
             void chargeAvailable(int);
-            void pointGroupAvailable(QString const&);
+            void pointGroupAvailable(Data::PointGroup const&);
             void energyAvailable(double const, Info::EnergyUnit);
             void dipoleAvailable(qglviewer::Vec const& dipole, bool const estimated);
             void radiusAvailable(double const radius);

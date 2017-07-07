@@ -36,6 +36,7 @@ SOURCES = \
    $$PWD/OrbitalsList.C \
    $$PWD/OrbitalSymmetries.C \
    $$PWD/PointCharge.C \
+   $$PWD/PointGroup.C \
    $$PWD/PovRay.C \
    $$PWD/RemSectionData.C \
    $$PWD/Shell.C \

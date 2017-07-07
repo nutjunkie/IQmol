@@ -23,7 +23,8 @@ SOURCES = \
    $$PWD/MolecularSurfacesConfigurator.C \
    $$PWD/NmrConfigurator.C \
    $$PWD/OrbitalsConfigurator.C \
-   $$PWD/SurfaceConfigurator.C
+   $$PWD/SurfaceConfigurator.C \
+   $$PWD/SymmetryConfigurator.C
 
 HEADERS = \
    $$PWD/AxesMeshConfigurator.h \
@@ -44,7 +45,8 @@ HEADERS = \
    $$PWD/MolecularSurfacesConfigurator.h \
    $$PWD/NmrConfigurator.h \
    $$PWD/OrbitalsConfigurator.h \
-   $$PWD/SurfaceConfigurator.h
+   $$PWD/SurfaceConfigurator.h \
+   $$PWD/SymmetryConfigurator.h
 
 FORMS = \
    $$PWD/AxesMeshConfigurator.ui \
@@ -67,3 +69,4 @@ FORMS = \
    $$PWD/SurfaceConfigurator.ui \
    $$PWD/VectorConstraintConfigurator.ui \
    $$PWD/../Old/SurfaceAnimatorDialog.ui \
+   $$PWD/SymmetryConfigurator.ui \

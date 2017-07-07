@@ -37,6 +37,7 @@ SOURCES = \
    $$PWD/OrbitalsLayer.C \
    $$PWD/PrimitiveLayer.C \
    $$PWD/SurfaceLayer.C \
+   $$PWD/SymmetryLayer.C \
 
 
 HEADERS = \
@@ -72,3 +73,4 @@ HEADERS = \
    $$PWD/OrbitalsLayer.h \
    $$PWD/PrimitiveLayer.h \
    $$PWD/SurfaceLayer.h \
+   $$PWD/SymmetryLayer.h \

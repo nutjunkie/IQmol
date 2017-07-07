@@ -22,7 +22,7 @@
 
 #include "InfoConfigurator.h"
 #include "InfoLayer.h"
-#include "IQmol.h"
+#include "StringFormat.h"
 #include <cmath>
 
 #include <QDebug>
@@ -60,7 +60,7 @@ void Info::sync()
 
    switch (m_info.m_energyUnit) {
       case Layer::Info::Hartree:
-         s = QString::number(m_info.m_energy, 'f', 6) + " E" + subscript("h");
+         s = QString::number(m_info.m_energy, 'f', 6) + " E" + Util::subscript("h");
       break;
       case Layer::Info::KJMol:
          s = QString::number(m_info.m_energy, 'f', 3) + " kJ/mol";
@@ -76,8 +76,7 @@ void Info::sync()
    if (m_info.m_dipoleEstimated) s+= " (est.)";
    m_infoConfigurator.dipoleLabel->setText(s);
 
-   s = PointGroupForDisplay(m_info.m_pointGroup);
-   m_infoConfigurator.symmetryLabel->setText(s);
+   m_infoConfigurator.symmetryLabel->setText(m_info.m_pointGroup.toString());
 }
 
 

@@ -1,10 +1,12 @@
+#ifndef IQMOL_LAYER_SYMMETRY_H
+#define IQMOL_LAYER_SYMMETRY_H
 /*******************************************************************************
-
+       
   Copyright (C) 2011-2015 Andrew Gilbert
-
+           
   This file is part of IQmol, a free molecular visualization program. See
   <http://iqmol.org> for more details.
-
+       
   IQmol is free software: you can redistribute it and/or modify it under the
   terms of the GNU General Public License as published by the Free Software
   Foundation, either version 3 of the License, or (at your option) any later
@@ -14,43 +16,37 @@
   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
   FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
   details.
-
+      
   You should have received a copy of the GNU General Public License along
-  with IQmol.  If not, see <http://www.gnu.org/licenses/>.
-
+  with IQmol.  If not, see <http://www.gnu.org/licenses/>.  
+   
 ********************************************************************************/
 
-#include "IQmol.h"
-#include <QColor>
-#include <QToolButton>
+#include "Layer.h"
+#include "PointGroup.h"
+#include "SymmetryConfigurator.h"
 
-#include <QDebug>
 
 namespace IQmol {
+namespace Layer {
 
-QString subscript(QString const& s) {
-   return QString("<span style=\"font-size:16pt; vertical-align:sub;\">" + s + "</span>");
-}
+   class Symmetry : public Base {
 
+      Q_OBJECT
 
-QString superscript(QString const& s) {
-   return QString("<span style=\"font-size:16pt; vertical-align:sup;\">" + s + "</span>");
-}
+      friend class Configurator::Symmetry;
 
+      public:
+         explicit Symmetry(Data::PointGroup const&);
 
-QString PointGroupForDisplay(QString const& pg) 
-{
-   QString pointGroup;
-   QChar ch(0x221E); // infinity
+      public Q_SLOTS:
+         void update();
 
-   if (pg == "Civ") {
-      pointGroup = "C" + IQmol::subscript(QString(ch) + "v");
-   }else if (pg == "Dih") {
-      pointGroup = "D" + subscript(QString(ch) + "h");
-   }else { 
-      pointGroup = pg.left(1) + subscript(pg.mid(1));
-   }
-   return pointGroup;
-}
+      private:
+         Configurator::Symmetry m_configurator;
+         Data::PointGroup const& m_pointGroup;
+   };
 
-} // end namespace IQmol
+} } // end namespace IQmol::Layer
+
+#endif

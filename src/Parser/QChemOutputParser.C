@@ -254,7 +254,7 @@ bool QChemOutput::parse(TextStream& textStream)
          tokens = TextStream::tokenize(line);
          if (tokens.size() > 3 && currentGeometry) {
             Data::PointGroup& pg = currentGeometry->getProperty<Data::PointGroup>();
-            pg.setValue(tokens[3]);
+            pg.setPointGroup(tokens[3]);
          }
 
       }else if (line.contains("beta electrons")) {

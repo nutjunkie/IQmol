@@ -1,3 +1,5 @@
+#ifndef IQMOL_CONFIGURATOR_SYMMETRY_H
+#define IQMOL_CONFIGURATOR_SYMMETRY_H
 /*******************************************************************************
 
   Copyright (C) 2011-2015 Andrew Gilbert
@@ -14,11 +16,39 @@
   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
   FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
   details.
-
+      
   You should have received a copy of the GNU General Public License along
   with IQmol.  If not, see <http://www.gnu.org/licenses/>.
-
+      
 ********************************************************************************/
 
-#define IQMOL_VERSION "2.9.1"
-#define IQMOL_YEAR "2017"
+#include "Configurator.h"
+#include "ui_SymmetryConfigurator.h"
+
+
+namespace IQmol {
+
+namespace Layer {
+   class Symmetry;
+}
+
+namespace Configurator {
+
+   class Symmetry: public Base {
+
+      Q_OBJECT
+
+      public:
+         explicit Symmetry(Layer::Symmetry&);
+         void sync();
+      
+      public Q_SLOTS:
+
+      private:
+         Ui::SymmetryConfigurator m_configurator;
+         Layer::Symmetry& m_symmetry;
+   };
+
+} } // end namespace IQmol::Configurator
+
+#endif
