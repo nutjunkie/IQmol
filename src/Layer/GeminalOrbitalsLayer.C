@@ -472,16 +472,12 @@ bool GeminalOrbitals::computeOrbitalGrids(Data::GridDataList& grids)
    QTime time;
    time.start();
 
-   Matrix const* coefficientsA;
-   //Matrix const* coefficientsB;
-   //QList<double> const* coefficientsG;
+   Matrix const& coefficientsA(m_geminalOrbitals.alphaCoefficients());
 
-/* MOGem is never used
-   QList<int> const* MOGem;
-      coefficientsA = &(m_geminalOrbitals.alphaCoefficients());
-      //coefficientsB = &(m_geminalOrbitals.betaCoefficients());
-      //coefficientsG = &(m_geminalOrbitals.geminalCoefficients());
-      MOGem = &(m_geminalOrbitals.geminalMoMap());
+/* These are never used
+   Matrix const& coefficientsB(m_geminalOrbitals.betaCoefficients());
+   QList<double> const& coefficientsG(m_geminalOrbitals.geminalCoefficients());
+   QList<int> const& MOGem(m_geminalOrbitals.geminalMoMap());
 */
 
    
@@ -525,7 +521,7 @@ bool GeminalOrbitals::computeOrbitalGrids(Data::GridDataList& grids)
                    if ( (values = (*shell)->evaluate(gridPoint)) ) {
                       for (unsigned s = 0; s < (*shell)->nBasis(); ++s) {
                           for (unsigned orb = 0; orb < nOrb; ++orb) {
-                              tmp[orb] += (*coefficientsA)(orbitals[orb], offset) * values[s]; //VAR temp
+                              tmp[orb] += coefficientsA(orbitals[orb], offset) * values[s]; //VAR temp
                           }
                           ++offset;
                       }

@@ -456,14 +456,14 @@ void PovRayGen::writeMesh(QList<qglviewer::Vec> const& vertices,
 
    m_stream << "   vertex_vectors {\n";
    m_stream << "      " << nVertices;
-   for (int i = 0; i < nVertices; ++i) {
+   for (unsigned i = 0; i < nVertices; ++i) {
        m_stream << ",\n   " << formatVector(vertices.at(i));
    }
    m_stream << "\n   }\n\n";
 
    m_stream << "   normal_vectors {\n";
    m_stream << "      " << nVertices;
-   for (int i = 0; i < nVertices; ++i) {
+   for (unsigned i = 0; i < nVertices; ++i) {
        Vec n(normals.at(i));
        //m_stream << ",\n   " << formatVector(normals.at(i));
        m_stream << ",\n   " << formatVector(Vec(n.x, n.y, -n.z));

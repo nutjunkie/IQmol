@@ -158,8 +158,9 @@ QString TemplateForRunFile(bool const local)
          "#  <-- End user configuration -->\n"
          "\n"
          "qchem ${JOB_NAME}.inp ${JOB_NAME}.out &";
-#ifdef Q_OS_WIN32
+
    if (local) {
+#ifdef Q_OS_WIN32
       cmd = "@echo off\n"
             ":: The following variables MUST be set with correct values:\n"
             "::\n"
@@ -200,8 +201,8 @@ QString TemplateForRunFile(bool const local)
             "   if errorlevel 1 ( set ProcessId=%1 )\n"
             ")\n";
        
-   }
 #endif
+   }
    return cmd;
 }
 

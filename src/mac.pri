@@ -2,8 +2,8 @@ CONFIG += DEPLOY
 
 
 contains(CONFIG, DEPLOY) {
-   CONFIG += debug
-   #CONFIG += release
+   #CONFIG += debug
+   CONFIG += release
 
    # Boost
    BOOST        = $(DEV)/boost_1_64_0

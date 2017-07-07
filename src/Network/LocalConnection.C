@@ -128,7 +128,8 @@ Reply* LocalConnection::execute(QString const& command, QString const& workingDi
 }
 
 
-Reply* LocalConnection::getFiles(QStringList const& fileList, QString const& destinationPath)
+Reply* LocalConnection::getFiles(QStringList const& /*fileList*/, 
+   QString const& /* destinationPath */)
 {
    qDebug() << "Warning, LocalConnection::getFiles not implemented";
    return 0;
