@@ -50,7 +50,6 @@ SOURCES += \
    $$PWD/FragmentTable.C \
    $$PWD/HelpBrowser.C \
    $$PWD/InsertMoleculeDialog.C \
-   $$PWD/IQmol.C \
    $$PWD/IQmolApplication.C \
    $$PWD/MainWindow.C \
    $$PWD/PeriodicTable.C \
@@ -63,12 +62,12 @@ HEADERS += \
    $$PWD/FragmentTable.h \
    $$PWD/HelpBrowser.h \
    $$PWD/InsertMoleculeDialog.h \
-   $$PWD/IQmol.h \
    $$PWD/IQmolApplication.h \
    $$PWD/MainWindow.h \
    $$PWD/PeriodicTable.h \
    $$PWD/PreferencesBrowser.h \
    $$PWD/ToolBar.h \
+   $$PWD/Version.h \
 
 FORMS += \
    $$PWD/AboutDialog.ui \

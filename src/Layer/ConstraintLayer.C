@@ -24,6 +24,7 @@
 #include "ConstraintLayer.h"
 #include "Constraint.h"
 #include "GLShape.h"
+#include "Axes.h"
 
 #include <QDebug>
 

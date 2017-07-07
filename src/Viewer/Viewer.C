@@ -25,7 +25,6 @@
 #include "CameraDialog.h"
 #include "Viewer.h"
 #include "ViewerModel.h"
-#include "IQmol.h"
 #include "QsLog.h"
 #include "MoleculeLayer.h"
 #include "EfpFragmentLayer.h"
@@ -336,7 +335,7 @@ void Viewer::fastDraw()
 
 void Viewer::setSceneRadius(double const radius)
 {
-   float r = std::max(radius, DefaultSceneRadius);
+   float r = std::max(radius, Preferences::DefaultSceneRadius());
    QGLViewer::setSceneRadius(r);
    Vec position(camera()->position());
    position = 3.0*r*position.unit();
@@ -348,7 +347,7 @@ void Viewer::setSceneRadius(double const radius)
 void Viewer::resetView()
 {
    setMouseBinding(Qt::NoModifier, Qt::LeftButton, QGLViewer::CAMERA, QGLViewer::ROTATE);
-   double radius = std::max(DefaultSceneRadius, m_viewerModel.sceneRadius());
+   double radius = std::max(Preferences::DefaultSceneRadius(), m_viewerModel.sceneRadius());
 
 /*
    // do the interpolation in spherical coordinates to avoid slicing through the 

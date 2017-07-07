@@ -28,7 +28,6 @@
 #include "GeometryListConfigurator.h"
 #include "InfoLayer.h"
 #include "AtomLayer.h"
-#include "IQmol.h"
 #include "QsLog.h"
 
 #include <QDebug>

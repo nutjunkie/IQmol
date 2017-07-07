@@ -1,5 +1,5 @@
-#ifndef IQMOL_LAYER_GLOBAL_H
-#define IQMOL_LAYER_GLOBAL_H
+#ifndef IQMOL_UTIL_STRINGFORMAT_H
+#define IQMOL_UTIL_STRINGFORMAT_H
 /*******************************************************************************
 
   Copyright (C) 2011-2015 Andrew Gilbert
@@ -22,36 +22,21 @@
 
 ********************************************************************************/
 
-#include "Layer.h"
-#include "Preferences.h"
+#include <QString>
 
 namespace IQmol {
-namespace Layer {
+namespace Util {
 
-   /// Abstract Base Layer for global display Layers such as the Axes, Mesh and 
-   /// Background.  
-   class Global : public Base {
+inline QString subscript(QString const& s) {
+   return QString("<span style=\"font-size:16pt; vertical-align:sub;\">" + s + "</span>");
+}
 
-      Q_OBJECT
 
-      public:
-         explicit Global(QString const& text = QString(), QObject* parent = 0) 
-            : Base(text, parent), m_sceneRadius(Preferences::DefaultSceneRadius())
-         { 
-            setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-            setCheckState(Qt::Unchecked);
-         }
+inline QString superscript(QString const& s) 
+{
+   return QString("<span style=\"font-size:16pt; vertical-align:sup;\">" + s + "</span>");
+}
 
-         virtual ~Global() { }
-         virtual void draw() = 0;
-
-     public Q_SLOTS:
-         void setSceneRadius(double radius) { m_sceneRadius = radius; }
-
-      protected:
-         double m_sceneRadius;
-   };
-
-} } // end namespace IQmol::Layer
+} } // end namespace IQmol::Util
 
 #endif

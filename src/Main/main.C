@@ -33,12 +33,12 @@
 #include "IQmolApplication.h"
 #include "Preferences.h"
 #include "Exception.h"
-#include "IQmol.h"
 #include <QStringList>
 #include <QDir>
 #include <QSysInfo>
 #include "QsLog.h"
 #include "QsLogDest.h"
+#include "Version.h"
 
 #ifdef Q_OS_WIN32
 #include <windows.h>

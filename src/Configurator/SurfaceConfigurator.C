@@ -20,7 +20,6 @@
    
 ********************************************************************************/
 
-#include "IQmol.h"
 #include "QsLog.h"
 #include "SurfaceConfigurator.h"
 #include "SurfaceLayer.h"

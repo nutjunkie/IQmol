@@ -22,6 +22,7 @@ SOURCES = \
 
 HEADERS = \
    $$PWD/Align.h \
+   $$PWD/Axes.h \
    $$PWD/ColorGradient.h \
    $$PWD/ColorGradientdialog.h \
    $$PWD/Constants.h \
@@ -38,6 +39,7 @@ HEADERS = \
    $$PWD/RemoveDirectory.h \
    $$PWD/ScanDirectory.h \
    $$PWD/SetButtonColor.h \
+   $$PWD/StringFormat.h \
    $$PWD/Task.h \
    $$PWD/Timer.h \
    $$PWD/WriteToTemporaryFile.h \
