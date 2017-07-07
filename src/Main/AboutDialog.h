@@ -37,6 +37,7 @@ namespace IQmol {
             m_aboutDialog.setupUi(this);
             m_aboutDialog.versionLabel->setText(IQMOL_VERSION);
             m_aboutDialog.yearLabel->setText(IQMOL_YEAR);
+            resize(sizeHint());
          }
 
       private:
