@@ -23,6 +23,7 @@
 #ifndef QGLVIEWER_VEC_H
 #define QGLVIEWER_VEC_H
 
+
 #include <math.h>
 #include <iostream>
 

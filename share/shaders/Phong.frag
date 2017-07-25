@@ -11,12 +11,15 @@ uniform bool  user_light_Highlight;
 uniform bool  user_light_Left;
 uniform bool  user_light_Lower;
 
+uniform vec4  backgroundColor;
+
 varying float shine;
 varying vec4  color;
 varying vec3  normal;
 varying vec3  viewDirection;
 varying vec3  v_texCoord3D;
 
+varying float fogFactor;
 
 //---------------------------- Snoise Functions ------------------------------------
 vec3 mod289(vec3 x) 
@@ -185,5 +188,8 @@ void main()
       rgb += 0.5*user_Noise_Intensity*(rgb + vec3(x, x, x));
    }
 
+   float fog = clamp(fogFactor, 0.0, 1.0);
+   rgb = mix(backgroundColor.xyz, rgb, fog);
+ 
    gl_FragColor = vec4(rgb, alpha);
 }

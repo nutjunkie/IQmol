@@ -131,6 +131,7 @@ namespace IQmol {
          void setRecord(bool);
          void blockUpdate(bool tf);
          void movieMakingFinished();
+         void setBackgroundColor(QColor const&);
 
       protected:
          void dropEvent(QDropEvent*);

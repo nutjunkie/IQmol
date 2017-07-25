@@ -191,6 +191,13 @@ void Viewer::editCamera()
 }
 
 
+void Viewer::setBackgroundColor(QColor const& color)
+{
+   if (m_shaderLibrary) m_shaderLibrary->broadcast("backgroundColor", color);
+   QGLViewer::setBackgroundColor(color);
+}
+
+
 
 void Viewer::resizeGL(int width, int height)
 {

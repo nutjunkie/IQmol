@@ -1,21 +1,24 @@
 #version 120
 
 // BEGIN UNIFORM
-uniform float user_Ambient;                // 0.75
-uniform float user_Diffuse;                // 0.75
-uniform float user_Highlights;             // 0.50
-uniform float user_Noise_Intensity;        // 0.00
-uniform float user_Saturation;             // 1.00
-uniform float user_Shininess;              // 0.50
+uniform float user_Ambient;                // 0.50
+uniform float user_Diffuse;                // 0.60
+uniform float user_Highlights;             // 0.40
+uniform float user_Shininess;              // 0.90
 
-uniform bool  user_Enhance_Edges;          // 0
+uniform float user_Saturation;             // 1.00
+uniform float user_Noise_Intensity;        // 0.00
+uniform float user_Fog_Strength;           // 0.00
+
 uniform bool  user_Enhance_Transparency;   // 1
+uniform bool  user_Enhance_Edges;          // 0
 uniform bool  user_Hemisphere_Lighting;    // 1
 
 uniform bool  user_light_Front;            // 1
 uniform bool  user_light_Highlight;        // 1
-uniform bool  user_light_Left;             // 1
+uniform bool  user_light_Left;             // 0
 uniform bool  user_light_Lower;            // 0
+uniform vec4  backgroundColor; 
 // END UNIFORM
  
 varying float shine;
@@ -23,6 +26,7 @@ varying vec4  color;
 varying vec3  normal;
 varying vec3  viewDirection;
 varying vec3  v_texCoord3D;
+varying float fogFactor;
 
 
 void main()
@@ -74,7 +78,10 @@ void main()
    normal        = vertexNormal;
    viewDirection = normalize(vertexPosition);
    v_texCoord3D  = gl_Vertex.xyz;
+   gl_ClipVertex = gl_ModelViewMatrix * gl_Vertex;
    gl_Position   = gl_ModelViewProjectionMatrix * gl_Vertex;
 
-   gl_ClipVertex = gl_ModelViewMatrix * gl_Vertex;
+   float fogDistance = gl_ClipVertex.z;
+   float fogDensity  = 0.1*user_Fog_Strength;
+   fogFactor         = 1.0 /exp( (fogDistance * fogDensity)* (fogDistance * fogDensity));
 }

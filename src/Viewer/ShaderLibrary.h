@@ -116,6 +116,21 @@ namespace Data {
          bool filtersActive() { return m_filtersActive; };
          bool shadersInitialized() const { return m_shadersInitialized; }
 
+         template <class T>
+         void broadcast(QString const& variableName, T const& value) {
+#ifdef IQMOL_SHADERS
+            QByteArray raw(variableName.toLocal8Bit());
+            const char* c_str(raw.data());
+
+            QList<unsigned> programs(m_shaders.values());
+            for (int i = 0; i < programs.size(); ++i) {
+                unsigned program(programs[i]);
+                GLint location(m_glFunctions->glGetUniformLocation(program, c_str));
+                if (location > 0) setUniformVariable(program, location, value);
+            }
+#endif
+         }
+
          // This does not filter for NoShader
          template <class T>
          bool setUniformVariable(QString const& shaderName, QString const& variable, T 
@@ -133,7 +148,7 @@ namespace Data {
             const char* c_str(raw.data());
             GLint location(m_glFunctions->glGetUniformLocation(program, c_str));
             if (location < 0) {
-               // qDebug() << "Shader location not found:" << shaderName << variable;
+               qDebug() << "Shader location not found:" << shaderName << variable;
                return false;
             }
             setUniformVariable(program, location, value);

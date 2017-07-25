@@ -426,8 +426,8 @@ uniform vec4 color; // red green blue alpha
 // END UNIFORM
 
 uniform can be replaced by 'in' and if no default is given the floats default
-to 0.0 and the color to white.  Comments between the BEGIN and END lines are
-ignored.
+to 0.0 and the color to white.  Note colors must be given as vec4 not vec3.
+Comments between the BEGIN and END lines are ignored.
 */
 QVariantMap ShaderLibrary::parseUniformVariables(QString const& shaderPath)
 {
@@ -542,26 +542,21 @@ bool ShaderLibrary::setUniformVariables(QString const& shaderName, QVariantMap c
 
    for (QVariantMap::const_iterator iter = map.begin(); iter != map.end(); ++iter) {
        name = iter.key();
+
        switch (iter.value().type()) {
-
-//        case QVariant::QColor:
-//             color = iter.value().value<QColor>();
-//             if (!color.isValid() || !setUniformVariable(shaderName, name, color)) {
-//                return false;
-//             }
-//           break;
-
           case QVariant::Bool:
              ok = iter.value().toBool(); 
              if (!setUniformVariable(shaderName, name, ok)) return false;
              break;
-
           case QVariant::Double:
              val = iter.value().toDouble(&ok);  
              if (!ok || !setUniformVariable(shaderName, name, val)) return false;
              break;
-
           default:
+             // See if we have a color.  Note QColor is not in the QVariant
+             // namespace so we have to do an explicit test.
+             color = iter.value().value<QColor>();
+             if (color.isValid() && setUniformVariable(shaderName, name, color)) break;
              QLOG_DEBUG() << "Unsupported QVariant type in ShaderLibrary";
              break;
        }
