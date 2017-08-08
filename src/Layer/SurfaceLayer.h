@@ -62,6 +62,7 @@ namespace IQmol {
             void drawFast();
             void drawSelected();
             void setAlpha(double const alpha);
+            void setDrawMode(DrawMode const mode) { m_drawMode = mode; }
             void setClip(bool const tf);
             void povray(PovRayGen&);
 
@@ -84,7 +85,6 @@ namespace IQmol {
             bool propertyIsSigned() const { return m_surface.propertyIsSigned(); }
             bool isVdW() const;
             void getPropertyRange(double& min, double& max) const;
-            void setDrawMode(DrawMode const mode) { m_drawMode = mode; }
             double area() const { return m_surface.area(); }
             void balanceScale(bool const);
 

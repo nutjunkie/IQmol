@@ -28,37 +28,47 @@
 
 namespace IQmol {
 
+class Viewer;
+
 class CameraDialog : public QDialog {
 
    Q_OBJECT
 
    public:
-      CameraDialog(qglviewer::Camera&, QWidget* parent = 0);
+      CameraDialog(qglviewer::Camera&, Viewer* parent = 0);
 
    Q_SIGNALS:
       void updated();
       void resetView();
+      void interpolated();
 
    public Q_SLOTS:
       void sync();
 
    private Q_SLOTS:
-      void on_okButton_clicked(bool);
       void on_rValue_valueChanged(double)  { updatePosition(); }
       void on_thetaValue_valueChanged(int) { updatePosition(); }
       void on_phiValue_valueChanged(int)   { updatePosition(); }
-      void on_resetButton_clicked(bool)    { resetView(); }
-
-      void updatePosition();
-
+      void on_addFrameButton_clicked(bool);
+      void on_okButton_clicked(bool);
+      void on_playButton_clicked(bool);
+      void on_resetButton_clicked(bool);
       void on_fieldOfView_valueChanged(int angle);
       void on_perspectiveButton_clicked(bool tf);
       void on_orthographicButton_clicked(bool tf);
+      void on_autoRotation_valueChanged(int speed);
+      void on_frameTable_itemSelectionChanged();
+    
+      void stopSpinning();
+      void updateSpinAngle();
+      void updatePosition();
 
    private:
       qglviewer::Camera& m_camera;
       Ui::CameraDialog m_dialog;
       bool m_emitSignals;
+      double m_angleIncrement;
+      double m_spinAngle;
 };
 
 } // end namespace IQmol

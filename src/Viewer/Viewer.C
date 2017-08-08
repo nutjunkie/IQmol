@@ -184,6 +184,9 @@ void Viewer::editCamera()
       m_cameraDialog = new CameraDialog(*camera(), this);
       connect(m_cameraDialog, SIGNAL(updated()), this, SLOT(updateGL()));
       connect(m_cameraDialog, SIGNAL(resetView()), this, SLOT(resetView()));
+
+      //connect(m_cameraDialog, SIGNAL(interpolated()), this, SLOT(updateGL()));
+      connect(m_cameraDialog, SIGNAL(interpolated()), this, SLOT(animate()));
    }
    m_cameraDialog->sync();
    m_cameraDialog->show();
@@ -706,7 +709,8 @@ void Viewer::animate()
        (*iter)->step();
    }
 
-   draw();
+   updateGL();
+   //draw();
    animationStep();
 }
 

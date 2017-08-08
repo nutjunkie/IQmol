@@ -261,14 +261,15 @@ void Surface::povray(PovRayGen& povray, Data::OMMesh const& data, QColor const& 
 
    for (face = data.faces_begin(); face != data.faces_end(); ++face) {
        faceVertex = data.cfv_iter(*face);
-       //faces.append(faceVertex->idx());
-       faces.append(faceVertex);
+       faces.append(faceVertex->idx());
+       // idx is deprectate, but this does not work:
+       // faces.append(faceVertex);
        ++faceVertex;
-       //faces.append(faceVertex->idx());
-       faces.append(faceVertex);
+       faces.append(faceVertex->idx());
+       // faces.append(faceVertex);
        ++faceVertex;
-       //faces.append(faceVertex->idx());
-       faces.append(faceVertex);
+       faces.append(faceVertex->idx());
+       // faces.append(faceVertex);
    }
 
    povray.writeMesh(vertices, normals, faces, color, m_clip);

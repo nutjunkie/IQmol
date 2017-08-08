@@ -110,6 +110,7 @@ namespace IQmol {
          void setDefaultSceneRadius() { setSceneRadius(Preferences::DefaultSceneRadius()); }
          void setSceneRadius(double const);
          void resetView();
+         void animate();
 
          /// Provided as a slot as the base function isn't.
          void updateGL() { QGLViewer::updateGL(); }
@@ -136,9 +137,6 @@ namespace IQmol {
       protected:
          void dropEvent(QDropEvent*);
          void dragEnterEvent(QDragEnterEvent*);
-
-      private Q_SLOTS:
-         void animate();
 
       protected:
          ViewerModel&  m_viewerModel;

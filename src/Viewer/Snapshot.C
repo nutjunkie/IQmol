@@ -157,7 +157,7 @@ void Snapshot::capture()
 
 if (1) {
 fileName += ".png";
-qDebug() << "Saving snapshot to" << fileName;
+//qDebug() << "Saving snapshot to" << fileName;
 m_viewer->QGLViewer::saveSnapshot(fileName, true);
 m_fileNames << fileName;
 return;

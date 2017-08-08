@@ -179,7 +179,9 @@ Data::Surface* MolecularSurfaces::calculateSuperposition(Data::SurfaceInfo const
           }
        }
 
-       coordinates.append( (*iter)->getPosition() );
+       //Molecular frame is accounted for when adding the surface
+       //coordinates.append( (*iter)->getPosition() );
+       coordinates.append( (*iter)->getTranslation() );
        atomList.append(atom); 
    }
 

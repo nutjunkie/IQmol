@@ -22,16 +22,20 @@
 
 #include "CameraDialog.h"
 #include "Numerical.h"
+#include "Viewer.h"
 #include "QsLog.h"
+#include "QVariantPointer.h"
+#include "QGLViewer/manipulatedCameraFrame.h"
 #include <cmath>
 #include <QtDebug>
+#include <QTimer>
 
 using namespace qglviewer;
 
 
 namespace IQmol {
 
-CameraDialog::CameraDialog(qglviewer::Camera& camera, QWidget* parent) : QDialog(parent),
+CameraDialog::CameraDialog(qglviewer::Camera& camera, Viewer* viewer) : QDialog(viewer),
    m_camera(camera), m_emitSignals(true)
 {
    m_dialog.setupUi(this);
@@ -39,6 +43,14 @@ CameraDialog::CameraDialog(qglviewer::Camera& camera, QWidget* parent) : QDialog
    short phi(981);
    m_dialog.thetaLabel->setText(QChar(theta));
    m_dialog.phiLabel->setText(QChar(phi));
+
+   QTableWidget* table(m_dialog.frameTable);
+   table->setColumnWidth(0,30);
+   table->horizontalHeaderItem(0)->setText("Time (s)");
+   table->horizontalHeaderItem(1)->setText("Camera Position");
+   table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+   table->setSelectionBehavior(QAbstractItemView::SelectRows);
+   table->setSelectionMode(QAbstractItemView::SingleSelection);
 }
 
 
@@ -55,12 +67,6 @@ void CameraDialog::sync()
 
    theta *= 180.0/M_PI;
    phi   *= 180.0/M_PI;
-
-/*
-   qDebug() ;
-   qDebug() << "Syncing camera from viewer" << pos.x << pos.y << pos.z  
-                                   << "   " << r << theta << phi;
-*/
 
    double fov(m_camera.fieldOfView());
    m_dialog.fieldOfView->setValue(Util::round(fov*180.0/M_PI));
@@ -100,7 +106,6 @@ void CameraDialog::on_fieldOfView_valueChanged(int angle)
 }
 
 
-
 void CameraDialog::on_perspectiveButton_clicked(bool)
 {
    m_camera.setType(Camera::PERSPECTIVE);
@@ -116,6 +121,159 @@ void CameraDialog::on_orthographicButton_clicked(bool)
    m_dialog.fieldOfViewLabel->setEnabled(false);
    m_dialog.fieldOfView->setEnabled(false);
    updated();
+}
+
+
+void CameraDialog::on_autoRotation_valueChanged(int speed)
+{
+   if (speed == 0) {
+      m_camera.frame()->stopSpinning();
+      disconnect(m_camera.frame(), SIGNAL(spun()), this, SIGNAL(interpolated()));
+      disconnect(m_camera.frame(), SIGNAL(spun()), this, SLOT(updateSpinAngle()));
+   }else {
+      m_angleIncrement = 0.01*speed;
+      m_spinAngle = 0.0;
+      m_camera.frame()->setSpinningQuaternion(Quaternion(Vec(0,1,0), -m_angleIncrement));
+      connect(m_camera.frame(), SIGNAL(spun()), this, SIGNAL(interpolated()));
+
+      if (!m_dialog.loopCheckBox->isChecked()) {
+         connect(m_camera.frame(), SIGNAL(spun()), this, SLOT(updateSpinAngle()));
+      }
+
+      m_camera.frame()->startSpinning(40); // msec
+   }
+   updated();
+}
+
+
+void CameraDialog::updateSpinAngle()
+{
+   m_spinAngle += m_angleIncrement;
+   if (m_spinAngle >= 2.0*M_PI) stopSpinning();
+}
+
+
+void CameraDialog::stopSpinning()
+{
+   m_dialog.autoRotation->setValue(0);
+}
+
+
+void CameraDialog::on_addFrameButton_clicked(bool)
+{
+   double time(m_dialog.time->value());
+   Frame* cameraFrame(new Frame(*(m_camera.frame())));
+   Vec pos(cameraFrame->position());
+
+   QString sTime(QString::number(time,'f',2));
+   QString sPos("(");
+   sPos += QString::number(pos.x,'f',2) + ",";
+   sPos += QString::number(pos.y,'f',2) + ",";
+   sPos += QString::number(pos.z,'f',2) + ")";
+
+   QTableWidget* table(m_dialog.frameTable);
+   QTableWidgetItem* item;
+
+   table->insertRow(table->rowCount());
+
+   item = new QTableWidgetItem();
+   item->setData(Qt::DisplayRole, time);
+   table->setItem(table->rowCount()-1, 0, item);
+
+   item = new QTableWidgetItem(sPos);
+   QVariant v(QVariantPointer<Frame>::toQVariant(cameraFrame));
+   item->setData(Qt::UserRole, v);
+   table->setItem(table->rowCount()-1, 1, item);
+
+   table->sortByColumn(0, Qt::AscendingOrder);
+
+   m_dialog.time->setValue(time+1.0);
+}
+
+
+void CameraDialog::on_playButton_clicked(bool)
+{
+   QTableWidget* table(m_dialog.frameTable);
+   qDebug() << "Playing" << table->rowCount() << "camera key frames";
+   if (table->rowCount() == 0) return;
+
+   KeyFrameInterpolator* keyFrameInterpolator(m_camera.keyFrameInterpolator(0));
+   if (!keyFrameInterpolator) {
+      keyFrameInterpolator = new KeyFrameInterpolator(m_camera.frame()); 
+      m_camera.setKeyFrameInterpolator(0, keyFrameInterpolator);
+      connect(keyFrameInterpolator, SIGNAL(interpolated()), this, SIGNAL(interpolated()));
+   }
+
+   keyFrameInterpolator->deletePath();
+
+   bool ok;
+   double time;
+   QTableWidgetItem* item;
+
+   for (int row = 0; row < table->rowCount(); ++row) {
+       item = table->item(row,0);
+       time = item->text().toDouble(&ok);
+       item = table->item(row,1);
+       Frame* frame = QVariantPointer<Frame>::toPointer(item->data(Qt::UserRole));
+       if (frame && ok) {
+          qDebug() << "Adding frame" << frame << "time" << time;
+          keyFrameInterpolator->addKeyFrame(*frame, time);
+       }
+   }
+
+   keyFrameInterpolator->drawPath();
+   updated();
+  
+   keyFrameInterpolator = m_camera.keyFrameInterpolator(0);
+
+   if (keyFrameInterpolator) {
+      qDebug() << "keyFrameInterpolator" << keyFrameInterpolator << "activating";
+      qDebug() << "Duration            " << keyFrameInterpolator->duration();
+      qDebug() << "Number of frames    " << keyFrameInterpolator->numberOfKeyFrames();
+      qDebug() << "Interpolation period" << keyFrameInterpolator->interpolationPeriod();
+      qDebug() << "Interpolation frame " << keyFrameInterpolator->frame();
+      qDebug() << "Camera frame        " << m_camera.frame();
+   }
+
+   keyFrameInterpolator->setInterpolationTime(0.0);
+   m_camera.playPath(0);
+}
+
+
+void CameraDialog::on_frameTable_itemSelectionChanged()
+{
+   QTableWidget* table(m_dialog.frameTable);
+
+   QList<QTableWidgetItem*> selection(table->selectedItems());
+   if (selection.isEmpty()) return;
+
+   int row(selection.first()->row());
+   qDebug() << "Item selection changed" << row;
+
+   QTableWidgetItem* item(table->item(row,1));
+   Frame* frame = QVariantPointer<Frame>::toPointer(item->data(Qt::UserRole));
+   if (frame) {
+      m_camera.setPosition(frame->position());
+      m_camera.setOrientation(frame->orientation());
+   }
+   updated();
+}
+
+
+void CameraDialog::on_resetButton_clicked(bool)
+{ 
+   QTableWidget* table(m_dialog.frameTable);
+   QTableWidgetItem* item;
+   for (int row = 0; row < table->rowCount(); ++row) {
+       item = table->item(row,1);
+       Frame* frame = QVariantPointer<Frame>::toPointer(item->data(Qt::UserRole));
+       if (frame) delete frame;
+   }
+
+   table->setRowCount(0);
+   m_dialog.autoRotation->setValue(0);
+   m_dialog.time->setValue(0.00);
+   resetView(); 
 }
 
 

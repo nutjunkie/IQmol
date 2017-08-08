@@ -94,6 +94,7 @@ namespace IQmol {
 
          double m_speed;
          double m_alpha;
+         Layer::Surface::DrawMode m_mode;
 
          int  m_referenceFrames;
          bool m_updateBonds;

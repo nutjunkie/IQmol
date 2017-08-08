@@ -6,147 +6,276 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>347</width>
-    <height>132</height>
+    <width>369</width>
+    <height>516</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Configure Camera</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_4">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
-      <widget class="QRadioButton" name="orthographicButton">
-       <property name="text">
-        <string>Orthographic</string>
+      <widget class="QGroupBox" name="groupBox_3">
+       <property name="title">
+        <string>Projection</string>
        </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QRadioButton" name="perspectiveButton">
+          <property name="text">
+           <string>Perspective</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="orthographicButton">
+          <property name="text">
+           <string>Orthographic</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QLabel" name="fieldOfViewLabel">
+            <property name="text">
+             <string>Field of View</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="fieldOfView">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="minimum">
+             <number>5</number>
+            </property>
+            <property name="maximum">
+             <number>180</number>
+            </property>
+            <property name="singleStep">
+             <number>5</number>
+            </property>
+            <property name="value">
+             <number>45</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
      </item>
      <item>
-      <widget class="QRadioButton" name="perspectiveButton">
-       <property name="text">
-        <string>Perspective</string>
+      <widget class="QGroupBox" name="groupBox_4">
+       <property name="title">
+        <string>Auto Rotation</string>
        </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QDial" name="autoRotation">
+          <property name="minimum">
+           <number>-10</number>
+          </property>
+          <property name="maximum">
+           <number>10</number>
+          </property>
+          <property name="notchesVisible">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="loopCheckBox">
+          <property name="text">
+           <string>Loop</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="fieldOfViewLabel">
-       <property name="text">
-        <string>FoV</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QSpinBox" name="fieldOfView">
-       <property name="minimum">
-        <number>5</number>
-       </property>
-       <property name="maximum">
-        <number>180</number>
-       </property>
-       <property name="singleStep">
-        <number>5</number>
-       </property>
-       <property name="value">
-        <number>45</number>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_3">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
      </item>
     </layout>
    </item>
    <item>
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="1">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>r</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="2">
-      <widget class="QDoubleSpinBox" name="rValue">
-       <property name="minimum">
-        <double>0.000000000000000</double>
-       </property>
-       <property name="maximum">
-        <double>999.990000000000009</double>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>Position</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="5">
-      <widget class="QLabel" name="phiLabel">
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;p&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="3">
-      <widget class="QLabel" name="thetaLabel">
-       <property name="text">
-        <string>t</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="6">
-      <widget class="QSpinBox" name="phiValue">
-       <property name="wrapping">
-        <bool>true</bool>
-       </property>
-       <property name="correctionMode">
-        <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
-       </property>
-       <property name="maximum">
-        <number>360</number>
-       </property>
-       <property name="singleStep">
-        <number>15</number>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="4">
-      <widget class="QSpinBox" name="thetaValue">
-       <property name="wrapping">
-        <bool>true</bool>
-       </property>
-       <property name="correctionMode">
-        <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
-       </property>
-       <property name="maximum">
-        <number>180</number>
-       </property>
-       <property name="singleStep">
-        <number>15</number>
-       </property>
-       <property name="value">
-        <number>0</number>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Position</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_5">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>r</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="rValue">
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="minimum">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>999.990000000000009</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="thetaLabel">
+        <property name="text">
+         <string>t</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="thetaValue">
+        <property name="wrapping">
+         <bool>true</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="correctionMode">
+         <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
+        </property>
+        <property name="maximum">
+         <number>180</number>
+        </property>
+        <property name="singleStep">
+         <number>15</number>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="phiLabel">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;p&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="phiValue">
+        <property name="wrapping">
+         <bool>true</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="correctionMode">
+         <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
+        </property>
+        <property name="maximum">
+         <number>360</number>
+        </property>
+        <property name="singleStep">
+         <number>15</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_4">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>55</width>
+          <height>35</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Path</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Time</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QDoubleSpinBox" name="time">
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="suffix">
+           <string>s</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="addFrameButton">
+          <property name="text">
+           <string>Add Frame</string>
+          </property>
+          <property name="autoDefault">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="playButton">
+          <property name="text">
+           <string>Play</string>
+          </property>
+          <property name="autoDefault">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QTableWidget" name="frameTable">
+        <column>
+         <property name="text">
+          <string>Time</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Frame</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -168,6 +297,9 @@
        <property name="text">
         <string>Reset</string>
        </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
       </widget>
      </item>
      <item>
@@ -182,9 +314,19 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>frameTable</tabstop>
+  <tabstop>addFrameButton</tabstop>
+  <tabstop>autoRotation</tabstop>
   <tabstop>perspectiveButton</tabstop>
+  <tabstop>time</tabstop>
+  <tabstop>orthographicButton</tabstop>
   <tabstop>rValue</tabstop>
+  <tabstop>playButton</tabstop>
+  <tabstop>thetaValue</tabstop>
+  <tabstop>resetButton</tabstop>
   <tabstop>okButton</tabstop>
+  <tabstop>fieldOfView</tabstop>
+  <tabstop>phiValue</tabstop>
  </tabstops>
  <resources/>
  <connections/>

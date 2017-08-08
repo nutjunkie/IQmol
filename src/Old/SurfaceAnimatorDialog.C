@@ -168,6 +168,7 @@ void SurfaceAnimatorDialog::setPositiveColor(QColor const& color)
       QString bg("background-color: ");
       bg += color.name();
       m_dialog.positiveColorButton->setStyleSheet(bg);
+      m_colorPositive = color;
       Preferences::PositiveSurfaceColor(color);
    }
 }
@@ -179,6 +180,7 @@ void SurfaceAnimatorDialog::setNegativeColor(QColor const& color)
       QString bg("background-color: ");
       bg += color.name();
       m_dialog.negativeColorButton->setStyleSheet(bg);
+      m_colorNegative = color;
       Preferences::NegativeSurfaceColor(color);
    }
 }
@@ -214,6 +216,7 @@ void SurfaceAnimatorDialog::on_dotsButton_clicked(bool)
 
 void SurfaceAnimatorDialog::setDrawMode(Layer::Surface::DrawMode const mode)
 {
+   m_mode = mode;
    if (m_animator) {
       m_animator->setDrawMode(mode);
       updated();
@@ -264,6 +267,7 @@ void SurfaceAnimatorDialog::computeIsovalueAnimation()
 
        if (surface) {
           surface->setAlpha(m_alpha);
+          surface->setDrawMode(m_mode);
           frames.append(new Animator::Combo::Data(geom, surface));
        }
        isovalue1 += dIso;
