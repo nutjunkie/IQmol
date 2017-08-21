@@ -36,7 +36,7 @@ Symmetry::Symmetry(Layer::Symmetry& symmetry) : m_symmetry(symmetry)
 
 void Symmetry::sync()
 {
-   qDebug() << "Symmetry::sync called";
+   //qDebug() << "Symmetry::sync called";
 }
 
 } } // end namespace IQmol::Configurator

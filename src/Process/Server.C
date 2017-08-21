@@ -735,7 +735,12 @@ QStringList Server::parseListMessage(Job* job, QString const& message)
 
    for (int i = 0; i < tokens.size(); ++i) {
        QString file(tokens[i]);
-       if (!file.isEmpty() && file != "pathtable") list << file;
+       if (!file.isEmpty() && 
+           // avoid copying the duplicate individual checkpoint files
+           !file.contains(QRegExp("input\\.\\d+\\.FChk")) &&
+           file != "pathtable") {
+           list << file;
+       }
    }
 
    if (m_configuration.isWebBased()) {
