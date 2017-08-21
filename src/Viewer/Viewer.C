@@ -795,8 +795,8 @@ void Viewer::endSelection(const QPoint&)
    m_selectionHits = glRenderMode(GL_RENDER);
    //qDebug() << "Viewer::endSelection with nhits:" << m_selectionHits << m_objects.size() ;
    //for (int i = 0; i < m_objects.size(); ++i) qDebug() << m_objects[i];
-   setSelectRegionWidth(3);
-   setSelectRegionHeight(3);
+   setSelectRegionWidth(5);
+   setSelectRegionHeight(5);
 
    if (m_selectionHits == 0) return;
 
