@@ -34,7 +34,7 @@ namespace Parser {
 
 bool Xyz::parse(TextStream& textStream)
 {
-   Data::GeometryList* geometryList(new Data::GeometryList);
+   Data::GeometryList* geometryList(new Data::GeometryList(m_label));
    Data::Geometry* geometry(0);
 
    while (!textStream.atEnd()) {

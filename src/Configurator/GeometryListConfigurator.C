@@ -77,6 +77,7 @@ void GeometryList::load()
    QList<Layer::Geometry*> 
       geometries(m_geometryList.findLayers<Layer::Geometry>(Layer::Children));
    table->setRowCount(geometries.size());
+   m_rawData.clear();
 
    QTableWidgetItem* energy;
 
@@ -99,7 +100,7 @@ void GeometryList::load()
        energy->setTextAlignment(Qt::AlignCenter|Qt::AlignVCenter);
        table->setItem(row, 0, energy);
        double e((*iter)->energy());
-       double x(row);
+       double x(row+1);
        Data::Geometry& geom((*iter)->data());
 
        if (geom.hasProperty<Data::Constraint>()) {
@@ -113,7 +114,7 @@ void GeometryList::load()
    if (property) {
       m_customPlot->xAxis->setLabel("Geometric Parameter");
    }else {
-   m_customPlot->xAxis->setLabel("Geometry");
+      m_customPlot->xAxis->setLabel("Geometry");
    }
 
    plotEnergies();

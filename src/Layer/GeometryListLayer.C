@@ -131,14 +131,15 @@ void GeometryList::removeGeometry()
     for (iter = m_geometryList.begin(); iter != m_geometryList.end(); ++iter) {
         if (m_molecule->isCurrentGeometry(*iter)) {
            target = *iter;
-qDebug() << "Data::Geometry Match found"<< target;
+           // qDebug() << "Data::Geometry Match found"<< target;
            QList<Geometry*> geometryLayers(findLayers<Geometry>(Children));
            QList<Geometry*>::iterator geom;
            for (geom = geometryLayers.begin(); geom != geometryLayers.end(); ++geom) {
                if (&((*geom)->data()) == target) {
-                  qDebug() << "Layer::Geometry Match found"<< target;
+                  //qDebug() << "Layer::Geometry Match found"<< target;
                   removeLayer(*geom);
                   m_geometryList.removeAll(target);
+                  if (m_configurator) m_configurator->load();
                   return;
                   delete target;
                   delete (*geom);

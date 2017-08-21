@@ -23,6 +23,7 @@
 #include "CartesianCoordinatesParser.h"
 #include "QChemOutputParser.h"
 #include "QChemInputParser.h"
+#include "XyzParser.h"
 #include "TextStream.h"
 #include "AtomicProperty.h"
 #include "Constraint.h"
@@ -154,6 +155,10 @@ bool QChemOutput::parse(TextStream& textStream)
    QStringList tokens;
    QString line;
 
+   // This is a hack as the FSM jobs print out the wrong format for the SCF
+   // energy.
+   bool isFSM(false);
+
    while (!textStream.atEnd()) {
       line = textStream.nextLine();
 
@@ -219,6 +224,9 @@ bool QChemOutput::parse(TextStream& textStream)
             break;
          }
 
+      }else if (line.contains("Starting FSM Calculation")) {
+         isFSM = true;
+
       }else if (line.contains("PES scan, value:")) {
          tokens = TextStream::tokenize(line);
          if (tokens.size() > 5 && currentGeometry) {
@@ -236,7 +244,13 @@ bool QChemOutput::parse(TextStream& textStream)
                scanGeometries->append(geom);
             }
          }
-     
+
+      }else if (line == "STRING") {
+         Xyz parser("FSM Geometries");
+         if (parser.parse(textStream)) {
+            Data::Bank& bank(parser.data());
+            m_dataBank.merge(bank); 
+         }
 
       }else if (line.contains("Requested basis set is")) {
          tokens = TextStream::tokenize(line);
@@ -266,7 +280,8 @@ bool QChemOutput::parse(TextStream& textStream)
             currentGeometry->setMultiplicity(m_nAlpha-m_nBeta + 1);
          }
 
-      }else if (line.contains("Total energy in the final basis set")) {
+      }else if (line.contains("Total energy in the final basis set") ||
+                (isFSM && line.contains("Total energy in the small basis set")) ) {
          tokens = TextStream::tokenize(line);
          if (tokens.size() == 9 && currentGeometry) {
             bool ok;

@@ -34,10 +34,12 @@ namespace Parser {
    class Xyz : public Base {
 
       public:
+         Xyz(QString const& label = "Geometries") : m_label(label) { }
          bool  parse(TextStream&);
 
       private:
          Data::Geometry* readNextGeometry(TextStream&);
+         QString m_label;
    };
 
 } } // end namespace IQmol::Parser
