@@ -1093,7 +1093,6 @@ void InputDialog::resetControls()
    }
 }
 
-
 //! A simple loop for synchronizing controls with the list of string values
 //! contained in a Job object.  This routine takes advantage of the Update
 //! functions that are bind'ed in the initializeControl functions.  These Updates
@@ -1101,12 +1100,20 @@ void InputDialog::resetControls()
 //! irrespective of its type.
 void InputDialog::setControls(Job* job) 
 {
+   bool noHF = false, hasCisRoot = false;
    typedef QMap<QString, QString> QStringMap;
    QStringMap::iterator iter;
    QStringMap opts(job->getOptions());
    for (iter = opts.begin(); iter != opts.end(); ++iter) {
        if (m_setUpdates.count(iter.key())) {
-          m_setUpdates[iter.key()]->operator()(iter.value());
+          //qDebug() << "setControls: " << iter.key() << iter.value();
+          if (iter.key() == "EXCHANGE" && iter.value() != "HF") noHF = true;
+          if (iter.key() == "CIS_N_ROOTS" && iter.value() != "0") hasCisRoot = true;
+          if (noHF && hasCisRoot && iter.key() == "METHOD") { 
+            qDebug() << "setControls: " << iter.key() << "TD-DFT";
+            m_setUpdates[iter.key()]->operator()("TD-DFT");
+          }else
+            m_setUpdates[iter.key()]->operator()(iter.value());
        }else {
           qDebug() << "Warning: Update not initialised for" 
                    << iter.key() << "in InputDialog::setControls";

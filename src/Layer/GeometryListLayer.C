@@ -107,6 +107,8 @@ void GeometryList::cloneLastGeometry()
    Data::Geometry* last(m_geometryList.last());
    Data::Geometry* geom(new Data::Geometry(*last));
    m_geometryList.append(geom);
+   m_geometryList.setDefaultIndex(-1);
+
    
    // Now create the new layer
    Geometry* geometry(new Geometry(*geom));
@@ -118,6 +120,8 @@ void GeometryList::cloneLastGeometry()
    QAction* remove(geometry->newAction("Remove"));
    connect(remove, SIGNAL(triggered()), this, SLOT(removeGeometry()));
    appendRow(geometry);
+
+   setCurrentGeometry(m_geometryList.defaultIndex());
 }
 
 

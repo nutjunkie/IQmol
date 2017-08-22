@@ -95,7 +95,11 @@ QString MoleculeSection::myDump()
          s += "  " + m_coordinatesFsm + "\n";
       }else {
          if (m_coordinates != "") {
-            s += "  " + m_coordinates + "\n";
+           // ZQ: temporary fix for fragment job input
+           if (m_coordinates.contains(QRegExp("^--")))
+             s += m_coordinates + "\n";
+           else
+             s += "  " + m_coordinates + "\n";
          }
       }
    }
@@ -124,7 +128,6 @@ void MoleculeSection::setCoordinates(QString const& coordinates) {
 
 
 void MoleculeSection::setCoordinatesFsm(QString const& coordinates) { 
-qDebug() << "Fsm coordinates set to " << coordinates;
    m_coordinatesFsm = coordinates; 
 }
 

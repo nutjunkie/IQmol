@@ -1442,9 +1442,9 @@ void Molecule::createGeometryList()
    if (list.isEmpty()) {
       Data::GeometryList* gld(new Data::GeometryList());
       saveToCurrentGeometry();
+
       if (m_currentGeometry) {
          gld->append(m_currentGeometry); 
-
          Data::Bank bank;
          bank.append(gld);
          appendData(bank);
@@ -1452,7 +1452,7 @@ void Molecule::createGeometryList()
    }
 
    list = findLayers<GeometryList>(Children);
-   if (!list.isEmpty()) list.last()->cloneLastGeometry();
+   if (!list.isEmpty())  list.last()->cloneLastGeometry();
 }
 
 
