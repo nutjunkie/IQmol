@@ -127,9 +127,10 @@ void ParseFile::run()
    for (file = m_filePaths.begin(); file != m_filePaths.end(); ++file) {
        QString fileName(*file);
        QLOG_INFO() << "Parsing file: " << fileName;
-       if (parse(fileName, addToFileList)) {
+       //if (parse(fileName, addToFileList)) {
+          parse(fileName, addToFileList); //ignore return for the moment
           if (addToFileList) fileList->append(new Data::File(fileName));
-       }
+       //}
    }
 
    if (fileList->isEmpty()) {

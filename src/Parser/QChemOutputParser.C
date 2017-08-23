@@ -246,8 +246,16 @@ bool QChemOutput::parse(TextStream& textStream)
          }
 
       }else if (line == "STRING") {
+         textStream.skipLine(1);
+         QString nodes;
+         while (!line.contains("--------")) {
+             line = textStream.nextLine();
+             nodes += line + "\n";
+         }
+
          Xyz parser("FSM Geometries");
-         if (parser.parse(textStream)) {
+         TextStream fsmStream(&nodes);
+         if (parser.parse(fsmStream)) {
             Data::Bank& bank(parser.data());
             m_dataBank.merge(bank); 
          }
@@ -259,7 +267,7 @@ bool QChemOutput::parse(TextStream& textStream)
             if (!rem.isEmpty()) {
                method = rem.last()->value("method").toUpper();
                method += "/" + tokens[4];
-               qDebug() << "Setting method to" << method;
+               //qDebug() << "Setting method to" << method;
             }
 
          }
@@ -589,7 +597,7 @@ qDebug() << "Reading CIS(D) Energies";
 
 void QChemOutput::readOrbitalSymmetries(TextStream& textStream, bool const readSymmetries)
 {
-   qDebug() << "Reading orbital energies";
+//   qDebug() << "Reading orbital energies";
    // We only parse the orbital symmetries section if we have excited states
    QList<Data::ExcitedStates*> es(m_dataBank.findData<Data::ExcitedStates>());
    if (es.isEmpty()) return;
@@ -1267,8 +1275,6 @@ void QChemOutput::readCharges(TextStream& textStream, Data::Geometry& geometry,
       double q(0.0);
       for (int i = 0; i < charges.size(); ++i) q += charges[i];
       geometry.setCharge(Util::round(q));
-qDebug() << "Setting charge to:" << Util::round(q);
-      
    }else {
       m_errors.append("Problem setting atomic charges");
    }
