@@ -1518,6 +1518,8 @@ void Molecule::setGeometry(IQmol::Data::Geometry& geometry)
 
    multiplicityAvailable(geometry.multiplicity());
    chargeAvailable(geometry.charge());
+
+   reperceiveBonds(false);
 }
 
 
@@ -1542,6 +1544,7 @@ void Molecule::saveToGeometry(Data::Geometry& geometry)
       geometry.setCoordinates(coordinates);
    }else {
       QLOG_WARN() << "Invalid Geometry passed to Molecule::saveToGeometry";
+      QLOG_WARN() << atomicNumbers;
    }
 
    geometry.setChargeAndMultiplicity(totalCharge(), multiplicity());
@@ -1905,7 +1908,9 @@ void Molecule::symmetrize(double tolerance, bool updateCoordinates)
       postCommand(cmd);
       m_modified = true;
       softUpdate();
-      saveToCurrentGeometry();
+	  // remove this as I think it is unnecessary and can cause a premature
+	  // setting of number of atom for the GeometryList.
+	  // saveToCurrentGeometry();
 
       centerOfNuclearChargeAvailable(centerOfNuclearCharge());
       setAtomicCharges(Data::Type::GasteigerCharge);
@@ -1956,7 +1961,9 @@ void Molecule::translateToCenter(GLObjectList const& selection)
    softUpdate();
    centerOfNuclearChargeAvailable(centerOfNuclearCharge());
    reindexAtomsAndBonds();
-   saveToCurrentGeometry();
+   // remove this as I think it is unnecessary and can cause a premature
+   // setting of number of atom for the GeometryList.
+   // saveToCurrentGeometry();
    m_modified = true;
 }
 
