@@ -491,7 +491,8 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
 
 void FormattedCheckpoint::clear(OrbitalData& orbitalData)
 {
-   orbitalData.label.clear();
+   // Don't clear this as it results in blank items in multi-job files.
+   //orbitalData.label.clear();  
    orbitalData.alphaCoefficients.clear();
    orbitalData.betaCoefficients.clear();
    orbitalData.alphaEnergies.clear();

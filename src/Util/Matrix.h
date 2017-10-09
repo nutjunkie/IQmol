@@ -28,6 +28,9 @@
 #include "boost/multi_array.hpp"
 //#include <boost/serialization/serialization.hpp>
 
+// Following included as per: https://svn.boost.org/trac/boost/ticket/12978
+#include <boost/serialization/array_wrapper.hpp>
+
 #include <QStringList>
 
 

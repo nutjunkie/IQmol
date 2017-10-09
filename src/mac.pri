@@ -12,20 +12,20 @@ contains(CONFIG, DEPLOY) {
    LIBS        += $${BOOST}/stage/lib/libboost_serialization.a
    LIBS        += $${BOOST}/stage/lib/libboost_exception.a
 
-   # OpenBabel
-   OPENBABEL    = $(DEV)/openbabel-2.4.1
-   INCLUDEPATH += $${OPENBABEL}/include
-   INCLUDEPATH += $${OPENBABEL}/build/include
-   LIBS        += $${OPENBABEL}/build/src/libopenbabel.a
+   # libssl/libcrypto
+   INCLUDEPATH += $(DEV)/openssl/include
+   LIBS        += $(DEV)/openssl/libssl.a
+   LIBS        += $(DEV)/openssl/libcrypto.a
 
    # SSH2
    INCLUDEPATH += $(DEV)/libssh2-1.8.0/include
    LIBS        += $(DEV)/libssh2-1.8.0/build/src/libssh2.a
 
-   # libssl/libcrypto
-   INCLUDEPATH += $(DEV)/openssl/include
-   LIBS        += $(DEV)/openssl/libssl.a
-   LIBS        += $(DEV)/openssl/libcrypto.a
+   # OpenBabel
+   OPENBABEL    = $(DEV)/openbabel-2.4.1
+   INCLUDEPATH += $${OPENBABEL}/include
+   INCLUDEPATH += $${OPENBABEL}/build/include
+   LIBS        += $${OPENBABEL}/build/src/libopenbabel.a
 
    # gfortran
    LIBS        += /usr/local/gfortran/lib/libgfortran.a

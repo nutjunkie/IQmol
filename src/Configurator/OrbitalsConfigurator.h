@@ -46,9 +46,6 @@ namespace Configurator {
       Q_OBJECT
 
       public:
-//         enum { AlphaOrbital, BetaOrbital, TotalDensity, SpinDensity, 
-//            AlphaDensity, BetaDensity, CustomDensity };
-
          explicit Orbitals(Layer::Orbitals&);
          ~Orbitals();
 

@@ -64,6 +64,8 @@ namespace Configurator {
          void on_lorentzianButton_clicked(bool);
          void on_widthSlider_valueChanged(int);
          void on_energyTable_itemSelectionChanged();
+         void on_resetZoomButton_clicked(bool);
+         void setSelectionRectMode(QMouseEvent* e);
 
       private:
          enum Profile { Gaussian, Lorentzian };

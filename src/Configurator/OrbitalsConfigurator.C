@@ -151,17 +151,14 @@ void Orbitals::initPlot()
    frame->setLayout(layout);
    layout->addWidget(m_customPlot);
 
-   QVector<double>  ticks;
-   QVector<QString> labels;
+   QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
+   m_customPlot->xAxis->setTicker(textTicker);
+   textTicker->addTick(0.75, "Alpha");
+   textTicker->addTick(2.5, "Beta");
 
-   ticks << 0.75 << 2.50;
-   labels << "Alpha" << "Beta";
-
-   m_customPlot->xAxis->setAutoTicks(false);
-   m_customPlot->xAxis->setAutoTickLabels(false);
-   m_customPlot->xAxis->setTickVector(ticks);
-   m_customPlot->xAxis->setTickVectorLabels(labels);
-   m_customPlot->xAxis->setSubTickCount(0);
+   //m_customPlot->xAxis->setAutoTicks(false);
+   m_customPlot->xAxis->setTickLabels(false);
+   m_customPlot->xAxis->setSubTicks(false);
    m_customPlot->xAxis->setRange(0,3.25);
 
    unsigned nOrbs(m_orbitals.nOrbitals());
@@ -311,7 +308,7 @@ void Orbitals::clearSelectedOrbitals(int)
    QList<QCPGraph*> selection(m_customPlot->selectedGraphs());
    QList<QCPGraph*>::iterator iter;
    for (iter = selection.begin(); iter != selection.end(); ++iter) {
-       (*iter)->setSelected(false);
+//       (*iter)->setSelected(false);
    }
 }
 

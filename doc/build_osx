@@ -6,7 +6,11 @@ Libraries
 ~~~~~~~~~
 
 Most of the work required in compiling IQmol is setting up the required
-libraries.  The compilation of the code should be relatively straightforward.
+libraries.  The compilation of the code itself is relatively straightforward.
+
+ o You will need XCode > 5.0 installed in order to install the Qt libraries.
+   To get the command line tools installed you need to run:
+     xcode-select --install 
 
  o Download the Qt libraries from http://www.qt.io
    The latest version tested is 5.8.  Ensure that the bin directory
@@ -21,7 +25,7 @@ libraries.  The compilation of the code should be relatively straightforward.
 
 
  o OpenSSL:
-   - Download: https://www.openssl.org/source  (version 1.0.1p)
+   - Download: https://www.openssl.org/source  (version 1.0.1p tested)
    - Compile:  The regular compilation does not compile x86 code, so we envoke
      Configure manually:
 
@@ -33,10 +37,10 @@ libraries.  The compilation of the code should be relatively straightforward.
 
 
  o LibSSH2:
-   - Download: http://www.libssh2.org  (version 1.6.0)
-   - Compile: 
+   - Download: http://www.libssh2.org  (version 1.8.0 tested)
+   - Compile (making sure the correct path for libssl is specified): 
 
-        ./configure --with-openssl --with-libssl-prefix=$DEV/openssl-1.0.1p --with-libz
+        ./configure --with-openssl --with-libssl-prefix=/path/to/openssl-1.0.1p --with-libz
         make
 
    - Shared and static libraries located in src/.libs
@@ -88,9 +92,3 @@ Compilation
  o Compile the remaining IQmol source
       qmake IQmol.pro
       make
-
-
-Other
-~~~~~
- o In order to get the command line tools installed you need to:
-     xcode-select --install 
