@@ -230,7 +230,8 @@ bool ParseFile::parse(QString const& filePath, bool& addToFileList)
    }
 
    if (!parser) {
-      QLOG_WARN() << "Failed to find parser for file:" << filePath << " extension " << extension;
+      QLOG_WARN() << "Failed to find parser for file:" << filePath 
+                  << " extension " << extension;
       return false;
    }
 

@@ -858,6 +858,8 @@ void ViewerModel::insertMoleculeById(QString identifier)
    Parser::OpenBabel parser;
    QString ext;
 
+   qDebug() << "Identifier" << identifier;
+
    if (identifier.indexOf("SMILES:") == 0) {
       identifier.replace(0,7,"");
       ext = "smi";
@@ -874,8 +876,6 @@ void ViewerModel::insertMoleculeById(QString identifier)
       QLOG_WARN() << "Unknown molecule identifier type:" << identifier;
       return;
    }
-
-   qDebug() << "Identifier" << identifier;
 
    bool ok(parser.parse(identifier, ext));
    QStringList errors(parser.errors());
