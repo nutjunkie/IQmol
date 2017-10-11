@@ -866,11 +866,8 @@ void ViewerModel::insertMoleculeById(QString identifier)
 
    }else if (identifier.indexOf("INCHI:") == 0) {
       identifier.replace(0,6,"");
+      if (!identifier.startsWith("InChI=")) identifier.prepend("InChI=");
       ext = "inchi";
-
-   }else if (identifier.indexOf("INCHIKEY:") == 0) {
-      identifier.replace(0,9,"");
-      ext = "inchikey";
 
    }else {
       QLOG_WARN() << "Unknown molecule identifier type:" << identifier;
