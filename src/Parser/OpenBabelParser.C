@@ -173,8 +173,8 @@ bool OpenBabel::parse(QString const& string, QString const& extension)
 
 void OpenBabel::buildFrom2D(::OpenBabel::OBMol& obMol)
 {
-qDebug() << "*** Building 3D coordinates ***";
-qDebug() << "***     Build    may fail   ***";
+   qDebug() << "*** Building 3D coordinates ***";
+   qDebug() << "***      Build may fail     ***";
    ::OpenBabel::OBBuilder builder;
    builder.Build(obMol);
 
@@ -182,20 +182,22 @@ qDebug() << "***     Build    may fail   ***";
    atomTyper.AssignImplicitValence(obMol);
    atomTyper.AssignHyb(obMol);
 
-   obMol.AddHydrogens(true, true);
+   obMol.AddHydrogens(false, false);
    obMol.BeginModify();
    obMol.EndModify();
 
    const char* obff(Preferences::DefaultForceField().toLatin1().data());
    ::OpenBabel::OBForceField* 
       forceField(::OpenBabel::OBForceField::FindForceField(obff));
+
    if (!forceField) {
-qDebug() << "Force Field not found";
+      m_errors.append("Force field not found");
       return;
    }
 
    if (!forceField->Setup(obMol)) {
-qDebug() << "Force Field failed setup";
+      m_errors.append("Force field setup failed");
+      return;
    }
 
    forceField->SetLogFile(&std::cout);
@@ -203,8 +205,10 @@ qDebug() << "Force Field failed setup";
 
    forceField->SetConformers(obMol);
 
+   // Built structures can be a bit dodge, so give the optimizers plenty of
+   // cycles.
    double convergence(1e-6f);
-   int maxSteps(1000);
+   int maxSteps(2000);
 
    // We pre-optimize with conjugate gradient 
    forceField->ConjugateGradientsInitialize(maxSteps, convergence);

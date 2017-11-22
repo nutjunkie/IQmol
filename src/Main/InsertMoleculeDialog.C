@@ -43,9 +43,6 @@ void InsertMoleculeDialog::okButton_clicked()
    }else if (m_dialog.inchi->isChecked()) {
       id = "INCHI:" + id;
       insertMoleculeById(id);
-   }else if (m_dialog.inchikey->isChecked()) {
-      id = "INCHIKEY:" + id;
-      insertMoleculeById(id);
    }
 }
 

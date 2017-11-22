@@ -69,9 +69,9 @@ libraries.  The compilation of the code itself is relatively straightforward.
      PlugIns: /usr/local/lib/openbable/2.4.1
      Libs:    /usr/local/lib
 
-   - Alternatively, the source can be downloaded and compiled with:
+   - Alternatively, the source can be downloaded and compiled with (in the build directory):
 
-        cmake -DBUILD_SHARED=OFF ..
+        cmake -DBUILD_SHARED=OFF -DWITH_STATIC_INCHI=ON -DWITH_STATIC_LIBXML=ON ..
         make
 
 	 The static libopenbabel.a will be in the build/src directory. This 

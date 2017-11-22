@@ -858,24 +858,21 @@ void ViewerModel::insertMoleculeById(QString identifier)
    Parser::OpenBabel parser;
    QString ext;
 
+   qDebug() << "Identifier" << identifier;
+
    if (identifier.indexOf("SMILES:") == 0) {
       identifier.replace(0,7,"");
       ext = "smi";
 
    }else if (identifier.indexOf("INCHI:") == 0) {
       identifier.replace(0,6,"");
+      if (!identifier.startsWith("InChI=")) identifier.prepend("InChI=");
       ext = "inchi";
-
-   }else if (identifier.indexOf("INCHIKEY:") == 0) {
-      identifier.replace(0,9,"");
-      ext = "inchikey";
 
    }else {
       QLOG_WARN() << "Unknown molecule identifier type:" << identifier;
       return;
    }
-
-   qDebug() << "Identifier" << identifier;
 
    bool ok(parser.parse(identifier, ext));
    QStringList errors(parser.errors());

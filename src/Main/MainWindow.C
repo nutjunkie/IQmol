@@ -575,7 +575,7 @@ void MainWindow::createMenus()
    // ----- Build Menu -----
    menu = menuBar()->addMenu("Build");
 
-      name = "Insert Molecule ID";
+      name = "Insert Molecule by ID";
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), this, SLOT(insertMoleculeDialog()));
       action->setShortcut(Qt::CTRL + Qt::Key_B);

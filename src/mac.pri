@@ -26,6 +26,7 @@ contains(CONFIG, DEPLOY) {
    INCLUDEPATH += $${OPENBABEL}/include
    INCLUDEPATH += $${OPENBABEL}/build/include
    LIBS        += $${OPENBABEL}/build/src/libopenbabel.a
+   LIBS        += $${OPENBABEL}/build/src/formats/libinchi/libinchi.a
 
    # gfortran
    LIBS        += /usr/local/gfortran/lib/libgfortran.a
@@ -35,7 +36,7 @@ contains(CONFIG, DEPLOY) {
    # Misc
    LIBS        += -L/usr/X11/lib  
    LIBS        += -framework GLUT
-   LIBS        += -L/usr/lib -lz
+   LIBS        += -L/usr/lib -lz -lxml2
 
    QMAKE_LFLAGS   += -Wl,-no_compact_unwind 
    #QMAKE_LFLAGS  += -stdlib=libc++ -std=c++11
