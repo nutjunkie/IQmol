@@ -41,25 +41,34 @@ namespace Data {
          enum AngularMomentum { S, P, D5, D6, F7, F10, G9, G15 };
          static QString toString(AngularMomentum const);
 
+         Type::ID typeID() const { return Type::Shell; }
+
          Shell(AngularMomentum const angularMomentum = S, 
             unsigned const atomIndex = 0,
             qglviewer::Vec const& position = qglviewer::Vec(), 
             QList<double> const& exponents = QList<double>(), 
             QList<double> const& contractionCoefficients = QList<double>());
 
-         Type::ID typeID() const { return Type::Shell; }
-
 		 /// Returns the (-1,-1,-1) and (1,1,1) octant corners of a rectangular
 		 /// box that encloses the significant region of the Shell where 
-		 /// significance is determined by s_thresh.  
-         void boundingBox(qglviewer::Vec& min, qglviewer::Vec& max);
+		 /// significance is determined by thresh.  Note that for surfaces this 
+         /// value is rather large to ensure the bounding box as small as possible. 
+         /// The value should be consistent with the minimum isosurface value
+         /// in the SurfaceConfigurator class.  Note that a large value may 
+         /// not be appropriate for other wavefunction analyses.
+         void boundingBox(qglviewer::Vec& min, qglviewer::Vec& max, 
+            double const thresh = 0.001);
 
 		 // Returns a pointer to an array containing the values of the basis
 		 // functions at the given position.
-         double* evaluate(qglviewer::Vec const& position) const;
+         double const* evaluate(qglviewer::Vec const& gridPoint) const;
+
          AngularMomentum angularMomentum() const { return m_angularMomentum; }
+
          unsigned atomIndex() const { return m_atomIndex; }
+
          unsigned nBasis() const;
+
          QString label(unsigned const) const;
 
          void serialize(InputArchive& ar, unsigned int const version = 0) {
@@ -72,21 +81,17 @@ namespace Data {
 
          void dump() const;
 
-         static double thresh() { return s_thresh; }
-
       private:
-		 /// Value used for Shell cutoffs.  Note that for surfaces this value
-		 /// is rather large to ensure the bounding box as small as possible. 
-         /// The value should be consistent with the minimum isosurface value
-         /// in the SurfaceConfigurator class.  Note that a large value may 
-         /// not be appropriate for other wavefunction analyses.
-		 static double s_thresh; 
 		 /// Shell values are stored in this static array, the length of which
-		 /// is sufficient for up to g angular momentum.
-         /// This could cause problems if Shells are ever used in parallel
+		 /// is sufficient for up to g angular momentum.  This could cause 
+         /// problems if Shells are ever used in parallel.
          static double s_values[15];
          static double s_zeroValues[15];
 
+		 /// Computes and saves the significant radius of the shell,
+		 /// as determined by thresh.  Note that this is set to
+		 /// numeric_limits<double>::max until the bounding box is 
+         /// requested with a threshold which is passed on to this.
          double computeSignificantRadius(double const thresh);
          void normalize();
 
