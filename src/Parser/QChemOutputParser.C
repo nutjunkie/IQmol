@@ -349,15 +349,28 @@ bool QChemOutput::parse(TextStream& textStream)
 
       }else if (line.contains("Ground-State Mulliken Net Atomic Charges")) {
          textStream.skipLine(3);
-         if (currentGeometry) readCharges(textStream, *currentGeometry, "Mulliken");
+         if (currentGeometry) 
+            readCharges(textStream, *currentGeometry, Data::Type::MullikenCharge);
 
       }else if (line.contains("Ground-State ChElPG Net Atomic Charges")) {
          textStream.skipLine(3);
-         if (currentGeometry) readCharges(textStream, *currentGeometry, "CHELPG");
+         if (currentGeometry) 
+            readCharges(textStream, *currentGeometry, Data::Type::ChelpgCharge);
+
+      }else if (line.contains("Hirshfeld Atomic Charges")) {
+         textStream.skipLine(3);
+         if (currentGeometry) 
+            readCharges(textStream, *currentGeometry, Data::Type::HirshfeldCharge);
  
       }else if (line.contains("Stewart Net Atomic Charges")) {
          textStream.skipLine(3);
-         if (currentGeometry) readCharges(textStream, *currentGeometry, "Stewart");
+         if (currentGeometry) 
+            readCharges(textStream, *currentGeometry, Data::Type::MultipoleDerivedCharge);
+
+      }else if (line.contains("Lowdin Net Atomic Charges")) {
+         textStream.skipLine(3);
+         if (currentGeometry) 
+            readCharges(textStream, *currentGeometry, Data::Type::LowdinCharge);
 
       }else if (line.contains("Orbital Energies (a.u.) and Symmetries")) {
          textStream.skipLine(2);
@@ -1217,8 +1230,9 @@ void QChemOutput::readNmrCouplings(TextStream& textStream, Data::Geometry& geome
 
 
 void QChemOutput::readCharges(TextStream& textStream, Data::Geometry& geometry, 
-   QString const& label)
+   Data::Type::ID type)
 {
+qDebug() << "Reading charge group" << Data::Type::toString(type);
    QStringList tokens;
 
    QList<double> charges;
@@ -1258,15 +1272,19 @@ void QChemOutput::readCharges(TextStream& textStream, Data::Geometry& geometry,
       return;
    }
 
-   if (label == "Mulliken") {
+   if (type == Data::Type::MullikenCharge) {
       allOk = geometry.setAtomicProperty<Data::MullikenCharge>(charges);
       if (allOk && !spins.isEmpty()) {
          allOk = allOk && geometry.setAtomicProperty<Data::SpinDensity>(spins);
       }
-   }else if (label == "Stewart") {
+   }else if (type == Data::Type::MultipoleDerivedCharge) {
       allOk = geometry.setAtomicProperty<Data::MultipoleDerivedCharge>(charges);
-   }else if (label == "CHELPG") {
+   }else if (type == Data::Type::ChelpgCharge) {
       allOk = geometry.setAtomicProperty<Data::ChelpgCharge>(charges);
+   }else if (type == Data::Type::HirshfeldCharge) {
+      allOk = geometry.setAtomicProperty<Data::HirshfeldCharge>(charges);
+   }else if (type == Data::Type::LowdinCharge) {
+      allOk = geometry.setAtomicProperty<Data::LowdinCharge>(charges);
    }else {
       m_errors.append("Unknown charge type");
    }

@@ -70,6 +70,7 @@ namespace Data {
                 NmrShielding,           NmrShift,               Mass, 
                 MultipoleExpansion,     MullikenCharge,         MultipoleDerivedCharge, 
                 AtomicCharge,           GasteigerCharge,        ChelpgCharge,
+                HirshfeldCharge,        LowdinCharge,
                 SpinDensity,            VdwRadius,              MultipoleExpansionList,
                 NmrReference,           NmrReferenceList,       Nmr,
                 ElectronicTransition,   ElectronicTransitionList, ExcitedStates,

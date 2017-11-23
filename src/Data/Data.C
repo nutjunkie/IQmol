@@ -76,14 +76,17 @@ QString toString(ID const id)
       case NmrShielding:             s = "Data::NmrShielding";              break;
       case NmrShift:                 s = "Data::NmrShift";                  break;
       case Mass:                     s = "Data::Mass";                      break;
+
       case AtomicCharge:             s = "Data::AtomicCharge";              break;
       case MullikenCharge:           s = "Data::MullikenCharge";            break;
       case GasteigerCharge:          s = "Data::GasteigerCharge";           break;
       case MultipoleDerivedCharge:   s = "Data::MultipoleDerivedCharge";    break;
+      case LowdinCharge:             s = "Data::LoedinCharge";    break;
       case ChelpgCharge:             s = "Data::ChelpgCharge";              break;
+      case HirshfeldCharge:          s = "Data::HirshfeldCharge";           break;
+
       case SpinDensity:              s = "Data::SpinDensity";               break;
       case VdwRadius:                s = "Data::VdwRadius";                 break;
-
       case DipoleMoment:             s = "Data::DipoleMoment";              break;
       case TotalEnergy:              s = "Data::TotalEnergy";               break;
       case ScfEnergy:                s = "Data::ScfEnergy";                 break;
