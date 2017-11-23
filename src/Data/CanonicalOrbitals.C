@@ -31,14 +31,15 @@ namespace Data {
 CanonicalOrbitals::CanonicalOrbitals(
    unsigned const nAlpha, 
    unsigned const nBeta, 
-   ShellList const& shells, 
+   ShellList& shells, 
    QList<double> const& alphaCoefficients, 
    QList<double> const& alphaEnergies,  
    QList<double> const& betaCoefficients,  
    QList<double> const& betaEnergies,
    QString const& label)
  : Orbitals(Orbitals::Canonical, nAlpha, nBeta, shells, alphaCoefficients, 
-      betaCoefficients, label), m_alphaEnergies(alphaEnergies), m_betaEnergies(betaEnergies)
+      betaCoefficients, label), m_alphaEnergies(alphaEnergies), m_betaEnergies(betaEnergies),
+      m_nAlpha(nAlpha), m_nBeta(nBeta)
 {
 }
 

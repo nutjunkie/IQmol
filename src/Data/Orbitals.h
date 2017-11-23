@@ -40,7 +40,8 @@ namespace Data {
                             Canonical, 
                             Localized, 
                             NaturalTransition, 
-                            NaturalBond 
+                            NaturalBond,
+                            Dyson
                           };
 
          static QString toString(OrbitalType const);
@@ -51,26 +52,34 @@ namespace Data {
 
          // Pass in an empty betaCoefficient list for restricted orbitals
          Orbitals(OrbitalType const orbitalType, unsigned const nAlpha, 
-            unsigned const nBeta, ShellList const& shells,
+            unsigned const nBeta, ShellList& shells,
             QList<double> const& alphaCoefficients, QList<double> const& betaCoefficients,
             QString const& label = QString());
+
+         Orbitals(ShellList& shells, QString const& label = QString());
 
          OrbitalType orbitalType() const { return m_orbitalType; }
          // TODO: get rid of this with proper subclassing of NTOs/NBOs 
          void setOrbitalType(OrbitalType orbitalType) { m_orbitalType = orbitalType; }
 
-         unsigned nAlpha() const { return m_nAlpha; }
-         unsigned nBeta()  const { return m_nBeta; }
+         //unsigned nAlpha() const { return m_nAlpha; }
+         //unsigned nBeta()  const { return m_nBeta; }
+
          unsigned nBasis() const { return m_nBasis; }
          unsigned nOrbitals() const { return m_nOrbitals; }
          bool     restricted() const { return m_restricted; }
 
          Matrix const& alphaCoefficients() const;
          Matrix const& betaCoefficients() const; 
-         ShellList& shellList();
 
+         ShellList& shellList() { return m_shellList; }
          QString const& label() const { return m_label; }
+
          void setLabel(QString const& label) { m_label = label; }
+
+         // Returns a list of labels, set = 0 => alpha/left
+         //                           set = 1 => beta/right
+         virtual QStringList labels(unsigned const set) const;
 
          virtual bool consistent() const;
 

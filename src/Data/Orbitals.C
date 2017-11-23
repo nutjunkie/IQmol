@@ -38,6 +38,7 @@ QString Orbitals::toString(OrbitalType const type)
       case Localized:          s = "Localized Orbitals";           break;
       case NaturalTransition:  s = "Natural Transition Orbitals";  break;
       case NaturalBond:        s = "Natural Bond Orbitals";        break;
+      case Dyson:              s = "Dyson Orbitals";               break;
    }
 
    return s;
@@ -45,10 +46,19 @@ QString Orbitals::toString(OrbitalType const type)
 
 
 Orbitals::Orbitals(
+   ShellList& shells,
+   QString const& label)
+ : m_label(label), m_shellList(shells)
+{
+}
+  
+
+
+Orbitals::Orbitals(
    OrbitalType const orbitalType,
    unsigned const nAlpha, 
    unsigned const nBeta, 
-   ShellList const& shells,
+   ShellList& shells,
    QList<double> const& alphaCoefficients, 
    QList<double> const& betaCoefficients,
    QString const& label)
@@ -85,6 +95,23 @@ qDebug() << "Orbitals ctor restricted" << m_restricted;
            m_betaCoefficients(i,j) = betaCoefficients[kb];
        }
    }
+}
+
+
+QStringList Orbitals::labels(unsigned const set) const
+{
+/*
+   unsigned n(set ? m_betaCoefficients.size()
+   QStringList list;
+   if (set == 0 ) {
+       
+   }else {
+   }
+
+   for (unsigned i = 0; i < n; ++
+
+   return list;
+*/
 }
 
 
@@ -125,12 +152,6 @@ Matrix const& Orbitals::alphaCoefficients() const
 Matrix const& Orbitals::betaCoefficients()  const 
 { 
    return restricted() ? m_alphaCoefficients :  m_betaCoefficients;
-}
-
-
-ShellList& Orbitals::shellList() 
-{ 
-   return m_shellList; 
 }
 
 

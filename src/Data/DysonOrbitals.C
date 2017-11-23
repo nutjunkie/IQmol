@@ -20,32 +20,39 @@
 
 ********************************************************************************/
 
-#include "OrbitalsList.h"
+#include "CanonicalOrbitals.h"
 #include <QDebug>
 
 
 namespace IQmol {
 namespace Data {
 
-template<> const 
-  Type::ID Data::List<Data::Orbitals>::TypeID = Type::OrbitalsList;
 
-
-void OrbitalsList::setDefaultIndex(int index) 
-{ 
-   if (index < 0) {
-      m_defaultIndex = size()-1;
-   }else if (index < size()) {
-      m_defaultIndex = index; 
-   }
-   qDebug() << "Setting default index in OrbitalsList" << index << "->" << m_defaultIndex;
+DysonOrbitals::DysonOrbitals(ShellList const& shells)
+ : Orbitals(Orbitals::Dyson, 0, 0, shells, 
+      betaCoefficients, "Dyson Orbitals")
+{
 }
 
 
-void OrbitalsList::dump() const
+
+bool DysonOrbitals::consistent() const
 {
-   qDebug() << "OrbitalsList of length" << size() << "default index:" << m_defaultIndex;
-   List<Orbitals>::dump();
+   bool ok(Orbitals::consistent());
+
+   //TODO: remove when NTOs/NBOs properly subclassed.
+   if (orbitalType() == Orbitals::Canonical) {
+      ok = ok && m_alphaEnergies.size() == (int)m_nOrbitals;
+      if (!m_restricted) ok = ok && m_betaEnergies.size() == (int)m_nOrbitals;
+   }
+      
+   return ok; 
+}
+
+
+void CanonicalOrbitals::dump() const
+{
+   Orbitals::dump();
 }
 
 } } // end namespace IQmol::Data

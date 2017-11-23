@@ -741,6 +741,7 @@ Data::ShellList* FormattedCheckpoint::makeShellList(ShellData const& shellData,
        }
    }
 
+   shellList->resize();
    return shellList;
 }
 

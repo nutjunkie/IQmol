@@ -1,5 +1,5 @@
-#ifndef IQMOL_DATA_CANONICALORBITALS_H
-#define IQMOL_DATA_CANONICALORBITALS_H
+#ifndef IQMOL_DATA_DYSONORBITALS_H
+#define IQMOL_DATA_DYSONORBITALS_H
 /*******************************************************************************
 
   Copyright (C) 2011-2015 Andrew Gilbert
@@ -24,43 +24,23 @@
 
 #include "Orbitals.h"
 #include "Surface.h"
-#include "Density.h"
 
 
 namespace IQmol {
 namespace Data {
 
-   /// Data class for molecular orbital information
-   class CanonicalOrbitals : public Orbitals {
+   class DysonOrbitals : public Orbitals {
 
       friend class boost::serialization::access;
 
       public:
-         Type::ID typeID() const { return Type::CanonicalOrbitals; }
+         Type::ID typeID() const { return Type::DysonOrbitals; }
 
-         CanonicalOrbitals(unsigned const nAlpha, unsigned const nBeta, 
-            ShellList& shells, QList<double> const& alphaCoefficients, 
-            QList<double> const& alphaEnergies, QList<double> const& betaCoefficients,  
-            QList<double> const& betaEnergies, QString const& label);
+         DysonOrbitals(ShellList const& shells);
 
-         // TODO: Not sure why this is here or even required, perhaps move it to Orbitals.
-         //SurfaceList& surfaceList() { return m_surfaceList; }
+         addOrbital(QString const& label, QList<double> const& coefficients);
 
-         //void appendSurface(Data::Surface* surfaceData) {
-         //   m_surfaceList.append(surfaceData);
-         //}
-
-         DensityList const& densityList() const { return m_densityList; }
-         void appendDensities(Data::DensityList const& densities) {
-            m_densityList << densities;
-         }
-
-         double alphaOrbitalEnergy(unsigned i) const;
-         double betaOrbitalEnergy(unsigned i) const;
-         bool   consistent() const;
-
-         unsigned nAlpha() const { return m_nAlpha; }
-         unsigned nBeta()  const { return m_nBeta; }
+         bool consistent() const;
 
          void serialize(InputArchive& ar, unsigned const version = 0) 
          {
@@ -80,17 +60,8 @@ namespace Data {
          template <class Archive>
          void privateSerialize(Archive& ar, unsigned const /* version */) 
          {
-            ar & m_alphaEnergies;
-            ar & m_betaEnergies;
-            ar & m_surfaceList;
+            // nothing extra at the moment
          }
-
-         QList<double> m_alphaEnergies;
-         QList<double> m_betaEnergies;
-         SurfaceList   m_surfaceList;
-         DensityList   m_densityList;
-         unsigned      m_nAlpha;
-         unsigned      m_nBeta;
    };
 
 } } // end namespace IQmol::Data

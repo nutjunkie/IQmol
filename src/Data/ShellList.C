@@ -141,8 +141,6 @@ Vector const& ShellList::shellPairValues(qglviewer::Vec const& gridPoint)
    }
 
    return m_shellPairValues;
-
 }
-
 
 } } // end namespace IQmol::Data

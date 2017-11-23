@@ -39,6 +39,7 @@ contains(CONFIG, DEPLOY) {
    LIBS        += -L/usr/lib -lz -lxml2
 
    QMAKE_LFLAGS   += -Wl,-no_compact_unwind 
-   #QMAKE_LFLAGS  += -stdlib=libc++ -std=c++11
+   QMAKE_LFLAGS   += -stdlib=libc++ 
+   #QMAKE_LFLAGS  += -std=c++11
    QMAKE_RPATHDIR += @executable_path/../Frameworks
 }

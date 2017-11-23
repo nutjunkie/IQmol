@@ -81,8 +81,6 @@ Orbitals::Orbitals(Data::Orbitals& orbitals)
    m_configurator.sync();
    setConfigurator(&m_configurator);
 
-   m_orbitals.shellList().resize();
- 
    m_orbitals.boundingBox(m_bbMin, m_bbMax);
    QLOG_WARN() << "Attempt to append surface";
    //appendSurfaces(m_orbitals.surfaceList());
@@ -112,13 +110,21 @@ void Orbitals::setMolecule(Layer::Molecule* molecule)
 
 unsigned Orbitals::nAlpha() const 
 { 
-   return m_orbitals.nAlpha(); 
+qDebug() << "####################################";
+qDebug() << "# !!! Returning 0 for nAlpha() !!! #";
+qDebug() << "####################################";
+return 0;
+   //return m_orbitals.nAlpha(); 
 }
 
 
 unsigned Orbitals::nBeta() const 
 { 
-   return m_orbitals.nBeta(); 
+qDebug() << "###################################";
+qDebug() << "# !!! Returning 0 for nBeta() !!! #";
+qDebug() << "###################################";
+return 0;
+   //return m_orbitals.nBeta(); 
 }
 
 

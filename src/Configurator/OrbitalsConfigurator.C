@@ -567,7 +567,7 @@ void Orbitals::updateOrbitalRange(int nElectrons, QComboBox* combo)
 void Orbitals::updateBasisRange() 
 {
    m_configurator.orbitalLabel->setText("Function(s):");
-   Data::ShellList& shellList(m_orbitals.m_orbitals.shellList());
+   Data::ShellList const& shellList(m_orbitals.m_orbitals.shellList());
 
    QComboBox* comboMin(m_configurator.orbitalRangeMin);
    QComboBox* comboMax(m_configurator.orbitalRangeMax);
