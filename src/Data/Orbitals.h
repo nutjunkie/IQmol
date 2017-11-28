@@ -30,7 +30,6 @@
 namespace IQmol {
 namespace Data {
 
-   /// Base class for different orbital types
    class Orbitals : public Base {
 
       friend class boost::serialization::access;
@@ -47,23 +46,18 @@ namespace Data {
          static QString toString(OrbitalType const);
 
          // Required for serialization
-         Orbitals() : m_orbitalType(Undefined), m_nAlpha(0), m_nBeta(0), m_nBasis(0), 
-            m_nOrbitals(0), m_restricted(false) { }
-
+         Orbitals() : m_orbitalType(Undefined), m_nBasis(0), m_nOrbitals(0),
+            m_restricted(false) { }
+            
          // Pass in an empty betaCoefficient list for restricted orbitals
-         Orbitals(OrbitalType const orbitalType, unsigned const nAlpha, 
-            unsigned const nBeta, ShellList& shells,
-            QList<double> const& alphaCoefficients, QList<double> const& betaCoefficients,
+         Orbitals(
+            OrbitalType const orbitalType, 
+            ShellList const& shellList,
+            QList<double> const& alphaCoefficients, 
+            QList<double> const& betaCoefficients,
             QString const& label = QString());
 
-         Orbitals(ShellList& shells, QString const& label = QString());
-
          OrbitalType orbitalType() const { return m_orbitalType; }
-         // TODO: get rid of this with proper subclassing of NTOs/NBOs 
-         void setOrbitalType(OrbitalType orbitalType) { m_orbitalType = orbitalType; }
-
-         //unsigned nAlpha() const { return m_nAlpha; }
-         //unsigned nBeta()  const { return m_nBeta; }
 
          unsigned nBasis() const { return m_nBasis; }
          unsigned nOrbitals() const { return m_nOrbitals; }
@@ -76,19 +70,16 @@ namespace Data {
          QString const& label() const { return m_label; }
 
          void setLabel(QString const& label) { m_label = label; }
+         // Returns a list of labels for each orbital for display.
+         // Default label is just the orbital index.
+         virtual QStringList labels(bool const alpha = true) const;
 
-         // Returns a list of labels, set = 0 => alpha/left
-         //                           set = 1 => beta/right
-         virtual QStringList labels(unsigned const set) const;
+         // Returns the recommended index for displaying.
+         virtual unsigned labelIndex(bool /* alpha = true */) const { return 0; }
 
          virtual bool consistent() const;
-
-         // TODO: remove this is actually part of ShellList
-         void boundingBox(qglviewer::Vec& min, qglviewer::Vec& max) const
-         {
-            min = m_bbMin;
-            max = m_bbMax;
-         }
+         virtual unsigned nAlpha() const { return 0; }
+         virtual unsigned nBeta() const { return 0; }
 
          void serialize(InputArchive& ar, unsigned const version = 0)
          {
@@ -102,6 +93,13 @@ namespace Data {
 
          void dump() const;
 
+         // TODO: Not sure why this is here or even required.
+         //SurfaceList& surfaceList() { return m_surfaceList; }
+         //void appendSurface(Data::Surface* surfaceData) {
+         //   m_surfaceList.append(surfaceData);
+         //}
+
+
 
       protected:
          template <class Archive>
@@ -109,33 +107,26 @@ namespace Data {
          {
             ar & m_orbitalType;
             ar & m_label;
-            ar & m_nAlpha;
-            ar & m_nBeta;
             ar & m_nBasis;
             ar & m_nOrbitals;
             ar & m_restricted;
             ar & m_alphaCoefficients;
             ar & m_betaCoefficients;
             ar & m_shellList;
-            ar & m_bbMin;
-            ar & m_bbMax;
+            //ar & m_surfaceList;
          }
 
          OrbitalType m_orbitalType;
-         unsigned m_nAlpha;
-         unsigned m_nBeta;
-         unsigned m_nBasis;
-         unsigned m_nOrbitals;
-         bool     m_restricted;
-
-         QString   m_label;
-         ShellList m_shellList;    // TODO: move out
-         Matrix    m_alphaCoefficients;
-         Matrix    m_betaCoefficients;
-
-         qglviewer::Vec m_bbMin, m_bbMax; // bounding box, TODO: move out
-
+         QString     m_label;
+         unsigned    m_nBasis;
+         unsigned    m_nOrbitals;
+         bool        m_restricted;
+         ShellList   m_shellList;
+         Matrix      m_alphaCoefficients;
+         Matrix      m_betaCoefficients;
+         //SurfaceList   m_surfaceList;
    };
+
 
 } } // end namespace IQmol::Data
 

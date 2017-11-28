@@ -20,7 +20,7 @@
 
 ********************************************************************************/
 
-#include "CanonicalOrbitals.h"
+#include "NaturalBondOrbitals.h"
 #include <QDebug>
 
 
@@ -28,7 +28,7 @@ namespace IQmol {
 namespace Data {
 
 
-CanonicalOrbitals::CanonicalOrbitals(
+NaturalBondOrbitals::NaturalBondOrbitals(
    unsigned const nAlpha, 
    unsigned const nBeta, 
    ShellList const& shells, 
@@ -37,20 +37,20 @@ CanonicalOrbitals::CanonicalOrbitals(
    QList<double> const& betaCoefficients,  
    QList<double> const& betaEnergies,
    QString const& label)
- : Orbitals(Orbitals::Canonical, shells, alphaCoefficients, betaCoefficients, label), 
-   m_nAlpha(nAlpha), m_nBeta(nBeta), 
-   m_alphaEnergies(alphaEnergies), m_betaEnergies(betaEnergies)
+ : Orbitals(Orbitals::NaturalTransition, shells, alphaCoefficients, betaCoefficients, label), 
+   m_alphaEnergies(alphaEnergies), m_betaEnergies(betaEnergies),
+   m_nAlpha(nAlpha), m_nBeta(nBeta)
 {
 }
 
 
-double CanonicalOrbitals::alphaOrbitalEnergy(unsigned i) const 
+double NaturalBondOrbitals::alphaOrbitalEnergy(unsigned i) const 
 {
    return ((int)i < m_alphaEnergies.size()) ? m_alphaEnergies[i] : 0.0;
 }
 
 
-double CanonicalOrbitals::betaOrbitalEnergy(unsigned i) const 
+double NaturalBondOrbitals::betaOrbitalEnergy(unsigned i) const 
 {
    double energy(0.0);
    if (m_restricted) {
@@ -62,41 +62,21 @@ double CanonicalOrbitals::betaOrbitalEnergy(unsigned i) const
 }
 
 
-bool CanonicalOrbitals::consistent() const
+bool NaturalBondOrbitals::consistent() const
 {
    bool ok(Orbitals::consistent());
 
-   ok = ok && m_nAlpha <= m_nOrbitals;
-   ok = ok && m_nBeta  <= m_nOrbitals;
-
-   ok = ok && m_alphaEnergies.size() == (int)m_nOrbitals;
-   if (!m_restricted) ok = ok && m_betaEnergies.size() == (int)m_nOrbitals;
+   //TODO: remove when NTOs/NBOs properly subclassed.
+   if (orbitalType() == Orbitals::NaturalTransition) {
+      ok = ok && m_alphaEnergies.size() == (int)m_nOrbitals;
+      if (!m_restricted) ok = ok && m_betaEnergies.size() == (int)m_nOrbitals;
+   }
       
    return ok; 
 }
 
 
-QStringList CanonicalOrbitals::labels(bool const alpha) const
-{
-   QStringList list(Orbitals::labels(alpha));
-   int n(alpha ? m_nAlpha : m_nBeta);
-   if (n > 0 && list.size() > n) {
-      list[n-1] += " (HOMO)"; 
-      list[n]   += " (LUMO)"; 
-   }  
-   return list;
-} 
-
-
-unsigned CanonicalOrbitals::labelIndex(bool const alpha) const
-{
-   int n(alpha ? m_nAlpha : m_nBeta);
-   return std::max(0,n-1);
-}
-
-
-
-void CanonicalOrbitals::dump() const
+void NaturalBondOrbitals::dump() const
 {
    Orbitals::dump();
 }

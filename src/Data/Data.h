@@ -53,10 +53,10 @@ namespace Data {
                 Energy,                 ConformerEnergy,        Hessian,
                 ScfEnergy,              TotalEnergy,            ForceFieldEnergy,
                 DipoleMoment,           VibrationalMode,        VibrationalModeList, 
-                PointGroup,
-                Frequencies,            MolecularOrbitals,      MolecularOrbitalsList,
+                PointGroup,             Frequencies,            
+//MolecularOrbitals,      MolecularOrbitalsList,
                 Orbitals,               OrbitalsList,           LocalizedOrbitals, 
-                CanonicalOrbitals, 
+                CanonicalOrbitals,      NaturalBondOrbitals,    NaturalTransitionOrbitals,
                 Density,                DensityList,
                 Shell,                  ShellList,              Mesh,
                 MeshList,               Surface,                SurfaceList,
@@ -73,7 +73,7 @@ namespace Data {
                 HirshfeldCharge,        LowdinCharge,
                 SpinDensity,            VdwRadius,              MultipoleExpansionList,
                 NmrReference,           NmrReferenceList,       Nmr,
-                ElectronicTransition,   ElectronicTransitionList, ExcitedStates,
+                ExcitedStates,          ElectronicTransition,   ElectronicTransitionList, 
                 OrbitalSymmetries,
                /*---------------------  *---------------------  *--------------------- */
                 YamlNode,               PovRay,                 GeminalOrbitals

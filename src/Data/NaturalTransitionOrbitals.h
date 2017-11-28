@@ -1,5 +1,5 @@
-#ifndef IQMOL_DATA_DYSONORBITALS_H
-#define IQMOL_DATA_DYSONORBITALS_H
+#ifndef IQMOL_DATA_NATURALTRANSITIONORBITALS_H
+#define IQMOL_DATA_NATURALTRANSITIONORBITALS_H
 /*******************************************************************************
 
   Copyright (C) 2011-2015 Andrew Gilbert
@@ -23,22 +23,31 @@
 ********************************************************************************/
 
 #include "Orbitals.h"
+#include "Density.h"
+
 
 namespace IQmol {
 namespace Data {
 
-   class DysonOrbitals : public Orbitals {
+   /// Data class for molecular orbital information
+   class NaturalTransitionOrbitals : public Orbitals {
 
       friend class boost::serialization::access;
 
       public:
-         Type::ID typeID() const { return Type::DysonOrbitals; }
+         Type::ID typeID() const { return Type::NaturalTransitionOrbitals; }
 
-         DysonOrbitals(ShellList const& shells);
+         NaturalTransitionOrbitals(ShellList const& shells, 
+            QList<double> const& alphaCoefficients, QList<double> const& alphaOccupancies, 
+            QList<double> const& betaCoefficients,  QList<double> const& betaOccupancies, 
+            QString const& label);
 
-         addOrbital(QString const& label, QList<double> const& coefficients);
+         double alphaOccupancy(unsigned i) const;
+         double betaOccupancy(unsigned i) const;
+         bool   consistent() const;
 
-         bool consistent() const;
+         QStringList labels(bool const alpha = true) const;
+         unsigned labelIndex(bool const alpha = true) const;
 
          void serialize(InputArchive& ar, unsigned const version = 0) 
          {
@@ -58,8 +67,12 @@ namespace Data {
          template <class Archive>
          void privateSerialize(Archive& ar, unsigned const /* version */) 
          {
-            // nothing extra at the moment
+            ar & m_alphaOccupancies;
+            ar & m_betaOccupancies;
          }
+
+         QList<double> m_alphaOccupancies;
+         QList<double> m_betaOccupancies;
    };
 
 } } // end namespace IQmol::Data

@@ -101,7 +101,7 @@ Base* Factory::create(Type::ID const id)
       case Type::VibrationalModeList:     data = new VibrationalModeList();     break;
       case Type::Energy:                  data = new Energy();                  break;
       case Type::Orbitals:                data = new Orbitals();                break;
-      case Type::OrbitalsList:            data = new OrbitalsList();                break;
+      case Type::OrbitalsList:            data = new OrbitalsList();            break;
 
       // ---------- Atomic Properties ---------
       case Type::AtomicSymbol:            data = new AtomicSymbol();            break;

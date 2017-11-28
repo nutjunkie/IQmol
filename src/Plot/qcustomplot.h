@@ -2321,6 +2321,7 @@ public:
                       ,ssPlus      ///< \enumimage{ssPlus.png} a plus
                       ,ssVirtual        ///<  a minus
                       ,ssOccupied       ///<  a circle
+                      ,ssHole           ///<  a circle
                       ,ssDoublyOccupied ///<  two circles
                       ,ssCircle    ///< \enumimage{ssCircle.png} a circle
                       ,ssDisc      ///< \enumimage{ssDisc.png} a circle which is filled with the pen's color (not the brush as with ssCircle)

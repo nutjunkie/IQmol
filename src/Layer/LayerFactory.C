@@ -39,6 +39,7 @@
 #include "AtomLayer.h"
 #include "BondLayer.h"
 #include "CanonicalOrbitalsLayer.h"
+#include "NaturalTransitionOrbitalsLayer.h"
 #include "ChargeLayer.h"
 #include "CubeDataLayer.h"
 #include "FileLayer.h"
@@ -112,20 +113,6 @@ Layer::List Factory::toLayers(Data::Base& data)
             Data::PointChargeList&  charges(dynamic_cast<Data::PointChargeList&>(data));
             layers << convert(charges);
          } break;
-
-/*
-         case Data::Type::MolecularOrbitalsList: {
-            Data::MolecularOrbitalsList& list(dynamic_cast<Data::MolecularOrbitalsList&>(data));
-            layers << convert(list);
-         } break;
-
-         case Data::Type::MolecularOrbitals: {
-            Data::MolecularOrbitals& 
-               molecularOrbitals(dynamic_cast<Data::MolecularOrbitals&>(data));
-            layers.append(new MolecularOrbitals(molecularOrbitals));
-         } break;
-*/
-
 
          case Data::Type::OrbitalsList: {
             Data::OrbitalsList& list(dynamic_cast<Data::OrbitalsList&>(data));
@@ -324,8 +311,13 @@ List Factory::convert(Data::OrbitalsList& orbitalsList)
        Data::CanonicalOrbitals* canonical =
           dynamic_cast<Data::CanonicalOrbitals*>(*iter);
 
+       Data::NaturalTransitionOrbitals* ntos=
+          dynamic_cast<Data::NaturalTransitionOrbitals*>(*iter);
+
        if (canonical) {
           list.append(new CanonicalOrbitals(*canonical));
+       }else if (ntos) {
+          list.append(new NaturalTransitionOrbitals(*ntos));
        }else {
           list.append(new Orbitals(**iter));
        }

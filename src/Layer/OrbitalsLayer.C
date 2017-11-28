@@ -21,7 +21,6 @@
 ********************************************************************************/
 
 #include "OrbitalsLayer.h"
-#include "Orbitals.h"
 #include "MoleculeLayer.h"
 #include "GridInfoDialog.h"
 #include "MarchingCubes.h"
@@ -81,9 +80,7 @@ Orbitals::Orbitals(Data::Orbitals& orbitals)
    m_configurator.sync();
    setConfigurator(&m_configurator);
 
-   m_orbitals.boundingBox(m_bbMin, m_bbMax);
-   QLOG_WARN() << "Attempt to append surface";
-   //appendSurfaces(m_orbitals.surfaceList());
+   m_orbitals.shellList().boundingBox(m_bbMin, m_bbMax);
 }
 
 
@@ -105,26 +102,6 @@ void Orbitals::setMolecule(Layer::Molecule* molecule)
    m_molecule = molecule;
    connect(this, SIGNAL(updated()), m_molecule, SIGNAL(updated()));
    connect(this, SIGNAL(softUpdate()), m_molecule, SIGNAL(softUpdate()));
-}
-
-
-unsigned Orbitals::nAlpha() const 
-{ 
-qDebug() << "####################################";
-qDebug() << "# !!! Returning 0 for nAlpha() !!! #";
-qDebug() << "####################################";
-return 0;
-   //return m_orbitals.nAlpha(); 
-}
-
-
-unsigned Orbitals::nBeta() const 
-{ 
-qDebug() << "###################################";
-qDebug() << "# !!! Returning 0 for nBeta() !!! #";
-qDebug() << "###################################";
-return 0;
-   //return m_orbitals.nBeta(); 
 }
 
 

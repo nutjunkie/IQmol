@@ -46,39 +46,25 @@ QString Orbitals::toString(OrbitalType const type)
 
 
 Orbitals::Orbitals(
-   ShellList& shells,
-   QString const& label)
- : m_label(label), m_shellList(shells)
-{
-}
-  
-
-
-Orbitals::Orbitals(
    OrbitalType const orbitalType,
-   unsigned const nAlpha, 
-   unsigned const nBeta, 
-   ShellList& shells,
+   ShellList const& shellList,
    QList<double> const& alphaCoefficients, 
    QList<double> const& betaCoefficients,
    QString const& label)
- : m_orbitalType(orbitalType), m_nAlpha(nAlpha), m_nBeta(nBeta), m_nBasis(0), m_nOrbitals(0),
-   m_label(label), m_shellList(shells)
+ : m_orbitalType(orbitalType), m_label(label), m_nBasis(0), m_nOrbitals(0),
+   m_shellList(shellList)
 {
    if (m_shellList.isEmpty() || alphaCoefficients.isEmpty()) {
-      QLOG_WARN() << "Empty data in Orbitals constructor";  return;
+      QLOG_WARN() << "Empty data in Orbitals constructor";  
+      return;
    }
-qDebug() << "Orbitals ctor nbasis" << shells.nBasis() << m_shellList.nBasis();
-qDebug() << "Orbitals ctor a/b sizes" << alphaCoefficients.size() << betaCoefficients.size();
 
    m_nBasis     = m_shellList.nBasis();
    m_nOrbitals  = alphaCoefficients.size() / m_nBasis;
-qDebug() << "Orbitals ctor nOrbs" << m_nOrbitals;
    m_restricted = (betaCoefficients.size() != alphaCoefficients.size());
-   m_shellList.boundingBox(m_bbMin, m_bbMax);
-qDebug() << "Orbitals ctor restricted" << m_restricted;
 
    m_alphaCoefficients.resize(m_nOrbitals, m_nBasis);
+
    unsigned ka(0);
    for (unsigned i = 0; i < m_nOrbitals; ++i) {
        for (unsigned j = 0; j < m_nBasis; ++j, ++ka) {
@@ -98,45 +84,32 @@ qDebug() << "Orbitals ctor restricted" << m_restricted;
 }
 
 
-QStringList Orbitals::labels(unsigned const set) const
+QStringList Orbitals::labels(bool alpha) const
 {
-/*
-   unsigned n(set ? m_betaCoefficients.size()
+   unsigned n(alpha ? m_alphaCoefficients.size1() : m_betaCoefficients.size1());
    QStringList list;
-   if (set == 0 ) {
-       
-   }else {
+
+   for (unsigned i = 1; i <= n; ++i) {
+       list.append(QString::number(i));
    }
 
-   for (unsigned i = 0; i < n; ++
-
    return list;
-*/
 }
 
 
 bool Orbitals::consistent() const 
 { 
-   unsigned nBasis(0);
-   ShellList::const_iterator iter;
-   for (iter = m_shellList.begin(); iter != m_shellList.end(); ++iter) {
-       nBasis += (*iter)->nBasis();
-   }
+   bool consistent(m_nBasis == m_shellList.nBasis());
 
-   bool consistent(m_nBasis == nBasis);
-
-   consistent = consistent        &&
-      m_nOrbitals > 0             && 
-      m_nBasis    > 0             && 
-      m_nOrbitals <= m_nBasis ;/*    &&   // Not valid for NTOs/NBOs
-      m_nAlpha    <= m_nOrbitals  &&
-      m_nBeta     <= m_nOrbitals; */
+   consistent = consistent  &&
+      m_nOrbitals > 0       && 
+      m_nBasis    > 0       && 
+      m_nOrbitals <= m_nBasis;
 
    if (!consistent) {
+      qDebug() << "Inconsistent orbital information";
       qDebug() << "Orbitals:" << m_nOrbitals;
       qDebug() << "Basis:   " << m_nBasis;
-      qDebug() << "Alpha:   " << m_nAlpha;
-      qDebug() << "Beta:    " << m_nBeta;
    }
 
    return consistent;
@@ -157,7 +130,6 @@ Matrix const& Orbitals::betaCoefficients()  const
 
 void Orbitals::dump() const 
 {
-   qDebug() << "There are  " << m_nAlpha << "alpha and" << m_nBeta << "beta electrons";
    qDebug() << "There are  " << m_nBasis << "basis functions and" << m_nOrbitals << "orbitals";
    qDebug() << "There ares " << m_shellList.size() << "shells";
    qDebug() << "Restricted:" << m_restricted;
@@ -192,6 +164,13 @@ void Orbitals::dump() const
    qDebug() << "                       " << tally;
 
    m_shellList.dump();
+
+/*
+   SurfaceList::const_iterator surface;
+   for (surface = m_surfaceList.begin(); surface != m_surfaceList.end(); ++surface) {
+       (*surface)->dump();
+   }
+*/
 }
 
 } } // end namespace IQmol::Data

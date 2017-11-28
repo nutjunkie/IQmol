@@ -27,8 +27,11 @@ SOURCES = \
    $$PWD/GridData.C \
    $$PWD/GridSize.C \
    $$PWD/Hessian.C \
+   $$PWD/LocalizedOrbitals.C \
    $$PWD/Mesh.C \
    $$PWD/MultipoleExpansion.C \
+   $$PWD/NaturalBondOrbitals.C \
+   $$PWD/NaturalTransitionOrbitals.C \
    $$PWD/NmrData.C \
    $$PWD/NmrReference.C \
    $$PWD/NmrReferenceLibrary.C \
@@ -73,8 +76,11 @@ HEADERS = \
    $$PWD/GridData.h \
    $$PWD/GridSize.h \
    $$PWD/Hessian.h \
+   $$PWD/LocalizedOrbitals.h \
    $$PWD/Mesh.h \
    $$PWD/MultipoleExpansion.h \
+   $$PWD/NaturalBondOrbitals.h \
+   $$PWD/NaturalTransitionOrbitals.h \
    $$PWD/NmrData.h \
    $$PWD/NmrReference.C \
    $$PWD/NmrReference.h \

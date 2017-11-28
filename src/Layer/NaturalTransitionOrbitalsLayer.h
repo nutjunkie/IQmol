@@ -1,3 +1,5 @@
+#ifndef IQMOL_LAYER_NATURALTRANSITIONORBITALS_H
+#define IQMOL_LAYER_NATURALTRANSITIONORBITALS_H
 /*******************************************************************************
 
   Copyright (C) 2011-2015 Andrew Gilbert
@@ -20,23 +22,38 @@
 
 ********************************************************************************/
 
-#include "LocalizedOrbitals.h"
+#include "OrbitalsLayer.h"
+#include "NaturalTransitionOrbitals.h"
 
 
 namespace IQmol {
-namespace Data {
 
-QStringList LocalizedOrbitals::labels(bool alpha) const
-{
-   QStringList list(Orbitals::labels());
-
-   unsigned occ(alpha ? m_nAlpha : m_nBeta);
-
-   for (unsigned i = 0; i < occ; ++i) {
-       list[i] += " (occ)";
-   }
-
-   return list;
+namespace Configurator {
+   class Orbitals;
 }
 
-} } // end namespace IQmol::Data
+namespace Layer {
+
+   class NaturalTransitionOrbitals : public Orbitals {
+
+      Q_OBJECT
+
+      friend class Configurator::Orbitals;
+
+      public:
+         NaturalTransitionOrbitals(Data::NaturalTransitionOrbitals&);
+         ~NaturalTransitionOrbitals() { }
+         
+      protected:
+         double alphaOrbitalAmplitude(unsigned) const;
+         double betaOrbitalAmplitude(unsigned)  const;
+
+         QString description(Data::SurfaceInfo const&, bool const tooltip);
+
+      private:
+         // Cast of Orbitals::m_orbitals
+         Data::NaturalTransitionOrbitals& m_naturalTransitionOrbitals;  
+   };
+
+} } // End namespace IQmol::Layer 
+#endif

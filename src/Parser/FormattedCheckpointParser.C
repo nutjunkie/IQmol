@@ -22,6 +22,9 @@
 
 #include "FormattedCheckpointParser.h"
 #include "CanonicalOrbitals.h"
+#include "LocalizedOrbitals.h"
+#include "NaturalTransitionOrbitals.h"
+#include "NaturalBondOrbitals.h"
 #include "GeminalOrbitals.h"
 #include "DipoleMoment.h"
 #include "GeometryList.h"
@@ -588,30 +591,21 @@ Data::Orbitals* FormattedCheckpoint::makeOrbitals(unsigned const nAlpha,
       } break;
 
       case Data::Orbitals::Localized: {
-         orbitals = new Data::Orbitals(orbitalData.orbitalType, nAlpha, nBeta, 
-            *shellList, orbitalData.alphaCoefficients, orbitalData.betaCoefficients, 
+         orbitals = new Data::LocalizedOrbitals(nAlpha, nBeta, *shellList, 
+            orbitalData.alphaCoefficients, orbitalData.betaCoefficients, 
             orbitalData.label);
       } break;
 
       case Data::Orbitals::NaturalTransition: {
-         //TODO: create new derived orbitals classes for these
-         Data::CanonicalOrbitals* canonical = 
-            new Data::CanonicalOrbitals(nAlpha, nBeta, *shellList,
-                orbitalData.alphaCoefficients, orbitalData.alphaEnergies, 
-                orbitalData.betaCoefficients,  orbitalData.betaEnergies, orbitalData.label);
-         orbitals = canonical;
-         orbitals->setOrbitalType(Data::Orbitals::NaturalTransition);
+         orbitals = new Data::NaturalTransitionOrbitals(*shellList,
+            orbitalData.alphaCoefficients, orbitalData.alphaEnergies, 
+            orbitalData.betaCoefficients,  orbitalData.betaEnergies, orbitalData.label);
       } break;
 
       case Data::Orbitals::NaturalBond: {
-
-         //TODO: create new derived orbitals classes for these
-         Data::CanonicalOrbitals* canonical = 
-            new Data::CanonicalOrbitals(nAlpha, nBeta, *shellList,
-                orbitalData.alphaCoefficients, orbitalData.alphaEnergies, 
-                orbitalData.betaCoefficients,  orbitalData.betaEnergies, orbitalData.label);
-         orbitals = canonical;
-         orbitals->setOrbitalType(Data::Orbitals::NaturalBond);
+         orbitals = new Data::NaturalBondOrbitals(nAlpha, nBeta, *shellList,
+            orbitalData.alphaCoefficients, orbitalData.alphaEnergies, 
+            orbitalData.betaCoefficients,  orbitalData.betaEnergies, orbitalData.label);
 
 //       qDebug() << "Add one NTO(3)/NBO(4). Code = " << mos->orbitalType();
 //       surfaceTag = QString(moData.stateTag);
@@ -762,8 +756,11 @@ bool FormattedCheckpoint::installExcitedStates(unsigned const nAlpha, unsigned c
    bool restricted(moData.betaEnergies.isEmpty());
    if (restricted) NVb += moData.alphaEnergies.size();
 
-qDebug() << "Number of orbitals etc" << NOa << NOb << NVa << NVb <<  nAlpha << nBeta << moData.alphaEnergies.size()  << moData.betaEnergies.size();
-qDebug() << "nState" << extData.nState <<extData.excitationEnergies.size() << extData.oscillatorStrengths.size();
+   qDebug() << "Number of orbitals etc" 
+            << NOa << NOb << NVa << NVb <<  nAlpha << nBeta 
+            << moData.alphaEnergies.size()  << moData.betaEnergies.size();
+   qDebug() << "nState" << extData.nState   << extData.excitationEnergies.size() 
+            << extData.oscillatorStrengths.size();
 
    for (unsigned i = 0; i < extData.nState; i++) {
       energy = extData.excitationEnergies[i] * Constants::HartreeToEv;
@@ -799,6 +796,7 @@ qDebug() << "nState" << extData.nState <<extData.excitationEnergies.size() << ex
       states->append(transition);
       qDebug() << "Add transitions to state: " << i + 1;
    }
+
    if (states->nTransitions() > 0) m_dataBank.append(states);
 
    // set up orbital symmetry
