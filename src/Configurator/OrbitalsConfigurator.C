@@ -337,12 +337,14 @@ void Orbitals::on_surfaceType_currentIndexChanged(int index)
          break;
 
       case Data::SurfaceType::AlphaOrbital:
+      case Data::SurfaceType::DysonLeft:
          enableOrbitalSelection(true);
          enableNegativeColor(true);
          updateOrbitalRange(true);
          break;
 
       case Data::SurfaceType::BetaOrbital:
+      case Data::SurfaceType::DysonRight:
          enableOrbitalSelection(true);
          enableNegativeColor(true);
          updateOrbitalRange(false);
@@ -461,7 +463,8 @@ void Orbitals::on_addToQueueButton_clicked(bool)
          }
       } break;
 
-      case Data::SurfaceType::AlphaOrbital: {
+      case Data::SurfaceType::AlphaOrbital: 
+      case Data::SurfaceType::DysonLeft: {
          info.type().setKind(Data::SurfaceType::AlphaOrbital);
          int orb1(m_configurator.orbitalRangeMin->currentIndex()+1);
          int orb2(m_configurator.orbitalRangeMax->currentIndex()+1);
@@ -472,7 +475,8 @@ void Orbitals::on_addToQueueButton_clicked(bool)
          }
       } break;
 
-      case Data::SurfaceType::BetaOrbital: {
+      case Data::SurfaceType::BetaOrbital: 
+      case Data::SurfaceType::DysonRight: {
          info.type().setKind(Data::SurfaceType::BetaOrbital);
          int orb1(m_configurator.orbitalRangeMin->currentIndex()+1);
          int orb2(m_configurator.orbitalRangeMax->currentIndex()+1);
