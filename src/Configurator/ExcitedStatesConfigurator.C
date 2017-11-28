@@ -524,12 +524,12 @@ void ExcitedStates::moSelectionChanged(bool tf)
    QString symmetry(orbitals.symmetry(Data::Alpha, orb));
    QString label(Data::SpinLabel(spin));
 
-   label += " orbital " + QString::number(orb+1);
+   label += " " + QString::number(orb+1);
 
-   if (!symmetry.isEmpty()) label += " (" + symmetry + ")";
-   label += ": ";
+   label += " orbital energy: ";
    label += QString::number(energy, 'f', 3);
    label += " Eh";
+   if (!symmetry.isEmpty()) label += "  Irrep " + symmetry;
 
    m_configurator.orbitalLabel->setText(label);
 }

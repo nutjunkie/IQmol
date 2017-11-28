@@ -20,25 +20,48 @@
 
 ********************************************************************************/
 
-#include "DysonOrbitals.h"
-#include <cmath>
+#include "DysonOrbitalsLayer.h"
 
+
+using namespace qglviewer;
 
 namespace IQmol {
-namespace Data {
+namespace Layer {
 
-
-DysonOrbitals::DysonOrbitals(
-   ShellList const& shells, 
-   QList<double> const& leftCoefficients, 
-   QList<double> const& rightCoefficients,  
-   QList<double> const& excitationEnergies,  
-   QStringList   const& names)
- : Orbitals(Orbitals::Dyson, shells, 
-      leftCoefficients, rightCoefficients, "Dyson Orbitals"), 
-   m_excitationEnergies(excitationEnergies), m_labels(names)
+DysonOrbitals::DysonOrbitals(Data::DysonOrbitals& dysonOrbitals)
+ : Orbitals(dysonOrbitals), m_dysonOrbitals(dysonOrbitals)
 {
 }
 
 
-} } // end namespace IQmol::Data
+double DysonOrbitals::excitationEnergy(unsigned index) const 
+{ 
+   return m_dysonOrbitals.excitationEnergy(index);
+}
+
+
+QString DysonOrbitals::description(unsigned index) const 
+{ 
+   return m_dysonOrbitals.label(index);
+}
+
+
+QString DysonOrbitals::description(Data::SurfaceInfo const& info, 
+   bool const tooltip)
+{
+   Data::SurfaceType const& type(info.type());
+   Data::SurfaceType::Kind kind(type.kind());
+
+   QString  label(type.toString());
+   unsigned index(type.index());
+   double energy = excitationEnergy(index);
+
+   if (tooltip) {
+      label += "\nEx. Energy = " + QString::number(energy, 'f', 3);
+      label += " eV\nIsovalue = " + QString::number(info.isovalue(), 'f', 3);
+   }
+ 
+   return label;
+}
+
+} } // end namespace IQmol::Layer

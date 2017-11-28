@@ -24,6 +24,7 @@
 
 #include "Orbitals.h"
 
+
 namespace IQmol {
 namespace Data {
 
@@ -34,11 +35,29 @@ namespace Data {
       public:
          Type::ID typeID() const { return Type::DysonOrbitals; }
 
-         DysonOrbitals(ShellList const& shells);
+         DysonOrbitals(
+            ShellList const& shellList, 
+            QList<double> const& leftCoefficients, 
+            QList<double> const& rightCoefficients,  
+            QList<double> const& excitationEnergies, 
+            QStringList const&  names);
+            
+         QStringList labels(bool const) const
+         {
+            return m_labels;
+         }
 
-         addOrbital(QString const& label, QList<double> const& coefficients);
+         QString label(unsigned index) const
+         {
+            return ((int)index < m_labels.size() ? m_labels[index] : QString("undef"));
+         }
 
-         bool consistent() const;
+
+         double excitationEnergy(unsigned index) const 
+         {
+            return ((int)index < m_excitationEnergies.size() ? 
+                                 m_excitationEnergies[index] : 0.0);
+         }
 
          void serialize(InputArchive& ar, unsigned const version = 0) 
          {
@@ -52,14 +71,17 @@ namespace Data {
             privateSerialize(ar, version);
          }
 
-         void dump() const;
 
       private:
          template <class Archive>
          void privateSerialize(Archive& ar, unsigned const /* version */) 
          {
-            // nothing extra at the moment
+            ar & m_excitationEnergies;
+            ar & m_labels;
          }
+
+         QList<double> m_excitationEnergies;
+         QList<QString> m_labels;
    };
 
 } } // end namespace IQmol::Data

@@ -1,3 +1,5 @@
+#ifndef IQMOL_LAYER_DYSONORBITALS_H
+#define IQMOL_LAYER_DYSONORBITALS_H
 /*******************************************************************************
 
   Copyright (C) 2011-2015 Andrew Gilbert
@@ -20,25 +22,38 @@
 
 ********************************************************************************/
 
+#include "OrbitalsLayer.h"
 #include "DysonOrbitals.h"
-#include <cmath>
 
 
 namespace IQmol {
-namespace Data {
 
-
-DysonOrbitals::DysonOrbitals(
-   ShellList const& shells, 
-   QList<double> const& leftCoefficients, 
-   QList<double> const& rightCoefficients,  
-   QList<double> const& excitationEnergies,  
-   QStringList   const& names)
- : Orbitals(Orbitals::Dyson, shells, 
-      leftCoefficients, rightCoefficients, "Dyson Orbitals"), 
-   m_excitationEnergies(excitationEnergies), m_labels(names)
-{
+namespace Configurator {
+   class Orbitals;
 }
 
+namespace Layer {
 
-} } // end namespace IQmol::Data
+   class DysonOrbitals : public Orbitals {
+
+      Q_OBJECT
+
+      friend class Configurator::Orbitals;
+
+      public:
+         DysonOrbitals(Data::DysonOrbitals&);
+         ~DysonOrbitals() { }
+         
+      protected:
+         double excitationEnergy(unsigned index) const;
+         QString description(unsigned index) const;
+
+         QString description(Data::SurfaceInfo const&, bool const tooltip);
+
+      private:
+         // Cast of Orbitals::m_orbitals
+         Data::DysonOrbitals& m_dysonOrbitals;  
+   };
+
+} } // End namespace IQmol::Layer 
+#endif

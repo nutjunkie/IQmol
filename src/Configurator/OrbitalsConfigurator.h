@@ -82,8 +82,6 @@ namespace Configurator {
          unsigned int m_nAlpha;
          unsigned int m_nBeta;
          unsigned int m_nOrbitals;
-         unsigned int m_AlphaHOMO;
-         unsigned int m_BetaHOMO;
          CustomPlot* m_customPlot;
          QPen m_pen;
          QPen m_selectedPen;

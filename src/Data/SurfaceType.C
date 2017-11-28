@@ -49,6 +49,8 @@ QString SurfaceType::toString() const
       case Correlation:            label = "Correlated Density";      break;
       case CustomDensity:          label = "Custom Density";          break;
       case BasisFunction:          label = "Basis Function";          break;
+      case DysonLeft:              label = "Dyson (left)";            break;
+      case DysonRight:             label = "Dyson (right)";            break;
    }
 
    if (isIndexed()) label += " " + QString::number(m_index);

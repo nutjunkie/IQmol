@@ -39,6 +39,7 @@
 #include "AtomLayer.h"
 #include "BondLayer.h"
 #include "CanonicalOrbitalsLayer.h"
+#include "DysonOrbitalsLayer.h"
 #include "NaturalTransitionOrbitalsLayer.h"
 #include "ChargeLayer.h"
 #include "CubeDataLayer.h"
@@ -311,13 +312,18 @@ List Factory::convert(Data::OrbitalsList& orbitalsList)
        Data::CanonicalOrbitals* canonical =
           dynamic_cast<Data::CanonicalOrbitals*>(*iter);
 
-       Data::NaturalTransitionOrbitals* ntos=
+       Data::NaturalTransitionOrbitals* ntos =
           dynamic_cast<Data::NaturalTransitionOrbitals*>(*iter);
+
+       Data::DysonOrbitals* dyson =
+          dynamic_cast<Data::DysonOrbitals*>(*iter);
 
        if (canonical) {
           list.append(new CanonicalOrbitals(*canonical));
        }else if (ntos) {
           list.append(new NaturalTransitionOrbitals(*ntos));
+       }else if (dyson) {
+          list.append(new DysonOrbitals(*dyson));
        }else {
           list.append(new Orbitals(**iter));
        }

@@ -52,8 +52,6 @@ QString toString(ID const id)
       case Frequencies:                s = "Data::Frequencies";               break;
       case VibrationalMode:            s = "Data::VibrationalMode";           break;
       case VibrationalModeList:        s = "Data::VibrationalModeList";       break;
-//      case MolecularOrbitals:          s = "Data::MolecularOrbitals";         break;
-//      case MolecularOrbitalsList:      s = "Data::MolecularOrbitalsList";     break;
 
       case Orbitals:                   s = "Data::Orbitals";                  break;
       case OrbitalsList:               s = "Data::OrbitalsList";              break;
@@ -61,6 +59,7 @@ QString toString(ID const id)
       case CanonicalOrbitals:          s = "Data::CanonicalOrbitals";         break;
       case NaturalTransitionOrbitals:  s = "Data::NaturalTransitionOrbitals"; break;
       case NaturalBondOrbitals:        s = "Data::NaturalBondlOrbitals";      break;
+      case DysonOrbitals:              s = "Data::DysonOrbitals";             break;
 
       case Density:                    s = "Data::Density";                   break;
       case DensityList:                s = "Data::DensityList";               break;

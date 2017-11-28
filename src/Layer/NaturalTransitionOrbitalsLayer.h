@@ -45,8 +45,8 @@ namespace Layer {
          ~NaturalTransitionOrbitals() { }
          
       protected:
-         double alphaOrbitalAmplitude(unsigned) const;
-         double betaOrbitalAmplitude(unsigned)  const;
+         double alphaOrbitalAmplitude(unsigned index) const;
+         double betaOrbitalAmplitude(unsigned index)  const;
 
          QString description(Data::SurfaceInfo const&, bool const tooltip);
 

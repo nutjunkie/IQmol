@@ -19,6 +19,7 @@ SOURCES = \
    $$PWD/ContainerLayer.C \
    $$PWD/CubeDataLayer.C \
    $$PWD/DipoleLayer.C \
+   $$PWD/DysonOrbitalsLayer.C \
    $$PWD/GeminalOrbitalsLayer.C \
    $$PWD/GeometryLayer.C \
    $$PWD/GeometryListLayer.C \
@@ -54,6 +55,7 @@ HEADERS = \
    $$PWD/ContainerLayer.h \
    $$PWD/CubeDataLayer.h \
    $$PWD/DipoleLayer.h \
+   $$PWD/DysonOrbitalsLayer.h \
    $$PWD/GeminalOrbitalsLayer.h \
    $$PWD/GeometryLayer.h \
    $$PWD/GeometryListLayer.h \

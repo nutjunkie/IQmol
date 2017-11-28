@@ -49,6 +49,9 @@ Orbitals::Orbitals(Layer::Orbitals& orbitals)
       m_configurator.surfaceType->addItem("Alpha NTO",  Data::SurfaceType::AlphaOrbital);
       m_configurator.surfaceType->addItem("Beta NTO",   Data::SurfaceType::BetaOrbital);
     //m_configurator.surfaceType->addItem("Transition Density", TotalDensity);
+   }else if (m_orbitals.m_orbitals.orbitalType() == Data::Orbitals::Dyson) {
+      m_configurator.surfaceType->addItem("Dyson (Left)",  Data::SurfaceType::DysonLeft);
+      m_configurator.surfaceType->addItem("Dyson (Right)", Data::SurfaceType::DysonRight);
    }else {
       m_configurator.surfaceType->addItem("Alpha Orbital",  Data::SurfaceType::AlphaOrbital);
       m_configurator.surfaceType->addItem("Beta Orbital",   Data::SurfaceType::BetaOrbital);
@@ -79,16 +82,10 @@ void Orbitals::init()
    m_nAlpha    = m_orbitals.nAlpha();
    m_nBeta     = m_orbitals.nBeta();
    m_nOrbitals = m_orbitals.nOrbitals();
-   m_AlphaHOMO = m_nAlpha;
-   m_BetaHOMO  = m_nBeta;
 
    switch (m_orbitals.orbitalType()) {
       case Data::Orbitals::Undefined:
          QLOG_WARN() << "Undefined orbitals in Orbitals::Configurator::init()";
-         break;
-
-      case Data::Orbitals::Canonical:
-         if (m_nOrbitals > 0) initPlot();
          break;
 
       case Data::Orbitals::Localized:
@@ -98,22 +95,18 @@ void Orbitals::init()
          resize(sizeHint());
          break;
 
-      case Data::Orbitals::NaturalTransition:
-         m_AlphaHOMO = m_BetaHOMO = m_nOrbitals/2;
-         if (m_nOrbitals > 0) initPlot();
-         break;
-
       case Data::Orbitals::NaturalBond:
-         QLOG_WARN() << "NBOs in Orbitals::Configurator::init()";
+         QLOG_WARN() << "NBOs requested in Orbitals::Configurator::init() (NYI)";
          break;
       
-      case Data::Orbitals::Dyson:
+      default:
          if (m_nOrbitals > 0) initPlot();
          break;
    }
 
-   updateOrbitalRange(m_AlphaHOMO);
-   m_configurator.surfaceType->setCurrentIndex(1);
+   updateOrbitalRange(true);
+   // 0 => basis function, 1 => alpha orbitals
+   m_configurator.surfaceType->setCurrentIndex(1); 
 
    Data::DensityList& densities(m_orbitals.m_availableDensities);
    qDebug() << "Appending additional densities" << densities.size();

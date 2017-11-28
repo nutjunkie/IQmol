@@ -26,6 +26,7 @@
 #include "NaturalTransitionOrbitals.h"
 #include "NaturalBondOrbitals.h"
 #include "GeminalOrbitals.h"
+#include "DysonOrbitals.h"
 #include "DipoleMoment.h"
 #include "GeometryList.h"
 #include "OrbitalsList.h"
@@ -88,6 +89,11 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
    OrbitalData nboData;
    nboData.orbitalType = Data::Orbitals::NaturalBond;
    nboData.label = "Natural Bond Orbitals";
+
+   OrbitalData dysonData;
+   dysonData.orbitalType = Data::Orbitals::Dyson;
+   dysonData.label = "Dyson Orbitals";
+
 
    unsigned nAlpha(0);
    unsigned nBeta(0);
@@ -295,6 +301,24 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          if (!toInt(n, list, 2)) goto error;
          boysData.betaCoefficients = readDoubleArray(textStream, n);
 
+      // Dyson Orbitals
+
+      }else if (key.contains("EOM-IP") || 
+                key.contains("EOM-EA") ||
+                key.contains("EOM-SF") ) {
+         double energy(0.0);
+         if (!toDouble(energy, list, 1)) goto error;
+         dysonData.alphaEnergies.append(energy);
+         dysonData.labels.append(key);
+                
+      }else if (key == "Dyson Orbital (left)") {
+         if (!toInt(n, list, 2)) goto error;
+         dysonData.alphaCoefficients.append(readDoubleArray(textStream, n));
+         
+      }else if (key == "Dyson Orbital (right)") {
+         if (!toInt(n, list, 2)) goto error;
+         dysonData.betaCoefficients.append(readDoubleArray(textStream, n));
+         
       // Geminals
 
       }else if (key == "Alpha GMO coefficients") {
@@ -427,6 +451,9 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       orbitals = makeOrbitals(nAlpha, nBeta, boysData, shellData, *geometry); 
       if (orbitals) orbitalsList->append(orbitals);
 
+      orbitals = makeOrbitals(nAlpha, nBeta, dysonData, shellData, *geometry); 
+      if (orbitals) orbitalsList->append(orbitals);
+
       Data::GeminalOrbitals* gmos(makeGeminalOrbitals(nAlpha, nBeta, gmoData, 
          shellData, *geometry)); 
       if (gmos) m_dataBank.append(gmos);
@@ -444,38 +471,6 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
    }else {
       m_dataBank.append(orbitalsList);    
    }
-
-
-// DEPRECATE   
-/*
-   if (molecularOrbitalsList) {
-      if (molecularOrbitalsList->isEmpty()) {
-         delete molecularOrbitalsList;
-      }else {
-         molecularOrbitalsList->setDefaultIndex(-1);
-         m_dataBank.append(molecularOrbitalsList);
-      }
-   }
-   
-   if (naturaltransOrbitalList) {
-      if (naturaltransOrbitalList->isEmpty()) {
-         delete naturaltransOrbitalList;
-      }else {
-         naturaltransOrbitalList->setDefaultIndex(-1);
-         m_dataBank.append(naturaltransOrbitalList);
-      }
-   }
-   
-   if (naturalbondOrbitalList) {
-      if (naturalbondOrbitalList->isEmpty()) {
-         delete naturalbondOrbitalList;
-      }else {
-         naturalbondOrbitalList->setDefaultIndex(-1);
-         m_dataBank.append(naturalbondOrbitalList);
-      }
-   }
-*/
-// END DEPRECATE   
 
    return m_errors.isEmpty();
  
@@ -495,7 +490,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
 void FormattedCheckpoint::clear(OrbitalData& orbitalData)
 {
    // Don't clear this as it results in blank items in multi-job files.
-   //orbitalData.label.clear();  
+   // orbitalData.label.clear();  
    orbitalData.alphaCoefficients.clear();
    orbitalData.betaCoefficients.clear();
    orbitalData.alphaEnergies.clear();
@@ -602,16 +597,16 @@ Data::Orbitals* FormattedCheckpoint::makeOrbitals(unsigned const nAlpha,
             orbitalData.betaCoefficients,  orbitalData.betaEnergies, orbitalData.label);
       } break;
 
+      case Data::Orbitals::Dyson: {
+         orbitals = new Data::DysonOrbitals(*shellList, orbitalData.alphaCoefficients, 
+            orbitalData.betaCoefficients, orbitalData.alphaEnergies, orbitalData.labels);
+      } break;
+
+
       case Data::Orbitals::NaturalBond: {
          orbitals = new Data::NaturalBondOrbitals(nAlpha, nBeta, *shellList,
             orbitalData.alphaCoefficients, orbitalData.alphaEnergies, 
             orbitalData.betaCoefficients,  orbitalData.betaEnergies, orbitalData.label);
-
-//       qDebug() << "Add one NTO(3)/NBO(4). Code = " << mos->orbitalType();
-//       surfaceTag = QString(moData.stateTag);
-//       if (moData.stateNumber!= 0) surfaceTag += QString::number(moData.stateNumber);
-         //surfaceTag = QString(moData.stateTag) + QString::number(moData.stateNumber);
-//       mos->setOrbTitle(surfaceTag);
       }  break;
 
       default:

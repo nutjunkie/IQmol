@@ -14,6 +14,7 @@ SOURCES = \
    $$PWD/Data.C \
    $$PWD/DataFactory.C \
    $$PWD/Density.C \
+   $$PWD/DysonOrbitals.C \
    $$PWD/EfpFragment.C \
    $$PWD/EfpFragmentLibrary.C \
    $$PWD/ElectronicTransition.C \
@@ -63,6 +64,7 @@ HEADERS = \
    $$PWD/DataList.h \
    $$PWD/Density.h \
    $$PWD/DipoleMoment.h \
+   $$PWD/DysonOrbitals.h \
    $$PWD/EfpFragment.h \
    $$PWD/EfpFragmentLibrary.h \
    $$PWD/ElectronicTransition.h \

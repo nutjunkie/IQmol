@@ -44,15 +44,17 @@ bool ElectronicTransition::addAmplitude(QList<double> &list,
        m_amplitudes.append(Amplitude(spin, occ, NO+vir, amp, spin));
      }
    }
+   return true;
 }
+
 bool ElectronicTransition::addAmplitude(QList<double> &list, unsigned const state,
     unsigned const NO, unsigned const NV, Spin spin)
 {
    double thresh(15.0/100.0);
 
    QList<double>::iterator amp = list.begin() + (state-1)*NO*NV;
-   for (int i = 0 ; i < NO; i++) {
-      for (int a = 0; a < NV; a++) {
+   for (unsigned i = 0 ; i < NO; i++) {
+      for (unsigned a = 0; a < NV; a++) {
          if (std::fabs(*amp) >= thresh) {
            //qDebug() << "Adding amplitude:" << i+1 << "->" << NO+a+1 << "     " << *amp;
            m_amplitudes.append(Amplitude(spin, i+1, NO+a+1, *amp, spin));
