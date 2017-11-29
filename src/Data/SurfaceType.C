@@ -78,8 +78,10 @@ bool SurfaceType::isIndexed() const
 
 bool SurfaceType::isOrbital() const
 {
-   return m_kind == AlphaOrbital || m_kind == BetaOrbital;
-          m_kind == DysonLeft    || m_kind == DysonRight;
+   return m_kind == AlphaOrbital || 
+          m_kind == BetaOrbital  ||
+          m_kind == DysonLeft    || 
+          m_kind == DysonRight;
 }
 
 

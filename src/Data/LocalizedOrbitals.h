@@ -48,7 +48,6 @@ namespace Data {
             alphaCoefficients, betaCoefficients, label), 
             m_nAlpha(nAlpha), m_nBeta(nBeta) { }
               
-
          unsigned nAlpha() const { return m_nAlpha; }
          unsigned nBeta()  const { return m_nBeta;  }
 
@@ -58,6 +57,12 @@ namespace Data {
              unsigned n(alpha ? m_nAlpha : m_nBeta);
              if (index < n)  s += " (occ)";
              return s;
+         }
+
+         unsigned labelIndex(bool const alpha) const
+         {
+            int n(alpha ? m_nAlpha : m_nBeta);
+            return std::max(0,n-1);
          }
 
       private:

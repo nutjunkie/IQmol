@@ -91,7 +91,7 @@ QStringList NaturalTransitionOrbitals::labels(bool const alpha) const
    return list;
 }
 
-unsigned NaturalTransitionOrbitals::labelIndex(bool const alpha) const
+unsigned NaturalTransitionOrbitals::labelIndex(bool const) const
 {
    int n(nOrbitals()/2);
    return std::max(0, n-1);

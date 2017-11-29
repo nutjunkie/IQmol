@@ -6,6 +6,7 @@ INCLUDEPATH += ../Layer ../Data ../Util ../Plot ../Viewer \
                ../Main ../Grid ../Old ../OpenMesh/src
 
 SOURCES = \
+   $$PWD/AxesConfigurator.C \
    $$PWD/AxesMeshConfigurator.C \
    $$PWD/BackgroundConfigurator.C \
    $$PWD/ClippingPlaneConfigurator.C \
@@ -27,6 +28,7 @@ SOURCES = \
    $$PWD/SymmetryConfigurator.C
 
 HEADERS = \
+   $$PWD/AxesConfigurator.h \
    $$PWD/AxesMeshConfigurator.h \
    $$PWD/BackgroundConfigurator.h \
    $$PWD/ClippingPlaneConfigurator.h \
@@ -49,6 +51,7 @@ HEADERS = \
    $$PWD/SymmetryConfigurator.h
 
 FORMS = \
+   $$PWD/AxesConfigurator.ui \
    $$PWD/AxesMeshConfigurator.ui \
    $$PWD/BackgroundConfigurator.ui \
    $$PWD/ClippingPlaneConfigurator.ui \

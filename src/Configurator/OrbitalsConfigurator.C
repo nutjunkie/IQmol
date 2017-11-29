@@ -88,13 +88,8 @@ void Orbitals::init()
          QLOG_WARN() << "Undefined orbitals in Orbitals::Configurator::init()";
          break;
 
-      case Data::Orbitals::Localized:
-         // Orbital energy diagram doesn't make sense here
-         m_configurator.energyFrame->hide();
-         m_configurator.energyLabel->hide();
-         break;
-
       case Data::Orbitals::Dyson:
+      case Data::Orbitals::Localized:
          // Orbital energy diagram doesn't make sense here
          m_configurator.energyFrame->hide();
          m_configurator.energyLabel->hide();

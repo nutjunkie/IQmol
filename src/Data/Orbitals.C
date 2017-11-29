@@ -84,7 +84,7 @@ Orbitals::Orbitals(
 }
 
 
-QString Orbitals::label(unsigned index, bool alpha) const
+QString Orbitals::label(unsigned index, bool) const
 {
    return QString::number(index+1);
 }
