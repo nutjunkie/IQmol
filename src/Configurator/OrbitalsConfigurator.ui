@@ -280,7 +280,7 @@ QToolButton:pressed {
           <number>1</number>
          </property>
          <property name="value">
-          <number>3</number>
+          <number>4</number>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>

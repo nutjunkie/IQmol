@@ -71,24 +71,23 @@ bool NaturalTransitionOrbitals::consistent() const
 }
 
 
-QStringList NaturalTransitionOrbitals::labels(bool const alpha) const
+QString NaturalTransitionOrbitals::label(unsigned index, bool) const
 {
-   QStringList list(Orbitals::labels(alpha));
+   QString s(QString::number(index+1));
    // Half the orbitals correspond to occupieds, half virtuals.
-   if (list.size() < 2) return list;
+   unsigned n(nOrbitals()/2);
 
-   unsigned n(list.size()/2);
-   list[n-1] += " (HONTO)";
-   list[n]   += " (LUNTO)";
+   if (n == index+2) {
+      s += " (HONTO-1)";
+   }else if (n == index+1) {
+      s += " (HONTO)";
+   }else if (n == index) {
+      s += " (LUNTO)";
+   }else if (index == n+1) {
+      s += " (LUNTO+1)";
+   }
 
-   if (list.size() < 4) return list;
-   list[n-2] += " (HONTO-1)";
-   list[n+1] += " (LUNTO+1)";
-
-   //for (unsigned i = 0; i < n-2; ++i)            list[i] += " (occ)";
-   //for (unsigned i = n+2; i < list.size(); ++i)  list[i] += " (virt)";
-       
-   return list;
+   return s;
 }
 
 unsigned NaturalTransitionOrbitals::labelIndex(bool const) const

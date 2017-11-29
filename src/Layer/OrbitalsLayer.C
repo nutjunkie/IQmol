@@ -54,7 +54,7 @@ namespace IQmol {
 namespace Layer {
 
 Orbitals::Orbitals(Data::Orbitals& orbitals)
- : Base(Data::Orbitals::toString(orbitals.orbitalType())), 
+ : Base(orbitals.title()),
    m_orbitals(orbitals),
    m_configurator(*this), 
    m_molecularGridEvaluator(0),

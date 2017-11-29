@@ -50,8 +50,6 @@ QString DysonOrbitals::description(Data::SurfaceInfo const& info,
    bool const tooltip)
 {
    Data::SurfaceType const& type(info.type());
-   //Data::SurfaceType::Kind kind(type.kind());
-
    unsigned index(type.index());
    QString label(m_dysonOrbitals.label(index));
 

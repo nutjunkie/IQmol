@@ -50,14 +50,16 @@ Orbitals::Orbitals(
    ShellList const& shellList,
    QList<double> const& alphaCoefficients, 
    QList<double> const& betaCoefficients,
-   QString const& label)
- : m_orbitalType(orbitalType), m_label(label), m_nBasis(0), m_nOrbitals(0),
+   QString const& title)
+ : m_orbitalType(orbitalType), m_title(title), m_nBasis(0), m_nOrbitals(0),
    m_shellList(shellList)
 {
    if (m_shellList.isEmpty() || alphaCoefficients.isEmpty()) {
       QLOG_WARN() << "Empty data in Orbitals constructor";  
       return;
    }
+
+   if (m_title.isEmpty()) m_title = toString(orbitalType);
 
    m_nBasis     = m_shellList.nBasis();
    m_nOrbitals  = alphaCoefficients.size() / m_nBasis;
@@ -92,7 +94,9 @@ QString Orbitals::label(unsigned index, bool) const
 
 QStringList Orbitals::labels(bool alpha) const
 {
-   unsigned n(alpha ? m_alphaCoefficients.size1() : m_betaCoefficients.size1());
+   unsigned n(m_alphaCoefficients.size1());
+   if (!alpha && !m_restricted) n = m_betaCoefficients.size1();
+
    QStringList list;
  
    for (unsigned i = 0; i < n; ++i) {

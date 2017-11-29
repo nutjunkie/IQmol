@@ -98,37 +98,29 @@ void CanonicalOrbitals::computeDensityVectors()
 }
 
 
-QString CanonicalOrbitals::description(Data::SurfaceInfo const& info, bool const tooltip)
+QString CanonicalOrbitals::description(Data::SurfaceInfo const& info, 
+   bool const tooltip)
 {
    Data::SurfaceType const& type(info.type());
-   QString label(type.toString());
+   QString label;
 
    if (type.isOrbital()) {
-      Data::SurfaceType::Kind kind(type.kind());
-
-      unsigned nElectrons = Data::SurfaceType::AlphaOrbital ? nAlpha() : nBeta();
       unsigned index(type.index());
-      double   orbitalEnergy(0.0);
+      label = m_canonicalOrbitals.label(index);
 
-      if (kind == Data::SurfaceType::AlphaOrbital) {
-         orbitalEnergy = m_canonicalOrbitals.alphaOrbitalEnergy(index);
-      }else {
-         orbitalEnergy = m_canonicalOrbitals.betaOrbitalEnergy(index);
-      }
-
-      if (index == nElectrons-2) {
-         label += " (HOMO-1)";
-      }else if (index == nElectrons-1) {
-         label += " (HOMO)";
-      }else if (index == nElectrons) {
-         label += " (LUMO)";
-      }else if (index == nElectrons+1) {
-         label += " (LUMO+1)";
-      }
-
-      if (tooltip) label += "\nEnergy   = " + QString::number(orbitalEnergy, 'f', 3);
+      if (tooltip) {
+         double   orbitalEnergy(0.0);
+         Data::SurfaceType::Kind kind(type.kind());
+         if (kind == Data::SurfaceType::AlphaOrbital) {
+            orbitalEnergy = m_canonicalOrbitals.alphaOrbitalEnergy(index);
+         }else {
+            orbitalEnergy = m_canonicalOrbitals.betaOrbitalEnergy(index);
+         }
+         label += "\nEnergy   = " + QString::number(orbitalEnergy, 'f', 3);
+       }
    }else {
       // density
+      label = type.toString();
    }
 
    if (tooltip) label += "\nIsovalue = " + QString::number(info.isovalue(), 'f', 3);

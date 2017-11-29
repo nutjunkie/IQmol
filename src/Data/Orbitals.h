@@ -55,7 +55,7 @@ namespace Data {
             ShellList const& shellList,
             QList<double> const& alphaCoefficients, 
             QList<double> const& betaCoefficients,
-            QString const& label = QString());
+            QString const& title = QString());
 
          OrbitalType orbitalType() const { return m_orbitalType; }
 
@@ -67,6 +67,8 @@ namespace Data {
          Matrix const& betaCoefficients() const; 
 
          ShellList& shellList() { return m_shellList; }
+
+         QString title() const { return m_title; }
 
          // Returns a label for the given orbital for display.
          // Default label is just the orbital index (watch for off-by-one).
@@ -107,7 +109,7 @@ namespace Data {
          void privateSerialize(Archive& ar, unsigned const /* version */) 
          {
             ar & m_orbitalType;
-            ar & m_label;
+            ar & m_title;
             ar & m_nBasis;
             ar & m_nOrbitals;
             ar & m_restricted;
@@ -118,7 +120,7 @@ namespace Data {
          }
 
          OrbitalType m_orbitalType;
-         QString     m_label;
+         QString     m_title;
          unsigned    m_nBasis;
          unsigned    m_nOrbitals;
          bool        m_restricted;

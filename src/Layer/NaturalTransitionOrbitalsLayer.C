@@ -52,37 +52,22 @@ QString NaturalTransitionOrbitals::description(Data::SurfaceInfo const& info,
    bool const tooltip)
 {
    Data::SurfaceType const& type(info.type());
-   QString label(type.toString());
 
-   if (type.isOrbital()) {
+   unsigned index(type.index());
+   QString label(m_naturalTransitionOrbitals.label(index));
+
+   if (tooltip) {
       Data::SurfaceType::Kind kind(type.kind());
-
-      unsigned index(type.index());
-      unsigned nOrbs(nOrbitals()/2);
-      double   amplitude(0.0);
-
+      double occupancy(0.0);
       if (kind == Data::SurfaceType::AlphaOrbital) {
-         amplitude = m_naturalTransitionOrbitals.alphaOccupancy(index-1);
+         occupancy = m_naturalTransitionOrbitals.alphaOccupancy(index-1);
       }else {
-         amplitude = m_naturalTransitionOrbitals.betaOccupancy(index-1);
+         occupancy = m_naturalTransitionOrbitals.betaOccupancy(index-1);
       }
 
-      if (index == nOrbs - 1) {
-         label += " (HONTO-1)";
-      }else if (index == nOrbs) {
-         label += " (HONTO)";
-      }else if (index == nOrbs+1) {
-         label += " (LUNTO)";
-      }else if (index == nOrbs+2) {
-         label += " (LUNTO+1)";
-      }
-
-      if (tooltip) label += "\nAmplitude = " + QString::number(amplitude, 'f', 3);
-   }else {
-      // density NYI
+      label += "\nOccupancy = " + QString::number(occupancy, 'f', 3);
+      label += "\nIsovalue = " + QString::number(info.isovalue(), 'f', 3);
    }
-
-   if (tooltip) label += "\nIsovalue = " + QString::number(info.isovalue(), 'f', 3);
  
    return label;
 }
