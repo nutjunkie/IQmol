@@ -50,13 +50,13 @@ QString DysonOrbitals::description(Data::SurfaceInfo const& info,
    bool const tooltip)
 {
    Data::SurfaceType const& type(info.type());
-   Data::SurfaceType::Kind kind(type.kind());
+   //Data::SurfaceType::Kind kind(type.kind());
 
-   QString  label(type.toString());
    unsigned index(type.index());
-   double energy = excitationEnergy(index);
+   QString label(m_dysonOrbitals.label(index));
 
    if (tooltip) {
+      double energy = excitationEnergy(index);
       label += "\nEx. Energy = " + QString::number(energy, 'f', 3);
       label += " eV\nIsovalue = " + QString::number(info.isovalue(), 'f', 3);
    }

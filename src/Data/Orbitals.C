@@ -84,13 +84,19 @@ Orbitals::Orbitals(
 }
 
 
+QString Orbitals::label(unsigned index, bool alpha) const
+{
+   return QString::number(index+1);
+}
+
+
 QStringList Orbitals::labels(bool alpha) const
 {
    unsigned n(alpha ? m_alphaCoefficients.size1() : m_betaCoefficients.size1());
    QStringList list;
-
-   for (unsigned i = 1; i <= n; ++i) {
-       list.append(QString::number(i));
+ 
+   for (unsigned i = 0; i < n; ++i) {
+       list.append(label(i,alpha));
    }
 
    return list;

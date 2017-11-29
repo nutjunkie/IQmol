@@ -67,14 +67,15 @@ namespace Data {
          Matrix const& betaCoefficients() const; 
 
          ShellList& shellList() { return m_shellList; }
-         QString const& label() const { return m_label; }
 
-         void setLabel(QString const& label) { m_label = label; }
-         // Returns a list of labels for each orbital for display.
-         // Default label is just the orbital index.
-         virtual QStringList labels(bool const alpha = true) const;
+         // Returns a label for the given orbital for display.
+         // Default label is just the orbital index (watch for off-by-one).
+         virtual QString label(unsigned index, bool alpha = true) const;
 
-         // Returns the recommended index for displaying.
+         // Returns a list of the above labels
+         QStringList labels(bool alpha = true) const;
+
+         // Returns the recommended index for displaying in the configurator.
          virtual unsigned labelIndex(bool /* alpha = true */) const { return 0; }
 
          virtual bool consistent() const;
@@ -93,12 +94,12 @@ namespace Data {
 
          void dump() const;
 
-         // TODO: Not sure why this is here or even required.
+		 // TODO: This is here to enable  archiving of the surfaces associated
+		 // with the orbitals, needs testing.
          //SurfaceList& surfaceList() { return m_surfaceList; }
          //void appendSurface(Data::Surface* surfaceData) {
          //   m_surfaceList.append(surfaceData);
          //}
-
 
 
       protected:

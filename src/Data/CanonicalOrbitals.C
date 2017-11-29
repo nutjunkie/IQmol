@@ -76,15 +76,22 @@ bool CanonicalOrbitals::consistent() const
 }
 
 
-QStringList CanonicalOrbitals::labels(bool const alpha) const
+QString CanonicalOrbitals::label(unsigned index, bool alpha) const
 {
-   QStringList list(Orbitals::labels(alpha));
-   int n(alpha ? m_nAlpha : m_nBeta);
-   if (n > 0 && list.size() > n) {
-      list[n-1] += " (HOMO)"; 
-      list[n]   += " (LUMO)"; 
-   }  
-   return list;
+   QString s(QString::number(index+1));
+   unsigned n(alpha ? m_nAlpha : m_nBeta);
+
+   if (n == index+2) {
+      s += " (HOMO-1)";
+   }else if (n == index+1) {
+      s += " (HOMO)";
+   }else if (n == index) {
+      s += " (LUMO)";
+   }else if (index == n+1) {
+      s += " (LUMO+1)";
+   }
+
+   return s;
 } 
 
 

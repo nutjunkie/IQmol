@@ -14,7 +14,6 @@ SOURCES = \
    $$PWD/Data.C \
    $$PWD/DataFactory.C \
    $$PWD/Density.C \
-   $$PWD/DysonOrbitals.C \
    $$PWD/EfpFragment.C \
    $$PWD/EfpFragmentLibrary.C \
    $$PWD/ElectronicTransition.C \
@@ -28,7 +27,6 @@ SOURCES = \
    $$PWD/GridData.C \
    $$PWD/GridSize.C \
    $$PWD/Hessian.C \
-   $$PWD/LocalizedOrbitals.C \
    $$PWD/Mesh.C \
    $$PWD/MultipoleExpansion.C \
    $$PWD/NaturalBondOrbitals.C \

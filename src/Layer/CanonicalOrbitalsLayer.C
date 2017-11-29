@@ -111,18 +111,18 @@ QString CanonicalOrbitals::description(Data::SurfaceInfo const& info, bool const
       double   orbitalEnergy(0.0);
 
       if (kind == Data::SurfaceType::AlphaOrbital) {
-         orbitalEnergy = m_canonicalOrbitals.alphaOrbitalEnergy(index-1);
+         orbitalEnergy = m_canonicalOrbitals.alphaOrbitalEnergy(index);
       }else {
-         orbitalEnergy = m_canonicalOrbitals.betaOrbitalEnergy(index-1);
+         orbitalEnergy = m_canonicalOrbitals.betaOrbitalEnergy(index);
       }
 
-      if (index == nElectrons-1) {
+      if (index == nElectrons-2) {
          label += " (HOMO-1)";
-      }else if (index == nElectrons) {
+      }else if (index == nElectrons-1) {
          label += " (HOMO)";
-      }else if (index == nElectrons+1) {
+      }else if (index == nElectrons) {
          label += " (LUMO)";
-      }else if (index == nElectrons+2) {
+      }else if (index == nElectrons+1) {
          label += " (LUMO+1)";
       }
 

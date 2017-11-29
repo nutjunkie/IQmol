@@ -52,7 +52,13 @@ namespace Data {
          unsigned nAlpha() const { return m_nAlpha; }
          unsigned nBeta()  const { return m_nBeta;  }
 
-         QStringList labels(bool const alpha = true) const;
+         QString label(unsigned index, bool alpha = true) const
+         {
+             QString s(QString::number(index+1));
+             unsigned n(alpha ? m_nAlpha : m_nBeta);
+             if (index < n)  s += " (occ)";
+             return s;
+         }
 
       private:
          unsigned m_nAlpha;

@@ -56,8 +56,8 @@ namespace Data {
          double alphaOccupancy(unsigned i) const { return (i < m_nAlpha ? 1.0 : 0.0); }
          double betaOccupancy(unsigned i)  const { return (i < m_nBeta  ? 1.0 : 0.0); }
 
-         QStringList labels(bool const alpha = true) const;
-         unsigned labelIndex(bool const alpha = true) const;
+         QString label(unsigned index, bool alpha = true) const;
+         unsigned labelIndex(bool alpha = true) const;
 
          void serialize(InputArchive& ar, unsigned const version = 0) 
          {

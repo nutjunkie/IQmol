@@ -92,6 +92,12 @@ void Orbitals::init()
          // Orbital energy diagram doesn't make sense here
          m_configurator.energyFrame->hide();
          m_configurator.energyLabel->hide();
+         break;
+
+      case Data::Orbitals::Dyson:
+         // Orbital energy diagram doesn't make sense here
+         m_configurator.energyFrame->hide();
+         m_configurator.energyLabel->hide();
          resize(sizeHint());
          break;
 
@@ -107,6 +113,7 @@ void Orbitals::init()
    updateOrbitalRange(true);
    // 0 => basis function, 1 => alpha orbitals
    m_configurator.surfaceType->setCurrentIndex(1); 
+
 
    Data::DensityList& densities(m_orbitals.m_availableDensities);
    qDebug() << "Appending additional densities" << densities.size();
@@ -126,6 +133,7 @@ void Orbitals::init()
 void Orbitals::initPlot()
 {
    m_customPlot = new CustomPlot(); 
+   m_customPlot->setMinimumSize(QSize(300,200));
    m_customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
    m_customPlot->axisRect()->setRangeDrag(m_customPlot->yAxis->orientation());
    m_customPlot->axisRect()->setRangeZoom(m_customPlot->yAxis->orientation());
@@ -454,8 +462,8 @@ void Orbitals::on_addToQueueButton_clicked(bool)
 
       case Data::SurfaceType::BasisFunction: {
          info.type().setKind(Data::SurfaceType::BasisFunction);
-         int fn1(m_configurator.orbitalRangeMin->currentIndex()+1);
-         int fn2(m_configurator.orbitalRangeMax->currentIndex()+1);
+         int fn1(m_configurator.orbitalRangeMin->currentIndex());
+         int fn2(m_configurator.orbitalRangeMax->currentIndex());
 
          for (int i = std::min(fn1,fn2); i <= std::max(fn1, fn2); ++i) {
              info.type().setIndex(i);
@@ -463,11 +471,10 @@ void Orbitals::on_addToQueueButton_clicked(bool)
          }
       } break;
 
-      case Data::SurfaceType::AlphaOrbital: 
-      case Data::SurfaceType::DysonLeft: {
+      case Data::SurfaceType::AlphaOrbital: {
          info.type().setKind(Data::SurfaceType::AlphaOrbital);
-         int orb1(m_configurator.orbitalRangeMin->currentIndex()+1);
-         int orb2(m_configurator.orbitalRangeMax->currentIndex()+1);
+         int orb1(m_configurator.orbitalRangeMin->currentIndex());
+         int orb2(m_configurator.orbitalRangeMax->currentIndex());
 
          for (int i = std::min(orb1,orb2); i <= std::max(orb1, orb2); ++i) {
              info.type().setIndex(i);
@@ -475,11 +482,32 @@ void Orbitals::on_addToQueueButton_clicked(bool)
          }
       } break;
 
-      case Data::SurfaceType::BetaOrbital: 
-      case Data::SurfaceType::DysonRight: {
+      case Data::SurfaceType::BetaOrbital: {
          info.type().setKind(Data::SurfaceType::BetaOrbital);
-         int orb1(m_configurator.orbitalRangeMin->currentIndex()+1);
-         int orb2(m_configurator.orbitalRangeMax->currentIndex()+1);
+         int orb1(m_configurator.orbitalRangeMin->currentIndex());
+         int orb2(m_configurator.orbitalRangeMax->currentIndex());
+
+         for (int i = std::min(orb1,orb2); i <= std::max(orb1, orb2); ++i) {
+             info.type().setIndex(i);
+             queueSurface(info);
+         }
+      } break;
+
+      case Data::SurfaceType::DysonLeft: {
+         info.type().setKind(Data::SurfaceType::DysonLeft);
+         int orb1(m_configurator.orbitalRangeMin->currentIndex());
+         int orb2(m_configurator.orbitalRangeMax->currentIndex());
+
+         for (int i = std::min(orb1,orb2); i <= std::max(orb1, orb2); ++i) {
+             info.type().setIndex(i);
+             queueSurface(info);
+         }
+      } break;
+
+      case Data::SurfaceType::DysonRight: {
+         info.type().setKind(Data::SurfaceType::DysonRight);
+         int orb1(m_configurator.orbitalRangeMin->currentIndex());
+         int orb2(m_configurator.orbitalRangeMax->currentIndex());
 
          for (int i = std::min(orb1,orb2); i <= std::max(orb1, orb2); ++i) {
              info.type().setIndex(i);

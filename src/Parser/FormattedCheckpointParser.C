@@ -46,7 +46,6 @@ namespace IQmol {
 namespace Parser {
 
 
-
 bool FormattedCheckpoint::toInt(unsigned& n, QStringList const& list, unsigned const index)
 {
    bool ok(false);
@@ -308,7 +307,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
                 key.contains("EOM-SF") ) {
          double energy(0.0);
          if (!toDouble(energy, list, 1)) goto error;
-         dysonData.alphaEnergies.append(energy);
+         dysonData.alphaEnergies.append(energy*Constants::HartreeToEv);
          dysonData.labels.append(key);
                 
       }else if (key == "Dyson Orbital (left)") {
