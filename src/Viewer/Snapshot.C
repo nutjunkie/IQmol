@@ -28,16 +28,16 @@
 #include <QImageWriter>
 #include <QFileDialog>
 
-	#include <QDebug>
+#include <QDebug>
+
 
 using namespace qglviewer;
 
 namespace IQmol {
 
 
-
-Snapshot::Snapshot(Viewer* viewer, int const flags) : m_viewer(viewer), m_flags(flags), 
-   m_counter(0), m_movieProcess(0)
+Snapshot::Snapshot(Viewer* viewer, int const flags) : m_viewer(viewer), m_fileFormat(PNG),
+    m_flags(flags), m_counter(0), m_movieProcess(0)
 {
    if (m_flags & Movie) m_flags = m_flags | AutoIncrement;
 }
@@ -66,7 +66,8 @@ if (0) {
    */
 
    QStringList extensions;
-   extensions << "jpg" << "png" << "tiff" << "ppm" << "bmp" << "eps" << "pdf" << "svg" << "mov";
+   extensions << "jpg" << "png" << "tiff" << "ppm" << "bmp" 
+              << "eps" << "pdf" << "svg"  << "mov" << "mp4";
 
    QString filter("PNG (*.png)");  // The default image type;
    QStringList menuTexts;
@@ -88,16 +89,16 @@ if (0) {
       fileInfo.setFile(fileInfo.dir(), "movie.mov");
       title = "Save movie as";
       filter = "QuickTime Movie (*.mov)";
-      menuTexts << filter;
+      menuTexts << filter
+                << "MPEG4 Movie (*.mp4)";
       formatsAvailable.clear();
-      formatsAvailable << "mov";
+      formatsAvailable << "mov" << "mp4";
 #else
       title = "Save movie sequence as";
 #endif
    }else {
       title = "Save snapshot as";
    }
-
 
    QStringList menu;
    QStringList::iterator iter;
@@ -107,7 +108,6 @@ if (0) {
           menu += menuTexts[index];
        }
    }
-
 
    QString fileName = QFileDialog::getSaveFileName(m_viewer, title,
       fileInfo.filePath(), menu.join(";;"), &filter);
@@ -206,15 +206,6 @@ void Snapshot::capture(QString const& fileName)
    //QImage image(m_viewer->grabFrameBuffer(withAlpha));
    image.save(fileName);
    m_fileNames << fileName;
-
-/*
-not sure if this is of any use
-widget->setActiveWindow();
-widget->raise()
-widget->repaint()
-QPixmap::grabWindow(widget->winId());
-*/
-
 }
 
 
@@ -265,6 +256,64 @@ void Snapshot::makeMovie()
 #endif
    return;
 }
+
+
+void Snapshot::makeFfmpegMovie()
+{
+   if (m_movieProcess) {
+      QMsgBox::warning(0, "IQmol", "Movie making already in progress, please wait");
+      return;
+   }
+
+   QDir dir(QApplication::applicationDirPath());
+   QFileInfo ffmpeg(dir,"ffmpeg");
+   if (!ffmpeg.exists()) {
+      QMsgBox::warning(0, "IQmol", "ffmpeg executable not found");
+      return;
+   }
+
+   QFile movie(m_fileBaseName + ".mp4");
+   if (movie.exists()) {
+      if (!movie.remove()) {
+         QMsgBox::warning(0, "IQmol", "Could not remove existing file " + movie.fileName());
+         return;
+      }
+   }
+/*
+
+The following ffmpeg command works, but does not work when the files are jpg 
+
+ffmpeg -r 24 -i movie%04d.png -vcodec libx264 -y -an video.mp4 \
+-vf "scale=trunc(iw/2)*2:trunc(ih/2)*2"
+
+*/
+
+
+
+   QStringList args;
+   args << "-r" << "24" << "-i" << "movie%04d.png" 
+        << "-vcodec" << "libx264" << "-y" << "-an" 
+        << movie.fileName()
+        << "-vf" << "\"scale=trunc(iw/2)*2:trunc(ih/2)*2\"";
+
+
+   m_movieProcess = new QProcess;
+
+   connect(m_movieProcess, SIGNAL(error(QProcess::ProcessError)), 
+      this, SLOT(movieError(QProcess::ProcessError)));
+
+   connect(m_movieProcess, SIGNAL(finished(int, QProcess::ExitStatus)), 
+      this, SLOT(movieFinished(int, QProcess::ExitStatus)));
+
+   qDebug() << "Start movie making";
+   qDebug() << ffmpeg.filePath() << "with args" ;
+   qDebug() << args;
+   m_movieProcess->start(ffmpeg.filePath(), args);
+
+   return;
+}
+
+
 
 
 void Snapshot::movieFinished(int, QProcess::ExitStatus exitStatus)

@@ -1295,7 +1295,7 @@ QToolButton:checked {
                    <widget class="QComboBox" name="aimd_method"/>
                   </item>
                   <item row="2" column="3">
-                   <widget class="QSpinBox" name="aimd_temperature">
+                   <widget class="QSpinBox" name="aimd_temp">
                     <property name="suffix">
                      <string> K</string>
                     </property>
