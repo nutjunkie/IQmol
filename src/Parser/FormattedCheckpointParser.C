@@ -110,6 +110,8 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
    GmoData   gmoData;
    ExtData   extData;   
    extData.nState = 0;
+   extData.alphaActiveOcc = 0;
+   extData.alphaActiveVir = 0;
 
    Data::DensityList densityList;
 
@@ -394,7 +396,7 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          }
          clear(nboData);
 
-      // Parsing CIS/TDDFT data
+      // Parsing CIS/TDDFT/EOM excited states
       //
       //}else if (key == "Number of Excited States") {
       //   extData.nState  = list.at(1).toInt(&ok);
@@ -409,7 +411,14 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       }else if (key == "Oscillator Strengths") {
          if (!toInt(n, list, 2)) goto error;
          extData.oscillatorStrengths = readDoubleArray(textStream, n);
-
+      }else if (key == "Number of Active Occ") {
+         if (!toInt(n, list, 1)) goto error;
+         extData.alphaActiveOcc = n/2;
+         extData.betaActiveOcc = n/2;
+      }else if (key == "Number of Active Vir") {
+         if (!toInt(n, list, 1)) goto error;
+         extData.alphaActiveVir = n/2;
+         extData.betaActiveVir = n/2;
       }else if (key == "Alpha Amplitudes" || key == "Alpha X Amplitudes") {
          if (!toInt(n, list, 2)) goto error;
          extData.alphaAmplitudes = readDoubleArray(textStream, n);
@@ -777,15 +786,22 @@ bool FormattedCheckpoint::installExcitedStates(unsigned const nAlpha, unsigned c
    int NOb = nBeta;
    int NVa = moData.alphaEnergies.size() - NOa;
    int NVb = moData.betaEnergies.size()  - NOb;
+   // For now, support only singlet EOM-EE 
+   int NOcc = extData.alphaActiveOcc;
+   int NVir = extData.alphaActiveVir;
 
    bool restricted(moData.betaEnergies.isEmpty());
    if (restricted) NVb += moData.alphaEnergies.size();
 
    qDebug() << "Number of orbitals etc" 
-            << NOa << NOb << NVa << NVb <<  nAlpha << nBeta 
-            << moData.alphaEnergies.size()  << moData.betaEnergies.size();
+            << NOa << NOb << NVa << NVb << nAlpha << nBeta 
+            << moData.alphaEnergies.size()  << moData.betaEnergies.size()
+            << NOcc << NVir;
    qDebug() << "nState" << extData.nState   << extData.excitationEnergies.size() 
             << extData.oscillatorStrengths.size();
+
+   if (NOcc > 0) NOa = NOb = NOcc;
+   if (NVir > 0) NVa = NVb = NVir;
 
    for (unsigned i = 0; i < extData.nState; i++) {
       energy = extData.excitationEnergies[i] * Constants::HartreeToEv;

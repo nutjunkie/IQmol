@@ -104,6 +104,10 @@ namespace Parser {
            QList<int>    alphaSparseI;
            QList<int>    betaSparseJ;
            QList<int>    betaSparseI;
+           unsigned      alphaActiveOcc;
+           unsigned      alphaActiveVir;
+           unsigned      betaActiveOcc;
+           unsigned      betaActiveVir;
          };
 
          void clear(ExtData&);
