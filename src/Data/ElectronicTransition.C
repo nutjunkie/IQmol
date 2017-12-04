@@ -38,8 +38,8 @@ bool ElectronicTransition::addAmplitude(QList<double> &list,
    for (int k = indexJ[state-1] ; k < indexJ[state] ; k++) { 
      amp = list[k]; 
      if (std::fabs(amp) >= thresh) {
-       vir = (indexI[k] % NV) + 1;
-       occ = (int)((indexI[k]+1) / NV);
+       vir = (indexI[k]%NV) + 1;
+       occ = (int)((indexI[k])/NV) + 1;
        //qDebug() << "Adding amplitude:" << occ << "->" << NO+vir << "     " << amp;
        m_amplitudes.append(Amplitude(spin, occ, NO+vir, amp, spin));
      }
