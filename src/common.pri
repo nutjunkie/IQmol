@@ -9,10 +9,15 @@ QMAKE_CXXFLAGS += -O2 -g -ggdb
 # the packages.  To simplify distribution, we use static libraries wherever
 # possible.  Platform dependent settings are made in the following files:
 
-win32:     { include(windows.pri) }
-macx:      { include(mac.pri)   }
-unix:!macx { include(linux.pri) }
-
+equals(USER_PRI, "") {
+   message( "Using default project include file" )
+   win32:     { include(windows.pri) }
+   macx:      { include(mac.pri)   }
+   unix:!macx { include(linux.pri) }
+} else {
+   message( "Using user-define project include file: " $$USER_PRI )
+   include($$USER_PRI)
+}
 
 # Path to the build directory ($$PWD contains IQmol.pro)
 BUILD_DIR     = $$PWD/../build
