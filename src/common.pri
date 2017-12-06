@@ -10,12 +10,10 @@ QMAKE_CXXFLAGS += -O2 -g -ggdb
 # possible.  Platform dependent settings are made in the following files:
 
 equals(USER_PRI, "") {
-   message( "Using default project include file" )
    win32:     { include(windows.pri) }
    macx:      { include(mac.pri)   }
    unix:!macx { include(linux.pri) }
 } else {
-   message( "Using user-define project include file: " $$USER_PRI )
    include($$USER_PRI)
 }
 
