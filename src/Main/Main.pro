@@ -5,6 +5,16 @@ TARGET  = IQmol
 # ordering of the libraries.
 
 
+IQMOL_YEAR = $$system(date +%Y)
+DEFINES += IQMOL_YEAR='\\"$$IQMOL_YEAR\\"'
+
+IQMOL_VERSION = $$system(git describe --abbrev=0)
+DEFINES += IQMOL_VERSION='\\"$$IQMOL_VERSION\\"'
+
+GIT_VERSION = $$system(git describe --always --tags)
+DEFINES += GIT_VERSION='\\"$$GIT_VERSION\\"'
+
+
 BUILD_DIR  = $$PWD/../../build
 
 LIBS += $$BUILD_DIR/libQui.a \
@@ -67,7 +77,6 @@ HEADERS += \
    $$PWD/PeriodicTable.h \
    $$PWD/PreferencesBrowser.h \
    $$PWD/ToolBar.h \
-   $$PWD/Version.h \
 
 FORMS += \
    $$PWD/AboutDialog.ui \
