@@ -1,5 +1,5 @@
 ### Basic
-string(TIMESTAMP SYSTEM_TIME "%Y%m%d%H%M%S")
+string(TIMESTAMP SYSTEM_DATE "%Y%m%d")
 set(CPACK_PACKAGE_NAME "IQmol")
 set(CPACK_PACKAGE_VERSION_MAJOR "2")
 set(CPACK_PACKAGE_VERSION_MINOR "10")
@@ -9,8 +9,8 @@ set(CPACK_SYSTEM_NAME "${CMAKE_SYSTEM_NAME}")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A molecule editor and visualization package")
 set(CPACK_PACKAGE_VENDOR "IQmol.org")
 set(CPACK_PACKAGE_CONTACT "Andrew Gilbert")
-set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}-${SYSTEM_TIME}")
-set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${SYSTEM_TIME}")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}-devel-${SYSTEM_DATE}")
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-devel-${SYSTEM_DATE}")
 
 ### Generator
 if(APPLE)
@@ -28,11 +28,11 @@ message("IQmol source directory: ${IQMOL_SOURCE_DIR}")
 
 # cpack_installed_directories "/full/path;subdir"
 # => subdir/files_in_full_path
-if(UNIX)
+if(UNIX OR APPLE)
     set(CPACK_INSTALLED_DIRECTORIES "${IQMOL_SOURCE_DIR}/deploy;usr") 
 else()
     set(CPACK_INSTALLED_DIRECTORIES "${IQMOL_SOURCE_DIR}/deploy;.") 
-    set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${SYSTEM_TIME}-windows-installer")
+    set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-windows-installer")
 endif()
 
 # cpack_packaing_install_prefix "prefix"
@@ -41,7 +41,7 @@ endif()
 #set(CPACK_PACKAGING_INSTALL_PREFIX "/tmp/cpacktest")
 
 ## macOS
-set(CPACK_BUNDLE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
+set(CPACK_BUNDLE_NAME "${CPACK_PACKAGE_FILE_NAME}")
 set(CPACK_BUNDLE_PLIST "${IQMOL_SOURCE_DIR}/src/Main/resources/Info.plist")
 set(CPACK_BUNDLE_ICON "${IQMOL_SOURCE_DIR}/src/Main/resources/IQmol.icns")
 
