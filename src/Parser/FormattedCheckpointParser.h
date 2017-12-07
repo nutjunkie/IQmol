@@ -76,6 +76,7 @@ namespace Parser {
             int stateIndex;
             QString label;
 
+            QStringList   labels;
             QList<double> alphaCoefficients;
             QList<double> betaCoefficients;
             QList<double> alphaEnergies;

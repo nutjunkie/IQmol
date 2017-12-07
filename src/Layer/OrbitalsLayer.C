@@ -21,7 +21,6 @@
 ********************************************************************************/
 
 #include "OrbitalsLayer.h"
-#include "Orbitals.h"
 #include "MoleculeLayer.h"
 #include "GridInfoDialog.h"
 #include "MarchingCubes.h"
@@ -55,7 +54,7 @@ namespace IQmol {
 namespace Layer {
 
 Orbitals::Orbitals(Data::Orbitals& orbitals)
- : Base(orbitals.label()), 
+ : Base(orbitals.title()),
    m_orbitals(orbitals),
    m_configurator(*this), 
    m_molecularGridEvaluator(0),
@@ -81,11 +80,7 @@ Orbitals::Orbitals(Data::Orbitals& orbitals)
    m_configurator.sync();
    setConfigurator(&m_configurator);
 
-   m_orbitals.shellList().resize();
- 
-   m_orbitals.boundingBox(m_bbMin, m_bbMax);
-   QLOG_WARN() << "Attempt to append surface";
-   //appendSurfaces(m_orbitals.surfaceList());
+   m_orbitals.shellList().boundingBox(m_bbMin, m_bbMax);
 }
 
 
@@ -107,18 +102,6 @@ void Orbitals::setMolecule(Layer::Molecule* molecule)
    m_molecule = molecule;
    connect(this, SIGNAL(updated()), m_molecule, SIGNAL(updated()));
    connect(this, SIGNAL(softUpdate()), m_molecule, SIGNAL(softUpdate()));
-}
-
-
-unsigned Orbitals::nAlpha() const 
-{ 
-   return m_orbitals.nAlpha(); 
-}
-
-
-unsigned Orbitals::nBeta() const 
-{ 
-   return m_orbitals.nBeta(); 
 }
 
 

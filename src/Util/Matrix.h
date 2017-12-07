@@ -22,12 +22,13 @@
 
 ********************************************************************************/
 
+// Following included as per: https://svn.boost.org/trac/boost/ticket/12978
+#include <boost/serialization/array_wrapper.hpp>
 #include "boost/numeric/ublas/matrix.hpp"
 #include "boost/numeric/ublas/matrix_proxy.hpp"
 #include "boost/numeric/ublas/vector.hpp"
 #include "boost/multi_array.hpp"
 //#include <boost/serialization/serialization.hpp>
-
 #include <QStringList>
 
 

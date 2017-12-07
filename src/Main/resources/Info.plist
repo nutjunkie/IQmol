@@ -179,9 +179,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleGetInfoString</key>
-	<string>IQmol - version 1.0.0</string>
+	<string>IQmol - version 2.9.0</string>
 	<key>NSHumanReadableCopyright</key>
-	<string2015 2013 Andrew Gilbert</string>
+	<string>2017 Andrew Gilbert</string>
 	<key>CFBundleExecutable</key>
 	<string>IQmol</string>
 	<key>CFBundleIdentifier</key>

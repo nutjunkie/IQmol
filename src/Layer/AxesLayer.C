@@ -29,32 +29,51 @@
 namespace IQmol {
 namespace Layer {
 
+Axes::Axes() 
+ : Global("Axes"), m_xAxisOn(true), m_yAxisOn(true), m_zAxisOn(true), m_scale(1.0),
+   m_configurator(*this)
+{ 
+   setConfigurator(&m_configurator);
+   connect(newAction("Configure"), SIGNAL(triggered()), this, SLOT(configure()));
+}
+            
+ 
+
 void Axes::draw()
 {
    if (checkState() != Qt::Checked) return;
 
    GLfloat color[4]; 
    GLfloat blend(0.5f);  // So the colors don't look too garish
+
+   GLfloat size(m_scale*m_sceneRadius);
    
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  
 
-   color[0] = blend;  color[1] = blend;  color[2] = 1.0f;  color[3] = 1.0f;
-   glColor4fv(color);
-   drawArrow(m_sceneRadius, 0.01f*m_sceneRadius);
+   if (m_xAxisOn) {
+      color[0] = blend;  color[1] = blend;  color[2] = 1.0f;  color[3] = 1.0f;
+      glColor4fv(color);
+      drawArrow(size, 0.01f*size);
+   }
 
-   color[0] = 1.0f;  color[1] = blend;  color[2] = blend;  color[3] = 1.0f;
-   glColor4fv(color);
-   glPushMatrix();
-   glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
-   drawArrow(m_sceneRadius, 0.01*m_sceneRadius);
-   glPopMatrix();
+   if (m_yAxisOn) {
+      color[0] = 1.0f;  color[1] = blend;  color[2] = blend;  color[3] = 1.0f;
+      glColor4fv(color);
+      glPushMatrix();
+      glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+      drawArrow(size, 0.01*size);
+      glPopMatrix();
+   }
 
-   color[0] = blend;  color[1] = 1.0f;  color[2] = blend;  color[3] = 1.0f;
-   glColor4fv(color);
-   glPushMatrix();
-   glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
-   drawArrow(m_sceneRadius, 0.01f*m_sceneRadius);
-   glPopMatrix();
+
+   if (m_zAxisOn) {
+      color[0] = blend;  color[1] = 1.0f;  color[2] = blend;  color[3] = 1.0f;
+      glColor4fv(color);
+      glPushMatrix();
+      glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+      drawArrow(size, 0.01f*size);
+      glPopMatrix();
+   }
 }
 
 

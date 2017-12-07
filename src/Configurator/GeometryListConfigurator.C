@@ -42,31 +42,42 @@ GeometryList::GeometryList(Layer::GeometryList& geometryList) : m_geometryList(g
    m_configurator.setupUi(this);
    m_configurator.energyTable->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
-   m_customPlot = new CustomPlot();
-
-   m_customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-   m_customPlot->xAxis->setSelectableParts(QCPAxis::spNone);
-   m_customPlot->xAxis->setLabel("Geometry");
-   m_customPlot->yAxis->setLabel("Energy");
-   
-   QFrame* frame(m_configurator.plotFrame);
-   QVBoxLayout* layout(new QVBoxLayout());
-   frame->setLayout(layout);
-   layout->addWidget(m_customPlot);
-   
    m_pen.setColor(Qt::blue);
    m_pen.setStyle(Qt::SolidLine);
    m_pen.setWidthF(1);
    
-   m_selectPen.setColor(Qt::red);
-   m_selectPen.setStyle(Qt::SolidLine);
-   m_selectPen.setWidthF(3);
+   m_selectedPen.setColor(Qt::red);
+   m_selectedPen.setStyle(Qt::SolidLine);
+   m_selectedPen.setWidthF(3);
+
+   initPlot();
 }
 
 
 GeometryList::~GeometryList()
 {
    if (m_customPlot) delete m_customPlot;
+}
+
+
+void GeometryList::initPlot()
+{
+   m_customPlot = new CustomPlot();
+   m_customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+   m_customPlot->axisRect()->setRangeDrag(Qt::Horizontal | Qt::Vertical);
+   m_customPlot->axisRect()->setRangeZoom(Qt::Horizontal | Qt::Vertical);
+
+   m_customPlot->xAxis->setSelectableParts(QCPAxis::spNone);
+   m_customPlot->xAxis->setLabel("Geometry");
+   m_customPlot->yAxis->setLabel("Energy");
+
+   connect(m_customPlot, SIGNAL(mousePress(QMouseEvent*)), 
+      this, SLOT(setSelectionRectMode(QMouseEvent*)));
+   
+   QFrame* frame(m_configurator.plotFrame);
+   QVBoxLayout* layout(new QVBoxLayout());
+   frame->setLayout(layout);
+   layout->addWidget(m_customPlot);
 }
 
 
@@ -138,10 +149,12 @@ void GeometryList::plotEnergies()
        ymax = std::max(ymax, yy[i]);
    }
 
+   // Note this means the first graph is the line plot
    QCPGraph* graph(m_customPlot->addGraph());
    graph->setData(xx, yy);
    graph->setPen(m_pen);
-   graph->setSelectable(false);
+   graph->selectionDecorator()->setPen(m_selectedPen);
+   graph->setSelectable(QCP::stNone);
    graph->setLineStyle(QCPGraph::lsLine);
 
    QVector<double> x(1), y(1);
@@ -154,16 +167,16 @@ void GeometryList::plotEnergies()
        graph->setName(QString::number(geom));
        graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle));
        graph->setPen(m_pen);
-       graph->setSelectedPen(m_selectPen);
+       graph->selectionDecorator()->setPen(m_selectedPen);
        connect(graph, SIGNAL(selectionChanged(bool)), this, SLOT(plotSelectionChanged(bool)));
    }
 
    m_customPlot->xAxis->setRange(0, m_rawData.size());
    m_customPlot->yAxis->setRange(ymin, ymax);
    m_customPlot->xAxis->setRange(xmin, xmax);
-   m_customPlot->yAxis->setAutoTickStep(true);
    m_customPlot->replot();
 }
+
 
 
 void GeometryList::plotSelectionChanged(bool tf)
@@ -172,7 +185,7 @@ void GeometryList::plotSelectionChanged(bool tf)
    if (!graph) return;
 
    if (tf) {
-      graph->setPen(m_selectPen);
+      graph->setPen(m_selectedPen);
       graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc));
    }else {
       graph->setPen(m_pen);
@@ -184,12 +197,42 @@ void GeometryList::plotSelectionChanged(bool tf)
        
    bool ok;
    int geom(graph->name().toInt(&ok));
+   // table cells are index
    if (!ok) return;
 
    QTableWidget* table(m_configurator.energyTable);
-   table->setCurrentCell(geom, 0, QItemSelectionModel::Rows | QItemSelectionModel::ClearAndSelect);
+   table->setCurrentCell(geom, 0, 
+      QItemSelectionModel::Rows | QItemSelectionModel::ClearAndSelect);
    table->scrollToItem(table->item(geom,0));
-   on_energyTable_itemSelectionChanged();
+}
+
+
+void GeometryList::on_energyTable_itemSelectionChanged()
+{
+   QList<QTableWidgetItem*> selection = m_configurator.energyTable->selectedItems();
+   if (selection.isEmpty()) return;
+
+   int index(selection.first()->row());
+   int nGraphs(m_customPlot->graphCount()); 
+
+   if (index < 0 || index >= nGraphs) {
+      qDebug() << "Unmatched graph requested" << index;
+      return;
+   }
+
+   // skip the (first) line graph that connects the dots
+   for (int i = 1; i < nGraphs; ++i) { 
+       QCPGraph* graph(m_customPlot->graph(i));
+       if (i-1 == index) {
+          QCPDataSelection selection(QCPDataRange(0, graph->dataCount()));
+          graph->setSelection(selection);
+       }else {
+          graph->setSelection(QCPDataSelection());  // Empty Selection
+       }
+   }
+
+   m_customPlot->replot();
+   m_geometryList.setCurrentGeometry(index);
 }
 
 
@@ -244,30 +287,6 @@ void GeometryList::on_speedSlider_valueChanged(int value)
 }
 
 
-void GeometryList::on_energyTable_itemSelectionChanged()
-{
-   QList<QTableWidgetItem*> selection = m_configurator.energyTable->selectedItems();
-   if (selection.isEmpty()) return;
-
-   int index(selection.first()->row());
-   if (index > -1) m_geometryList.setCurrentGeometry(index);
-
-   QCPGraph* graph(m_customPlot->graph(index+1));
-   if (graph && graph->selected()) return;
-         
-   QList<QCPGraph*> selectedGraphs(m_customPlot->selectedGraphs());
-   QList<QCPGraph*>::iterator iter;
-   for (iter = selectedGraphs.begin(); iter != selectedGraphs.end(); ++iter) {
-       (*iter)->setSelected(false);
-   }
-
-   if (graph) {
-       graph->setSelected(true);
-       m_customPlot->replot();
-   }
-}
-
-
 void GeometryList::on_bounceButton_clicked(bool tf)
 {
    m_geometryList.setBounce(tf);
@@ -284,6 +303,22 @@ void GeometryList::on_updateBondsButton_clicked(bool tf)
 {
    m_geometryList.setReperceiveBonds(tf);
    on_energyTable_itemSelectionChanged(); 
+}
+
+
+void GeometryList::on_resetViewButton_clicked()
+{
+   plotEnergies();
+}
+
+
+void GeometryList::setSelectionRectMode(QMouseEvent* e)
+{
+   if (e->modifiers() == Qt::ShiftModifier) {
+      m_customPlot->setSelectionRectMode(QCP::srmZoom);
+   }else {
+      m_customPlot->setSelectionRectMode(QCP::srmNone);
+   }
 }
 
 

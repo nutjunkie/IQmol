@@ -23,7 +23,6 @@
 ********************************************************************************/
 
 #include "Orbitals.h"
-#include "Surface.h"
 
 
 namespace IQmol {
@@ -34,23 +33,41 @@ namespace Data {
       friend class boost::serialization::access;
 
       public:
-         enum LocalizationMethod { Undefined = 0, 
-                                   Boys, 
-                                   EdmistonRuedenberg, 
-                                   PipekMezey };
-
-         static QString toString(LocalizationMethod const);
-
-         LocalizedOrbitals() : Orbitals() { }
-
-         LocalizedOrbitals(unsigned const nAlpha, unsigned const nBeta, ShellList const& shells,
-            QList<double> const& alphaCoefficients, QList<double> const& betaCoefficients,
-            LocalizationMethod const, bool const restricted = false);
-            
          Type::ID typeID() const { return Type::LocalizedOrbitals; }
 
+         LocalizedOrbitals() : Orbitals(), m_nAlpha(0), m_nBeta(0) { }
+
+         LocalizedOrbitals(
+            unsigned const nAlpha, 
+            unsigned const nBeta, 
+            ShellList const& shellList,
+            QList<double> const& alphaCoefficients, 
+            QList<double> const& betaCoefficients, 
+            QString const& label) 
+          : Orbitals(Orbitals::Localized, shellList, 
+            alphaCoefficients, betaCoefficients, label), 
+            m_nAlpha(nAlpha), m_nBeta(nBeta) { }
+              
+         unsigned nAlpha() const { return m_nAlpha; }
+         unsigned nBeta()  const { return m_nBeta;  }
+
+         QString label(unsigned index, bool alpha = true) const
+         {
+             QString s(QString::number(index+1));
+             unsigned n(alpha ? m_nAlpha : m_nBeta);
+             if (index < n)  s += " (occ)";
+             return s;
+         }
+
+         unsigned labelIndex(bool const alpha) const
+         {
+            int n(alpha ? m_nAlpha : m_nBeta);
+            return std::max(0,n-1);
+         }
+
       private:
-         LocalizationMethod m_localizationMethod;
+         unsigned m_nAlpha;
+         unsigned m_nBeta;
    };
 
 } } // end namespace IQmol::Data

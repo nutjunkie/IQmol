@@ -27,7 +27,6 @@
 namespace IQmol {
 namespace Data {
 
-//template<> const Type::ID MolecularOrbitalsList::TypeID = Type::MolecularOrbitalsList;
 template<> const 
   Type::ID Data::List<Data::Orbitals>::TypeID = Type::OrbitalsList;
 

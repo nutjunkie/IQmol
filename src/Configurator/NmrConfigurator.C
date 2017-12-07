@@ -244,13 +244,13 @@ void Nmr::plotImpulse(QList<double> const& data, QPair<double, double> const& do
        graph->setLineStyle(QCPGraph::lsImpulse);
        graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle));
        graph->setPen(m_pen);
-       graph->setSelectedPen(m_selectPen);
+       graph->selectionDecorator()->setPen(m_selectPen);
        connect(graph, SIGNAL(selectionChanged(bool)), this, SLOT(plotSelectionChanged(bool)));
    }
 
    m_plot->yAxis->setRange(-0.00, 1.05*range);
-   m_plot->yAxis->setAutoTickStep(false);
-   m_plot->yAxis->setTickStep(1);
+  // m_plot->yAxis->setAutoTickStep(false);
+   //m_plot->yAxis->ticker()->setTickStep(1);
    m_plot->yAxis->setTickLabels(true);
    m_plot->yAxis->setLabel("Count");
 }
@@ -301,7 +301,7 @@ void Nmr::plotSpectrum(QList<double> const& data, QPair<double, double> const& d
    graph->setData(x, y);
    graph->setPen(m_pen);
    graph->setAntialiased(true);
-   graph->setSelectedPen(m_selectPen);
+   graph->selectionDecorator()->setPen(m_selectPen);
 
    m_plot->yAxis->setRange(-0.00, 1.05*maxIntensity);
    m_plot->yAxis->setLabel("Relative Intensity");
@@ -462,10 +462,10 @@ void Nmr::on_shieldingsTable_itemSelectionChanged()
    QList<QCPGraph*> selectedGraphs(m_plot->selectedGraphs());
    QList<QCPGraph*>::iterator it;
    for (it = selectedGraphs.begin(); it != selectedGraphs.end(); ++it) {
-       (*it)->setSelected(false);
+//       (*it)->setSelected(false);
    }
 
-   if (graph) graph->setSelected(true);
+//   if (graph) graph->setSelected(true);
    m_plot->replot();
 }
 

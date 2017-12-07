@@ -101,8 +101,8 @@ void QGLViewer::initializeSnapshotFormats()
 
 #ifndef NO_VECTORIAL_RENDER
 	// We add the 3 vectorial formats to the list
-	formatList += "EPS";
-	formatList += "PS";
+//	formatList += "EPS";
+//	formatList += "PS";
 	formatList += "XFIG";
 #endif
 
@@ -111,8 +111,9 @@ void QGLViewer::initializeSnapshotFormats()
 	QStringList QtText, MenuText, Ext;
 	QtText += "JPEG";	MenuText += "JPEG (*.jpg)";		Ext += "jpg";
 	QtText += "PNG";	MenuText += "PNG (*.png)";      Ext += "png";
-	QtText += "EPS";	MenuText += "Encapsulated Postscript (*.eps)";	Ext += "eps";
-	QtText += "PS";	    MenuText += "Postscript (*.ps)"; Ext += "ps";
+//  ATG - thse seem to trigger a crash
+//	QtText += "EPS";	MenuText += "Encapsulated Postscript (*.eps)";	Ext += "eps";
+//	QtText += "PS";	    MenuText += "Postscript (*.ps)"; Ext += "ps";
 	QtText += "PPM";	MenuText += "24bit RGB Bitmap (*.ppm)";	Ext += "ppm";
 	QtText += "BMP";	MenuText += "Windows Bitmap (*.bmp)";	Ext += "bmp";
 	QtText += "XFIG";	MenuText += "XFig (*.fig)";		Ext += "fig";

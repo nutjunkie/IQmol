@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1007</width>
+    <width>1106</width>
     <height>387</height>
    </rect>
   </property>
@@ -420,6 +420,13 @@ QToolTip {
         </widget>
        </item>
        <item>
+        <widget class="Line" name="line_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QRadioButton" name="gaussianButton">
          <property name="text">
           <string>Gaussian</string>
@@ -430,13 +437,6 @@ QToolTip {
         <widget class="QRadioButton" name="lorentzianButton">
          <property name="text">
           <string>Lorentzian</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="Line" name="line_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
          </property>
         </widget>
        </item>
@@ -464,9 +464,23 @@ QToolTip {
         </widget>
        </item>
        <item>
+        <widget class="Line" name="line">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QCheckBox" name="ramanCheckbox">
          <property name="text">
           <string>Raman</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="resetViewButton">
+         <property name="text">
+          <string>Reset View</string>
          </property>
         </widget>
        </item>

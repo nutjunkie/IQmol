@@ -94,7 +94,7 @@ QToolButton:pressed {
        <item>
         <widget class="QLabel" name="orbitalLabel">
          <property name="text">
-          <string>...</string>
+          <string/>
          </property>
         </widget>
        </item>
@@ -175,6 +175,23 @@ QToolButton:pressed {
       </widget>
      </item>
      <item>
+      <widget class="Line" name="line">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="resetZoomButton">
+       <property name="text">
+        <string>Reset Zoom</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -193,7 +210,7 @@ QToolButton:pressed {
         <string>Close</string>
        </property>
        <property name="autoDefault">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
       </widget>
      </item>

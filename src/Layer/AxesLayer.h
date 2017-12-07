@@ -23,6 +23,7 @@
 ********************************************************************************/
 
 #include "GlobalLayer.h"
+#include "AxesConfigurator.h"
 
 
 namespace IQmol {
@@ -35,13 +36,26 @@ namespace Layer {
       Q_OBJECT
 
       public:
-         explicit Axes() : Global("Axes") { }
+         Axes();
          ~Axes() { }
          void draw();
+
+         void xAxisOn(bool tf) { m_xAxisOn = tf; }
+         void yAxisOn(bool tf) { m_yAxisOn = tf; }
+         void zAxisOn(bool tf) { m_zAxisOn = tf; }
+
+         void setScale(double scale) { m_scale = scale; }
 
       private:
          void drawArrow(double const length, double const radius = -1.0f,
             int const resolution = 24);
+
+         bool m_xAxisOn;
+         bool m_yAxisOn;
+         bool m_zAxisOn;
+         double m_scale;
+
+         Configurator::Axes m_configurator;
    };
 
 } } // end namespace IQmol::Layer

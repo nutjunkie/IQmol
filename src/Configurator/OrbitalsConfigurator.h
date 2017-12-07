@@ -46,9 +46,6 @@ namespace Configurator {
       Q_OBJECT
 
       public:
-//         enum { AlphaOrbital, BetaOrbital, TotalDensity, SpinDensity, 
-//            AlphaDensity, BetaDensity, CustomDensity };
-
          explicit Orbitals(Layer::Orbitals&);
          ~Orbitals();
 
@@ -73,8 +70,7 @@ namespace Configurator {
       private:
          void enableOrbitalSelection(bool);
          void enableNegativeColor(bool);
-         void updateOrbitalRange(int nElectrons);
-         void updateOrbitalRange(int nElectrons, QComboBox*);
+         void updateOrbitalRange(bool alpha);
          void updateBasisRange();
          void setPositiveColor(QColor const& color);
          void setNegativeColor(QColor const& color);
@@ -86,8 +82,6 @@ namespace Configurator {
          unsigned int m_nAlpha;
          unsigned int m_nBeta;
          unsigned int m_nOrbitals;
-         unsigned int m_AlphaHOMO;
-         unsigned int m_BetaHOMO;
          CustomPlot* m_customPlot;
          QPen m_pen;
          QPen m_selectedPen;

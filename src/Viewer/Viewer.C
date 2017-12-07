@@ -737,6 +737,7 @@ void Viewer::setRecord(bool activate)
          }
       } 
    }else {
+      //if (m_snapper) m_snapper->makeFfmpegMovie();
       if (m_snapper) m_snapper->makeMovie();
    }
 }

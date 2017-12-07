@@ -23,7 +23,6 @@
 ********************************************************************************/
 
 #include "ui_AboutDialog.h"
-#include "Version.h"
 
 
 namespace IQmol {

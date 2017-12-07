@@ -595,16 +595,16 @@ void InputDialog::initializeQuiLogic()
    QtNode& aimd_method(reg.get("AIMD_METHOD"));
    aimd_method.addRule(
       If (aimd_method == "BOMD", 
-         Disable(m_ui.deuterate), 
-         Enable(m_ui.deuterate) 
+         Disable(m_ui.deuterate),
+         Enable(m_ui.deuterate)
       )
    );
 
    QtNode& aimd_initial_velocities(reg.get("AIMD_INITIAL_VELOCITIES"));
    aimd_initial_velocities.addRule(
       If (aimd_initial_velocities == QString("Thermal"), 
-          Enable(m_ui.aimd_temperature), 
-          Disable(m_ui.aimd_temperature) 
+          Enable(m_ui.aimd_temp), 
+          Disable(m_ui.aimd_temp) 
       )
    );
 

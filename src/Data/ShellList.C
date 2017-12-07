@@ -40,7 +40,7 @@ unsigned ShellList::nBasis() const
 }
 
 
-void ShellList::boundingBox(qglviewer::Vec& min, qglviewer::Vec& max) 
+void ShellList::boundingBox(qglviewer::Vec& min, qglviewer::Vec& max, double const thresh) 
 {
    if (isEmpty()) {
       min.x = min.y = min.z = 0.0;
@@ -48,12 +48,12 @@ void ShellList::boundingBox(qglviewer::Vec& min, qglviewer::Vec& max)
       return;
    }
 
-   at(0)->boundingBox(min, max);
+   at(0)->boundingBox(min, max, thresh);
 
    qglviewer::Vec tmin, tmax;
    ShellList::const_iterator shell;
    for (shell = begin(); shell != end(); ++shell) {
-       (*shell)->boundingBox(tmin, tmax);
+       (*shell)->boundingBox(tmin, tmax, thresh);
        min.x = std::min(tmin.x, min.x);
        min.y = std::min(tmin.y, min.y);
        min.z = std::min(tmin.z, min.z);
@@ -109,7 +109,7 @@ void ShellList::resize()
 // make the computation more efficient.
 Vector const& ShellList::shellValues(qglviewer::Vec const& gridPoint)
 {
-   double* values;
+   double const* values;
    unsigned offset(0);
 
    ShellList::const_iterator shell;
@@ -141,8 +141,6 @@ Vector const& ShellList::shellPairValues(qglviewer::Vec const& gridPoint)
    }
 
    return m_shellPairValues;
-
 }
-
 
 } } // end namespace IQmol::Data

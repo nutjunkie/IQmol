@@ -42,29 +42,20 @@ Orbitals::Orbitals(Layer::Orbitals& orbitals)
       m_configurator.orbitalRangeMax, SLOT(setCurrentIndex(int)));
 
    m_configurator.surfaceType->clear();
+   // Watch the ordering of these affects the index selection below
    m_configurator.surfaceType->addItem("Basis Function", Data::SurfaceType::BasisFunction);
-   m_configurator.surfaceType->addItem("Alpha Orbital", Data::SurfaceType::AlphaOrbital);
-   m_configurator.surfaceType->addItem("Beta Orbital",  Data::SurfaceType::BetaOrbital);
-   m_configurator.surfaceType->setCurrentIndex(1);
-
-   //if (m_orbitals.moTypeID() == Data::moType::NTOs)
-   //{
-   //m_configurator.surfaceType->addItem("Alpha Orbital", AlphaOrbital);
-   //m_configurator.surfaceType->addItem("Beta Orbital",  BetaOrbital);
-   //m_configurator.surfaceType->addItem("Transition Density", TotalDensity);
-   //}
-   //else
-   //{
-/*
-   m_configurator.surfaceType->addItem("Alpha Orbital", AlphaOrbital);
-   m_configurator.surfaceType->addItem("Beta Orbital",  BetaOrbital);
-   // TO DO Conditional
-   m_configurator.surfaceType->addItem("Total Density", TotalDensity);
-   m_configurator.surfaceType->addItem("Spin Density",  SpinDensity);
-   m_configurator.surfaceType->addItem("Alpha Density", AlphaDensity);
-   m_configurator.surfaceType->addItem("Beta Density",  BetaDensity);
-*/
-   //}
+  
+   if (m_orbitals.m_orbitals.orbitalType() == Data::Orbitals::NaturalTransition) {
+      m_configurator.surfaceType->addItem("Alpha NTO",  Data::SurfaceType::AlphaOrbital);
+      m_configurator.surfaceType->addItem("Beta NTO",   Data::SurfaceType::BetaOrbital);
+    //m_configurator.surfaceType->addItem("Transition Density", TotalDensity);
+   }else if (m_orbitals.m_orbitals.orbitalType() == Data::Orbitals::Dyson) {
+      m_configurator.surfaceType->addItem("Dyson (Left)",  Data::SurfaceType::DysonLeft);
+      m_configurator.surfaceType->addItem("Dyson (Right)", Data::SurfaceType::DysonRight);
+   }else {
+      m_configurator.surfaceType->addItem("Alpha Orbital",  Data::SurfaceType::AlphaOrbital);
+      m_configurator.surfaceType->addItem("Beta Orbital",   Data::SurfaceType::BetaOrbital);
+   }
 
    setPositiveColor(Preferences::PositiveSurfaceColor());
    setNegativeColor(Preferences::NegativeSurfaceColor());
@@ -88,16 +79,16 @@ Orbitals::~Orbitals()
 
 void Orbitals::init() 
 { 
-   qDebug() << "Configurator::Orbitals ctor w/" 
-            << Data::Orbitals::toString(m_orbitals.orbitalType());
-
    m_nAlpha    = m_orbitals.nAlpha();
    m_nBeta     = m_orbitals.nBeta();
    m_nOrbitals = m_orbitals.nOrbitals();
-   m_AlphaHOMO = m_nAlpha;
-   m_BetaHOMO  = m_nBeta;
 
    switch (m_orbitals.orbitalType()) {
+      case Data::Orbitals::Undefined:
+         QLOG_WARN() << "Undefined orbitals in Orbitals::Configurator::init()";
+         break;
+
+      case Data::Orbitals::Dyson:
       case Data::Orbitals::Localized:
          // Orbital energy diagram doesn't make sense here
          m_configurator.energyFrame->hide();
@@ -105,24 +96,20 @@ void Orbitals::init()
          resize(sizeHint());
          break;
 
-      case Data::Orbitals::NaturalTransition:
-         m_AlphaHOMO = m_BetaHOMO = m_nOrbitals/2;
-         if (m_nOrbitals > 0) initPlot();
+      case Data::Orbitals::NaturalBond:
+         QLOG_WARN() << "NBOs requested in Orbitals::Configurator::init() (NYI)";
          break;
-
-//      case Data::Orbitals::NaturalBond:
-//         break;
       
-      case Data::Orbitals::Canonical:
+      default:
          if (m_nOrbitals > 0) initPlot();
          break;
    }
 
-   updateOrbitalRange(m_AlphaHOMO);
+   updateOrbitalRange(true);
+   // 0 => basis function, 1 => alpha orbitals
+   m_configurator.surfaceType->setCurrentIndex(1); 
 
-//   static bool densitiesAppended(false);
-//   if (!densitiesAppended) {
-//      densitiesAppended = true;
+
    Data::DensityList& densities(m_orbitals.m_availableDensities);
    qDebug() << "Appending additional densities" << densities.size();
    Data::DensityList::iterator density;
@@ -131,7 +118,8 @@ void Orbitals::init()
         //if ((*density)->surfaceType().kind() == Data::SurfaceType::Custom) {
         //   m_configurator.surfaceType->addItem((*density)->label(),  CustomDensity);
        // }
-        m_configurator.surfaceType->addItem((*density)->label(),  Data::SurfaceType::CustomDensity);
+        m_configurator.surfaceType->addItem((*density)->label(),  
+            Data::SurfaceType::CustomDensity);
    }
 //   }
 }
@@ -140,10 +128,12 @@ void Orbitals::init()
 void Orbitals::initPlot()
 {
    m_customPlot = new CustomPlot(); 
+   m_customPlot->setMinimumSize(QSize(300,200));
    m_customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
    m_customPlot->axisRect()->setRangeDrag(m_customPlot->yAxis->orientation());
    m_customPlot->axisRect()->setRangeZoom(m_customPlot->yAxis->orientation());
    m_customPlot->xAxis->setSelectableParts(QCPAxis::spNone);
+   m_customPlot->yAxis->setNumberPrecision(3);
    
    QFrame* frame(m_configurator.energyFrame);
    QVBoxLayout* layout(new QVBoxLayout());
@@ -151,111 +141,129 @@ void Orbitals::initPlot()
    frame->setLayout(layout);
    layout->addWidget(m_customPlot);
 
-   QVector<double>  ticks;
-   QVector<QString> labels;
-
-   ticks << 0.75 << 2.50;
-   labels << "Alpha" << "Beta";
-
-   m_customPlot->xAxis->setAutoTicks(false);
-   m_customPlot->xAxis->setAutoTickLabels(false);
-   m_customPlot->xAxis->setTickVector(ticks);
-   m_customPlot->xAxis->setTickVectorLabels(labels);
-   m_customPlot->xAxis->setSubTickCount(0);
+   QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
+   textTicker->addTick(0.75, "Alpha");
+   textTicker->addTick(2.5, "Beta");
+   m_customPlot->xAxis->setTicker(textTicker);
+   m_customPlot->xAxis->setSubTicks(false);
    m_customPlot->xAxis->setRange(0,3.25);
 
    unsigned nOrbs(m_orbitals.nOrbitals());
    unsigned nAlpha(m_orbitals.nAlpha());
    unsigned nBeta(m_orbitals.nBeta());
-   //unsigned moTypeID(m_orbitals.moTypeID());
+
    QVector<double>  xAlpha(nOrbs), yAlpha(nOrbs), xBeta(nOrbs), yBeta(nOrbs); 
    QVector<double> a(1), b(1), y(1);
    QCPGraph* graph(0);
 
-   // For NTOs
-   if (m_orbitals.orbitalType() == Data::Orbitals::NaturalTransition) {
-     if (nBeta == nAlpha) {
-       nAlpha = nOrbs/2;
-       nBeta = 0;
-     } else 
-       nAlpha = nBeta = nOrbs/2;
+   bool ntos(m_orbitals.orbitalType() == Data::Orbitals::NaturalTransition);
+
+   if (ntos) {
+     // nBeta = (nBeta == nAlpha) ? 0 : nOrbs/2;
+      nAlpha = nBeta = nOrbs/2;
    }
 
-   // Alpha
    unsigned i(0), g(0);
-   while (i < nOrbs) {
-       y[0] = m_orbitals.alphaOrbitalEnergy(i);
+   if (nAlpha > 0) {
+      while (i < nOrbs) {
 
-       g = 1; // degeneracy
-       while (i+g < nOrbs && 
-              std::abs(y[0]-m_orbitals.alphaOrbitalEnergy(i+g)) < 0.001) { ++g; }
+          g = 1; // degeneracy
+          if (ntos) {
+             y[0] = m_orbitals.alphaOrbitalAmplitude(i);
+             while (i+g < nOrbs && 
+                 std::abs(y[0]-m_orbitals.alphaOrbitalAmplitude(i+g)) < 0.001) { ++g; }
+          }else{
+             y[0] = m_orbitals.alphaOrbitalEnergy(i);
+             while (i+g < nOrbs && 
+                 std::abs(y[0]-m_orbitals.alphaOrbitalEnergy(i+g)) < 0.001) { ++g; }
+          }
 
-       for (unsigned k = i; k < i+g; ++k) {
-           a[0]  = 0.75 - 0.25*(g-1) + (k-i)*0.50;
-           graph = m_customPlot->addGraph();
-           graph->setData(a, y);
-           graph->setName(QString::number(k));
-           graph->setScatterStyle(k<nAlpha ? QCPScatterStyle::ssOccupied 
-                                           : QCPScatterStyle::ssVirtual);
-           connect(graph, SIGNAL(selectionChanged(bool)), 
-              this, SLOT(plotSelectionChanged(bool)));
-       }
-       i += g;
+          for (unsigned k = i; k < i+g; ++k) {
+              a[0]  = 0.75 - 0.25*(g-1) + (k-i)*0.50;
+              graph = m_customPlot->addGraph();
+              graph->setData(a, y);
+              graph->setName(QString::number(k));
+              if (ntos) {
+                 graph->setScatterStyle(k<nAlpha ? QCPScatterStyle::ssHole
+                                                 : QCPScatterStyle::ssOccupied);
+              }else {
+                 graph->setScatterStyle(k<nAlpha ? QCPScatterStyle::ssOccupied 
+                                                 : QCPScatterStyle::ssVirtual);
+              }
+              connect(graph, SIGNAL(selectionChanged(bool)), 
+                 this, SLOT(plotSelectionChanged(bool)));
+          }
+          i += g;
+      }
    }
 
-   if (nBeta > 0) 
-   {
+   if (nBeta > 0) {
+      i = 0;
+      while (i < nOrbs) {
+          g = 1; // degeneracy
+          if (ntos) {
+             y[0] = m_orbitals.betaOrbitalAmplitude(i);
+             while (i+g < nOrbs && 
+                 std::abs(y[0]-m_orbitals.betaOrbitalAmplitude(i+g)) < 0.001) { ++g; }
+          }else{
+             y[0] = m_orbitals.betaOrbitalEnergy(i);
+             while (i+g < nOrbs && 
+                 std::abs(y[0]-m_orbitals.betaOrbitalEnergy(i+g)) < 0.001) { ++g; }
+          }
 
-   i = 0;
-   // Beta
-   while (i < nOrbs) {
-       y[0] = m_orbitals.betaOrbitalEnergy(i);
-
-       g = 1; // degeneracy
-       while (i+g < nOrbs && 
-              std::abs(y[0]-m_orbitals.betaOrbitalEnergy(i+g)) < 0.001) { ++g; }
-
-       for (unsigned k = i; k < i+g; ++k) {
-           a[0]  = 2.50 - 0.25*(g-1) + (k-i)*0.50;
-           graph = m_customPlot->addGraph();
-           graph->setData(a, y);
-           graph->setName(QString::number(k+nOrbs));
-           graph->setScatterStyle(k<nBeta ? QCPScatterStyle::ssOccupied 
-                                           : QCPScatterStyle::ssVirtual);
-           connect(graph, SIGNAL(selectionChanged(bool)), 
-              this, SLOT(plotSelectionChanged(bool)));
-       }
-       i += g;
+          for (unsigned k = i; k < i+g; ++k) {
+              a[0]  = 2.50 - 0.25*(g-1) + (k-i)*0.50;
+              graph = m_customPlot->addGraph();
+              graph->setData(a, y);
+              graph->setName(QString::number(k+nOrbs));
+              if (ntos) {
+                 graph->setScatterStyle(k<nAlpha ? QCPScatterStyle::ssHole
+                                                 : QCPScatterStyle::ssOccupied);
+              }else {
+                 graph->setScatterStyle(k<nAlpha ? QCPScatterStyle::ssOccupied 
+                                                 : QCPScatterStyle::ssVirtual);
+              }
+              connect(graph, SIGNAL(selectionChanged(bool)), 
+                 this, SLOT(plotSelectionChanged(bool)));
+          }
+          i += g;
+      }
    }
 
-   }
 
-   m_customPlot->yAxis->setLabel("Energy/Hartree");
-   m_customPlot->yAxis->setNumberPrecision(3);
    // Set the scale
-   double yMin(-1.0), yMax(0.5);
-   // Show 5 occupied and virtual orbitals to start with
-   unsigned index, nShow(5);
+   double yMin(-1.0), yMax(1.0);
+   unsigned index, nShow(5);  // Show 5 occupied and virtual orbitals to start with
    
-   if (nBeta > nAlpha) {
-      // Use the beta energies instead
-      index = nBeta < nShow ? 0 : nBeta-nShow;
-      yMin  = m_orbitals.betaOrbitalEnergy(index);
-      index = nOrbs > nBeta+nShow ? nBeta+nShow : nOrbs;
-      yMax  = m_orbitals.betaOrbitalEnergy(index);
+   if (ntos) {
+      // The first half of the orbitals correspond to holes, 
+      // with increasing vacancies.
+      yMin = std::min(m_orbitals.alphaOrbitalAmplitude(nOrbs/2-1), 
+                      m_orbitals.betaOrbitalAmplitude( nOrbs/2-1));
+      yMax = std::max(m_orbitals.alphaOrbitalAmplitude(nOrbs/2), 
+                      m_orbitals.betaOrbitalAmplitude( nOrbs/2));
+      m_customPlot->yAxis->setLabel("Occupancy");
+
    }else {
-      index = nAlpha < nShow ? 0 : nAlpha-nShow;
-      yMin  = m_orbitals.alphaOrbitalEnergy(index);
-      index = nOrbs > nAlpha+nShow ? nAlpha+nShow : nOrbs;
-      yMax  = m_orbitals.alphaOrbitalEnergy(index);
+
+      if (nBeta > nAlpha) {
+         // Use the beta energies instead of alpha
+         index = nBeta < nShow ? 0 : nBeta-nShow;
+         yMin  = m_orbitals.betaOrbitalEnergy(index);
+         index = nOrbs > nBeta+nShow ? nBeta+nShow : nOrbs-1;
+         yMax  = m_orbitals.betaOrbitalEnergy(index);
+      }else {
+         index = nAlpha < nShow ? 0 : nAlpha-nShow;
+         yMin  = m_orbitals.alphaOrbitalEnergy(index);
+         index = nOrbs > nAlpha+nShow ? nAlpha+nShow : nOrbs-1;
+         yMax  = m_orbitals.alphaOrbitalEnergy(index);
+      }
+      yMax = std::min(yMax, 0.5*std::abs(yMin));
+      m_customPlot->yAxis->setLabel("Energy/Hartree");
+
    }
-   yMax = std::min(yMax, 0.5*std::abs(yMin));
-   // For NTOs
-   if (m_orbitals.orbitalType() == Data::Orbitals::NaturalTransition) {
-     m_customPlot->yAxis->setLabel("Occupation");
-     m_customPlot->yAxis->setRange(-1.1,1.1);
-   } else
-     m_customPlot->yAxis->setRange(1.05*yMin,1.05*yMax);
+
+   m_customPlot->yAxis->setRange(1.05*yMin,1.05*yMax);
 }
 
 
@@ -278,30 +286,34 @@ void Orbitals::plotSelectionChanged(bool tf)
    if (!ok) return;
 
    double energy(0.0);
+   double amplitude(0.0);
    QString label;
+
    if (orb < nOrbs) {  //alpha
-      energy = m_orbitals.alphaOrbitalEnergy(orb);
-      label  = "Alpha orbital ";
-      //updateOrbitalRange(m_nAlpha);
-      updateOrbitalRange(m_AlphaHOMO);
+      energy    = m_orbitals.alphaOrbitalEnergy(orb);
+      amplitude = m_orbitals.alphaOrbitalAmplitude(orb);
+      label     = "Alpha ";
+      m_configurator.surfaceType->setCurrentIndex(1);
+      updateOrbitalRange(true);
    }else {  // beta
       orb -= nOrbs;
-      energy = m_orbitals.betaOrbitalEnergy(orb);
-      label  = "Beta orbital ";
-      //updateOrbitalRange(m_nBeta);
-      updateOrbitalRange(m_BetaHOMO);
+      energy    = m_orbitals.betaOrbitalEnergy(orb);
+      amplitude = m_orbitals.betaOrbitalAmplitude(orb);
+      label     = "Beta ";
+      m_configurator.surfaceType->setCurrentIndex(2);
+      updateOrbitalRange(false);
    }
 
-   m_configurator.surfaceType->setCurrentIndex(0);
    m_configurator.orbitalRangeMin->setCurrentIndex(orb);
    m_configurator.orbitalRangeMax->setCurrentIndex(orb);
 
    label += QString::number(orb+1);
-   label += ": ";
-   label += QString::number(energy, 'f', 3);
-   if (m_orbitals.orbitalType() != Data::Orbitals::NaturalTransition) {
-      label += " Eh";
+   if (m_orbitals.orbitalType() == Data::Orbitals::Canonical) {
+      label += " orbital energy: " + QString::number(energy, 'f', 3) + " Eh";
+   }else if (m_orbitals.orbitalType() == Data::Orbitals::NaturalTransition) {
+      label += " NTO occupancy: " + QString::number(amplitude, 'f', 3);
    }
+
    m_configurator.energyLabel->setText(label);
 }
 
@@ -311,7 +323,7 @@ void Orbitals::clearSelectedOrbitals(int)
    QList<QCPGraph*> selection(m_customPlot->selectedGraphs());
    QList<QCPGraph*>::iterator iter;
    for (iter = selection.begin(); iter != selection.end(); ++iter) {
-       (*iter)->setSelected(false);
+//       (*iter)->setSelected(false);
    }
 }
 
@@ -328,15 +340,17 @@ void Orbitals::on_surfaceType_currentIndexChanged(int index)
          break;
 
       case Data::SurfaceType::AlphaOrbital:
+      case Data::SurfaceType::DysonLeft:
          enableOrbitalSelection(true);
          enableNegativeColor(true);
-         updateOrbitalRange(m_AlphaHOMO);
+         updateOrbitalRange(true);
          break;
 
       case Data::SurfaceType::BetaOrbital:
+      case Data::SurfaceType::DysonRight:
          enableOrbitalSelection(true);
          enableNegativeColor(true);
-         updateOrbitalRange(m_BetaHOMO);
+         updateOrbitalRange(false);
          break;
 
       case Data::SurfaceType::TotalDensity:
@@ -443,8 +457,8 @@ void Orbitals::on_addToQueueButton_clicked(bool)
 
       case Data::SurfaceType::BasisFunction: {
          info.type().setKind(Data::SurfaceType::BasisFunction);
-         int fn1(m_configurator.orbitalRangeMin->currentIndex()+1);
-         int fn2(m_configurator.orbitalRangeMax->currentIndex()+1);
+         int fn1(m_configurator.orbitalRangeMin->currentIndex());
+         int fn2(m_configurator.orbitalRangeMax->currentIndex());
 
          for (int i = std::min(fn1,fn2); i <= std::max(fn1, fn2); ++i) {
              info.type().setIndex(i);
@@ -454,8 +468,8 @@ void Orbitals::on_addToQueueButton_clicked(bool)
 
       case Data::SurfaceType::AlphaOrbital: {
          info.type().setKind(Data::SurfaceType::AlphaOrbital);
-         int orb1(m_configurator.orbitalRangeMin->currentIndex()+1);
-         int orb2(m_configurator.orbitalRangeMax->currentIndex()+1);
+         int orb1(m_configurator.orbitalRangeMin->currentIndex());
+         int orb2(m_configurator.orbitalRangeMax->currentIndex());
 
          for (int i = std::min(orb1,orb2); i <= std::max(orb1, orb2); ++i) {
              info.type().setIndex(i);
@@ -465,8 +479,30 @@ void Orbitals::on_addToQueueButton_clicked(bool)
 
       case Data::SurfaceType::BetaOrbital: {
          info.type().setKind(Data::SurfaceType::BetaOrbital);
-         int orb1(m_configurator.orbitalRangeMin->currentIndex()+1);
-         int orb2(m_configurator.orbitalRangeMax->currentIndex()+1);
+         int orb1(m_configurator.orbitalRangeMin->currentIndex());
+         int orb2(m_configurator.orbitalRangeMax->currentIndex());
+
+         for (int i = std::min(orb1,orb2); i <= std::max(orb1, orb2); ++i) {
+             info.type().setIndex(i);
+             queueSurface(info);
+         }
+      } break;
+
+      case Data::SurfaceType::DysonLeft: {
+         info.type().setKind(Data::SurfaceType::DysonLeft);
+         int orb1(m_configurator.orbitalRangeMin->currentIndex());
+         int orb2(m_configurator.orbitalRangeMax->currentIndex());
+
+         for (int i = std::min(orb1,orb2); i <= std::max(orb1, orb2); ++i) {
+             info.type().setIndex(i);
+             queueSurface(info);
+         }
+      } break;
+
+      case Data::SurfaceType::DysonRight: {
+         info.type().setKind(Data::SurfaceType::DysonRight);
+         int orb1(m_configurator.orbitalRangeMin->currentIndex());
+         int orb2(m_configurator.orbitalRangeMax->currentIndex());
 
          for (int i = std::min(orb1,orb2); i <= std::max(orb1, orb2); ++i) {
              info.type().setIndex(i);
@@ -521,56 +557,28 @@ void Orbitals::enableNegativeColor(bool tf)
 }
 
 
-void Orbitals::updateOrbitalRange(int nElectrons) 
+void Orbitals::updateOrbitalRange(bool alpha)
 {
    m_configurator.orbitalLabel->setText("Orbital(s):");
 
-   int index;
-   QComboBox* combo;
+   QComboBox* combo(0);
 
    combo = m_configurator.orbitalRangeMin;
-   index = combo->currentIndex();
-   updateOrbitalRange(nElectrons, combo);
-   if (nElectrons == 0 ) {
-      index = 0;
-   }else {
-      if (index < 0 || index >= (int)m_nOrbitals) index = nElectrons-1;
-   }
-
-   combo->setCurrentIndex(index);
+   combo->clear();
+   combo->addItems(m_orbitals.m_orbitals.labels(alpha));
+   combo->setCurrentIndex(m_orbitals.m_orbitals.labelIndex(alpha));
 
    combo = m_configurator.orbitalRangeMax;
-   index = combo->currentIndex();
-   updateOrbitalRange(nElectrons, combo);
-    if (nElectrons == 0 ) {
-      index = 0;
-   }else {
-      if (index < 0 || index >= (int)m_nOrbitals) index = nElectrons;
-   }
-
-   combo->setCurrentIndex(index);
-}
-
-
-void Orbitals::updateOrbitalRange(int nElectrons, QComboBox* combo) 
-{
    combo->clear();
-   for (unsigned int i = 1; i <= m_nOrbitals; ++i) {
-       combo->addItem(QString::number(i));
-   }
-   
-   if (nElectrons > 0) {
-      combo->setItemText(nElectrons-1, QString::number(nElectrons) + " (HOMO)");
-      combo->setItemText(nElectrons,   QString::number(nElectrons+1) + " (LUMO)");
-   }
+   combo->addItems(m_orbitals.m_orbitals.labels(alpha));
+   combo->setCurrentIndex(m_orbitals.m_orbitals.labelIndex(alpha)+1);
 }
-
 
 
 void Orbitals::updateBasisRange() 
 {
    m_configurator.orbitalLabel->setText("Function(s):");
-   Data::ShellList& shellList(m_orbitals.m_orbitals.shellList());
+   Data::ShellList const& shellList(m_orbitals.m_orbitals.shellList());
 
    QComboBox* comboMin(m_configurator.orbitalRangeMin);
    QComboBox* comboMax(m_configurator.orbitalRangeMax);
@@ -578,7 +586,7 @@ void Orbitals::updateBasisRange()
    comboMin->clear();
    comboMax->clear();
 
-   for (unsigned i = 0; i < shellList.size(); ++i) {
+   for (int i = 0; i < shellList.size(); ++i) {
        Data::Shell* shell(shellList[i]);
        QString label(QString::number(shell->atomIndex()+1));
        label += " : ";

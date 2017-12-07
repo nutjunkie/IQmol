@@ -69,14 +69,15 @@ void CustomPlot::saveAs()
          int upscale(2);
 
          if (filter == ".pdf") {
-            qDebug() << "Saving with filter " << fileName << filter;
-            bool noCosmeticPen = true;
-            savePdf(fileName, noCosmeticPen, dim.width(), dim.height());
+            //qDebug() << "Saving with filter " << fileName << filter;
+            //bool noCosmeticPen = true;
+            //savePdf(fileName, noCosmeticPen, dim.width(), dim.height());
+            savePdf(fileName, dim.width(), dim.height());
          }else if (filter == ".png") {
-            qDebug() << "Saving with filter " << fileName << filter;
+            //qDebug() << "Saving with filter " << fileName << filter;
             savePng(fileName, dim.width(), dim.height(), upscale);
          }else if (filter == ".jpg") {
-            qDebug() << "Saving with filter " << fileName << filter;
+            //qDebug() << "Saving with filter " << fileName << filter;
             saveJpg(fileName, dim.width(), dim.height(), upscale);
          }
 

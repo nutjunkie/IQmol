@@ -76,9 +76,12 @@ namespace Configurator {
          void on_lorentzianButton_clicked(bool);
          void on_widthSlider_valueChanged(int);
          void on_ramanCheckbox_clicked(bool);
+         void on_resetViewButton_clicked(bool);
 
          void plotSelectionChanged(bool);
          void updatePlot();
+
+         void setSelectionRectMode(QMouseEvent*);
 
 
       private:
@@ -89,10 +92,11 @@ namespace Configurator {
          void setVectorColor(QColor const& color);
          void plotImpulse(double const scaleFactor);
          void plotSpectrum(Profile const, double const scaleFactor, double const width);
+         void initSpectrum();
 
          Ui::FrequenciesConfigurator m_configurator;
          Layer::Frequencies& m_frequencies;
-         CustomPlot* m_customPlot;
+         CustomPlot* m_spectrum;
          QList<QPair<double, double> > m_rawData;
          QList<QPair<double, double> > m_rawRamanData;
          QList<QPair<double, double> > m_rawIrData;

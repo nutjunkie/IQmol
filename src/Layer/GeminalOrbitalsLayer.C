@@ -500,7 +500,7 @@ bool GeminalOrbitals::computeOrbitalGrids(Data::GridDataList& grids)
    progressDialog->show();
 
    double  x, y, z;
-   double* values;
+   double const* values;
    double* tmp = new double[nGem];
    unsigned i, j, k;
    
@@ -758,7 +758,7 @@ void GeminalOrbitals::computeShellPairs(Vec const& gridPoint)
 {
    Data::ShellList const& shells(m_geminalOrbitals.shellList());
 
-   double* values;
+   double const* values;
    Data::ShellList::const_iterator shell;
    unsigned k(0);
    for (shell = shells.begin(); shell != shells.end(); ++shell) {
@@ -816,7 +816,7 @@ double GeminalOrbitalProperty::orbital(double const x, double const y, double co
   
    Vec gridPoint(x,y,z);
    unsigned offset(0),i,s;
-   double*  values;
+   double const*  values;
    double   val(0.0);
 
    QList<unsigned> const& Limits(m_geminalOrbitals.geminalOrbitalLimits());

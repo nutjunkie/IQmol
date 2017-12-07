@@ -70,13 +70,16 @@ namespace Layer {
          void processSurfaceQueue();
 
       protected:
-         unsigned nAlpha() const;
-         unsigned nBeta() const;
+         unsigned nAlpha() const { return m_orbitals.nAlpha(); }
+         unsigned nBeta()  const { return m_orbitals.nBeta(); }
          unsigned nBasis() const;
          unsigned nOrbitals() const;
          
          virtual double alphaOrbitalEnergy(unsigned) const { return 0.0; }
          virtual double betaOrbitalEnergy(unsigned)  const { return 0.0; }
+
+         virtual double alphaOrbitalAmplitude(unsigned) const { return 1.0; }
+         virtual double betaOrbitalAmplitude(unsigned)  const { return 1.0; }
 
          Data::Orbitals& m_orbitals;
          Data::DensityList m_availableDensities;

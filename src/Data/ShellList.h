@@ -39,7 +39,8 @@ namespace Data {
          /// Returns the (-1,-1,-1) and (1,1,1) octant corners of a rectangular
          /// box that encloses the significant region of the Shells where 
          /// significance is determined by thresh.  
-         void boundingBox(qglviewer::Vec& min, qglviewer::Vec& max);
+         void boundingBox(qglviewer::Vec& min, qglviewer::Vec& max, 
+            double const thresh = 0.001);
 
          unsigned nBasis() const;
 

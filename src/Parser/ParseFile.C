@@ -118,6 +118,9 @@ void ParseFile::parseDirectory(QString const& filePath, QString const& filter)
 }
 
 
+// There is a problem in this routine if an attempt is made to parse 
+// iqmol_povray.inc, but the file does not exist.  A crash occurs at
+// the end of the for loop.
 void ParseFile::run()
 {
    Data::FileList* fileList = new Data::FileList();
@@ -148,9 +151,12 @@ bool ParseFile::parse(QString const& filePath, bool& addToFileList)
    
    if (!fileInfo.exists()) {
       QString msg("File not found: ");
+
       msg += fileInfo.filePath();
+qDebug() << msg;
       m_filePaths.removeAll(filePath);
       m_errorList.append(msg);
+      addToFileList = false;
       return false;
    }
 
@@ -230,7 +236,8 @@ bool ParseFile::parse(QString const& filePath, bool& addToFileList)
    }
 
    if (!parser) {
-      QLOG_WARN() << "Failed to find parser for file:" << filePath << " extension " << extension;
+      QLOG_WARN() << "Failed to find parser for file:" << filePath 
+                  << " extension " << extension;
       return false;
    }
 

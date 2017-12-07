@@ -137,6 +137,7 @@ void MolecularSurfaces::on_calculateButton_clicked(bool)
 
       case Data::SurfaceType::VanDerWaals:
          info.type().setKind(Data::SurfaceType::VanDerWaals);
+         info.setIsSigned(false);
           break;
       case Data::SurfaceType::Promolecule:
          info.type().setKind(Data::SurfaceType::Promolecule);

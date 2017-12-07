@@ -165,10 +165,24 @@ namespace Data {
          Type::ID typeID() const { return Type::MultipoleDerivedCharge; }
    };
 
+
    class ChelpgCharge : public AtomicCharge {
       public:
          Type::ID typeID() const { return Type::ChelpgCharge; }
    };
+
+
+   class HirshfeldCharge : public AtomicCharge {
+      public:
+         Type::ID typeID() const { return Type::HirshfeldCharge; }
+   };
+
+
+   class LowdinCharge : public AtomicCharge {
+      public:
+         Type::ID typeID() const { return Type::LowdinCharge; }
+   };
+
 
    class NmrShielding : public ScalarProperty {
       public:

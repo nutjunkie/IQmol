@@ -51,6 +51,7 @@ namespace IQmol {
          bool requestFileName();
          void resetCounter() { m_counter = 0; } 
          void makeMovie();
+         void makeFfmpegMovie();
 
       Q_SIGNALS:
          void movieFinished();
@@ -71,11 +72,12 @@ namespace IQmol {
          void writefile(int format, int sort, int options, int nbcol,
                const char *filename, const char *extension);
 
+         Viewer* m_viewer;
+
          QString m_fileBaseName; 
          QString m_fileExtension;
          Format  m_fileFormat;
 
-         Viewer* m_viewer;
          int m_flags;
          int m_counter;
          QImage m_image;

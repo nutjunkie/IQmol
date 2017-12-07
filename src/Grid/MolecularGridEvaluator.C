@@ -106,17 +106,27 @@ void MolecularGridEvaluator::run()
               }else if (type.kind() == Data::SurfaceType::BasisFunction) {
                  found = true;
                  basisGrids.append(*iter);
-                 basisFunctions.append(type.index()-1);
+                 basisFunctions.append(type.index());
 
               }else if (type.kind() == Data::SurfaceType::AlphaOrbital) {
                  found = true;
                  alphaGrids.append(*iter);
-                 alphaOrbitals.append(type.index()-1);
+                 alphaOrbitals.append(type.index());
                  
               }else if (type.kind() == Data::SurfaceType::BetaOrbital) {
                  found = true;
                  betaGrids.append(*iter);
-                 betaOrbitals.append(type.index()-1);
+                 betaOrbitals.append(type.index());
+
+              }else if (type.kind() == Data::SurfaceType::DysonLeft) {
+                 found = true;
+                 alphaGrids.append(*iter);
+                 alphaOrbitals.append(type.index());
+                 
+              }else if (type.kind() == Data::SurfaceType::DysonRight) {
+                 found = true;
+                 betaGrids.append(*iter);
+                 betaOrbitals.append(type.index());
 
               }else if (type.kind() == Data::SurfaceType::Custom) {
                  for (int i = 0; i < m_densities.size(); ++i) {

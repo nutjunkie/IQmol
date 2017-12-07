@@ -23,6 +23,7 @@
 #include "Shell.h"
 #include <QDebug>
 #include <cmath>
+#include <limits>
 
 
 using qglviewer::Vec;
@@ -32,13 +33,16 @@ namespace Data {
 
 double Shell::s_values[15];
 double Shell::s_zeroValues[15] = {  };
-double Shell::s_thresh = 0.001;
 
-
-Shell::Shell(AngularMomentum L, unsigned const atomIndex, Vec const& position, 
-   QList<double> const& exponents, QList<double> const& contractionCoefficients) : 
-   m_angularMomentum(L), m_atomIndex(atomIndex), m_position(position), 
-   m_exponents(exponents), m_contractionCoefficients(contractionCoefficients)
+Shell::Shell(
+   AngularMomentum L, 
+   unsigned const atomIndex, 
+   Vec const& position, 
+   QList<double> const& exponents, 
+   QList<double> const& contractionCoefficients) 
+ : m_angularMomentum(L), m_atomIndex(atomIndex), m_position(position), 
+   m_exponents(exponents), m_contractionCoefficients(contractionCoefficients),
+   m_significantRadiusSquared(std::numeric_limits<double>::max())
 {
    if (m_exponents.size() > m_contractionCoefficients.size()) {
       qDebug() << "Inconsistent array lengths in Shell constructor";
@@ -48,8 +52,6 @@ Shell::Shell(AngularMomentum L, unsigned const atomIndex, Vec const& position,
    }
 
    normalize();
-   m_significantRadiusSquared  = computeSignificantRadius(s_thresh); 
-   m_significantRadiusSquared *= m_significantRadiusSquared;
 }
 
 
@@ -251,17 +253,20 @@ QString Shell::label(unsigned const index) const
 }
 
 
-void Shell::boundingBox(Vec& min, Vec& max) 
+void Shell::boundingBox(Vec& min, Vec& max, double const thresh) 
 {
-   double r(std::sqrt(m_significantRadiusSquared));
+   double r(computeSignificantRadius(thresh));
+
    Vec d(r, r, r);
    min = m_position - d;
    max = m_position + d;
+
+   m_significantRadiusSquared = r*r;
 }
 
 
 // returns a null pointer if grid point is outside the significant radius
-double* Shell::evaluate(Vec const& gridPoint) const
+double const* Shell::evaluate(Vec const& gridPoint) const
 {
    static const double half   = 0.5;
    static const double quart  = 0.25;

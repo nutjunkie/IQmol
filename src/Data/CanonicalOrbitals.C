@@ -37,8 +37,9 @@ CanonicalOrbitals::CanonicalOrbitals(
    QList<double> const& betaCoefficients,  
    QList<double> const& betaEnergies,
    QString const& label)
- : Orbitals(Orbitals::Canonical, nAlpha, nBeta, shells, alphaCoefficients, 
-      betaCoefficients, label), m_alphaEnergies(alphaEnergies), m_betaEnergies(betaEnergies)
+ : Orbitals(Orbitals::Canonical, shells, alphaCoefficients, betaCoefficients, label), 
+   m_nAlpha(nAlpha), m_nBeta(nBeta), 
+   m_alphaEnergies(alphaEnergies), m_betaEnergies(betaEnergies)
 {
 }
 
@@ -65,24 +66,46 @@ bool CanonicalOrbitals::consistent() const
 {
    bool ok(Orbitals::consistent());
 
-   //TODO: remove when NTOs/NBOs properly subclassed.
-   if (orbitalType() == Orbitals::Canonical) {
-      ok = ok && m_alphaEnergies.size() == (int)m_nOrbitals;
-      if (!m_restricted) ok = ok && m_betaEnergies.size() == (int)m_nOrbitals;
-   }
+   ok = ok && m_nAlpha <= m_nOrbitals;
+   ok = ok && m_nBeta  <= m_nOrbitals;
+
+   ok = ok && m_alphaEnergies.size() == (int)m_nOrbitals;
+   if (!m_restricted) ok = ok && m_betaEnergies.size() == (int)m_nOrbitals;
       
    return ok; 
 }
 
 
+QString CanonicalOrbitals::label(unsigned index, bool alpha) const
+{
+   QString s(QString::number(index+1));
+   unsigned n(alpha ? m_nAlpha : m_nBeta);
+
+   if (n == index+2) {
+      s += " (HOMO-1)";
+   }else if (n == index+1) {
+      s += " (HOMO)";
+   }else if (n == index) {
+      s += " (LUMO)";
+   }else if (index == n+1) {
+      s += " (LUMO+1)";
+   }
+
+   return s;
+} 
+
+
+unsigned CanonicalOrbitals::labelIndex(bool const alpha) const
+{
+   int n(alpha ? m_nAlpha : m_nBeta);
+   return std::max(0,n-1);
+}
+
+
+
 void CanonicalOrbitals::dump() const
 {
    Orbitals::dump();
-
-   SurfaceList::const_iterator surface;
-   for (surface = m_surfaceList.begin(); surface != m_surfaceList.end(); ++surface) {
-       (*surface)->dump();
-   }
 }
 
 } } // end namespace IQmol::Data

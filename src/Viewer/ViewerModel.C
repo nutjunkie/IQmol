@@ -268,19 +268,15 @@ void ViewerModel::processParsedData(ParseJobFiles* parser)
 
    void* moleculePointer(parser->moleculePointer());
 
-qDebug() << "======= QJI ====== ViewerModel *moleculePointer" << moleculePointer;
-qDebug() << "======= QJI ====== ViewerModel *molecule       " << molecule;
    if (overwrite && moleculePointer) {
       for (int row = 0; row < root->rowCount(); ++row) {
           child = root->child(row);
           if (child->text() == name) {
              Layer::Base* base = QVariantPointer<Layer::Base>::toPointer(child->data());
              Layer::Molecule* mol = qobject_cast<Layer::Molecule*>(base);
-qDebug() << "======= QJI ====== ViewerModel *mol            " << mol;
 
              if (mol && mol == moleculePointer) {
-                qDebug() << "found existing molecule";
-qDebug() << "replacing " << mol << "with" << molecule;
+                QLOG_TRACE() << "Found existing molecule";
                 molecule->setCheckState(mol->checkState());
                 // makeActive = makeActive || (mol->checkState() == Qt::Checked);
                 // This may result in a memory leak, but we need the Molecule
@@ -858,24 +854,21 @@ void ViewerModel::insertMoleculeById(QString identifier)
    Parser::OpenBabel parser;
    QString ext;
 
+   qDebug() << "Identifier" << identifier;
+
    if (identifier.indexOf("SMILES:") == 0) {
       identifier.replace(0,7,"");
       ext = "smi";
 
    }else if (identifier.indexOf("INCHI:") == 0) {
       identifier.replace(0,6,"");
+      if (!identifier.startsWith("InChI=")) identifier.prepend("InChI=");
       ext = "inchi";
-
-   }else if (identifier.indexOf("INCHIKEY:") == 0) {
-      identifier.replace(0,9,"");
-      ext = "inchikey";
 
    }else {
       QLOG_WARN() << "Unknown molecule identifier type:" << identifier;
       return;
    }
-
-   qDebug() << "Identifier" << identifier;
 
    bool ok(parser.parse(identifier, ext));
    QStringList errors(parser.errors());

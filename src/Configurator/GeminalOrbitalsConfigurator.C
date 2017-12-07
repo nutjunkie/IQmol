@@ -85,17 +85,12 @@ void GeminalOrbitals::initPlot()
    frame->setLayout(layout);
    layout->addWidget(m_customPlot);
 
-   QVector<double>  ticks;
-   QVector<QString> labels;
+   QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
+   m_customPlot->xAxis->setTicker(textTicker);
+   textTicker->addTick(1.5, "Geminal");
 
-   ticks << 1.5;
-   labels << "Geminal";
-
-   m_customPlot->xAxis->setAutoTicks(false);
-   m_customPlot->xAxis->setAutoTickLabels(false);
-   m_customPlot->xAxis->setTickVector(ticks);
-   m_customPlot->xAxis->setTickVectorLabels(labels);
-   m_customPlot->xAxis->setSubTickCount(0);
+   m_customPlot->xAxis->setTickLabels(false);
+   m_customPlot->xAxis->setSubTicks(false);
    m_customPlot->xAxis->setRange(0,3.0);
 
    unsigned nTot(m_geminalOrbitals.nGeminals() + m_geminalOrbitals.nOpenShell());
@@ -212,7 +207,7 @@ void GeminalOrbitals::clearSelectedOrbitals(int)
    QList<QCPGraph*> selection(m_customPlot->selectedGraphs());
    QList<QCPGraph*>::iterator iter;
    for (iter = selection.begin(); iter != selection.end(); ++iter) {
-       (*iter)->setSelected(false);
+//       (*iter)->setSelected(false);
    }
 }
 

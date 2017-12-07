@@ -23,7 +23,6 @@
 ********************************************************************************/
 
 #include "Orbitals.h"
-#include "Surface.h"
 #include "Density.h"
 
 
@@ -43,21 +42,22 @@ namespace Data {
             QList<double> const& alphaEnergies, QList<double> const& betaCoefficients,  
             QList<double> const& betaEnergies, QString const& label);
 
-         // TODO: Not sure why this is here or even required, perhaps move it to Orbitals.
-         SurfaceList& surfaceList() { return m_surfaceList; }
-
-         void appendSurface(Data::Surface* surfaceData) {
-            m_surfaceList.append(surfaceData);
-         }
-
          DensityList const& densityList() const { return m_densityList; }
          void appendDensities(Data::DensityList const& densities) {
             m_densityList << densities;
          }
 
+         unsigned nAlpha() const { return m_nAlpha; }
+         unsigned nBeta()  const { return m_nBeta;  }
+
          double alphaOrbitalEnergy(unsigned i) const;
          double betaOrbitalEnergy(unsigned i) const;
          bool   consistent() const;
+         double alphaOccupancy(unsigned i) const { return (i < m_nAlpha ? 1.0 : 0.0); }
+         double betaOccupancy(unsigned i)  const { return (i < m_nBeta  ? 1.0 : 0.0); }
+
+         QString label(unsigned index, bool alpha = true) const;
+         unsigned labelIndex(bool alpha = true) const;
 
          void serialize(InputArchive& ar, unsigned const version = 0) 
          {
@@ -77,14 +77,16 @@ namespace Data {
          template <class Archive>
          void privateSerialize(Archive& ar, unsigned const /* version */) 
          {
+            ar & m_nAlpha;
+            ar & m_nBeta;
             ar & m_alphaEnergies;
             ar & m_betaEnergies;
-            ar & m_surfaceList;
          }
 
+         unsigned m_nAlpha;
+         unsigned m_nBeta;
          QList<double> m_alphaEnergies;
          QList<double> m_betaEnergies;
-         SurfaceList   m_surfaceList;
          DensityList   m_densityList;
    };
 

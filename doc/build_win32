@@ -87,12 +87,6 @@ libraries.  The compilation of the code should be relatively straightforward.
    - Note that /usr/bin needs to be removed from PATH as above
 
 
- o OpenMesh:
-   - Download: http://www.openmesh.org/download/ 
-   - Complie (within the Qt command prompt):
-   - Compile:
-
-    
  o Boost:
    - Download: http://sourceforge.net/projects/boost/files/boost/1.59.0/
      Later versions of boost seem to have removed support for the mingw option.

@@ -19,6 +19,7 @@ SOURCES = \
    $$PWD/ContainerLayer.C \
    $$PWD/CubeDataLayer.C \
    $$PWD/DipoleLayer.C \
+   $$PWD/DysonOrbitalsLayer.C \
    $$PWD/GeminalOrbitalsLayer.C \
    $$PWD/GeometryLayer.C \
    $$PWD/GeometryListLayer.C \
@@ -33,6 +34,7 @@ SOURCES = \
    $$PWD/LayerFactory.C \
    $$PWD/MoleculeLayer.C \
    $$PWD/MolecularSurfacesLayer.C \
+   $$PWD/NaturalTransitionOrbitalsLayer.C \
    $$PWD/NmrLayer.C \
    $$PWD/OrbitalsLayer.C \
    $$PWD/PrimitiveLayer.C \
@@ -53,6 +55,7 @@ HEADERS = \
    $$PWD/ContainerLayer.h \
    $$PWD/CubeDataLayer.h \
    $$PWD/DipoleLayer.h \
+   $$PWD/DysonOrbitalsLayer.h \
    $$PWD/GeminalOrbitalsLayer.h \
    $$PWD/GeometryLayer.h \
    $$PWD/GeometryListLayer.h \
@@ -69,6 +72,7 @@ HEADERS = \
    $$PWD/LayerFactory.h \
    $$PWD/MoleculeLayer.h \
    $$PWD/MolecularSurfacesLayer.h \
+   $$PWD/NaturalTransitionOrbitalsLayer.h \
    $$PWD/NmrLayer.h \
    $$PWD/OrbitalsLayer.h \
    $$PWD/PrimitiveLayer.h \

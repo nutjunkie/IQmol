@@ -36,7 +36,7 @@ namespace Data {
          enum Kind { Custom = -1, AlphaOrbital, BetaOrbital, TotalDensity, 
             SpinDensity, AlphaDensity, BetaDensity, DensityCombo, CubeData, 
             VanDerWaals, Promolecule, SolventExcluded, SID, ElectrostaticPotential,
-            Geminal, Correlation, CustomDensity, BasisFunction
+            Geminal, Correlation, CustomDensity, BasisFunction, DysonLeft, DysonRight
 // TODO
 //            AlphaHole Density, BetaHole Density,
 //            AlphaExcitationDensity, BetaExcitationDensity,

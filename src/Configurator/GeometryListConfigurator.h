@@ -71,18 +71,21 @@ namespace Configurator {
          void on_loopButton_clicked(bool tf);
          void on_updateBondsButton_clicked(bool tf);
          void on_energyTable_itemSelectionChanged();
+         void on_resetViewButton_clicked();
          void plotSelectionChanged(bool);
+         void setSelectionRectMode(QMouseEvent* e);
 
       private:
          void closeEvent(QCloseEvent*);
          void plotEnergies();
+         void initPlot();
 
          Ui::GeometryListConfigurator m_configurator;
          Layer::GeometryList& m_geometryList;
          CustomPlot* m_customPlot;
          QList<QPair<double, double> > m_rawData;
          QPen m_pen;
-         QPen m_selectPen;
+         QPen m_selectedPen;
    };
 
 } } // End namespace IQmol::Configurator
