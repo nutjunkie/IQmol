@@ -2,6 +2,26 @@
                       Building IQmol From Source on Linux
                      =====================================
 
+These steps were used to compile under Ubuntu 16.04 (LTS):
+
+apt-get install git
+apt-get install gfortran
+apt-get install cmake
+apt-get install qt5-default
+apt-get install libssh2-1-dev
+apt-get install libssl-dev
+apt-get install libboost-serialization-dev
+apt-get install libboost-iostreams-dev
+apt-get install libopenbabel-dev
+
+git clone https://github.com/nutjunkie/IQmol.git
+
+cd IQmol/src
+qmake IQmol
+make
+
+
+
 These steps were used to compile under Ubuntu 13.04
 
 1) Insure the necessary utilities and libraries are installed:
