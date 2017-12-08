@@ -22,6 +22,7 @@
 
 ********************************************************************************/
 
+#include <boost/version.hpp>
 // Following included as per: https://svn.boost.org/trac/boost/ticket/12978
 #include <boost/serialization/array.hpp>
 #if BOOST_VERSION >= 106300

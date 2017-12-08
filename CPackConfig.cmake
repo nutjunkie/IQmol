@@ -1,3 +1,6 @@
+# CPack configuration for development build 
+# must set GIT_TAG=`git describe` to get package version *** 
+
 ### Basic
 string(TIMESTAMP SYSTEM_DATE "%Y%m%d")
 set(CPACK_PACKAGE_NAME "IQmol")
@@ -5,11 +8,11 @@ set(CPACK_PACKAGE_NAME "IQmol")
 #set(CPACK_PACKAGE_VERSION_MINOR "10")
 #set(CPACK_PACKAGE_VERSION_PATCH "0")
 #set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
-string(REPLACE "^v" "" tag_string ${CPACK_PACKAGE_VERSION})
-string(REPLACE "-.*" "" CPACK_PACKAGE_VERSION ${tag_string})
-string(REPLACE "${CPACK_PACKAGE_VERSION}-" "" extra_string ${tag_string})
-string(REPLACE "-.*" "" change_number ${extra_string})
-string(REPLACE "${change_number}-" "" git_hash ${extra_string})
+string(REGEX REPLACE "^v" "" tag_string "$ENV{GIT_TAG}")
+string(REGEX REPLACE "-.*" "" CPACK_PACKAGE_VERSION "${tag_string}")
+string(REGEX REPLACE "${CPACK_PACKAGE_VERSION}-" "" extra_string "${tag_string}")
+string(REGEX REPLACE "-.*" "" change_number "${extra_string}")
+string(REGEX REPLACE "${change_number}-" "" git_hash "${extra_string}")
 set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION}.${change_number}")
 set(CPACK_SYSTEM_NAME "${CMAKE_SYSTEM_NAME}")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A molecule editor and visualization package (development build)")
@@ -36,6 +39,7 @@ message("IQmol source directory: ${IQMOL_SOURCE_DIR}")
 # => subdir/files_in_full_path
 if(UNIX OR APPLE)
     set(CPACK_INSTALLED_DIRECTORIES "${IQMOL_SOURCE_DIR}/deploy;usr") 
+    set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION}-${git_hash}") # ex. 2.10.0.49-g7116ad0
 else()
     set(CPACK_INSTALLED_DIRECTORIES "${IQMOL_SOURCE_DIR}/deploy;.") 
     set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_FILE_NAME}-windows-installer")
