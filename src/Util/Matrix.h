@@ -23,7 +23,10 @@
 ********************************************************************************/
 
 // Following included as per: https://svn.boost.org/trac/boost/ticket/12978
+#include <boost/serialization/array.hpp>
+#if BOOST_VERSION >= 106300
 #include <boost/serialization/array_wrapper.hpp>
+#endif
 #include "boost/numeric/ublas/matrix.hpp"
 #include "boost/numeric/ublas/matrix_proxy.hpp"
 #include "boost/numeric/ublas/vector.hpp"

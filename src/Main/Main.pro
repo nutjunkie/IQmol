@@ -5,15 +5,18 @@ TARGET  = IQmol
 # ordering of the libraries.
 
 
-IQMOL_YEAR = $$system(date +%Y)
-DEFINES += IQMOL_YEAR='\\"$$IQMOL_YEAR\\"'
+win32 {
+IQMOL_YEAR    = $$system(echo %DATE:~-4%)
+} else {
+IQMOL_YEAR    = $$system(date +%Y)
+}
 
 IQMOL_VERSION = $$system(git describe --abbrev=0)
+GIT_VERSION   = $$system(git describe --always --tags)
+
+DEFINES += IQMOL_YEAR='\\"$$IQMOL_YEAR\\"'
 DEFINES += IQMOL_VERSION='\\"$$IQMOL_VERSION\\"'
-
-GIT_VERSION = $$system(git describe --always --tags)
 DEFINES += GIT_VERSION='\\"$$GIT_VERSION\\"'
-
 
 BUILD_DIR  = $$PWD/../../build
 
