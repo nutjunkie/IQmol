@@ -23,7 +23,7 @@ set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${SY
 
 ### Generator
 if(APPLE)
-    set(CPACK_GENERATOR "Bundle")
+    set(CPACK_GENERATOR "DragNDrop")
 elseif(UNIX)
     set(CPACK_GENERATOR "DEB")
 elseif(WIN32)
@@ -35,15 +35,22 @@ endif()
 set(IQMOL_SOURCE_DIR $ENV{PWD})
 message("IQmol source directory: ${IQMOL_SOURCE_DIR}")
 
+### Files
 # cpack_installed_directories "/full/path;subdir"
 # => subdir/files_in_full_path
-if(UNIX OR APPLE)
-    set(CPACK_INSTALLED_DIRECTORIES "${IQMOL_SOURCE_DIR}/deploy;usr") 
+if(APPLE)
+    set(CPACK_INSTALLED_DIRECTORIES "${IQMOL_SOURCE_DIR}/dist;.") 
     set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION}-${git_hash}") # ex. 2.10.0.49-g7116ad0
-else()
-    set(CPACK_INSTALLED_DIRECTORIES "${IQMOL_SOURCE_DIR}/deploy;.") 
+elseif(WIN32)
+    set(CPACK_INSTALLED_DIRECTORIES "${IQMOL_SOURCE_DIR}/dist;.") 
     set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_FILE_NAME}-windows-installer")
+    set(CPACK_RESOURCE_FILE_LICENSE "${IQMOL_SOURCE_DIR}/LICENSE.txt")
+else()
+    set(CPACK_INSTALLED_DIRECTORIES "${IQMOL_SOURCE_DIR}/dist;usr") 
+    set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION}-${git_hash}") # ex. 2.10.0.49-g7116ad0
 endif()
+set(CPACK_RESOURCE_FILE_LICENSE "${IQMOL_SOURCE_DIR}/LICENSE")
+set(CPACK_PACKAGE_DESCRIPTION_FILE "${IQMOL_SOURCE_DIR}/README")
 
 # cpack_packaing_install_prefix "prefix"
 # tgz => cpack_package_file_name/prefix/subdir/files_in_full_path
@@ -51,18 +58,14 @@ endif()
 #set(CPACK_PACKAGING_INSTALL_PREFIX "/tmp/cpacktest")
 
 ## macOS
-set(CPACK_BUNDLE_NAME "${CPACK_PACKAGE_FILE_NAME}")
-set(CPACK_BUNDLE_PLIST "${IQMOL_SOURCE_DIR}/src/Main/resources/Info.plist")
-set(CPACK_BUNDLE_ICON "${IQMOL_SOURCE_DIR}/src/Main/resources/IQmol.icns")
+set(CPACK_DMG_VOLUME_NAME "${CPACK_PACKAGE_VERSION}")
+set(CPACK_DMG_DISABLE_APPLICATIONS_SYMLINK "ON")
 
 ### Windows
-set(CPACK_PACKAGE_DESCRIPTION_FILE "${IQMOL_SOURCE_DIR}/README")
-set(CPACK_RESOURCE_FILE_LICENSE "${IQMOL_SOURCE_DIR}/LICENSE")
 set(CPACK_PACKAGE_EXECUTABLES "iqmol;IQmol") # link in Start Menu
 set(CPACK_CREATE_DESKTOP_LINKS "iqmol;IQmol")
 # WiX
 set(CPACK_WIX_SIZEOF_VOID_P 4)	# 32-bit
-set(CPACK_RESOURCE_FILE_LICENSE "${IQMOL_SOURCE_DIR}/LICENSE.txt")
 set(CPACK_WIX_PROGRAM_MENU_FOLDER "${CPACK_PACKAGE_INSTALL_DIRECTORY}")
 set(CPACK_WIX_PRODUCT_ICON "${IQMOL_SOURCE_DIR}/src/Main/resources/IQmol.ico") 
 set(CPACK_WIX_UI_BANNER "${IQMOL_SOURCE_DIR}/src/Main/resources/Installer-header.bmp")
