@@ -1,6 +1,9 @@
 # CPack configuration for development build 
 # must set GIT_TAG=`git describe` to get package version *** 
 
+### Get Git tag 
+execute_process(COMMAND git describe --always --tags OUTPUT_VARIABLE GIT_TAG OUTPUT_STRIP_TRAILING_WHITESPACE)
+
 ### Basic
 string(TIMESTAMP SYSTEM_DATE "%Y%m%d")
 set(CPACK_PACKAGE_NAME "IQmol")
@@ -8,7 +11,7 @@ set(CPACK_PACKAGE_NAME "IQmol")
 #set(CPACK_PACKAGE_VERSION_MINOR "10")
 #set(CPACK_PACKAGE_VERSION_PATCH "0")
 #set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
-string(REGEX REPLACE "^v" "" tag_string "$ENV{GIT_TAG}")
+string(REGEX REPLACE "^v" "" tag_string "${GIT_TAG}")
 string(REGEX REPLACE "-.*" "" CPACK_PACKAGE_VERSION "${tag_string}")
 string(REGEX REPLACE "${CPACK_PACKAGE_VERSION}-" "" extra_string "${tag_string}")
 string(REGEX REPLACE "-.*" "" change_number "${extra_string}")
