@@ -41,6 +41,8 @@ message("IQmol source directory: ${IQMOL_SOURCE_DIR}")
 ### Files
 # cpack_installed_directories "/full/path;subdir"
 # => subdir/files_in_full_path
+set(CPACK_RESOURCE_FILE_LICENSE "${IQMOL_SOURCE_DIR}/LICENSE")
+set(CPACK_PACKAGE_DESCRIPTION_FILE "${IQMOL_SOURCE_DIR}/README")
 if(APPLE)
     set(CPACK_INSTALLED_DIRECTORIES "${IQMOL_SOURCE_DIR}/dist;.") 
     set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION}-${git_hash}") # ex. 2.10.0.49-g7116ad0
@@ -52,8 +54,6 @@ else()
     set(CPACK_INSTALLED_DIRECTORIES "${IQMOL_SOURCE_DIR}/dist;usr") 
     set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION}-${git_hash}") # ex. 2.10.0.49-g7116ad0
 endif()
-set(CPACK_RESOURCE_FILE_LICENSE "${IQMOL_SOURCE_DIR}/LICENSE")
-set(CPACK_PACKAGE_DESCRIPTION_FILE "${IQMOL_SOURCE_DIR}/README")
 
 # cpack_packaing_install_prefix "prefix"
 # tgz => cpack_package_file_name/prefix/subdir/files_in_full_path
