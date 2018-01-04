@@ -38,37 +38,37 @@ Axes::Axes(Layer::Axes& axes) : m_axes(axes)
 
 void Axes::sync()
 {
-   m_axesConfigurator.xCheckBox->setChecked (true);
-   m_axesConfigurator.yCheckBox->setChecked (true);
-   m_axesConfigurator.zCheckBox->setChecked (true);
-   m_axesConfigurator.scaleSlider->setValue(100);
+   m_axesConfigurator.xCheckBox->setChecked(m_axes.m_xAxisOn);
+   m_axesConfigurator.yCheckBox->setChecked(m_axes.m_yAxisOn);
+   m_axesConfigurator.zCheckBox->setChecked(m_axes.m_zAxisOn);
+   m_axesConfigurator.scaleSlider->setValue(100*m_axes.m_scale);
 }
 
 
 void Axes::on_xCheckBox_clicked(bool tf) 
 { 
-   m_axes.xAxisOn(tf); 
+   m_axes.m_xAxisOn = tf; 
    m_axes.updated();
 }
 
 
 void Axes::on_yCheckBox_clicked(bool tf) 
 { 
-   m_axes.yAxisOn(tf); 
+   m_axes.m_yAxisOn = tf; 
    m_axes.updated();
 }
 
 
 void Axes::on_zCheckBox_clicked(bool tf) 
 { 
-   m_axes.xAxisOn(tf); 
+   m_axes.m_zAxisOn = tf; 
    m_axes.updated();
 }
 
 
 void Axes::on_scaleSlider_valueChanged(int value) 
 {
-   m_axes.setScale(value/100.0); 
+   m_axes.m_scale = value/100.0; 
    m_axes.updated();
 }
 
