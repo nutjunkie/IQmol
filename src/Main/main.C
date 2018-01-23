@@ -38,6 +38,7 @@
 #include <QSysInfo>
 #include "QsLog.h"
 #include "QsLogDest.h"
+#include "version.h"
 
 #ifdef Q_OS_WIN32
 #include <windows.h>

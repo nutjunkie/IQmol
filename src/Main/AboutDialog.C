@@ -1,5 +1,3 @@
-#ifndef IQMOL_ABOUTDIALOG_H
-#define IQMOL_ABOUTDIALOG_H
 /*******************************************************************************
        
   Copyright (C) 2011-2015 Andrew Gilbert
@@ -22,21 +20,19 @@
    
 ********************************************************************************/
 
-#include "ui_AboutDialog.h"
+#include "AboutDialog.h"
+//#include "version.h"
 
 namespace IQmol {
 
-   class AboutDialog : public QDialog {
-
-      Q_OBJECT
-
-      public: 
-         AboutDialog(QWidget* parent);
-
-      private:
-         Ui::AboutDialog m_aboutDialog;
-   };
+AboutDialog::AboutDialog(QWidget* parent) : QDialog(parent) 
+{
+   m_aboutDialog.setupUi(this);
+ //  m_aboutDialog.versionLabel->setText(IQMOL_VERSION);
+ //   m_aboutDialog.yearLabel->setText(IQMOL_YEAR);
+   resize(sizeHint());
+}
 
 } // end namespace IQmol
 
-#endif
+
