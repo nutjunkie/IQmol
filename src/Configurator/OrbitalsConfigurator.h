@@ -64,12 +64,14 @@ namespace Configurator {
          void on_cancelButton_clicked(bool);
          void on_positiveColorButton_clicked(bool);
          void on_negativeColorButton_clicked(bool);
+         void on_populationsButton_clicked(bool);
          void plotSelectionChanged(bool tf);
          void clearSelectedOrbitals(int);
 
       private:
          void enableOrbitalSelection(bool);
          void enableNegativeColor(bool);
+         void enablePopulations(bool);
          void updateOrbitalRange(bool alpha);
          void updateBasisRange();
          void setPositiveColor(QColor const& color);

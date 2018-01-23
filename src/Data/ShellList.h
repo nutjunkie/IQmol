@@ -44,10 +44,20 @@ namespace Data {
 
          unsigned nBasis() const;
 
+         Vector const& overlapMatrix() { return m_overlapMatrix; }
+
+         void setOverlapMatrix(QList<double> const& overlapMatrix) {
+            unsigned nElements(overlapMatrix.size());
+            m_overlapMatrix.resize(nElements);
+            for (unsigned i = 0; i < nElements; ++i) {
+                m_overlapMatrix[i] = overlapMatrix[i];
+            }
+         }
+
          /// Allocates the memory for evaluating the shells/shell pairs on a grid
          /// point.  This should be called after the last Shell has been appended
-          /// to the list and before shellValues or shellPairValues is called.
-          void resize();
+         /// to the list and before shellValues or shellPairValues is called.
+         void resize();
 
          Vector const& shellValues(qglviewer::Vec const& gridPoint);
          // Returns the vectorized upper triangular array of unique shell 
@@ -68,6 +78,7 @@ namespace Data {
          unsigned m_nBasis;
          Vector   m_shellValues;
          Vector   m_shellPairValues;
+         Vector   m_overlapMatrix;   // upper triangular
    };
 
 } } // end namespace IQmol::Data
