@@ -79,6 +79,7 @@ namespace Data {
             privateSerialize(ar, version); 
          }  
 
+
          void dump() const;
 
       private:

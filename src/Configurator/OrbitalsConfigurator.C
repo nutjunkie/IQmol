@@ -22,6 +22,7 @@
 
 #include "OrbitalsConfigurator.h"
 #include "CanonicalOrbitalsLayer.h"
+#include "PopulationsDialog.h"
 #include "Preferences.h"
 #include "CustomPlot.h"
 #include "QsLog.h"
@@ -121,7 +122,10 @@ void Orbitals::init()
         m_configurator.surfaceType->addItem((*density)->label(),  
             Data::SurfaceType::CustomDensity);
    }
-//   }
+
+   if (!m_orbitals.hasPopulations()) {
+      m_configurator.populationsButton->hide();
+   }
 }
 
 
@@ -336,6 +340,7 @@ void Orbitals::on_surfaceType_currentIndexChanged(int index)
       case Data::SurfaceType::BasisFunction:
          enableOrbitalSelection(true);
          enableNegativeColor(true);
+         enablePopulations(false);
          updateBasisRange();
          break;
 
@@ -343,6 +348,7 @@ void Orbitals::on_surfaceType_currentIndexChanged(int index)
       case Data::SurfaceType::DysonLeft:
          enableOrbitalSelection(true);
          enableNegativeColor(true);
+         enablePopulations(false);
          updateOrbitalRange(true);
          break;
 
@@ -350,32 +356,38 @@ void Orbitals::on_surfaceType_currentIndexChanged(int index)
       case Data::SurfaceType::DysonRight:
          enableOrbitalSelection(true);
          enableNegativeColor(true);
+         enablePopulations(false);
          updateOrbitalRange(false);
          break;
 
       case Data::SurfaceType::TotalDensity:
          enableOrbitalSelection(false);
          enableNegativeColor(false);
+         enablePopulations(true);
          break;
 
       case Data::SurfaceType::SpinDensity:
          enableOrbitalSelection(false);
          enableNegativeColor(true);
+         enablePopulations(true);
          break;
 
       case Data::SurfaceType::AlphaDensity:
          enableOrbitalSelection(false);
          enableNegativeColor(false);
+         enablePopulations(true);
          break;
 
       case Data::SurfaceType::BetaDensity:
          enableOrbitalSelection(false);
          enableNegativeColor(false);
+         enablePopulations(true);
          break;
 
       case Data::SurfaceType::CustomDensity:
          enableOrbitalSelection(false);
          enableNegativeColor(false);
+         enablePopulations(true);
          break;
 
       default:
@@ -416,6 +428,33 @@ void Orbitals::setNegativeColor(QColor const& color)
       m_configurator.negativeColorButton->setStyleSheet(bg);
       Preferences::NegativeSurfaceColor(color);
    }
+}
+
+
+void Orbitals::on_populationsButton_clicked(bool)
+{
+   // get current density
+   // compute matrix of pops
+
+   // A little dodge, we use the label to match the density
+   QString label(m_configurator.surfaceType->currentText());
+
+   Data::DensityList& densities(m_orbitals.m_availableDensities);
+   Data::DensityList::iterator density;
+   for (density = densities.begin(); density != densities.end(); ++density) {
+       if ((*density)->label() == label) break;
+   }
+
+   if (density == densities.end()) {
+      QLOG_WARN() << "Failed to find density" << label;
+   }else {
+      qDebug() << "found density" << label;
+      PopulationsDialog* dialog(
+         new PopulationsDialog(m_orbitals.m_orbitals.shellList(), **density, this));
+      dialog->show();
+      dialog->raise();
+   }
+
 }
 
 
@@ -547,6 +586,15 @@ void Orbitals::enableOrbitalSelection(bool tf)
 {
    m_configurator.orbitalRangeMin->setEnabled(tf);
    m_configurator.orbitalRangeMax->setEnabled(tf);
+}
+
+
+void Orbitals::enablePopulations(bool tf)
+{
+   if (m_orbitals.hasPopulations()) {
+      m_configurator.populationsButton->setEnabled(tf);
+   }
+   
 }
 
 

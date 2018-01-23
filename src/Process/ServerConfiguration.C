@@ -373,7 +373,7 @@ qDebug() << "Setting defaults for " << toString(queueSystem);
                  << "setenv QCSCRATCH $PBS_JOBFS"
                  << "if (-e $QC/bin/qchem.setup) source $QC/bin/qchem.setup"
                  << ""
-                 << "qchem ${JOB_NAME}.inp ${JOB_NAME}.out";
+                 << "qchem -seq ${JOB_NAME}.inp ${JOB_NAME}.out";
     
          m_configuration.insert(RunFileTemplate, runFile.join("\n"));
 

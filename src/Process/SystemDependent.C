@@ -154,6 +154,7 @@ QString TemplateForRunFile(bool const local)
          "setenv QC        /usr/local/qchem\n"
          "setenv QCSCRATCH /scratch\n"
          "setenv QCAUX     $QC/aux\n"
+         "setenv PATH      $QC/bin:$PATH\n"
          "\n"
          "#  <-- End user configuration -->\n"
          "\n"

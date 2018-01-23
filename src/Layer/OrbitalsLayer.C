@@ -117,6 +117,12 @@ unsigned Orbitals::nOrbitals() const
 }
 
 
+bool Orbitals::hasPopulations() const 
+{
+   return !m_availableDensities.isEmpty() &&
+           m_orbitals.shellList().overlapMatrix().size() != 0;
+}
+
 void Orbitals::addToQueue(Data::SurfaceInfo const& info) 
 { 
    m_surfaceInfoQueue.append(info); 
