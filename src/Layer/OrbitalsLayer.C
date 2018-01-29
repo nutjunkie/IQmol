@@ -117,7 +117,7 @@ unsigned Orbitals::nOrbitals() const
 }
 
 
-bool Orbitals::hasPopulations() const 
+bool Orbitals::hasMullikenDecompositions() const 
 {
    return !m_availableDensities.isEmpty() &&
            m_orbitals.shellList().overlapMatrix().size() != 0;

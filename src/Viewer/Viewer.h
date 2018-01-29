@@ -162,6 +162,7 @@ namespace IQmol {
          void drawSelected(GLObjectList const&);
          void drawLabels(GLObjectList const&);
          void displayGeometricParameter(GLObjectList const& selection);
+         void displayMullikenDecomposition(GLObjectList const& selection);
          void drawWithNames(); 
 
          void drawSelectionRectangle(QRect const& rect) const;

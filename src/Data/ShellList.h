@@ -64,6 +64,12 @@ namespace Data {
          // values at the grid point pairs.
          Vector const& shellPairValues(qglviewer::Vec const& gridPoint);
 
+         // Shell offset for each atom
+         QList<unsigned> shellAtomOffsets() const;
+
+         // Basis offset for each atom
+         QList<unsigned> basisAtomOffsets() const;
+
          void serialize(InputArchive& ar, unsigned int const version = 0) {
             serializeList(ar, version);
          }  

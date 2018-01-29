@@ -81,7 +81,7 @@ namespace Layer {
          virtual double alphaOrbitalAmplitude(unsigned) const { return 1.0; }
          virtual double betaOrbitalAmplitude(unsigned)  const { return 1.0; }
 
-         bool hasPopulations() const;
+         bool hasMullikenDecompositions() const;
 
          Data::Orbitals& m_orbitals;
          Data::DensityList m_availableDensities;

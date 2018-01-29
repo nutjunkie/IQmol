@@ -1551,6 +1551,28 @@ void Molecule::saveToGeometry(Data::Geometry& geometry)
 }
 
 
+bool Molecule::hasMullikenDecompositions() const
+{
+  return m_mullikenDecompositions.size1() != 0;
+}
+
+void Molecule::setMullikenDecompositions(Matrix const& M) 
+{
+  m_mullikenDecompositions = M;
+  qDebug() << PrintMatrix(M);
+}
+
+double Molecule::mullikenDecomposition(int const a, int const b) const
+{
+   double md(0.0);
+   if (m_mullikenDecompositions.size1() >= a &&
+       m_mullikenDecompositions.size2() >= b) {
+       md = m_mullikenDecompositions(a-1,b-1);
+   }
+   return md;
+}
+
+
 void Molecule::saveToCurrentGeometry()
 {
    if (!m_currentGeometry) m_currentGeometry = new Data::Geometry();
@@ -2106,6 +2128,19 @@ void Molecule::reperceiveBonds(bool postCmd)
    }
 
    delete obMol;
+}
+
+
+QList<QString> Molecule::atomicSymbols() 
+{
+   QList<QString> symbols;
+   AtomList atoms(findLayers<Atom>(Children));
+   AtomList::iterator atom;
+
+   for (atom = atoms.begin(); atom != atoms.end(); ++atom) {
+       symbols.append((*atom)->getAtomicSymbol());
+   }
+   return symbols;
 }
 
 

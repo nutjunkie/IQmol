@@ -24,7 +24,7 @@ SOURCES = \
    $$PWD/MolecularSurfacesConfigurator.C \
    $$PWD/NmrConfigurator.C \
    $$PWD/OrbitalsConfigurator.C \
-   $$PWD/PopulationsDialog.C \
+   $$PWD/MullikenDecompositionsDialog.C \
    $$PWD/SurfaceConfigurator.C \
    $$PWD/SymmetryConfigurator.C
 
@@ -48,7 +48,7 @@ HEADERS = \
    $$PWD/MolecularSurfacesConfigurator.h \
    $$PWD/NmrConfigurator.h \
    $$PWD/OrbitalsConfigurator.h \
-   $$PWD/PopulationsDialog.h \
+   $$PWD/MullikenDecompositionsDialog.h \
    $$PWD/SurfaceConfigurator.h \
    $$PWD/SymmetryConfigurator.h
 
@@ -70,7 +70,7 @@ FORMS = \
    $$PWD/MolecularSurfacesConfigurator.ui \
    $$PWD/NmrConfigurator.ui \
    $$PWD/OrbitalsConfigurator.ui \
-   $$PWD/PopulationsDialog.ui \
+   $$PWD/MullikenDecompositionsDialog.ui \
    $$PWD/ScalarConstraintConfigurator.ui \
    $$PWD/SurfaceConfigurator.ui \
    $$PWD/VectorConstraintConfigurator.ui \

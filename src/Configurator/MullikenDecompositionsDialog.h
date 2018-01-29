@@ -1,5 +1,5 @@
-#ifndef IQMOL_CONFIGURATOR_POPULATIONSDIALOG_H
-#define IQMOL_CONFIGURATOR_POPULATIONSDIALOG_H
+#ifndef IQMOL_CONFIGURATOR_MULLIKENDECOMPOSITIONSDIALOG_H
+#define IQMOL_CONFIGURATOR_MULLIKENDECOMPOSITIONSDIALOG_H
 /*******************************************************************************
          
   Copyright (C) 2011-2015 Andrew Gilbert
@@ -22,7 +22,7 @@
    
 ********************************************************************************/
 
-#include "ui_PopulationsDialog.h"
+#include "ui_MullikenDecompositionsDialog.h"
 #include "QGLViewer/vec.h"
 #include "Density.h"
 #include "ShellList.h"
@@ -30,21 +30,21 @@
 
 namespace IQmol {
 
-   class PopulationsDialog : public QDialog {
+   class MullikenDecompositionsDialog : public QDialog {
 
       Q_OBJECT
 
       public:
-         PopulationsDialog(Data::ShellList const& shellList, Data::Density const& density,
-            QWidget* parent = 0);
+         MullikenDecompositionsDialog(Data::ShellList const& shellList, 
+            Data::Density const& density, QWidget* parent = 0);
 
          void compute();
 
-      private Q_SLOTS:
-
+      Q_SIGNALS:
+         void mullikenDecompositionsAvailable(Matrix const&);
       private:
          void fillTable(Matrix const& M);
-         Ui::PopulationsDialog m_dialog; 
+         Ui::MullikenDecompositionsDialog m_dialog; 
          Data::ShellList m_shellList;
          Data::Density   m_density;
    };

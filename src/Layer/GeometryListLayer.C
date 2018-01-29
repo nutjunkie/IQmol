@@ -209,7 +209,7 @@ qDebug() << "GeometryList::makeAnimators()";
    }
    setLoop(m_loop);
 
-   if (!m_animatorList.isEmpty()) {
+   if (!m_animatorList.isEmpty() && m_configurator) {
       connect(m_animatorList.last(), SIGNAL(finished()), m_configurator, SLOT(reset()));
    }
 }
