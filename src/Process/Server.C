@@ -200,7 +200,6 @@ void Server::queryAllJobs()
 // ---------- Submit ----------
 void Server::submit(Job* job)
 {
-qDebug() << "QJI - trace Server::submit()";
    QList<Network::Reply*> keys(m_activeRequests.keys(job));
 
    if (!job) throw Exception("Submit called with null job");
@@ -232,13 +231,11 @@ qDebug() << "QJI - trace Server::submit()";
       m_activeRequests.insert(reply, job);
       reply->start();
    }
-qDebug() << "QJI - trace Server::submit() finished";
 }
 
 
 void Server::copyRunFile()
 {
-qDebug() << "QJI - trace Server::copyRunFile()";
    Network::Reply* reply(qobject_cast<Network::Reply*>(sender()));
 
    if (reply && m_activeRequests.contains(reply)) {
@@ -326,7 +323,6 @@ qDebug() << "QJI - trace Server::queueJob()";
 
 void Server::submitFinished()
 {
-qDebug() << "QJI - trace Server::submitFinished()";
    Network::Reply* reply(qobject_cast<Network::Reply*>(sender()));
 
    if (reply && m_activeRequests.contains(reply)) {
@@ -334,13 +330,12 @@ qDebug() << "QJI - trace Server::submitFinished()";
       m_activeRequests.remove(reply);
 
       if (job) {
-qDebug() << "QJI: Server.C job info dump";
+qDebug() << "Server.C job info dump:";
 job->jobInfo().dump();
          if (reply->status() == Network::Reply::Finished && 
               parseSubmitMessage(job, reply->message())) {
             job->setStatus(Job::Queued);
             JobMonitor::instance().jobSubmissionSuccessful(job);
-qDebug() << "About to watch job";
             watchJob(job);
          }else {
             job->setStatus(Job::Error, reply->message());
@@ -355,7 +350,6 @@ qDebug() << "About to watch job";
    }else {
       QLOG_ERROR() << "Server Error: invalid reply";
    }
-qDebug() << "QJI: Server.C job submission finished";
 }
 
 
@@ -417,7 +411,10 @@ bool Server::parseSubmitMessage(Job* job, QString const& message)
             }
          }else {
             QStringList tokens(message.split(QRegExp("\\s+"), QString::SkipEmptyParts));
-            if (tokens.size() >= 2) {
+            if (tokens.size() == 1) {  // bash returns only the pid
+               int id(tokens[0].toInt(&ok));
+               if (ok) job->setJobId(QString::number(id));
+            }else if (tokens.size() >= 2) { // skip csh initial [1] 
                int id(tokens[1].toInt(&ok));
                if (ok) job->setJobId(QString::number(id));
             }
