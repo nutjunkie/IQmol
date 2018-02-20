@@ -117,7 +117,8 @@ namespace IQmol {
          void resizeGL(int width, int height);
          void generatePovRay(QString const& filename);
 
-         void displayMessage(QString const& msg) { QGLViewer::displayMessage(msg, FOREVER); }
+         //void displayMessage(QString const& msg) { QGLViewer::displayMessage(msg, FOREVER); }
+         void displayMessage(QString const& msg) { QGLViewer::displayMessage(msg, 3000); }
          void setActiveViewerMode(Viewer::Mode const mode);
          void saveSnapshot();
          void setDefaultBuildElement(unsigned int element);
