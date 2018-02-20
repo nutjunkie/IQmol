@@ -44,7 +44,7 @@ namespace Data {
 
          unsigned nBasis() const;
 
-         Vector const& overlapMatrix() { return m_overlapMatrix; }
+         Vector const& overlapMatrix() const { return m_overlapMatrix; }
 
          void setOverlapMatrix(QList<double> const& overlapMatrix) {
             unsigned nElements(overlapMatrix.size());
