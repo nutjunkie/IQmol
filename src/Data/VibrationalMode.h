@@ -45,8 +45,8 @@ namespace Data {
          double frequency() const { return m_frequency; }
          double intensity() const { return m_intensity; }
          double ramanIntensity() const { return m_ramanIntensity; }
-         bool irActive() const { return m_irActive; }
-         bool ramanActive() const { return m_ramanActive; }
+         bool   irActive() const { return m_irActive; }
+         bool   ramanActive() const { return m_ramanActive; }
          QList<qglviewer::Vec> const&  eigenvector() const { return m_eigenvector; }
 
          void setFreqeuncy(double const frequency) { m_frequency = frequency; }

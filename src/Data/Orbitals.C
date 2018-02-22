@@ -109,9 +109,9 @@ bool Orbitals::areOrthonormal() const
    double thresh(1e-8);
 
    for (unsigned i = 0; i < m_nOrbitals; ++i) {
-       pass = pass && (std::absT(i,i) < thresh);
+       pass = pass && (std::abs(T(i,i)) < thresh);
        for (unsigned j = 0; j < i; ++j) {
-           pass = pass && (std::absT(i,j) < thresh) && (std::absT(j,i) < thresh);
+           pass = pass && (std::abs(T(i,j)) < thresh) && (std::abs(T(j,i)) < thresh);
        } 
    }
 

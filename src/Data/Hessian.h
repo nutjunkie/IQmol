@@ -40,6 +40,8 @@ namespace Data {
 
          void setData(unsigned const nAtoms, QList<double> const& hessian);
          void setData(Matrix const&);
+         void setPartialData(unsigned const nAtoms, QList<unsigned> const& atomList, 
+            Matrix const& partialHhessian);
 
          void serialize(InputArchive& ar, unsigned int const version = 0) {
             privateSerialize(ar, version);
