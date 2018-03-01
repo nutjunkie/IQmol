@@ -92,7 +92,12 @@ QStringList QChemOutput::parseForErrors(TextStream& textStream)
 
       if (line.contains("Q-Chem fatal error")) {
          textStream.skipLine();  // blank line
-         error = textStream.readLine().trimmed();
+         line = textStream.readLine().trimmed();
+         do {
+            error += line + " ";
+            line = textStream.readLine().trimmed();
+         }  while (!line.isEmpty());
+
          if (error.isEmpty()) error = "Fatal error occured at end of output file";
 
       }else if (line.contains("Time limit has been exceeded")) {
@@ -177,9 +182,15 @@ bool QChemOutput::parse(TextStream& textStream)
 
       }else if (line.contains("Q-Chem fatal error occurred in module")) {
          textStream.skipLine();
-         QString msg("Q-Chem fatal error line: ");
-         msg += QString::number(textStream.lineNumber());
-         m_errors.append(msg + "\n" + textStream.nextLine());
+         QString msg("Q-Chem fatal error line ");
+         msg += QString::number(textStream.lineNumber()) + ":\n";
+         line = textStream.readLine().trimmed();
+         do {
+            msg += line + " ";
+            line = textStream.readLine().trimmed();
+         }  while (!line.isEmpty());
+
+         m_errors.append(msg);
 
       }else if (line.contains("Time limit has been exceeded")) {
          if (!m_errors.isEmpty()) m_errors.removeLast();
@@ -945,7 +956,6 @@ void QChemOutput::readVibrationalModes(TextStream& textStream, Data::Geometry& g
 
          if (partialHessianAtomList.isEmpty() ||
              partialHessianAtomList.contains(atomCount)) {
-qDebug() << "Adding displacement vectors for atom" << atomCount;
             if (tokens.size() == 10) {
                x = tokens[7].toDouble(&ok);  if (!ok) goto error;
                y = tokens[8].toDouble(&ok);  if (!ok) goto error;
@@ -965,7 +975,6 @@ qDebug() << "Adding displacement vectors for atom" << atomCount;
                if (v1) v1->appendDirectionVector(Vec(x,y,z)); 
             }
          }else {
-qDebug() << "Adding zero displacement vectors for atom" << atomCount;
             if (v1) v1->appendDirectionVector(Vec(0,0,0)); 
             if (v2) v2->appendDirectionVector(Vec(0,0,0)); 
             if (v3) v3->appendDirectionVector(Vec(0,0,0)); 
@@ -973,8 +982,9 @@ qDebug() << "Adding zero displacement vectors for atom" << atomCount;
          }
       }
 
+      // For partial hessian jobs, we may need to top up the eigenvectors
+      // with zeros for the frozen atoms.
       while (atomCount < nAtoms) {
-qDebug() << "Adding zero displacement vectors for atom topup" << atomCount;
          if (v1) v1->appendDirectionVector(Vec(0,0,0)); 
          if (v2) v2->appendDirectionVector(Vec(0,0,0)); 
          if (v3) v3->appendDirectionVector(Vec(0,0,0)); 
