@@ -84,6 +84,7 @@ namespace Data {
          virtual unsigned nAlpha() const { return 0; }
          virtual unsigned nBeta() const { return 0; }
 
+
          void serialize(InputArchive& ar, unsigned const version = 0)
          {
             privateSerialize(ar, version);
@@ -105,6 +106,8 @@ namespace Data {
 
 
       protected:
+         bool areOrthonormal() const;
+
          template <class Archive>
          void privateSerialize(Archive& ar, unsigned const /* version */) 
          {

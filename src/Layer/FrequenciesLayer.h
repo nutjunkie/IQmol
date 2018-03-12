@@ -58,10 +58,11 @@ namespace Layer {
 
          void setMolecule(Molecule*);
          void setPlay(bool const play);
+         void setPlay();
          void setLoop(bool const loop);
-         void setPlay() { setPlay(m_play); }
          void setSpeed(double const speed);
          void setScale(double const scale);
+
 
          double maxFrequency() const;
          double maxIntensity() const;

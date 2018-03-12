@@ -44,7 +44,7 @@ namespace Data {
 
          unsigned nBasis() const;
 
-         Vector const& overlapMatrix() { return m_overlapMatrix; }
+         Vector const& overlapMatrix() const { return m_overlapMatrix; }
 
          void setOverlapMatrix(QList<double> const& overlapMatrix) {
             unsigned nElements(overlapMatrix.size());
@@ -63,6 +63,12 @@ namespace Data {
          // Returns the vectorized upper triangular array of unique shell 
          // values at the grid point pairs.
          Vector const& shellPairValues(qglviewer::Vec const& gridPoint);
+
+         // Shell offset for each atom
+         QList<unsigned> shellAtomOffsets() const;
+
+         // Basis offset for each atom
+         QList<unsigned> basisAtomOffsets() const;
 
          void serialize(InputArchive& ar, unsigned int const version = 0) {
             serializeList(ar, version);

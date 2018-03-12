@@ -54,7 +54,11 @@ namespace Parser {
          void readNmrCouplings(TextStream&, Data::Geometry&, Data::Nmr&);
          void readDipoleMoment(TextStream&, Data::Geometry&);
          void readHessian(TextStream&, Data::Geometry&);
-         void readVibrationalModes(TextStream&);
+         void readPartialHessian(TextStream&, Data::Geometry&, 
+            QList<unsigned>& partialHessianAtomList);
+         bool readHessian(TextStream& textStream, Matrix& hessian);
+         void readVibrationalModes(TextStream&, Data::Geometry&, 
+            QList<unsigned> const& partialHessianAtomList);
          void readEffectiveRegion(TextStream&);
          void readDMA(TextStream&, Data::Geometry&);
          void readCisStates(TextStream&, Data::ExcitedStates::ExcitedStatesT);

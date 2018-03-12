@@ -294,6 +294,7 @@ void Viewer::draw()
    glDisable(GL_DEPTH_TEST);
 
    displayGeometricParameter(m_selectedObjects);
+   displayMullikenDecomposition(m_selectedObjects);
 }
 
 
@@ -340,6 +341,7 @@ void Viewer::fastDraw()
    glDisable(GL_LIGHTING);
    //glDisable(GL_DEPTH_TEST);
    displayGeometricParameter(m_selectedObjects);
+   displayMullikenDecomposition(m_selectedObjects);
 }
 
 
@@ -586,7 +588,7 @@ void Viewer::displayGeometricParameter(GLObjectList const& selection)
 {
    QString msg;
    Layer::Atom *a, *b, *c, *d;
-   Layer::Primitive*A, *B;
+   Layer::Primitive *A, *B;
    Layer::Bond *bond;
    Layer::EfpFragment *efp;
 
@@ -649,6 +651,61 @@ void Viewer::displayGeometricParameter(GLObjectList const& selection)
    //displayMessage(""); 
 
    drawText(10, height()-10, msg);
+}
+
+
+
+void Viewer::displayMullikenDecomposition(GLObjectList const& selection)
+{
+   if (selection.isEmpty()) {
+      //qDebug() << "Selection is empty";
+      return;
+   }
+   MoleculeList parents(selection.first()->findLayers<Layer::Molecule>(Layer::Parents));
+   if (parents.isEmpty()) {
+      //qDebug() << "No parent molecule found";
+      return;
+   }
+
+   Layer::Molecule* molecule(parents.first());
+   if (!molecule->hasMullikenDecompositions()) {
+      //qDebug() << "No Mulliken Decompositon available";
+      return;
+   }
+
+   Layer::Atom *a(0), *b(0);
+   Layer::Bond *bond;
+   int ia(0), ib(0);
+
+   switch (selection.size()) {
+      case 1: 
+         if ( (bond = qobject_cast<Layer::Bond*>(selection[0])) ) {
+            ia = bond->beginAtom()->getIndex();
+            ib = bond->beginAtom()->getIndex();
+         }else if ( (a = qobject_cast<Layer::Atom*>(selection[0])) ) {
+            ia = ib = a->getIndex();
+         }
+         break;
+
+      case 2:
+         if ( (a = qobject_cast<Layer::Atom*>(selection[0])) &&
+              (b = qobject_cast<Layer::Atom*>(selection[1])) ) {
+            ia = a->getIndex();
+            ib = b->getIndex();
+         }
+         break;
+
+      default:
+         return;
+         break;
+   }
+   
+   QString msg("Mullliken Decomposition ");
+   msg += QString::number(ia) + "-" + QString::number(ib) + ": ";
+   msg += QString::number(molecule->mullikenDecomposition(ia,ib), 'f', 4);
+
+   // We cannot use displayMessage here as it triggers an update
+   drawText(width()-s_labelFontMetrics.width(msg), height()-10, msg);
 }
 
 

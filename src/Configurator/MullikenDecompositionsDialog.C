@@ -20,24 +20,23 @@
    
 ********************************************************************************/
 
-#include "PopulationsDialog.h"
+#include "MullikenDecompositionsDialog.h"
 #include "QsLog.h"
 #include <QDebug>
 
 
 namespace IQmol {
 
-PopulationsDialog::PopulationsDialog(Data::ShellList const& shellList, 
+MullikenDecompositionsDialog::MullikenDecompositionsDialog(Data::ShellList const& shellList, 
    Data::Density const& density, QWidget* parent) : QDialog(parent), 
    m_shellList(shellList), m_density(density)
 {
    m_dialog.setupUi(this);
-   setWindowTitle("Population decomposition for " + m_density.label());
-   compute();
+   setWindowTitle("Mulliken decomposition for " + m_density.label());
 }
 
 
-void PopulationsDialog::compute()
+void MullikenDecompositionsDialog::compute()
 {
    Vector const& overlap(m_shellList.overlapMatrix());
    Vector const* density(m_density.vector());
@@ -46,9 +45,11 @@ void PopulationsDialog::compute()
    unsigned nAtoms(m_shellList.last()->atomIndex()+1);
    unsigned nBasis(m_shellList.nBasis());
 
-   if (overlap.size()  != nBasis*(nBasis+1)/2 ||
-       density->size() != nBasis*(nBasis+1)/2) {
-      qDebug() << "Incommensurate vectorised matrices in PopulationsDialog";
+   if (2*overlap.size()  != nBasis*(nBasis+1) ||
+       2*density->size() != nBasis*(nBasis+1)) {
+      qDebug() << "Incommensurate vectorised matrices in MullikenDecompositionsDialog";
+      qDebug() << "S" << overlap.size() << "P" << density->size() << ":"
+               << nBasis*(nBasis+1)/2 ;
       return;
    }
 
@@ -91,14 +92,6 @@ void PopulationsDialog::compute()
        iBasOff += (*iShell)->nBasis();
    }
 
-/*
-   qDebug() << "printing population matrix";
-   QStringList pr(PrintMatrix(M));
-   for (int i = 0; i < pr.size(); ++i) {
-       qDebug() << pr[i];
-   }
-*/
-
    double nElectrons(0.0);
    for (unsigned i = 0; i < nAtoms; ++i) {
        for (unsigned j = 0; j < nAtoms; ++j) {
@@ -111,12 +104,14 @@ void PopulationsDialog::compute()
    text += QString::number(nElectrons,'f',6);
    m_dialog.label->setText(text);
    fillTable(M);
+
+   mullikenDecompositionsAvailable(M);
 }
 
 
-void PopulationsDialog::fillTable(Matrix const& M)
+void MullikenDecompositionsDialog::fillTable(Matrix const& M)
 {
-    QTableWidget* table(m_dialog.populationsTable); 
+    QTableWidget* table(m_dialog.decompositionTable); 
     unsigned nAtoms(M.size1());
 
     table->setRowCount(nAtoms);
