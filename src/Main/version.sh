@@ -9,6 +9,7 @@ if [ -e version.h ]; then
    rm version.h
 fi
 echo "// Version file generated on \"$IQMOL_DATE\"" > version.h
+echo "// Automatically generated file, do not edit" >> version.h
 echo "#define IQMOL_YEAR \"$IQMOL_YEAR\"" >> version.h
 echo "#define IQMOL_VERSION \"$IQMOL_VERSION\"" >> version.h
 echo "#define GIT_VERSION \"$GIT_VERSION\"" >> version.h

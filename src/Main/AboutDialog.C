@@ -21,15 +21,15 @@
 ********************************************************************************/
 
 #include "AboutDialog.h"
-//#include "version.h"
+#include "version.h"
 
 namespace IQmol {
 
 AboutDialog::AboutDialog(QWidget* parent) : QDialog(parent) 
 {
    m_aboutDialog.setupUi(this);
- //  m_aboutDialog.versionLabel->setText(IQMOL_VERSION);
- //   m_aboutDialog.yearLabel->setText(IQMOL_YEAR);
+   m_aboutDialog.versionLabel->setText(IQMOL_VERSION);
+   m_aboutDialog.yearLabel->setText(IQMOL_YEAR);
    resize(sizeHint());
 }
 
