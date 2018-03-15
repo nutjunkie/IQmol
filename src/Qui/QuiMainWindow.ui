@@ -5390,7 +5390,7 @@ widgets.</string>
               <item row="1" column="1">
                <layout class="QHBoxLayout">
                 <item>
-                 <widget class="QSpinBox" name="cpscf_nseg_2">
+                 <widget class="QSpinBox" name="cpscf_nseg">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                     <horstretch>0</horstretch>
