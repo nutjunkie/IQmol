@@ -169,6 +169,28 @@ QString Molecule::formatConstraintsForQui() {
 }
 
 
+double Molecule::radius(bool addVdw) 
+{
+   double radius(0.0);
+   double vdw(0.0);
+
+   FOR_ATOMS_OF_MOL(atom, this) {
+      double x(atom->GetX());
+      double y(atom->GetY());
+      double z(atom->GetZ());
+      double r(x*x + y*y + z*z);
+
+      if (r > radius) {
+         radius = r;
+         vdw =  OpenBabel::etab.GetVdwRad(atom->GetAtomicNum());
+      }
+   }
+      
+   if (addVdw) radius += vdw;
+   return radius;
+}
+
+
 QString Molecule::formatForQui(Coordinates::ID const& coords) {
    QString buffer;
    QTextStream mol(&buffer);
@@ -358,7 +380,6 @@ void Molecule::deleteAtomAndConstraints(OBAtom* a) {
    int ia(a->GetIdx());
    qDebug() << ia;
 }
-
 
 
 } // end namespace Qui

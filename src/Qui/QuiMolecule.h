@@ -55,6 +55,8 @@ class Molecule : public QObject, public OpenBabel::OBMol {
                       OpenBabel::OBAtom* c, OpenBabel::OBAtom* d, double angle);
       void deleteAtomAndConstraints(OpenBabel::OBAtom* a);
 
+      double radius(bool addVdw = true);
+
 
    public Q_SLOTS:
 

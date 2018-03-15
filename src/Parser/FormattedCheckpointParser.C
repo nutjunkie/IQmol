@@ -619,7 +619,7 @@ Data::Orbitals* FormattedCheckpoint::makeOrbitals(unsigned const nAlpha,
 
    if (orbitals && !orbitals->consistent()) {
       QString msg(Data::Orbitals::toString(orbitalData.orbitalType));
-      msg += " orbital data are inconsistent. Check shell types.";
+      msg += " data are inconsistent. Check shell types.";
       m_errors.append(msg);
       delete orbitals;
       orbitals = 0;

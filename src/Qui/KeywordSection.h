@@ -26,6 +26,7 @@ class KeywordSection {
 
       QString name() const { return m_name; }
       void print(bool print) { m_print = print; }
+      bool print () const { return m_print; }
 
 	  //! This is just a wrapper for dump() which checks the m_print flag and
 	  //! is what should be called.
@@ -36,12 +37,12 @@ class KeywordSection {
 
 
    protected:
-      virtual QString dump() = 0;  
-      bool m_print;
+      virtual QString dump() const = 0;  
+      bool    m_print;
+      QString m_name;
 
 
    private:
-      QString m_name;
       // This should prevent copying sections
       KeywordSection(KeywordSection const& that);
       KeywordSection const& operator=(KeywordSection const& that);
@@ -68,7 +69,7 @@ class GenericSection :  public KeywordSection {
       GenericSection* clone() const;
 
     protected: 
-      QString dump();
+	  QString dump() const;
 
     private:
       QString m_data;

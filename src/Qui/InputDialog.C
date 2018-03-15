@@ -27,7 +27,7 @@
 #include "ExternalChargesSection.h"
 #include "GeometryConstraint.h"
 #include "KeywordSection.h"
-#include "QCJob.h"
+#include "QuiJob.h"
 #include "Job.h" 
 #include "LJParametersSection.h"
 #include "Option.h"
@@ -171,7 +171,7 @@ void InputDialog::setQChemJobInfo(IQmol::Process::QChemJobInfo const& jobInfo)
 
    // Solvent sections
    QString solvent("Dielectric       78.39\n");
-   m_currentJob->setGenericSection("solvent", solvent);
+//   m_currentJob->setGenericSection("solvent", solvent);
 
    QString pcm("Theory  CPCM\n"
                "Method  SWIG\n"
@@ -197,6 +197,8 @@ void InputDialog::setQChemJobInfo(IQmol::Process::QChemJobInfo const& jobInfo)
    
    QString chemsol("EField   1");
    m_currentJob->setGenericSection("chemsol", chemsol);
+
+
 
    if (m_qchemJobInfo.efpOnlyJob()) {
       m_ui.basis->setEnabled(false);
@@ -898,24 +900,11 @@ void InputDialog::on_ftc_toggled(bool on)
    toggleStack(m_ui.largeMoleculesStack, on, "LargeMoleculesFTC");
 }
 
-void InputDialog::on_qui_solvent_pcm_toggled(bool on) 
-{
-   toggleStack(m_ui.solventStack, on, "SolventPCM");
-}
 
+/*
 void InputDialog::on_qui_solvent_cosmo_toggled(bool on) 
 {
    toggleStack(m_ui.solventStack, on, "SolventCosmo");
-}
-
-void InputDialog::on_qui_solvent_onsager_toggled(bool on) 
-{
-   toggleStack(m_ui.solventStack, on, "SolventOnsager");
-}
-
-void InputDialog::on_qui_solvent_none_toggled(bool on) 
-{
-   toggleStack(m_ui.solventStack, on, "SolventNone");
 }
 
 void InputDialog::on_qui_solvent_chemsol_toggled(bool on) 
@@ -931,6 +920,21 @@ void InputDialog::on_qui_solvent_smx_toggled(bool on)
 void InputDialog::on_qui_solvent_svp_toggled(bool on) 
 {
    toggleStack(m_ui.solventStack, on, "SolventSVP");
+}
+*/
+
+
+void InputDialog::on_solvent_method_currentTextChanged(QString const& value)
+{
+   if (value == "None") {
+      toggleStack(m_ui.solventStack, true, "SolventNone");
+   }else if (value == "Onsager") {
+      m_currentJob->printOption("QUI_SOLVENT_DIELECTRIC", true);
+      m_currentJob->printOption("QUI_SOLVENT_CAVITYRADIUS", true);
+      toggleStack(m_ui.solventStack, true, "SolventOnsager");
+   }else if (value == "PCM") {
+      toggleStack(m_ui.solventStack, true, "SolventPCM");
+   }
 }
 
 

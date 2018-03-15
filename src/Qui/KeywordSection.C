@@ -50,7 +50,8 @@ QString KeywordSection::format() {
 // This a fallback section that simply holds the data in a string.  It is
 // useful when no other formating or processing is required.
 
-QString GenericSection::dump() {
+QString GenericSection::dump() const 
+{
    QString s;
    s += "$" + name() + "\n";
    if (!m_data.isEmpty()) s += m_data + "\n";

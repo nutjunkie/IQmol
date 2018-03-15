@@ -29,7 +29,7 @@ class OptSection : public KeywordSection {
       int numberOfDummyAtoms() const { return m_dummyAtoms.size(); }
 
    protected:
-      QString dump();
+      QString dump() const;
 
    private:
       GeometryConstraint::List m_constraints;

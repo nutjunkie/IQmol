@@ -40,7 +40,8 @@ void ExternalChargesSection::processData()
 }
 
 
-QString ExternalChargesSection::dump() {
+QString ExternalChargesSection::dump() const
+{
    QString s("$external_charges\n");
    if (!m_data.isEmpty()) s += m_data + "\n";
    s += "$end\n";
@@ -48,18 +49,21 @@ QString ExternalChargesSection::dump() {
 }
 
 
-void ExternalChargesSection::read(QString const& data) {
+void ExternalChargesSection::read(QString const& data) 
+{
     m_data = data.trimmed();
     processData();
 }
 
 
-ExternalChargesSection* ExternalChargesSection::clone() const {
+ExternalChargesSection* ExternalChargesSection::clone() const 
+{
    return new ExternalChargesSection(m_data, m_print);
 }
 
 
-QString ExternalChargesSection::previewFormat() const {
+QString ExternalChargesSection::previewFormat() const 
+{
    QString s("$external_charges\n");
    if (!m_truncatedData.isEmpty()) s += m_truncatedData + "\n";
    s += "$end\n";

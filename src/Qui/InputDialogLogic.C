@@ -1249,8 +1249,12 @@ void InputDialog::initializeQuiLogic()
    );*/
 
 
-/*
    // Advanced -> Solvation - this keeps solvation setup while the preview text is tainted
+   node = &reg.get("SOLVENT_METHOD");
+   node->addRule( If(*node == "Onsager", Enable(m_ui.qui_solvent_dielectric)) );
+
+
+/*
    //QString solvent_method(node->getValue().toUpper());
    node = &reg.get("SOLVENT_METHOD");
    node->addRule(If(*node == "PCM", reg.get("QUI_SOLVENT_PCM").shouldBe(QtTrue)));
@@ -1347,7 +1351,7 @@ void InputDialog::initializeQuiLogic()
 
    node = &reg.get("SOLVENT_METHOD");
    node->addRule(
-      If(*node == S("ONSAGER") || *node == S("PCM") || *node == S("COSMO"), 
+      If(*node == S("Onsager") || *node == S("PCM") || *node == S("COSMO"), 
          boost::bind(&InputDialog::printSection, this, "solvent", true),
          boost::bind(&InputDialog::printSection, this, "solvent", false)
       )

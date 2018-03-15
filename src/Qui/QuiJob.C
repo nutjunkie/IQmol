@@ -7,11 +7,13 @@
  *  \date November 2008
  */
 
-#include "QCJob.h"
+#include "QuiJob.h"
 #include "OptionDatabase.h"
 #include "Option.h"
+#include "QuiMolecule.h"
 #include "RemSection.h"
 #include "MoleculeSection.h"
+#include "KeyValueSection.h"
 #include "ExternalChargesSection.h"
 
 #include <QDebug>
@@ -19,13 +21,15 @@
 namespace Qui {
 
 
-class Molecule;
 
 Job::Job() {
-   m_remSection = new RemSection();
+   m_remSection      = new RemSection();
    m_moleculeSection = new MoleculeSection();
-   m_sections["rem"] = m_remSection;
+   m_solventSection  = new KeyValueSection("solvent",false);
+
+   m_sections["rem"]      = m_remSection;
    m_sections["molecule"] = m_moleculeSection;
+   m_sections["solvent"]  = m_solventSection;
 }
 
 
@@ -57,7 +61,6 @@ void Job::destroy() {
    }
    m_sections.clear();
 }
-
 
 
 void Job::copy(Job const& that) {
@@ -111,7 +114,9 @@ StringMap Job::getOptions()
    return opts;
 }
 
-QString Job::getOption(QString const& name) {
+
+QString Job::getOption(QString const& name) 
+{
    if (m_remSection) {
       return m_remSection->getOption(name);
    }else {
@@ -120,7 +125,8 @@ QString Job::getOption(QString const& name) {
 }
 
 
-bool Job::isReadCoordinates() {
+bool Job::isReadCoordinates() 
+{
    if (m_moleculeSection) {
       return  m_moleculeSection->isReadCoordinates();
    }else { 
@@ -129,7 +135,8 @@ bool Job::isReadCoordinates() {
 }
 
 
-Molecule* Job::getMolecule() {
+Molecule* Job::getMolecule() 
+{
    if (m_moleculeSection)  {
       return m_moleculeSection->getMolecule();
    }else {
@@ -154,7 +161,17 @@ void Job::setMultiplicity(int value)
 
 void Job::setCoordinates(QString const& coords) 
 {
-   if (m_moleculeSection) m_moleculeSection->setCoordinates(coords);
+   if (m_moleculeSection) {
+      m_moleculeSection->setCoordinates(coords);
+
+!!!
+/*
+      Molecule* molecule(m_moleculeSection->getMolecule());
+      m_solventSection->setOption("QUI_SOLVENT_CAVITYRADIUS", 
+         QString::number(molecule->radius(), 'g', 4));
+      delete molecule;
+*/
+   }
 }
 
 
@@ -209,12 +226,20 @@ void Job::setGenericSection(QString const& name, QString const& contents)
 
 void Job::setMolecule(Molecule* mol) 
 {
-   if (m_moleculeSection) m_moleculeSection->setMolecule(mol);
+   if (m_moleculeSection) {
+      m_moleculeSection->setMolecule(mol);
+   }
 }
 
 
 void Job::setOption(QString const& name, QString const& value) 
 {
+   if (name.startsWith("QUI_SOLVENT_", Qt::CaseInsensitive)) {
+      QString key(name);
+      m_solventSection->setOption(key, value);
+      m_solventSection->printOption(key, true);
+   }
+
    if (m_remSection) {
       m_remSection->setOption(name, value);
       if (name.toUpper() == "JOB_TYPE" && m_moleculeSection) {
@@ -282,9 +307,17 @@ int Job::getNumberOfAtoms() {
    }
 }
 
-void Job::printOption(QString const& name, bool doPrint) {
-   if (m_remSection) m_remSection->printOption(name, doPrint);
+
+void Job::printOption(QString const& name, bool doPrint) 
+{
+   if (name.startsWith("QUI_SOLVENT")) {
+qDebug() << "Solvent Job printing";
+      if (m_solventSection) m_solventSection->printOption(name, doPrint);
+   }else {
+      if (m_remSection) m_remSection->printOption(name, doPrint);
+   }
 }
+
 
 void Job::printSection(QString const& name, bool doPrint) {
    if (doPrint && m_sections.count(name) == 0) {

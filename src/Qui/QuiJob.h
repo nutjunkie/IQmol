@@ -1,5 +1,5 @@
-#ifndef QUI_JOB_H
-#define QUI_JOB_H
+#ifndef QUI_QUIJOB_H
+#define QUI_QUIJOB_H
 
 /*!
  *  \class Job
@@ -25,6 +25,7 @@ typedef QMap<QString,QString> StringMap;
 
 class RemSection;
 class KeywordSection;
+class KeyValueSection;
 class MoleculeSection;
 class Molecule;
 
@@ -85,6 +86,8 @@ class Job {
 	  //! cast them all the time.
       RemSection* m_remSection;
       MoleculeSection* m_moleculeSection;
+
+      KeyValueSection* m_solventSection;
 
 	  //! This contains a list of all the sections, including the RemSection
 	  //! and MoleculeSection

@@ -19,7 +19,8 @@ std::map<QString,QString>
 LJParametersSection::s_parameters = LJParametersSection::createMap();
 
 
-std::map<QString,QString> LJParametersSection::createMap() {
+std::map<QString,QString> LJParametersSection::createMap() 
+{
    std::map<QString,QString> parameters;
    parameters["C"]  = "  0.00010  7.60";
    parameters["H"]  = "  0.00005  4.20";
@@ -36,12 +37,14 @@ std::map<QString,QString> LJParametersSection::createMap() {
 }
 
 
-void LJParametersSection::read(QString const& input) {
+void LJParametersSection::read(QString const& input) 
+{
    m_data = input;
 }
 
 
-void LJParametersSection::generateData(QString const& geometry) {
+void LJParametersSection::generateData(QString const& geometry) 
+{
    QStringList tokens;
    QStringList lines(geometry.split(QRegExp("\\n")));
    std::map<QString, QString>::iterator iter, end(s_parameters.end());
@@ -77,7 +80,8 @@ void LJParametersSection::generateData(QString const& geometry) {
 
 
 
-QString  LJParametersSection::dump() {
+QString  LJParametersSection::dump() const
+{
    QString s("$lj_parameters\n");
    s += m_data;
    s += "$end\n";
@@ -85,7 +89,8 @@ QString  LJParametersSection::dump() {
 }
 
 
-LJParametersSection* LJParametersSection::clone() const {
+LJParametersSection* LJParametersSection::clone() const 
+{
    return new  LJParametersSection(m_data);
 }
 

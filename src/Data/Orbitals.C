@@ -108,10 +108,18 @@ bool Orbitals::areOrthonormal() const
    bool pass(true);
    double thresh(1e-8);
 
-   for (unsigned i = 0; i < m_nOrbitals; ++i) {
-       pass = pass && (std::abs(T(i,i)) < thresh);
-       for (unsigned j = 0; j < i; ++j) {
-           pass = pass && (std::abs(T(i,j)) < thresh) && (std::abs(T(j,i)) < thresh);
+   for (unsigned i = 0; i < m_nOrbitals && pass; ++i) {
+       if (std::abs(1.0-std::abs(T(i,i))) > thresh) {
+          QLOG_WARN() << "Element (" << i << "," << i << ") =" << T(i,i)
+                      << "deviation exceeds threshold" << thresh;
+          pass = false;
+       }
+       for (unsigned j = 0; j < i && pass; ++j) {
+           if (std::abs(T(i,j)) > thresh) {
+              QLOG_WARN() << "Element (" << i << "," << j << ") =" << T(i,j) 
+                          << "exceeds threshold" << thresh;
+              pass = false;
+           }
        } 
    }
 
@@ -156,12 +164,14 @@ bool Orbitals::consistent() const
       m_nBasis    > 0       && 
       m_nOrbitals <= m_nBasis;
 
-   consistent = consistent && areOrthonormal();
+   bool orthonormal(areOrthonormal());
+   consistent = consistent && orthonormal;
 
    if (!consistent) {
       qDebug() << "Inconsistent orbital information";
-      qDebug() << "Orbitals:" << m_nOrbitals;
-      qDebug() << "Basis:   " << m_nBasis;
+      qDebug() << "Orbitals:    " << m_nOrbitals;
+      qDebug() << "Basis:       " << m_nBasis;
+      qDebug() << "Orthonormal: " << orthonormal;
    }
 
    return consistent;

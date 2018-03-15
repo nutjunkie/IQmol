@@ -61,14 +61,16 @@ void MoleculeSection::read(QString const& input)
 }
 
 
-bool MoleculeSection::isReadCoordinates() {
+bool MoleculeSection::isReadCoordinates() const
+{
     return (m_coordinates == "read");
 }
 
 
 //! Returns a Molecule object corresponding to the current contents of the
 //! $molecule section
-Molecule* MoleculeSection::getMolecule() {
+Molecule* MoleculeSection::getMolecule() 
+{
    if (m_molecule == 0) {
       m_molecule = new Molecule();
       m_molecule->setCoordinates(myDump());
@@ -80,7 +82,7 @@ Molecule* MoleculeSection::getMolecule() {
 }
 
 
-QString MoleculeSection::myDump() 
+QString MoleculeSection::myDump() const
 {
    QString s;
    if (isReadCoordinates()) {
@@ -107,7 +109,8 @@ QString MoleculeSection::myDump()
 }
 
 
-QString MoleculeSection::dump() {
+QString MoleculeSection::dump() const
+{
    QString s("$molecule\n");
    s += myDump();
    s += "$end\n";

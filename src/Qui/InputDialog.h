@@ -95,13 +95,8 @@ class InputDialog : public QMainWindow {
       void on_qui_use_case_toggled(bool);
       void on_ftc_toggled(bool);
       void on_qui_cfmm_toggled(bool);
-      void on_qui_solvent_cosmo_toggled(bool);
-      void on_qui_solvent_pcm_toggled(bool);
-      void on_qui_solvent_onsager_toggled(bool);
-      void on_qui_solvent_none_toggled(bool);
-      void on_qui_solvent_smx_toggled(bool);
-      void on_qui_solvent_svp_toggled(bool);
-      void on_qui_solvent_chemsol_toggled(bool);
+
+      void on_solvent_method_currentTextChanged(QString const&);
 
       void on_readChargesButton_clicked(bool);
 
