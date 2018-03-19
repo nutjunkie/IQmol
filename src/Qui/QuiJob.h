@@ -46,7 +46,6 @@ class Job {
       
       QString format(bool const preview);
 
-      void init();
       void addSection(KeywordSection* section);
       KeywordSection* addSection(QString const& name, QString const& value);
 
@@ -88,6 +87,9 @@ class Job {
       MoleculeSection* m_moleculeSection;
 
       KeyValueSection* m_solventSection;
+      KeyValueSection* m_pcmSection;
+      KeyValueSection* m_smxSection;
+      KeyValueSection* m_chemsolSection;
 
 	  //! This contains a list of all the sections, including the RemSection
 	  //! and MoleculeSection

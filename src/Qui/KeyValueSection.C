@@ -27,6 +27,15 @@ KeyValueSection::~KeyValueSection()
 
 void KeyValueSection::printOption(QString const& key, bool print)
 {
+qDebug() << "KVSection setting print" << key << print;
+
+   // always print these options if the $block is active
+   if ( key == "QUI_SOLVENT_DIELECTRIC" ||
+        key == "QUI_PCM_THEORY" ||
+        key == "QUI_SMX_SOLVENT") {
+        print  = true;
+   }
+        
    if (print) {
       m_toPrint.insert(key);
    }else {
@@ -55,6 +64,9 @@ QString KeyValueSection::dump() const
        if (printOption(key) ) {
           value = iter.value();
           key.replace("QUI_SOLVENT_","");
+          key.replace("QUI_PCM_","");
+          key.replace("QUI_SMX_","");
+          key.replace("QUI_CHEMSOL_","");
           s += "   " + key + "  " + value + "\n";
        }
    }

@@ -123,6 +123,7 @@ namespace IQmol {
             ~Molecule();
 
             double radius();
+            double onsagerRadius();
    
       		/// Attempts to save the molecule, returning false if the operation
             /// was unsuccessful or canceled by the user.

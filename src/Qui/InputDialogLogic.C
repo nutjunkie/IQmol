@@ -1250,8 +1250,8 @@ void InputDialog::initializeQuiLogic()
 
 
    // Advanced -> Solvation - this keeps solvation setup while the preview text is tainted
-   node = &reg.get("SOLVENT_METHOD");
-   node->addRule( If(*node == "Onsager", Enable(m_ui.qui_solvent_dielectric)) );
+   //node = &reg.get("SOLVENT_METHOD");
+   //node->addRule( If(*node == "Onsager", Enable(m_ui.qui_solvent_dielectric)) );
 
 
 /*
@@ -1350,43 +1350,70 @@ void InputDialog::initializeQuiLogic()
    // Section logic ----------------------------------------------------------
 
    node = &reg.get("SOLVENT_METHOD");
+
+   // -- solvent
    node->addRule(
       If(*node == S("Onsager") || *node == S("PCM") || *node == S("COSMO"), 
          boost::bind(&InputDialog::printSection, this, "solvent", true),
          boost::bind(&InputDialog::printSection, this, "solvent", false)
       )
    );
+
    node->addRule(
-      If(*node == S("PCM"), 
-         boost::bind(&InputDialog::printSection, this, "pcm", true),
-         boost::bind(&InputDialog::printSection, this, "pcm", false)
+      If(*node == S("None") || *node == S("SM8") || *node == S("SM12") || 
+         *node == S("SMD")  || *node == S("ChemSol"),  
+         Disable(m_ui.solventGroupBox), 
+         Enable(m_ui.solventGroupBox)
       )
    );
+
+   node->addRule(
+      If(*node == S("Onsager"),  
+         Enable(m_ui.qui_solvent_cavityradius)  + Enable(m_ui.qui_solvent_multipoleorder),
+         Disable(m_ui.qui_solvent_cavityradius) + Disable(m_ui.qui_solvent_multipoleorder)
+      )
+   );
+
+   node->addRule(
+      If(*node == S("PCM"), 
+         boost::bind(&InputDialog::printSection, this, "pcm", true) +
+         Enable(m_ui.qui_solvent_opticaldielectric),
+         boost::bind(&InputDialog::printSection, this, "pcm", false) +
+         Disable(m_ui.qui_solvent_opticaldielectric)
+      )
+   );
+
    node->addRule(
       If(*node == S("ISOSVP"), 
          boost::bind(&InputDialog::printSection, this, "pcm_nonels", true),
          boost::bind(&InputDialog::printSection, this, "pcm_nonels", false)
       )
    );
+
    node->addRule(
       If(*node == S("ISOSVP"), 
          boost::bind(&InputDialog::printSection, this, "svp", true),
          boost::bind(&InputDialog::printSection, this, "svp", false)
       )
    );
+
    node->addRule(
       If(*node == S("SM8") || *node == S("SM12") || *node == S("SMD"), 
          boost::bind(&InputDialog::printSection, this, "smx", true),
          boost::bind(&InputDialog::printSection, this, "smx", false)
       )
    );
+
    node->addRule(
-      If(*node == S("CHEM_SOL"),
+      If(*node == S("ChemSol"),
          boost::bind(&InputDialog::printSection, this, "chemsol", true),
          boost::bind(&InputDialog::printSection, this, "chemsol", false)
       )
    );
 
+
+
+   // -------------------------------------------------------------------------
 
    node = &reg.get("QUI_TITLE");
    node->addRule(

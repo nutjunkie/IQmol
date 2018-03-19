@@ -99,6 +99,7 @@ namespace Layer {
          int getIndex() const { return m_index; }
          int getReorderIndex() const { return m_reorderIndex; }
          double getRadius(bool const selected);
+         double getVdwRadius() { return m_vdwRadius; }
          bool smallHydrogen() const { return (m_atomicNumber == 1 && m_smallerHydrogens); }
          QColor color() const { 
              QColor col;

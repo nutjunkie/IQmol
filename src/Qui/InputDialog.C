@@ -169,14 +169,37 @@ void InputDialog::setQChemJobInfo(IQmol::Process::QChemJobInfo const& jobInfo)
    m_currentJob->setExternalCharges(
       m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::ExternalCharges));
 
-   // Solvent sections
-   QString solvent("Dielectric       78.39\n");
-//   m_currentJob->setGenericSection("solvent", solvent);
 
-   QString pcm("Theory  CPCM\n"
-               "Method  SWIG\n"
-               "Radii   BONDI\n");
-   m_currentJob->setGenericSection("pcm", pcm);
+   // Solvent section
+
+   // Add an update for the current solvent radius
+   QString s(m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::OnsagerRadius));
+   bool ok(true);
+   double r(s.toDouble(&ok));
+   Action* action = new Action(
+      boost::bind(&QDoubleSpinBox::setValue, m_ui.qui_solvent_cavityradius, r) );
+   m_resetActions.push_back(action);
+
+   // This is a bit of a hack.  We (re)set these variables to ensure they are
+   // printed whenever their enclosing $blocks are printed.
+   m_currentJob->setOption(  "QUI_SOLVENT_CAVITYRADIUS", s);
+   m_currentJob->printOption("QUI_SOLVENT_CAVITYRADIUS", true);
+
+/*
+   m_currentJob->setOption(  "QUI_SOLVENT_DIELECTRIC", "78.39");
+   m_currentJob->printOption("QUI_SOLVENT_DIELECTRIC", true);
+   m_currentJob->setOption(  "QUI_PCM_THEORY", "CPCM");
+   m_currentJob->printOption("QUI_PCM_THEORY", true);
+   m_currentJob->setOption(  "QUI_SMX_SOLVENT", "water");
+   m_currentJob->printOption("QUI_SMX_SOLVENT", true);
+*/
+
+
+
+   //QString pcm("Theory  CPCM\n"
+   //            "Method  SWIG\n"
+   //            "Radii   BONDI\n");
+   //m_currentJob->setGenericSection("pcm", pcm);
 
    QString svp("RHOISO=0.001, DIELST=78.36, NPTLEB=1202,\n"
                " ITRNGR=2, IROTGR=2, IPNRF=1, IDEFESR=1\n");
@@ -192,13 +215,11 @@ void InputDialog::setQChemJobInfo(IQmol::Process::QChemJobInfo const& jobInfo)
                       "GauLag_N  40\n");
    m_currentJob->setGenericSection("pcm_nonels", pcm_nonels);
 
-   QString smx("water");
-   m_currentJob->setGenericSection("smx", smx);
+   //QString smx("water");
+   //m_currentJob->setGenericSection("smx", smx);
    
-   QString chemsol("EField   1");
-   m_currentJob->setGenericSection("chemsol", chemsol);
-
-
+   //QString chemsol("EField   1");
+   //m_currentJob->setGenericSection("chemsol", chemsol);
 
    if (m_qchemJobInfo.efpOnlyJob()) {
       m_ui.basis->setEnabled(false);
@@ -837,7 +858,11 @@ void InputDialog::printOption(QString const& name, bool doPrint)
    if (m_currentJob) m_currentJob->printOption(name, doPrint);
 }
 
-
+void InputDialog::printOptionDebug(QString const& name, bool doPrint) 
+{
+qDebug() << "printOption" << name << doPrint;
+   if (m_currentJob) m_currentJob->printOption(name, doPrint);
+}
 
 /***********************************************************************
  *   
@@ -912,11 +937,6 @@ void InputDialog::on_qui_solvent_chemsol_toggled(bool on)
    toggleStack(m_ui.solventStack, on, "SolventChemSol");
 }
 
-void InputDialog::on_qui_solvent_smx_toggled(bool on) 
-{
-   toggleStack(m_ui.solventStack, on, "SolventSMx");
-}
-
 void InputDialog::on_qui_solvent_svp_toggled(bool on) 
 {
    toggleStack(m_ui.solventStack, on, "SolventSVP");
@@ -926,14 +946,20 @@ void InputDialog::on_qui_solvent_svp_toggled(bool on)
 
 void InputDialog::on_solvent_method_currentTextChanged(QString const& value)
 {
-   if (value == "None") {
-      toggleStack(m_ui.solventStack, true, "SolventNone");
-   }else if (value == "Onsager") {
-      m_currentJob->printOption("QUI_SOLVENT_DIELECTRIC", true);
-      m_currentJob->printOption("QUI_SOLVENT_CAVITYRADIUS", true);
-      toggleStack(m_ui.solventStack, true, "SolventOnsager");
-   }else if (value == "PCM") {
-      toggleStack(m_ui.solventStack, true, "SolventPCM");
+   toggleStack(m_ui.solventStack, false, "SolventNone");
+   toggleStack(m_ui.solventStack, false, "SolventOnsager");
+   toggleStack(m_ui.solventStack, false, "SolventPCM");
+   toggleStack(m_ui.solventStack, false, "SolventSMx");
+   toggleStack(m_ui.solventStack, false, "SolventChemSol");
+
+   if (value == "None")    toggleStack(m_ui.solventStack, true, "SolventNone");
+   if (value == "Onsager") toggleStack(m_ui.solventStack, true, "SolventOnsager");
+   if (value == "PCM")     toggleStack(m_ui.solventStack, true, "SolventPCM");
+   if (value == "COSMO")   toggleStack(m_ui.solventStack, true, "SolventNone");
+   if (value == "ChemSol") toggleStack(m_ui.solventStack, true, "SolventChemSol");
+
+   if (value == "SM8" || value == "SM12" || value == "SMD") {
+       toggleStack(m_ui.solventStack, true, "SolventSMx");
    }
 }
 

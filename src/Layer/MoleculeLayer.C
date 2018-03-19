@@ -1609,6 +1609,22 @@ double Molecule::radius()
 }
 
 
+double Molecule::onsagerRadius()
+{
+   double radius(0), r(0);
+
+   AtomList atoms(findLayers<Atom>(Children | Visible));
+   AtomList::iterator iter;
+   for (iter = atoms.begin(); iter != atoms.end(); ++iter) {
+       r = (*iter)->getVdwRadius() + (double)(*iter)->getPosition().norm();
+       radius = std::max(radius, r);
+   }
+
+   return radius;
+}
+
+
+
 Atom* Molecule::createAtom(unsigned int const Z, qglviewer::Vec const& position)
 {
    Atom* atom(new Atom(Z));
@@ -1652,6 +1668,7 @@ Process::QChemJobInfo Molecule::qchemJobInfo()
    jobInfo.set(Process::QChemJobInfo::EfpFragments,    efpFragmentsAsString());
    jobInfo.set(Process::QChemJobInfo::EfpParameters,   efpParametersAsString());
    jobInfo.set(Process::QChemJobInfo::ExternalCharges, externalChargesAsString());
+   jobInfo.set(Process::QChemJobInfo::OnsagerRadius,   QString::number(onsagerRadius(),'f',4));
 
    AtomList atomList(findLayers<Atom>(Children | Visible));
    if (atomList.isEmpty()) jobInfo.setEfpOnlyJob(true);

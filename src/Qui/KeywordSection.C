@@ -40,7 +40,7 @@ KeywordSection* KeywordSectionFactory(QString const& type) {
 
 
 QString KeywordSection::format() {
-   return m_print ? dump() : QString();
+   return m_print ? dump() + "\n" : QString();
 }
 
 
