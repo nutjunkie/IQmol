@@ -23,12 +23,12 @@ namespace Qui {
 
 
 Job::Job() {
-   m_remSection      = new RemSection();
-   m_moleculeSection = new MoleculeSection();
-   m_solventSection  = new KeyValueSection("solvent",false);
-   m_pcmSection      = new KeyValueSection("pcm",false);
-   m_smxSection      = new KeyValueSection("smx",false);
-   m_chemsolSection  = new KeyValueSection("chemsol",false);
+   m_remSection           = new RemSection();
+   m_moleculeSection      = new MoleculeSection();
+   m_solventSection       = new KeyValueSection("solvent",false);
+   m_pcmSection           = new KeyValueSection("pcm",false);
+   m_smxSection           = new KeyValueSection("smx",false);
+   m_chemsolSection       = new KeyValueSection("chemsol",false);
 
    m_sections["rem"]      = m_remSection;
    m_sections["molecule"] = m_moleculeSection;
@@ -36,10 +36,17 @@ Job::Job() {
    m_sections["pcm"]      = m_pcmSection;
    m_sections["smx"]      = m_smxSection;
    m_sections["chemsol"]  = m_chemsolSection;
+
+   // A hack to ensure the corresponding $blocks have something inside them
+   // when they are printed.
+   setOption("QUI_SOLVENT_DIELECTRIC", "78.39");
+   setOption("QUI_PCM_THEORY", "CPCM");
+   setOption("QUI_SMX_SOLVENT", "water");
+   setOption("QUI_CHEMSOL_EFIELD", "Exact");
 }
 
 
-Job::Job(std::vector<KeywordSection*> sections) {
+void Job::addSections(std::vector<KeywordSection*> sections) {
    std::vector<KeywordSection*>::iterator iter;
    for (iter = sections.begin(); iter != sections.end(); ++iter) {
        addSection(*iter);
@@ -52,7 +59,9 @@ Job::~Job() {
 }
 
 
-void Job::destroy() {
+void Job::destroy() 
+{
+   //qDebug() << "WARN: Job::Destroy() called";
    QMap<QString,KeywordSection*>::iterator iter;
    for (iter = m_sections.begin(); iter != m_sections.end(); ++iter) {
        delete iter.value();
@@ -61,7 +70,8 @@ void Job::destroy() {
 }
 
 
-void Job::copy(Job const& that) {
+void Job::copy(Job const& that) 
+{
    destroy();
 
    QMap<QString,KeywordSection*>::const_iterator iter;
@@ -79,9 +89,6 @@ void Job::copy(Job const& that) {
    if (iter2 == m_sections.end()) addSection(new MoleculeSection());
 
 }
-
-
-
 
 
 //! Adds the given section to the Job object, deleting any existing section of
@@ -116,11 +123,26 @@ void Job::addSection(KeywordSection* section) {
 StringMap Job::getOptions()  
 {
    StringMap opts;
-   if (m_remSection)     opts  = m_remSection->getOptions();
-   if (m_solventSection) opts.unite(m_solventSection->getOptions());
-   if (m_pcmSection)     opts.unite(m_pcmSection->getOptions());
-   if (m_smxSection)     opts.unite(m_smxSection->getOptions());
-   if (m_chemsolSection) opts.unite(m_chemsolSection->getOptions());
+   StringMap::const_iterator iter;
+
+   if (m_remSection) opts = m_remSection->getOptions();
+
+   // QMap::unite does not work here for some reason 
+   QList<KeyValueSection*> sections;
+   sections.append(m_solventSection);
+   sections.append(m_pcmSection);
+   sections.append(m_chemsolSection);
+   sections.append(m_smxSection);
+
+   for (int i = 0; i < sections.size(); ++i) {
+       if (sections[i]) {
+          StringMap const& map(sections[i]->getOptions());
+          for (iter = map.begin(); iter != map.end(); ++iter) {
+              opts.insert(iter.key(), iter.value());
+          }
+       }
+   }
+
    return opts;
 }
 
@@ -258,6 +280,26 @@ void Job::setOption(QString const& name, QString const& value)
 }
 
 
+void Job::printOption(QString const& name, bool doPrint) 
+{
+   if (name.startsWith("QUI_SOLVENT")) {
+      if (m_solventSection) m_solventSection->printOption(name, doPrint);
+
+   }else if (name.startsWith("QUI_PCM")) {
+      if (m_pcmSection) m_pcmSection->printOption(name, doPrint);
+
+   }else if (name.startsWith("QUI_SMX_", Qt::CaseInsensitive)) {
+      if (m_smxSection) m_smxSection->printOption(name, doPrint);
+
+   }else if (name.startsWith("QUI_CHEMSOL_", Qt::CaseInsensitive)) {
+      if (m_chemsolSection) m_chemsolSection->printOption(name, doPrint);
+
+   }else {
+      if (m_remSection) m_remSection->printOption(name, doPrint);
+   }
+}
+
+
 KeywordSection* Job::addSection(QString const& name, QString const& value) 
 {
    KeywordSection* section(KeywordSectionFactory(name));
@@ -313,18 +355,6 @@ int Job::getNumberOfAtoms() {
       return m_moleculeSection->getNumberOfAtoms();
    }else {
       return 0;
-   }
-}
-
-
-void Job::printOption(QString const& name, bool doPrint) 
-{
-   if (name.startsWith("QUI_SOLVENT")) {
-      if (m_solventSection) m_solventSection->printOption(name, doPrint);
-   }else if (name.startsWith("QUI_PCM")) {
-      if (m_pcmSection) m_pcmSection->printOption(name, doPrint);
-   }else {
-      if (m_remSection) m_remSection->printOption(name, doPrint);
    }
 }
 

@@ -36,6 +36,7 @@
 #include "Qui.h"
 #include "QMsgBox.h"
 #include "RemSection.h"
+#include "KeyValueSection.h"
 #include "MoleculeSection.h"
 #include "QsLog.h"
 #include "ParseFile.h"
@@ -185,22 +186,6 @@ void InputDialog::setQChemJobInfo(IQmol::Process::QChemJobInfo const& jobInfo)
    m_currentJob->setOption(  "QUI_SOLVENT_CAVITYRADIUS", s);
    m_currentJob->printOption("QUI_SOLVENT_CAVITYRADIUS", true);
 
-/*
-   m_currentJob->setOption(  "QUI_SOLVENT_DIELECTRIC", "78.39");
-   m_currentJob->printOption("QUI_SOLVENT_DIELECTRIC", true);
-   m_currentJob->setOption(  "QUI_PCM_THEORY", "CPCM");
-   m_currentJob->printOption("QUI_PCM_THEORY", true);
-   m_currentJob->setOption(  "QUI_SMX_SOLVENT", "water");
-   m_currentJob->printOption("QUI_SMX_SOLVENT", true);
-*/
-
-
-
-   //QString pcm("Theory  CPCM\n"
-   //            "Method  SWIG\n"
-   //            "Radii   BONDI\n");
-   //m_currentJob->setGenericSection("pcm", pcm);
-
    QString svp("RHOISO=0.001, DIELST=78.36, NPTLEB=1202,\n"
                " ITRNGR=2, IROTGR=2, IPNRF=1, IDEFESR=1\n");
    m_currentJob->setGenericSection("svp", svp);
@@ -215,8 +200,6 @@ void InputDialog::setQChemJobInfo(IQmol::Process::QChemJobInfo const& jobInfo)
                       "GauLag_N  40\n");
    m_currentJob->setGenericSection("pcm_nonels", pcm_nonels);
 
-   //QString smx("water");
-   //m_currentJob->setGenericSection("smx", smx);
    
    //QString chemsol("EField   1");
    //m_currentJob->setGenericSection("chemsol", chemsol);
@@ -640,7 +623,6 @@ void InputDialog::capturePreviewTextChanges()
 }
 
 
-
 void InputDialog::on_jobList_currentIndexChanged(int index) 
 {
    if (index < 0 || index >= m_jobs.count()) return;
@@ -860,7 +842,7 @@ void InputDialog::printOption(QString const& name, bool doPrint)
 
 void InputDialog::printOptionDebug(QString const& name, bool doPrint) 
 {
-qDebug() << "printOption" << name << doPrint;
+   //qDebug() << "printOption" << name << doPrint;
    if (m_currentJob) m_currentJob->printOption(name, doPrint);
 }
 
@@ -1140,7 +1122,7 @@ void InputDialog::setControls(Job* job)
           if (iter.key() == "EXCHANGE" && iter.value() != "HF") noHF = true;
           if (iter.key() == "CIS_N_ROOTS" && iter.value() != "0") hasCisRoot = true;
           if (noHF && hasCisRoot && iter.key() == "METHOD") { 
-            qDebug() << "setControls: " << iter.key() << "TD-DFT";
+            //qDebug() << "setControls: " << iter.key() << "TD-DFT";
             m_setUpdates[iter.key()]->operator()("TD-DFT");
           }else
             m_setUpdates[iter.key()]->operator()(iter.value());
@@ -1197,6 +1179,7 @@ void InputDialog::initializeControl(Option const& opt, QComboBox* combo)
        }else if (split.size() == 2) {
           opts[i] = split[0];  
           RemSection::addAdHoc(name, split[0], split[1]);
+          KeyValueSection::addAdHoc(name, split[0], split[1]);
        }else {
           qDebug() << "InputDialog::initialiseComboBox:\n"
                    << " replacement for option" << name << "is invalid:" << opts[i];
@@ -1509,7 +1492,7 @@ void InputDialog::widgetChanged(bool const& value)
 void InputDialog::widgetChanged(QObject* orig, QString const& value) 
 {
    QString name(orig->objectName().toUpper());
-   //qDebug() << "Widget changed" << name << "to" << value;
+   qDebug() << "Widget changed" << name << "to" << value;
    if (m_reg.exists(name)) m_reg.get(name).setValue(value);
    if (m_currentJob) {
       capturePreviewTextChanges();

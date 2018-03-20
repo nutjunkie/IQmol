@@ -11,11 +11,12 @@
 #include <QMap>
 #include <set>
 #include <QString>
-
 #include "KeywordSection.h"
 
 
 namespace Qui {
+
+typedef QMap<QString, QString> StringMap;
 
 
 class KeyValueSection : public KeywordSection 
@@ -33,7 +34,7 @@ class KeyValueSection : public KeywordSection
          return m_options.count(key) > 0 ? m_options[key] : QString();
       }
 
-      QMap<QString,QString> const& getOptions() const {
+      StringMap const& getOptions() const {
          return m_options;
       }
 
@@ -47,12 +48,27 @@ class KeyValueSection : public KeywordSection
 
       QString format() const;
 
+      static void addAdHoc(QString const& rem, QString const& v1, QString const& v2);
+
    protected:
       QString dump() const;
 
    private:
-      //! Contains a list of the option values that have been set
-      QMap<QString,QString> m_options;
+      /// An ad-hoc map which converts values in the QUI to values used in
+	  /// QChem and vice versa.  The values are stored as a QMap with keys
+	  /// of the form rem::quiValue => qchemValue and also 
+      /// rem::qchemValue => quiValue.  This allows a given value to be 
+      /// mapped to different things depending on which option the value is 
+      /// associated with.   This function is called in
+      /// InputDialog::initializeControl() to avoid additional database access.
+      static StringMap s_adHoc;
+
+      static void fixAdHoc(QString const& name, QString& value);
+       
+	  /// Contains a list of the option values that have been explicitly set
+	  /// (i.e. altered from the default.
+	  StringMap m_options;
+
 	  //! Contains a list of those options that should be printed to the input
 	  //! file.  This act as a filter on the contents of m_options.
       std::set<QString> m_toPrint;

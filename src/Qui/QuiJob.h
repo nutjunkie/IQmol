@@ -33,9 +33,9 @@ class Job {
 
    public:
       Job();
+
       ~Job();
 
-      Job(std::vector<KeywordSection*> sections);
 
       Job(Job const& that) { copy(that); }
 
@@ -47,6 +47,8 @@ class Job {
       QString format(bool const preview);
 
       void addSection(KeywordSection* section);
+      void addSections(std::vector<KeywordSection*> sections);
+
       KeywordSection* addSection(QString const& name, QString const& value);
 
 	  // Pass-through functions.  These rely on the corresponding
