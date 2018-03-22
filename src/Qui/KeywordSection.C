@@ -17,10 +17,12 @@
 
 namespace Qui {
 
+
 // Factory - we use this to generate a derived KeywordSection based on its
 // name.  Note that if you add additional specialized KeywordSections, this
 // Factory needs to be made aware of them.
-KeywordSection* KeywordSectionFactory(QString const& type) {
+KeywordSection* KeywordSectionFactory(QString const& type) 
+{
    QString t(type.toLower());
 
    if (t == "molecule") {

@@ -35,11 +35,10 @@ INCLUDEPATH += . ../Util ../Data ../Parser ../Qui ../Layer \
                ../OpenMesh/src
 INCLUDEPATH += $$BUILD_DIR/Qui   # Required for the ui_QuiMainWindow.h header
 
-version.target = version.h
-version.commands = ./version.sh 
-version.depends = FORCE
-QMAKE_EXTRA_TARGETS += version
-
+#version.target = version.h
+#version.commands = ./version.sh 
+#version.depends = FORCE
+#QMAKE_EXTRA_TARGETS += version
 
 symmol.target = $$BUILD_DIR/symmol.o
 symmol.commands = gfortran -c $$PWD/symmol.f90 -o $$BUILD_DIR/symmol.o

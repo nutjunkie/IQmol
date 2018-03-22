@@ -84,6 +84,7 @@ namespace IQmol {
 
    namespace Layer {
 
+      class Isotopes;
       class Constraint;
       class Surface;
       class Group;
@@ -197,6 +198,8 @@ namespace IQmol {
 			// and are used by the undo commands.
             void addConstraintLayer(Constraint*);
             void removeConstraintLayer(Constraint*);
+
+            void addIsotopes(Isotopes*);
    
             /// Converts the Molecule to an XYZ format and uses OpenBabel to parse this.  
             /// Useful for, e.g., reperceiving bonds.
@@ -410,6 +413,7 @@ namespace IQmol {
             Layer::Container m_fileList;
             Layer::Container m_surfaceList;
             Layer::Container m_constraintList;
+            Layer::Container m_isotopesList;
             Layer::Container m_scanList;
             Layer::Container m_groupList;
    

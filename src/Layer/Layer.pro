@@ -30,6 +30,7 @@ SOURCES = \
    $$PWD/FrequenciesLayer.C \
    $$PWD/GroupLayer.C \
    $$PWD/InfoLayer.C \
+   $$PWD/IsotopesLayer.C \
    $$PWD/Layer.C \
    $$PWD/LayerFactory.C \
    $$PWD/MoleculeLayer.C \
@@ -68,6 +69,7 @@ HEADERS = \
    $$PWD/GLObjectLayer.h \
    $$PWD/GroupLayer.h \
    $$PWD/InfoLayer.h \
+   $$PWD/IsotopesLayer.h \
    $$PWD/Layer.h \
    $$PWD/LayerFactory.h \
    $$PWD/MoleculeLayer.h \

@@ -47,6 +47,7 @@
 #include "GeometryLayer.h"
 #include "GeometryListLayer.h"
 #include "GroupLayer.h"
+#include "IsotopesLayer.h"
 #include "MoleculeLayer.h"
 #include "OrbitalsLayer.h"
 #include "SurfaceLayer.h"
@@ -105,6 +106,7 @@ Molecule::Molecule(QObject* parent) : Base(DefaultMoleculeName, parent),
    m_fileList(this, "Files"), 
    m_surfaceList(this, "Surfaces"), 
    m_constraintList(this, "Constraints"), 
+   m_isotopesList(this, "Isotopes"), 
    m_scanList(this, "Scan Coordinates"), 
    m_groupList(this, "Groups"), 
    m_efpFragmentList(this),
@@ -818,6 +820,23 @@ QString Molecule::scanCoordinatesAsString()
 
    return s;
 }
+
+
+void Molecule::addIsotopes(Isotopes* isotopes)
+{
+   if (isotopes) {
+      if (isotopes->text().isEmpty()) {
+         QList<Isotopes*> list(m_isotopesList.findLayers<Isotopes>(Children));
+
+         QString label("Loop ");
+         label += QString::number(list.size() +1);
+         QString label(QString::number(list.size() +1));
+         isotopes->setText(label);
+      }
+      m_isotopesList.appendLayer(isotopes);
+   }
+}
+
 
 
 Constraint* Molecule::findMatchingConstraint(AtomList const& atoms)
