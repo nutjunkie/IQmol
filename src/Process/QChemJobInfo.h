@@ -61,7 +61,8 @@ namespace Process {
                  EfpFragments, 
                  EfpParameters, 
                  ExternalCharges,         // 20
-                 OnsagerRadius
+                 OnsagerRadius,
+                 Isotopes
               };
             
 

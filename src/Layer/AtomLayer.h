@@ -51,6 +51,11 @@ namespace Layer {
       friend class Constraint;
 
       public:
+
+         static bool indexSort(Atom* A, Atom* B) {
+            return A->getIndex() < B->getIndex();
+         }
+
          enum LabelType { None, Index, Element, Charge, Mass, Spin, Reindex, NmrShift };
          //enum ChargeType { Unknown = -1, Gasteiger, Sanderson, Mulliken };
 

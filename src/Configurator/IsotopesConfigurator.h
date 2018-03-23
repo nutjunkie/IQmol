@@ -26,12 +26,14 @@
 #include "ui_IsotopesConfigurator.h"
 
 
+class QComboBox;
+
 namespace IQmol {
 
 namespace Layer {
    class Isotopes;
+   class Atom;
 }
-
 
 namespace Configurator {
 
@@ -42,11 +44,13 @@ namespace Configurator {
       public:
          Isotopes(Layer::Isotopes& isotopes);
 
-      protected:
+         void loadTable(QList<Layer::Atom*> const& atomicNumbers);
+         QString toString() const;
+
+      private:
          Ui::IsotopesConfigurator m_configurator;
          Layer::Isotopes& m_isotopes;
 
-      private:
          void loadMasses(unsigned Z, QComboBox*);
    };
 

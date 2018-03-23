@@ -31,20 +31,21 @@ namespace Layer {
 
 Isotopes::Isotopes(AtomList const& atomList) : m_configurator(*this), m_accepted(false)
 {
+   m_configurator.loadTable(atomList);
    setConfigurator(&m_configurator);
 }
 
 
 void Isotopes::configure()
 {
-   //m_configurator->sync();
    m_accepted = (m_configurator.exec() == QDialog::Accepted);
+   m_configurator.toString();   
 }
 
-QString formatQChem()
-{
-   return QString();
 
+QString Isotopes::formatQChem() const
+{
+   return m_accepted ? m_configurator.toString() : QString();
 }
 
 } } // end namespace IQmol::Layer

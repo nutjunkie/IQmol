@@ -830,11 +830,29 @@ void Molecule::addIsotopes(Isotopes* isotopes)
 
          QString label("Loop ");
          label += QString::number(list.size() +1);
-         QString label(QString::number(list.size() +1));
          isotopes->setText(label);
       }
       m_isotopesList.appendLayer(isotopes);
    }
+}
+
+QString Molecule::isotopesAsString()
+{
+   QList<Isotopes*> list(m_isotopesList.findLayers<Isotopes>(Children));
+
+   unsigned n(list.size());
+   if (n == 0) return QString();
+
+   QString s(QString::number(n));
+   s += "   1\n";  // tp_flag;
+   for (unsigned i = 0; i < n; ++i) {
+       s += list[i]->formatQChem();
+   }
+   
+   qDebug() << "Formatted isotopes string";
+   qDebug() << s;
+
+   return s;
 }
 
 
@@ -1688,6 +1706,7 @@ Process::QChemJobInfo Molecule::qchemJobInfo()
    jobInfo.set(Process::QChemJobInfo::EfpParameters,   efpParametersAsString());
    jobInfo.set(Process::QChemJobInfo::ExternalCharges, externalChargesAsString());
    jobInfo.set(Process::QChemJobInfo::OnsagerRadius,   QString::number(onsagerRadius(),'f',4));
+   jobInfo.set(Process::QChemJobInfo::Isotopes,        isotopesAsString());
 
    AtomList atomList(findLayers<Atom>(Children | Visible));
    if (atomList.isEmpty()) jobInfo.setEfpOnlyJob(true);

@@ -722,6 +722,8 @@ void ViewerModel::setIsotopes()
       return;
    }
 
+   qSort(atoms.begin(), atoms.end(), Layer::Atom::indexSort);
+
    // Check all the selected atoms belong to the same Molecule.
    unsigned int findFlags(Layer::Parents | Layer::Visible);
    MoleculeList parents(m_selectedObjects[0]->findLayers<Layer::Molecule>(findFlags));
@@ -737,13 +739,11 @@ void ViewerModel::setIsotopes()
 
    Layer::Molecule* molecule(parents.first());
    Layer::Isotopes* isotopes(new Layer::Isotopes(atoms));
-qDebug() << "Configuring isotopes";
    isotopes->configure();
    if (isotopes->accepted()) {
       selectNone();
       molecule->addIsotopes(isotopes);
    }else {
-qDebug() << "Rejected - deleteing isotopes";
       delete isotopes;
    }
 

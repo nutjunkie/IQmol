@@ -206,6 +206,8 @@ namespace IQmol {
             QString coordinatesAsString(bool const selectedOnly = false);
             QString coordinatesAsStringFsm();
             QStringList coordinatesForCubeFile();
+
+            QString isotopesAsString();
    
             /// Assigns the atom indices based on the ordering selected by 
             /// the user via the reorderIndex variable in the Atom class.

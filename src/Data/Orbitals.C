@@ -165,9 +165,10 @@ bool Orbitals::consistent() const
       m_nOrbitals <= m_nBasis;
 
    bool orthonormal(areOrthonormal());
-   consistent = consistent && orthonormal;
+   // disable this check for the time being as noise can cause problems
+   // consistent = consistent && orthonormal;
 
-   if (!consistent) {
+   if (!consistent || !orthonormal) {
       qDebug() << "Inconsistent orbital information";
       qDebug() << "Orbitals:    " << m_nOrbitals;
       qDebug() << "Basis:       " << m_nBasis;

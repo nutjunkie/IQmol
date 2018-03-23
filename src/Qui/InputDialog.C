@@ -181,6 +181,10 @@ void InputDialog::setQChemJobInfo(IQmol::Process::QChemJobInfo const& jobInfo)
       boost::bind(&QDoubleSpinBox::setValue, m_ui.qui_solvent_cavityradius, r) );
    m_resetActions.push_back(action);
 
+   QString isotopes(m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::Isotopes));
+   m_currentJob->setGenericSection("isotopes", isotopes);
+   
+
    // This is a bit of a hack.  We (re)set these variables to ensure they are
    // printed whenever their enclosing $blocks are printed.
    m_currentJob->setOption(  "QUI_SOLVENT_CAVITYRADIUS", s);
