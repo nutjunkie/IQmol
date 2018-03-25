@@ -63,7 +63,7 @@ namespace Layer {
          void setSpeed(double const speed);
          void setScale(double const scale);
 
-
+         double zpve() const;
          double maxFrequency() const;
          double maxIntensity() const;
          double maxRamanIntensity() const;

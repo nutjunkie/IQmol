@@ -83,10 +83,12 @@ void QChemJobInfo::set(Field const field, QString const& value)
       case ExternalCharges:
       case EfpFragments:
       case EfpParameters:
+      case OnsagerRadius:
+      case Isotopes:
          m_data[field] = value;
          break;
       default:
-         QLOG_DEBUG() << "Attempt to set invalid field in QChemJobInfo::set()";
+         QLOG_WARN() << "Attempt to set invalid field in QChemJobInfo::set()";
       break;
    }
    //updated();

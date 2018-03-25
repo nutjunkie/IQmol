@@ -325,7 +325,6 @@ bool RemSection::fixOptionForQChem(QString& name, QString& value) const
       } 
    }
 
-  
    if (name == "QUI_XOPT1" && value.toInt() > 0) {
       name = "XOPT_STATE_1";
       shouldPrint = true;

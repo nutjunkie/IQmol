@@ -228,10 +228,15 @@ void InputDialog::initializeQuiLogic()
       If(basis2 != "None", ecp.shouldBe("None") )
    );
  
-   ecp.addRule(
-      If(ecp != "None", basis.makeSameAs(ecp))
-   );
-      
+   ecp.addRule( If(ecp == "fit-CRENBL",  basis.shouldBe("CRENBL")) );
+   ecp.addRule( If(ecp == "fit-CRENBS",  basis.shouldBe("CRENBS")) );
+   ecp.addRule( If(ecp == "fit-HWMB",    basis.shouldBe("HWMB")) );
+   ecp.addRule( If(ecp == "fit-HWVDZ",   basis.shouldBe("HWVDZ")) );
+   ecp.addRule( If(ecp == "fit-LACVP",   basis.shouldBe("LACVP")) );
+   ecp.addRule( If(ecp == "fit-LANL2DZ", basis.shouldBe("LANL2DZ")) );
+   ecp.addRule( If(ecp == "fit-SBKJC",   basis.shouldBe("SBKJC")) );
+   ecp.addRule( If(ecp == "SRLC",        basis.shouldBe("SRLC")) );
+   ecp.addRule( If(ecp == "SRSC",        basis.shouldBe("SRSC")) );
 
    QtNode& exchange(reg.get("EXCHANGE"));
    QtNode& correlation(reg.get("CORRELATION"));
@@ -1249,144 +1254,96 @@ void InputDialog::initializeQuiLogic()
    );*/
 
 
-   // Advanced -> Solvation - this keeps solvation setup while the preview text is tainted
-   node = &reg.get("SOLVENT_METHOD");
-   node->addRule( If(*node == "Onsager", Enable(m_ui.qui_solvent_dielectric)) );
-
-
-/*
-   //QString solvent_method(node->getValue().toUpper());
-   node = &reg.get("SOLVENT_METHOD");
-   node->addRule(If(*node == "PCM", reg.get("QUI_SOLVENT_PCM").shouldBe(QtTrue)));
-   node->addRule(If(*node == "COSMO", reg.get("QUI_SOLVENT_COSMO").shouldBe(QtTrue)));
-   node->addRule(If(*node == "ONSAGER", reg.get("QUI_SOLVENT_ONSAGER").shouldBe(QtTrue)));
-   node->addRule(If(*node == "CHEM_SOL", reg.get("QUI_SOLVENT_CHEMSOL").shouldBe(QtTrue)));
-   node->addRule(
-       If(*node == "SM8" || *node == "SM12" || *node == "SMD",
-          reg.get("QUI_SOLVENT_SMX").shouldBe(QtTrue)
-       )
-   );
-
-   // Advanced -> Solvation Models -> ChemSol
-   node = &reg.get("QUI_SOLVENT_CHEMSOL");
-   node->addRule(
-      If(*node == QtTrue, 
-         reg.get("SOLVENT_METHOD").shouldBe("CHEM_SOL")
-         + Enable(m_ui.solvent_method), Disable(m_ui.solvent_method)
-      )
-   );
-   
-   // Advanced -> Solvation Models -> ChemSol
-   node = &reg.get("QUI_SOLVENT_CHEMSOL");
-   node->addRule(
-      If(*node == QtTrue, 
-         reg.get("SOLVENT_METHOD").shouldBe("CHEM_SOL")
-         + Enable(m_ui.solvent_method), Disable(m_ui.solvent_method)
-      )
-   );
-   
-   // Advanced -> Solvation Models -> SMx
-   QtNode* smx(&reg.get("QUI_SOLVENT_SMX"));
-   rule = If(*smx == QtTrue,
-       reg.get("SOLVENT_METHOD").shouldBe("SM8")
-       + reg.get("QUI_SOLVENT_SMX_MODEL").shouldBe("SM8")
-       + Enable(m_ui.solvent_method), Disable(m_ui.solvent_method)
-   );
-   smx->addRule(rule);
-   QtNode* smx_model(&reg.get("QUI_SOLVENT_SMX_MODEL"));
-   // Why smx_model.getValue() can not return the correct value ...
-   smx_model->addRule(
-      If(*smx_model == "SM12", reg.get("SOLVENT_METHOD").shouldBe("SM12"))
-   );
-   smx_model->addRule(
-      If(*smx_model == "SM12", reg.get("SOLVENT_METHOD").shouldBe("SM12"))
-   );
-   smx_model->addRule(
-      If(*smx_model == "SMD", reg.get("SOLVENT_METHOD").shouldBe("SMD"))
-   );
-
-   QtNode& dielectricOnsager(reg.get("QUI_SOLVENT_DIELECTRIC_ONSAGER"));
-   QtNode& dielectricCosmo(reg.get("QUI_SOLVENT_DIELECTRIC_COSMO"));
-   QtNode& solventDielectric(reg.get("SOLVENT_DIELECTRIC"));
-
-   rule = If(True, solventDielectric.makeSameAs(dielectricOnsager));
-   dielectricOnsager.addRule(rule);
-   rule = If(True, solventDielectric.makeSameAs(dielectricCosmo));
-   dielectricCosmo.addRule(rule);
-
-   QtNode* cosmo(&reg.get("QUI_SOLVENT_COSMO"));
-   rule = If(*cosmo == QtTrue, reg.get("SOLVENT_METHOD").shouldBe("COSMO"));
-   cosmo->addRule(rule);
-
-   QtNode* pcm(&reg.get("QUI_SOLVENT_PCM"));
-   rule = If(*pcm == QtTrue, reg.get("SOLVENT_METHOD").shouldBe("PCM"));
-   pcm->addRule(rule);
-
-   QtNode* svp(&reg.get("QUI_SOLVENT_SVP"));
-   rule = If(*svp == QtTrue, reg.get("SOLVENT_METHOD").shouldBe("ISOSVP"));
-   svp->addRule(rule);
-
-   QtNode* onsager(&reg.get("QUI_SOLVENT_ONSAGER"));
-   rule = If(*onsager == QtTrue, reg.get("SOLVENT_METHOD").shouldBe("ONSAGER"));
-   onsager->addRule(rule);
-
-   rule = If(*cosmo == QtTrue || *pcm == QtTrue || *onsager == QtTrue || *svp == QtTrue,
-            Enable(m_ui.solvent_method), Disable(m_ui.solvent_method));
-
-   cosmo->addRule(rule);
-   pcm->addRule(rule);
-   svp->addRule(rule);
-   onsager->addRule(rule);
-   
-   rule = If(*cosmo == QtTrue || *onsager == QtTrue,
-            Enable(m_ui.solvent_dielectric), Disable(m_ui.solvent_dielectric));
-
-   cosmo->addRule(rule);
-   onsager->addRule(rule);
-*/
-
-
 
    // Section logic ----------------------------------------------------------
 
-   node = &reg.get("SOLVENT_METHOD");
+   node  = &reg.get("SOLVENT_METHOD");
+   node2 = &reg.get("QUI_PCM_METHOD");
+
+   // -- solvent
    node->addRule(
       If(*node == S("Onsager") || *node == S("PCM") || *node == S("COSMO"), 
          boost::bind(&InputDialog::printSection, this, "solvent", true),
          boost::bind(&InputDialog::printSection, this, "solvent", false)
       )
    );
+
    node->addRule(
-      If(*node == S("PCM"), 
-         boost::bind(&InputDialog::printSection, this, "pcm", true),
-         boost::bind(&InputDialog::printSection, this, "pcm", false)
+      If(*node == S("None") || *node == S("SM8") || *node == S("SM12") || 
+         *node == S("SMD")  || *node == S("ChemSol"),  
+         Disable(m_ui.solventGroupBox), 
+         Enable(m_ui.solventGroupBox)
       )
    );
+
+   node->addRule(
+      If(*node == S("SM12"),
+         Enable( m_ui.qui_smx_charges)
+      )
+   );
+
+   node->addRule(
+      If(*node == S("SM8") || *node == S("SMD") ,
+         Disable(m_ui.qui_smx_charges)
+      )
+   );
+
+   node->addRule(
+      If(*node == S("Onsager"),  
+         Enable(m_ui.qui_solvent_multipoleorder),
+         Disable(m_ui.qui_solvent_multipoleorder)
+      )
+   );
+
+   rule = If(*node == S("Onsager") || *node2 == S("Spherical"),  
+             Enable(m_ui.qui_solvent_cavityradius),
+             Disable(m_ui.qui_solvent_cavityradius)
+          );
+
+   node->addRule(rule);
+   node2->addRule(rule);
+
+
+   node->addRule(
+      If(*node == S("PCM"), 
+         boost::bind(&InputDialog::printSection, this, "pcm", true) +
+         Enable(m_ui.qui_solvent_opticaldielectric),
+         boost::bind(&InputDialog::printSection, this, "pcm", false) +
+         Disable(m_ui.qui_solvent_opticaldielectric)
+      )
+   );
+
    node->addRule(
       If(*node == S("ISOSVP"), 
          boost::bind(&InputDialog::printSection, this, "pcm_nonels", true),
          boost::bind(&InputDialog::printSection, this, "pcm_nonels", false)
       )
    );
+
    node->addRule(
       If(*node == S("ISOSVP"), 
          boost::bind(&InputDialog::printSection, this, "svp", true),
          boost::bind(&InputDialog::printSection, this, "svp", false)
       )
    );
+
    node->addRule(
       If(*node == S("SM8") || *node == S("SM12") || *node == S("SMD"), 
          boost::bind(&InputDialog::printSection, this, "smx", true),
          boost::bind(&InputDialog::printSection, this, "smx", false)
       )
    );
+
    node->addRule(
-      If(*node == S("CHEM_SOL"),
+      If(*node == S("ChemSol"),
          boost::bind(&InputDialog::printSection, this, "chemsol", true),
          boost::bind(&InputDialog::printSection, this, "chemsol", false)
       )
    );
 
+
+
+   // -------------------------------------------------------------------------
 
    node = &reg.get("QUI_TITLE");
    node->addRule(

@@ -26,7 +26,7 @@ class KeywordSection {
 
       QString name() const { return m_name; }
       void print(bool print) { m_print = print; }
-      bool print () const { return m_print; }
+      bool print() const { return m_print; }
 
 	  //! This is just a wrapper for dump() which checks the m_print flag and
 	  //! is what should be called.

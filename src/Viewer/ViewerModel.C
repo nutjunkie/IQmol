@@ -27,6 +27,7 @@
 #include "ConstraintLayer.h"
 #include "GeometryListLayer.h"
 #include "GeometryLayer.h"
+#include "IsotopesLayer.h"
 #include "Preferences.h"
 #include "UndoCommands.h"
 #include "QMsgBox.h"
@@ -703,6 +704,49 @@ void ViewerModel::setConstraint()
          delete constraint;
       }
    }
+}
+
+
+void ViewerModel::setIsotopes()
+{
+   int n(m_selectedObjects.size());
+   AtomList atoms;
+   Layer::Atom* A;
+
+   for (int i = 0; i < n; ++i) {
+       if ((A = qobject_cast<Layer::Atom*>(m_selectedObjects[i]))) atoms << A;
+   } 
+
+   if (atoms.isEmpty()) {
+      displayMessage("Atom selection required");
+      return;
+   }
+
+   qSort(atoms.begin(), atoms.end(), Layer::Atom::indexSort);
+
+   // Check all the selected atoms belong to the same Molecule.
+   unsigned int findFlags(Layer::Parents | Layer::Visible);
+   MoleculeList parents(m_selectedObjects[0]->findLayers<Layer::Molecule>(findFlags));
+   if (parents.isEmpty()) return;
+
+   for (int i = 1; i < n; ++i) {
+       if (m_selectedObjects[i]->findLayers<Layer::Molecule>(findFlags) != parents) {
+          QString msg("Cannot set isotopes in more than one molecule");
+          QMsgBox::warning(m_parent, "IQmol", msg);
+          return;
+       }
+   }
+
+   Layer::Molecule* molecule(parents.first());
+   Layer::Isotopes* isotopes(new Layer::Isotopes(atoms));
+   isotopes->configure();
+   if (isotopes->accepted()) {
+      selectNone();
+      molecule->addIsotopes(isotopes);
+   }else {
+      delete isotopes;
+   }
+
 }
 
 

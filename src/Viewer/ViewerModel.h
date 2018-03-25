@@ -91,6 +91,7 @@ namespace IQmol {
          void toggleAutoDetectSymmetry();
 
          void setConstraint();
+         void setIsotopes();
          void translateToCenter();
          void minimizeEnergy();
          void insertMoleculeById(QString identifier);

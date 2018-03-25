@@ -84,6 +84,7 @@ namespace IQmol {
 
    namespace Layer {
 
+      class Isotopes;
       class Constraint;
       class Surface;
       class Group;
@@ -123,6 +124,7 @@ namespace IQmol {
             ~Molecule();
 
             double radius();
+            double onsagerRadius();
    
       		/// Attempts to save the molecule, returning false if the operation
             /// was unsuccessful or canceled by the user.
@@ -196,12 +198,16 @@ namespace IQmol {
 			// and are used by the undo commands.
             void addConstraintLayer(Constraint*);
             void removeConstraintLayer(Constraint*);
+
+            void addIsotopes(Isotopes*);
    
             /// Converts the Molecule to an XYZ format and uses OpenBabel to parse this.  
             /// Useful for, e.g., reperceiving bonds.
             QString coordinatesAsString(bool const selectedOnly = false);
             QString coordinatesAsStringFsm();
             QStringList coordinatesForCubeFile();
+
+            QString isotopesAsString();
    
             /// Assigns the atom indices based on the ordering selected by 
             /// the user via the reorderIndex variable in the Atom class.
@@ -409,6 +415,7 @@ namespace IQmol {
             Layer::Container m_fileList;
             Layer::Container m_surfaceList;
             Layer::Container m_constraintList;
+            Layer::Container m_isotopesList;
             Layer::Container m_scanList;
             Layer::Container m_groupList;
    

@@ -309,7 +309,9 @@ void Viewer::fastDraw()
    glEnable(GL_DEPTH_TEST);
    glShadeModel(GL_SMOOTH);
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  
-   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+   glColorMask (GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+   glDepthMask (GL_TRUE);
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
    m_shaderLibrary->resume();
    drawGlobals();

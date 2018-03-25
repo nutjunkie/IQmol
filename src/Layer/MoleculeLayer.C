@@ -47,6 +47,7 @@
 #include "GeometryLayer.h"
 #include "GeometryListLayer.h"
 #include "GroupLayer.h"
+#include "IsotopesLayer.h"
 #include "MoleculeLayer.h"
 #include "OrbitalsLayer.h"
 #include "SurfaceLayer.h"
@@ -105,6 +106,7 @@ Molecule::Molecule(QObject* parent) : Base(DefaultMoleculeName, parent),
    m_fileList(this, "Files"), 
    m_surfaceList(this, "Surfaces"), 
    m_constraintList(this, "Constraints"), 
+   m_isotopesList(this, "Isotopes"), 
    m_scanList(this, "Scan Coordinates"), 
    m_groupList(this, "Groups"), 
    m_efpFragmentList(this),
@@ -818,6 +820,41 @@ QString Molecule::scanCoordinatesAsString()
 
    return s;
 }
+
+
+void Molecule::addIsotopes(Isotopes* isotopes)
+{
+   if (isotopes) {
+      if (isotopes->text().isEmpty()) {
+         QList<Isotopes*> list(m_isotopesList.findLayers<Isotopes>(Children));
+
+         QString label("Loop ");
+         label += QString::number(list.size() +1);
+         isotopes->setText(label);
+      }
+      m_isotopesList.appendLayer(isotopes);
+   }
+}
+
+QString Molecule::isotopesAsString()
+{
+   QList<Isotopes*> list(m_isotopesList.findLayers<Isotopes>(Children));
+
+   unsigned n(list.size());
+   if (n == 0) return QString();
+
+   QString s(QString::number(n));
+   s += "   1\n";  // tp_flag;
+   for (unsigned i = 0; i < n; ++i) {
+       s += list[i]->formatQChem();
+   }
+   
+   qDebug() << "Formatted isotopes string";
+   qDebug() << s;
+
+   return s;
+}
+
 
 
 Constraint* Molecule::findMatchingConstraint(AtomList const& atoms)
@@ -1609,6 +1646,22 @@ double Molecule::radius()
 }
 
 
+double Molecule::onsagerRadius()
+{
+   double radius(0), r(0);
+
+   AtomList atoms(findLayers<Atom>(Children | Visible));
+   AtomList::iterator iter;
+   for (iter = atoms.begin(); iter != atoms.end(); ++iter) {
+       r = (*iter)->getVdwRadius() + (double)(*iter)->getPosition().norm();
+       radius = std::max(radius, r);
+   }
+
+   return radius;
+}
+
+
+
 Atom* Molecule::createAtom(unsigned int const Z, qglviewer::Vec const& position)
 {
    Atom* atom(new Atom(Z));
@@ -1652,6 +1705,8 @@ Process::QChemJobInfo Molecule::qchemJobInfo()
    jobInfo.set(Process::QChemJobInfo::EfpFragments,    efpFragmentsAsString());
    jobInfo.set(Process::QChemJobInfo::EfpParameters,   efpParametersAsString());
    jobInfo.set(Process::QChemJobInfo::ExternalCharges, externalChargesAsString());
+   jobInfo.set(Process::QChemJobInfo::OnsagerRadius,   QString::number(onsagerRadius(),'f',4));
+   jobInfo.set(Process::QChemJobInfo::Isotopes,        isotopesAsString());
 
    AtomList atomList(findLayers<Atom>(Children | Visible));
    if (atomList.isEmpty()) jobInfo.setEfpOnlyJob(true);

@@ -33,9 +33,9 @@ class Job {
 
    public:
       Job();
+
       ~Job();
 
-      Job(std::vector<KeywordSection*> sections);
 
       Job(Job const& that) { copy(that); }
 
@@ -46,8 +46,9 @@ class Job {
       
       QString format(bool const preview);
 
-      void init();
       void addSection(KeywordSection* section);
+      void addSections(std::vector<KeywordSection*> sections);
+
       KeywordSection* addSection(QString const& name, QString const& value);
 
 	  // Pass-through functions.  These rely on the corresponding
@@ -88,6 +89,9 @@ class Job {
       MoleculeSection* m_moleculeSection;
 
       KeyValueSection* m_solventSection;
+      KeyValueSection* m_pcmSection;
+      KeyValueSection* m_smxSection;
+      KeyValueSection* m_chemsolSection;
 
 	  //! This contains a list of all the sections, including the RemSection
 	  //! and MoleculeSection

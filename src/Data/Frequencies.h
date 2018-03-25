@@ -43,6 +43,7 @@ namespace Data {
 
          void haveRaman(bool tf) { m_haveRaman = tf; }
          bool haveRaman() const { return m_haveRaman; }
+         double zpve() const { return m_zpve; }
 
          double maxFrequency() const;
          double maxIntensity() const;

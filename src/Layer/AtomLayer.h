@@ -51,6 +51,11 @@ namespace Layer {
       friend class Constraint;
 
       public:
+
+         static bool indexSort(Atom* A, Atom* B) {
+            return A->getIndex() < B->getIndex();
+         }
+
          enum LabelType { None, Index, Element, Charge, Mass, Spin, Reindex, NmrShift };
          //enum ChargeType { Unknown = -1, Gasteiger, Sanderson, Mulliken };
 
@@ -99,6 +104,7 @@ namespace Layer {
          int getIndex() const { return m_index; }
          int getReorderIndex() const { return m_reorderIndex; }
          double getRadius(bool const selected);
+         double getVdwRadius() { return m_vdwRadius; }
          bool smallHydrogen() const { return (m_atomicNumber == 1 && m_smallerHydrogens); }
          QColor color() const { 
              QColor col;

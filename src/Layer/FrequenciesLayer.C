@@ -117,6 +117,12 @@ void Frequencies::setActiveMode(Mode const& mode)
 }
 
 
+double Frequencies::zpve() const 
+{ 
+   return m_frequencies.zpve(); 
+}
+
+
 void Frequencies::setPlay() 
 { 
    setPlay(m_play); 

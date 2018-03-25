@@ -591,6 +591,10 @@ void MainWindow::createMenus()
       action = menu->addAction(name);
       connect(action, SIGNAL(triggered()), &m_viewerModel, SLOT(reperceiveBonds()));
 
+      name = "Set Isotopes";
+      action = menu->addAction(name);
+      connect(action, SIGNAL(triggered()), &m_viewerModel, SLOT(setIsotopes()));
+
       menu->addSeparator();
 
       name = "Set Geometric Constraint";

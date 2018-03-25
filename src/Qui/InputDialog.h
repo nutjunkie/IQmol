@@ -183,6 +183,7 @@ class InputDialog : public QMainWindow {
       void widgetError(QString const& name);
       void printSection(QString const& name, bool doPrint);
       void printOption(QString const& name, bool doPrint);
+      void printOptionDebug(QString const& name, bool doPrint);
       void updateLJParameters();
       bool saveFile(bool prompt);
 

@@ -143,6 +143,13 @@ void Frequencies::load()
 
    }
 
+   QLabel* label(m_configurator.zpveLabel);
+   double zpve(m_frequencies.zpve());
+   QString txt("ZPVE: ");
+   txt += QString::number(zpve,'f', 3);
+   txt += " kcal/mol";
+   label->setText(txt);
+
    m_rawData = m_rawIrData;
 
    table->setCurrentCell(0, 0, 
