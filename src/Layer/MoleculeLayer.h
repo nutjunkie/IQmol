@@ -200,6 +200,7 @@ namespace IQmol {
             void removeConstraintLayer(Constraint*);
 
             void addIsotopes(Isotopes*);
+            void clearIsotopes();
    
             /// Converts the Molecule to an XYZ format and uses OpenBabel to parse this.  
             /// Useful for, e.g., reperceiving bonds.

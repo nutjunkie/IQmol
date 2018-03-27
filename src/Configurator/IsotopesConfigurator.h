@@ -46,6 +46,7 @@ namespace Configurator {
 
          void loadTable(QList<Layer::Atom*> const& atomicNumbers);
          QString toString() const;
+         QMap<unsigned, double> makeMassList() const;
 
       private:
          Ui::IsotopesConfigurator m_configurator;

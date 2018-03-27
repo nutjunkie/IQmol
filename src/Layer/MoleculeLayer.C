@@ -822,13 +822,23 @@ QString Molecule::scanCoordinatesAsString()
 }
 
 
+void Molecule::clearIsotopes()
+{
+   QList<Isotopes*> list(m_isotopesList.findLayers<Isotopes>(Children));
+   QList<Isotopes*>::iterator iter;
+   for (iter = list.begin(); iter != list.end(); ++iter) {
+       m_isotopesList.removeLayer(*iter);
+   }
+}
+
+
 void Molecule::addIsotopes(Isotopes* isotopes)
 {
    if (isotopes) {
       if (isotopes->text().isEmpty()) {
          QList<Isotopes*> list(m_isotopesList.findLayers<Isotopes>(Children));
 
-         QString label("Loop ");
+         QString label("Substitution ");
          label += QString::number(list.size() +1);
          isotopes->setText(label);
       }
@@ -1144,6 +1154,7 @@ void Molecule::takePrimitive(Primitive* primitive)
    PrimitiveList primitiveList;
    primitiveList.append(primitive);
    takePrimitives(primitiveList);
+   clearIsotopes();
 }
 
 
@@ -1152,6 +1163,7 @@ void Molecule::appendPrimitive(Primitive* primitive)
    PrimitiveList primitiveList;
    primitiveList.append(primitive);
    appendPrimitives(primitiveList);
+   clearIsotopes();
 }
 
 
@@ -1602,8 +1614,8 @@ void Molecule::setMullikenDecompositions(Matrix const& M)
 double Molecule::mullikenDecomposition(int const a, int const b) const
 {
    double md(0.0);
-   if (m_mullikenDecompositions.size1() >= a &&
-       m_mullikenDecompositions.size2() >= b) {
+   if ((int)m_mullikenDecompositions.size1() >= a &&
+       (int)m_mullikenDecompositions.size2() >= b) {
        md = m_mullikenDecompositions(a-1,b-1);
    }
    return md;
@@ -1630,6 +1642,7 @@ void Molecule::reindexAtomsAndBonds()
    for (int i = 0; i < bonds.size(); ++i) {
        bonds[i]->setIndex(i+1);
    }
+   clearIsotopes();
 }
 
 

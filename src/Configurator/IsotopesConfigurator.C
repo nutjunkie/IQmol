@@ -103,12 +103,48 @@ void Isotopes::loadMasses(unsigned Z, QComboBox* combo)
 
    // The isotopes are ordered by abundance
    switch(Z) {
-      case 1:
-         isotopes << 1 << 2 << 3;
-         break;
-      case 6:
-         isotopes << 12 << 13;
-         break;
+      case  1:  isotopes <<   1  <<   2  <<   3          ;break;
+      case  2:  isotopes <<   4  <<   3                  ;break;
+
+      case  3:  isotopes <<   7  <<   6                  ;break;
+      case  4:  isotopes <<   9                          ;break;
+      case  5:  isotopes <<  11  <<  10                  ;break;
+      case  6:  isotopes <<  12  <<  13  <<  14          ;break;
+      case  7:  isotopes <<  14  <<  15                  ;break;
+      case  8:  isotopes <<  16  <<  18  <<  17          ;break;
+      case  9:  isotopes <<  19                          ;break;
+      case 10:  isotopes <<  20  <<  22  <<  21          ;break;
+
+      case 11:  isotopes <<  23  <<  22                  ;break;
+      case 12:  isotopes <<  24  <<  26  <<  25          ;break;
+      case 13:  isotopes <<  27                          ;break;
+      case 14:  isotopes <<  28  <<  29  <<  30          ;break;
+      case 15:  isotopes <<  31                          ;break;
+      case 16:  isotopes <<  32  <<  34  <<  33  <<  36  ;break;
+      case 17:  isotopes <<  32  <<  37  <<  36          ;break;
+      case 18:  isotopes <<  40  <<  38  <<  39          ;break;
+
+      case 19:  isotopes <<  39  <<  41  <<  40                                  ;break;
+      case 20:  isotopes <<  40  <<  44  <<  42  <<  48  <<  43  <<  46  <<  41  ;break;
+
+      case 21:  isotopes <<  45                                                  ;break;
+      case 22:  isotopes <<  48  <<  46  <<  47  <<  49  <<  50                  ;break;
+      case 23:  isotopes <<  51  <<  50                                          ;break;
+      case 24:  isotopes <<  52  <<  53  <<  50  <<  54                          ;break;
+      case 25:  isotopes <<  55  <<  53                                          ;break;
+      case 26:  isotopes <<  56  <<  54  <<  57  <<  58                          ;break;
+      case 27:  isotopes <<  59  <<  60                                          ;break;
+      case 28:  isotopes <<  58  <<  60  <<  62  <<  61  <<  64                  ;break;
+      case 29:  isotopes <<  63  <<  65                                          ;break;
+      case 30:  isotopes <<  64  <<  66  <<  68  <<  67  <<  70                  ;break;
+
+      case 31:  isotopes <<  69  <<  71                                          ;break;
+      case 32:  isotopes <<  74  <<  72  <<  70  <<  73  <<  76                  ;break;
+      case 33:  isotopes <<  75                                                  ;break;
+      case 34:  isotopes <<  80  <<  78  <<  76  <<  82  <<  77  <<  74  <<  79  ;break;
+      case 35:  isotopes <<  79  <<  81                                          ;break;
+      case 36:  isotopes <<  84  <<  86  <<  82  <<  83  <<  80  <<  78  <<  85  ;break;
+
       default:
          break;
    }
@@ -122,6 +158,35 @@ void Isotopes::loadMasses(unsigned Z, QComboBox* combo)
        double m(it.GetExactMass(Z,isotopes[i]));
        combo->addItem(label, m);
    }
+}
+
+
+QMap<unsigned, double> Isotopes::makeMassList() const
+{
+   QMap<unsigned, double> massList;
+   bool ok;
+
+   QTableWidget* table(m_configurator.isotopeTable);
+
+   for (int row = 0; row < table->rowCount(); ++row) {
+       QComboBox* combo(qobject_cast<QComboBox*>(table->cellWidget(row, 1)));
+       if (combo) {
+          QString s(combo->currentText());
+          if (!s.contains("(std)")) { 
+             double mass(combo->currentData().toDouble(&ok));
+             if (ok) {
+                QStringList indices(table->item(row, 2)->text().split(", "));
+                QStringList::iterator index;
+                for (index = indices.begin(); index != indices.end(); ++index) {
+                    unsigned idx(index->toUInt(&ok));
+                    if (ok) massList.insert(idx, mass);
+                }            
+             }
+          }
+       }
+   }
+
+   return massList;
 }
 
 
@@ -148,7 +213,6 @@ QString Isotopes::toString() const
        }
    }
 
-
    double T(m_configurator.temperatureSpinBox->value());
    double P(m_configurator.pressureSpinBox->value());
    QString temperature(QString::number(T, 'f', 2));
@@ -156,6 +220,8 @@ QString Isotopes::toString() const
 
    str = QString::number(count) + "  " + temperature + "  " + pressure + "\n" + str;
    //qDebug() << "Found mass: " << str;
+
+   makeMassList();
 
    return str;
 }
