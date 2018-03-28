@@ -90,7 +90,7 @@
 \vfill
 %\myline\\
 \begin{center}
-{\large v2.10 (2017) Andrew Gilbert}
+{\large v2.11 (2018) Andrew Gilbert}
 \end{center}
 %\myline\\
 
@@ -826,6 +826,29 @@ menu.
 
 The horizontal scale of the spectrum can be zoomed (using the scroll wheel on
 the mouse) and translated (left-click and drag) to give greater detail.
+
+\subsubsection{Isotopic Substitution}
+
+\iqmol{} makes it easy to set up isotopic substitution loops for a \qchem{}
+vibrational frequency calculation.  First select the atoms  you wish to
+substitute in the Viewer and then select the Build \bt\ Set Isotopes menu option.
+A dialog will appear that allows you to change the isotope for the selected atoms.  
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.20]{figures/IsotopeDialog.png}
+\caption{Isotope substitution dialog allowing non-default masses to be
+specified for the selected atoms.  Note that only one non-default mass is
+allowed for each element type.}
+\end{center}
+\end{figure}
+Once the masses have been selected, click OK and an Isotopes item appears in
+the MV containing the substitution information.  This can be edited or checked
+by double-clicking on the appropriate Substitution item in the MV.  Different
+substitutions can be set up by selecting different atoms in the Viewer and/or
+different masses and these will be looped over in the \qchem{} frequency
+calculation.  Each substitution loop only requires a re-weighting of the
+Hessian before diagonalization and so multiple loops can be obtained very
+quickly once the Hessian has been calculated.
 
 
 \subsection{NMR Spectra}
