@@ -22,6 +22,7 @@
 
 #include "IsotopesConfigurator.h"
 #include "IsotopesLayer.h"
+#include "MoleculeLayer.h"
 
 #include <QDebug>
 
@@ -31,6 +32,8 @@ namespace Layer {
 
 Isotopes::Isotopes(AtomList const& atomList) : m_configurator(*this), m_accepted(false)
 {
+   setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+
    m_configurator.loadTable(atomList);
    setConfigurator(&m_configurator);
 }
@@ -38,14 +41,34 @@ Isotopes::Isotopes(AtomList const& atomList) : m_configurator(*this), m_accepted
 
 void Isotopes::configure()
 {
-   m_accepted = (m_configurator.exec() == QDialog::Accepted);
-   m_configurator.toString();   
+   if (m_configurator.exec() == QDialog::Accepted) {
+      m_qchem = m_configurator.toString();
+      m_accepted = true;
+      updateLabels(m_configurator.makeMassList());
+   }
 }
 
 
-QString Isotopes::formatQChem() const
+void Isotopes::updateLabels()
 {
-   return m_accepted ? m_configurator.toString() : QString();
+   updateLabels(m_configurator.makeMassList());
+}
+
+
+void Isotopes::updateLabels(QMap<unsigned, double> const& masses)
+{
+   QList<Molecule*> list(findLayers<Molecule>(Parents));
+   if (list.isEmpty()) return;
+   Molecule* molecule(list.first());
+
+   AtomList atoms(molecule->findLayers<Atom>());
+
+   AtomList::iterator atom;
+   for (atom = atoms.begin(); atom != atoms.end(); ++atom) {
+       (*atom)->resetMass();
+       unsigned index((*atom)->getIndex());
+       if (masses.contains(index)) (*atom)->setMass(masses[index]);
+   }
 }
 
 } } // end namespace IQmol::Layer

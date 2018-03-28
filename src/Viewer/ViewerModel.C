@@ -740,9 +740,11 @@ void ViewerModel::setIsotopes()
    Layer::Molecule* molecule(parents.first());
    Layer::Isotopes* isotopes(new Layer::Isotopes(atoms));
    isotopes->configure();
+
    if (isotopes->accepted()) {
       selectNone();
       molecule->addIsotopes(isotopes);
+      isotopes->updateLabels();
    }else {
       delete isotopes;
    }

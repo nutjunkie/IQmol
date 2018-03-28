@@ -106,6 +106,10 @@ namespace Layer {
          double getRadius(bool const selected);
          double getVdwRadius() { return m_vdwRadius; }
          bool smallHydrogen() const { return (m_atomicNumber == 1 && m_smallerHydrogens); }
+
+         void resetMass();
+         void setMass(double const mass) { m_mass = mass; }
+
          QColor color() const { 
              QColor col;
              col.setRgbF(m_color[0],m_color[1],m_color[2],m_color[3]); 

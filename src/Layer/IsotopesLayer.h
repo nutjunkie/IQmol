@@ -30,8 +30,6 @@
 namespace IQmol {
 namespace Layer {
 
-   /// Base class for Layers representing geometric constraints on Atoms in a
-   /// Molecule.
    class Isotopes : public Base {
 
       Q_OBJECT
@@ -39,10 +37,9 @@ namespace Layer {
       public:
 		 Isotopes(AtomList const& atoms);
 
-         /// Passes the return value from the Configurator dialog 
+         QString const& formatQChem() const { return m_qchem; }
          bool accepted() const { return m_accepted; }
-
-         QString formatQChem() const;
+         void updateLabels();
 
       Q_SIGNALS:
 
@@ -50,7 +47,10 @@ namespace Layer {
          void configure();
 
       private:
+         void updateLabels(QMap<unsigned, double> const& masses);
+
          Configurator::Isotopes m_configurator;
+         QString m_qchem;
          bool m_accepted;
    };
 
