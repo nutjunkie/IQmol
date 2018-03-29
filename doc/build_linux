@@ -21,8 +21,12 @@ qmake IQmol
 make
 
 
+To include cml support in openbabel:
 
-These steps were used to compile under Ubuntu 13.04
+ #> apt-get install libxml2
+ #> mkdir build
+ #> cmake -DBUILD_SHARED=OFF ../
+ #> make
 
 1) Insure the necessary utilities and libraries are installed:
 
