@@ -27,7 +27,7 @@
 #include "ExternalChargesSection.h"
 #include "GeometryConstraint.h"
 #include "KeywordSection.h"
-#include "QCJob.h"
+#include "QuiJob.h"
 #include "Job.h" 
 #include "LJParametersSection.h"
 #include "Option.h"
@@ -36,6 +36,7 @@
 #include "Qui.h"
 #include "QMsgBox.h"
 #include "RemSection.h"
+#include "KeyValueSection.h"
 #include "MoleculeSection.h"
 #include "QsLog.h"
 #include "ParseFile.h"
@@ -169,14 +170,25 @@ void InputDialog::setQChemJobInfo(IQmol::Process::QChemJobInfo const& jobInfo)
    m_currentJob->setExternalCharges(
       m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::ExternalCharges));
 
-   // Solvent sections
-   QString solvent("Dielectric       78.39\n");
-   m_currentJob->setGenericSection("solvent", solvent);
 
-   QString pcm("Theory  CPCM\n"
-               "Method  SWIG\n"
-               "Radii   BONDI\n");
-   m_currentJob->setGenericSection("pcm", pcm);
+   // Solvent section
+
+   // Add an update for the current solvent radius
+   QString s(m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::OnsagerRadius));
+   bool ok(true);
+   double r(s.toDouble(&ok));
+   Action* action = new Action(
+      boost::bind(&QDoubleSpinBox::setValue, m_ui.qui_solvent_cavityradius, r) );
+   m_resetActions.push_back(action);
+
+   QString isotopes(m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::Isotopes));
+   m_currentJob->setGenericSection("isotopes", isotopes);
+   
+
+   // This is a bit of a hack.  We (re)set these variables to ensure they are
+   // printed whenever their enclosing $blocks are printed.
+   m_currentJob->setOption(  "QUI_SOLVENT_CAVITYRADIUS", s);
+   m_currentJob->printOption("QUI_SOLVENT_CAVITYRADIUS", true);
 
    QString svp("RHOISO=0.001, DIELST=78.36, NPTLEB=1202,\n"
                " ITRNGR=2, IROTGR=2, IPNRF=1, IDEFESR=1\n");
@@ -192,11 +204,9 @@ void InputDialog::setQChemJobInfo(IQmol::Process::QChemJobInfo const& jobInfo)
                       "GauLag_N  40\n");
    m_currentJob->setGenericSection("pcm_nonels", pcm_nonels);
 
-   QString smx("water");
-   m_currentJob->setGenericSection("smx", smx);
    
-   QString chemsol("EField   1");
-   m_currentJob->setGenericSection("chemsol", chemsol);
+   //QString chemsol("EField   1");
+   //m_currentJob->setGenericSection("chemsol", chemsol);
 
    if (m_qchemJobInfo.efpOnlyJob()) {
       m_ui.basis->setEnabled(false);
@@ -617,7 +627,6 @@ void InputDialog::capturePreviewTextChanges()
 }
 
 
-
 void InputDialog::on_jobList_currentIndexChanged(int index) 
 {
    if (index < 0 || index >= m_jobs.count()) return;
@@ -835,7 +844,11 @@ void InputDialog::printOption(QString const& name, bool doPrint)
    if (m_currentJob) m_currentJob->printOption(name, doPrint);
 }
 
-
+void InputDialog::printOptionDebug(QString const& name, bool doPrint) 
+{
+   //qDebug() << "printOption" << name << doPrint;
+   if (m_currentJob) m_currentJob->printOption(name, doPrint);
+}
 
 /***********************************************************************
  *   
@@ -898,24 +911,11 @@ void InputDialog::on_ftc_toggled(bool on)
    toggleStack(m_ui.largeMoleculesStack, on, "LargeMoleculesFTC");
 }
 
-void InputDialog::on_qui_solvent_pcm_toggled(bool on) 
-{
-   toggleStack(m_ui.solventStack, on, "SolventPCM");
-}
 
+/*
 void InputDialog::on_qui_solvent_cosmo_toggled(bool on) 
 {
    toggleStack(m_ui.solventStack, on, "SolventCosmo");
-}
-
-void InputDialog::on_qui_solvent_onsager_toggled(bool on) 
-{
-   toggleStack(m_ui.solventStack, on, "SolventOnsager");
-}
-
-void InputDialog::on_qui_solvent_none_toggled(bool on) 
-{
-   toggleStack(m_ui.solventStack, on, "SolventNone");
 }
 
 void InputDialog::on_qui_solvent_chemsol_toggled(bool on) 
@@ -923,14 +923,30 @@ void InputDialog::on_qui_solvent_chemsol_toggled(bool on)
    toggleStack(m_ui.solventStack, on, "SolventChemSol");
 }
 
-void InputDialog::on_qui_solvent_smx_toggled(bool on) 
-{
-   toggleStack(m_ui.solventStack, on, "SolventSMx");
-}
-
 void InputDialog::on_qui_solvent_svp_toggled(bool on) 
 {
    toggleStack(m_ui.solventStack, on, "SolventSVP");
+}
+*/
+
+
+void InputDialog::on_solvent_method_currentTextChanged(QString const& value)
+{
+   toggleStack(m_ui.solventStack, false, "SolventNone");
+   toggleStack(m_ui.solventStack, false, "SolventOnsager");
+   toggleStack(m_ui.solventStack, false, "SolventPCM");
+   toggleStack(m_ui.solventStack, false, "SolventSMx");
+   toggleStack(m_ui.solventStack, false, "SolventChemSol");
+
+   if (value == "None")    toggleStack(m_ui.solventStack, true, "SolventNone");
+   if (value == "Onsager") toggleStack(m_ui.solventStack, true, "SolventOnsager");
+   if (value == "PCM")     toggleStack(m_ui.solventStack, true, "SolventPCM");
+   if (value == "COSMO")   toggleStack(m_ui.solventStack, true, "SolventNone");
+   if (value == "ChemSol") toggleStack(m_ui.solventStack, true, "SolventChemSol");
+
+   if (value == "SM8" || value == "SM12" || value == "SMD") {
+       toggleStack(m_ui.solventStack, true, "SolventSMx");
+   }
 }
 
 
@@ -1110,7 +1126,7 @@ void InputDialog::setControls(Job* job)
           if (iter.key() == "EXCHANGE" && iter.value() != "HF") noHF = true;
           if (iter.key() == "CIS_N_ROOTS" && iter.value() != "0") hasCisRoot = true;
           if (noHF && hasCisRoot && iter.key() == "METHOD") { 
-            qDebug() << "setControls: " << iter.key() << "TD-DFT";
+            //qDebug() << "setControls: " << iter.key() << "TD-DFT";
             m_setUpdates[iter.key()]->operator()("TD-DFT");
           }else
             m_setUpdates[iter.key()]->operator()(iter.value());
@@ -1167,6 +1183,7 @@ void InputDialog::initializeControl(Option const& opt, QComboBox* combo)
        }else if (split.size() == 2) {
           opts[i] = split[0];  
           RemSection::addAdHoc(name, split[0], split[1]);
+          KeyValueSection::addAdHoc(name, split[0], split[1]);
        }else {
           qDebug() << "InputDialog::initialiseComboBox:\n"
                    << " replacement for option" << name << "is invalid:" << opts[i];

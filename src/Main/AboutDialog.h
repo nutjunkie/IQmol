@@ -24,7 +24,6 @@
 
 #include "ui_AboutDialog.h"
 
-
 namespace IQmol {
 
    class AboutDialog : public QDialog {
@@ -32,12 +31,7 @@ namespace IQmol {
       Q_OBJECT
 
       public: 
-         AboutDialog(QWidget* parent) : QDialog(parent) {
-            m_aboutDialog.setupUi(this);
-            m_aboutDialog.versionLabel->setText(IQMOL_VERSION);
-            m_aboutDialog.yearLabel->setText(IQMOL_YEAR);
-            resize(sizeHint());
-         }
+         AboutDialog(QWidget* parent);
 
       private:
          Ui::AboutDialog m_aboutDialog;

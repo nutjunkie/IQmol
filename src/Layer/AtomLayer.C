@@ -144,7 +144,12 @@ void Atom::updateHybridization()
 }
 
 
- 
+void Atom::resetMass()
+{
+   m_mass = OpenBabel::etab.GetMass(m_atomicNumber);
+}
+
+
 void Atom::setAtomicNumber(unsigned int const Z) 
 {
    m_atomicNumber = Z;

@@ -21,6 +21,7 @@
 ********************************************************************************/
 
 #include "ShellList.h"
+#include "QsLog.h"
 #include <QDebug>
 #include <cmath>
 
@@ -100,7 +101,55 @@ void ShellList::resize()
 {
    m_nBasis = nBasis();
    m_shellValues.resize(m_nBasis);
-   m_shellPairValues.resize(m_nBasis*(m_nBasis+1)/2);
+   unsigned size(m_nBasis*(m_nBasis+1)/2);
+   if (2*size != m_nBasis*(m_nBasis+1)) {
+      QLOG_WARN() << "Round error in ShellList::resize()";
+      ++size;
+   }
+   m_shellPairValues.resize(size);
+
+   qDebug() << shellAtomOffsets();
+   qDebug() << basisAtomOffsets();
+}
+
+
+QList<unsigned>ShellList::shellAtomOffsets() const
+{
+   QList<unsigned> offsets;
+   offsets.append(0);
+
+   unsigned k(0);
+   unsigned atomIndex(0);
+
+   ShellList::const_iterator shell;
+   for (shell = begin(); shell != end(); ++shell, ++k) {
+       if ((*shell)->atomIndex() != atomIndex) {
+          offsets.append(k);
+          ++atomIndex;
+       }
+   }
+
+   return offsets;
+}
+
+QList<unsigned>ShellList::basisAtomOffsets() const
+{
+   QList<unsigned> offsets;
+   offsets.append(0);
+
+   unsigned k(0);
+   unsigned atomIndex(0);
+
+   ShellList::const_iterator shell;
+   for (shell = begin(); shell != end(); ++shell) {
+       if ((*shell)->atomIndex() != atomIndex) {
+          offsets.append(k);
+          ++atomIndex;
+       }
+       k += (*shell)->nBasis();
+   }
+
+   return offsets;
 }
 
 

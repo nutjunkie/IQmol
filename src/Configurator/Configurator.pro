@@ -20,10 +20,12 @@ SOURCES = \
    $$PWD/GeminalOrbitalsConfigurator.C \
    $$PWD/GeometryListConfigurator.C \
    $$PWD/InfoConfigurator.C \
+   $$PWD/IsotopesConfigurator.C \
    $$PWD/MoleculeConfigurator.C \
    $$PWD/MolecularSurfacesConfigurator.C \
    $$PWD/NmrConfigurator.C \
    $$PWD/OrbitalsConfigurator.C \
+   $$PWD/MullikenDecompositionsDialog.C \
    $$PWD/SurfaceConfigurator.C \
    $$PWD/SymmetryConfigurator.C
 
@@ -43,10 +45,12 @@ HEADERS = \
    $$PWD/GeminalOrbitalsConfigurator.h \
    $$PWD/GeometryListConfigurator.h \
    $$PWD/InfoConfigurator.h \
+   $$PWD/IsotopesConfigurator.h \
    $$PWD/MoleculeConfigurator.h \
    $$PWD/MolecularSurfacesConfigurator.h \
    $$PWD/NmrConfigurator.h \
    $$PWD/OrbitalsConfigurator.h \
+   $$PWD/MullikenDecompositionsDialog.h \
    $$PWD/SurfaceConfigurator.h \
    $$PWD/SymmetryConfigurator.h
 
@@ -64,10 +68,12 @@ FORMS = \
    $$PWD/GeminalOrbitalsConfigurator.ui \
    $$PWD/GeometryListConfigurator.ui \
    $$PWD/InfoConfigurator.ui \
+   $$PWD/IsotopesConfigurator.ui \
    $$PWD/MoleculeConfigurator.ui \
    $$PWD/MolecularSurfacesConfigurator.ui \
    $$PWD/NmrConfigurator.ui \
    $$PWD/OrbitalsConfigurator.ui \
+   $$PWD/MullikenDecompositionsDialog.ui \
    $$PWD/ScalarConstraintConfigurator.ui \
    $$PWD/SurfaceConfigurator.ui \
    $$PWD/VectorConstraintConfigurator.ui \

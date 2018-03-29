@@ -50,7 +50,9 @@ QString SurfaceType::toString() const
       case CustomDensity:          label = "Custom Density";          break;
       case BasisFunction:          label = "Basis Function";          break;
       case DysonLeft:              label = "Dyson (left)";            break;
-      case DysonRight:             label = "Dyson (right)";            break;
+      case DysonRight:             label = "Dyson (right)";           break;
+      case MullikenAtomic:         label = "Mulliken Atomic";         break;
+      case MullikenDiatomic:       label = "Mulliken Diatomic";       break;
    }
 
    if (isIndexed()) label += " " + QString::number(m_index);
@@ -92,9 +94,10 @@ bool SurfaceType::isBasis() const
 
 bool SurfaceType::isDensity() const
 {
-   return (m_kind == AlphaDensity) || (m_kind == BetaDensity) ||
-          (m_kind == TotalDensity) || (m_kind == SpinDensity) ||
-          (m_kind == DensityCombo) || (m_kind == Correlation);
+   return (m_kind == AlphaDensity)   || (m_kind == BetaDensity)      ||
+          (m_kind == TotalDensity)   || (m_kind == SpinDensity)      ||
+          (m_kind == MullikenAtomic) || (m_kind == MullikenDiatomic) ||
+          (m_kind == DensityCombo)   || (m_kind == Correlation);
 }
 
 
@@ -109,10 +112,11 @@ bool SurfaceType::isRegularDensity() const
 
 bool SurfaceType::isSigned() const
 {
-   return (m_kind == AlphaOrbital) || (m_kind == BetaOrbital)  ||
-          (m_kind == DysonLeft)    || (m_kind == DysonRight)   ||
-          (m_kind == SpinDensity)  || (m_kind == DensityCombo) ||
-          (m_kind == Geminal)      || (m_kind == Correlation)  ||
+   return (m_kind == AlphaOrbital)   || (m_kind == BetaOrbital)      ||
+          (m_kind == DysonLeft)      || (m_kind == DysonRight)       ||
+          (m_kind == SpinDensity)    || (m_kind == DensityCombo)     ||
+          (m_kind == MullikenAtomic) || (m_kind == MullikenDiatomic) ||
+          (m_kind == Geminal)        || (m_kind == Correlation)      ||
           (m_kind == BasisFunction);
 }
 

@@ -64,12 +64,15 @@ namespace Configurator {
          void on_cancelButton_clicked(bool);
          void on_positiveColorButton_clicked(bool);
          void on_negativeColorButton_clicked(bool);
+         void on_mullikenDecompositionsButton_clicked(bool);
          void plotSelectionChanged(bool tf);
          void clearSelectedOrbitals(int);
+         void setMullikenDecompositions(Matrix const&);
 
       private:
          void enableOrbitalSelection(bool);
          void enableNegativeColor(bool);
+         void enableMullikenDecompositions(bool);
          void updateOrbitalRange(bool alpha);
          void updateBasisRange();
          void setPositiveColor(QColor const& color);

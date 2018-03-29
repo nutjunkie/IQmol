@@ -30,7 +30,7 @@ class PcmSection : public KeywordSection {
       QString previewFormat() const;
 
    protected:
-      QString dump();
+      QString dump() const;
 
    private:
       QString m_data;

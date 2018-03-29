@@ -95,6 +95,32 @@ void CanonicalOrbitals::computeDensityVectors()
 
    Data::SurfaceType spin(Data::SurfaceType::SpinDensity);
    m_availableDensities.append(new Data::Density(spin, Pa-Pb, "Spin Density"));
+
+   // Mulliken densities
+   Data::ShellList const&  shells(m_canonicalOrbitals.shellList());
+   QList<unsigned> offsets(shells.basisAtomOffsets());
+   unsigned nAtoms(offsets.size());
+
+   offsets.append(N);
+   Matrix Mull(Pa+Pb);
+
+   for (unsigned atom = 0; atom < nAtoms; ++atom) {
+       unsigned begin(offsets[atom]);
+       unsigned end(offsets[atom+1]);
+       for (unsigned i = begin; i < end; ++i) {
+           for (unsigned j = begin; j < end; ++j) {
+               Mull(i,j) = 0;
+           }
+       }
+   }
+
+   Data::SurfaceType mulliken2(Data::SurfaceType::MullikenDiatomic);
+   m_availableDensities.append(new Data::Density(mulliken2, Mull, "Mulliken Diatomic Density"));
+
+   Mull = Pa + Pb - Mull;
+
+   Data::SurfaceType mulliken(Data::SurfaceType::MullikenAtomic);
+   m_availableDensities.append(new Data::Density(mulliken, Mull, "Mulliken Atomic Density"));
 }
 
 

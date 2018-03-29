@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>883</width>
-    <height>645</height>
+    <width>951</width>
+    <height>690</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -446,8 +446,8 @@ QToolButton:checked {
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>484</width>
-             <height>577</height>
+             <width>523</width>
+             <height>516</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -467,8 +467,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>460</width>
-                 <height>77</height>
+                 <width>499</width>
+                 <height>60</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -522,7 +522,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>136</width>
+                 <width>499</width>
                  <height>60</height>
                 </rect>
                </property>
@@ -570,7 +570,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>159</width>
+                 <width>499</width>
                  <height>60</height>
                 </rect>
                </property>
@@ -629,7 +629,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>167</width>
+                 <width>499</width>
                  <height>60</height>
                 </rect>
                </property>
@@ -684,8 +684,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>100</width>
-                 <height>30</height>
+                 <width>499</width>
+                 <height>23</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -775,7 +775,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>460</width>
+                 <width>499</width>
                  <height>166</height>
                 </rect>
                </property>
@@ -917,7 +917,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>384</width>
+                 <width>499</width>
                  <height>162</height>
                 </rect>
                </property>
@@ -1088,7 +1088,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>381</width>
+                 <width>499</width>
                  <height>211</height>
                 </rect>
                </property>
@@ -1230,7 +1230,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>448</width>
+                 <width>499</width>
                  <height>163</height>
                 </rect>
                </property>
@@ -1360,7 +1360,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>330</width>
+                 <width>499</width>
                  <height>64</height>
                 </rect>
                </property>
@@ -1425,7 +1425,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>416</width>
+                 <width>499</width>
                  <height>146</height>
                 </rect>
                </property>
@@ -1524,7 +1524,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>195</width>
+                 <width>499</width>
                  <height>83</height>
                 </rect>
                </property>
@@ -1586,7 +1586,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>397</width>
+                 <width>499</width>
                  <height>155</height>
                 </rect>
                </property>
@@ -1732,7 +1732,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>415</width>
+                 <width>499</width>
                  <height>105</height>
                 </rect>
                </property>
@@ -2013,7 +2013,7 @@ QToolButton:checked {
           </item>
           <item>
            <property name="text">
-            <string>Solvent Models</string>
+            <string>Solvent Model</string>
            </property>
           </item>
           <item>
@@ -2049,7 +2049,7 @@ QToolButton:checked {
            <enum>QFrame::Sunken</enum>
           </property>
           <property name="currentIndex">
-           <number>31</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="AdvancedSCFControl">
            <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -5390,7 +5390,7 @@ widgets.</string>
               <item row="1" column="1">
                <layout class="QHBoxLayout">
                 <item>
-                 <widget class="QSpinBox" name="cpscf_nseg_2">
+                 <widget class="QSpinBox" name="cpscf_nseg">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -5581,605 +5581,451 @@ widgets.</string>
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="AdvancedSolventModels">
+          <widget class="QWidget" name="AdvancedSolventModel">
            <layout class="QVBoxLayout" name="verticalLayout_51">
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_10">
-              <item>
+             <layout class="QGridLayout" name="gridLayout_5">
+              <item row="0" column="0">
                <widget class="QLabel" name="label_64">
                 <property name="text">
                  <string>Solvent Method</string>
                 </property>
                </widget>
               </item>
-              <item>
+              <item row="0" column="1">
                <widget class="QComboBox" name="solvent_method"/>
               </item>
              </layout>
             </item>
             <item>
-             <widget class="QStackedWidget" name="solventStack">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
+             <widget class="QGroupBox" name="solventGroupBox">
+              <property name="title">
+               <string>Solvent</string>
               </property>
-              <property name="currentIndex">
-               <number>2</number>
+              <layout class="QGridLayout" name="gridLayout_23">
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_b160_3">
+                 <property name="text">
+                  <string>Dielectric</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="label_a160">
+                 <property name="text">
+                  <string>Cavity Radius</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QDoubleSpinBox" name="qui_solvent_cavityradius">
+                 <property name="decimals">
+                  <number>4</number>
+                 </property>
+                 <property name="maximum">
+                  <double>99.999899999999997</double>
+                 </property>
+                 <property name="singleStep">
+                  <double>0.000100000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QDoubleSpinBox" name="qui_solvent_opticaldielectric">
+                 <property name="decimals">
+                  <number>4</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QDoubleSpinBox" name="qui_solvent_dielectric">
+                 <property name="decimals">
+                  <number>4</number>
+                 </property>
+                 <property name="maximum">
+                  <double>99.999899999999997</double>
+                 </property>
+                 <property name="singleStep">
+                  <double>0.000100000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_97">
+                 <property name="text">
+                  <string>Optical Dielectric</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_4">
+              <property name="title">
+               <string>Options</string>
               </property>
-              <widget class="QWidget" name="SolventOnsager">
-               <layout class="QVBoxLayout">
-                <item>
-                 <layout class="QGridLayout">
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="label_a160">
-                    <property name="text">
-                     <string>Cavity Radius</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="0">
-                   <widget class="QLabel" name="label_b160">
-                    <property name="text">
-                     <string>Solvent Dielectric</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="QDoubleSpinBox" name="qui_solvent_dielectric_onsager">
-                    <property name="decimals">
-                     <number>4</number>
-                    </property>
-                    <property name="maximum">
-                     <double>99.999899999999997</double>
-                    </property>
-                    <property name="singleStep">
-                     <double>0.000100000000000</double>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="1">
-                   <widget class="QDoubleSpinBox" name="solute_radius">
-                    <property name="decimals">
-                     <number>4</number>
-                    </property>
-                    <property name="maximum">
-                     <double>99.999899999999997</double>
-                    </property>
-                    <property name="singleStep">
-                     <double>0.000100000000000</double>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="2">
-                   <spacer>
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item row="2" column="0">
-                   <widget class="QLabel" name="label_37">
-                    <property name="text">
-                     <string>Multipole Order</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="1">
-                   <layout class="QHBoxLayout" name="horizontalLayout_11">
-                    <item>
-                     <spacer name="horizontalSpacer_2">
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>40</width>
-                        <height>20</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                    <item>
-                     <widget class="QSpinBox" name="sol_order"/>
-                    </item>
-                   </layout>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <spacer>
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>231</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="SolventNone"/>
-              <widget class="QWidget" name="SolventHidden">
-               <layout class="QVBoxLayout" name="verticalLayout_27">
-                <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_16">
-                  <item>
-                   <widget class="QLabel" name="label_b160_3">
-                    <property name="text">
-                     <string>Dielectric</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QDoubleSpinBox" name="solvent_dielectric">
-                    <property name="decimals">
-                     <number>4</number>
-                    </property>
-                    <property name="maximum">
-                     <double>99.999899999999997</double>
-                    </property>
-                    <property name="singleStep">
-                     <double>0.000100000000000</double>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer_14">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <widget class="QGroupBox" name="groupBox_7">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="title">
-                   <string>Solvent Model</string>
-                  </property>
+              <layout class="QVBoxLayout" name="verticalLayout_23">
+               <item>
+                <widget class="QStackedWidget" name="solventStack">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="currentIndex">
+                  <number>2</number>
+                 </property>
+                 <widget class="QWidget" name="SolventNone"/>
+                 <widget class="QWidget" name="SolventOnsager">
+                  <layout class="QVBoxLayout" name="verticalLayout_27">
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_10">
+                     <item>
+                      <widget class="QLabel" name="label_37">
+                       <property name="text">
+                        <string>Multipole Order</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QSpinBox" name="qui_solvent_multipoleorder"/>
+                     </item>
+                     <item>
+                      <spacer name="horizontalSpacer_2">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <spacer>
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>231</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QWidget" name="SolventPCM">
                   <layout class="QVBoxLayout" name="verticalLayout_22">
                    <item>
-                    <layout class="QGridLayout" name="gridLayout_5">
+                    <layout class="QGridLayout" name="gridLayout_20">
+                     <item row="3" column="1">
+                      <layout class="QHBoxLayout" name="horizontalLayout_13">
+                       <item>
+                        <widget class="QSpinBox" name="qui_pcm_printlevel"/>
+                       </item>
+                       <item>
+                        <spacer name="horizontalSpacer_12">
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="sizeHint" stdset="0">
+                          <size>
+                           <width>40</width>
+                           <height>20</height>
+                          </size>
+                         </property>
+                        </spacer>
+                       </item>
+                      </layout>
+                     </item>
+                     <item row="3" column="0">
+                      <widget class="QLabel" name="label_75">
+                       <property name="text">
+                        <string>Print Level</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="1">
+                      <widget class="QComboBox" name="qui_pcm_theory"/>
+                     </item>
                      <item row="0" column="0">
-                      <widget class="QRadioButton" name="qui_solvent_none">
+                      <widget class="QLabel" name="label_80">
                        <property name="text">
-                        <string>None</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="2" column="1">
-                      <widget class="QRadioButton" name="qui_solvent_svp">
-                       <property name="text">
-                        <string>SVP</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="1" column="1">
-                      <widget class="QRadioButton" name="qui_solvent_cosmo">
-                       <property name="text">
-                        <string>COSMO</string>
+                        <string>Model</string>
                        </property>
                       </widget>
                      </item>
                      <item row="1" column="0">
-                      <widget class="QRadioButton" name="qui_solvent_onsager">
+                      <widget class="QLabel" name="label_81">
                        <property name="text">
-                        <string>Onsager</string>
+                        <string>Boundary</string>
                        </property>
                       </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QComboBox" name="qui_pcm_method"/>
                      </item>
                      <item row="2" column="0">
-                      <widget class="QRadioButton" name="qui_solvent_pcm">
+                      <widget class="QLabel" name="label_96">
                        <property name="text">
-                        <string>PCM</string>
+                        <string>Radii</string>
                        </property>
                       </widget>
                      </item>
-                     <item row="6" column="0">
-                      <widget class="QRadioButton" name="qui_solvent_smx">
+                     <item row="2" column="1">
+                      <widget class="QComboBox" name="qui_pcm_radii"/>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <spacer name="verticalSpacer_9">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>354</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QWidget" name="SolventSVP">
+                  <layout class="QVBoxLayout">
+                   <item>
+                    <layout class="QGridLayout" name="gridLayout_6">
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="label_f161">
                        <property name="text">
-                        <string>SMx</string>
+                        <string>Memory</string>
                        </property>
                       </widget>
                      </item>
-                     <item row="6" column="1">
-                      <widget class="QRadioButton" name="qui_solvent_chemsol">
+                     <item row="0" column="1">
+                      <widget class="QSpinBox" name="qui_svp_memory"/>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="label_d161">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
                        <property name="text">
-                        <string>ChemSol</string>
+                        <string>Cavity Convergence</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QSpinBox" name="qui_svp_cavity_conv"/>
+                     </item>
+                     <item row="2" column="0">
+                      <widget class="QLabel" name="label_e161">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="text">
+                        <string>Charge Convergence</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="1">
+                      <widget class="QSpinBox" name="qui_svp_charge_conv"/>
+                     </item>
+                     <item row="3" column="0" colspan="2">
+                      <layout class="QHBoxLayout" name="horizontalLayout_12">
+                       <item>
+                        <widget class="QLabel" name="label_c161">
+                         <property name="text">
+                          <string>Guess</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <spacer name="spacer_2">
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="sizeHint" stdset="0">
+                          <size>
+                           <width>85</width>
+                           <height>17</height>
+                          </size>
+                         </property>
+                        </spacer>
+                       </item>
+                       <item>
+                        <widget class="QComboBox" name="qui_svp_guess"/>
+                       </item>
+                      </layout>
+                     </item>
+                     <item row="4" column="0">
+                      <widget class="QCheckBox" name="qui_svp_path">
+                       <property name="text">
+                        <string>Run gas phase</string>
                        </property>
                       </widget>
                      </item>
                     </layout>
                    </item>
+                   <item>
+                    <spacer>
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
                   </layout>
                  </widget>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_13">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>318</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="SolventSVP">
-               <layout class="QVBoxLayout">
-                <item>
-                 <layout class="QGridLayout" name="gridLayout_6">
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="label_f161">
-                    <property name="text">
-                     <string>Memory</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="1">
-                   <widget class="QSpinBox" name="svp_memory"/>
-                  </item>
-                  <item row="1" column="0">
-                   <widget class="QLabel" name="label_d161">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="text">
-                     <string>Cavity Convergence</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="QSpinBox" name="svp_cavity_conv"/>
-                  </item>
-                  <item row="2" column="0">
-                   <widget class="QLabel" name="label_e161">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="text">
-                     <string>Charge Convergence</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="1">
-                   <widget class="QSpinBox" name="svp_charge_conv"/>
-                  </item>
-                  <item row="3" column="0" colspan="2">
-                   <layout class="QHBoxLayout" name="horizontalLayout_12">
-                    <item>
-                     <widget class="QLabel" name="label_c161">
-                      <property name="text">
-                       <string>Guess</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <spacer name="spacer_2">
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>85</width>
-                        <height>17</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                    <item>
-                     <widget class="QComboBox" name="svp_guess"/>
-                    </item>
-                   </layout>
-                  </item>
-                  <item row="4" column="0">
-                   <widget class="QCheckBox" name="svp_path">
-                    <property name="text">
-                     <string>Run gas phase</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <spacer>
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>40</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="SolventCosmo">
-               <layout class="QVBoxLayout" name="verticalLayout_28">
-                <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_15">
-                  <item>
-                   <widget class="QLabel" name="label_b160_2">
-                    <property name="text">
-                     <string>Dielectric</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QDoubleSpinBox" name="qui_solvent_dielectric_cosmo">
-                    <property name="decimals">
-                     <number>4</number>
-                    </property>
-                    <property name="maximum">
-                     <double>99.999899999999997</double>
-                    </property>
-                    <property name="singleStep">
-                     <double>0.000100000000000</double>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer_13">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_14">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>354</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="SolventPCM">
-               <layout class="QVBoxLayout" name="verticalLayout_23">
-                <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_13">
-                  <item>
-                   <widget class="QLabel" name="label_75">
-                    <property name="text">
-                     <string>Print Level</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QSpinBox" name="pcm_print"/>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer_12">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_9">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>354</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="SolventChemSol">
-               <layout class="QVBoxLayout">
-                <item>
-                 <layout class="QHBoxLayout">
-                  <item>
-                   <widget class="QLabel" name="label_162a">
-                    <property name="text">
-                     <string>Number of Grids</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QSpinBox" name="chemsol_nn"/>
-                  </item>
-                  <item>
-                   <spacer>
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <layout class="QGridLayout">
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="label_162b">
-                    <property name="text">
-                     <string>Electric Field</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="1">
-                   <widget class="QComboBox" name="chemsol_efield"/>
-                  </item>
-                  <item row="1" column="0">
-                   <widget class="QLabel" name="label_162c">
-                    <property name="text">
-                     <string>Atomic Radii</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="QComboBox" name="chemsol_read_vdw"/>
-                  </item>
-                  <item row="0" column="2">
-                   <spacer>
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <layout class="QHBoxLayout">
-                  <item>
-                   <widget class="QCheckBox" name="chemsol_print">
-                    <property name="text">
-                     <string>Increase Printout</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer>
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <spacer>
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>163</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="SolventSMx">
-               <layout class="QVBoxLayout">
-                <item>
-                 <layout class="QGridLayout" name="gridLayout_18" rowstretch="0" columnstretch="0,0">
-                  <property name="horizontalSpacing">
-                   <number>6</number>
-                  </property>
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="label_54">
-                    <property name="text">
-                     <string>SMx Model</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="1">
-                   <widget class="QComboBox" name="qui_solvent_smx_model"/>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <layout class="QHBoxLayout">
-                  <item>
-                   <widget class="QLabel" name="label_65">
-                    <property name="text">
-                     <string>Solvent</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QComboBox" name="smx_solvent"/>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <spacer>
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>40</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </widget>
+                 <widget class="QWidget" name="SolventCosmo">
+                  <layout class="QVBoxLayout" name="verticalLayout_28"/>
+                 </widget>
+                 <widget class="QWidget" name="SolventChemSol">
+                  <layout class="QVBoxLayout" name="verticalLayout_53">
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_11">
+                     <item>
+                      <widget class="QLabel" name="label_162b">
+                       <property name="text">
+                        <string>Electric Field</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QComboBox" name="qui_chemsol_efield"/>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <layout class="QHBoxLayout">
+                     <item>
+                      <widget class="QLabel" name="label_162a">
+                       <property name="text">
+                        <string>Number of Grids</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <spacer>
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                     <item>
+                      <widget class="QSpinBox" name="qui_chemsol_ngrids"/>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <layout class="QHBoxLayout">
+                     <item>
+                      <widget class="QCheckBox" name="qui_chemsol_print">
+                       <property name="text">
+                        <string>Increase Printout</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <spacer>
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <spacer>
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>163</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QWidget" name="SolventSMx">
+                  <layout class="QVBoxLayout" name="verticalLayout_52">
+                   <item>
+                    <layout class="QGridLayout" name="gridLayout_18">
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="label_65">
+                       <property name="text">
+                        <string>Solvent</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="1">
+                      <widget class="QComboBox" name="qui_smx_solvent"/>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="label_54">
+                       <property name="text">
+                        <string>Charges</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QComboBox" name="qui_smx_charges"/>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <spacer>
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </widget>
+                </widget>
+               </item>
+              </layout>
              </widget>
             </item>
            </layout>
@@ -6760,7 +6606,7 @@ Eventually this should go.</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>883</width>
+     <width>951</width>
      <height>22</height>
     </rect>
    </property>
@@ -6867,7 +6713,6 @@ Eventually this should go.</string>
   <tabstop>geom_opt_print</tabstop>
   <tabstop>geom_opt_scf_guess_always</tabstop>
   <tabstop>geom_print</tabstop>
-  <tabstop>cpscf_nseg_2</tabstop>
   <tabstop>vibman_print</tabstop>
   <tabstop>analytic_derivative_order</tabstop>
   <tabstop>fd_step_size</tabstop>
@@ -6891,12 +6736,8 @@ Eventually this should go.</string>
   <tabstop>ao2mo_disk</tabstop>
   <tabstop>integrals_buffer</tabstop>
   <tabstop>mem_total</tabstop>
-  <tabstop>qui_solvent_dielectric_onsager</tabstop>
-  <tabstop>solute_radius</tabstop>
-  <tabstop>chemsol_nn</tabstop>
-  <tabstop>chemsol_efield</tabstop>
-  <tabstop>chemsol_read_vdw</tabstop>
-  <tabstop>chemsol_print</tabstop>
+  <tabstop>qui_chemsol_ngrids</tabstop>
+  <tabstop>qui_chemsol_print</tabstop>
   <tabstop>qui_svp_nptleb</tabstop>
   <tabstop>qui_svp_intcav</tabstop>
   <tabstop>qui_svp_nptthe</tabstop>
@@ -6926,16 +6767,12 @@ Eventually this should go.</string>
   <tabstop>xopt_state_1</tabstop>
   <tabstop>xopt_state_2</tabstop>
   <tabstop>xopt_seam_only</tabstop>
-  <tabstop>qui_solvent_none</tabstop>
-  <tabstop>sol_order</tabstop>
-  <tabstop>solvent_dielectric</tabstop>
-  <tabstop>svp_memory</tabstop>
-  <tabstop>svp_cavity_conv</tabstop>
-  <tabstop>svp_charge_conv</tabstop>
-  <tabstop>svp_guess</tabstop>
-  <tabstop>svp_path</tabstop>
-  <tabstop>qui_solvent_dielectric_cosmo</tabstop>
-  <tabstop>pcm_print</tabstop>
+  <tabstop>qui_svp_memory</tabstop>
+  <tabstop>qui_svp_cavity_conv</tabstop>
+  <tabstop>qui_svp_charge_conv</tabstop>
+  <tabstop>qui_svp_guess</tabstop>
+  <tabstop>qui_svp_path</tabstop>
+  <tabstop>qui_pcm_printlevel</tabstop>
  </tabstops>
  <resources>
   <include location="../Main/IQmol.qrc"/>

@@ -22,7 +22,9 @@
 
 #include "OrbitalsConfigurator.h"
 #include "CanonicalOrbitalsLayer.h"
+#include "MullikenDecompositionsDialog.h"
 #include "Preferences.h"
+#include "MoleculeLayer.h"
 #include "CustomPlot.h"
 #include "QsLog.h"
 #include <QColorDialog>
@@ -121,7 +123,10 @@ void Orbitals::init()
         m_configurator.surfaceType->addItem((*density)->label(),  
             Data::SurfaceType::CustomDensity);
    }
-//   }
+
+   if (!m_orbitals.hasMullikenDecompositions()) {
+      m_configurator.mullikenDecompositionsButton->hide();
+   }
 }
 
 
@@ -336,6 +341,7 @@ void Orbitals::on_surfaceType_currentIndexChanged(int index)
       case Data::SurfaceType::BasisFunction:
          enableOrbitalSelection(true);
          enableNegativeColor(true);
+         enableMullikenDecompositions(false);
          updateBasisRange();
          break;
 
@@ -343,6 +349,7 @@ void Orbitals::on_surfaceType_currentIndexChanged(int index)
       case Data::SurfaceType::DysonLeft:
          enableOrbitalSelection(true);
          enableNegativeColor(true);
+         enableMullikenDecompositions(false);
          updateOrbitalRange(true);
          break;
 
@@ -350,32 +357,38 @@ void Orbitals::on_surfaceType_currentIndexChanged(int index)
       case Data::SurfaceType::DysonRight:
          enableOrbitalSelection(true);
          enableNegativeColor(true);
+         enableMullikenDecompositions(false);
          updateOrbitalRange(false);
          break;
 
       case Data::SurfaceType::TotalDensity:
          enableOrbitalSelection(false);
          enableNegativeColor(false);
+         enableMullikenDecompositions(true);
          break;
 
       case Data::SurfaceType::SpinDensity:
          enableOrbitalSelection(false);
          enableNegativeColor(true);
+         enableMullikenDecompositions(true);
          break;
 
       case Data::SurfaceType::AlphaDensity:
          enableOrbitalSelection(false);
          enableNegativeColor(false);
+         enableMullikenDecompositions(true);
          break;
 
       case Data::SurfaceType::BetaDensity:
          enableOrbitalSelection(false);
          enableNegativeColor(false);
+         enableMullikenDecompositions(true);
          break;
 
       case Data::SurfaceType::CustomDensity:
          enableOrbitalSelection(false);
          enableNegativeColor(false);
+         enableMullikenDecompositions(true);
          break;
 
       default:
@@ -416,6 +429,46 @@ void Orbitals::setNegativeColor(QColor const& color)
       m_configurator.negativeColorButton->setStyleSheet(bg);
       Preferences::NegativeSurfaceColor(color);
    }
+}
+
+
+void Orbitals::on_mullikenDecompositionsButton_clicked(bool)
+{
+   // A little dodge, we use the label to match the density
+   QString label(m_configurator.surfaceType->currentText());
+
+   Data::DensityList& densities(m_orbitals.m_availableDensities);
+   Data::DensityList::iterator density;
+   for (density = densities.begin(); density != densities.end(); ++density) {
+       if ((*density)->label() == label) break;
+   }
+
+   if (density == densities.end()) {
+      QLOG_WARN() << "Failed to find density" << label;
+   }else {
+      MullikenDecompositionsDialog* dialog(
+         new MullikenDecompositionsDialog(m_orbitals.m_orbitals.shellList(), **density, this));
+
+      connect(dialog, SIGNAL(mullikenDecompositionsAvailable(Matrix const&)),
+              this,   SLOT(setMullikenDecompositions(Matrix const&)));
+
+      dialog->compute();
+      dialog->show();
+      dialog->raise();
+   }
+
+}
+
+
+void Orbitals::setMullikenDecompositions(Matrix const& M)
+{
+   MoleculeList parents(m_orbitals.findLayers<Layer::Molecule>(Layer::Parents));
+   if (parents.isEmpty()) {
+      QLOG_WARN() << "No parent molecule found for Mulliken decompositions";
+      return;
+   }
+
+   parents.first()->setMullikenDecompositions(M);
 }
 
 
@@ -547,6 +600,15 @@ void Orbitals::enableOrbitalSelection(bool tf)
 {
    m_configurator.orbitalRangeMin->setEnabled(tf);
    m_configurator.orbitalRangeMax->setEnabled(tf);
+}
+
+
+void Orbitals::enableMullikenDecompositions(bool tf)
+{
+   if (m_orbitals.hasMullikenDecompositions()) {
+      m_configurator.mullikenDecompositionsButton->setEnabled(tf);
+   }
+   
 }
 
 

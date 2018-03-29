@@ -360,5 +360,4 @@ void Molecule::deleteAtomAndConstraints(OBAtom* a) {
 }
 
 
-
 } // end namespace Qui

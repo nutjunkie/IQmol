@@ -122,7 +122,8 @@ void RemSection::read(QString const& input) {
 
 
 
-QString RemSection::dump()  {
+QString RemSection::dump() const
+{
    QString s("$rem\n");
    QMap<QString,QString>::const_iterator iter;
    QString name, value;
@@ -141,7 +142,8 @@ QString RemSection::dump()  {
 
 
 
-RemSection* RemSection::clone() const {
+RemSection* RemSection::clone() const 
+{
    RemSection* rs = new RemSection();
    rs->setOptions(m_options);
    rs->setPrint(m_toPrint);
@@ -184,7 +186,8 @@ void RemSection::printOption(QString const& option, bool print) {
 
 
 
-bool RemSection::fixOptionForQui(QString& name, QString& value) {
+bool RemSection::fixOptionForQui(QString& name, QString& value) const
+{
    //qDebug() << "Fixing option for QUI" << name << "=" << value;
    Option opt;
    OptionDatabase& db = OptionDatabase::instance();
@@ -248,7 +251,8 @@ bool RemSection::fixOptionForQui(QString& name, QString& value) {
 }
 
 
-bool RemSection::fixOptionForQChem(QString& name, QString& value) {
+bool RemSection::fixOptionForQChem(QString& name, QString& value) const
+{
    //qDebug() << "Fixing option for QChem" << name << "=" << value;
    bool shouldPrint(true);
    Option opt;
@@ -321,7 +325,6 @@ bool RemSection::fixOptionForQChem(QString& name, QString& value) {
       } 
    }
 
-  
    if (name == "QUI_XOPT1" && value.toInt() > 0) {
       name = "XOPT_STATE_1";
       shouldPrint = true;
@@ -329,11 +332,16 @@ bool RemSection::fixOptionForQChem(QString& name, QString& value) {
       // This is crappy
       key = "QUI_XOPT_SPIN1::";      
       key += m_options["QUI_XOPT_SPIN1"];
-      if (m_adHoc.count(key)) m_options["QUI_XOPT_SPIN1"] = m_adHoc[key];
+      value = "[";
 
-      value = "[" + m_options["QUI_XOPT_SPIN1"]  + ", "
-                  + m_options["QUI_XOPT_IRREP1"] + ", "
-                  + m_options["QUI_XOPT_STATE1"] + "]";
+      if (m_adHoc.count(key)) {
+         value += m_adHoc[key];
+      }else {
+         value += m_options["QUI_XOPT_SPIN1"];
+      }
+
+      value += ", " + m_options["QUI_XOPT_IRREP1"] + ", "
+                    + m_options["QUI_XOPT_STATE1"] + "]";
 
    }
 
@@ -343,11 +351,16 @@ bool RemSection::fixOptionForQChem(QString& name, QString& value) {
 
       key = "QUI_XOPT_SPIN2::";      
       key += m_options["QUI_XOPT_SPIN2"];
-      if (m_adHoc.count(key)) m_options["QUI_XOPT_SPIN2"] = m_adHoc[key];
+      value = "[";
 
-      value = "[" + m_options["QUI_XOPT_SPIN2"]  + ", "
-                  + m_options["QUI_XOPT_IRREP2"] + ", "
-                  + m_options["QUI_XOPT_STATE2"] + "]";
+      if (m_adHoc.count(key)) {
+         value += m_adHoc[key];
+      }else {
+         value += m_options["QUI_XOPT_SPIN2"];
+      }
+
+      value += ", " + m_options["QUI_XOPT_IRREP2"] + ", "
+                    + m_options["QUI_XOPT_STATE2"] + "]";
    }
  
 

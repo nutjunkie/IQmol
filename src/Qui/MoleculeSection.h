@@ -34,7 +34,7 @@ class MoleculeSection : public KeywordSection {
       void setMultiplicity(int multiplicity);
       void setCoordinates(QString const& coordinates);
       void setCoordinatesFsm(QString const& coordinates);
-      bool isReadCoordinates();
+      bool isReadCoordinates() const;
 
       void setFsm(bool tf) { m_isFsm = tf; }
 
@@ -48,7 +48,7 @@ class MoleculeSection : public KeywordSection {
 
 
    protected:
-      QString dump();
+      QString dump() const;
 
 
    private:
@@ -61,7 +61,7 @@ class MoleculeSection : public KeywordSection {
       Molecule* m_molecule;
       bool m_isFsm;
 
-      QString myDump();
+      QString myDump() const;
       void parseCoordinates();
 };
 

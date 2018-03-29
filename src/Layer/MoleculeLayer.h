@@ -84,6 +84,7 @@ namespace IQmol {
 
    namespace Layer {
 
+      class Isotopes;
       class Constraint;
       class Surface;
       class Group;
@@ -123,6 +124,7 @@ namespace IQmol {
             ~Molecule();
 
             double radius();
+            double onsagerRadius();
    
       		/// Attempts to save the molecule, returning false if the operation
             /// was unsuccessful or canceled by the user.
@@ -196,12 +198,17 @@ namespace IQmol {
 			// and are used by the undo commands.
             void addConstraintLayer(Constraint*);
             void removeConstraintLayer(Constraint*);
+
+            void addIsotopes(Isotopes*);
+            void clearIsotopes();
    
             /// Converts the Molecule to an XYZ format and uses OpenBabel to parse this.  
             /// Useful for, e.g., reperceiving bonds.
             QString coordinatesAsString(bool const selectedOnly = false);
             QString coordinatesAsStringFsm();
             QStringList coordinatesForCubeFile();
+
+            QString isotopesAsString();
    
             /// Assigns the atom indices based on the ordering selected by 
             /// the user via the reorderIndex variable in the Atom class.
@@ -214,6 +221,8 @@ namespace IQmol {
             QList<qglviewer::Vec> coordinates();
             QList<double> atomicCharges(Data::Type::ID type);
             void setGeometry(IQmol::Data::Geometry&);
+            QList<QString> atomicSymbols();
+
 
             // There must be a better way of doing this, but this is used
             // in Layer::GeometryList for de
@@ -232,7 +241,10 @@ namespace IQmol {
             }
 
             unsigned maxAtomicNumber() { return m_maxAtomicNumber; }
-   
+
+            void   setMullikenDecompositions(Matrix const& M);
+            double mullikenDecomposition(int const a, int const b) const;
+            bool   hasMullikenDecompositions() const;
    
          public Q_SLOTS:
             void groupSelection();
@@ -257,6 +269,8 @@ namespace IQmol {
             void autoDetectSymmetry();
             void invalidateSymmetry();
             void saveToCurrentGeometry();
+
+            
    
          Q_SIGNALS:
             void softUpdate(); // issue if the number of primitives does not change
@@ -402,6 +416,7 @@ namespace IQmol {
             Layer::Container m_fileList;
             Layer::Container m_surfaceList;
             Layer::Container m_constraintList;
+            Layer::Container m_isotopesList;
             Layer::Container m_scanList;
             Layer::Container m_groupList;
    
@@ -417,6 +432,8 @@ namespace IQmol {
             QAction* m_atomicChargesMenu;
             unsigned m_maxAtomicNumber;
             QAction* m_addGeometryMenu;;
+
+            Matrix m_mullikenDecompositions;
       };
    
    } // end namespace Layer

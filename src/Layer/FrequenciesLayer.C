@@ -98,6 +98,9 @@ void Frequencies::setActiveMode(Mode const& mode)
 {  
    if (!m_molecule) return;
 
+   bool currentPlay(m_play);
+   setPlay(false);
+
    AtomList atoms(m_molecule->findLayers<Atom>(Children));
    QList<qglviewer::Vec> const& eigenvector(mode.modeData().eigenvector());
 
@@ -110,6 +113,19 @@ void Frequencies::setActiveMode(Mode const& mode)
    }
 
    connect(m_animatorList.last(), SIGNAL(finished()), &m_configurator, SLOT(reset()));
+   setPlay(currentPlay);
+}
+
+
+double Frequencies::zpve() const 
+{ 
+   return m_frequencies.zpve(); 
+}
+
+
+void Frequencies::setPlay() 
+{ 
+   setPlay(m_play); 
 }
 
 
@@ -127,7 +143,6 @@ void Frequencies::setPlay(bool const play)
       for (iter = m_animatorList.begin(); iter != m_animatorList.end(); ++iter) {
           (*iter)->reset();
       }
-      update();
    }
 }
 

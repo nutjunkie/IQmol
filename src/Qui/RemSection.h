@@ -27,7 +27,7 @@ class RemSection : public KeywordSection {
 
       void printOption(QString const& option, bool print);
 
-      bool printOption(QString const& option) {
+      bool printOption(QString const& option) const {
            return m_toPrint.count(option) > 0;
       }
 
@@ -48,7 +48,7 @@ class RemSection : public KeywordSection {
 
 
    protected:
-      QString dump();
+      QString dump() const;
 
 
    private:
@@ -64,8 +64,8 @@ class RemSection : public KeywordSection {
 
       // ---------- Member Functions ---------
       void init();
-      bool fixOptionForQui(QString& name, QString& value);
-      bool fixOptionForQChem(QString& name, QString& value);
+      bool fixOptionForQui(QString& name, QString& value) const; 
+      bool fixOptionForQChem(QString& name, QString& value) const;
 
       //bool printOption(QString const& option) const {
       //   return m_toPrint.count(option) > 0;

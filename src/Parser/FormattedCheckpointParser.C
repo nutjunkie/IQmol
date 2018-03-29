@@ -200,6 +200,10 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          if (!toInt(n, list, 2)) goto error;
          shellData.contractionCoefficientsSP = readDoubleArray(textStream, n);
 
+      }else if (key == "Overlap Matrix") {
+         if (!toInt(n, list, 2)) goto error;
+         shellData.overlapMatrix = readDoubleArray(textStream, n);
+
       }else if (key == "SCF Energy") {
          double energy(0.0);
          if (!geometry || !toDouble(energy, list, 1)) goto error;
@@ -615,7 +619,7 @@ Data::Orbitals* FormattedCheckpoint::makeOrbitals(unsigned const nAlpha,
 
    if (orbitals && !orbitals->consistent()) {
       QString msg(Data::Orbitals::toString(orbitalData.orbitalType));
-      msg += " orbital data are inconsistent. Check shell types.";
+      msg += " data are inconsistent. Check shell types.";
       m_errors.append(msg);
       delete orbitals;
       orbitals = 0;
@@ -727,6 +731,11 @@ Data::ShellList* FormattedCheckpoint::makeShellList(ShellData const& shellData,
              return 0;
              break;
        }
+   }
+
+   unsigned nBasis(shellList->nBasis());
+   if (shellData.overlapMatrix.size() == (nBasis+1)*nBasis/2) {
+      shellList->setOverlapMatrix(shellData.overlapMatrix);
    }
 
    shellList->resize();

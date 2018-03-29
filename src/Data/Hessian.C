@@ -62,6 +62,48 @@ void Hessian::setData(unsigned const nAtoms, QList<double> const& hessian)
 }
 
 
+void Hessian::setPartialData(unsigned const nAtoms, QList<unsigned> const& atomList, 
+   Matrix const& partialHessian)
+{
+   unsigned pAtoms(atomList.size());
+   unsigned d(3*nAtoms);  // dimension of the full hessian
+   unsigned pd(3*pAtoms); // dimension of the reduced hessian
+
+   m_hessian.resize(d,d);
+   for (unsigned i = 0; i < d; ++i) {
+       for (unsigned j = 0; j < d; ++j) {
+           m_hessian(i,j) = 0;
+       }
+   }
+
+   if (partialHessian.size1() != pd || partialHessian.size2() != pd) {
+      QLOG_DEBUG() << "Invalid Partial Hessian data";
+      return;
+   }
+
+   for (unsigned i = 0; i < (unsigned)atomList.size(); ++i) {
+       if (atomList[i] > nAtoms) {
+          QLOG_DEBUG() << "Invalid Partial Hessian index" << i << atomList[i];
+          return;
+       }
+   }
+
+   // block insert the partial hessian into the full hessian
+   for (unsigned pa = 0; pa < pAtoms; ++pa) {
+       unsigned a(atomList[pa]-1);
+       for (unsigned pb = 0; pb < pAtoms; ++pb) {
+           unsigned b(atomList[pb]-1);
+
+           for (unsigned i = 0; i < 3; ++i) {
+               for (unsigned j = 0; j < 3; ++j) {
+                   m_hessian(3*a+i,3*b+j) = partialHessian(3*pa+i,3*pb+j);
+               }
+           }
+       }
+   }
+}
+
+
 void Hessian::setData(Matrix const& hessian)
 {
    m_hessian = hessian;

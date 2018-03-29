@@ -88,7 +88,8 @@ void OptSection::read(QString const& input) {
 
 
 
-QString OptSection::dump() {
+QString OptSection::dump() const
+{
    QString s;
 
    int n(m_constraints.size());
@@ -98,7 +99,7 @@ QString OptSection::dump() {
 
    if (n != 0) {
       List constraints, dummyAtoms, fixedAtoms;
-      List::iterator iter;
+      List::const_iterator iter;
 
       s += "$opt\n";
 

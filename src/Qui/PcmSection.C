@@ -22,7 +22,8 @@ void PcmSection::processData()
 }
 
 
-QString PcmSection::dump() {
+QString PcmSection::dump() const
+{
    QString s("$pcm\n");
    if (!m_data.isEmpty()) s += m_data + "\n";
    s += "$end\n";
@@ -30,7 +31,8 @@ QString PcmSection::dump() {
 }
 
 
-void PcmSection::read(QString const& data) {
+void PcmSection::read(QString const& data) 
+{
     m_data = data.trimmed();
     processData();
 }
@@ -41,7 +43,8 @@ PcmSection* PcmSection::clone() const {
 }
 
 
-QString PcmSection::previewFormat() const {
+QString PcmSection::previewFormat() const 
+{
    QString s("$pcm\n");
    if (!m_data.isEmpty()) s += m_data + "\n";
    s += "$end\n";

@@ -92,7 +92,12 @@ QStringList QChemOutput::parseForErrors(TextStream& textStream)
 
       if (line.contains("Q-Chem fatal error")) {
          textStream.skipLine();  // blank line
-         error = textStream.readLine().trimmed();
+         line = textStream.readLine().trimmed();
+         do {
+            error += line + " ";
+            line = textStream.readLine().trimmed();
+         }  while (!line.isEmpty());
+
          if (error.isEmpty()) error = "Fatal error occured at end of output file";
 
       }else if (line.contains("Time limit has been exceeded")) {
@@ -159,6 +164,10 @@ bool QChemOutput::parse(TextStream& textStream)
    // energy.
    bool isFSM(false);
 
+   // Another hack.  We need a petite list of atoms for partial hessian calculations
+   QList<unsigned> partialHessianAtomList;
+
+
    while (!textStream.atEnd()) {
       line = textStream.nextLine();
 
@@ -173,9 +182,15 @@ bool QChemOutput::parse(TextStream& textStream)
 
       }else if (line.contains("Q-Chem fatal error occurred in module")) {
          textStream.skipLine();
-         QString msg("Q-Chem fatal error line: ");
-         msg += QString::number(textStream.lineNumber());
-         m_errors.append(msg + "\n" + textStream.nextLine());
+         QString msg("Q-Chem fatal error line ");
+         msg += QString::number(textStream.lineNumber()) + ":\n";
+         line = textStream.readLine().trimmed();
+         do {
+            msg += line + " ";
+            line = textStream.readLine().trimmed();
+         }  while (!line.isEmpty());
+
+         m_errors.append(msg);
 
       }else if (line.contains("Time limit has been exceeded")) {
          if (!m_errors.isEmpty()) m_errors.removeLast();
@@ -415,13 +430,18 @@ bool QChemOutput::parse(TextStream& textStream)
          textStream.skipLine(4);
          if (currentGeometry) readDipoleMoment(textStream, *currentGeometry);
 
+      }else if (line.contains("Partial Hessian Calculation")) {
+         if (currentGeometry) readPartialHessian(textStream, *currentGeometry, 
+             partialHessianAtomList);
+
       }else if (line.contains("Hessian of the SCF Energy") || 
                 line.contains("Final Hessian.")) {
          if (currentGeometry) readHessian(textStream, *currentGeometry);
 
       }else if (line.contains("VIBRATIONAL ANALYSIS")) {
          textStream.seek("Mode:");
-         readVibrationalModes(textStream);
+         readVibrationalModes(textStream, *currentGeometry, partialHessianAtomList);
+         partialHessianAtomList.clear();
 
       }else if (line.contains("DISTRIBUTED MULTIPOLE ANALYSIS")) {
          textStream.skipLine(4);
@@ -831,13 +851,15 @@ void QChemOutput::readEffectiveRegion(TextStream& textStream)
 }
 
 
-void QChemOutput::readVibrationalModes(TextStream& textStream)
+void QChemOutput::readVibrationalModes(TextStream& textStream, Data::Geometry& geometry,
+    QList<unsigned> const& partialHessianAtomList)
 {
    QString line;
    QStringList tokens;
    double x, y, z, w;
    double zpve(0.0), enthalpy(0.0), entropy(0.0);
    bool ok;
+   unsigned nAtoms(geometry.nAtoms());
 
    Data::VibrationalMode* v1(0);
    Data::VibrationalMode* v2(0);
@@ -867,11 +889,9 @@ void QChemOutput::readVibrationalModes(TextStream& textStream)
          v1 = new Data::VibrationalMode(w);
       }
 
-     // Skip Force Cnst and Red. Mass
-      textStream.skipLine(2);
-
+      // Skip Force Cnst and Red. Mass
       // IR Active:
-      tokens = textStream.nextLineAsTokens();
+      tokens = textStream.seekAndSplit("IR Active:");
       if (tokens.size() < 3 || !tokens[1].contains("Active:")) goto error;
       if (tokens.size() == 5 && v3) v3->setIrActive(tokens[4].contains("YES"));
       if (tokens.size() >= 4 && v2) v2->setIrActive(tokens[3].contains("YES"));
@@ -928,28 +948,47 @@ void QChemOutput::readVibrationalModes(TextStream& textStream)
       }
 
       // Eigenvectors
+      unsigned atomCount(0);
       while (!textStream.atEnd()) {
          tokens = textStream.nextLineAsTokens();
          if (tokens.size() < 4 || tokens[0].contains("TransDip")) break;
+         ++atomCount;
 
-         if (tokens.size() == 10) {
-            x = tokens[7].toDouble(&ok);  if (!ok) goto error;
-            y = tokens[8].toDouble(&ok);  if (!ok) goto error;
-            z = tokens[9].toDouble(&ok);  if (!ok) goto error;
-            if (v3) v3->appendDirectionVector(Vec(x,y,z)); 
+         if (partialHessianAtomList.isEmpty() ||
+             partialHessianAtomList.contains(atomCount)) {
+            if (tokens.size() == 10) {
+               x = tokens[7].toDouble(&ok);  if (!ok) goto error;
+               y = tokens[8].toDouble(&ok);  if (!ok) goto error;
+               z = tokens[9].toDouble(&ok);  if (!ok) goto error;
+               if (v3) v3->appendDirectionVector(Vec(x,y,z)); 
+            }
+            if (tokens.size() >= 7) {
+               x = tokens[4].toDouble(&ok);  if (!ok) goto error;
+               y = tokens[5].toDouble(&ok);  if (!ok) goto error;
+               z = tokens[6].toDouble(&ok);  if (!ok) goto error;
+               if (v2) v2->appendDirectionVector(Vec(x,y,z)); 
+            }
+            if (tokens.size() >= 4) {
+               x = tokens[1].toDouble(&ok);  if (!ok) goto error;
+               y = tokens[2].toDouble(&ok);  if (!ok) goto error;
+               z = tokens[3].toDouble(&ok);  if (!ok) goto error;
+               if (v1) v1->appendDirectionVector(Vec(x,y,z)); 
+            }
+         }else {
+            if (v1) v1->appendDirectionVector(Vec(0,0,0)); 
+            if (v2) v2->appendDirectionVector(Vec(0,0,0)); 
+            if (v3) v3->appendDirectionVector(Vec(0,0,0)); 
+            
          }
-         if (tokens.size() >= 7) {
-            x = tokens[4].toDouble(&ok);  if (!ok) goto error;
-            y = tokens[5].toDouble(&ok);  if (!ok) goto error;
-            z = tokens[6].toDouble(&ok);  if (!ok) goto error;
-            if (v2) v2->appendDirectionVector(Vec(x,y,z)); 
-         }
-         if (tokens.size() >= 4) {
-            x = tokens[1].toDouble(&ok);  if (!ok) goto error;
-            y = tokens[2].toDouble(&ok);  if (!ok) goto error;
-            z = tokens[3].toDouble(&ok);  if (!ok) goto error;
-            if (v1) v1->appendDirectionVector(Vec(x,y,z)); 
-         }
+      }
+
+      // For partial hessian jobs, we may need to top up the eigenvectors
+      // with zeros for the frozen atoms.
+      while (atomCount < nAtoms) {
+         if (v1) v1->appendDirectionVector(Vec(0,0,0)); 
+         if (v2) v2->appendDirectionVector(Vec(0,0,0)); 
+         if (v3) v3->appendDirectionVector(Vec(0,0,0)); 
+         ++atomCount;
       }
       
       if (v1) { frequencies->append(v1);  v1 = 0; }
@@ -986,6 +1025,84 @@ qDebug() << "ERROR: " << msg;
 }
 
 
+void QChemOutput::readPartialHessian(TextStream& textStream, Data::Geometry& geometry, 
+   QList<unsigned>& partialHessianAtomList)
+{
+   textStream.seek("Hessian Limited to Following Atoms"); 
+   textStream.skipLine();  // I     At.No.     X           Y           Z
+
+   QStringList tokens(textStream.nextLineAsTokens());
+
+   partialHessianAtomList.clear();
+   int  atomIndex(0);
+   bool ok(true);
+
+   while (tokens.size() >= 5) {
+      atomIndex = tokens[0].toUInt(&ok);
+      if (ok) partialHessianAtomList.append(atomIndex);
+      tokens = textStream.nextLineAsTokens();
+   }
+
+   qDebug() << "Partial Hessian atom list" << partialHessianAtomList;
+   textStream.seek("Hessian of the SCF Energy"); 
+
+   unsigned nAtoms(partialHessianAtomList.size());
+   Matrix hessian(3*nAtoms, 3*nAtoms);
+
+   if (readHessian(textStream, hessian) ) {
+      Data::Hessian& h(geometry.getProperty<Data::Hessian>());
+      h.setPartialData(geometry.nAtoms(), partialHessianAtomList, hessian);
+   }
+}
+
+
+void QChemOutput::readHessian(TextStream& textStream, Data::Geometry& geometry)
+{
+   unsigned nAtoms(geometry.nAtoms());
+   Matrix hessian(3*nAtoms, 3*nAtoms);
+
+   if (readHessian(textStream, hessian) ) {
+      Data::Hessian& h(geometry.getProperty<Data::Hessian>());
+      h.setData(hessian);
+   }
+}
+
+
+bool QChemOutput::readHessian(TextStream& textStream, Matrix& hessian)
+{
+   unsigned dim(hessian.size1());  // 3*nAtoms
+   QStringList tokens;
+   QList<double> values;
+
+   unsigned firstCol(0);
+   unsigned lastCol(0);
+   unsigned nCol(0);
+
+   while (firstCol < dim) {
+       // header line
+       tokens  = textStream.nextLineAsTokens();
+       nCol    = tokens.size();
+       lastCol = firstCol + tokens.size();
+
+       for (unsigned row = 0; row < dim; ++row) {
+           values = textStream.nextLineAsDoubles();
+           if ((unsigned)values.size() != lastCol-firstCol+1) {  // +1 for the row index
+              QString msg("Problem parsing hessian, line number ");
+              m_errors.append(msg + QString::number(textStream.lineNumber()));
+              return false;
+           }
+           values.removeFirst();
+           for (unsigned col = firstCol; col < lastCol; ++col) {
+               hessian(row, col) = values.takeFirst();
+           }
+       }
+       firstCol += nCol;
+   }
+
+   return true;
+}
+
+
 void QChemOutput::readDipoleMoment(TextStream& textStream, Data::Geometry& geometry)
 {
    QStringList tokens;
@@ -1005,43 +1122,6 @@ void QChemOutput::readDipoleMoment(TextStream& textStream, Data::Geometry& geome
    error:
       QString msg("Problem parsing dipole moment, line number ");
       m_errors.append(msg + QString::number(textStream.lineNumber()));
-}
-
-
-void QChemOutput::readHessian(TextStream& textStream, Data::Geometry& geometry)
-{
-   unsigned nAtoms(geometry.nAtoms());
-   Matrix hessian(3*nAtoms, 3*nAtoms);
-   QStringList tokens;
-   QList<double> values;
-
-   unsigned firstCol(0);
-   unsigned lastCol(0);
-   unsigned nCol(0);
-
-   while (firstCol < 3*nAtoms) {
-       // header line
-       tokens  = textStream.nextLineAsTokens();
-       nCol    = tokens.size();
-       lastCol = firstCol + tokens.size();
-
-       for (unsigned row = 0; row < 3*nAtoms; ++row) {
-           values = textStream.nextLineAsDoubles();
-           if ((unsigned)values.size() != lastCol-firstCol+1) {  // +1 for the row index
-              QString msg("Problem parsing hessian, line number ");
-              m_errors.append(msg + QString::number(textStream.lineNumber()));
-              return;
-           }
-           values.removeFirst();
-           for (unsigned col = firstCol; col < lastCol; ++col) {
-               hessian(row, col) = values.takeFirst();
-           }
-       }
-       firstCol += nCol;
-   }
-
-   Data::Hessian& h(geometry.getProperty<Data::Hessian>());
-   h.setData(hessian);
 }
 
 

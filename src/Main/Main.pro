@@ -5,19 +5,6 @@ TARGET  = IQmol
 # ordering of the libraries.
 
 
-win32 {
-IQMOL_YEAR    = $$system(echo %DATE:~-4%)
-} else {
-IQMOL_YEAR    = $$system(date +%Y)
-}
-
-IQMOL_VERSION = $$system(git describe --abbrev=0)
-GIT_VERSION   = $$system(git describe --always --tags)
-
-DEFINES += IQMOL_YEAR='\\"$$IQMOL_YEAR\\"'
-DEFINES += IQMOL_VERSION='\\"$$IQMOL_VERSION\\"'
-DEFINES += GIT_VERSION='\\"$$GIT_VERSION\\"'
-
 BUILD_DIR  = $$PWD/../../build
 
 LIBS += $$BUILD_DIR/libQui.a \
@@ -48,6 +35,10 @@ INCLUDEPATH += . ../Util ../Data ../Parser ../Qui ../Layer \
                ../OpenMesh/src
 INCLUDEPATH += $$BUILD_DIR/Qui   # Required for the ui_QuiMainWindow.h header
 
+#version.target = version.h
+#version.commands = ./version.sh 
+#version.depends = FORCE
+#QMAKE_EXTRA_TARGETS += version
 
 symmol.target = $$BUILD_DIR/symmol.o
 symmol.commands = gfortran -c $$PWD/symmol.f90 -o $$BUILD_DIR/symmol.o
@@ -60,6 +51,7 @@ unix:!macx:FORMS += $$PWD/PeriodicTable.ui
 
 
 SOURCES += \
+   $$PWD/AboutDialog.C \
    $$PWD/FragmentTable.C \
    $$PWD/HelpBrowser.C \
    $$PWD/InsertMoleculeDialog.C \
@@ -80,6 +72,7 @@ HEADERS += \
    $$PWD/PeriodicTable.h \
    $$PWD/PreferencesBrowser.h \
    $$PWD/ToolBar.h \
+   $$PWD/version.h \
 
 FORMS += \
    $$PWD/AboutDialog.ui \

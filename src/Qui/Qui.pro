@@ -12,6 +12,7 @@ SOURCES += \
    $$PWD/InputDialog.C \
    $$PWD/InputDialogLogic.C \
    $$PWD/KeywordSection.C \
+   $$PWD/KeyValueSection.C \
    $$PWD/LJParametersSection.C \
    $$PWD/MoleculeSection.C \
    $$PWD/Option.C \
@@ -20,7 +21,7 @@ SOURCES += \
    $$PWD/OptionEditors.C \
    $$PWD/OptSection.C \
    $$PWD/PcmSection.C \
-   $$PWD/QCJob.C \
+   $$PWD/QuiJob.C \
    $$PWD/Qui.C \
    $$PWD/QuiMolecule.C \
    $$PWD/RemSection.C \
@@ -33,6 +34,7 @@ HEADERS += \
    $$PWD/GeometryConstraint.h \
    $$PWD/InputDialog.h \
    $$PWD/KeywordSection.h \
+   $$PWD/KeyValueSection.h \
    $$PWD/LJParametersSection.h \
    $$PWD/MoleculeSection.h \
    $$PWD/Node.h \
@@ -42,12 +44,13 @@ HEADERS += \
    $$PWD/OptionEditors.h \
    $$PWD/OptSection.h \
    $$PWD/PcmSection.h \
-   $$PWD/QCJob.h \
+   $$PWD/QuiJob.h \
    $$PWD/Qui.h \
    $$PWD/QuiMolecule.h \
    $$PWD/QtNode.h \
    $$PWD/Register.h \
    $$PWD/RemSection.h \
+
 
 FORMS += \
    $$PWD/GeometryConstraintDialog.ui \

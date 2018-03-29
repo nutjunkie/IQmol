@@ -23,6 +23,7 @@
 #include "Orbitals.h"
 #include "QsLog.h"
 #include <QDebug>
+#include <cmath>
 
 
 namespace IQmol {
@@ -86,6 +87,53 @@ Orbitals::Orbitals(
 }
 
 
+bool Orbitals::areOrthonormal() const
+{
+   Vector const&  overlap(m_shellList.overlapMatrix());
+   if (overlap.size() == 0) return true;
+
+   Matrix S(m_nBasis, m_nBasis);
+   Matrix T;
+
+   unsigned k(0);
+   for (unsigned i = 0; i < m_nBasis; ++i) {
+       for (unsigned j = 0; j <=i; ++j, ++k) {
+           S(i,j) = S(j,i) = overlap[k];
+       }   
+   }   
+
+   T = prod(S, trans(m_alphaCoefficients));
+   T = prod(m_alphaCoefficients, T);
+   
+   bool pass(true);
+   double thresh(1e-8);
+
+   for (unsigned i = 0; i < m_nOrbitals && pass; ++i) {
+       if (std::abs(1.0-std::abs(T(i,i))) > thresh) {
+          QLOG_WARN() << "Element (" << i << "," << i << ") =" << T(i,i)
+                      << "deviation exceeds threshold" << thresh;
+          pass = false;
+       }
+       for (unsigned j = 0; j < i && pass; ++j) {
+           if (std::abs(T(i,j)) > thresh) {
+              QLOG_WARN() << "Element (" << i << "," << j << ") =" << T(i,j) 
+                          << "exceeds threshold" << thresh;
+              pass = false;
+           }
+       } 
+   }
+
+#if 0
+   QStringList matT(PrintMatrix(T,5));
+   for (int i = 0; i < matT.size(); ++i) {
+       qDebug() << matT[i];
+   }
+#endif
+ 
+   return pass;
+}
+
+
 QString Orbitals::label(unsigned index, bool) const
 {
    return QString::number(index+1);
@@ -116,10 +164,15 @@ bool Orbitals::consistent() const
       m_nBasis    > 0       && 
       m_nOrbitals <= m_nBasis;
 
-   if (!consistent) {
+   bool orthonormal(areOrthonormal());
+   // disable this check for the time being as noise can cause problems
+   // consistent = consistent && orthonormal;
+
+   if (!consistent || !orthonormal) {
       qDebug() << "Inconsistent orbital information";
-      qDebug() << "Orbitals:" << m_nOrbitals;
-      qDebug() << "Basis:   " << m_nBasis;
+      qDebug() << "Orbitals:    " << m_nOrbitals;
+      qDebug() << "Basis:       " << m_nBasis;
+      qDebug() << "Orthonormal: " << orthonormal;
    }
 
    return consistent;

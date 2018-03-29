@@ -30,7 +30,7 @@ class LJParametersSection : public KeywordSection {
       static std::map<QString,QString> createMap();
 
    protected:
-      QString dump();
+      QString dump() const;
 
    private:
       QString m_data;

@@ -60,7 +60,9 @@ namespace Process {
                  ScanCoordinates,
                  EfpFragments, 
                  EfpParameters, 
-                 ExternalCharges          // 20
+                 ExternalCharges,         // 20
+                 OnsagerRadius,
+                 Isotopes
               };
             
 

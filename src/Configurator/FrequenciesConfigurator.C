@@ -143,6 +143,13 @@ void Frequencies::load()
 
    }
 
+   QLabel* label(m_configurator.zpveLabel);
+   double zpve(m_frequencies.zpve());
+   QString txt("ZPVE: ");
+   txt += QString::number(zpve,'f', 3);
+   txt += " kcal/mol";
+   label->setText(txt);
+
    m_rawData = m_rawIrData;
 
    table->setCurrentCell(0, 0, 
@@ -365,6 +372,7 @@ void Frequencies::reset()
 void Frequencies::on_playButton_clicked(bool play)
 {
    m_frequencies.setPlay(play);
+   m_frequencies.update();
 }
 
 
@@ -451,7 +459,6 @@ void Frequencies::on_frequencyTable_itemSelectionChanged()
 
    if (mode) {
       m_frequencies.setActiveMode(*mode);
-      m_frequencies.setPlay();
    }
 
    if (!m_configurator.impulseButton->isChecked()) return;
@@ -475,6 +482,7 @@ void Frequencies::on_frequencyTable_itemSelectionChanged()
    }
 
    m_spectrum->replot();
+   m_frequencies.update();
 }
 
 
@@ -492,6 +500,7 @@ void Frequencies::closeEvent(QCloseEvent* e)
 {
    m_frequencies.clearActiveMode();
    m_frequencies.setPlay(false);
+   m_frequencies.update();
    Base::closeEvent(e);
 }
 

@@ -66,6 +66,7 @@ namespace Parser {
                QList<double>   exponents;
                QList<double>   contractionCoefficients;
                QList<double>   contractionCoefficientsSP;
+               QList<double>   overlapMatrix;
          };
 
          bool dataAreConsistent(ShellData const&, unsigned const nAtoms);

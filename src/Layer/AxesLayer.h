@@ -27,6 +27,11 @@
 
 
 namespace IQmol {
+
+namespace Configurator {
+   class Axes;
+}
+
 namespace Layer {
 
    /// Representation of a set of axes centered a the world origin.  The
@@ -35,25 +40,22 @@ namespace Layer {
 
       Q_OBJECT
 
+      friend class Configurator::Axes;
+
       public:
          Axes();
          ~Axes() { }
          void draw();
 
-         void xAxisOn(bool tf) { m_xAxisOn = tf; }
-         void yAxisOn(bool tf) { m_yAxisOn = tf; }
-         void zAxisOn(bool tf) { m_zAxisOn = tf; }
-
-         void setScale(double scale) { m_scale = scale; }
-
-      private:
-         void drawArrow(double const length, double const radius = -1.0f,
-            int const resolution = 24);
-
+      protected:
          bool m_xAxisOn;
          bool m_yAxisOn;
          bool m_zAxisOn;
          double m_scale;
+
+      private:
+         void drawArrow(double const length, double const radius = -1.0f,
+            int const resolution = 24);
 
          Configurator::Axes m_configurator;
    };

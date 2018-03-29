@@ -12,15 +12,17 @@
 #include "OptSection.h"
 #include "MoleculeSection.h"
 #include "ExternalChargesSection.h"
-#include "PcmSection.h"
+#include "KeyValueSection.h"
 
 
 namespace Qui {
 
+
 // Factory - we use this to generate a derived KeywordSection based on its
 // name.  Note that if you add additional specialized KeywordSections, this
 // Factory needs to be made aware of them.
-KeywordSection* KeywordSectionFactory(QString const& type) {
+KeywordSection* KeywordSectionFactory(QString const& type) 
+{
    QString t(type.toLower());
 
    if (t == "molecule") {
@@ -32,7 +34,13 @@ KeywordSection* KeywordSectionFactory(QString const& type) {
    }else if (t == "external_charges") {
       return new ExternalChargesSection();
    }else if (t == "pcm") {
-      return new PcmSection();
+      return new KeyValueSection("pcm");
+   }else if (t == "solvent") {
+      return new KeyValueSection("solvent");
+   }else if (t == "smx") {
+      return new KeyValueSection("smx");
+   }else if (t == "chemsol") {
+      return new KeyValueSection("chemsol");
    }else {
       return new GenericSection(t);
    }
@@ -40,7 +48,7 @@ KeywordSection* KeywordSectionFactory(QString const& type) {
 
 
 QString KeywordSection::format() {
-   return m_print ? dump() : QString();
+   return m_print ? dump() + "\n" : QString();
 }
 
 
@@ -50,7 +58,8 @@ QString KeywordSection::format() {
 // This a fallback section that simply holds the data in a string.  It is
 // useful when no other formating or processing is required.
 
-QString GenericSection::dump() {
+QString GenericSection::dump() const 
+{
    QString s;
    s += "$" + name() + "\n";
    if (!m_data.isEmpty()) s += m_data + "\n";

@@ -47,6 +47,7 @@
 #include "GeometryLayer.h"
 #include "GeometryListLayer.h"
 #include "GroupLayer.h"
+#include "IsotopesLayer.h"
 #include "MoleculeLayer.h"
 #include "OrbitalsLayer.h"
 #include "SurfaceLayer.h"
@@ -105,6 +106,7 @@ Molecule::Molecule(QObject* parent) : Base(DefaultMoleculeName, parent),
    m_fileList(this, "Files"), 
    m_surfaceList(this, "Surfaces"), 
    m_constraintList(this, "Constraints"), 
+   m_isotopesList(this, "Isotopes"), 
    m_scanList(this, "Scan Coordinates"), 
    m_groupList(this, "Groups"), 
    m_efpFragmentList(this),
@@ -820,6 +822,51 @@ QString Molecule::scanCoordinatesAsString()
 }
 
 
+void Molecule::clearIsotopes()
+{
+   QList<Isotopes*> list(m_isotopesList.findLayers<Isotopes>(Children));
+   QList<Isotopes*>::iterator iter;
+   for (iter = list.begin(); iter != list.end(); ++iter) {
+       m_isotopesList.removeLayer(*iter);
+   }
+}
+
+
+void Molecule::addIsotopes(Isotopes* isotopes)
+{
+   if (isotopes) {
+      if (isotopes->text().isEmpty()) {
+         QList<Isotopes*> list(m_isotopesList.findLayers<Isotopes>(Children));
+
+         QString label("Substitution ");
+         label += QString::number(list.size() +1);
+         isotopes->setText(label);
+      }
+      m_isotopesList.appendLayer(isotopes);
+   }
+}
+
+QString Molecule::isotopesAsString()
+{
+   QList<Isotopes*> list(m_isotopesList.findLayers<Isotopes>(Children));
+
+   unsigned n(list.size());
+   if (n == 0) return QString();
+
+   QString s(QString::number(n));
+   s += "   1\n";  // tp_flag;
+   for (unsigned i = 0; i < n; ++i) {
+       s += list[i]->formatQChem();
+   }
+   
+   qDebug() << "Formatted isotopes string";
+   qDebug() << s;
+
+   return s;
+}
+
+
+
 Constraint* Molecule::findMatchingConstraint(AtomList const& atoms)
 {
    ConstraintList::iterator iter;
@@ -1107,6 +1154,7 @@ void Molecule::takePrimitive(Primitive* primitive)
    PrimitiveList primitiveList;
    primitiveList.append(primitive);
    takePrimitives(primitiveList);
+   clearIsotopes();
 }
 
 
@@ -1115,6 +1163,7 @@ void Molecule::appendPrimitive(Primitive* primitive)
    PrimitiveList primitiveList;
    primitiveList.append(primitive);
    appendPrimitives(primitiveList);
+   clearIsotopes();
 }
 
 
@@ -1551,6 +1600,28 @@ void Molecule::saveToGeometry(Data::Geometry& geometry)
 }
 
 
+bool Molecule::hasMullikenDecompositions() const
+{
+  return m_mullikenDecompositions.size1() != 0;
+}
+
+void Molecule::setMullikenDecompositions(Matrix const& M) 
+{
+  m_mullikenDecompositions = M;
+  qDebug() << PrintMatrix(M);
+}
+
+double Molecule::mullikenDecomposition(int const a, int const b) const
+{
+   double md(0.0);
+   if ((int)m_mullikenDecompositions.size1() >= a &&
+       (int)m_mullikenDecompositions.size2() >= b) {
+       md = m_mullikenDecompositions(a-1,b-1);
+   }
+   return md;
+}
+
+
 void Molecule::saveToCurrentGeometry()
 {
    if (!m_currentGeometry) m_currentGeometry = new Data::Geometry();
@@ -1571,6 +1642,7 @@ void Molecule::reindexAtomsAndBonds()
    for (int i = 0; i < bonds.size(); ++i) {
        bonds[i]->setIndex(i+1);
    }
+   clearIsotopes();
 }
 
 
@@ -1585,6 +1657,22 @@ double Molecule::radius()
    radiusAvailable(radius);
    return radius;
 }
+
+
+double Molecule::onsagerRadius()
+{
+   double radius(0), r(0);
+
+   AtomList atoms(findLayers<Atom>(Children | Visible));
+   AtomList::iterator iter;
+   for (iter = atoms.begin(); iter != atoms.end(); ++iter) {
+       r = (*iter)->getVdwRadius() + (double)(*iter)->getPosition().norm();
+       radius = std::max(radius, r);
+   }
+
+   return radius;
+}
+
 
 
 Atom* Molecule::createAtom(unsigned int const Z, qglviewer::Vec const& position)
@@ -1630,6 +1718,8 @@ Process::QChemJobInfo Molecule::qchemJobInfo()
    jobInfo.set(Process::QChemJobInfo::EfpFragments,    efpFragmentsAsString());
    jobInfo.set(Process::QChemJobInfo::EfpParameters,   efpParametersAsString());
    jobInfo.set(Process::QChemJobInfo::ExternalCharges, externalChargesAsString());
+   jobInfo.set(Process::QChemJobInfo::OnsagerRadius,   QString::number(onsagerRadius(),'f',4));
+   jobInfo.set(Process::QChemJobInfo::Isotopes,        isotopesAsString());
 
    AtomList atomList(findLayers<Atom>(Children | Visible));
    if (atomList.isEmpty()) jobInfo.setEfpOnlyJob(true);
@@ -2106,6 +2196,19 @@ void Molecule::reperceiveBonds(bool postCmd)
    }
 
    delete obMol;
+}
+
+
+QList<QString> Molecule::atomicSymbols() 
+{
+   QList<QString> symbols;
+   AtomList atoms(findLayers<Atom>(Children));
+   AtomList::iterator atom;
+
+   for (atom = atoms.begin(); atom != atoms.end(); ++atom) {
+       symbols.append((*atom)->getAtomicSymbol());
+   }
+   return symbols;
 }
 
 

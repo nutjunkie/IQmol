@@ -68,7 +68,7 @@ QToolTip {
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,2">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0">
      <item>
       <widget class="QTableWidget" name="frequencyTable">
        <property name="sizePolicy">
@@ -128,6 +128,13 @@ QToolTip {
          <string>Raman (Å4 amu⁻¹)</string>
         </property>
        </column>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="zpveLabel">
+       <property name="text">
+        <string>ZPVE:</string>
+       </property>
       </widget>
      </item>
      <item>

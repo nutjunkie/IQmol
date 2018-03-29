@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>724</width>
-    <height>302</height>
+    <height>305</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -146,6 +146,13 @@ QToolButton:pressed {
            <string>Spin-Only Density</string>
           </property>
          </item>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="mullikenDecompositionsButton">
+         <property name="text">
+          <string>Decompositions</string>
+         </property>
         </widget>
        </item>
        <item>

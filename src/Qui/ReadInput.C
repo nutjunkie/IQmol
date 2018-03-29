@@ -23,7 +23,7 @@
 #include <QRegExp>
 #include <QMessageBox>
 
-#include "QCJob.h"
+#include "QuiJob.h"
 #include "Qui.h" 
 #include "RemSection.h"
 #include "MoleculeSection.h"
@@ -67,7 +67,8 @@ QList<Job*> ParseQChemFileContents(QString const& contents)
    }
 
    for (int i = 0; i < blocks.count(); ++i) {
-       Job* job = new Job(ReadKeywordSections(blocks.at(i)));
+       Job* job = new Job();
+       job->addSections(ReadKeywordSections(blocks.at(i)));
        jobs.append(job);
    }
 
