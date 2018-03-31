@@ -786,7 +786,7 @@ bool FormattedCheckpoint::installExcitedStates(unsigned const nAlpha, unsigned c
    int NOb = nBeta;
    int NVa = moData.alphaEnergies.size() - NOa;
    int NVb = moData.betaEnergies.size()  - NOb;
-   // For now, support only singlet EOM-EE 
+   // For now, support only singlet EOM-EE
    int NOcc = extData.alphaActiveOcc;
    int NVir = extData.alphaActiveVir;
 
@@ -794,7 +794,7 @@ bool FormattedCheckpoint::installExcitedStates(unsigned const nAlpha, unsigned c
    if (restricted) NVb += moData.alphaEnergies.size();
 
    qDebug() << "Number of orbitals etc" 
-            << NOa << NOb << NVa << NVb << nAlpha << nBeta 
+            << NOa << NOb << NVa << NVb << nAlpha << nBeta
             << moData.alphaEnergies.size()  << moData.betaEnergies.size()
             << NOcc << NVir;
    qDebug() << "nState" << extData.nState   << extData.excitationEnergies.size() 
