@@ -81,6 +81,11 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
    boysData.orbitalType = Data::Orbitals::Localized;
    boysData.label = "Localized MOs (Boys)";
 
+   OrbitalData virtLocData;
+   virtLocData.orbitalType = Data::Orbitals::Localized;
+   virtLocData.label = "Localized MOs (VirtLoc)";
+
+
    OrbitalData ntoData;
    ntoData.orbitalType = Data::Orbitals::NaturalTransition;
    ntoData.label = "Natural Transition Orbitals";
@@ -304,6 +309,15 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          if (!toInt(n, list, 2)) goto error;
          boysData.betaCoefficients = readDoubleArray(textStream, n);
 
+      }else if (key == "Localized Alpha MO Coefficients (VirtLoc)") {
+         if (!toInt(n, list, 2)) goto error;
+         virtLocData.alphaCoefficients = readDoubleArray(textStream, n);
+
+      }else if (key == "Localized Beta  MO Coefficients (VirtLoc)") {
+         if (!toInt(n, list, 2)) goto error;
+         virtLocData.betaCoefficients = readDoubleArray(textStream, n);
+
+
       // Dyson Orbitals
 
       }else if (key.contains("EOM-IP") || 
@@ -452,6 +466,9 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       if (orbitals) orbitalsList->append(orbitals);
 
       orbitals = makeOrbitals(nAlpha, nBeta, boysData, shellData, *geometry); 
+      if (orbitals) orbitalsList->append(orbitals);
+
+      orbitals = makeOrbitals(nAlpha, nBeta, virtLocData, shellData, *geometry); 
       if (orbitals) orbitalsList->append(orbitals);
 
       orbitals = makeOrbitals(nAlpha, nBeta, dysonData, shellData, *geometry); 
