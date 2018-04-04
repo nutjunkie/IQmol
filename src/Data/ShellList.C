@@ -21,6 +21,8 @@
 ********************************************************************************/
 
 #include "ShellList.h"
+#include "Geometry.h"
+#include "Constants.h"
 #include "QsLog.h"
 #include <QDebug>
 #include <cmath>
@@ -30,6 +32,84 @@ namespace IQmol {
 namespace Data {
 
 template<> const Type::ID List<Shell>::TypeID = Type::ShellList;
+
+
+ShellList::ShellList(ShellData const& shellData, Geometry const& geometry)
+{
+   static double const convExponents(std::pow(Constants::BohrToAngstrom, -2.0));
+   unsigned nShells(shellData.shellTypes.size());
+   unsigned cnt(0);
+
+   for (unsigned shell = 0; shell < nShells; ++shell) {
+
+       QList<double> expts;
+       QList<double> coefs;
+       QList<double> coefsSP;
+
+       unsigned atom(shellData.shellToAtom.at(shell)-1);
+       qglviewer::Vec pos(geometry.position(atom));
+
+       for (unsigned i = 0; i < shellData.shellPrimitives.at(shell); ++i, ++cnt) {
+           // Convert exponents from bohr to angstrom.  The conversion factor
+           // for the coefficients depends on the angular momentum and the 
+           // conversion is effectively done in the  Shell constructor
+           expts.append(shellData.exponents.at(cnt)*convExponents);
+
+           coefs.append(shellData.contractionCoefficients.at(cnt));
+           if (!shellData.contractionCoefficientsSP.isEmpty()) {
+              coefsSP.append(shellData.contractionCoefficientsSP.at(cnt));
+           }   
+       }   
+
+       // These cases are from the formatted checkpoint file format
+       switch (shellData.shellTypes.at(shell)) {
+          case 0:
+             append( new Data::Shell(Data::Shell::S, atom, pos, expts, coefs) );
+             break;
+          case -1: 
+             append( new Data::Shell(Data::Shell::S, atom, pos, expts, coefs) );
+             append( new Data::Shell(Data::Shell::P, atom, pos, expts, coefsSP) );
+             break;
+          case 1:
+             append( new Data::Shell(Data::Shell::P, atom, pos, expts, coefs) );
+             break;
+          case -2: 
+             append( new Data::Shell(Data::Shell::D5, atom, pos, expts, coefs) );
+             break;
+          case 2:
+             append( new Data::Shell(Data::Shell::D6, atom, pos, expts, coefs) );
+             break;
+          case -3: 
+             append( new Data::Shell(Data::Shell::F7, atom, pos, expts, coefs) );
+             break;
+          case 3:
+             append( new Data::Shell(Data::Shell::F10, atom, pos, expts, coefs) );
+             break;
+          case -4: 
+             append( new Data::Shell(Data::Shell::G9, atom, pos, expts, coefs) );
+             break;
+          case 4:
+             append( new Data::Shell(Data::Shell::G15, atom, pos, expts, coefs) );
+             break;
+
+          default:
+             QString msg("Unknown Shell type found at position ");
+             msg += QString::number(shell);
+             msg += ", type: "+ QString::number(shellData.shellTypes.at(shell));
+             qDebug() << msg;
+             break;
+       }   
+   }   
+
+   unsigned n(nBasis());
+   if (shellData.overlapMatrix.size() == (n+1)*n/2) {
+      setOverlapMatrix(shellData.overlapMatrix);
+   }   
+
+   resize();
+}
+
+
 
 unsigned ShellList::nBasis() const
 {

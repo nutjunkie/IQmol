@@ -105,7 +105,8 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
    unsigned n(0);
 
    GeomData  geomData;
-   ShellData shellData;
+   Data::ShellData shellData;
+
    GmoData   gmoData;
    ExtData   extData;   
    extData.nState = 0;
@@ -543,7 +544,8 @@ Data::Geometry* FormattedCheckpoint::makeGeometry(GeomData const& geomData)
 }
 
 
-bool FormattedCheckpoint::dataAreConsistent(ShellData const& shellData, unsigned const nAtoms)
+bool FormattedCheckpoint::dataAreConsistent(Data::ShellData const& shellData, 
+   unsigned const nAtoms)
 {
    for (int i = 0; i < shellData.shellToAtom.size(); ++i) {
        int atomIndex(shellData.shellToAtom[i]);
@@ -583,12 +585,13 @@ bool FormattedCheckpoint::dataAreConsistent(ShellData const& shellData, unsigned
 
 
 Data::Orbitals* FormattedCheckpoint::makeOrbitals(unsigned const nAlpha, 
-   unsigned const nBeta, OrbitalData const& orbitalData, ShellData const& shellData, 
+   unsigned const nBeta, OrbitalData const& orbitalData, Data::ShellData const& shellData, 
    Data::Geometry const& geometry, Data::DensityList densityList)
 {
    if (orbitalData.alphaCoefficients.isEmpty()) return 0;
    // TODO: This needs to move to avoid duplication 
-   Data::ShellList* shellList = makeShellList(shellData, geometry);
+   //Data::ShellList* shellList = makeShellList(shellData, geometry);
+   Data::ShellList* shellList = new Data::ShellList(shellData, geometry);
    if (!shellList) return 0;
 
    Data::Orbitals* orbitals(0);
@@ -647,7 +650,7 @@ Data::Orbitals* FormattedCheckpoint::makeOrbitals(unsigned const nAlpha,
 
 
 Data::GeminalOrbitals* FormattedCheckpoint::makeGeminalOrbitals(unsigned const nAlpha,
-   unsigned const nBeta, GmoData const& gmoData, ShellData const& shellData, 
+   unsigned const nBeta, GmoData const& gmoData, Data::ShellData const& shellData, 
    Data::Geometry const& geometry)
 {
    // This needs fixing.  Newer versions of QChem only print the orbitals for the
@@ -678,7 +681,9 @@ Data::GeminalOrbitals* FormattedCheckpoint::makeGeminalOrbitals(unsigned const n
 }
 
 
-Data::ShellList* FormattedCheckpoint::makeShellList(ShellData const& shellData, 
+// This has been moved to Data::ShellList so Parser::QChemOutputFile can use it.
+// To be removed
+Data::ShellList* FormattedCheckpoint::makeShellList(Data::ShellData const& shellData, 
    Data::Geometry const& geometry)
 {
    if (!dataAreConsistent(shellData, geometry.nAtoms())) return 0;

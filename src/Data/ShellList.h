@@ -31,11 +31,29 @@
 namespace IQmol {
 namespace Data {
 
+    class Geometry;
+
+   // This is a POD structure to accumulate the data in the parsers (taken from
+   // FormattedCheckpoingParser).
+   struct ShellData {
+      QList<int>      shellTypes;
+      QList<unsigned> shellToAtom;
+      QList<unsigned> shellPrimitives;
+      QList<double>   exponents;
+      QList<double>   contractionCoefficients;
+      QList<double>   contractionCoefficientsSP;
+      QList<double>   overlapMatrix;
+   };
+
    class ShellList : public List<Shell> {
 
       friend class boost::serialization::access;
 
       public:
+         ShellList() { }
+
+         ShellList(ShellData const& shellData, Geometry const& geometry);
+
          /// Returns the (-1,-1,-1) and (1,1,1) octant corners of a rectangular
          /// box that encloses the significant region of the Shells where 
          /// significance is determined by thresh.  
