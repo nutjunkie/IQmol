@@ -879,6 +879,12 @@ void InputDialog::initializeQuiLogic()
       )
    );
 
+   // MOM
+   QtNode& mom_method(reg.get("MOM_METHOD"));
+   QtNode& scf_guess(reg.get("SCF_GUESS"));
+   mom_method.addRule(
+     If(mom_method == "IMOM", scf_guess.shouldBe("READ"))
+   );
 
    // Advanced -> SCF Control -> Print Options
    QtNode& qui_print_orbitals(reg.get("QUI_PRINT_ORBITALS"));

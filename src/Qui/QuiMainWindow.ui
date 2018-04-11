@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>951</width>
+    <width>982</width>
     <height>690</height>
    </rect>
   </property>
@@ -447,7 +447,7 @@ QToolButton:checked {
              <x>0</x>
              <y>0</y>
              <width>523</width>
-             <height>516</height>
+             <height>577</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -457,7 +457,7 @@ QToolButton:checked {
                <bool>true</bool>
               </property>
               <property name="currentIndex">
-               <number>5</number>
+               <number>0</number>
               </property>
               <property name="tabSpacing">
                <number>-1</number>
@@ -468,7 +468,7 @@ QToolButton:checked {
                  <x>0</x>
                  <y>0</y>
                  <width>499</width>
-                 <height>60</height>
+                 <height>77</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -523,7 +523,7 @@ QToolButton:checked {
                  <x>0</x>
                  <y>0</y>
                  <width>499</width>
-                 <height>60</height>
+                 <height>77</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -571,7 +571,7 @@ QToolButton:checked {
                  <x>0</x>
                  <y>0</y>
                  <width>499</width>
-                 <height>60</height>
+                 <height>77</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -630,7 +630,7 @@ QToolButton:checked {
                  <x>0</x>
                  <y>0</y>
                  <width>499</width>
-                 <height>60</height>
+                 <height>77</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -685,7 +685,7 @@ QToolButton:checked {
                  <x>0</x>
                  <y>0</y>
                  <width>499</width>
-                 <height>23</height>
+                 <height>77</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1361,7 +1361,7 @@ QToolButton:checked {
                  <x>0</x>
                  <y>0</y>
                  <width>499</width>
-                 <height>64</height>
+                 <height>77</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -2054,13 +2054,9 @@ QToolButton:checked {
           <widget class="QWidget" name="AdvancedSCFControl">
            <layout class="QVBoxLayout" name="verticalLayout_12">
             <item>
-             <layout class="QGridLayout">
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_202">
-                <property name="text">
-                 <string>Pure/Cartesian</string>
-                </property>
-               </widget>
+             <layout class="QGridLayout" name="gridLayout_24">
+              <item row="0" column="1" colspan="2">
+               <widget class="QComboBox" name="purecart"/>
               </item>
               <item row="1" column="0">
                <widget class="QLabel" name="label_203">
@@ -2069,23 +2065,83 @@ QToolButton:checked {
                 </property>
                </widget>
               </item>
-              <item row="1" column="1" colspan="3">
+              <item row="4" column="1">
+               <widget class="QSpinBox" name="mom_start"/>
+              </item>
+              <item row="5" column="1" colspan="2">
+               <widget class="QComboBox" name="mom_method"/>
+              </item>
+              <item row="6" column="0">
+               <widget class="QCheckBox" name="qui_section_swap_occupied_virtual">
+                <property name="text">
+                 <string>Swap Orbitals</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1" colspan="2">
                <widget class="QComboBox" name="basis_projection_type"/>
               </item>
-              <item row="0" column="1" colspan="3">
-               <widget class="QComboBox" name="purecart"/>
+              <item row="8" column="1">
+               <widget class="QSpinBox" name="rca_max_cycles"/>
               </item>
-              <item row="2" column="0" colspan="2">
+              <item row="2" column="0">
                <widget class="QLabel" name="label_199">
                 <property name="text">
                  <string>Incremental Fock</string>
                 </property>
                </widget>
               </item>
-              <item row="2" column="2">
+              <item row="4" column="2">
+               <spacer name="horizontalSpacer_3">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="2" column="1">
                <widget class="QSpinBox" name="incfock"/>
               </item>
-              <item row="3" column="0" colspan="2">
+              <item row="3" column="0" colspan="3">
+               <widget class="Line" name="line">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="10" column="0">
+               <widget class="QLabel" name="label_85">
+                <property name="text">
+                 <string>RCA Print Level</string>
+                </property>
+               </widget>
+              </item>
+              <item row="9" column="0">
+               <widget class="QLabel" name="label_101">
+                <property name="text">
+                 <string>RCA Switch Thresh</string>
+                </property>
+               </widget>
+              </item>
+              <item row="10" column="1">
+               <widget class="QSpinBox" name="rca_print"/>
+              </item>
+              <item row="9" column="1">
+               <widget class="QSpinBox" name="rca_switch_thresh"/>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_202">
+                <property name="text">
+                 <string>Pure/Cartesian</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
                <widget class="QLabel" name="label_200">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -2098,58 +2154,26 @@ QToolButton:checked {
                 </property>
                </widget>
               </item>
-              <item row="3" column="2">
-               <widget class="QSpinBox" name="mom_start"/>
+              <item row="5" column="0">
+               <widget class="QLabel" name="label_117">
+                <property name="text">
+                 <string>MOM Method</string>
+                </property>
+               </widget>
               </item>
-              <item row="5" column="0" colspan="2">
+              <item row="8" column="0">
                <widget class="QLabel" name="label_201">
                 <property name="text">
                  <string>Max RCA Cycles</string>
                 </property>
                </widget>
               </item>
-              <item row="5" column="2">
-               <widget class="QSpinBox" name="rca_max_cycles"/>
-              </item>
-              <item row="6" column="0" colspan="2">
-               <widget class="QLabel" name="label_101">
-                <property name="text">
-                 <string>RCA Switch Thresh</string>
-                </property>
-               </widget>
-              </item>
-              <item row="6" column="2">
-               <widget class="QSpinBox" name="rca_switch_thresh"/>
-              </item>
-              <item row="7" column="0" colspan="2">
-               <widget class="QLabel" name="label_85">
-                <property name="text">
-                 <string>RCA Print Level</string>
-                </property>
-               </widget>
-              </item>
-              <item row="7" column="2">
-               <widget class="QSpinBox" name="rca_print"/>
-              </item>
-              <item row="4" column="0" colspan="4">
-               <widget class="Line" name="line">
+              <item row="7" column="0" colspan="3">
+               <widget class="Line" name="line_3">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
                 </property>
                </widget>
-              </item>
-              <item row="2" column="3">
-               <spacer name="horizontalSpacer_3">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
               </item>
              </layout>
             </item>
@@ -2164,20 +2188,6 @@ QToolButton:checked {
              <widget class="QCheckBox" name="direct_scf">
               <property name="text">
                <string>Direct SCF</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="Line" name="line_2">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="qui_section_swap_occupied_virtual">
-              <property name="text">
-               <string>Swap Orbitals</string>
               </property>
              </widget>
             </item>
@@ -6606,7 +6616,7 @@ Eventually this should go.</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>951</width>
+     <width>982</width>
      <height>22</height>
     </rect>
    </property>

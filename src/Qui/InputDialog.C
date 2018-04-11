@@ -240,6 +240,19 @@ void InputDialog::setQChemJobInfo(IQmol::Process::QChemJobInfo const& jobInfo)
    m_ui.qui_charge->setValue(charge);
    m_ui.qui_multiplicity->setValue(multiplicity);
 
+   int nElectrons(m_qchemJobInfo.getNElectrons());
+
+   qDebug() << "ID: NElectrons" << nElectrons;
+
+   int nAlpha(nElectrons+multiplicity-1);
+   qDebug() << "ID: NAlpha" << nAlpha;
+   nAlpha /= 2;
+   qDebug() << "ID: NAlpha" << nAlpha;
+   QString sov("alpha "); 
+   sov += QString::number(nAlpha) + "  ";
+   sov += QString::number(nAlpha+1);
+   m_currentJob->setGenericSection("swap_occupied_virtual", sov);
+
    on_jobList_currentIndexChanged(0);
    TAINT(false);
    m_reg.get("JOB_TYPE").applyRules();
@@ -1005,6 +1018,7 @@ void InputDialog::on_qui_multiplicity_valueChanged(int value)
 {
    if (m_currentJob) m_currentJob->setMultiplicity(value);
 }
+
 
 
 

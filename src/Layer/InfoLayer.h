@@ -56,19 +56,19 @@ namespace Layer {
          void clear();
 
          int  getCharge() const { return m_charge; }
-         unsigned int  getMultiplicity() const { return m_multiplicity; }
+         unsigned getMultiplicity() const { return m_multiplicity; }
+         unsigned numberOfElectrons() const;
 
       public Q_SLOTS:
          void setCharge(int const charge);
-         void setMultiplicity(unsigned int const multiplicity);
+         void setMultiplicity(unsigned const multiplicity);
          void setEnergy(double const energy, Info::EnergyUnit unit);
          void setDipole(qglviewer::Vec const& dipole, bool const estimated = false);
          void setPointGroup(Data::PointGroup const&);
 
       protected:
-         unsigned int numberOfElectrons() const;
-         unsigned int numberOfAlphaElectrons() const;
-         unsigned int numberOfBetaElectrons() const;
+         unsigned numberOfAlphaElectrons() const;
+         unsigned numberOfBetaElectrons() const;
          QString formula() const;
          void detectSymmetry();
 
@@ -77,9 +77,9 @@ namespace Layer {
          double m_mass;
          double m_dipoleValue;
 
-         unsigned int m_numberOfAtoms;
-         unsigned int m_nuclearCharge;
-         unsigned int m_multiplicity;
+         unsigned m_numberOfAtoms;
+         unsigned m_nuclearCharge;
+         unsigned m_multiplicity;
 
          EnergyUnit m_energyUnit;
          QMap<QString, int> m_formula;

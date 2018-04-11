@@ -1720,6 +1720,8 @@ Process::QChemJobInfo Molecule::qchemJobInfo()
    jobInfo.set(Process::QChemJobInfo::ExternalCharges, externalChargesAsString());
    jobInfo.set(Process::QChemJobInfo::OnsagerRadius,   QString::number(onsagerRadius(),'f',4));
    jobInfo.set(Process::QChemJobInfo::Isotopes,        isotopesAsString());
+   jobInfo.set(Process::QChemJobInfo::NElectrons,      m_info.numberOfElectrons());
+qDebug() << "Number of electrons set to " <<   m_info.numberOfElectrons();
 
    AtomList atomList(findLayers<Atom>(Children | Visible));
    if (atomList.isEmpty()) jobInfo.setEfpOnlyJob(true);
