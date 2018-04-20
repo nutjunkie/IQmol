@@ -222,10 +222,10 @@ void Orbitals::initPlot()
               graph->setData(a, y);
               graph->setName(QString::number(k+nOrbs));
               if (ntos) {
-                 graph->setScatterStyle(k<nAlpha ? QCPScatterStyle::ssHole
+                 graph->setScatterStyle(k<nBeta ? QCPScatterStyle::ssHole
                                                  : QCPScatterStyle::ssOccupied);
               }else {
-                 graph->setScatterStyle(k<nAlpha ? QCPScatterStyle::ssOccupied 
+                 graph->setScatterStyle(k<nBeta ? QCPScatterStyle::ssOccupied 
                                                  : QCPScatterStyle::ssVirtual);
               }
               connect(graph, SIGNAL(selectionChanged(bool)), 
