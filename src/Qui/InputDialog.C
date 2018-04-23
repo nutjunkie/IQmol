@@ -241,13 +241,9 @@ void InputDialog::setQChemJobInfo(IQmol::Process::QChemJobInfo const& jobInfo)
    m_ui.qui_multiplicity->setValue(multiplicity);
 
    int nElectrons(m_qchemJobInfo.getNElectrons());
-
-   qDebug() << "ID: NElectrons" << nElectrons;
-
    int nAlpha(nElectrons+multiplicity-1);
-   qDebug() << "ID: NAlpha" << nAlpha;
    nAlpha /= 2;
-   qDebug() << "ID: NAlpha" << nAlpha;
+
    QString sov("alpha "); 
    sov += QString::number(nAlpha) + "  ";
    sov += QString::number(nAlpha+1);

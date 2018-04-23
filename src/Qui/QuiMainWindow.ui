@@ -1917,11 +1917,6 @@ QToolButton:checked {
            </property>
            <item>
             <property name="text">
-             <string>Frozen Core</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
              <string>Coupled Cluster</string>
             </property>
            </item>
@@ -3496,6 +3491,66 @@ QToolButton:checked {
           <widget class="QWidget" name="AdvancedPostHartreeFock">
            <layout class="QVBoxLayout" name="verticalLayout_19">
             <item>
+             <widget class="QGroupBox" name="groupBox_3">
+              <property name="title">
+               <string>Frozen Core</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_17">
+               <item>
+                <widget class="QCheckBox" name="qui_frozen_core">
+                 <property name="text">
+                  <string>Use Frozen Core</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <layout class="QGridLayout">
+                 <item row="3" column="0">
+                  <widget class="QLabel" name="label_93">
+                   <property name="text">
+                    <string>Core Print</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="1" colspan="2">
+                  <widget class="QComboBox" name="core_character_print"/>
+                 </item>
+                 <item row="2" column="2">
+                  <widget class="QSpinBox" name="core_character"/>
+                 </item>
+                 <item row="1" column="2">
+                  <widget class="QSpinBox" name="n_frozen_virtual"/>
+                 </item>
+                 <item row="0" column="2">
+                  <widget class="QSpinBox" name="n_frozen_core"/>
+                 </item>
+                 <item row="1" column="0" colspan="2">
+                  <widget class="QLabel" name="label_234">
+                   <property name="text">
+                    <string>Frozen Virtual Orbs</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0" colspan="2">
+                  <widget class="QLabel" name="label_123">
+                   <property name="text">
+                    <string>Frozen Core Orbs</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0" colspan="2">
+                  <widget class="QLabel" name="label_92">
+                   <property name="text">
+                    <string>Core Character</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
              <widget class="QCheckBox" name="ssg">
               <property name="text">
                <string>Compute SSG Wavefunction</string>
@@ -3532,87 +3587,6 @@ QToolButton:checked {
                <size>
                 <width>20</width>
                 <height>570</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="AdvancedFrozenCore">
-           <layout class="QVBoxLayout" name="verticalLayout_17">
-            <item>
-             <widget class="QCheckBox" name="qui_frozen_core">
-              <property name="text">
-               <string>Use Frozen Core</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <layout class="QGridLayout">
-              <item row="0" column="1">
-               <widget class="QSpinBox" name="n_frozen_core"/>
-              </item>
-              <item row="1" column="1">
-               <widget class="QSpinBox" name="n_frozen_virtual"/>
-              </item>
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_123">
-                <property name="text">
-                 <string>Frozen Core Orbs</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_234">
-                <property name="text">
-                 <string>Frozen Virtual Orbs</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="2">
-               <spacer name="horizontalSpacer_5">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_92">
-                <property name="text">
-                 <string>Core Character</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QSpinBox" name="core_character"/>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="label_93">
-                <property name="text">
-                 <string>Core Print</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1" colspan="2">
-               <widget class="QComboBox" name="core_character_print"/>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <spacer>
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
                </size>
               </property>
              </spacer>
@@ -6732,9 +6706,6 @@ Eventually this should go.</string>
   <tabstop>qmmm</tabstop>
   <tabstop>qmmm_charges</tabstop>
   <tabstop>readChargesButton</tabstop>
-  <tabstop>qui_frozen_core</tabstop>
-  <tabstop>n_frozen_core</tabstop>
-  <tabstop>n_frozen_virtual</tabstop>
   <tabstop>cis_max_cycles</tabstop>
   <tabstop>cis_convergence</tabstop>
   <tabstop>symmetry_ignore</tabstop>
