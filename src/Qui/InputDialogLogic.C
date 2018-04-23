@@ -1148,8 +1148,11 @@ void InputDialog::initializeQuiLogic()
    node2->addRule(rule);
 
 
-   // Advanced -> Correlated Methods
+   // Advanced -> Post Hartree Fock
    node = &reg.get("QUI_FROZEN_CORE");
+   QtNode& n_frozen_core(reg.get("N_FROZEN_CORE"));
+   QtNode& n_frozen_virtual(reg.get("N_FROZEN_VIRTUAL"));
+
    node->addRule(
       If(*node == QtTrue,
          Disable(m_ui.n_frozen_core)
@@ -1159,6 +1162,10 @@ void InputDialog::initializeQuiLogic()
       ) 
    );
 
+   node->addRule(
+     If(*node == QtFalse,
+        n_frozen_core.shouldBe("0") + n_frozen_virtual.shouldBe("0"))
+   );
 
 
    // Advanced -> Excited States -> CIS

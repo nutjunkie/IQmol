@@ -304,11 +304,18 @@ bool RemSection::fixOptionForQChem(QString& name, QString& value) const
       value = QString::number(value.toInt()/10);
    }
 
-   if (name == "QUI_FROZEN_CORE" && value.toInt() != 0) {
+//   if (name == "QUI_FROZEN_CORE" && value.toInt() != 0) {
+//      name = "N_FROZEN_CORE";
+//      value = "FC";
+//      shouldPrint = true;
+//   }
+
+/*
+   if (name == "QUI_FROZEN_CORE" && value.toInt() == 0) {
       name = "N_FROZEN_CORE";
-      value = "FC";
       shouldPrint = true;
    }
+*/
 
    if (name == "XC_GRID" || name == "NL_GRID") {
       QStringList tokens(value.split(","));
