@@ -89,6 +89,7 @@ QString ServerConfiguration::toString(QueueSystemT const queue)
       case PBS:    s = "PBS";    break;
       case SGE:    s = "SGE";    break;
       case Web:    s = "Web";    break;
+      case SLURM:  s = "SLURM";  break;
    }
    return s;
 }
@@ -133,9 +134,10 @@ ServerConfiguration::ConnectionT ServerConfiguration::toConnectionT(QString cons
 ServerConfiguration::QueueSystemT ServerConfiguration::toQueueSystemT(
    QString const& queueSystem)
 {
-   if (queueSystem.contains("pbs", Qt::CaseInsensitive)) return PBS;
-   if (queueSystem.contains("sge", Qt::CaseInsensitive)) return SGE;
-   if (queueSystem.contains("web", Qt::CaseInsensitive)) return Web;
+   if (queueSystem.contains("pbs",   Qt::CaseInsensitive)) return PBS;
+   if (queueSystem.contains("sge",   Qt::CaseInsensitive)) return SGE;
+   if (queueSystem.contains("web",   Qt::CaseInsensitive)) return Web;
+   if (queueSystem.contains("slurm", Qt::CaseInsensitive)) return SLURM;
 
    return Basic;
 }
@@ -403,11 +405,46 @@ qDebug() << "Setting defaults for " << toString(queueSystem);
                  << "setenv QCSCRATCH $TMPDIR"
                  << "if (-e $QC/bin/qchem.setup) source $QC/bin/qchem.setup"
                  << ""
-                 << "qchem ${JOB_NAME}.inp ${JOB_NAME}.out";
+                 << "qchem -seq ${JOB_NAME}.inp ${JOB_NAME}.out";
 
          m_configuration.insert(RunFileTemplate, runFile.join("\n"));
 
       } break;
+
+      case SLURM: {
+         m_configuration.insert(Submit, "cd ${JOB_DIR} && sbatch ${JOB_NAME}.run");
+         m_configuration.insert(Query, "squeue -j ${JOB_ID} -o %20T");
+         // ? m_configuration.insert(Query, "scontrol show job ${JOB_ID}");
+         m_configuration.insert(Kill, "scancel ${JOB_ID}");
+         m_configuration.insert(JobFileList, "find ${JOB_DIR} -type f");
+
+         m_configuration.insert(QueueInfo, "sinfo");
+
+   
+         QStringList runFile;
+         runFile << "#!/bin/csh"
+                 << "#SBATCH --partition=${QUEUE}"
+                 << "#SBATCH --time=${WALLTIME}"
+                 << "#SBATCH --mem=${MEMORY}M"
+                 << "#SBATCH --tmp=${SCRATCH}M"
+                 << "#SBATCH --nodes=1"
+                 << "#SBATCH --cpus-per-task=${NCPUS}"
+                 << "#SBATCH --output=${JOB_NAME}.err"
+                 << "#SBATCH --error=${JOB_NAME}.err"
+                 << ""
+                 << "setenv QCSCRATCH $TMPDIR"
+                 << "setenv QC /usr/local/qchem"
+                 << "setenv QCAUX $QC/aux"
+                 << ""
+                 << "if (-e $QC/bin/qchem.setup) source $QC/bin/qchem.setup"
+                 << ""
+                 << "qchem -seq ${JOB_NAME}.inp ${JOB_NAME}.out";
+ 
+         m_configuration.insert(RunFileTemplate, runFile.join("\n"));
+
+      } break;
+
+
 
       case Web: {
          m_configuration.insert(Kill,      "GET  /delete?cookie=${COOKIE}&jobid=${JOB_ID}");

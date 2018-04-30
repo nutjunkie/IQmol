@@ -134,6 +134,37 @@ void QueueResourcesList::fromSgeQueueInfoString(QString const& queueInfo)
 }
 
 
+// I can't figure out how to get much information from the SLURM sinfo, so we
+// just settle on a list of queue names and rely on the default limits given
+// in ServerQueue.h
+void QueueResourcesList::fromSlurmQueueInfoString(QString const& queueInfo)
+{  
+   QString info(queueInfo);
+   QStringList tokens;
+   Parser::TextStream textStream(&info);
+   
+   // The list of queues comes after the header line
+   textStream.seek("PARTITION");
+      
+   while (!textStream.atEnd()) {
+      tokens = textStream.nextLineAsTokens();
+      if (tokens.size() >= 3) {
+         QString queue(tokens[2]);
+         bool exists(false);
+         QueueResourcesList::iterator iter;
+         for (iter = begin(); iter != end(); ++iter) {
+             if ( (*iter)->m_name == queue) {
+                exists = true;
+                break;
+             }
+         }
+
+         if (!exists) append(new QueueResources(queue));
+         
+      }
+   }     
+}
+
 void QueueResourcesList::copy(QueueResourcesList const& list) 
 { 
    QueueResourcesList::const_iterator iter;
