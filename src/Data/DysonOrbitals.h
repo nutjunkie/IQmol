@@ -44,10 +44,16 @@ namespace Data {
           : Orbitals(Orbitals::Dyson, shellList, leftCoefficients, rightCoefficients), 
             m_excitationEnergies(excitationEnergies), m_labels(names) { }
             
-         QString label(unsigned index, bool alpha = true) const
+         QString label(unsigned index, bool left = true) const
          {
-            Q_UNUSED(alpha);
-            return ((int)index < m_labels.size() ? m_labels[index] : QString("undef"));
+            QString s((int)index < m_labels.size() ? m_labels[index] : QString("undef"));
+            s += left ? " (left)" : " (right)";
+            return s;
+         }
+
+         QStringList labels(bool) const
+         {
+            return m_labels;
          }
 
          double excitationEnergy(unsigned index) const 

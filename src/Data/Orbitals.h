@@ -75,7 +75,7 @@ namespace Data {
          virtual QString label(unsigned index, bool alpha = true) const;
 
          // Returns a list of the above labels
-         QStringList labels(bool alpha = true) const;
+         virtual QStringList labels(bool alpha = true) const;
 
          // Returns the recommended index for displaying in the configurator.
          virtual unsigned labelIndex(bool /* alpha = true */) const { return 0; }

@@ -149,7 +149,8 @@ QStringList QChemOutput::parseForErrors(TextStream& textStream)
 struct DysonData {
    QString       label;
    QStringList   labels;
-   QList<double> coefficients;
+   QList<double> leftCoefficients;
+   QList<double> rightCoefficients;
    QList<double> energies;
 };
 
@@ -498,17 +499,21 @@ bool QChemOutput::parse(TextStream& textStream)
    }
 
    if (shellList) {
-qDebug() << "Found shell list";
       int n(dysonData.labels.size());
+
       if (n > 0) {
-         if (dysonData.labels.size() == n) {
-            dumpDyson(dysonData);
-qDebug() << "Creating Dyson";
-            Data::Orbitals* dyson = new Data::DysonOrbitals(*shellList, dysonData.coefficients,
-              QList<double>(), dysonData.energies, dysonData.labels);
+         dumpDyson(dysonData);
+
+         Data::Orbitals* dyson = new Data::DysonOrbitals(*shellList, 
+            dysonData.leftCoefficients, dysonData.rightCoefficients, 
+            dysonData.energies, dysonData.labels);
+              
+         if (dyson->consistent()) {
             Data::OrbitalsList* orbitalsList(new Data::OrbitalsList());
             orbitalsList->append(dyson);
             m_dataBank.append(orbitalsList);
+         }else {
+            m_errors.append("Inconsistent Dyson data encountered");
          }
       }
    }
@@ -525,16 +530,18 @@ qDebug() << "Creating Dyson";
 
 void QChemOutput::dumpDyson(DysonData const& dysonData)
 {
+qDebug() << "Dumping Dyson data from outout file:";
+
    for (int i = 0; i < dysonData.labels.size(); ++i) {
-       qDebug() << dysonData.labels[i];
+       qDebug() << "Dyson label" << dysonData.labels[i];
    }
-   for (int i = 0; i < dysonData.labels.size(); ++i) {
-       qDebug() << dysonData.energies[i];
+   for (int i = 0; i < dysonData.energies.size(); ++i) {
+       qDebug() << "Dyson energy" << dysonData.energies[i];
    }
 
    qDebug() << dysonData.labels.size();
    qDebug() << dysonData.energies.size();
-   qDebug() << dysonData.coefficients.size();
+   qDebug() << dysonData.leftCoefficients.size() << dysonData.rightCoefficients.size();
 }
 
 
@@ -555,51 +562,54 @@ qDebug() << "QChemOutput::readDyson called with label" << dysonData.label;
    dysonData.label.remove("transition");
    dysonData.label = dysonData.label.trimmed();
 
+   QChar alpha(0x3b1);
+   QChar beta(0x3b2);
+
    while (!textStream.atEnd()) {
       line = textStream.readLine();
       if (line.contains("End transition")) return;
 
       if (line.contains("Decomposition over AOs for the left alpha Dyson orbital")) {
-         dysonData.labels.append(dysonData.label + " (left alpha)");
+         dysonData.labels.append(dysonData.label + " " + alpha);
          dysonData.energies.append(energy);
          
          line = textStream.nextLine();
          while (!line.contains("****")) {
             x = line.toDouble(&ok);
-            if (ok) dysonData.coefficients.append(x);
+            if (ok) dysonData.leftCoefficients.append(x);
             line = textStream.nextLine();
          }
 
       }else if (line.contains("Decomposition over AOs for the right alpha Dyson orbital")) {
-         dysonData.labels.append(dysonData.label + " (right alpha)");
-         dysonData.energies.append(energy);
+         //dysonData.labels.append(dysonData.label + " (right alpha)");
+         //dysonData.energies.append(energy);
 
          line = textStream.nextLine();
          while (!line.contains("****")) {
             x = line.toDouble(&ok);
-            if (ok) dysonData.coefficients.append(x);
+            if (ok) dysonData.rightCoefficients.append(x);
             line = textStream.nextLine();
          }
 
       }else if (line.contains("Decomposition over AOs for the left beta Dyson orbital")) {
-         dysonData.labels.append(dysonData.label + " (left beta)");
+         dysonData.labels.append(dysonData.label + " " + beta);
          dysonData.energies.append(energy);
 
          line = textStream.nextLine();
          while (!line.contains("****")) {
             x = line.toDouble(&ok);
-            if (ok) dysonData.coefficients.append(x);
+            if (ok) dysonData.leftCoefficients.append(x);
             line = textStream.nextLine();
          }
 
       }else if (line.contains("Decomposition over AOs for the right beta Dyson orbital")) {
-         dysonData.labels.append(dysonData.label + " (right beta)");
-         dysonData.energies.append(energy);
+         //dysonData.labels.append(dysonData.label + " (right beta)");
+         //dysonData.energies.append(energy);
 
          line = textStream.nextLine();
          while (!line.contains("****")) {
             x = line.toDouble(&ok);
-            if (ok) dysonData.coefficients.append(x);
+            if (ok) dysonData.rightCoefficients.append(x);
             line = textStream.nextLine();
          }
       }
@@ -616,10 +626,13 @@ Data::ShellList* QChemOutput::readBasis(TextStream& textStream, Data::Geometry& 
    QString line;
    QList<double> x;
    unsigned index(1), K;
+   unsigned nBasis(0);
    bool ok;
 
    textStream.seek("$basis");
    textStream.skipLine();  // skip over the first element and '0' line
+
+   Data::ShellList* shells(0);
 
    while (!textStream.atEnd()) {
       line = textStream.readLine();
@@ -634,13 +647,14 @@ Data::ShellList* QChemOutput::readBasis(TextStream& textStream, Data::Geometry& 
          K = tokens[1].toUInt(&ok);
          if (!ok) goto error;
 
-         // We only do cartesian for the time being.
-         if (tokens[0] == "S")  shellData.shellTypes.append(0);
-         if (tokens[0] == "P")  shellData.shellTypes.append(1);
-         if (tokens[0] == "SP") shellData.shellTypes.append(-1);
-         if (tokens[0] == "D")  shellData.shellTypes.append(2);
-         if (tokens[0] == "F")  shellData.shellTypes.append(3);
-         if (tokens[0] == "G")  shellData.shellTypes.append(4);
+         // We assume cartesian for the time being, but will fix
+         // this later if we have the wrong number of basis functions.
+         if (tokens[0] == "S")  { shellData.shellTypes.append( 0);  nBasis +=  1; }
+         if (tokens[0] == "P")  { shellData.shellTypes.append( 1);  nBasis +=  3; }
+         if (tokens[0] == "SP") { shellData.shellTypes.append(-1);  nBasis +=  4; }
+         if (tokens[0] == "D")  { shellData.shellTypes.append( 2);  nBasis +=  6; }
+         if (tokens[0] == "F")  { shellData.shellTypes.append( 3);  nBasis += 10; }
+         if (tokens[0] == "G")  { shellData.shellTypes.append( 4);  nBasis += 15; }
 
          shellData.shellToAtom.append(index);
          shellData.shellPrimitives.append(K);
@@ -663,13 +677,38 @@ Data::ShellList* QChemOutput::readBasis(TextStream& textStream, Data::Geometry& 
       }
    }
 
+   // Fix the pure/cart status if we have the wrong number of basis functions
+   textStream.skipLine();  // skip over the ------------------------------ line
+   line = textStream.readLine();
+   if (line.contains("There are") && line.contains("basis functions")) {
+      tokens = TextStream::tokenize(line);
+      if (tokens.size() >= 6) {
+         unsigned n(0);
+         n = tokens[5].toUInt(&ok);
+         if (ok && n != nBasis) {
+            nBasis = n;
+            QLOG_INFO() << "Non-cartesian functions detected, pure conversion applied";
+
+            int nShells(shellData.shellTypes.size());
+            for (int i = 0; i < nShells; ++i) {
+                if (shellData.shellTypes[i] > 1)  {
+                    shellData.shellTypes[i] = -shellData.shellTypes[i];
+                }
+            }
+         }
+      }
+   }
+   
    qDebug() << "ShellData" << shellData.exponents.size();
    qDebug() << "ShellData" << shellData.contractionCoefficients.size();
    qDebug() << "ShellData" << shellData.contractionCoefficientsSP.size();
    qDebug() << shellData.shellToAtom;
    qDebug() << shellData.shellPrimitives;
 
-   return new Data::ShellList(shellData, geometry);
+   shells = new Data::ShellList(shellData, geometry);
+   if (shells->nBasis() == nBasis)  return shells;
+
+   delete shells;
 
    error:
      QString msg("Problem parsing general basis section, line number ");

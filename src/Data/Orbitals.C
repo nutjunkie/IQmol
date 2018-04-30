@@ -66,6 +66,12 @@ Orbitals::Orbitals(
    m_nOrbitals  = alphaCoefficients.size() / m_nBasis;
    m_restricted = (betaCoefficients.size() != alphaCoefficients.size());
 
+   if (alphaCoefficients.size() != m_nBasis*m_nOrbitals) {
+      QLOG_WARN() << "Inconsist alpha orbital data" << toString(m_orbitalType);
+      m_nOrbitals = 0;
+      return;
+   }
+
    m_alphaCoefficients.resize(m_nOrbitals, m_nBasis);
 
    unsigned ka(0);
@@ -76,6 +82,12 @@ Orbitals::Orbitals(
    }
 
    if (m_restricted) return;
+
+   if (betaCoefficients.size() != m_nBasis*m_nOrbitals) {
+      QLOG_WARN() << "Inconsist beta orbital data" << toString(m_orbitalType);
+      m_nOrbitals = 0;
+      return;
+   }
 
    m_betaCoefficients.resize(m_nOrbitals, m_nBasis);
    unsigned kb(0);

@@ -633,7 +633,12 @@ void Orbitals::updateOrbitalRange(bool alpha)
    combo = m_configurator.orbitalRangeMax;
    combo->clear();
    combo->addItems(m_orbitals.m_orbitals.labels(alpha));
-   combo->setCurrentIndex(m_orbitals.m_orbitals.labelIndex(alpha)+1);
+
+   if (combo->count() == 1) {
+      combo->setCurrentIndex(m_orbitals.m_orbitals.labelIndex(alpha));
+   }else {
+      combo->setCurrentIndex(m_orbitals.m_orbitals.labelIndex(alpha)+1);
+   }
 }
 
 
