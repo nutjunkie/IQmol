@@ -203,6 +203,185 @@ Matrix const& Orbitals::betaCoefficients()  const
 }
 
 
+/*
+From the Molden page:
+The following order of D, F and G functions is expected:
+
+   5D: D 0, D+1, D-1, D+2, D-2
+   6D: xx, yy, zz, xy, xz, yz
+
+   7F: F 0, F+1, F-1, F+2, F-2, F+3, F-3
+  10F: xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz
+
+   9G: G 0, G+1, G-1, G+2, G-2, G+3, G-3, G+4, G-4
+  15G: xxxx yyyy zzzz xxxy xxxz xyyy yyyz xzzz yzzz,
+       xxyy xxzz yyzz xxyz xyyz xyzz
+*/
+
+void Orbitals::reorderFromQChem(Matrix& C)
+{
+   unsigned offset(0);
+   ShellList::iterator shell;
+
+   for (shell = m_shellList.begin(); shell != m_shellList.end(); ++shell) {
+       switch ((*shell)->angularMomentum()) {
+
+          case Shell::S:
+             offset += 1;
+             break;
+
+          case Shell::P:
+             offset += 3;
+             break;
+
+          case Shell::D5:
+             for (unsigned i = 0; i < m_nOrbitals; ++i) {
+                 double d2m( C(i, offset+0) );
+                 double d1m( C(i, offset+1) );
+                 double d0 ( C(i, offset+2) );
+                 double d1p( C(i, offset+3) );
+                 double d2p( C(i, offset+4) );
+                 C(i, offset+0) = d0;
+                 C(i, offset+1) = d1p;
+                 C(i, offset+2) = d1m;
+                 C(i, offset+3) = d2p;
+                 C(i, offset+4) = d2m;
+             }
+             offset += 5; 
+             break;
+
+          case Shell::D6:
+             for (unsigned i = 0; i < m_nOrbitals; ++i) {
+                 double dxx( C(i, offset+0) );
+                 double dxy( C(i, offset+1) );
+                 double dyy( C(i, offset+2) );
+                 double dxz( C(i, offset+3) );
+                 double dyz( C(i, offset+4) );
+                 double dzz( C(i, offset+5) );
+                 C(i, offset+0) = dxx;
+                 C(i, offset+1) = dyy;
+                 C(i, offset+2) = dzz;
+                 C(i, offset+3) = dxy;
+                 C(i, offset+4) = dxz;
+                 C(i, offset+5) = dyz;
+             }
+             offset += 6; 
+             break;
+
+          case Shell::F7:
+             for (unsigned i = 0; i < m_nOrbitals; ++i) {
+                 double f3m( C(i, offset+0) );
+                 double f2m( C(i, offset+1) );
+                 double f1m( C(i, offset+2) );
+                 double f0 ( C(i, offset+3) );
+                 double f1p( C(i, offset+4) );
+                 double f2p( C(i, offset+5) );
+                 double f3p( C(i, offset+6) );
+                 C(i, offset+0) = f0;
+                 C(i, offset+1) = f1p;
+                 C(i, offset+2) = f1m;
+                 C(i, offset+3) = f2p;
+                 C(i, offset+4) = f2m;
+                 C(i, offset+5) = f3p;
+                 C(i, offset+6) = f3m;
+             }
+ 
+             offset += 7; 
+             break;
+
+          case Shell::F10:
+             for (unsigned i = 0; i < m_nOrbitals; ++i) {
+                 double fxxx( C(i, offset+0) );
+                 double fxxy( C(i, offset+1) );
+                 double fxyy( C(i, offset+2) );
+                 double fyyy( C(i, offset+3) );
+                 double fxxz( C(i, offset+4) );
+                 double fxyz( C(i, offset+5) );
+                 double fyyz( C(i, offset+6) );
+                 double fxzz( C(i, offset+7) );
+                 double fyzz( C(i, offset+8) );
+                 double fzzz( C(i, offset+9) );
+                 C(i, offset+0) = fxxx;
+                 C(i, offset+1) = fyyy;
+                 C(i, offset+2) = fzzz;
+                 C(i, offset+3) = fxyy;
+                 C(i, offset+4) = fxxy;
+                 C(i, offset+5) = fxxz;
+                 C(i, offset+6) = fxzz;
+                 C(i, offset+7) = fyzz;
+                 C(i, offset+8) = fyyz;
+                 C(i, offset+9) = fxyz;
+             }
+
+             offset += 10; 
+             break;
+
+          case Shell::G9:
+             for (unsigned i = 0; i < m_nOrbitals; ++i) {
+                 double g4m( C(i, offset+0) );
+                 double g3m( C(i, offset+1) );
+                 double g2m( C(i, offset+2) );
+                 double g1m( C(i, offset+3) );
+                 double g0 ( C(i, offset+4) );
+                 double g1p( C(i, offset+5) );
+                 double g2p( C(i, offset+6) );
+                 double g3p( C(i, offset+7) );
+                 double g4p( C(i, offset+8) );
+                 C(i, offset+0) = g0;
+                 C(i, offset+1) = g1p;
+                 C(i, offset+2) = g1m;
+                 C(i, offset+3) = g2p;
+                 C(i, offset+4) = g2m;
+                 C(i, offset+5) = g3p;
+                 C(i, offset+6) = g3m;
+                 C(i, offset+7) = g4p;
+                 C(i, offset+8) = g4m;
+             }
+ 
+             offset += 9; 
+             break;
+
+          case Shell::G15:
+             for (unsigned i = 0; i < m_nOrbitals; ++i) {
+                 double gxxxx( C(i, offset+ 0) );
+                 double gxxxy( C(i, offset+ 1) );
+                 double gxxyy( C(i, offset+ 2) );
+                 double gxyyy( C(i, offset+ 3) );
+                 double gyyyy( C(i, offset+ 4) );
+                 double gxxxz( C(i, offset+ 5) );
+                 double gxxyz( C(i, offset+ 6) );
+                 double gxyyz( C(i, offset+ 7) );
+                 double gyyyz( C(i, offset+ 8) );
+                 double gxxzz( C(i, offset+ 9) );
+                 double gxyzz( C(i, offset+10) );
+                 double gyyzz( C(i, offset+11) );
+                 double gxzzz( C(i, offset+12) );
+                 double gyzzz( C(i, offset+13) );
+                 double gzzzz( C(i, offset+14) );
+                 C(i, offset+ 0) = gxxxx;
+                 C(i, offset+ 1) = gyyyy;
+                 C(i, offset+ 2) = gzzzz;
+                 C(i, offset+ 3) = gxxxy;
+                 C(i, offset+ 4) = gxxxz;
+                 C(i, offset+ 5) = gxyyy;
+                 C(i, offset+ 6) = gyyyz;
+                 C(i, offset+ 7) = gxzzz;
+                 C(i, offset+ 8) = gyzzz;
+                 C(i, offset+ 9) = gxxyy;
+                 C(i, offset+10) = gxxzz;
+                 C(i, offset+11) = gyyzz;
+                 C(i, offset+12) = gxxyz;
+                 C(i, offset+13) = gxyyz;
+                 C(i, offset+14) = gxyzz;
+             }
+
+             offset += 15; 
+             break;
+       }
+   }
+}
+
+
 void Orbitals::dump() const 
 {
    qDebug() << "There are  " << m_nBasis << "basis functions and" << m_nOrbitals << "orbitals";

@@ -509,6 +509,7 @@ bool QChemOutput::parse(TextStream& textStream)
             dysonData.energies, dysonData.labels);
               
          if (dyson->consistent()) {
+            dyson->reorderFromQChem();
             Data::OrbitalsList* orbitalsList(new Data::OrbitalsList());
             orbitalsList->append(dyson);
             m_dataBank.append(orbitalsList);
