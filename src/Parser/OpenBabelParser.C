@@ -178,13 +178,38 @@ void OpenBabel::buildFrom2D(::OpenBabel::OBMol& obMol)
    ::OpenBabel::OBBuilder builder;
    builder.Build(obMol);
 
+
+   qDebug() << "---------------------------------";
+
+   ::OpenBabel::OBConversion conv(&std::cin, &std::cout);
+   conv.SetInAndOutFormats("SMI","MOL");
+   conv.Write(&obMol);
+
+   qDebug() << "---------------------------------";
+   
+
+
+       for (::OpenBabel::OBMolAtomIter obAtom(&obMol); obAtom; ++obAtom) {
+           qglviewer::Vec pos(obAtom->x(), obAtom->y(), obAtom->z());
+           unsigned Z(obAtom->GetAtomicNum());
+           qDebug() << obAtom->GetAtomicNum() << pos.x << pos.y << pos.z;
+       }
+ 
+           qDebug() << "---------------------------------";
+
+/*
    ::OpenBabel::OBAtomTyper atomTyper;  
    atomTyper.AssignImplicitValence(obMol);
    atomTyper.AssignHyb(obMol);
+*/
 
+   obMol.SetDimension(3);
    obMol.AddHydrogens(false, false);
+
+/*
    obMol.BeginModify();
    obMol.EndModify();
+*/
 
    const char* obff(Preferences::DefaultForceField().toLatin1().data());
    ::OpenBabel::OBForceField* 
@@ -203,7 +228,7 @@ void OpenBabel::buildFrom2D(::OpenBabel::OBMol& obMol)
    forceField->SetLogFile(&std::cout);
    forceField->SetLogLevel(OBFF_LOGLVL_LOW);
 
-   forceField->SetConformers(obMol);
+   //forceField->SetConformers(obMol);
 
    // Built structures can be a bit dodge, so give the optimizers plenty of
    // cycles.
@@ -213,6 +238,11 @@ void OpenBabel::buildFrom2D(::OpenBabel::OBMol& obMol)
    // We pre-optimize with conjugate gradient 
    forceField->ConjugateGradientsInitialize(maxSteps, convergence);
    forceField->ConjugateGradientsTakeNSteps(maxSteps);
+
+/*
+   forceField->FastRotorSearch(true);
+   forceField->ConjugateGradientsTakeNSteps(maxSteps);
+*/
 
    // And finish off with steepest descent
    forceField->SteepestDescentInitialize(maxSteps, convergence);

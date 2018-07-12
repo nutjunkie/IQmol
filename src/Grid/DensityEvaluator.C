@@ -33,10 +33,12 @@ namespace IQmol {
 
 
 DensityEvaluator::DensityEvaluator(Data::GridDataList& grids, Data::ShellList& shellList, 
-   QList<Vector*> const& densities) : m_grids(grids), m_shellList(shellList),
+   QList<Vector const*> const& densities) : m_grids(grids), m_shellList(shellList),
    m_densities(densities), m_evaluator(0)
 {
    if (grids.isEmpty()) return;
+
+   shellList.setDensityVectors(densities);
    m_returnValues.resize(m_densities.size());
    m_function = boost::bind(&DensityEvaluator::evaluate, this, _1, _2, _3);
 
@@ -48,7 +50,6 @@ DensityEvaluator::DensityEvaluator(Data::GridDataList& grids, Data::ShellList& s
 
    m_totalProgress = m_evaluator->totalProgress();
 }
-
 
 
 void DensityEvaluator::run()
@@ -65,7 +66,6 @@ void DensityEvaluator::run()
 }
 
 
-
 void DensityEvaluator::evaluatorFinished()
 {
    qDebug() << "DensityEvaluator finished";
@@ -75,15 +75,18 @@ void DensityEvaluator::evaluatorFinished()
 }
 
 
-
 Vector const& DensityEvaluator::evaluate(double const x, double const y, double const z)
 {
+   return m_shellList.densityValues(x,y,z);
+
+// DEPRECATE
    Vector const& s2(m_shellList.shellPairValues(Vec(x,y,z)));
    for (int i = 0; i < m_densities.size(); ++i) {
        m_returnValues[i] = inner_prod(*(m_densities[i]), s2);
    }  
     
    return m_returnValues;
+// DEPRECATE
 }
 
 } // end namespace IQmol

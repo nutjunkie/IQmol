@@ -327,6 +327,7 @@ bool Molecule::save(bool prompt)
                  << tr("MDL SDfile") + "(*.mol)"
                  << tr("PDB") + " (*.pdb)"
                  << tr("Sybyl Mol2") + " (*.mol2)"
+                 << tr("SMILES") + " (*.smi)"
                  << tr("IQmol Archive") + " (*.iqmol)";
 
       QString fileName(QFileDialog::getSaveFileName(0, tr("Save File"), 

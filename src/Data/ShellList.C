@@ -34,7 +34,7 @@ namespace Data {
 template<> const Type::ID List<Shell>::TypeID = Type::ShellList;
 
 
-ShellList::ShellList(ShellData const& shellData, Geometry const& geometry)
+ShellList::ShellList(ShellData const& shellData, Geometry const& geometry) : m_sigBasis(0)
 {
    static double const convExponents(std::pow(Constants::BohrToAngstrom, -2.0));
    unsigned nShells(shellData.shellTypes.size());
@@ -110,6 +110,10 @@ ShellList::ShellList(ShellData const& shellData, Geometry const& geometry)
 }
 
 
+ShellList::~ShellList() 
+{
+   if (m_sigBasis) delete [] m_sigBasis;
+}
 
 unsigned ShellList::nBasis() const
 {
@@ -180,20 +184,24 @@ void ShellList::dump() const
 void ShellList::resize()
 {
    m_nBasis = nBasis();
-   m_shellValues.resize(m_nBasis);
+   m_basisValues.resize(m_nBasis);
+
+   if (m_sigBasis) delete [] m_sigBasis;
+   m_sigBasis = new unsigned[m_nBasis];
+
    unsigned size(m_nBasis*(m_nBasis+1)/2);
    if (2*size != m_nBasis*(m_nBasis+1)) {
       QLOG_WARN() << "Round error in ShellList::resize()";
       ++size;
    }
-   m_shellPairValues.resize(size);
+   m_basisPairValues.resize(size);
 
    qDebug() << shellAtomOffsets();
    qDebug() << basisAtomOffsets();
 }
 
 
-QList<unsigned>ShellList::shellAtomOffsets() const
+QList<unsigned> ShellList::shellAtomOffsets() const
 {
    QList<unsigned> offsets;
    offsets.append(0);
@@ -212,7 +220,7 @@ QList<unsigned>ShellList::shellAtomOffsets() const
    return offsets;
 }
 
-QList<unsigned>ShellList::basisAtomOffsets() const
+QList<unsigned> ShellList::basisAtomOffsets() const
 {
    QList<unsigned> offsets;
    offsets.append(0);
@@ -245,14 +253,15 @@ Vector const& ShellList::shellValues(qglviewer::Vec const& gridPoint)
    for (shell = begin(); shell != end(); ++shell) {
        values = (*shell)->evaluate(gridPoint);
        for (unsigned s = 0; s < (*shell)->nBasis(); ++s, ++offset) {
-           m_shellValues[offset] = values[s];
+           m_basisValues[offset] = values[s];
        }
    }
 
-   return m_shellValues;
+   return m_basisValues;
 }
 
 
+// DEPRECATE
 Vector const& ShellList::shellPairValues(qglviewer::Vec const& gridPoint)
 {
    shellValues(gridPoint);
@@ -260,16 +269,79 @@ Vector const& ShellList::shellPairValues(qglviewer::Vec const& gridPoint)
    unsigned k(0);
    double xi, xj; 
    for (unsigned i = 0; i < m_nBasis; ++i) {
-       xi = m_shellValues[i];
+       xi = m_basisValues[i];
        for (unsigned j = 0; j < i; ++j, ++k) {
-           xj = m_shellValues[j];
-           m_shellPairValues[k] = 2.0*xi*xj;
+           xj = m_basisValues[j];
+           m_basisPairValues[k] = 2.0*xi*xj;
        }   
-       m_shellPairValues[k] = xi*xi;
+       m_basisPairValues[k] = xi*xi;
        ++k;
    }
 
-   return m_shellPairValues;
+   return m_basisPairValues;
 }
+// DEPRECATE
+
+
+
+void ShellList::setDensityVectors(QList<Vector const*> const& densityVectors)
+{
+   m_densityVectors = densityVectors;
+   m_densityValues.resize(m_densityVectors.size());
+}
+
+
+Vector const& ShellList::densityValues(double const x, double const y, double const z)
+{
+   unsigned numbas, nSigBas(0), basoff(0);
+   double const* values;
+
+   // Determine the significant shells, and corresponding basis function indices
+   ShellList::const_iterator shell;
+   for (shell = begin(); shell != end(); ++shell) {
+       values = (*shell)->evaluate(x,y,z);
+       numbas = (*shell)->nBasis();
+
+       if (values) { // only add the significant shells
+          for (unsigned i = 0; i < numbas; ++i, ++nSigBas, ++basoff) {
+              m_basisValues[nSigBas] = values[i];
+              m_sigBasis[nSigBas]    = basoff;
+          }
+       }else {
+          basoff += numbas;
+       }
+   }
+
+   double   xi, xij; 
+   unsigned ii, jj, Ti;
+   unsigned nden(m_densityVectors.size());
+
+   for (unsigned k = 0; k < nden; ++k) {
+       m_densityValues[k] = 0.0;
+   }
+
+   // Now compute the basis function pair values on the grid
+   for (unsigned i = 0; i < nSigBas; ++i) {
+       xi = m_basisValues[i];
+       ii = m_sigBasis[i];
+       Ti = (ii*(ii+1))/2;
+       for (unsigned j = 0; j < i; ++j) {
+           xij = 2.0*xi*m_basisValues[j];
+           jj  = m_sigBasis[j];
+
+           for (unsigned k = 0; k < nden; ++k) {
+               m_densityValues[k] += 2.0*xij*(*m_densityVectors[k])[Ti+jj];
+           }
+
+       }
+       
+       for (unsigned k = 0; k < nden; ++k) {
+           m_densityValues[k] += xi*xi*(*m_densityVectors[k])[Ti+ii];
+       }
+   }
+
+   return m_densityValues;
+}
+
 
 } } // end namespace IQmol::Data

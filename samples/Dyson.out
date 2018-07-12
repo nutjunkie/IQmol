@@ -1,5 +1,5 @@
-tin.anu.edu.au 150.203.123
-Q-Chem Developer Version! Running on 150.203.123.*
+Check license passed
+
                   Welcome to Q-Chem
      A Quantum Leap Into The Future Of Chemistry
 
@@ -63,17 +63,18 @@ Q-Chem Developer Version! Running on 150.203.123.*
  Y. Shao et al., Mol. Phys. 113, 184-215 (2015)
  DOI: 10.1080/00268976.2014.952696
 
- Q-Chem 5.0.2 for Mac (Intel) OS X
+ Q-Chem 5.0.2 for Intel X86 EM64T Linux
 
- Parts of Q-Chem use Armadillo 5.200.1 (Boston Tea Smuggler).
+ Parts of Q-Chem use Armadillo 8.300.2 (Tropical Shenanigans).
  http://arma.sourceforge.net/
 
- Q-Chem begins on Tue Jan 16 17:02:34 2018  
+ Q-Chem begins on Mon Apr 30 20:35:39 2018  
 
-tin.anu.edu.au
-Host: 0
+Host: iqmol
+0
 
-     Scratch files written to /Users/agilbert/Development/QChem/scratch/local/qchem61289//
+     Scratch files written to /scratch/qchem2756//
+ Feb718  _RNUM -1
 Core orbitals will be frozen
 
 Checking the input file for inconsistencies... 	...done.
@@ -81,92 +82,183 @@ Checking the input file for inconsistencies... 	...done.
 --------------------------------------------------------------
 User input:
 --------------------------------------------------------------
-\begin{qinput}
-{Dyson orbitals for ionization of CH2
-from high-spin triplet reference and from the lowest SF state
-$end
 $molecule
-   0 3
-   C
-   H  1 rCH
-   H  1 rCH 2 aHCH
-
-   rCH    = 1.1167
-   aHCH   = 102.07
+1 1
+  Ca    0.0000000    0.0000000   -0.6744107
+  O    0.0000000    0.0000000    1.3929626
+  H    0.0000000    0.0000000    2.3445138
 $end
 
 $rem
-   CORRELATION           CCSD
-   BASIS                 6-31G*
-   PURECART              2222    6d, will be required for ezDyson
-   SCF_GUESS             core
-   CCMAN2                true    new Dyson code
-   CC_SYMMETRY           false
-   SF_STATES             [1]
-   EOM_IP_ALPHA          [2]     one should be careful to request
-   EOM_EA_BETA           [2]     meaningful spin for EA/IP state(s)
-   CC_TRANS_PROP         true    necessary for Dyson orbitals job
-   CC_DO_DYSON           true
-   PRINT_GENERAL_BASIS   true    will be required for ezDyson
+   BASIS  =  cc-pVDZ
+   CC_DO_DYSON  =  1
+   CC_EOM_PROPERTIES  =  0
+   EOM_EA_BETA  =  [2,2,2,0]
+   GUI  =  2
+   METHOD  =  EOM-CCSD
+   PRINT_GENERAL_BASIS  =  1
 $end
+
 --------------------------------------------------------------
  ----------------------------------------------------------------
              Standard Nuclear Orientation (Angstroms)
     I     Atom           X                Y                Z
  ----------------------------------------------------------------
-    1      C       0.0000000000     0.0000000000     0.1755579542
-    2      H      -0.8682680261    -0.0000000000    -0.5266738627
-    3      H       0.8682680261    -0.0000000000    -0.5266738627
+    1      Ca      0.0000000000     0.0000000000    -0.6744107207
+    2      O       0.0000000000     0.0000000000     1.3929625793
+    3      H       0.0000000000     0.0000000000     2.3445137793
  ----------------------------------------------------------------
  Molecular Point Group                 C2v   NOp =  4
  Largest Abelian Subgroup              C2v   NOp =  4
- Nuclear Repulsion Energy =     5.9912422132 hartrees
- There are        5 alpha and        3 beta electrons
-
- Q-Chem warning in module /Users/agilbert/Development/QChem/trunk/forms1/BasisType.C, line 1718:
-
- You are not using the predefined 5D/6D in this basis set.
-
- Requested basis set is 6-31G(d)
+ Nuclear Repulsion Energy =    48.9092531091 hartrees
+ There are       14 alpha and       14 beta electrons
+ Requested basis set is cc-pVDZ
 Basis set in general basis input format:
 -----------------------------------------------------------------------
 $basis
-C    0
-S    6    1.000000
-   3.04752490E+03    1.83470000E-03 
-   4.57369510E+02    1.40373000E-02 
-   1.03948690E+02    6.88426000E-02 
-   2.92101550E+01    2.32184400E-01 
-   9.28666300E+00    4.67941300E-01 
-   3.16392700E+00    3.62312000E-01 
-SP   3    1.000000
-   7.86827240E+00   -1.19332400E-01   6.89991000E-02 
-   1.88128850E+00   -1.60854200E-01   3.16424000E-01 
-   5.44249300E-01    1.14345640E+00   7.44308300E-01 
-SP   1    1.000000
-   1.68714400E-01    1.00000000E+00   1.00000000E+00 
+Ca   0
+S    13    1.000000
+   1.90000700E+05    2.21450000E-04 
+   2.84814600E+04    1.71830000E-03 
+   6.48270100E+03    8.92348000E-03 
+   1.83589100E+03    3.63018300E-02 
+   5.98724300E+02    1.17622230E-01 
+   2.15884100E+02    2.86043520E-01 
+   8.40124200E+01    4.22607080E-01 
+   3.42248800E+01    2.57743660E-01 
+   1.00249700E+01    2.39189300E-02 
+   4.05592000E+00   -4.95218000E-03 
+   1.02026100E+00    1.71779000E-03 
+   4.26865000E-01   -8.92090000E-04 
+   6.33470000E-02    2.45100000E-04 
+S    13    1.000000
+   1.90000700E+05   -6.45300000E-05 
+   2.84814600E+04   -4.96620000E-04 
+   6.48270100E+03   -2.62826000E-03 
+   1.83589100E+03   -1.06684500E-02 
+   5.98724300E+02   -3.71350900E-02 
+   2.15884100E+02   -9.80428400E-02 
+   8.40124200E+01   -2.03426920E-01 
+   3.42248800E+01   -1.52446550E-01 
+   1.00249700E+01    4.82794060E-01 
+   4.05592000E+00    6.29238390E-01 
+   1.02026100E+00    6.16484200E-02 
+   4.26865000E-01   -1.47997100E-02 
+   6.33470000E-02    3.61089000E-03 
+S    13    1.000000
+   1.90000700E+05    2.22300000E-05 
+   2.84814600E+04    1.71700000E-04 
+   6.48270100E+03    9.04520000E-04 
+   1.83589100E+03    3.70343000E-03 
+   5.98724300E+02    1.28375000E-02 
+   2.15884100E+02    3.47545900E-02 
+   8.40124200E+01    7.30349100E-02 
+   3.42248800E+01    6.10008300E-02 
+   1.00249700E+01   -2.42929280E-01 
+   4.05592000E+00   -4.87085000E-01 
+   1.02026100E+00    5.65028040E-01 
+   4.26865000E-01    6.55743860E-01 
+   6.33470000E-02    2.67289400E-02 
+S    13    1.000000
+   1.90000700E+05    5.31000000E-06 
+   2.84814600E+04    4.11100000E-05 
+   6.48270100E+03    2.15680000E-04 
+   1.83589100E+03    8.88270000E-04 
+   5.98724300E+02    3.05813000E-03 
+   2.15884100E+02    8.37608000E-03 
+   8.40124200E+01    1.74105600E-02 
+   3.42248800E+01    1.51545300E-02 
+   1.00249700E+01   -6.20791900E-02 
+   4.05592000E+00   -1.26118030E-01 
+   1.02026100E+00    1.73606940E-01 
+   4.26865000E-01    3.78229430E-01 
+   6.33470000E-02   -6.59646980E-01 
+S    1    1.000000
+   2.63010000E-02    1.00000000E+00 
+P    10    1.000000
+   1.07204300E+03    1.98166000E-03 
+   2.53843900E+02    1.61294400E-02 
+   8.13162600E+01    7.65785100E-02 
+   3.02418300E+01    2.32695940E-01 
+   1.21011000E+01    4.24452100E-01 
+   5.02255400E+00    3.73264020E-01 
+   1.90922000E+00    7.86853000E-02 
+   7.71304000E-01   -5.99927000E-03 
+   3.00570000E-01    2.64257000E-03 
+   7.66490000E-02   -8.56940000E-04 
+P    10    1.000000
+   1.07204300E+03   -6.48910000E-04 
+   2.53843900E+02   -5.27907000E-03 
+   8.13162600E+01   -2.58113100E-02 
+   3.02418300E+01   -8.06289200E-02 
+   1.21011000E+01   -1.58465520E-01 
+   5.02255400E+00   -1.28168160E-01 
+   1.90922000E+00    2.56101030E-01 
+   7.71304000E-01    5.87240680E-01 
+   3.00570000E-01    3.03725610E-01 
+   7.66490000E-02    1.41645100E-02 
+P    10    1.000000
+   1.07204300E+03    1.35950000E-04 
+   2.53843900E+02    1.09420000E-03 
+   8.13162600E+01    5.42680000E-03 
+   3.02418300E+01    1.67471800E-02 
+   1.21011000E+01    3.38986300E-02 
+   5.02255400E+00    2.53118300E-02 
+   1.90922000E+00   -5.89571300E-02 
+   7.71304000E-01   -1.58761200E-01 
+   3.00570000E-01   -8.55452300E-02 
+   7.66490000E-02    5.44646650E-01 
+P    1    1.000000
+   2.77720000E-02    1.00000000E+00 
+D    4    1.000000
+   1.03182000E+01    3.28490000E-02 
+   2.59242000E+00    1.48192000E-01 
+   7.61700000E-01    3.10921000E-01 
+   2.08380000E-01    4.52195000E-01 
 D    1    1.000000
-   8.00000000E-01    1.00000000E+00 
+   5.37000000E-02    1.00000000E+00 
+****
+O    0
+S    7    1.000000
+   1.17200000E+04    7.10000000E-04 
+   1.75900000E+03    5.47087000E-03 
+   4.00800000E+02    2.78370000E-02 
+   1.13700000E+02    1.04858510E-01 
+   3.70300000E+01    2.83260430E-01 
+   1.32700000E+01    4.50493790E-01 
+   5.02500000E+00    2.72494270E-01 
+S    7    1.000000
+   1.17200000E+04   -1.60000000E-07 
+   1.75900000E+03   -3.15300000E-05 
+   1.13700000E+02   -2.12216000E-03 
+   3.70300000E+01   -7.19768000E-03 
+   1.32700000E+01   -6.43899900E-02 
+   5.02500000E+00   -5.59550300E-02 
+   1.01300000E+00    5.60848120E-01 
+S    1    1.000000
+   3.02300000E-01    1.00000000E+00 
+P    3    1.000000
+   1.77000000E+01    4.30180000E-02 
+   3.85400000E+00    2.28913000E-01 
+   1.04600000E+00    5.08728000E-01 
+P    1    1.000000
+   2.75300000E-01    1.00000000E+00 
+D    1    1.000000
+   1.18500000E+00    1.00000000E+00 
 ****
 H    0
 S    3    1.000000
-   1.87311370E+01    3.34946000E-02 
-   2.82539370E+00    2.34726950E-01 
-   6.40121700E-01    8.13757330E-01 
+   1.30100000E+01    1.96850000E-02 
+   1.96200000E+00    1.37977000E-01 
+   4.44600000E-01    4.78148000E-01 
 S    1    1.000000
-   1.61277800E-01    1.00000000E+00 
-****
-H    0
-S    3    1.000000
-   1.87311370E+01    3.34946000E-02 
-   2.82539370E+00    2.34726950E-01 
-   6.40121700E-01    8.13757330E-01 
-S    1    1.000000
-   1.61277800E-01    1.00000000E+00 
+   1.22000000E-01    1.00000000E+00 
+P    1    1.000000
+   7.27000000E-01    1.00000000E+00 
 ****
 $end
 -----------------------------------------------------------------------
- There are 8 shells and 19 basis functions
+ There are 20 shells and 46 basis functions
  Total memory of 2000MB is distributed as follows: 
    QALLOC including MEM_STATIC uses 192MB
    MEM_STATIC is set to 192MB
@@ -178,19 +270,21 @@ $end
  MEM_STATIC part       192 MB
 
                        Distance Matrix (Angstroms)
-             C (  1)   H (  2)
-   H (  2)  1.116700
-   H (  3)  1.116700  1.736536
+             Ca(  1)   O (  2)
+   O (  2)  2.067373
+   H (  3)  3.018924  0.951551
+ 
+ A cutoff of  1.0D-14 yielded    210 shell pairs
+ There are      1132 function pairs (      1291 Cartesian)
+ Smallest overlap matrix eigenvalue = 4.42E-02
 
- A cutoff of  1.0D-14 yielded     36 shell pairs
- There are       217 function pairs
- Smallest overlap matrix eigenvalue = 3.08E-02
-
- Scale SEOQF with 1.000000e+00/1.000000e+00/1.000000e+00
+ Scale SEOQF with 1.000000e-01/1.000000e-01/1.000000e-01
 
  Standard Electronic Orientation quadrupole field applied
- Nucleus-field energy     =    -0.0000000003 hartrees
- Guess MOs from core Hamiltonian diagonalization
+ Nucleus-field energy     =    -0.0000000032 hartrees
+ Guess from superposition of atomic densities
+ Warning:  Energy on first SCF cycle will be non-variational
+ SAD guess density has 29.000000 electrons
 
  ==================================================
     GEN_SCFMAN: A general SCF calculation manager  
@@ -211,31 +305,29 @@ $end
         -- Hugh Burton 2017-                       
  ==================================================
  Hartree-Fock
- A unrestricted SCF calculation will be
+ A restricted SCF calculation will be
  performed using DIIS
  SCF converges when DIIS error is below 1.0e-08
  ---------------------------------------
   Cycle       Energy         DIIS error
  ---------------------------------------
-    1     -34.8288845040      1.35e-01  
-    2     -38.1950494695      4.98e-02  
-    3     -38.8915174866      6.95e-03  
-    4     -38.9024572294      1.37e-03  
-    5     -38.9032365326      3.21e-04  
-    6     -38.9033087160      1.34e-04  
-    7     -38.9033226925      5.33e-05  
-    8     -38.9033251309      1.14e-05  
-    9     -38.9033252268      2.44e-06  
-   10     -38.9033252299      4.62e-07  
-   11     -38.9033252301      9.52e-08  
-   12     -38.9033252301      2.20e-08  
-   13     -38.9033252301      3.91e-09  Convergence criterion met
+    1    -752.0534695627      6.64e-02  
+    2    -751.9614119629      1.95e-02  
+    3    -752.0184029996      1.36e-02  
+    4    -752.0544561665      7.04e-04  
+    5    -752.0547674538      2.52e-04  
+    6    -752.0547964563      5.45e-05  
+    7    -752.0547985062      1.27e-05  
+    8    -752.0547986365      2.34e-06  
+    9    -752.0547986389      2.70e-07  
+   10    -752.0547986390      5.55e-08  
+   11    -752.0547986390      1.03e-08  
+   12    -752.0547986390      9.77e-10  Convergence criterion met
  ---------------------------------------
- SCF time:   CPU 0.83s  wall 0.00s 
- Total energy in the final basis set =      -38.9033252301
-<S^2> =          2.013007771
-Wall  1 = 0
-Clock 1 = 0.830097973
+ SCF time:   CPU 18.97s  wall 19.00s 
+ Total energy in the final basis set =     -752.0547986390
+Wall  1 = 19
+Clock 1 = 18.9699935913
  ==================================================
                   Done GEN_SCFMAN                  
  ==================================================
@@ -272,35 +364,67 @@ Clock 1 = 0.830097973
 
  Calculation will run on 1 core with 1808MB of RAM.
 
+ 
+ Alpha MOs, Restricted
+ -- Occupied --                  
+-149.58  -20.64  -17.03  -13.84  -13.84  -13.84   -2.45   -1.56
+  1 A1    2 A1    3 A1    1 B1    1 B2    4 A1    5 A1    6 A1                 
+ -1.557  -1.557  -1.357  -0.742  -0.572  -0.572
+  2 B1    2 B2    7 A1    8 A1    3 B1    3 B2                                 
+ -- Virtual --                   
+ -0.193  -0.124  -0.124  -0.106  -0.074  -0.074  -0.027  -0.023
+  9 A1    4 B1    4 B2   10 A1   11 A1    1 A2   12 A1    5 B1                 
+ -0.023  -0.009   0.045   0.045   0.076   0.076   0.082   0.082
+  5 B2   13 A1    6 B1    6 B2    2 A2   14 A1    7 B1    7 B2                 
+  0.090   0.172   0.209   0.832   1.206   1.206   1.317   1.511
+ 15 A1   16 A1   17 A1   18 A1    8 B1    8 B2   19 A1    9 B1                 
+  1.511   1.798   2.406   2.883   2.883   3.214   3.214   3.979
+  9 B2   20 A1   21 A1   22 A1    3 A2   10 B1   10 B2   23 A1                 
+ 
+ Beta MOs, Restricted
+ -- Occupied --                  
+-149.58  -20.64  -17.03  -13.84  -13.84  -13.84   -2.45   -1.56
+  1 A1    2 A1    3 A1    1 B1    1 B2    4 A1    5 A1    6 A1                 
+ -1.557  -1.557  -1.357  -0.742  -0.572  -0.572
+  2 B1    2 B2    7 A1    8 A1    3 B1    3 B2                                 
+ -- Virtual --                   
+ -0.193  -0.124  -0.124  -0.106  -0.074  -0.074  -0.027  -0.023
+  9 A1    4 B1    4 B2   10 A1   11 A1    1 A2   12 A1    5 B1                 
+ -0.023  -0.009   0.045   0.045   0.076   0.076   0.082   0.082
+  5 B2   13 A1    6 B1    6 B2    2 A2   14 A1    7 B1    7 B2                 
+  0.090   0.172   0.209   0.832   1.206   1.206   1.317   1.511
+ 15 A1   16 A1   17 A1   18 A1    8 B1    8 B2   19 A1    9 B1                 
+  1.511   1.798   2.406   2.883   2.883   3.214   3.214   3.979
+  9 B2   20 A1   21 A1   22 A1    3 A2   10 B1   10 B2   23 A1                 
 
  Occupation and symmetry of molecular orbitals
 
- Point group: C1 (1 irreducible representation).
+ Point group: C2v (4 irreducible representations).
 
-                           A     All 
- -------------------------------------
+                           A1   A2   B1   B2    All 
+ ----------------------------------------------------
  All molecular orbitals:
-  - Alpha                  19    19  
-  - Beta                   19    19  
- -------------------------------------
+  - Alpha                  23   3    10   10    46  
+  - Beta                   23   3    10   10    46  
+ ----------------------------------------------------
  Alpha orbitals:
-  - Frozen occupied        1     1   
-  - Active occupied        4     4   
-  - Active virtual         14    14  
-  - Frozen virtual         0     0   
- -------------------------------------
+  - Frozen occupied        6    0    2    2     10  
+  - Active occupied        2    0    1    1     4   
+  - Active virtual         15   3    7    7     32  
+  - Frozen virtual         0    0    0    0     0   
+ ----------------------------------------------------
  Beta orbitals:
-  - Frozen occupied        1     1   
-  - Active occupied        2     2   
-  - Active virtual         16    16  
-  - Frozen virtual         0     0   
- -------------------------------------
+  - Frozen occupied        6    0    2    2     10  
+  - Active occupied        2    0    1    1     4   
+  - Active virtual         15   3    7    7     32  
+  - Frozen virtual         0    0    0    0     0   
+ ----------------------------------------------------
 
  Import integrals:   CPU 0.00 s  wall 0.00 s
 
- Import integrals:   CPU 0.06 s  wall 0.06 s
+ Import integrals:   CPU 0.89 s  wall 0.91 s
 
- MP2 amplitudes:   CPU 0.00 s  wall 0.00 s
+ MP2 amplitudes:   CPU 0.08 s  wall 0.08 s
 
            CCSD T amplitudes will be solved using DIIS.
 
@@ -309,44 +433,53 @@ Clock 1 = 0.830097973
  ------------------------------------------------------------------------------
            Energy (a.u.)   Ediff      Tdiff       Comment
  ------------------------------------------------------------------------------
-           -38.98590263                           
-     1     -38.99897126   1.31e-02   2.63e-01     
-     2     -39.00224072   3.27e-03   4.27e-02     
-     3     -39.00331582   1.08e-03   1.31e-02     
-     4     -39.00413911   8.23e-04   9.87e-03     Switched to DIIS steps.
-     5     -39.00425003   1.11e-04   3.38e-03     
-     6     -39.00426260   1.26e-05   9.85e-04     
-     7     -39.00426107   1.52e-06   2.23e-04     
-     8     -39.00426110   2.40e-08   6.92e-05     
+          -752.26658485                           
+     1    -752.26014330   6.44e-03   3.89e-01     
+     2    -752.26736973   7.23e-03   5.63e-02     
+     3    -752.26626084   1.11e-03   2.93e-02     
+     4    -752.26723994   9.79e-04   1.97e-02     Switched to DIIS steps.
+     5    -752.26759534   3.55e-04   6.40e-03     
+     6    -752.26761614   2.08e-05   1.59e-03     
+     7    -752.26761156   4.58e-06   5.67e-04     
+     8    -752.26760983   1.73e-06   2.59e-04     
+     9    -752.26760999   1.65e-07   5.90e-05     
  ------------------------------------------------------------------------------
-           -39.00426110                           CCSD T converged.
+          -752.26760999                           CCSD T converged.
 
- SCF energy                 = -38.90332523
- MP2 energy                 = -38.98590263
- CCSD correlation energy     =  -0.10093587
- CCSD total energy           = -39.00426110
+ SCF energy                 = -752.05479864
+ MP2 energy                 = -752.26658485
+ CCSD correlation energy     =   -0.21281136
+ CCSD total energy           = -752.26760999
 
- CCSD  T1^2 = 0.0013  T2^2 = 0.0452  Leading amplitudes:
-
- Amplitude    Orbitals with energies
- -0.0232       2 (A) B                   ->    4 (A) B                    
-              -0.7817                          0.1067                     
-  0.0140       3 (A) B                   ->    7 (A) B                    
-              -0.5157                          0.3465                     
-  0.0129       3 (A) B                   ->    12 (A) B                   
-              -0.5157                          1.1539                     
- -0.0091       2 (A) B                   ->    13 (A) B                   
-              -0.7817                          1.2067                     
+ CCSD  T1^2 = 0.0076  T2^2 = 0.0645  Leading amplitudes:
 
  Amplitude    Orbitals with energies
-  0.0484       3 (A) A       3 (A) B     ->    7 (A) A       7 (A) B      
-              -0.5579       -0.5157            0.2954        0.3465       
- -0.0484       3 (A) A       3 (A) B     ->    7 (A) B       7 (A) A      
-              -0.5579       -0.5157            0.3465        0.2954       
- -0.0484       3 (A) B       3 (A) A     ->    7 (A) A       7 (A) B      
-              -0.5157       -0.5579            0.2954        0.3465       
-  0.0484       3 (A) B       3 (A) A     ->    7 (A) B       7 (A) A      
-              -0.5157       -0.5579            0.3465        0.2954       
+ -0.0343       3 (B1) A                  ->    5 (B1) A                   
+              -0.5719                         -0.0227                     
+ -0.0343       3 (B1) B                  ->    5 (B1) B                   
+              -0.5719                         -0.0227                     
+ -0.0343       3 (B2) A                  ->    5 (B2) A                   
+              -0.5719                         -0.0227                     
+ -0.0343       3 (B2) B                  ->    5 (B2) B                   
+              -0.5719                         -0.0227                     
+
+ Amplitude    Orbitals with energies
+ -0.0416       3 (B1) A      3 (B1) B    ->    8 (B1) A      8 (B1) B     
+              -0.5719       -0.5719            1.2064        1.2064       
+  0.0416       3 (B1) A      3 (B1) B    ->    8 (B1) B      8 (B1) A     
+              -0.5719       -0.5719            1.2064        1.2064       
+  0.0416       3 (B1) B      3 (B1) A    ->    8 (B1) A      8 (B1) B     
+              -0.5719       -0.5719            1.2064        1.2064       
+ -0.0416       3 (B1) B      3 (B1) A    ->    8 (B1) B      8 (B1) A     
+              -0.5719       -0.5719            1.2064        1.2064       
+ -0.0416       3 (B2) A      3 (B2) B    ->    8 (B2) A      8 (B2) B     
+              -0.5719       -0.5719            1.2064        1.2064       
+  0.0416       3 (B2) A      3 (B2) B    ->    8 (B2) B      8 (B2) A     
+              -0.5719       -0.5719            1.2064        1.2064       
+  0.0416       3 (B2) B      3 (B2) A    ->    8 (B2) A      8 (B2) B     
+              -0.5719       -0.5719            1.2064        1.2064       
+ -0.0416       3 (B2) B      3 (B2) A    ->    8 (B2) B      8 (B2) A     
+              -0.5719       -0.5719            1.2064        1.2064       
 
  Computing CCSD intemediates for later calculations
  Finished.
@@ -357,141 +490,24 @@ Clock 1 = 0.830097973
  ------------------------------------------------------------------------------
             Enorm      Ldiff       Comment
  ------------------------------------------------------------------------------
-     1     1.08e-02   7.53e-03     
-     2     2.39e-03   1.70e-03     
-     3     8.66e-04   4.73e-04     
-     4     2.79e-04   2.63e-04     Switched to DIIS steps.
-     5     9.37e-05   9.77e-05     
-     6     2.95e-05   2.98e-05     
-     7     9.51e-06   7.88e-06     
-     8     2.90e-06   1.94e-06     
-     9     8.79e-07   4.27e-07     
+     1     3.53e-02   7.74e-03     
+     2     2.01e-02   9.62e-03     
+     3     8.71e-03   1.24e-03     
+     4     3.64e-03   1.91e-03     Switched to DIIS steps.
+     5     7.53e-04   8.56e-04     
+     6     2.86e-04   1.06e-04     
+     7     1.18e-04   1.91e-05     
+     8     3.35e-05   1.01e-05     
+     9     1.38e-05   2.38e-06     
+    10     6.39e-06   3.90e-07     
+    11     2.15e-06   1.85e-07     
+    12     9.44e-07   3.15e-08     
  ------------------------------------------------------------------------------
                                    CCSD Lambda converged.
 
- CCSD calculation:   CPU 0.56 s  wall 0.54 s
+ CCSD calculation:   CPU 4.86 s  wall 4.86 s
 
-        Solving for EOMEE-CCSD A transitions.
-
-       EOMSF-CCSD/MP2 right amplitudes will be solved using Davidson.
-      Amplitudes will be solved using standard  algorithm
-      Roots     MaxVec    MaxIter   Precond   Conv      Thresh    Shift    
-      1         60        60        1         1.00e-05  1.00e-05  0.00e+00  
- ------------------------------------------------------------------------------
-      Iter ConvRoots NVecs ResNorm Current eigenvalues (eV)
- ------------------------------------------------------------------------------
-      0    0      2     1.33e-01   2.6164   
-      1    0      3     4.84e-02   1.0918   
-      2    0      4     4.44e-03   0.3288   
-      3    0      5     6.90e-04   0.2341   
-      4    0      6     1.56e-04   0.2185   
-      5    0      7     2.53e-05   0.2147   
-      6    1      8     3.57e-06   0.2144*  
-
-     Davidson procedure converged
-
- EOMSF transition 1/A
- Total energy = -38.99638361 a.u.  Excitation energy = 0.2144 eV.
- R1^2 = 0.9744  R2^2 = 0.0256  Res^2 = 3.57e-06
- Conv-d = yes
-
- Amplitude    Transitions between orbitals
-  0.9483       5 (A) A                   ->    4 (A) B                    
-  0.1685       4 (A) A                   ->    5 (A) B                    
-  0.1658       5 (A) A                   ->    9 (A) B                    
-  0.0775       2 (A) A                   ->    5 (A) B                    
-
-              Summary of significant orbitals:
-
-               Number  Type             Irrep      Energy
-               2       Occ  Alpha       2 (A)     -0.9451
-               4       Occ  Alpha       4 (A)     -0.5023
-               5       Occ  Alpha       5 (A)     -0.4168
-               4       Vir  Beta        4 (A)      0.1067
-               5       Vir  Beta        5 (A)      0.1755
-               9       Vir  Beta        9 (A)      0.8697
-
-
-      EOM-CCSD/MP2 left amplitudes will be solved using Davidson.
-      Amplitudes will be solved using MOM  algorithm
-      Roots     MaxVec    MaxIter   Precond   Conv      Thresh    Shift    
-      1         60        60        1         1.00e-05  1.00e-05  0.00e+00  
- ------------------------------------------------------------------------------
-      Iter ConvRoots NVecs ResNorm Current eigenvalues (eV)
- ------------------------------------------------------------------------------
-      0    0      1     7.31e-04   0.2144   
-      1    0      2     1.76e-04   0.2144   
-      2    0      3     1.34e-05   0.2145   
-      3    1      4     2.12e-06   0.2145*  
-
-     Davidson procedure converged
-
- EOMSF-CCSD calculation:   CPU 0.30 s  wall 0.29 s
-
-        Solving for EOMIP-CCSD A transitions.
-
-      EOMIP-CCSD/MP2 right amplitudes will be solved using Davidson.
-      Amplitudes will be solved using standard  algorithm
-      Roots     MaxVec    MaxIter   Precond   Conv      Thresh    Shift    
-      2         60        60        1         1.00e-05  1.00e-05  0.00e+00  
- ------------------------------------------------------------------------------
-      Iter ConvRoots NVecs ResNorm Current eigenvalues (eV)
- ------------------------------------------------------------------------------
-      0    0      2     6.87e-02   11.9561   14.3076   
-      1    0      4     1.65e-02   10.4762   12.7988   
-      2    0      6     5.55e-04   10.1995   12.5158   
-      3    0      8     7.94e-05   10.1916   12.4858   
-      4    2      10    4.09e-06   10.1911*  12.4826*  
-
-     Davidson procedure converged
-
- EOMIP transition 1/A
- Total energy = -38.62974543 a.u.  Excitation energy = 10.1911 eV.
- R1^2 = 0.9497  R2^2 = 0.0503  Res^2 = 7.82e-07
- Conv-d = yes
-
- Amplitude    Transitions between orbitals
- -0.9745       5 (A) A                   ->    infty        
-
-              Summary of significant orbitals:
-
-               Number  Type             Irrep      Energy
-               5       Occ  Alpha       5 (A)     -0.4168
-
-
- EOMIP transition 2/A
- Total energy = -38.54553358 a.u.  Excitation energy = 12.4826 eV.
- R1^2 = 0.9382  R2^2 = 0.0618  Res^2 = 7.41e-06
- Conv-d = yes
-
- Amplitude    Transitions between orbitals
-  0.9673       4 (A) A                   ->    infty        
-  0.0497       2 (A) A                   ->    infty        
-
-              Summary of significant orbitals:
-
-               Number  Type             Irrep      Energy
-               2       Occ  Alpha       2 (A)     -0.9451
-               4       Occ  Alpha       4 (A)     -0.5023
-
-
-      EOMIP-CCSD/MP2 left amplitudes will be solved using Davidson.
-      Amplitudes will be solved using MOM  algorithm
-      Roots     MaxVec    MaxIter   Precond   Conv      Thresh    Shift    
-      2         60        60        1         1.00e-05  1.00e-05  0.00e+00  
- ------------------------------------------------------------------------------
-      Iter ConvRoots NVecs ResNorm Current eigenvalues (eV)
- ------------------------------------------------------------------------------
-      0    0      2     1.29e-03   10.1911   12.4826   
-      1    0      4     3.09e-04   10.1910   12.4825   
-      2    0      6     1.20e-05   10.1910   12.4824   
-      3    2      8     1.18e-06   10.1910*  12.4824*  
-
-     Davidson procedure converged
-
- EOMIP-CCSD calculation:   CPU 0.31 s  wall 0.30 s
-
-        Solving for EOMEA-CCSD/MP2 A transitions.
+        Solving for EOMEA-CCSD/MP2 A1 transitions.
 
       EOMEA-CCSD/MP2 right amplitudes will be solved using Davidson.
       Amplitudes will be solved using standard  algorithm
@@ -500,54 +516,55 @@ Clock 1 = 0.830097973
  ------------------------------------------------------------------------------
       Iter ConvRoots NVecs ResNorm Current eigenvalues (eV)
  ------------------------------------------------------------------------------
-      0    0      2     1.32e-01   3.1738   4.9927   
-      1    0      4     4.25e-02   1.6254   3.5915   
-      2    0      6     2.03e-03   0.7954   2.8328   
-      3    0      8     1.16e-04   0.7479   2.8008   
-      4    0      10    2.12e-05   0.7480   2.8003   
-      5    1      12    6.38e-06   0.7460   2.7989*  
-      6    2      13    1.63e-06   0.7457*  2.7989*  
+      0    0      2     6.89e-03   -5.1741   -2.8325   
+      1    0      4     5.13e-03   -5.2733   -2.9542   
+      2    0      6     1.61e-04   -5.3526   -3.0271   
+      3    0      8     1.82e-05   -5.3549   -3.0304   
+      4    2      10    1.75e-06   -5.3548*  -3.0304*  
 
      Davidson procedure converged
 
- EOMEA transition 1/A
- Total energy = -38.97685547 a.u.  Excitation energy = 0.7457 eV.
- R1^2 = 0.9388  R2^2 = 0.0612  Res^2 = 1.22e-06
+ EOMEA transition 1/A1
+ Total energy = -752.46439619 a.u.  Excitation energy = -5.3548 eV.
+ R1^2 = 0.9914  R2^2 = 0.0086  Res^2 = 5.39e-07
  Conv-d = yes
 
  Amplitude    Transitions between orbitals
-  0.9644       infty       ->    4 (A) B                    
-  0.0778       infty       ->    9 (A) B                    
-  0.0444       infty       ->    6 (A) B                    
- -0.0265       infty       ->    11 (A) B                   
+  0.9954       infty       ->    9 (A1) B                   
+ -0.0209       infty       ->    10 (A1) B                  
+  0.0110       infty       ->    12 (A1) B                  
+ -0.0053       infty       ->    16 (A1) B                  
 
               Summary of significant orbitals:
 
                Number  Type             Irrep      Energy
-               4       Vir  Beta        4 (A)      0.1067
-               6       Vir  Beta        6 (A)      0.2935
-               9       Vir  Beta        9 (A)      0.8697
-               11      Vir  Beta       11 (A)      1.0116
+               15      Vir  Beta        9 (A1)     -0.1931
+               18      Vir  Beta       10 (A1)     -0.1057
+               21      Vir  Beta       12 (A1)     -0.0271
+               32      Vir  Beta       16 (A1)      0.1716
 
 
- EOMEA transition 2/A
- Total energy = -38.90140308 a.u.  Excitation energy = 2.7989 eV.
- R1^2 = 0.9456  R2^2 = 0.0544  Res^2 = 2.03e-06
+ EOMEA transition 2/A1
+ Total energy = -752.37897622 a.u.  Excitation energy = -3.0304 eV.
+ R1^2 = 0.9895  R2^2 = 0.0105  Res^2 = 2.97e-06
  Conv-d = yes
 
  Amplitude    Transitions between orbitals
- -0.9678       infty       ->    5 (A) B                    
- -0.0951       infty       ->    10 (A) B                   
- -0.0026       infty       ->    16 (A) B                   
+ -0.9940       infty       ->    10 (A1) B                  
+  0.0269       infty       ->    15 (A1) B                  
+ -0.0235       infty       ->    9 (A1) B                   
+ -0.0074       infty       ->    16 (A1) B                  
 
               Summary of significant orbitals:
 
                Number  Type             Irrep      Energy
-               5       Vir  Beta        5 (A)      0.1755
-               10      Vir  Beta       10 (A)      0.8957
-               16      Vir  Beta       16 (A)      2.0773
+               15      Vir  Beta        9 (A1)     -0.1931
+               18      Vir  Beta       10 (A1)     -0.1057
+               31      Vir  Beta       15 (A1)      0.0901
+               32      Vir  Beta       16 (A1)      0.1716
 
 
+ EEs and amplitudes of EOMEA can not be exported to fchk file
       EOMEA-CCSD/MP2 left amplitudes will be solved using Davidson.
       Amplitudes will be solved using MOM  algorithm
       Roots     MaxVec    MaxIter   Precond   Conv      Thresh    Shift    
@@ -555,862 +572,1350 @@ Clock 1 = 0.830097973
  ------------------------------------------------------------------------------
       Iter ConvRoots NVecs ResNorm Current eigenvalues (eV)
  ------------------------------------------------------------------------------
-      0    0      2     3.30e-03   0.7457   2.7989   
-      1    0      4     9.38e-04   0.7459   2.7992   
-      2    0      6     5.85e-05   0.7458   2.7992   
-      3    2      8     5.17e-06   0.7459*  2.7993*  
+      0    0      2     3.23e-04   -5.3548   -3.0304   
+      1    0      4     1.14e-04   -5.3549   -3.0305   
+      2    1      6     9.48e-06   -5.3549*  -3.0306   
+      3    2      7     4.10e-06   -5.3549*  -3.0306*  
 
      Davidson procedure converged
 
- EOMEA-CCSD calculation:   CPU 0.42 s  wall 0.41 s
+        Solving for EOMEA-CCSD/MP2 A2 transitions.
+
+      EOMEA-CCSD/MP2 right amplitudes will be solved using Davidson.
+      Amplitudes will be solved using standard  algorithm
+      Roots     MaxVec    MaxIter   Precond   Conv      Thresh    Shift    
+      2         60        60        1         1.00e-05  1.00e-05  0.00e+00  
+ ------------------------------------------------------------------------------
+      Iter ConvRoots NVecs ResNorm Current eigenvalues (eV)
+ ------------------------------------------------------------------------------
+      0    0      2     9.04e-03   -1.9385   2.1420   
+      1    0      4     4.58e-03   -2.1310   1.8898   
+      2    0      6     1.02e-04   -2.1966   1.8223   
+      3    0      8     1.58e-05   -2.1972   1.8207   
+      4    2      10    2.02e-06   -2.1975*  1.8196*  
+
+     Davidson procedure converged
+
+ EOMEA transition 1/A2
+ Total energy = -752.34836542 a.u.  Excitation energy = -2.1975 eV.
+ R1^2 = 0.9869  R2^2 = 0.0131  Res^2 = 4.24e-07
+ Conv-d = yes
+
+ Amplitude    Transitions between orbitals
+ -0.9927       infty       ->    1 (A2) B                   
+ -0.0376       infty       ->    2 (A2) B                   
+  0.0003       infty       ->    3 (A2) B                   
+
+              Summary of significant orbitals:
+
+               Number  Type             Irrep      Energy
+               20      Vir  Beta        1 (A2)     -0.0737
+               27      Vir  Beta        2 (A2)      0.0755
+               43      Vir  Beta        3 (A2)      2.8834
 
 
- Reference -- EOM-IP-CCSD state  1/A   transition
- Energy difference = 10.1911 eV.
+ EOMEA transition 2/A2
+ Total energy = -752.20074146 a.u.  Excitation energy = 1.8196 eV.
+ R1^2 = 0.9825  R2^2 = 0.0175  Res^2 = 3.62e-06
+ Conv-d = yes
 
- Left Dyson orbital norm is 0.9677
+ Amplitude    Transitions between orbitals
+  0.9901       infty       ->    2 (A2) B                   
+ -0.0478       infty       ->    1 (A2) B                   
+  0.0004       infty       ->    3 (A2) B                   
 
- Decomposition over MOs for normalized left alpha Dyson orbital:
- 1     -8.3498e-18 
- 2     9.7300e-18  
- 3     4.0391e-16  
- 4     -9.9978e-01 
- 5     1.1184e-16  
- 6     1.0980e-16  
- 7     -5.3296e-16 
- 8     2.0479e-02  
- 9     -5.3000e-16 
- 10    2.0043e-16  
- 11    7.2681e-17  
- 12    -4.6097e-17 
- 13    -1.4857e-15 
- 14    3.9721e-03  
- 15    -5.7341e-17 
- 16    -1.6996e-17 
- 17    1.0241e-18  
- 18    -7.3142e-17 
+              Summary of significant orbitals:
+
+               Number  Type             Irrep      Energy
+               20      Vir  Beta        1 (A2)     -0.0737
+               27      Vir  Beta        2 (A2)      0.0755
+               43      Vir  Beta        3 (A2)      2.8834
 
 
- Right Dyson orbital norm is 0.9656
+ EEs and amplitudes of EOMEA can not be exported to fchk file
+      EOMEA-CCSD/MP2 left amplitudes will be solved using Davidson.
+      Amplitudes will be solved using MOM  algorithm
+      Roots     MaxVec    MaxIter   Precond   Conv      Thresh    Shift    
+      2         60        60        1         1.00e-05  1.00e-05  0.00e+00  
+ ------------------------------------------------------------------------------
+      Iter ConvRoots NVecs ResNorm Current eigenvalues (eV)
+ ------------------------------------------------------------------------------
+      0    0      2     3.10e-04   -2.1975   1.8196   
+      1    0      4     1.13e-04   -2.1975   1.8197   
+      2    2      6     8.62e-06   -2.1975*  1.8196*  
 
- Decomposition over MOs for normalized right alpha Dyson orbital:
- 1     4.0854e-17  
- 2     7.0288e-18  
- 3     3.3441e-16  
- 4     -9.9978e-01 
- 5     1.1396e-16  
- 6     1.1076e-16  
- 7     -5.3626e-16 
- 8     2.0629e-02  
- 9     -5.3329e-16 
- 10    2.0294e-16  
- 11    7.3438e-17  
- 12    -4.9914e-17 
- 13    -1.6934e-15 
- 14    4.5000e-03  
- 15    -9.2247e-17 
- 16    -1.5423e-17 
- 17    4.6231e-19  
- 18    -7.2749e-17 
+     Davidson procedure converged
 
+        Solving for EOMEA-CCSD/MP2 B1 transitions.
 
- Decomposition over AOs for the left alpha Dyson orbital:
-  1.8927804542469446e-16  
-  -1.3897616544116187e-16 
-  -6.0450105633479510e-17 
-  -6.0201300238077649e-01 
-  -2.0412578812485406e-16 
-  3.8244562501352722e-16  
-  -2.9494891171540579e-16 
-  -5.2603948354755137e-01 
-  -5.5824335133183373e-16 
-  6.6149179511352783e-17  
-  6.6053831638406177e-19  
-  -3.2492352692399829e-18 
-  2.6179147594177062e-17  
-  6.3515751163065052e-04  
-  4.7020479157016394e-18  
-  4.5806221791831419e-17  
-  -6.0242682118247537e-16 
-  7.8791361792979773e-17  
-  -1.0138192653839372e-17 
-   *****
+      EOMEA-CCSD/MP2 right amplitudes will be solved using Davidson.
+      Amplitudes will be solved using standard  algorithm
+      Roots     MaxVec    MaxIter   Precond   Conv      Thresh    Shift    
+      2         60        60        1         1.00e-05  1.00e-05  0.00e+00  
+ ------------------------------------------------------------------------------
+      Iter ConvRoots NVecs ResNorm Current eigenvalues (eV)
+ ------------------------------------------------------------------------------
+      0    0      2     1.47e-02   -3.3101   -0.3785   
+      1    0      4     5.33e-03   -3.3973   -0.6278   
+      2    0      6     1.97e-04   -3.4332   -0.7624   
+      3    1      8     2.18e-05   -3.4330*  -0.7752   
+      4    2      9     5.87e-06   -3.4330*  -0.7764*  
 
- Decomposition over AOs for the right alpha Dyson orbital:
-  1.9443470608798865e-16  
-  -1.4715216067304438e-16 
-  -6.2350617422131212e-17 
-  -6.0185942442485896e-01 
-  -1.6643430628751387e-16 
-  3.8237999501982808e-16  
-  -2.9633519720116985e-16 
-  -5.2619827771191252e-01 
-  -5.3371396372397639e-16 
-  6.7728181881379370e-17  
-  -3.0237366310720946e-18 
-  -1.1384862207455801e-18 
-  2.5801129776154218e-17  
-  1.1646176393305431e-03  
-  5.7322722599943269e-19  
-  2.3986233275241034e-17  
-  -6.1131187180261277e-16 
-  5.6958266157328969e-17  
-  -1.9077464915036938e-17 
-   *****
+     Davidson procedure converged
 
-     End transition
+ EOMEA transition 1/B1
+ Total energy = -752.39377083 a.u.  Excitation energy = -3.4330 eV.
+ R1^2 = 0.9935  R2^2 = 0.0065  Res^2 = 4.72e-06
+ Conv-d = yes
+
+ Amplitude    Transitions between orbitals
+ -0.9965       infty       ->    4 (B1) B                   
+ -0.0139       infty       ->    5 (B1) B                   
+ -0.0133       infty       ->    7 (B1) B                   
+ -0.0080       infty       ->    6 (B1) B                   
+
+              Summary of significant orbitals:
+
+               Number  Type             Irrep      Energy
+               16      Vir  Beta        4 (B1)     -0.1235
+               22      Vir  Beta        5 (B1)     -0.0227
+               25      Vir  Beta        6 (B1)      0.0454
+               29      Vir  Beta        7 (B1)      0.0823
 
 
- Reference -- EOM-IP-CCSD state  2/A   transition
- Energy difference = 12.4826 eV.
+ EOMEA transition 2/B1
+ Total energy = -752.29614248 a.u.  Excitation energy = -0.7764 eV.
+ R1^2 = 0.9839  R2^2 = 0.0161  Res^2 = 7.03e-06
+ Conv-d = yes
 
- Left Dyson orbital norm is 0.9626
+ Amplitude    Transitions between orbitals
+ -0.9903       infty       ->    5 (B1) B                   
+ -0.0415       infty       ->    7 (B1) B                   
+  0.0317       infty       ->    6 (B1) B                   
+  0.0187       infty       ->    4 (B1) B                   
 
- Decomposition over MOs for normalized left alpha Dyson orbital:
- 1     4.9807e-02  
- 2     4.9008e-15  
- 3     9.9860e-01  
- 4     8.9275e-16  
- 5     -9.7222e-04 
- 6     -5.1017e-18 
- 7     -1.6953e-02 
- 8     4.4242e-16  
- 9     1.3772e-15  
- 10    -2.7035e-04 
- 11    3.1341e-16  
- 12    -4.4539e-03 
- 13    1.8039e-03  
- 14    5.7385e-16  
- 15    -1.8829e-18 
- 16    -2.6742e-03 
- 17    2.5741e-17  
- 18    -1.4436e-03 
+              Summary of significant orbitals:
+
+               Number  Type             Irrep      Energy
+               16      Vir  Beta        4 (B1)     -0.1235
+               22      Vir  Beta        5 (B1)     -0.0227
+               25      Vir  Beta        6 (B1)      0.0454
+               29      Vir  Beta        7 (B1)      0.0823
 
 
- Right Dyson orbital norm is 0.9613
+ EEs and amplitudes of EOMEA can not be exported to fchk file
+      EOMEA-CCSD/MP2 left amplitudes will be solved using Davidson.
+      Amplitudes will be solved using MOM  algorithm
+      Roots     MaxVec    MaxIter   Precond   Conv      Thresh    Shift    
+      2         60        60        1         1.00e-05  1.00e-05  0.00e+00  
+ ------------------------------------------------------------------------------
+      Iter ConvRoots NVecs ResNorm Current eigenvalues (eV)
+ ------------------------------------------------------------------------------
+      0    0      2     7.06e-04   -3.4330   -0.7764   
+      1    0      4     1.57e-04   -3.4333   -0.7765   
+      2    1      6     9.51e-06   -3.4333*  -0.7767   
+      3    2      7     2.51e-06   -3.4333*  -0.7767*  
 
- Decomposition over MOs for normalized right alpha Dyson orbital:
- 1     5.6193e-02  
- 2     7.3238e-15  
- 3     9.9825e-01  
- 4     3.7685e-16  
- 5     -2.0042e-03 
- 6     6.9336e-17  
- 7     -1.7799e-02 
- 8     2.5256e-16  
- 9     1.3722e-15  
- 10    -1.2394e-03 
- 11    2.5985e-16  
- 12    -3.0722e-03 
- 13    2.3320e-03  
- 14    7.5585e-16  
- 15    1.0629e-17  
- 16    -2.8588e-03 
- 17    2.7083e-17  
- 18    -1.4769e-03 
+     Davidson procedure converged
+
+ EOMEA-CCSD calculation:   CPU 2.59 s  wall 2.54 s
 
 
- Decomposition over AOs for the left alpha Dyson orbital:
-  7.6845969858241700e-02  
-  -1.6635268935743261e-01 
-  1.2123963874281119e-15  
-  1.0316328826460687e-15  
-  -5.3095392673046693e-01 
-  -3.5620003077615464e-01 
-  4.0818155330554466e-15  
-  2.4004302728079912e-17  
-  -3.7502927826639076e-01 
-  1.9444893011333661e-02  
-  1.8171301070091582e-17  
-  -7.5770584919544375e-03 
-  -1.9056937693063251e-16 
-  1.9623314797182795e-17  
-  5.0974712494941433e-03  
-  1.2698953659643505e-01  
-  1.1893361337495852e-01  
-  1.2698953659643755e-01  
-  1.1893361337495352e-01  
-   *****
+ EOM-EA-CCSD state  1/A1 -- Reference  transition
+ Energy difference = -5.3548 eV.
 
- Decomposition over AOs for the right alpha Dyson orbital:
-  7.8342430249560113e-02  
-  -1.6913124144979616e-01 
-  2.4050493947200909e-15  
-  5.2711044353047985e-16  
-  -5.2876287028516644e-01 
-  -3.6057965664812414e-01 
-  4.6290388838240720e-15  
-  -4.2603351733283140e-17 
-  -3.7487571157245764e-01 
-  1.9197307551497400e-02  
-  1.7296413492785974e-17  
-  -7.9270909431901175e-03 
-  -2.8560474149394038e-16 
-  -5.1288714847159507e-18 
-  5.5833165620765481e-03  
-  1.2747504929767597e-01  
-  1.1895575419082405e-01  
-  1.2747504929767961e-01  
-  1.1895575419081984e-01  
-   *****
-
-     End transition
-
-
-  Please note: Dyson orbitals above are computed for transitions between
-  reference high spin triplet/quartet and all ionized states. Now starting
-  transtioins from EOM spin-flip states.
-
-
- EOM-SF-CCSD state 1/A -- EOM-IP-CCSD state 1/A transition
- Energy difference = 9.9767 eV.
-
- Left Dyson orbital norm is 0.9440
+ Left Dyson orbital norm is 0.9936
 
  Decomposition over MOs for normalized left beta Dyson orbital:
- 1     -7.1918e-02 
- 2     -1.2714e-15 
- 3     -9.8090e-01 
- 4     5.5647e-16  
- 5     -7.6807e-02 
- 6     2.6605e-15  
- 7     3.6852e-16  
- 8     -1.5534e-01 
- 9     -6.4253e-16 
- 10    4.7894e-02  
- 11    9.0119e-17  
- 12    -3.6655e-03 
- 13    -3.8542e-03 
- 14    -5.8695e-16 
- 15    -2.1182e-16 
- 16    -1.6925e-02 
- 17    -5.8814e-18 
- 18    -3.9418e-03 
+ 1     -1.2335e-03 
+ 2     -1.5358e-03 
+ 3     0.0000e+00  
+ 4     0.0000e+00  
+ 5     9.9969e-01  
+ 6     -2.1369e-02 
+ 7     2.7478e-11  
+ 8     1.0263e-02  
+ 9     -1.1160e-03 
+ 10    -1.7063e-11 
+ 11    5.4329e-03  
+ 12    -5.2783e-03 
+ 13    -9.6594e-04 
+ 14    6.9351e-04  
+ 15    1.2357e-04  
+ 16    9.0909e-04  
+ 17    3.0221e-04  
+ 18    1.3011e-14  
+ 19    -7.7562e-05 
+ 20    0.0000e+00  
+ 21    0.0000e+00  
+ 22    0.0000e+00  
+ 23    0.0000e+00  
+ 24    0.0000e+00  
+ 25    0.0000e+00  
+ 26    0.0000e+00  
+ 27    0.0000e+00  
+ 28    0.0000e+00  
+ 29    0.0000e+00  
+ 30    0.0000e+00  
+ 31    0.0000e+00  
+ 32    0.0000e+00  
+ 33    0.0000e+00  
+ 34    0.0000e+00  
+ 35    0.0000e+00  
+ 36    0.0000e+00  
 
 
- Right Dyson orbital norm is 0.9522
+ Right Dyson orbital norm is 0.9956
 
  Decomposition over MOs for normalized right beta Dyson orbital:
- 1     -8.0469e-02 
- 2     -1.4833e-15 
- 3     -9.8042e-01 
- 4     5.7186e-16  
- 5     -7.8077e-02 
- 6     2.7687e-15  
- 7     3.5803e-16  
- 8     -1.5345e-01 
- 9     -7.9413e-16 
- 10    4.8273e-02  
- 11    2.6954e-17  
- 12    -1.8394e-03 
- 13    -3.2677e-03 
- 14    -5.3647e-16 
- 15    -1.9479e-16 
- 16    -1.7389e-02 
- 17    -1.0839e-17 
- 18    -3.7766e-03 
+ 1     -2.3204e-03 
+ 2     -5.4799e-03 
+ 3     0.0000e+00  
+ 4     0.0000e+00  
+ 5     9.9965e-01  
+ 6     -2.1405e-02 
+ 7     2.9098e-11  
+ 8     1.1090e-02  
+ 9     -1.4742e-03 
+ 10    -1.8694e-11 
+ 11    5.9912e-03  
+ 12    -5.7348e-03 
+ 13    -1.7904e-03 
+ 14    5.6163e-04  
+ 15    2.9375e-04  
+ 16    1.1515e-03  
+ 17    2.9314e-04  
+ 18    6.6483e-14  
+ 19    -1.7435e-05 
+ 20    0.0000e+00  
+ 21    0.0000e+00  
+ 22    0.0000e+00  
+ 23    0.0000e+00  
+ 24    0.0000e+00  
+ 25    0.0000e+00  
+ 26    0.0000e+00  
+ 27    0.0000e+00  
+ 28    0.0000e+00  
+ 29    0.0000e+00  
+ 30    0.0000e+00  
+ 31    0.0000e+00  
+ 32    0.0000e+00  
+ 33    0.0000e+00  
+ 34    0.0000e+00  
+ 35    0.0000e+00  
+ 36    0.0000e+00  
 
 
  Decomposition over AOs for the left beta Dyson orbital:
-  1.0946985103958941e-01  
-  -2.1042992974871849e-01 
-  1.3051041719660858e-17  
-  -5.0733192863959739e-16 
-  -4.6730399140539369e-01 
-  -5.1936905231811581e-01 
-  3.5535789195947241e-15  
-  -5.3097885765782078e-17 
-  -3.5978616874226305e-01 
-  3.2276037797175955e-03  
-  -6.1565576377142219e-17 
-  -1.8929399493406808e-02 
-  -1.5197715508870033e-16 
-  1.3530783297353821e-18  
-  4.1424602662757069e-02  
-  1.1702789315203288e-01  
-  1.5897374308445872e-01  
-  1.1702789315203323e-01  
-  1.5897374308445106e-01  
+  1.4069746576406748e-03  
+  1.0517917123186227e-02  
+  4.8793304341318448e-02  
+  4.2193335304803437e-01  
+  -5.4695212366298873e-01 
+  -5.1404893906610184e-17 
+  3.0739263717153075e-17  
+  2.9504464592969678e-04  
+  -4.8677194228616132e-17 
+  5.4690751046318790e-17  
+  -6.0940804654348096e-03 
+  3.6077886359838697e-17  
+  7.6428346189693130e-17  
+  2.7380430673625550e-01  
+  3.8418877638780415e-16  
+  -3.4119510624631286e-16 
+  1.7964831849359364e-01  
+  1.5867495991576821e-16  
+  -7.4497844706915897e-17 
+  6.1496820913114356e-02  
+  4.6673302942685808e-16  
+  1.0248520172583607e-10  
+  8.6816003136504566e-18  
+  2.4085165083276966e-17  
+  1.8082823400970238e-02  
+  3.1269472296648698e-16  
+  3.7865494324771893e-10  
+  -1.4619990674776493e-02 
+  3.3656424595167704e-02  
+  6.3238565840300826e-02  
+  2.6902868110850971e-16  
+  6.5379237883805609e-17  
+  -3.3732685556937626e-02 
+  5.6166656799475030e-17  
+  2.8865404750703082e-17  
+  -2.5552703016365103e-02 
+  -6.0422336666942413e-17 
+  -1.2762508476621604e-17 
+  3.6328354103156202e-05  
+  2.5418009539578892e-17  
+  1.1683687365437229e-12  
+  -2.2903517868220081e-02 
+  -2.8449670324498799e-02 
+  -2.6321214326703944e-16 
+  3.4708720058556760e-16  
+  -4.0536490014340932e-04 
    *****
 
  Decomposition over AOs for the right beta Dyson orbital:
-  1.0750486388814579e-01  
-  -2.0484703376290184e-01 
-  -8.6508684918473434e-17 
-  -3.2414083093944585e-16 
-  -4.6828415965936815e-01 
-  -5.1615316408016365e-01 
-  3.5781541349234371e-15  
-  -2.1941077679830017e-16 
-  -3.6275834350997294e-01 
-  3.8386407312521304e-03  
-  -6.2055001084649101e-17 
-  -1.9375566888354075e-02 
-  -1.4677940518642358e-16 
-  -1.3246154339564499e-17 
-  4.0881402556127169e-02  
-  1.1660262303226628e-01  
-  1.5948545182389970e-01  
-  1.1660262303226653e-01  
-  1.5948545182389193e-01  
+  1.3843801965530999e-03  
+  1.0340918403869742e-02  
+  4.7727615798522360e-02  
+  4.2330470811240845e-01  
+  -5.4590113949635144e-01 
+  -5.0980049464306612e-17 
+  2.9765341296380592e-17  
+  2.7016397227532511e-04  
+  -9.3842167934528540e-17 
+  6.0492865336337959e-17  
+  -7.1391828846171755e-03 
+  3.7769676994562820e-17  
+  5.5579063231136321e-17  
+  2.7344802865988727e-01  
+  3.9151197138048284e-16  
+  -3.4350478459769932e-16 
+  1.7899385456808750e-01  
+  1.7331536996732045e-16  
+  -9.7999869566395184e-17 
+  6.1554001803670738e-02  
+  4.8005515211050460e-16  
+  1.0251596504082089e-10  
+  9.9078928606479674e-18  
+  3.8718947600717978e-18  
+  1.7097688361573812e-02  
+  3.2266124619159794e-16  
+  3.7750794015904294e-10  
+  -1.5111330403446564e-02 
+  3.4945261832673241e-02  
+  6.5032033227310659e-02  
+  2.5728074327381435e-16  
+  1.2256436109803284e-17  
+  -3.6074062630264997e-02 
+  3.2734203901902888e-17  
+  1.5662654748997234e-16  
+  -2.7028595323317584e-02 
+  -2.2164103099267688e-16 
+  4.6375591552710002e-17  
+  -4.6741563991536496e-05 
+  3.8688093938657544e-17  
+  1.2173021710867827e-12  
+  -2.3981157581694793e-02 
+  -2.8110618139631026e-02 
+  -2.0981109454219172e-16 
+  2.0750295834183689e-16  
+  -3.1941716774512997e-04 
    *****
 
      End transition
 
 
- EOM-SF-CCSD state 1/A -- EOM-IP-CCSD state 2/A transition
- Energy difference = 12.2683 eV.
+ EOM-EA-CCSD state  2/A1 -- Reference  transition
+ Energy difference = -3.0304 eV.
 
- Left Dyson orbital norm is 0.1682
+ Left Dyson orbital norm is 0.9938
 
  Decomposition over MOs for normalized left beta Dyson orbital:
- 1     -4.2246e-15 
- 2     3.5499e-16  
- 3     2.8544e-15  
- 4     9.6054e-01  
- 5     -8.2579e-17 
- 6     -6.3959e-16 
- 7     -6.8999e-18 
- 8     -5.7407e-16 
- 9     2.3726e-01  
- 10    -6.6890e-16 
- 11    -3.6785e-17 
- 12    1.8943e-16  
- 13    -1.6064e-15 
- 14    7.3585e-15  
- 15    1.4515e-01  
- 16    -1.1255e-16 
- 17    7.0624e-17  
- 18    4.2570e-16  
+ 1     2.8461e-04  
+ 2     2.4810e-04  
+ 3     0.0000e+00  
+ 4     0.0000e+00  
+ 5     -2.3064e-02 
+ 6     -9.9929e-01 
+ 7     2.7229e-11  
+ 8     -6.8428e-03 
+ 9     4.7443e-03  
+ 10    -9.9358e-11 
+ 11    2.7364e-02  
+ 12    -7.6072e-03 
+ 13    2.4395e-04  
+ 14    1.8342e-04  
+ 15    -5.1830e-04 
+ 16    1.2072e-03  
+ 17    -3.4017e-04 
+ 18    4.3182e-14  
+ 19    -3.6640e-05 
+ 20    0.0000e+00  
+ 21    0.0000e+00  
+ 22    0.0000e+00  
+ 23    0.0000e+00  
+ 24    0.0000e+00  
+ 25    0.0000e+00  
+ 26    0.0000e+00  
+ 27    0.0000e+00  
+ 28    0.0000e+00  
+ 29    0.0000e+00  
+ 30    0.0000e+00  
+ 31    0.0000e+00  
+ 32    0.0000e+00  
+ 33    0.0000e+00  
+ 34    0.0000e+00  
+ 35    0.0000e+00  
+ 36    0.0000e+00  
 
 
- Right Dyson orbital norm is 0.1676
+ Right Dyson orbital norm is 0.9951
 
  Decomposition over MOs for normalized right beta Dyson orbital:
- 1     1.0261e-15  
- 2     3.0609e-16  
- 3     -1.1209e-15 
- 4     9.6190e-01  
- 5     -5.6180e-16 
- 6     -6.4819e-16 
- 7     -8.4674e-18 
- 8     -2.0504e-15 
- 9     2.3234e-01  
- 10    -1.5292e-16 
- 11    -3.6493e-17 
- 12    1.7009e-16  
- 13    -1.4266e-15 
- 14    7.4358e-15  
- 15    1.4411e-01  
- 16    -1.9244e-16 
- 17    6.6320e-17  
- 18    3.0054e-16  
+ 1     -3.5368e-04 
+ 2     1.5022e-03  
+ 3     0.0000e+00  
+ 4     0.0000e+00  
+ 5     -2.3203e-02 
+ 6     -9.9925e-01 
+ 7     2.5108e-11  
+ 8     -7.2670e-03 
+ 9     4.8123e-03  
+ 10    -1.0359e-10 
+ 11    2.8949e-02  
+ 12    -6.6012e-03 
+ 13    1.2887e-03  
+ 14    -9.6539e-05 
+ 15    -6.1565e-04 
+ 16    1.3327e-03  
+ 17    -2.3084e-04 
+ 18    1.7230e-13  
+ 19    -8.6551e-05 
+ 20    0.0000e+00  
+ 21    0.0000e+00  
+ 22    0.0000e+00  
+ 23    0.0000e+00  
+ 24    0.0000e+00  
+ 25    0.0000e+00  
+ 26    0.0000e+00  
+ 27    0.0000e+00  
+ 28    0.0000e+00  
+ 29    0.0000e+00  
+ 30    0.0000e+00  
+ 31    0.0000e+00  
+ 32    0.0000e+00  
+ 33    0.0000e+00  
+ 34    0.0000e+00  
+ 35    0.0000e+00  
+ 36    0.0000e+00  
 
 
  Decomposition over AOs for the left beta Dyson orbital:
-  -1.1462478787129490e-15 
-  2.7830590839633430e-15  
-  -3.5913635191692152e-17 
-  -6.2427833039943936e-01 
-  1.5475482046863244e-15  
-  2.3101911768358240e-15  
-  -7.0834741573106709e-17 
-  -4.9437044473146657e-01 
-  -1.7954889924520041e-16 
-  1.4645646601440956e-16  
-  3.1281998636422901e-16  
-  -9.9092930239508255e-17 
-  -3.3175102110948295e-17 
-  -1.1913863860586352e-01 
-  -1.1940440194727659e-16 
-  4.2009056881271142e-16  
-  -2.6227149101665105e-16 
-  6.7472331188720885e-16  
-  3.4560800510176407e-16  
+  -6.5041511041968923e-04 
+  -4.8796811833519416e-03 
+  -2.0897461542147989e-02 
+  1.9695621357870779e-01  
+  -7.7141937953575421e-02 
+  -7.2280842446917596e-17 
+  7.7832958873993277e-17  
+  2.6491677137933296e-03  
+  1.9101496954362141e-17  
+  4.9668017798958877e-17  
+  5.8687108458273338e-02  
+  2.7012992222641784e-16  
+  -5.8395612202062041e-16 
+  -1.7301999574727392e-01 
+  8.2238554941517755e-17  
+  -9.0884830437525478e-16 
+  -5.5387497343816938e-01 
+  5.9388962531411321e-16  
+  2.6109719967179886e-16  
+  3.4203806146370358e-01  
+  -3.1120593310096910e-17 
+  4.9859593047509902e-10  
+  -3.7214857083921489e-16 
+  7.1145125731591558e-16  
+  4.8078610431908003e-01  
+  2.2981605100683000e-16  
+  7.8515295662790401e-10  
+  -7.8798871887965048e-03 
+  2.8166984058871039e-02  
+  3.1429669972205475e-03  
+  3.2578551865301516e-16  
+  1.0161370258855073e-16  
+  1.1030436323815526e-02  
+  -1.1371863642050563e-16 
+  -9.1048519720527119e-17 
+  1.5655541850393105e-02  
+  -1.7209270872471132e-16 
+  6.7500354822979543e-18  
+  5.2319862408956672e-03  
+  1.7664566866961012e-17  
+  3.8345351960670732e-12  
+  2.4302660427460262e-02  
+  -1.9053632933710048e-02 
+  -6.9359850210977173e-17 
+  2.0368044798550514e-16  
+  -3.7128389687980565e-03 
    *****
 
  Decomposition over AOs for the right beta Dyson orbital:
-  3.1509072157506821e-16  
-  -7.7196980955895569e-16 
-  -5.9833372689557667e-17 
-  -6.1902130898953789e-01 
-  -3.5035675946880806e-16 
-  -7.2718158373616341e-16 
-  -8.7072895329671677e-17 
-  -5.0009626355593761e-01 
-  -6.3589189941512937e-16 
-  2.1780743905296159e-16  
-  4.4096601768164210e-16  
-  1.3060481736309150e-16  
-  -3.4774011646145277e-17 
-  -1.1814626846546761e-01 
-  -2.8596330761973481e-17 
-  -1.9072682616726178e-16 
-  -4.5944421682685045e-16 
-  3.4889486857974833e-17  
-  1.4753129075109578e-16  
+  -6.2300082688732019e-04 
+  -4.6692055992224061e-03 
+  -1.9813980004829708e-02 
+  1.9507817189330662e-01  
+  -7.8753244185728141e-02 
+  -7.2368046143684686e-17 
+  7.8049466622737891e-17  
+  2.6718702667651250e-03  
+  3.3629153471628041e-17  
+  4.5460510719610169e-17  
+  5.9138681870703633e-02  
+  2.7338553588232845e-16  
+  -5.8389850154139788e-16 
+  -1.7222492018049859e-01 
+  7.6775034725542774e-17  
+  -9.0004159333211458e-16 
+  -5.5460604547341741e-01 
+  6.1436565253732885e-16  
+  2.6306895387336122e-16  
+  3.4402654901431517e-01  
+  -4.0393032612902381e-17 
+  5.0026136702177135e-10  
+  -3.8919079043109072e-16 
+  7.2761428255215694e-16  
+  4.7924020377337273e-01  
+  2.3102741673763062e-16  
+  7.8583723815605441e-10  
+  -7.8522731387880799e-03 
+  2.8286744430544498e-02  
+  2.0540969218672293e-03  
+  3.2991776188614671e-16  
+  1.1348688706043940e-16  
+  1.1785622158047225e-02  
+  -1.1009395234836417e-16 
+  -1.2255741366575610e-16 
+  1.6380655214343773e-02  
+  -5.6043926396159155e-16 
+  -1.0215878383177228e-17 
+  5.4129129149673204e-03  
+  1.4456292479623643e-17  
+  3.9713017368609739e-12  
+  2.5582327639061292e-02  
+  -1.8367012752865640e-02 
+  -7.8134237418679917e-17 
+  2.3241407384104754e-16  
+  -3.8395666085672591e-03 
    *****
 
      End transition
 
 
- EOM-EA-CCSD state  1/A -- Reference  transition
- Energy difference = 0.7457 eV.
+ EOM-EA-CCSD state  1/A2 -- Reference  transition
+ Energy difference = -2.1975 eV.
 
- Left Dyson orbital norm is 0.9641
+ Left Dyson orbital norm is 0.9917
 
  Decomposition over MOs for normalized left beta Dyson orbital:
- 1     2.9148e-02  
- 2     1.0064e-15  
- 3     9.9492e-01  
- 4     -1.8146e-16 
- 5     4.6874e-02  
- 6     -1.7283e-15 
- 7     -1.0545e-15 
- 8     7.9100e-02  
- 9     3.9850e-16  
- 10    -2.7622e-02 
- 11    2.4405e-16  
- 12    -5.7766e-03 
- 13    -4.6781e-03 
- 14    -2.5531e-16 
- 15    8.4373e-17  
- 16    1.9939e-03  
- 17    1.4404e-16  
- 18    3.2484e-03  
+ 1     0.0000e+00  
+ 2     0.0000e+00  
+ 3     0.0000e+00  
+ 4     0.0000e+00  
+ 5     0.0000e+00  
+ 6     0.0000e+00  
+ 7     0.0000e+00  
+ 8     0.0000e+00  
+ 9     0.0000e+00  
+ 10    0.0000e+00  
+ 11    0.0000e+00  
+ 12    0.0000e+00  
+ 13    0.0000e+00  
+ 14    0.0000e+00  
+ 15    0.0000e+00  
+ 16    0.0000e+00  
+ 17    0.0000e+00  
+ 18    0.0000e+00  
+ 19    0.0000e+00  
+ 20    -9.9932e-01 
+ 21    -3.6940e-02 
+ 22    2.8681e-04  
+ 23    0.0000e+00  
+ 24    0.0000e+00  
+ 25    0.0000e+00  
+ 26    0.0000e+00  
+ 27    0.0000e+00  
+ 28    0.0000e+00  
+ 29    0.0000e+00  
+ 30    0.0000e+00  
+ 31    0.0000e+00  
+ 32    0.0000e+00  
+ 33    0.0000e+00  
+ 34    0.0000e+00  
+ 35    0.0000e+00  
+ 36    0.0000e+00  
 
 
- Right Dyson orbital norm is 0.9602
+ Right Dyson orbital norm is 0.9937
 
  Decomposition over MOs for normalized right beta Dyson orbital:
- 1     3.2839e-02  
- 2     1.0796e-15  
- 3     9.9530e-01  
- 4     4.3569e-17  
- 5     3.8597e-02  
- 6     -1.2660e-15 
- 7     -1.0703e-15 
- 8     7.7339e-02  
- 9     -2.5196e-16 
- 10    -2.7915e-02 
- 11    1.7820e-16  
- 12    -4.2078e-03 
- 13    -3.9224e-03 
- 14    -1.8686e-16 
- 15    4.5310e-17  
- 16    1.6672e-03  
- 17    1.3418e-16  
- 18    3.3621e-03  
+ 1     0.0000e+00  
+ 2     0.0000e+00  
+ 3     0.0000e+00  
+ 4     0.0000e+00  
+ 5     0.0000e+00  
+ 6     0.0000e+00  
+ 7     0.0000e+00  
+ 8     0.0000e+00  
+ 9     0.0000e+00  
+ 10    0.0000e+00  
+ 11    0.0000e+00  
+ 12    0.0000e+00  
+ 13    0.0000e+00  
+ 14    0.0000e+00  
+ 15    0.0000e+00  
+ 16    0.0000e+00  
+ 17    0.0000e+00  
+ 18    0.0000e+00  
+ 19    0.0000e+00  
+ 20    -9.9926e-01 
+ 21    -3.8467e-02 
+ 22    3.6977e-04  
+ 23    0.0000e+00  
+ 24    0.0000e+00  
+ 25    0.0000e+00  
+ 26    0.0000e+00  
+ 27    0.0000e+00  
+ 28    0.0000e+00  
+ 29    0.0000e+00  
+ 30    0.0000e+00  
+ 31    0.0000e+00  
+ 32    0.0000e+00  
+ 33    0.0000e+00  
+ 34    0.0000e+00  
+ 35    0.0000e+00  
+ 36    0.0000e+00  
 
 
  Decomposition over AOs for the left beta Dyson orbital:
-  -1.1786692309297654e-01 
-  1.7108839944592755e-01  
-  -6.0627284865290263e-16 
-  9.2073161409145768e-17  
-  3.8102462645007656e-01  
-  6.6307072919400212e-01  
-  -4.8481116760667469e-15 
-  -4.1477597914637457e-17 
-  3.9757544506417480e-01  
-  -3.0056125873876845e-04 
-  3.6750868956428373e-18  
-  -6.6930303875715582e-03 
-  2.4736745728563783e-16  
-  1.3558575025364779e-17  
-  -3.2284915793450171e-02 
-  -9.9236858250451809e-02 
-  -2.1328995836936857e-01 
-  -9.9236858250452226e-02 
-  -2.1328995836935788e-01 
+  -1.1998174722068983e-16 
+  -9.1042950566498664e-16 
+  -4.3912905271909905e-15 
+  1.0376640335952381e-14  
+  6.2865443930172389e-15  
+  -2.2948344866815071e-17 
+  -1.7856692066124360e-16 
+  2.6098319159446995e-17  
+  -5.4822126810539954e-15 
+  -1.2083759608772231e-15 
+  4.7925347487231578e-16  
+  -1.2108298784953193e-16 
+  -6.9884329533222034e-15 
+  5.4495223723017605e-16  
+  1.4877213319856376e-15  
+  1.4444568907182878e-15  
+  -4.6780799315281471e-15 
+  -6.0730318700318953e-01 
+  -5.8657155868526755e-15 
+  3.5905208316527082e-15  
+  4.7471587241962397e-15  
+  -2.4975152573875176e-06 
+  -6.1839454790521187e-01 
+  -6.7642041775379712e-15 
+  -8.2127419804076619e-16 
+  2.7011897379156998e-15  
+  -3.1992759714142014e-06 
+  -1.4744573565336782e-16 
+  1.8914253837474162e-16  
+  1.1852326372375101e-15  
+  -3.5571507045896485e-15 
+  -1.6372663999870965e-14 
+  -1.4219561801216482e-17 
+  -7.4680651611031999e-15 
+  3.9668049866531166e-14  
+  -2.3079416816188032e-16 
+  -3.9398047830690678e-03 
+  1.5817332328256540e-14  
+  5.5537633760166500e-17  
+  4.0610370494782308e-15  
+  -8.8049491380220780e-07 
+  1.3982235523136491e-16  
+  7.8544705864086554e-16  
+  1.8381799555585343e-14  
+  -4.4387529987407953e-14 
+  -2.7512735867799791e-17 
    *****
 
  Decomposition over AOs for the right beta Dyson orbital:
-  -1.1819311777806350e-01 
-  1.7306245627511671e-01  
-  -6.4511207135267998e-16 
-  7.5199480591123003e-16  
-  3.7725094941924348e-01  
-  6.7324832929187861e-01  
-  -4.9193318431649619e-15 
-  -8.2359932860946890e-16 
-  3.9261864317393841e-01  
-  2.0615737499197324e-04  
-  3.7773964068329747e-18  
-  -7.0044615967110825e-03 
-  2.3545454310427818e-16  
-  5.4001603493512585e-17  
-  -3.2914763053557547e-02 
-  -1.0045619336487149e-01 
-  -2.2382330461459113e-01 
-  -1.0045619336487190e-01 
-  -2.2382330461458017e-01 
+  -1.1981178785609286e-16 
+  -9.0914642489139914e-16 
+  -4.3854882519375249e-15 
+  1.0369168811640448e-14  
+  6.2700144994710288e-15  
+  -2.2905104318486710e-17 
+  -1.7844350530078742e-16 
+  2.5959345366732340e-17  
+  -5.4828671335475292e-15 
+  -1.2088258660244033e-15 
+  4.7641533950480973e-16  
+  -1.2388958505024024e-16 
+  -6.9890109256281906e-15 
+  5.3173107951836696e-16  
+  1.4912551128377961e-15  
+  1.4465235639999216e-15  
+  -4.6786584479676573e-15 
+  -6.0862895397524908e-01 
+  -5.8752702038950477e-15 
+  3.6024491167736592e-15  
+  4.7441871923887142e-15  
+  -2.4874684601621762e-06 
+  -6.1707700244323804e-01 
+  -6.7541504265874298e-15 
+  -8.4305607513779759e-16 
+  2.7030559767010063e-15  
+  -3.2012873933535609e-06 
+  -1.4794339059295531e-16 
+  1.8985719796247982e-16  
+  1.1903581817721699e-15  
+  -3.5575180413618065e-15 
+  -1.6371716506155202e-14 
+  -1.3826316473465914e-17 
+  -7.4669569108935024e-15 
+  3.9664555563349559e-14  
+  -2.3179875966737134e-16 
+  -4.0216277027222613e-03 
+  1.5816376164849410e-14  
+  5.5511158263431964e-17  
+  4.0611212504992209e-15  
+  -1.1301544800179999e-06 
+  1.4189628431125311e-16  
+  7.9430868249076739e-16  
+  1.8380384560114274e-14  
+  -4.4384544116398325e-14 
+  -2.8672457153078807e-17 
    *****
 
      End transition
 
 
- EOM-EA-CCSD state  2/A -- Reference  transition
- Energy difference = 2.7989 eV.
+ EOM-EA-CCSD state  2/A2 -- Reference  transition
+ Energy difference = 1.8196 eV.
 
- Left Dyson orbital norm is 0.9688
+ Left Dyson orbital norm is 0.9894
 
  Decomposition over MOs for normalized left beta Dyson orbital:
- 1     5.8426e-18  
- 2     2.0336e-17  
- 3     -2.0329e-16 
- 4     -9.9535e-01 
- 5     1.1796e-15  
- 6     3.7525e-16  
- 7     -4.2390e-17 
- 8     1.2000e-15  
- 9     -9.6253e-02 
- 10    -9.2700e-17 
- 11    -7.8810e-17 
- 12    -1.9925e-16 
- 13    1.7060e-16  
- 14    -1.2366e-16 
- 15    -3.1834e-03 
- 16    3.3413e-17  
- 17    -3.5091e-17 
- 18    -3.4196e-16 
+ 1     0.0000e+00  
+ 2     0.0000e+00  
+ 3     0.0000e+00  
+ 4     0.0000e+00  
+ 5     0.0000e+00  
+ 6     0.0000e+00  
+ 7     0.0000e+00  
+ 8     0.0000e+00  
+ 9     0.0000e+00  
+ 10    0.0000e+00  
+ 11    0.0000e+00  
+ 12    0.0000e+00  
+ 13    0.0000e+00  
+ 14    0.0000e+00  
+ 15    0.0000e+00  
+ 16    0.0000e+00  
+ 17    0.0000e+00  
+ 18    0.0000e+00  
+ 19    0.0000e+00  
+ 20    -4.9685e-02 
+ 21    9.9876e-01  
+ 22    3.5748e-04  
+ 23    0.0000e+00  
+ 24    0.0000e+00  
+ 25    0.0000e+00  
+ 26    0.0000e+00  
+ 27    0.0000e+00  
+ 28    0.0000e+00  
+ 29    0.0000e+00  
+ 30    0.0000e+00  
+ 31    0.0000e+00  
+ 32    0.0000e+00  
+ 33    0.0000e+00  
+ 34    0.0000e+00  
+ 35    0.0000e+00  
+ 36    0.0000e+00  
 
 
- Right Dyson orbital norm is 0.9637
+ Right Dyson orbital norm is 0.9920
 
  Decomposition over MOs for normalized right beta Dyson orbital:
- 1     -1.3257e-16 
- 2     1.6745e-17  
- 3     5.8323e-16  
- 4     -9.9545e-01 
- 5     1.3893e-16  
- 6     5.0722e-16  
- 7     -2.3937e-17 
- 8     5.7980e-17  
- 9     -9.5202e-02 
- 10    -2.4562e-16 
- 11    -4.5443e-17 
- 12    -9.5777e-16 
- 13    3.2867e-17  
- 14    -1.1405e-16 
- 15    -2.7489e-03 
- 16    2.2115e-16  
- 17    -3.2448e-17 
- 18    1.7881e-16  
+ 1     0.0000e+00  
+ 2     0.0000e+00  
+ 3     0.0000e+00  
+ 4     0.0000e+00  
+ 5     0.0000e+00  
+ 6     0.0000e+00  
+ 7     0.0000e+00  
+ 8     0.0000e+00  
+ 9     0.0000e+00  
+ 10    0.0000e+00  
+ 11    0.0000e+00  
+ 12    0.0000e+00  
+ 13    0.0000e+00  
+ 14    0.0000e+00  
+ 15    0.0000e+00  
+ 16    0.0000e+00  
+ 17    0.0000e+00  
+ 18    0.0000e+00  
+ 19    0.0000e+00  
+ 20    -4.7277e-02 
+ 21    9.9888e-01  
+ 22    2.2703e-04  
+ 23    0.0000e+00  
+ 24    0.0000e+00  
+ 25    0.0000e+00  
+ 26    0.0000e+00  
+ 27    0.0000e+00  
+ 28    0.0000e+00  
+ 29    0.0000e+00  
+ 30    0.0000e+00  
+ 31    0.0000e+00  
+ 32    0.0000e+00  
+ 33    0.0000e+00  
+ 34    0.0000e+00  
+ 35    0.0000e+00  
+ 36    0.0000e+00  
 
 
  Decomposition over AOs for the left beta Dyson orbital:
-  8.3641074718010027e-17  
-  -3.6167658892599964e-17 
-  -6.6025891941369528e-17 
-  4.6911510394990052e-01  
-  5.7947954704982783e-16  
-  -1.5915346645966574e-15 
-  -8.0232968907851130e-18 
-  6.5516866433500742e-01  
-  5.5129447800875327e-16  
-  1.2608355333870832e-17  
-  6.0332353179210220e-17  
-  3.5469308206806573e-19  
-  -1.5428641670503113e-19 
-  -2.1395612121157068e-02 
-  -7.0725214312228912e-17 
-  1.4407884446942801e-16  
-  1.0371729802984447e-15  
-  1.6606176337419269e-16  
-  1.1737157333923765e-15  
+  -1.1387752291771313e-16 
+  -8.5563019494016187e-16 
+  -3.8656043991542215e-15 
+  4.9888748487429052e-15  
+  1.0968362417987964e-14  
+  -3.0720810630039002e-17 
+  -8.3918578445102758e-17 
+  8.9989213336126791e-17  
+  3.4705565952664900e-16  
+  2.7370240555130590e-16  
+  1.9293909146377214e-15  
+  1.8289810127824451e-15  
+  3.1129430387399980e-16  
+  8.8232726954535940e-15  
+  -2.2883160212959143e-15 
+  -1.3510407070462216e-15 
+  1.9861063378333366e-16  
+  8.6061817952842312e-01  
+  6.1802678770953449e-15  
+  -7.6539460687534660e-15 
+  1.9992484427653473e-15  
+  -5.1498781028934427e-06 
+  -8.6833018380880900e-01 
+  -6.6509208486107444e-15 
+  1.4181756772884885e-14  
+  -1.1747754156282007e-15 
+  4.5958332580155204e-06  
+  3.6975264397467267e-16  
+  2.4938712562215468e-17  
+  -4.9646927062389803e-15 
+  1.6980883468122578e-16  
+  -8.2377747941899951e-16 
+  -6.0466042276177745e-16 
+  -7.7184365007371054e-16 
+  2.7381249433702239e-15  
+  1.8591310503674179e-16  
+  -1.1542259513128374e-03 
+  7.5856834547159665e-16  
+  -1.9309459732474618e-16 
+  9.5822278409215300e-17  
+  -1.0731974938825133e-06 
+  -5.6502854576366784e-16 
+  -5.3663643152870017e-15 
+  1.1133731945816345e-15  
+  -2.4261496757843284e-15 
+  4.6828715972167810e-17  
    *****
 
  Decomposition over AOs for the right beta Dyson orbital:
-  -2.7304407005637254e-16 
-  9.1056084237486181e-16  
-  2.1113678556566132e-17  
-  4.6791900186539331e-01  
-  -6.7243119669270043e-17 
-  2.7049161985578531e-15  
-  1.0721925465475292e-16  
-  6.5625051451321259e-01  
-  5.8728579565382980e-16  
-  -1.0921780458341625e-15 
-  4.8842187871956708e-17  
-  -1.0166741403784519e-15 
-  5.3910075876618725e-18  
-  -2.1815951231343184e-02 
-  -9.9506583786981738e-16 
-  1.2122423375093051e-15  
-  -1.4136271341276944e-15 
-  1.1964447645463398e-15  
-  -1.5998318067269026e-15 
+  -1.1358847408805807e-16 
+  -8.5344654991107233e-16 
+  -3.8550849875828389e-15 
+  4.9640524239960004e-15  
+  1.0953325981373444e-14  
+  -3.0661220113891791e-17 
+  -8.3487940351227009e-17 
+  8.9931767837655767e-17  
+  3.6031968691293697e-16  
+  2.7663811718490986e-16  
+  1.9281306930901460e-15  
+  1.8293378113385698e-15  
+  3.2811206445145674e-16  
+  8.8218092408641133e-15  
+  -2.2919807569198106e-15 
+  -1.3545225279852296e-15 
+  2.1018922517375461e-16  
+  8.6210523500447367e-01  
+  6.1945842595327070e-15  
+  -7.6630712350859928e-15 
+  1.9878630543000971e-15  
+  -5.1474523007434218e-06 
+  -8.6686607497349344e-01 
+  -6.6348167153168742e-15 
+  1.4184273912871351e-14  
+  -1.1813537383726343e-15 
+  4.5957933372945277e-06  
+  3.7000937643348420e-16  
+  2.3318896684506014e-17  
+  -4.9638279450870741e-15 
+  1.7845617834112069e-16  
+  -7.8430755433164999e-16 
+  -6.0381829760851928e-16 
+  -7.5396110063822469e-16 
+  2.6426168250952026e-15  
+  1.8758778037666295e-16  
+  -1.0149709170965699e-03 
+  7.2058807015328572e-16  
+  -1.9273250374714873e-16 
+  8.5790872974991579e-17  
+  -6.8059113594779389e-07 
+  -5.6725837080474045e-16 
+  -5.3694103044124617e-15 
+  1.0691631422903630e-15  
+  -2.3193393561441422e-15 
+  4.8586632890946683e-17  
    *****
 
      End transition
 
 
-  Please note: Dyson orbitals above are computed for transitions between
-  all electron attached and reference high spin triplet/quartet state. Now
-  starting transtioins to EOM spin-flip states.
+ EOM-EA-CCSD state  1/B1 -- Reference  transition
+ Energy difference = -3.4330 eV.
+
+ Left Dyson orbital norm is 0.9952
+
+ Decomposition over MOs for normalized left beta Dyson orbital:
+ 1     0.0000e+00  
+ 2     0.0000e+00  
+ 3     3.0961e-04  
+ 4     0.0000e+00  
+ 5     0.0000e+00  
+ 6     0.0000e+00  
+ 7     0.0000e+00  
+ 8     0.0000e+00  
+ 9     0.0000e+00  
+ 10    0.0000e+00  
+ 11    0.0000e+00  
+ 12    0.0000e+00  
+ 13    0.0000e+00  
+ 14    0.0000e+00  
+ 15    0.0000e+00  
+ 16    0.0000e+00  
+ 17    0.0000e+00  
+ 18    0.0000e+00  
+ 19    0.0000e+00  
+ 20    0.0000e+00  
+ 21    0.0000e+00  
+ 22    0.0000e+00  
+ 23    -9.9979e-01 
+ 24    -1.3605e-02 
+ 25    -7.5078e-03 
+ 26    -1.3498e-02 
+ 27    -4.5208e-04 
+ 28    3.9315e-04  
+ 29    2.0830e-04  
+ 30    0.0000e+00  
+ 31    0.0000e+00  
+ 32    0.0000e+00  
+ 33    0.0000e+00  
+ 34    0.0000e+00  
+ 35    0.0000e+00  
+ 36    0.0000e+00  
 
 
- EOM-EA-CCSD state 1/A -- EOM-SF-CCSD state 1/A transition
- Energy difference = 0.5314 eV.
+ Right Dyson orbital norm is 0.9965
 
- Left Dyson orbital norm is 0.9545
-
- Decomposition over MOs for normalized left alpha Dyson orbital:
- 1     1.3127e-16  
- 2     -1.0158e-16 
- 3     5.6857e-16  
- 4     -9.9509e-01 
- 5     6.2582e-17  
- 6     -7.7265e-17 
- 7     -1.9998e-15 
- 8     9.3533e-02  
- 9     -2.0787e-15 
- 10    3.3365e-16  
- 11    9.5922e-17  
- 12    -7.1868e-17 
- 13    -1.2386e-14 
- 14    3.2298e-02  
- 15    -1.9878e-15 
- 16    -3.2017e-17 
- 17    -3.8062e-17 
- 18    -8.5206e-17 
-
-
- Right Dyson orbital norm is 0.9479
-
- Decomposition over MOs for normalized right alpha Dyson orbital:
- 1     8.6580e-17  
- 2     -1.0195e-16 
- 3     1.5310e-16  
- 4     -9.9353e-01 
- 5     -3.9535e-16 
- 6     -1.2905e-16 
- 7     -2.2557e-15 
- 8     1.0883e-01  
- 9     -2.3768e-15 
- 10    2.9307e-16  
- 11    8.9737e-17  
- 12    -7.0939e-17 
- 13    -1.2610e-14 
- 14    3.2604e-02  
- 15    -2.0149e-15 
- 16    -1.6808e-16 
- 17    -4.2205e-17 
- 18    -8.0554e-17 
+ Decomposition over MOs for normalized right beta Dyson orbital:
+ 1     0.0000e+00  
+ 2     0.0000e+00  
+ 3     1.3778e-03  
+ 4     0.0000e+00  
+ 5     0.0000e+00  
+ 6     0.0000e+00  
+ 7     0.0000e+00  
+ 8     0.0000e+00  
+ 9     0.0000e+00  
+ 10    0.0000e+00  
+ 11    0.0000e+00  
+ 12    0.0000e+00  
+ 13    0.0000e+00  
+ 14    0.0000e+00  
+ 15    0.0000e+00  
+ 16    0.0000e+00  
+ 17    0.0000e+00  
+ 18    0.0000e+00  
+ 19    0.0000e+00  
+ 20    0.0000e+00  
+ 21    0.0000e+00  
+ 22    0.0000e+00  
+ 23    -9.9975e-01 
+ 24    -1.5634e-02 
+ 25    -6.6629e-03 
+ 26    -1.4229e-02 
+ 27    -3.4704e-04 
+ 28    2.3960e-04  
+ 29    8.8052e-05  
+ 30    0.0000e+00  
+ 31    0.0000e+00  
+ 32    0.0000e+00  
+ 33    0.0000e+00  
+ 34    0.0000e+00  
+ 35    0.0000e+00  
+ 36    0.0000e+00  
 
 
- Decomposition over AOs for the left alpha Dyson orbital:
-  2.1912078924859732e-16  
-  -9.2302164743905178e-17 
-  -2.0728169627366048e-17 
-  -5.2311813133227991e-01 
-  -2.3942317387607799e-16 
-  1.8727528538034073e-16  
-  -1.6003987270497787e-16 
-  -6.0433571074776504e-01 
-  -7.1231443627723416e-16 
-  -6.2699133482081657e-17 
-  -1.4809735018786931e-16 
-  -4.6125143669738564e-17 
-  4.9167676040117706e-18  
-  2.9712785290316530e-02  
-  1.5415615487918088e-17  
-  -2.8201439645668562e-17 
-  -2.0192461006628571e-16 
-  -1.4437267040891673e-17 
-  -1.9379801679586520e-16 
+ Decomposition over AOs for the left beta Dyson orbital:
+  8.4330826077755469e-18  
+  6.3117472629859597e-17  
+  2.9557516841715217e-16  
+  -4.3900969750303052e-16 
+  -6.9744394604283362e-16 
+  1.9612521990212215e-03  
+  -5.8754423914079492e-17 
+  -2.3295295864787857e-19 
+  4.2893313464568948e-02  
+  4.4902845333907122e-16  
+  -1.2311024891121813e-17 
+  -3.1642519095474558e-01 
+  -8.2236967383710755e-16 
+  -1.5822307498970371e-16 
+  -6.4707611551854893e-01 
+  -1.8671719287367493e-15 
+  -1.1558150336254914e-16 
+  4.8031824036109783e-16  
+  1.4060949981911144e-15  
+  3.5254822982200147e-17  
+  2.1412646376436797e-01  
+  1.3133829477459909e-16  
+  1.7116518866113904e-15  
+  1.1140857919593438e-15  
+  1.3660907208061604e-16  
+  3.1750621323620803e-01  
+  1.3536311756598686e-16  
+  -7.1460624588062103e-18 
+  1.9821018241422945e-17  
+  1.2747098900038097e-17  
+  1.7806882479818237e-02  
+  -2.8474391125256814e-16 
+  -9.2562384829199140e-18 
+  6.1620045246396958e-03  
+  -6.4138196209556326e-16 
+  1.5926790929711659e-17  
+  -2.3171213966006103e-16 
+  -5.4029648647363768e-17 
+  -4.4358894999588392e-18 
+  2.4905920607378585e-05  
+  -3.6708526253956393e-17 
+  -5.6986766188401826e-17 
+  1.3948396455118203e-16  
+  7.7985314736161429e-04  
+  -1.3599129509718101e-16 
+  -4.5316100690574225e-18 
    *****
 
- Decomposition over AOs for the right alpha Dyson orbital:
-  2.4666826072074986e-16  
-  1.7972059011950876e-17  
-  -9.1294134688157388e-18 
-  -5.0616698273767491e-01 
-  4.8746132760713805e-17  
-  -7.9870640243485742e-16 
-  -8.7971123904971722e-17 
-  -6.2048412699280586e-01 
-  3.6786766007582815e-17  
-  -1.0032807855063981e-16 
-  -1.4552802627441094e-16 
-  1.2578614380616029e-16  
-  5.8779948429362715e-18  
-  3.0178458877651897e-02  
-  -9.0567052784255204e-17 
-  5.3216563915329648e-17  
-  5.5640831638371479e-16  
-  3.3258721051061248e-17  
-  4.4195795073288049e-16  
-   *****
-
-     End transition
-
-
- EOM-EA-CCSD state 2/A -- EOM-SF-CCSD state 1/A transition
- Energy difference = 2.5846 eV.
-
- Left Dyson orbital norm is 0.1871
-
- Decomposition over MOs for normalized left alpha Dyson orbital:
- 1     3.9228e-01  
- 2     1.8307e-15  
- 3     8.8657e-01  
- 4     -2.7458e-15 
- 5     1.5984e-01  
- 6     -2.1609e-14 
- 7     -1.3745e-01 
- 8     -2.0217e-15 
- 9     9.1302e-15  
- 10    6.7747e-02  
- 11    3.0815e-15  
- 12    -4.0567e-02 
- 13    -4.0241e-02 
- 14    -1.5911e-14 
- 15    -1.0083e-15 
- 16    -8.8359e-02 
- 17    -2.1306e-16 
- 18    2.0275e-03  
-
-
- Right Dyson orbital norm is 0.1892
-
- Decomposition over MOs for normalized right alpha Dyson orbital:
- 1     3.9433e-01  
- 2     1.7701e-15  
- 3     8.7588e-01  
- 4     -3.3071e-15 
- 5     1.8820e-01  
- 6     -2.4206e-14 
- 7     -1.5040e-01 
- 8     -5.1534e-15 
- 9     1.0141e-14  
- 10    8.2800e-02  
- 11    3.5679e-15  
- 12    -4.8754e-02 
- 13    -4.5493e-02 
- 14    -1.8066e-14 
- 15    -1.0853e-15 
- 16    -8.9438e-02 
- 17    -2.5834e-16 
- 18    1.8532e-03  
-
-
- Decomposition over AOs for the left alpha Dyson orbital:
-  1.1944183840071086e-01  
-  -2.3928567909250559e-01 
-  1.0108310601822276e-15  
-  -1.3989195066171230e-15 
-  -3.8763244009197628e-01 
-  -2.1907747446159123e-01 
-  5.1198951595128874e-15  
-  -1.6858864513532224e-15 
-  -6.1360279613444191e-01 
-  -3.8435308929998739e-02 
-  6.1830067298791176e-17  
-  1.1918633512695227e-01  
-  -1.1467666184672834e-16 
-  -1.9999995641845124e-16 
-  -4.9759969431979856e-02 
-  2.5108217754792363e-02  
-  -1.2459494526530920e-01 
-  2.5108217754793438e-02  
-  -1.2459494526532040e-01 
-   *****
-
- Decomposition over AOs for the right alpha Dyson orbital:
-  1.1434266055813642e-01  
-  -2.3506986873047464e-01 
-  7.4139040494484435e-16  
-  -4.7550971883784325e-15 
-  -3.7887230587011217e-01 
-  -1.4988168042583067e-01 
-  4.1402424021130388e-15  
-  1.2159438861716488e-15  
-  -6.5924930655405523e-01 
-  -4.0873461347670337e-02 
-  2.3110637075941538e-17  
-  1.2528562819050129e-01  
-  -1.1326340734828757e-16 
-  -3.5557730246015931e-16 
-  -5.6833805813773147e-02 
-  7.7263767706952438e-03  
-  -1.6655458320178029e-01 
-  7.7263767706961736e-03  
-  -1.6655458320178904e-01 
+ Decomposition over AOs for the right beta Dyson orbital:
+  9.3707242132285784e-18  
+  7.0268289878659159e-17  
+  3.2955241612084149e-16  
+  -5.0620667452938472e-16 
+  -7.6183543231550743e-16 
+  1.9592932450024805e-03  
+  -5.8958812351475221e-17 
+  -6.5771218946349000e-19 
+  4.2884174292043338e-02  
+  4.4966695141744985e-16  
+  -2.0948819673699492e-17 
+  -3.1603539071229314e-01 
+  -8.1678635222170838e-16 
+  -1.8815248953756856e-16 
+  -6.4637454894155144e-01 
+  -1.8717200193609386e-15 
+  -8.3771969798525781e-17 
+  4.8311828445496295e-16  
+  1.4100862926202811e-15  
+  3.7049112374464421e-17  
+  2.1611926200711085e-01  
+  1.0865046330325997e-16  
+  1.7156566473711100e-15  
+  1.1081161534514858e-15  
+  1.4229998231353950e-16  
+  3.1818257384944743e-01  
+  1.6038017745540027e-16  
+  -7.0717275827020191e-18 
+  2.0856388756190880e-17  
+  1.1056715595954361e-17  
+  1.7858784055614026e-02  
+  -2.8141385292413054e-16 
+  -7.3386963702775729e-18 
+  6.2200083034123750e-03  
+  -6.3504679338355066e-16 
+  1.1815629759546964e-17  
+  -2.3204336718864479e-16 
+  -4.0970866672377435e-17 
+  -4.2273081279609015e-18 
+  -1.4523336035425729e-04 
+  -3.6552287651386517e-17 
+  -5.0674030588000452e-17 
+  1.3114177180915163e-16  
+  6.9715204352726679e-04  
+  -1.1888162678763267e-16 
+  -4.8148549861904083e-18 
    *****
 
      End transition
 
- Dyson orbitals calculation:   CPU 0.11 s  wall 0.11 s
 
- Total ccman2 time:   CPU 2.83 s  wall 2.85 s
+ EOM-EA-CCSD state  2/B1 -- Reference  transition
+ Energy difference = -0.7764 eV.
+
+ Left Dyson orbital norm is 0.9866
+
+ Decomposition over MOs for normalized left beta Dyson orbital:
+ 1     0.0000e+00  
+ 2     0.0000e+00  
+ 3     -1.4527e-02 
+ 4     0.0000e+00  
+ 5     0.0000e+00  
+ 6     0.0000e+00  
+ 7     0.0000e+00  
+ 8     0.0000e+00  
+ 9     0.0000e+00  
+ 10    0.0000e+00  
+ 11    0.0000e+00  
+ 12    0.0000e+00  
+ 13    0.0000e+00  
+ 14    0.0000e+00  
+ 15    0.0000e+00  
+ 16    0.0000e+00  
+ 17    0.0000e+00  
+ 18    0.0000e+00  
+ 19    0.0000e+00  
+ 20    0.0000e+00  
+ 21    0.0000e+00  
+ 22    0.0000e+00  
+ 23    1.9437e-02  
+ 24    -9.9843e-01 
+ 25    2.9192e-02  
+ 26    -4.0870e-02 
+ 27    4.3372e-03  
+ 28    -1.3348e-03 
+ 29    -3.7046e-04 
+ 30    0.0000e+00  
+ 31    0.0000e+00  
+ 32    0.0000e+00  
+ 33    0.0000e+00  
+ 34    0.0000e+00  
+ 35    0.0000e+00  
+ 36    0.0000e+00  
 
 
+ Right Dyson orbital norm is 0.9926
+
+ Decomposition over MOs for normalized right beta Dyson orbital:
+ 1     0.0000e+00  
+ 2     0.0000e+00  
+ 3     -2.9552e-02 
+ 4     0.0000e+00  
+ 5     0.0000e+00  
+ 6     0.0000e+00  
+ 7     0.0000e+00  
+ 8     0.0000e+00  
+ 9     0.0000e+00  
+ 10    0.0000e+00  
+ 11    0.0000e+00  
+ 12    0.0000e+00  
+ 13    0.0000e+00  
+ 14    0.0000e+00  
+ 15    0.0000e+00  
+ 16    0.0000e+00  
+ 17    0.0000e+00  
+ 18    0.0000e+00  
+ 19    0.0000e+00  
+ 20    0.0000e+00  
+ 21    0.0000e+00  
+ 22    0.0000e+00  
+ 23    1.6870e-02  
+ 24    -9.9797e-01 
+ 25    3.2129e-02  
+ 26    -4.3114e-02 
+ 27    3.3379e-03  
+ 28    -1.4195e-03 
+ 29    -2.6567e-04 
+ 30    0.0000e+00  
+ 31    0.0000e+00  
+ 32    0.0000e+00  
+ 33    0.0000e+00  
+ 34    0.0000e+00  
+ 35    0.0000e+00  
+ 36    0.0000e+00  
+
+
+ Decomposition over AOs for the left beta Dyson orbital:
+  4.8335938972137673e-16  
+  3.6679680460801903e-15  
+  1.7597259852749475e-14  
+  -3.3545404911635847e-14 
+  -3.2599238932302828e-14 
+  -7.7138141473401005e-03 
+  -4.2679468160407240e-17 
+  -1.6333895468375316e-16 
+  -1.3340759708940764e-01 
+  5.2820672142004849e-16  
+  -2.9820863883132747e-15 
+  -4.0921291956342798e-01 
+  2.1852430178032190e-15  
+  -1.2713903848655446e-14 
+  7.9780672081451054e-01  
+  -1.8175930938818566e-15 
+  1.3598389255142851e-14  
+  3.2359293658008159e-15  
+  -9.0736220202224258e-16 
+  6.5244183768674603e-16  
+  5.9084056214104230e-01  
+  1.8500024305379172e-15  
+  1.9764099188163179e-15  
+  -5.1975916993163538e-16 
+  2.9874848991633314e-15  
+  4.5419550904978440e-01  
+  -2.2824670008623927e-16 
+  6.4821065456666997e-17  
+  -2.6060497006919891e-16 
+  1.7642329018579293e-16  
+  -1.8411084565572766e-01 
+  -3.9064985354241473e-16 
+  8.1057474837356130e-16  
+  -2.4987226066534959e-01 
+  2.3397767713855047e-16  
+  1.3066780427122004e-15  
+  -2.2162870947465757e-17 
+  5.8613226827084247e-17  
+  8.6983866758132665e-17  
+  -6.6414400284394810e-03 
+  6.9341956167141713e-17  
+  6.3788473557098419e-16  
+  -2.7467814801675530e-15 
+  -7.8704843199064213e-03 
+  2.3912331416131131e-16  
+  1.1997273437282642e-16  
+   *****
+
+ Decomposition over AOs for the right beta Dyson orbital:
+  4.8319537579505424e-16  
+  3.6666395971336487e-15  
+  1.7592885253556876e-14  
+  -3.3527066001685658e-14 
+  -3.2578737955520196e-14 
+  -7.6376462267882597e-03 
+  -4.2923456326879620e-17 
+  -1.6340732157313169e-16 
+  -1.3157789330331923e-01 
+  5.4001756654367506e-16  
+  -2.9766813022964931e-15 
+  -4.0641492638752691e-01 
+  2.1769701746633030e-15  
+  -1.2712859854653154e-14 
+  7.9196518365848378e-01  
+  -1.8273494951372650e-15 
+  1.3610938065021260e-14  
+  3.2304431469930471e-15  
+  -9.0703278671223261e-16 
+  6.6080850493255531e-16  
+  5.9184720594446683e-01  
+  1.7602783159528414e-15  
+  1.9836291195806652e-15  
+  -5.3341123151194373e-16 
+  2.9939294033677338e-15  
+  4.5294625259802174e-01  
+  -1.4356925517766986e-16 
+  6.2315250576420737e-17  
+  -2.5738602873987113e-16 
+  2.0351741732541554e-16  
+  -1.9216809337541352e-01 
+  -4.3730496283139856e-16 
+  8.1444928427142895e-16  
+  -2.5857993308669613e-01 
+  5.8939143817566019e-17  
+  1.3333948590468979e-15  
+  -2.1563728670473157e-17 
+  5.1160257613629718e-17  
+  8.9010861279401545e-17  
+  -6.6054569548858067e-03 
+  7.0247839905241192e-17  
+  6.4158971766632559e-16  
+  -2.7992603140506252e-15 
+  -8.5268126459306544e-03 
+  2.3604913998512249e-16  
+  1.2477365897968631e-16  
+   *****
+
+     End transition
+
+ Dyson orbitals calculation:   CPU 0.14 s  wall 0.14 s
+
+ Total ccman2 time:   CPU 9.36 s  wall 9.34 s
+
+ 
  --------------------------------------------------------------
              Orbital Energies (a.u.) and Symmetries
  --------------------------------------------------------------
-
- Alpha MOs, Unrestricted
+ 
+ Alpha MOs, Restricted
  -- Occupied --                  
--11.280  -0.945  -0.558  -0.502  -0.417
-  1 A1    2 A1    1 B1    3 A1    1 B2                                         
+-149.58  -20.64  -17.03  -13.84  -13.84  -13.84   -2.45   -1.56
+  1 A1    2 A1    3 A1    1 B1    1 B2    4 A1    5 A1    6 A1                 
+ -1.557  -1.557  -1.357  -0.742  -0.572  -0.572
+  2 B1    2 B2    7 A1    8 A1    3 B1    3 B2                                 
  -- Virtual --                   
-  0.262   0.295   0.717   0.722   0.723   0.948   1.104   1.167
-  4 A1    2 B1    5 A1    2 B2    3 B1    6 A1    4 B1    7 A1                 
-  1.895   1.897   1.913   2.254   2.512   4.367
-  8 A1    3 B2    1 A2    9 A1    5 B1   10 A1                                 
-
- Beta MOs, Unrestricted
+ -0.193  -0.124  -0.124  -0.106  -0.074  -0.074  -0.027  -0.023
+  9 A1    4 B1    4 B2   10 A1   11 A1    1 A2   12 A1    5 B1                 
+ -0.023  -0.009   0.045   0.045   0.076   0.076   0.082   0.082
+  5 B2   13 A1    6 B1    6 B2    2 A2   14 A1    7 B1    7 B2                 
+  0.090   0.172   0.209   0.832   1.206   1.206   1.317   1.511
+ 15 A1   16 A1   17 A1   18 A1    8 B1    8 B2   19 A1    9 B1                 
+  1.511   1.798   2.406   2.883   2.883   3.214   3.214   3.979
+  9 B2   20 A1   21 A1   22 A1    3 A2   10 B1   10 B2   23 A1                 
+ 
+ Beta MOs, Restricted
  -- Occupied --                  
--11.228  -0.782  -0.516
-  1 A1    2 A1    1 B1                                                         
+-149.58  -20.64  -17.03  -13.84  -13.84  -13.84   -2.45   -1.56
+  1 A1    2 A1    3 A1    1 B1    1 B2    4 A1    5 A1    6 A1                 
+ -1.557  -1.557  -1.357  -0.742  -0.572  -0.572
+  2 B1    2 B2    7 A1    8 A1    3 B1    3 B2                                 
  -- Virtual --                   
-  0.107   0.175   0.294   0.347   0.751   0.870   0.896   1.012
-  3 A1    1 B2    4 A1    2 B1    3 B1    5 A1    2 B2    6 A1                 
-  1.154   1.207   2.025   2.040   2.077   2.370   2.586   4.439
-  4 B1    7 A1    8 A1    1 A2    3 B2    9 A1    5 B1   10 A1                 
+ -0.193  -0.124  -0.124  -0.106  -0.074  -0.074  -0.027  -0.023
+  9 A1    4 B1    4 B2   10 A1   11 A1    1 A2   12 A1    5 B1                 
+ -0.023  -0.009   0.045   0.045   0.076   0.076   0.082   0.082
+  5 B2   13 A1    6 B1    6 B2    2 A2   14 A1    7 B1    7 B2                 
+  0.090   0.172   0.209   0.832   1.206   1.206   1.317   1.511
+ 15 A1   16 A1   17 A1   18 A1    8 B1    8 B2   19 A1    9 B1                 
+  1.511   1.798   2.406   2.883   2.883   3.214   3.214   3.979
+  9 B2   20 A1   21 A1   22 A1    3 A2   10 B1   10 B2   23 A1                 
  --------------------------------------------------------------
-
+ 
           Ground-State Mulliken Net Atomic Charges
 
-     Atom                 Charge (a.u.)    Spin (a.u.)
-  --------------------------------------------------------
-      1 C                    -0.327425       2.190787
-      2 H                     0.163712      -0.095393
-      3 H                     0.163712      -0.095393
-  --------------------------------------------------------
-  Sum of atomic charges =     0.000000
-  Sum of spin   charges =     2.000000
+     Atom                 Charge (a.u.)
+  ----------------------------------------
+      1 Ca                    1.498780
+      2 O                    -0.712940
+      3 H                     0.214161
+  ----------------------------------------
+  Sum of atomic charges =     1.000000
 
  -----------------------------------------------------------------
                     Cartesian Multipole Moments
  -----------------------------------------------------------------
     Charge (ESU x 10^10)
-                 0.0000
+                 4.8032
     Dipole Moment (Debye)
-         X       0.0000      Y      -0.0000      Z      -0.6359
-       Tot       0.6359
+         X       0.0000      Y      -0.0000      Z      -8.2205
+       Tot       8.2205
     Quadrupole Moments (Debye-Ang)
-        XX      -6.8991     XY       0.0000     YY      -7.9624
-        XZ      -0.0000     YZ       0.0000     ZZ      -6.8599
+        XX     -15.7896     XY      -0.0000     YY     -15.7896
+        XZ       0.0000     YZ      -0.0000     ZZ      -9.1029
     Octopole Moments (Debye-Ang^2)
-       XXX       0.0000    XXY      -0.0000    XYY       0.0000
-       YYY      -0.0000    XXZ      -0.9219    XYZ      -0.0000
-       YYZ      -0.3142    XZZ       0.0000    YZZ      -0.0000
-       ZZZ      -1.0862
+       XXX       0.0000    XXY       0.0000    XYY       0.0000
+       YYY      -0.0000    XXZ      -6.2421    XYZ       0.0000
+       YYZ      -6.2421    XZZ       0.0000    YZZ      -0.0000
+       ZZZ      -1.1196
     Hexadecapole Moments (Debye-Ang^3)
-      XXXX     -14.1625   XXXY       0.0000   XXYY      -3.9763
-      XYYY       0.0000   YYYY      -8.4342   XXXZ      -0.0000
-      XXYZ       0.0000   XYYZ      -0.0000   YYYZ       0.0000
-      XXZZ      -3.7627   XYZZ       0.0000   YYZZ      -3.2461
-      XZZZ      -0.0000   YZZZ       0.0000   ZZZZ     -10.6276
+      XXXX     -14.3390   XXXY      -0.0000   XXYY      -4.7797
+      XYYY      -0.0000   YYYY     -14.3390   XXXZ       0.0000
+      XXYZ      -0.0000   XYYZ       0.0000   YYYZ      -0.0000
+      XXZZ     -23.0173   XYZZ      -0.0000   YYZZ     -23.0173
+      XZZZ       0.0000   YZZZ      -0.0000   ZZZZ     -66.8031
  -----------------------------------------------------------------
 Archival summary:
-1\1\tin.anu.edu.au\SP\ProcedureUnspecified\6-31G*\12(3)\TueJan1617:02:392018TueJan1617:02:392018\0\\#,ProcedureUnspecified,6-31G*,\\0,3\C\H,1,1.1167\H,1,1.1167,2,102.07\\HF=-38.9033252\\@
+1\1\iqmol\SP\ProcedureUnspecified\BasisUnspecified\a111(1+,1)\epif\MonApr3020:36:092018MonApr3020:36:092018\0\\#,ProcedureUnspecified,BasisUnspecified,\\1,1\O\H,1,0.951551\Ca,1,2.06737,2,180\\HF=-752.054799\\@
 
- Total job time:  4.84s(wall), 4.78s(cpu) 
- Tue Jan 16 17:02:39 2018
+ Total job time:  29.31s(wall), 29.35s(cpu) 
+ Mon Apr 30 20:36:09 2018
 
         *************************************************************
         *                                                           *

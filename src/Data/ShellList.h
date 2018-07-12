@@ -54,6 +54,8 @@ namespace Data {
 
          ShellList(ShellData const& shellData, Geometry const& geometry);
 
+         ~ShellList();
+
          /// Returns the (-1,-1,-1) and (1,1,1) octant corners of a rectangular
          /// box that encloses the significant region of the Shells where 
          /// significance is determined by thresh.  
@@ -82,6 +84,14 @@ namespace Data {
          // values at the grid point pairs.
          Vector const& shellPairValues(qglviewer::Vec const& gridPoint);
 
+		 // Initializes the list of densities to be evaluated a grid points
+		 // with subsequent densityValues calls.
+         void setDensityVectors(QList<Vector const*> const& densities);
+
+         // Returns a list of the densities evaulated at the given grid point
+         // Density vectors are upper triangular
+         Vector const& densityValues(double const x, double const y, double const z);
+
          // Shell offset for each atom
          QList<unsigned> shellAtomOffsets() const;
 
@@ -100,9 +110,16 @@ namespace Data {
 
       private:
          unsigned m_nBasis;
-         Vector   m_shellValues;
-         Vector   m_shellPairValues;
          Vector   m_overlapMatrix;   // upper triangular
+
+         // These arrays are workspace buffers for gridpoint evaluations;
+         unsigned* m_sigBasis;
+         Vector    m_basisValues;
+         Vector    m_densityValues;
+
+         QList<Vector const*> m_densityVectors;
+
+         Vector    m_basisPairValues;  // Deprecate
    };
 
 } } // end namespace IQmol::Data
