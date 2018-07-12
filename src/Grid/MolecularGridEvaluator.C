@@ -81,10 +81,11 @@ void MolecularGridEvaluator::run()
        Data::GridDataList betaGrids;
        Data::GridDataList basisGrids;
 
-       QList<Vector*> densityVectors;
-       QList<int>     alphaOrbitals;
-       QList<int>     betaOrbitals;
-       QList<int>     basisFunctions;
+       QList<Vector const*> densityVectors;
+
+       QList<int>  alphaOrbitals;
+       QList<int>  betaOrbitals;
+       QList<int>  basisFunctions;
 
        for (iter = m_grids.begin(); iter != m_grids.end(); ++iter) {
            if ((*iter)->size() == *size) {

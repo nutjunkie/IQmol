@@ -44,7 +44,7 @@ namespace IQmol {
          // Note the list of densities can be a superset of the requred densities
          // for the grid calcualation.
          DensityEvaluator(Data::GridDataList& grids, Data::ShellList& shellList, 
-            QList<Vector*> const& densities);
+            QList<Vector const*> const& densities);
 
       Q_SIGNALS:
          void progress(int);
@@ -60,12 +60,12 @@ namespace IQmol {
 		 // orbital at the given point.
          Vector const& evaluate(double const x, double const y, double const z);
          
-         MultiFunction3D     m_function;
-         Data::GridDataList  m_grids;
-         Data::ShellList&    m_shellList;
-         QList<Vector*>      m_densities;
-         Vector              m_returnValues;
-         MultiGridEvaluator* m_evaluator;
+         MultiFunction3D      m_function;
+         Data::GridDataList   m_grids;
+         Data::ShellList&     m_shellList;
+         QList<Vector const*> m_densities;
+         Vector               m_returnValues;
+         MultiGridEvaluator*  m_evaluator;
    };
 
 } // end namespace IQmol

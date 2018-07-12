@@ -62,6 +62,7 @@ namespace Data {
 		 // Returns a pointer to an array containing the values of the basis
 		 // functions at the given position.
          double const* evaluate(qglviewer::Vec const& gridPoint) const;
+         double const* evaluate(double const x, double const y, double const z) const;
 
          AngularMomentum angularMomentum() const { return m_angularMomentum; }
 
