@@ -38,9 +38,9 @@ DensityEvaluator::DensityEvaluator(Data::GridDataList& grids, Data::ShellList& s
 {
    if (grids.isEmpty()) return;
 
-   shellList.setDensityVectors(densities);
+   m_shellList.setDensityVectors(densities);
    m_returnValues.resize(m_densities.size());
-   m_function = boost::bind(&DensityEvaluator::evaluate, this, _1, _2, _3);
+   m_function = boost::bind(&Data::ShellList::densityValues, &m_shellList, _1, _2, _3);
 
    double thresh(0.001);
    m_evaluator = new MultiGridEvaluator(m_grids, m_function, thresh);
@@ -72,21 +72,6 @@ void DensityEvaluator::evaluatorFinished()
 //   m_evaluator->deleteLater();
 //   m_evaluator = 0;
    finished();
-}
-
-
-Vector const& DensityEvaluator::evaluate(double const x, double const y, double const z)
-{
-   return m_shellList.densityValues(x,y,z);
-
-// DEPRECATE
-   Vector const& s2(m_shellList.shellPairValues(Vec(x,y,z)));
-   for (int i = 0; i < m_densities.size(); ++i) {
-       m_returnValues[i] = inner_prod(*(m_densities[i]), s2);
-   }  
-    
-   return m_returnValues;
-// DEPRECATE
 }
 
 } // end namespace IQmol
