@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>982</width>
-    <height>690</height>
+    <height>645</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -457,7 +457,7 @@ QToolButton:checked {
                <bool>true</bool>
               </property>
               <property name="currentIndex">
-               <number>0</number>
+               <number>5</number>
               </property>
               <property name="tabSpacing">
                <number>-1</number>
@@ -522,8 +522,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>499</width>
-                 <height>77</height>
+                 <width>136</width>
+                 <height>60</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -570,8 +570,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>499</width>
-                 <height>77</height>
+                 <width>160</width>
+                 <height>60</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -629,8 +629,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>499</width>
-                 <height>77</height>
+                 <width>165</width>
+                 <height>60</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -684,8 +684,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>499</width>
-                 <height>77</height>
+                 <width>100</width>
+                 <height>30</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -776,7 +776,7 @@ QToolButton:checked {
                  <x>0</x>
                  <y>0</y>
                  <width>499</width>
-                 <height>166</height>
+                 <height>200</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -785,6 +785,30 @@ QToolButton:checked {
                <layout class="QVBoxLayout" name="verticalLayout_11">
                 <item>
                  <layout class="QGridLayout" name="_3">
+                  <item row="4" column="2" colspan="4">
+                   <widget class="QCheckBox" name="cis_ampl_anal">
+                    <property name="text">
+                     <string>Analyze Amplitudes</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="label_cis_state_derivative">
+                    <property name="text">
+                     <string>State To Optimize</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="0" colspan="2">
+                   <widget class="QCheckBox" name="cis_moments">
+                    <property name="text">
+                     <string>Excited State Moments</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QSpinBox" name="cis_state_derivative"/>
+                  </item>
                   <item row="0" column="5">
                    <spacer>
                     <property name="orientation">
@@ -798,86 +822,20 @@ QToolButton:checked {
                     </property>
                    </spacer>
                   </item>
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="label_91">
+                  <item row="1" column="3">
+                   <widget class="QCheckBox" name="xcis">
                     <property name="text">
-                     <string>Number of Roots</string>
+                     <string>XCIS</string>
                     </property>
                    </widget>
                   </item>
                   <item row="0" column="1">
                    <widget class="QSpinBox" name="cis_n_roots"/>
                   </item>
-                  <item row="1" column="0">
-                   <widget class="QLabel" name="label_cis_state_derivative">
+                  <item row="5" column="0" colspan="2">
+                   <widget class="QCheckBox" name="sts_mom">
                     <property name="text">
-                     <string>State To Optimize</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="QSpinBox" name="cis_state_derivative"/>
-                  </item>
-                  <item row="0" column="2">
-                   <widget class="QCheckBox" name="cis_singlets">
-                    <property name="text">
-                     <string>Singlets</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="2">
-                   <widget class="QCheckBox" name="cis_triplets">
-                    <property name="text">
-                     <string>Triplets</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="0" colspan="2">
-                   <widget class="QCheckBox" name="cis_mulliken">
-                    <property name="text">
-                     <string>State Mulliken Charges</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="2" colspan="4">
-                   <widget class="QCheckBox" name="cis_relaxed_density">
-                    <property name="text">
-                     <string>Analyze Relaxed Density</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="0" colspan="2">
-                   <widget class="QCheckBox" name="cis_moments">
-                    <property name="text">
-                     <string>Excited State Moments</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="2" colspan="4">
-                   <widget class="QCheckBox" name="cis_ampl_anal">
-                    <property name="text">
-                     <string>Analyze Amplitudes</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="4">
-                   <widget class="QCheckBox" name="spin_flip">
-                    <property name="text">
-                     <string>Spin Flip</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="3">
-                   <widget class="QCheckBox" name="rpa">
-                    <property name="text">
-                     <string>RPA</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="3">
-                   <widget class="QCheckBox" name="xcis">
-                    <property name="text">
-                     <string>XCIS</string>
+                     <string>Transition Moments</string>
                     </property>
                    </widget>
                   </item>
@@ -888,12 +846,64 @@ QToolButton:checked {
                     </property>
                    </widget>
                   </item>
-                  <item row="4" column="0" colspan="2">
-                   <widget class="QCheckBox" name="sts_mom">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_91">
                     <property name="text">
-                     <string>Transition Moments</string>
+                     <string>Number of Roots</string>
                     </property>
                    </widget>
+                  </item>
+                  <item row="0" column="3">
+                   <widget class="QCheckBox" name="rpa">
+                    <property name="text">
+                     <string>RPA</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="2">
+                   <widget class="QCheckBox" name="cis_singlets">
+                    <property name="text">
+                     <string>Singlets</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="4">
+                   <widget class="QCheckBox" name="spin_flip">
+                    <property name="text">
+                     <string>Spin Flip</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="0" colspan="2">
+                   <widget class="QCheckBox" name="cis_mulliken">
+                    <property name="text">
+                     <string>State Mulliken Charges</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="2">
+                   <widget class="QCheckBox" name="cis_triplets">
+                    <property name="text">
+                     <string>Triplets</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="2" colspan="4">
+                   <widget class="QCheckBox" name="cis_relaxed_density">
+                    <property name="text">
+                     <string>Analyze Relaxed Density</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="label_118">
+                    <property name="text">
+                     <string>NTO Pairs</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QSpinBox" name="nto_pairs"/>
                   </item>
                  </layout>
                 </item>
@@ -917,7 +927,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>499</width>
+                 <width>383</width>
                  <height>162</height>
                 </rect>
                </property>
@@ -1088,7 +1098,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>499</width>
+                 <width>379</width>
                  <height>211</height>
                 </rect>
                </property>
@@ -1230,7 +1240,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>499</width>
+                 <width>447</width>
                  <height>163</height>
                 </rect>
                </property>
@@ -1360,8 +1370,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>499</width>
-                 <height>77</height>
+                 <width>329</width>
+                 <height>64</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1425,7 +1435,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>499</width>
+                 <width>410</width>
                  <height>146</height>
                 </rect>
                </property>
@@ -1524,7 +1534,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>499</width>
+                 <width>195</width>
                  <height>83</height>
                 </rect>
                </property>
@@ -1586,7 +1596,7 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>499</width>
+                 <width>391</width>
                  <height>155</height>
                 </rect>
                </property>
@@ -1732,8 +1742,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>499</width>
-                 <height>105</height>
+                 <width>334</width>
+                 <height>89</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1746,13 +1756,6 @@ QToolButton:checked {
                    <widget class="QCheckBox" name="gui">
                     <property name="text">
                      <string>Generate Checkpoint File</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="0">
-                   <widget class="QCheckBox" name="nbo">
-                    <property name="text">
-                     <string>NBO Analysis</string>
                     </property>
                    </widget>
                   </item>
@@ -1781,26 +1784,19 @@ QToolButton:checked {
                       </property>
                      </spacer>
                     </item>
-                    <item>
-                     <widget class="QCheckBox" name="dma_midpoints">
-                      <property name="text">
-                       <string>Include Bond Midpoints</string>
-                      </property>
-                     </widget>
-                    </item>
                    </layout>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="QCheckBox" name="dma">
-                    <property name="text">
-                     <string>Distributed Multipole Analysis</string>
-                    </property>
-                   </widget>
                   </item>
                   <item row="0" column="1">
                    <widget class="QCheckBox" name="chelpg">
                     <property name="text">
                      <string>CHELPG Charges</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QCheckBox" name="nbo">
+                    <property name="text">
+                     <string>NBO Analysis</string>
                     </property>
                    </widget>
                   </item>
