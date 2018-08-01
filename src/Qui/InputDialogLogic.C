@@ -309,6 +309,7 @@ void InputDialog::initializeQuiLogic()
          << "Reaction Path" 
          << "Ab Initio MD" 
          << "Transition State"
+         << "Freezing String"
          << "Energy Decomposition"
          << "BSSE"
          << "Properties";
@@ -579,10 +580,12 @@ void InputDialog::initializeQuiLogic()
 
 
    // Setup -> Wavefunction Analysis
+/*
    QtNode& dma(reg.get("DMA"));
    dma.addRule(
       If(dma == QtTrue, Enable(m_ui.dma_midpoints), Disable(m_ui.dma_midpoints))
    );
+*/
 
 
 
