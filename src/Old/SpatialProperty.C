@@ -157,7 +157,7 @@ double PointChargePotential::potential(double const x, double const y, double co
        d = (m_coordinates[i] - pos).norm();
        esp += m_charges[i]/d;
    }
-   return esp;
+   return esp*Constants::BohrToAngstrom;
 }
 
 
