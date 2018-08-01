@@ -56,10 +56,6 @@ namespace IQmol {
          void evaluatorFinished();
 
       private:
-		 // Fills the m_returnValues vector with the value of each requested
-		 // orbital at the given point.
-         Vector const& evaluate(double const x, double const y, double const z);
-         
          MultiFunction3D      m_function;
          Data::GridDataList   m_grids;
          Data::ShellList&     m_shellList;

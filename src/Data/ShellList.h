@@ -81,6 +81,7 @@ namespace Data {
 
          Vector const& shellValues(double const x, double const y, double const z);
          Vector const& shellValues(qglviewer::Vec const& gridPoint);
+
          // Returns the vectorized upper triangular array of unique shell 
          // values at the grid point pairs.
          Vector const& shellPairValues(qglviewer::Vec const& gridPoint);
@@ -92,6 +93,13 @@ namespace Data {
          // Returns a list of the densities evaulated at the given grid point
          // Density vectors are upper triangular
          Vector const& densityValues(double const x, double const y, double const z);
+
+		 // Initializes the list of orbitlas to be evaluated a grid points
+		 // with subsequent orbitalValues calls.
+         void setOrbitalVectors(Matrix const& coefficients, QList<int> const& indices);
+
+         // Returns a list of the orbitals evaulated at the given grid point
+         Vector const& orbitalValues(double const x, double const y, double const z);
 
          // Shell offset for each atom
          QList<unsigned> shellAtomOffsets() const;
@@ -117,7 +125,10 @@ namespace Data {
          unsigned* m_sigBasis;
          Vector    m_basisValues;
          Vector    m_densityValues;
+         Vector    m_orbitalValues;
 
+         Matrix const*        m_orbitalCoefficients;
+         QList<int>           m_orbitalIndices;
          QList<Vector const*> m_densityVectors;
 
          Vector    m_basisPairValues;  // Deprecate
