@@ -90,6 +90,7 @@ void BuildMoleculeFragment::leftMouseReleaseEvent(QMouseEvent*)
 {
    m_viewer->setMouseBinding(Qt::NoModifier, Qt::LeftButton, QGLViewer::CAMERA, 
       QGLViewer::ROTATE);
+   m_viewer->setActiveViewerMode(Viewer::Manipulate);
 }
 
 
