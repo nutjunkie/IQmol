@@ -74,7 +74,8 @@ void OrbitalEvaluator::evaluatorFinished()
 
 Vector const& OrbitalEvaluator::evaluate(double const x, double const y, double const z)
 {
-   Vector const& s1(m_shellList.shellValues(Vec(x,y,z)));
+   Vector const& s1(m_shellList.shellValues(x,y,z));
+   //Vector const& s1(m_shellList.shellValues(Vec(x,y,z)));
    unsigned size(m_indices.size()); 
 
    for (unsigned i = 0; i < size; ++i) {

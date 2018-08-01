@@ -79,6 +79,7 @@ namespace Data {
          /// to the list and before shellValues or shellPairValues is called.
          void resize();
 
+         Vector const& shellValues(double const x, double const y, double const z);
          Vector const& shellValues(qglviewer::Vec const& gridPoint);
          // Returns the vectorized upper triangular array of unique shell 
          // values at the grid point pairs.
