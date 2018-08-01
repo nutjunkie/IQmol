@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>369</width>
-    <height>516</height>
+    <width>418</width>
+    <height>558</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -92,11 +92,22 @@
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="loopCheckBox">
-          <property name="text">
-           <string>Loop</string>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <widget class="QCheckBox" name="loopCheckBox">
+            <property name="text">
+             <string>Loop</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="bounceCheckBox">
+            <property name="text">
+             <string>Bounce</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
@@ -207,25 +218,32 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
-        <item>
-         <widget class="QLabel" name="label_2">
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="1" column="3">
+         <widget class="QPushButton" name="stopButton">
           <property name="text">
-           <string>Time</string>
+           <string>Stop</string>
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QDoubleSpinBox" name="time">
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        <item row="0" column="3">
+         <widget class="QPushButton" name="playButton">
+          <property name="text">
+           <string>Play</string>
           </property>
-          <property name="suffix">
-           <string>s</string>
+          <property name="autoDefault">
+           <bool>false</bool>
           </property>
          </widget>
         </item>
-        <item>
+        <item row="1" column="2">
+         <widget class="QPushButton" name="deleteFrameButton">
+          <property name="text">
+           <string>Delete Frame</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
          <widget class="QPushButton" name="addFrameButton">
           <property name="text">
            <string>Add Frame</string>
@@ -235,23 +253,27 @@
           </property>
          </widget>
         </item>
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QPushButton" name="playButton">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_2">
           <property name="text">
-           <string>Play</string>
+           <string>Time</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QDoubleSpinBox" name="time">
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="suffix">
+           <string>s</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QPushButton" name="resetButton">
+          <property name="text">
+           <string>Reset</string>
           </property>
           <property name="autoDefault">
            <bool>false</bool>
@@ -293,16 +315,6 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="resetButton">
-       <property name="text">
-        <string>Reset</string>
-       </property>
-       <property name="autoDefault">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="okButton">
        <property name="text">
         <string>OK</string>
@@ -315,15 +327,11 @@
  </widget>
  <tabstops>
   <tabstop>frameTable</tabstop>
-  <tabstop>addFrameButton</tabstop>
   <tabstop>autoRotation</tabstop>
   <tabstop>perspectiveButton</tabstop>
-  <tabstop>time</tabstop>
   <tabstop>orthographicButton</tabstop>
   <tabstop>rValue</tabstop>
-  <tabstop>playButton</tabstop>
   <tabstop>thetaValue</tabstop>
-  <tabstop>resetButton</tabstop>
   <tabstop>okButton</tabstop>
   <tabstop>fieldOfView</tabstop>
   <tabstop>phiValue</tabstop>

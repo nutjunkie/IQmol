@@ -789,6 +789,7 @@ void Viewer::setRecord(bool activate)
          QLOG_WARN() << "Animation recording started with existing Snapshot object";
       }else {
          m_snapper = new Snapshot(this, Snapshot::Movie);
+         // For continuous snapping:
          //connect(&m_recordTimer, SIGNAL(timeout()), m_snapper, SLOT(capture()));
          connect(this, SIGNAL(animationStep()), m_snapper, SLOT(capture()));
          connect(m_snapper, SIGNAL(movieFinished()), this, SLOT(movieMakingFinished()));
