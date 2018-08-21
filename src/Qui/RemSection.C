@@ -272,7 +272,7 @@ bool RemSection::fixOptionForQChem(QString& name, QString& value) const
 
    //fix logicals
    if (inDatabase && opt.getType() == Option::Type_Logical) {
-      if (name == "GUI") {
+      if (name == "GUI" || name == "NBO") {
          value = value.toInt() == 0 ? QString::number(0) : QString::number(2);
       }else if (value.toInt() == Qt::Checked) {
          value = QString::number(1);

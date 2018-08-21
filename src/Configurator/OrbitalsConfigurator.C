@@ -51,6 +51,9 @@ Orbitals::Orbitals(Layer::Orbitals& orbitals)
       m_configurator.surfaceType->addItem("Alpha NTO",  Data::SurfaceType::AlphaOrbital);
       m_configurator.surfaceType->addItem("Beta NTO",   Data::SurfaceType::BetaOrbital);
     //m_configurator.surfaceType->addItem("Transition Density", TotalDensity);
+   }else if (m_orbitals.m_orbitals.orbitalType() == Data::Orbitals::NaturalBond) {
+      m_configurator.surfaceType->addItem("Alpha NBO",  Data::SurfaceType::AlphaOrbital);
+      m_configurator.surfaceType->addItem("Beta NBO", Data::SurfaceType::BetaOrbital);
    }else if (m_orbitals.m_orbitals.orbitalType() == Data::Orbitals::Dyson) {
       m_configurator.surfaceType->addItem("Dyson (Left)",  Data::SurfaceType::DysonLeft);
       m_configurator.surfaceType->addItem("Dyson (Right)", Data::SurfaceType::DysonRight);
@@ -92,16 +95,13 @@ void Orbitals::init()
 
       case Data::Orbitals::Dyson:
       case Data::Orbitals::Localized:
+      case Data::Orbitals::NaturalBond:
          // Orbital energy diagram doesn't make sense here
          m_configurator.energyFrame->hide();
          m_configurator.energyLabel->hide();
          resize(sizeHint());
          break;
 
-      case Data::Orbitals::NaturalBond:
-         QLOG_WARN() << "NBOs requested in Orbitals::Configurator::init() (NYI)";
-         break;
-      
       default:
          if (m_nOrbitals > 0) initPlot();
          break;
@@ -317,6 +317,8 @@ void Orbitals::plotSelectionChanged(bool tf)
       label += " orbital energy: " + QString::number(energy, 'f', 3) + " Eh";
    }else if (m_orbitals.orbitalType() == Data::Orbitals::NaturalTransition) {
       label += " NTO occupancy: " + QString::number(amplitude, 'f', 3);
+   }else if (m_orbitals.orbitalType() == Data::Orbitals::NaturalBond) {
+      label += " NBO occupancy: " + QString::number(amplitude, 'f', 3);
    }
 
    m_configurator.energyLabel->setText(label);

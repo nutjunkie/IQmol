@@ -71,6 +71,7 @@ void OrbitalEvaluator::evaluatorFinished()
 }
 
 
+/*
 Vector const& OrbitalEvaluator::evaluate(double const x, double const y, double const z)
 {
    Vector const& s1(m_shellList.shellValues(x,y,z));
@@ -84,5 +85,6 @@ Vector const& OrbitalEvaluator::evaluate(double const x, double const y, double 
     
    return m_returnValues;
 }
+*/
 
 } // end namespace IQmol

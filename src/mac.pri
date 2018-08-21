@@ -19,7 +19,7 @@ contains(CONFIG, DEPLOY) {
 
    # SSH2
    INCLUDEPATH += $(DEV)/libssh2-1.8.0/include
-   LIBS        += $(DEV)/libssh2-1.8.0/src/libssh2.a
+   LIBS        += $(DEV)/libssh2-1.8.0/build/src/libssh2.a
 
    # OpenBabel
    OPENBABEL    = $(DEV)/openbabel-2.4.1
@@ -38,8 +38,6 @@ contains(CONFIG, DEPLOY) {
    LIBS        += -framework GLUT
    LIBS        += -L/usr/lib -lz -lxml2
 
-   QMAKE_LFLAGS   += -Wl,-no_compact_unwind 
-   QMAKE_LFLAGS   += -stdlib=libc++ 
-   #QMAKE_LFLAGS  += -std=c++11
+   QMAKE_LFLAGS   += -Wl,-no_compact_unwind -stdlib=libc++ 
    QMAKE_RPATHDIR += @executable_path/../Frameworks
 }
