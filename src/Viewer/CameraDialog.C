@@ -273,7 +273,7 @@ void CameraDialog::on_resetButton_clicked(bool)
    table->setRowCount(0);
    m_dialog.autoRotation->setValue(0);
    m_dialog.time->setValue(0.00);
-   resetView(); 
+   //resetView(); 
 }
 
 

@@ -35,6 +35,7 @@ namespace Data {
    class DistanceConstraint;
    class AngleConstraint;
    class TorsionConstraint;
+   class FrozenAtomsConstraint;
 }
 
 namespace Configurator {
@@ -57,7 +58,7 @@ namespace Layer {
 		 /// Specifies the type of constraint.  Note that for the time being a
 		 /// Position constraint corresponds to all coordinates being fixed, i.e.
 		 /// you can't fix just the x coordinate.
-         enum Type { Invalid, Position, Distance, Angle, Torsion };
+         enum Type { Invalid, Position, Distance, Angle, Torsion, FrozenAtoms };
 
 		 /// The type of constraint is determined by the number of Atoms.
 		 Constraint(AtomList const& atoms);
@@ -66,6 +67,7 @@ namespace Layer {
          Constraint(Data::DistanceConstraint const&);
          Constraint(Data::AngleConstraint const& );
          Constraint(Data::TorsionConstraint const&);
+         Constraint(Data::FrozenAtomsConstraint const&);
 
          Constraint(Constraint const& that) : GLObject() { copy(that); }
 

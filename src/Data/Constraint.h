@@ -136,6 +136,40 @@ namespace Data {
    };
 
 
+   class FrozenAtomsConstraint : public Constraint {
+
+      friend class boost::serialization::access;
+
+      public:
+         Type::ID typeID() const { return Type::FrozenAtomsConstraint; }
+
+         FrozenAtomsConstraint() { }
+
+         FrozenAtomsConstraint(QList<unsigned> const& atomIndices, 
+           QList<qglviewer::Vec> const& position);
+
+         QList<qglviewer::Vec> const& positions() const { return m_positions; }
+
+         void serialize(InputArchive& ar, unsigned const /* version = 0 */) 
+         {
+            ar & m_atomIndices;
+            ar & m_positions;
+         }
+
+         void serialize(OutputArchive& ar, unsigned const /* version = 0 */) 
+         {
+            ar & m_atomIndices;
+            ar & m_positions;
+         }
+
+         void dump() const;
+
+      private:
+         QList<unsigned> m_atomIndices;
+         QList<qglviewer::Vec> m_positions;
+   };
+
+
 } } // end namespace IQmol::Data
 
 #endif

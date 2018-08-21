@@ -141,4 +141,26 @@ void TorsionConstraint::dump() const
    }
 }
 
+
+// --------------- Frozen Atoms Constraint ---------------
+
+PositionConstraint::PositionConstraint(unsigned const atomIndex, 
+   qglviewer::Vec const& position)
+{
+   m_atomIndices << atomIndex;
+   m_position = position;
+}
+
+
+void PositionConstraint::dump() const
+{
+  if (m_atomIndices.size() == 1) {
+  qDebug() << "Constraint:" << m_atomIndices[0] << "Position:" 
+            << m_position.x << m_position.y << m_position.z;
+  }else {
+     qDebug() << "Invalid position constraint";
+  }
+}
+
+
 } } // end namespace IQmol::Data

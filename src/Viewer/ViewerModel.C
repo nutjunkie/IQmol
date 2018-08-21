@@ -640,10 +640,6 @@ void ViewerModel::selectNone()
 void ViewerModel::setConstraint()
 {
    int n(m_selectedObjects.size());
-   if (n < 1 || n > 4) {
-      displayMessage("Invalid number of atoms for constraint");
-      return;
-   }
 
    // Check all the selected atoms belong to the same Molecule.
    unsigned int findFlags(Layer::Parents | Layer::Visible);
@@ -670,13 +666,70 @@ void ViewerModel::setConstraint()
       for (int i = 0; i < n; ++i) {
           if ((A = qobject_cast<Layer::Atom*>(m_selectedObjects[i]))) atoms << A;
       } 
-      if (atoms.size() != n) atoms.clear();
    }
 
-   if (atoms.isEmpty()) {
+   n = atoms.size();
+
+   if (n < 1 || n > 4) {
       displayMessage("Unable to set constraint");
       return;
    }
+
+   Layer::Molecule* molecule(parents.first());
+   Layer::Constraint* constraint(molecule->findMatchingConstraint(atoms));
+
+   if (constraint) {
+      constraint->configure();
+      if (constraint->accepted()) {
+         selectNone();
+         molecule->applyConstraint(constraint);
+      }
+   }else {
+      constraint = new Layer::Constraint(atoms);
+      constraint->configure();
+      if (constraint->accepted()) {
+         if (molecule->canAcceptConstraint(constraint)) {
+            selectNone();
+            molecule->addConstraint(constraint);
+         }else {
+            QMsgBox::information(0, "IQmol", 
+               "A maximum of two scan coordinates are permitted");
+            delete constraint;
+         }
+         
+      }else {
+         delete constraint;
+      }
+   }
+}
+
+
+void ViewerModel::freezeAtoms()
+{
+   int n(m_selectedObjects.size());
+
+   // Check all the selected atoms belong to the same Molecule.
+   unsigned int findFlags(Layer::Parents | Layer::Visible);
+   MoleculeList parents(m_selectedObjects[0]->findLayers<Layer::Molecule>(findFlags));
+   if (parents.isEmpty()) return;
+
+   for (int i = 1; i < n; ++i) {
+       if (m_selectedObjects[i]->findLayers<Layer::Molecule>(findFlags) != parents) {
+          QString msg("Cannot freeze atoms in different molecules");
+          QMsgBox::warning(m_parent, "IQmol", msg);
+          return;
+       }
+   }
+
+   AtomList atoms;
+   LayerAtom* A;
+
+   Layer::Atom* A;
+   for (int i = 0; i < n; ++i) {
+       if ((A = qobject_cast<Layer::Atom*>(m_selectedObjects[i]))) atoms << A;
+   } 
+
+   if (atoms.isEmpty()) return;
 
    Layer::Molecule* molecule(parents.first());
    Layer::Constraint* constraint(molecule->findMatchingConstraint(atoms));
