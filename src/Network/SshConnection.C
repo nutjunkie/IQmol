@@ -691,10 +691,20 @@ Reply* SshConnection::execute(QString const& command, QString const& workingDire
 
 Reply* SshConnection::putFile(QString const& sourcePath, QString const& destinationPath) 
 {
-   SshReply* reply(new SshPutFile(this, sourcePath, destinationPath));
+   SshReply* reply(new SftpPutFile(this, sourcePath, destinationPath));
+   //SshReply* reply(new SshPutFile(this, sourcePath, destinationPath));
    thread(reply);
    return reply;
 }
+
+
+Reply* SshConnection::sftpPutFile(QString const& sourcePath, QString const& destinationPath) 
+{
+   SshReply* reply(new SftpPutFile(this, sourcePath, destinationPath));
+   thread(reply);
+   return reply;
+}
+
 
 
 Reply* SshConnection::getFile(QString const& sourcePath, QString const& destinationPath) 
