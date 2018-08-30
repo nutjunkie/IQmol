@@ -71,4 +71,20 @@ void OrbitalEvaluator::evaluatorFinished()
 }
 
 
+/*
+Vector const& OrbitalEvaluator::evaluate(double const x, double const y, double const z)
+{
+   Vector const& s1(m_shellList.shellValues(x,y,z));
+   //Vector const& s1(m_shellList.shellValues(Vec(x,y,z)));
+   unsigned size(m_indices.size()); 
+
+   for (unsigned i = 0; i < size; ++i) {
+       MatrixRow row(m_coefficients, m_indices[i]);
+       m_returnValues[i] = inner_prod(row, s1);
+   }  
+    
+   return m_returnValues;
+}
+*/
+
 } // end namespace IQmol

@@ -144,21 +144,21 @@ void TorsionConstraint::dump() const
 
 // --------------- Frozen Atoms Constraint ---------------
 
-PositionConstraint::PositionConstraint(unsigned const atomIndex, 
-   qglviewer::Vec const& position)
+FrozenAtomsConstraint::FrozenAtomsConstraint(QList<unsigned> const& atomIndices, 
+   QList<qglviewer::Vec> const& positions) : m_atomIndices(atomIndices), 
+   m_positions(positions)
 {
-   m_atomIndices << atomIndex;
-   m_position = position;
+   if (m_atomIndices.size() != m_positions.size()) {
+      qDebug() << "Incomensurate list sizes in FrozenAtomsConstraint";
+   }
 }
 
 
-void PositionConstraint::dump() const
+void FrozenAtomsConstraint::dump() const
 {
-  if (m_atomIndices.size() == 1) {
-  qDebug() << "Constraint:" << m_atomIndices[0] << "Position:" 
-            << m_position.x << m_position.y << m_position.z;
-  }else {
-     qDebug() << "Invalid position constraint";
+  for (int i = 0; i < m_atomIndices.size(); ++i) {
+      qDebug() << "Constraint:" << m_atomIndices[i] << "Position:" 
+               << m_positions[i].x << m_positions[i].y << m_positions[i].z;
   }
 }
 

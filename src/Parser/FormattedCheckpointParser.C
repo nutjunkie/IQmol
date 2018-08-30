@@ -375,10 +375,15 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       }else if (key.endsWith("Surface Title") || key == "NBO Ground State" ) {
          if (!geometry || !toInt(n, list, 1)) goto error;
 
-         key.replace("NBO ","");
-         key.replace("Surface Title","");
-  	     ntoData.label = key + " State: " + QString::number(n);
-  	     nboData.label = key + " State: " + QString::number(n);
+         if (key.contains("Surface Title")) {
+            key.replace("NBO ","");
+            key.replace("Surface Title","");
+  	        ntoData.label = key + " State: " + QString::number(n);
+  	        nboData.label = key + " State: " + QString::number(n);
+         }else {
+  	        nboData.label = key;
+  	        ntoData.label = key;
+         }
     
          Data::Orbitals* ntos(makeOrbitals(nAlpha, nBeta, ntoData, 
             shellData, *geometry));   // returns 0 if no alpha coefficients exist

@@ -262,6 +262,29 @@ Vector const& ShellList::shellValues(qglviewer::Vec const& gridPoint)
 }
 
 
+Vector const& ShellList::shellValues(double const x, double const y, double const z)
+{
+   double const* values;
+   unsigned offset(0);
+
+   ShellList::const_iterator shell;
+   for (shell = begin(); shell != end(); ++shell) {
+       values = (*shell)->evaluate(x, y, z);
+       if (values) {
+          for (unsigned s = 0; s < (*shell)->nBasis(); ++s, ++offset) {
+              m_basisValues[offset] = values[s];
+          }
+       }else{
+          for (unsigned s = 0; s < (*shell)->nBasis(); ++s, ++offset) {
+              m_basisValues[offset] = 0;
+          }
+       }
+   }
+
+   return m_basisValues;
+}
+
+
 // DEPRECATE
 Vector const& ShellList::shellPairValues(qglviewer::Vec const& gridPoint)
 {

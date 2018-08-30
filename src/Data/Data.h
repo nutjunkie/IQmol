@@ -63,7 +63,7 @@ namespace Data {
                 SurfaceInfo,            SurfaceInfoList,        SurfaceType, 
                /*---------------------  *---------------------  *--------------------- */
                 Constraint,             PositionConstraint,     DistanceConstraint,
-                AngleConstraint,        TorsionConstraint,
+                AngleConstraint,        TorsionConstraint,      FrozenAtomsConstraint,
                /*---------------------  *---------------------  *--------------------- */
                 AtomicProperty,         AtomicSymbol,           AtomColor, 
                 AtomicNumber,

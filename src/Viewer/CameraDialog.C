@@ -36,7 +36,7 @@ using namespace qglviewer;
 namespace IQmol {
 
 CameraDialog::CameraDialog(qglviewer::Camera& camera, Viewer* viewer) : QDialog(viewer),
-   m_camera(camera), m_emitSignals(true)
+   m_camera(camera), m_emitSignals(true), m_spinAngle(0.0), m_bounceStop(false)
 {
    m_dialog.setupUi(this);
    short theta(952);
@@ -127,20 +127,20 @@ void CameraDialog::on_orthographicButton_clicked(bool)
 void CameraDialog::on_autoRotation_valueChanged(int speed)
 {
    if (speed == 0) {
+      m_spinAngle  = 0.0;
+      m_bounceStop = false;
       m_camera.frame()->stopSpinning();
       disconnect(m_camera.frame(), SIGNAL(spun()), this, SIGNAL(interpolated()));
       disconnect(m_camera.frame(), SIGNAL(spun()), this, SLOT(updateSpinAngle()));
    }else {
       m_angleIncrement = 0.01*speed;
-      m_spinAngle = 0.0;
       m_camera.frame()->setSpinningQuaternion(Quaternion(Vec(0,1,0), -m_angleIncrement));
-      connect(m_camera.frame(), SIGNAL(spun()), this, SIGNAL(interpolated()));
 
-      if (!m_dialog.loopCheckBox->isChecked()) {
+      if (!m_camera.frame()->isSpinning()) {
+         connect(m_camera.frame(), SIGNAL(spun()), this, SIGNAL(interpolated()));
          connect(m_camera.frame(), SIGNAL(spun()), this, SLOT(updateSpinAngle()));
+         m_camera.frame()->startSpinning(40); // msec
       }
-
-      m_camera.frame()->startSpinning(40); // msec
    }
    updated();
 }
@@ -148,8 +148,24 @@ void CameraDialog::on_autoRotation_valueChanged(int speed)
 
 void CameraDialog::updateSpinAngle()
 {
+   const double bounceAngle(0.25*M_PI);
+
+   bool bounce(m_dialog.bounceCheckBox->isChecked());
+   bool loop(m_dialog.loopCheckBox->isChecked());
+
    m_spinAngle += m_angleIncrement;
-   if (m_spinAngle >= 2.0*M_PI) stopSpinning();
+
+   if (bounce) {
+      if (std::abs(m_spinAngle) >= bounceAngle) {
+         m_angleIncrement = -m_angleIncrement;
+         m_bounceStop = (m_angleIncrement > 0.0);
+         m_camera.frame()->setSpinningQuaternion(Quaternion(Vec(0,1,0), -m_angleIncrement));
+      }
+
+      if (!loop && m_bounceStop && m_spinAngle >= 0) stopSpinning();
+   }else {
+      if (!loop && std::abs(m_spinAngle) >= 2.0*M_PI) stopSpinning();
+   }
 }
 
 
@@ -193,6 +209,9 @@ void CameraDialog::on_addFrameButton_clicked(bool)
 
 void CameraDialog::on_playButton_clicked(bool)
 {
+   return on_playButton2_clicked(true);
+
+   // Concatinating the frames leads to some weird interpolation effects
    QTableWidget* table(m_dialog.frameTable);
    qDebug() << "Playing" << table->rowCount() << "camera key frames";
    if (table->rowCount() == 0) return;
@@ -221,10 +240,8 @@ void CameraDialog::on_playButton_clicked(bool)
        }
    }
 
-   keyFrameInterpolator->drawPath();
+   //keyFrameInterpolator->drawPath();
    updated();
-  
-   keyFrameInterpolator = m_camera.keyFrameInterpolator(0);
 
    if (keyFrameInterpolator) {
       qDebug() << "keyFrameInterpolator" << keyFrameInterpolator << "activating";
@@ -237,6 +254,84 @@ void CameraDialog::on_playButton_clicked(bool)
 
    keyFrameInterpolator->setInterpolationTime(0.0);
    m_camera.playPath(0);
+}
+
+void CameraDialog::on_stopButton_clicked(bool)
+{
+   KeyFrameInterpolator* keyFrameInterpolator(m_camera.keyFrameInterpolator(0));
+   if (keyFrameInterpolator) keyFrameInterpolator->stopInterpolation();
+}
+
+void CameraDialog::on_playButton2_clicked(bool)
+{
+   QTableWidget* table(m_dialog.frameTable);
+   qDebug() << "Playing" << table->rowCount() << "camera key frames";
+   if (table->rowCount() < 2) return;
+
+   KeyFrameInterpolator* keyFrameInterpolator(m_camera.keyFrameInterpolator(0));
+   if (!keyFrameInterpolator) {
+      keyFrameInterpolator = new KeyFrameInterpolator(m_camera.frame()); 
+      m_camera.setKeyFrameInterpolator(0, keyFrameInterpolator);
+      connect(keyFrameInterpolator, SIGNAL(interpolated()), this, SIGNAL(interpolated()));
+      connect(keyFrameInterpolator, SIGNAL(endReached()),   this, SLOT(runFrame()));
+   }   
+
+   keyFrameInterpolator->stopInterpolation();
+
+   m_keyFrameRow = 0;
+   runFrame();
+}
+
+
+void CameraDialog::runFrame()
+{
+   QTableWidget* table(m_dialog.frameTable);
+   if (m_keyFrameRow+1 >= table->rowCount()) return;
+
+   KeyFrameInterpolator* keyFrameInterpolator(m_camera.keyFrameInterpolator(0));
+   keyFrameInterpolator->deletePath();
+
+   bool ok; 
+   double start, end; 
+   Frame* frame;
+   QTableWidgetItem* item;
+
+   // First frame
+   item  = table->item(m_keyFrameRow,0);
+   start = item->text().toDouble(&ok);
+   item  = table->item(m_keyFrameRow,1);
+   frame = QVariantPointer<Frame>::toPointer(item->data(Qt::UserRole));
+
+   if (!ok || !frame) return;
+   qDebug() << "Adding first  key frame row" << m_keyFrameRow;
+   keyFrameInterpolator->addKeyFrame(*frame, 0.0);
+
+   // Second frame
+   item  = table->item(m_keyFrameRow+1,0);
+   end   = item->text().toDouble(&ok);
+   item  = table->item(m_keyFrameRow+1,1);
+   frame = QVariantPointer<Frame>::toPointer(item->data(Qt::UserRole));
+
+   if (!ok || !frame) return;
+   qDebug() << "Adding second key frame row" << m_keyFrameRow+1 << "duration" << end-start;
+   keyFrameInterpolator->addKeyFrame(*frame, end-start);
+
+   keyFrameInterpolator = m_camera.keyFrameInterpolator(0);
+   keyFrameInterpolator->setInterpolationTime(0.0);
+   m_camera.playPath(0);
+   ++m_keyFrameRow;
+}
+
+
+void CameraDialog::on_deleteFrameButton_clicked(bool)
+{
+   QTableWidget* table(m_dialog.frameTable);
+   QList<QTableWidgetItem*> selection(table->selectedItems());
+   if (selection.isEmpty()) return;
+
+   int row(selection.first()->row());
+   table->removeRow(row);
+   updated();
 }
 
 

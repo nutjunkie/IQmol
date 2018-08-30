@@ -722,7 +722,6 @@ void ViewerModel::freezeAtoms()
    }
 
    AtomList atoms;
-   LayerAtom* A;
 
    Layer::Atom* A;
    for (int i = 0; i < n; ++i) {

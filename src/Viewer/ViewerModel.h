@@ -90,6 +90,7 @@ namespace IQmol {
          void adjustSymmetryTolerance();
          void toggleAutoDetectSymmetry();
 
+         void freezeAtoms();
          void setConstraint();
          void setIsotopes();
          void translateToCenter();

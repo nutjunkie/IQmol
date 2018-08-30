@@ -2555,18 +2555,18 @@ void Molecule::initProperties()
       chargeTypes->addAction(action);
       connect(action, SIGNAL(triggered()), this, SLOT(updateAtomicCharges()));
       m_properties 
-        << new PointChargePotential(Data::Type::ChelpgCharge, "ESP (Hirshfeld)", this);
+        << new PointChargePotential(Data::Type::HirshfeldCharge, "ESP (Hirshfeld)", this);
    }
 
    // Lowdin
-   if (m_currentGeometry->hasProperty<Data::ChelpgCharge>()) {
+   if (m_currentGeometry->hasProperty<Data::LowdinCharge>()) {
       action = menu->addAction("Lowdin");
       action->setCheckable(true);
       action->setData(Data::Type::LowdinCharge);
       chargeTypes->addAction(action);
       connect(action, SIGNAL(triggered()), this, SLOT(updateAtomicCharges()));
       m_properties 
-        << new PointChargePotential(Data::Type::ChelpgCharge, "ESP (Lowdin)", this);
+        << new PointChargePotential(Data::Type::LowdinCharge, "ESP (Lowdin)", this);
    }
 
    if (m_currentGeometry->hasProperty<Data::MultipoleExpansionList>()) {
