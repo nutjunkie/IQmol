@@ -100,6 +100,9 @@ void Server::open()
          case ServerConfiguration::SSH:
             m_connection = new Network::SshConnection(address.toString(), port);
             break;
+         case ServerConfiguration::SFTP:
+            m_connection = new Network::SshConnection(address.toString(), port, true);
+            break;
          case ServerConfiguration::HTTP:
             m_connection = new Network::HttpConnection(address.toString(), port);
             break;
@@ -309,6 +312,10 @@ qDebug() << "QJI - trace Server::queueJob()";
 
       QString workingDirectory(job->jobInfo().get(QChemJobInfo::RemoteWorkingDirectory));
 
+      // Note that the execute takes a working directory which is changed into before
+      // executing the command.  If the Working Directory path is relative, and if
+      // cd ${JOB_DIR} is in the submit command, this results in the change of directory
+      // occuring twice, and if the paths are relative, the path will likely not exist.
       reply = m_connection->execute(submit, workingDirectory);
       connect(reply, SIGNAL(finished()), this, SLOT(submitFinished()));
       m_activeRequests.insert(reply, job);

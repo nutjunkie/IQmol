@@ -144,7 +144,7 @@ namespace Network {
 
       Q_OBJECT
 
-      friend class SshGetFiles;
+      friend class SftpGetFiles;
 
       public:
          SftpGetFile(SshConnection* connection, QString const& sourcePath, 

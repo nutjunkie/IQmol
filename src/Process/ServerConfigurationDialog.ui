@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>509</width>
+    <width>584</width>
     <height>401</height>
    </rect>
   </property>
@@ -166,6 +166,13 @@ Use Web for HTTP/HTTPS servers</string>
         <widget class="QRadioButton" name="sshRadioButton">
          <property name="text">
           <string>SSH</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="sftpRadioButton">
+         <property name="text">
+          <string>SFTP</string>
          </property>
         </widget>
        </item>

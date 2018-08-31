@@ -74,6 +74,7 @@ QString ServerConfiguration::toString(ConnectionT const connection)
    switch (connection) {
       case Local:  s = "Local";  break;
       case SSH:    s = "SSH";    break;
+      case SFTP:   s = "SFTP";   break;
       case HTTP:   s = "HTTP";   break;
       case HTTPS:  s = "HTTPS";  break;
    }
@@ -124,6 +125,7 @@ ServerConfiguration::FieldT ServerConfiguration::toFieldT(QString const& field)
 ServerConfiguration::ConnectionT ServerConfiguration::toConnectionT(QString const& connection)
 {
    if (connection.contains("ssh",   Qt::CaseInsensitive))  return SSH;
+   if (connection.contains("sftp",  Qt::CaseInsensitive))  return SFTP;
    if (connection.contains("https", Qt::CaseInsensitive))  return HTTPS;
    if (connection.contains("http",  Qt::CaseInsensitive))  return HTTP;
 
@@ -304,6 +306,14 @@ void ServerConfiguration::setDefaults(ConnectionT const connection)
          break;
 
       case SSH:
+         m_configuration.insert(ServerName, "Server");
+         m_configuration.insert(Port, 22);
+         m_configuration.insert(Authentication, Network::Connection::Password);
+         m_configuration.insert(UserName, QString(qgetenv("USER")));
+         m_configuration.insert(WorkingDirectory, "");
+         break;
+
+      case SFTP:
          m_configuration.insert(ServerName, "Server");
          m_configuration.insert(Port, 22);
          m_configuration.insert(Authentication, Network::Connection::Password);

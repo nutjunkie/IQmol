@@ -46,7 +46,8 @@ namespace Network {
       friend class SftpGetFile;
 
       public:
-         SshConnection(QString const& hostname, int const port = 22);
+         SshConnection(QString const& hostname, int const port = 22,
+             bool const useSftp = false);
          ~SshConnection() { close(); }
 
          void open();
@@ -65,9 +66,11 @@ namespace Network {
          Reply* getFile(QString const& sourcePath, QString const& destinationPath);
          Reply* getFiles(QStringList const& fileList, QString const& destinationPath);
 
+/*
          Reply* sftpPutFile(QString const& sourcePath, QString const& destinationPath);
          Reply* sftpGetFile(QString const& sourcePath, QString const& destinationPath);
          Reply* sftpGetFiles(QString const& sourcePath, QString const& destinationPath);
+*/
 
          bool waitSocket();  // returns true on timeout
 
@@ -87,6 +90,7 @@ namespace Network {
          int m_socket;
          LIBSSH2_AGENT* m_agent;
          QString m_username;
+         bool m_useSftp;
 
          void init();
          void openSocket(unsigned const timeout);

@@ -58,8 +58,8 @@ namespace Network {
 unsigned SshConnection::s_numberOfConnections = 0;
 
 
-SshConnection::SshConnection(QString const& hostname, int const port) : 
-   Connection(hostname, port), m_session(0), m_socket(0), m_agent(0)
+SshConnection::SshConnection(QString const& hostname, int const port, bool const useSftp) : 
+   Connection(hostname, port), m_session(0), m_socket(0), m_agent(0), m_useSftp(useSftp)
 {
 }
 
@@ -691,25 +691,25 @@ Reply* SshConnection::execute(QString const& command, QString const& workingDire
 
 Reply* SshConnection::putFile(QString const& sourcePath, QString const& destinationPath) 
 {
-   SshReply* reply(new SftpPutFile(this, sourcePath, destinationPath));
-   //SshReply* reply(new SshPutFile(this, sourcePath, destinationPath));
+   SshReply* reply(0);
+   if (m_useSftp) {
+      reply = new SftpPutFile(this, sourcePath, destinationPath);
+   }else {
+      reply = new SshPutFile(this, sourcePath, destinationPath);
+   }
    thread(reply);
    return reply;
 }
-
-
-Reply* SshConnection::sftpPutFile(QString const& sourcePath, QString const& destinationPath) 
-{
-   SshReply* reply(new SftpPutFile(this, sourcePath, destinationPath));
-   thread(reply);
-   return reply;
-}
-
 
 
 Reply* SshConnection::getFile(QString const& sourcePath, QString const& destinationPath) 
 {
-   SshReply* reply(new SshGetFile(this, sourcePath, destinationPath));
+   SshReply* reply(0);
+   if (m_useSftp) {
+      reply = new SftpGetFile(this, sourcePath, destinationPath);
+   }else {
+      reply = new SshGetFile(this, sourcePath, destinationPath);
+   }
    thread(reply);
    return reply;
 }
@@ -717,7 +717,12 @@ Reply* SshConnection::getFile(QString const& sourcePath, QString const& destinat
 
 Reply* SshConnection::getFiles(QStringList const& fileList, QString const& destinationPath)
 {
-   SshReply* reply(new SshGetFiles(this, fileList, destinationPath));
+   SshReply* reply(0);
+   if (m_useSftp) {
+      reply = new SftpGetFiles(this, fileList, destinationPath);
+   }else {
+      reply = new SshGetFiles(this, fileList, destinationPath);
+   }
    thread(reply);
    return reply;
 }

@@ -262,7 +262,6 @@ void SftpPutFile::runDelegate()
       throw Exception(msg + m_sourcePath);
    }
 
-   QLOG_TRACE() << "Initializing SFTP session";
    LIBSSH2_SESSION* session(m_connection->m_session);
    LIBSSH2_SFTP* sftp_session(0);
 
@@ -274,7 +273,6 @@ void SftpPutFile::runDelegate()
       }
    } 
 
-   QLOG_TRACE() << "Opening SFTP handle for write transfer";
    LIBSSH2_SFTP_HANDLE* sftp_handle(0);
    QByteArray destination(m_destinationPath.toLocal8Bit());
 
@@ -285,14 +283,14 @@ void SftpPutFile::runDelegate()
          LIBSSH2_SFTP_S_IRGRP | LIBSSH2_SFTP_S_IROTH);
  
         if (!sftp_handle && (libssh2_session_last_errno(session) != LIBSSH2_ERROR_EAGAIN)) {
-            QString msg("Unable to open file handle with SFTP\n");
+            QString msg("Unable to open remote file handle with SFTP\n");
             throw Exception(msg + m_destinationPath);
         }
    }
 
    struct stat fileInfo;
    stat(source.data(), &fileInfo);
-   QLOG_TRACE() <<  "Prepared to send" << fileInfo.st_size << "bytes";
+   QLOG_TRACE() <<  "Preparing to send" << fileInfo.st_size << "bytes via sftp";
 
    // If the buffer size changes, anything connected to the copyProgress will
    // need updating as it assumes kbyte increments.
@@ -324,6 +322,8 @@ void SftpPutFile::runDelegate()
        copyProgress();
 
    } while (rc > 0 && !m_interrupt);
+
+   if (total == fileInfo.st_size) QLOG_TRACE() << "Transfer complete";
 
    fclose(localFileHandle);
    libssh2_sftp_close(sftp_handle);
@@ -445,6 +445,109 @@ void SshGetFile::runDelegate(bool& getFilesInterrupt)
 }
 
 
+// -------------- SftpGetFile ----------------
+// HACK, needs cleaning up
+void SftpGetFile::runDelegate()
+{
+   bool parentInterrupt(false);
+   runDelegate(parentInterrupt);
+}
+
+
+void SftpGetFile::runDelegate(bool& getFilesInterrupt)
+{
+   QLOG_TRACE() << "SftpGetFile " << m_destinationPath << "<-" << m_sourcePath;
+
+   // Check we can write to the local file first
+   QByteArray destination(m_destinationPath.toLocal8Bit());
+   FILE* localFileHandle(fopen(destination.data(), "wb"));
+
+   if (!localFileHandle) {
+      QString msg("Could not open file for writing: ");
+      throw Exception(msg + m_destinationPath);
+   }
+
+   // initialize session
+   QLOG_TRACE() << "Initializing SFTP session for read";
+   LIBSSH2_SESSION* session(m_connection->m_session);
+   LIBSSH2_SFTP* sftp_session(0);
+
+   while (!sftp_session && !getFilesInterrupt) {
+      sftp_session = libssh2_sftp_init(session);
+
+      if (!sftp_session) {
+         if (libssh2_session_last_errno(session) == LIBSSH2_ERROR_EAGAIN) {
+            m_connection->waitSocket();
+         }else {
+            QString msg("Unable to init SFTP session for transfer: \n");
+            throw Exception(msg + m_sourcePath);
+         }
+      }
+   } 
+
+   QLOG_TRACE() << "Opening SFTP handle for read transfer";
+   LIBSSH2_SFTP_HANDLE* sftp_handle(0);
+   QByteArray source(m_sourcePath.toLocal8Bit());
+
+   while (!sftp_handle && !getFilesInterrupt) {
+      sftp_handle = libssh2_sftp_open(sftp_session, source,  LIBSSH2_FXF_READ, 0); 
+ 
+      if (!sftp_handle) {
+         if (libssh2_session_last_errno(session) == LIBSSH2_ERROR_EAGAIN) {
+            m_connection->waitSocket();
+         }else {
+            QString msg("Unable to open remote file handle with SFTP\n");
+            throw Exception(msg + m_sourcePath);
+         }
+      }
+   } 
+
+   // stat the filesize
+   LIBSSH2_SFTP_ATTRIBUTES attributes;
+   while ( libssh2_sftp_fstat(sftp_handle, &attributes) == LIBSSH2_ERROR_EAGAIN) {
+      m_connection->waitSocket();
+   }
+
+   unsigned fileSize(attributes.filesize);
+
+   QLOG_DEBUG() << "SFTP file size transfer: " << fileSize;
+
+   // If the buffer size changes, anything connected to the copyProgress will
+   // need updating as it assumes Kbyte increments.
+   char     buffer[1024];
+   int      rc(0);
+   unsigned got(0);
+   QString  error;
+
+   while (got < fileSize && !m_interrupt && !getFilesInterrupt) {
+      // read in a loop until we block 
+      do {
+         rc = libssh2_sftp_read(sftp_handle, buffer, sizeof(buffer));
+         if (rc > 0) {
+            fwrite(buffer, rc, 1, localFileHandle);
+            got += rc;
+            double frac(double(got)/double(fileSize));
+            copyProgress(frac);
+         }
+      } while (rc > 0);
+ 
+      if (rc == LIBSSH2_ERROR_EAGAIN) {
+         m_connection->waitSocket();
+
+      }else if (rc < 0) {
+          error  = "Error reading from sftp handle: ";
+          error += m_connection->lastSessionError();
+          break;
+      }
+   }
+
+   cleanup:
+      QLOG_TRACE() <<  "Closing sftp read transfer";
+      fclose(localFileHandle);
+      libssh2_sftp_shutdown(sftp_session);
+
+      if (!m_interrupt && !error.isEmpty()) throw Exception(error);
+}
 
 // -------------- SshGetFiles ----------------
 

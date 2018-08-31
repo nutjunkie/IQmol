@@ -40,6 +40,7 @@ namespace Process {
       private Q_SLOTS:
          void on_localRadioButton_toggled(bool);
          void on_sshRadioButton_toggled(bool);
+         void on_sftpRadioButton_toggled(bool);
          void on_httpRadioButton_toggled(bool);
          void on_httpsRadioButton_toggled(bool);
 
