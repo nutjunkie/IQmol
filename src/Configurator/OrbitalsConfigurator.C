@@ -57,6 +57,8 @@ Orbitals::Orbitals(Layer::Orbitals& orbitals)
    }else if (m_orbitals.m_orbitals.orbitalType() == Data::Orbitals::Dyson) {
       m_configurator.surfaceType->addItem("Dyson (Left)",  Data::SurfaceType::DysonLeft);
       m_configurator.surfaceType->addItem("Dyson (Right)", Data::SurfaceType::DysonRight);
+   }else if (m_orbitals.m_orbitals.orbitalType() == Data::Orbitals::Generic) {
+      m_configurator.surfaceType->addItem("Orbital",  Data::SurfaceType::GenericOrbital);
    }else {
       m_configurator.surfaceType->addItem("Alpha Orbital",  Data::SurfaceType::AlphaOrbital);
       m_configurator.surfaceType->addItem("Beta Orbital",   Data::SurfaceType::BetaOrbital);
@@ -96,6 +98,7 @@ void Orbitals::init()
       case Data::Orbitals::Dyson:
       case Data::Orbitals::Localized:
       case Data::Orbitals::NaturalBond:
+      case Data::Orbitals::Generic:
          // Orbital energy diagram doesn't make sense here
          m_configurator.energyFrame->hide();
          m_configurator.energyLabel->hide();
@@ -349,6 +352,7 @@ void Orbitals::on_surfaceType_currentIndexChanged(int index)
 
       case Data::SurfaceType::AlphaOrbital:
       case Data::SurfaceType::DysonLeft:
+      case Data::SurfaceType::GenericOrbital:
          enableOrbitalSelection(true);
          enableNegativeColor(true);
          enableMullikenDecompositions(false);
@@ -523,6 +527,17 @@ void Orbitals::on_addToQueueButton_clicked(bool)
 
       case Data::SurfaceType::AlphaOrbital: {
          info.type().setKind(Data::SurfaceType::AlphaOrbital);
+         int orb1(m_configurator.orbitalRangeMin->currentIndex());
+         int orb2(m_configurator.orbitalRangeMax->currentIndex());
+
+         for (int i = std::min(orb1,orb2); i <= std::max(orb1, orb2); ++i) {
+             info.type().setIndex(i);
+             queueSurface(info);
+         }
+      } break;
+
+      case Data::SurfaceType::GenericOrbital: {
+         info.type().setKind(Data::SurfaceType::GenericOrbital);
          int orb1(m_configurator.orbitalRangeMin->currentIndex());
          int orb2(m_configurator.orbitalRangeMax->currentIndex());
 

@@ -40,7 +40,8 @@ namespace Data {
                             Localized, 
                             NaturalTransition, 
                             NaturalBond,
-                            Dyson
+                            Dyson,
+                            Generic
                           };
 
          static QString toString(OrbitalType const);

@@ -40,6 +40,7 @@ QString Orbitals::toString(OrbitalType const type)
       case NaturalTransition:  s = "Natural Transition Orbitals";  break;
       case NaturalBond:        s = "Natural Bond Orbitals";        break;
       case Dyson:              s = "Dyson Orbitals";               break;
+      case Generic:            s = "Generic Orbitals";             break;
    }
 
    return s;

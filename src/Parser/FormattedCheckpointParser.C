@@ -85,7 +85,6 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
    virtLocData.orbitalType = Data::Orbitals::Localized;
    virtLocData.label = "Localized MOs (VirtLoc)";
 
-
    OrbitalData ntoData;
    ntoData.orbitalType = Data::Orbitals::NaturalTransition;
    ntoData.label = "Natural Transition Orbitals";
@@ -97,6 +96,10 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
    OrbitalData dysonData;
    dysonData.orbitalType = Data::Orbitals::Dyson;
    dysonData.label = "Dyson Orbitals";
+
+   OrbitalData genericData;
+   genericData.orbitalType = Data::Orbitals::Generic;
+   genericData.label = "Generic Orbitals";
 
 
    unsigned nAlpha(0);
@@ -337,6 +340,11 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          if (!toInt(n, list, 2)) goto error;
          dysonData.betaCoefficients.append(readDoubleArray(textStream, n));
          
+      // Generic Orbitals
+      }else if (key.contains("Orbital Coefficients")) {
+         if (!toInt(n, list, 2)) goto error;
+         genericData.alphaCoefficients.append(readDoubleArray(textStream, n));
+
       // Geminals
 
       }else if (key == "Alpha GMO coefficients") {
@@ -478,6 +486,9 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       if (orbitals) orbitalsList->append(orbitals);
 
       orbitals = makeOrbitals(nAlpha, nBeta, dysonData, shellData, *geometry); 
+      if (orbitals) orbitalsList->append(orbitals);
+
+      orbitals = makeOrbitals(nAlpha, nBeta, genericData, shellData, *geometry); 
       if (orbitals) orbitalsList->append(orbitals);
 
       Data::GeminalOrbitals* gmos(makeGeminalOrbitals(nAlpha, nBeta, gmoData, 
@@ -630,12 +641,17 @@ Data::Orbitals* FormattedCheckpoint::makeOrbitals(unsigned const nAlpha,
             orbitalData.betaCoefficients, orbitalData.alphaEnergies, orbitalData.labels);
       } break;
 
-
       case Data::Orbitals::NaturalBond: {
          orbitals = new Data::NaturalBondOrbitals(nAlpha, nBeta, *shellList,
             orbitalData.alphaCoefficients, orbitalData.alphaEnergies, 
             orbitalData.betaCoefficients,  orbitalData.betaEnergies, orbitalData.label);
       }  break;
+
+      case Data::Orbitals::Generic: {
+         orbitals = new Data::Orbitals(Data::Orbitals::Generic, *shellList, 
+            orbitalData.alphaCoefficients, orbitalData.betaCoefficients, "Generic");
+            
+      } break;
 
       default:
          QLOG_WARN() << "Unknown oribital type in FormattedCheckpoint::makeOrbitals";
