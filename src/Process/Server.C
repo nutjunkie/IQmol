@@ -100,6 +100,9 @@ void Server::open()
          case ServerConfiguration::SSH:
             m_connection = new Network::SshConnection(address.toString(), port);
             break;
+         case ServerConfiguration::SFTP:
+            m_connection = new Network::SshConnection(address.toString(), port, true);
+            break;
          case ServerConfiguration::HTTP:
             m_connection = new Network::HttpConnection(address.toString(), port);
             break;
@@ -309,6 +312,10 @@ qDebug() << "QJI - trace Server::queueJob()";
 
       QString workingDirectory(job->jobInfo().get(QChemJobInfo::RemoteWorkingDirectory));
 
+      // Note that the execute takes a working directory which is changed into before
+      // executing the command.  If the Working Directory path is relative, and if
+      // cd ${JOB_DIR} is in the submit command, this results in the change of directory
+      // occuring twice, and if the paths are relative, the path will likely not exist.
       reply = m_connection->execute(submit, workingDirectory);
       connect(reply, SIGNAL(finished()), this, SLOT(submitFinished()));
       m_activeRequests.insert(reply, job);
@@ -365,7 +372,7 @@ bool Server::parseSubmitMessage(Job* job, QString const& message)
       case ServerConfiguration::PBS: {
          // A successful submission returns a single token containing the job ID
          QStringList tokens(message.split(QRegExp("\\s+"), QString::SkipEmptyParts));
-         if (tokens.size() == 1) {
+         if (tokens.size() >= 1) {
             job->setJobId(tokens.first());
             QLOG_DEBUG() << "PBS job submitted with id" << job->jobId();
             ok = true;
@@ -385,9 +392,24 @@ bool Server::parseSubmitMessage(Job* job, QString const& message)
          //   Your job 2834 ("test.sh") has been submitted
          QStringList tokens(message.split(QRegExp("\\s+"), QString::SkipEmptyParts));
          if (message.contains("has been submitted")) {
-            int id(tokens[2].toInt(&ok));
-            if (ok) job->setJobId(QString::number(id));
-            ok = true;
+            if (tokens.size() >= 3) {
+               int id(tokens[2].toInt(&ok));
+               if (ok) job->setJobId(QString::number(id));
+               ok = true;
+            }
+         }
+      } break;
+
+      case ServerConfiguration::SLURM: {
+         // A successful submission returns a string like:
+         //   Submitted batch job 1234
+         QStringList tokens(message.split(QRegExp("\\s+"), QString::SkipEmptyParts));
+         if (message.contains("Submitted batch job")) {
+            if (tokens.size() >= 4) {
+               int id(tokens[3].toInt(&ok));
+               if (ok) job->setJobId(QString::number(id));
+               ok = true;
+            }
          }
       } break;
 
@@ -578,6 +600,23 @@ bool Server::parseQueryMessage(Job* job, QString const& message)
                   }
                }
             }
+         }
+      } break;
+
+      case ServerConfiguration::SLURM: {
+         if (message.isEmpty() || message.contains("COMPLETED") 
+                               || message.contains("FAILED") 
+                               || message.contains("TIMEOUT")) {
+            status = Job::Finished;
+
+         }else if (message.contains("PENDING") || message.contains("CONFIGURING")) {
+            status = Job::Queued;
+
+         }else if (message.contains("RUNNING")) {
+            status = Job::Running;
+
+         }else if (message.contains("SUSPENDED")) {
+            status = Job::Suspended;
          }
       } break;
 

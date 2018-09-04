@@ -44,6 +44,7 @@
 #include <QFontMetrics>
 #include <QStandardItemModel>
 #include <QItemSelectionModel>
+#include <QTimer>
 
 
 class QUndoCommand;
@@ -225,6 +226,7 @@ namespace IQmol {
          bool m_blockUpdate;
          bool m_shadersInit;
 
+         QTimer         m_recordTimer;
          QGLContext*    m_glContext;
          ShaderLibrary* m_shaderLibrary;
          ShaderDialog*  m_shaderDialog;

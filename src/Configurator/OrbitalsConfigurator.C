@@ -51,9 +51,14 @@ Orbitals::Orbitals(Layer::Orbitals& orbitals)
       m_configurator.surfaceType->addItem("Alpha NTO",  Data::SurfaceType::AlphaOrbital);
       m_configurator.surfaceType->addItem("Beta NTO",   Data::SurfaceType::BetaOrbital);
     //m_configurator.surfaceType->addItem("Transition Density", TotalDensity);
+   }else if (m_orbitals.m_orbitals.orbitalType() == Data::Orbitals::NaturalBond) {
+      m_configurator.surfaceType->addItem("Alpha NBO",  Data::SurfaceType::AlphaOrbital);
+      m_configurator.surfaceType->addItem("Beta NBO", Data::SurfaceType::BetaOrbital);
    }else if (m_orbitals.m_orbitals.orbitalType() == Data::Orbitals::Dyson) {
       m_configurator.surfaceType->addItem("Dyson (Left)",  Data::SurfaceType::DysonLeft);
       m_configurator.surfaceType->addItem("Dyson (Right)", Data::SurfaceType::DysonRight);
+   }else if (m_orbitals.m_orbitals.orbitalType() == Data::Orbitals::Generic) {
+      m_configurator.surfaceType->addItem("Orbital",  Data::SurfaceType::GenericOrbital);
    }else {
       m_configurator.surfaceType->addItem("Alpha Orbital",  Data::SurfaceType::AlphaOrbital);
       m_configurator.surfaceType->addItem("Beta Orbital",   Data::SurfaceType::BetaOrbital);
@@ -92,16 +97,14 @@ void Orbitals::init()
 
       case Data::Orbitals::Dyson:
       case Data::Orbitals::Localized:
+      case Data::Orbitals::NaturalBond:
+      case Data::Orbitals::Generic:
          // Orbital energy diagram doesn't make sense here
          m_configurator.energyFrame->hide();
          m_configurator.energyLabel->hide();
          resize(sizeHint());
          break;
 
-      case Data::Orbitals::NaturalBond:
-         QLOG_WARN() << "NBOs requested in Orbitals::Configurator::init() (NYI)";
-         break;
-      
       default:
          if (m_nOrbitals > 0) initPlot();
          break;
@@ -222,10 +225,10 @@ void Orbitals::initPlot()
               graph->setData(a, y);
               graph->setName(QString::number(k+nOrbs));
               if (ntos) {
-                 graph->setScatterStyle(k<nAlpha ? QCPScatterStyle::ssHole
+                 graph->setScatterStyle(k<nBeta ? QCPScatterStyle::ssHole
                                                  : QCPScatterStyle::ssOccupied);
               }else {
-                 graph->setScatterStyle(k<nAlpha ? QCPScatterStyle::ssOccupied 
+                 graph->setScatterStyle(k<nBeta ? QCPScatterStyle::ssOccupied 
                                                  : QCPScatterStyle::ssVirtual);
               }
               connect(graph, SIGNAL(selectionChanged(bool)), 
@@ -317,6 +320,8 @@ void Orbitals::plotSelectionChanged(bool tf)
       label += " orbital energy: " + QString::number(energy, 'f', 3) + " Eh";
    }else if (m_orbitals.orbitalType() == Data::Orbitals::NaturalTransition) {
       label += " NTO occupancy: " + QString::number(amplitude, 'f', 3);
+   }else if (m_orbitals.orbitalType() == Data::Orbitals::NaturalBond) {
+      label += " NBO occupancy: " + QString::number(amplitude, 'f', 3);
    }
 
    m_configurator.energyLabel->setText(label);
@@ -347,6 +352,7 @@ void Orbitals::on_surfaceType_currentIndexChanged(int index)
 
       case Data::SurfaceType::AlphaOrbital:
       case Data::SurfaceType::DysonLeft:
+      case Data::SurfaceType::GenericOrbital:
          enableOrbitalSelection(true);
          enableNegativeColor(true);
          enableMullikenDecompositions(false);
@@ -530,6 +536,17 @@ void Orbitals::on_addToQueueButton_clicked(bool)
          }
       } break;
 
+      case Data::SurfaceType::GenericOrbital: {
+         info.type().setKind(Data::SurfaceType::GenericOrbital);
+         int orb1(m_configurator.orbitalRangeMin->currentIndex());
+         int orb2(m_configurator.orbitalRangeMax->currentIndex());
+
+         for (int i = std::min(orb1,orb2); i <= std::max(orb1, orb2); ++i) {
+             info.type().setIndex(i);
+             queueSurface(info);
+         }
+      } break;
+
       case Data::SurfaceType::BetaOrbital: {
          info.type().setKind(Data::SurfaceType::BetaOrbital);
          int orb1(m_configurator.orbitalRangeMin->currentIndex());
@@ -633,7 +650,12 @@ void Orbitals::updateOrbitalRange(bool alpha)
    combo = m_configurator.orbitalRangeMax;
    combo->clear();
    combo->addItems(m_orbitals.m_orbitals.labels(alpha));
-   combo->setCurrentIndex(m_orbitals.m_orbitals.labelIndex(alpha)+1);
+
+   if (combo->count() == 1) {
+      combo->setCurrentIndex(m_orbitals.m_orbitals.labelIndex(alpha));
+   }else {
+      combo->setCurrentIndex(m_orbitals.m_orbitals.labelIndex(alpha)+1);
+   }
 }
 
 

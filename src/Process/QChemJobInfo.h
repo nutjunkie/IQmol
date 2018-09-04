@@ -62,12 +62,15 @@ namespace Process {
                  EfpParameters, 
                  ExternalCharges,         // 20
                  OnsagerRadius,
-                 Isotopes
+                 Isotopes,
+                 NElectrons
               };
             
 
-         QChemJobInfo() : m_charge(0), m_multiplicity(1), m_localFilesExist(false),
-           m_promptOnOverwrite(true), m_efpOnlyJob(false), m_moleculePointer(0) { }
+         QChemJobInfo() : m_charge(0), m_multiplicity(1), m_nElectrons(0), 
+           m_localFilesExist(false),  m_promptOnOverwrite(true), m_efpOnlyJob(false), 
+           m_moleculePointer(0) { }
+          
 
          QChemJobInfo(QChemJobInfo const& that) : JobInfo(that) { copy(that); }
 
@@ -91,6 +94,7 @@ namespace Process {
 
          int getCharge() const { return m_charge; }
          int getMultiplicity() const { return m_multiplicity; }
+         int getNElectrons() const { return m_nElectrons; }
 
          bool efpOnlyJob() const { return m_efpOnlyJob; }
          void setEfpOnlyJob(bool const tf) { m_efpOnlyJob = tf; }
@@ -116,6 +120,7 @@ namespace Process {
          QMap<Field,QString> m_data;
          int  m_charge;
          int  m_multiplicity;
+         int  m_nElectrons;
          bool m_localFilesExist;
          bool m_promptOnOverwrite;
          bool m_efpOnlyJob;

@@ -104,6 +104,9 @@ void QChemJobInfo::set(Field const field, int const& value)
       case Multiplicity:  
          m_multiplicity = value;  
          break;
+      case NElectrons:  
+         m_nElectrons = value;  
+         break;
       default: 
          m_data[field] = QString::number(value);
          break;
@@ -203,6 +206,7 @@ void QChemJobInfo::copy(QChemJobInfo const& that)
    m_data              = that.m_data;
    m_charge            = that.m_charge;
    m_multiplicity      = that.m_multiplicity;
+   m_nElectrons        = that.m_nElectrons;
    m_localFilesExist   = that.m_localFilesExist;
    m_promptOnOverwrite = that.m_promptOnOverwrite;
    m_efpOnlyJob        = that.m_efpOnlyJob;

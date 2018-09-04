@@ -141,4 +141,26 @@ void TorsionConstraint::dump() const
    }
 }
 
+
+// --------------- Frozen Atoms Constraint ---------------
+
+FrozenAtomsConstraint::FrozenAtomsConstraint(QList<unsigned> const& atomIndices, 
+   QList<qglviewer::Vec> const& positions) : m_atomIndices(atomIndices), 
+   m_positions(positions)
+{
+   if (m_atomIndices.size() != m_positions.size()) {
+      qDebug() << "Incomensurate list sizes in FrozenAtomsConstraint";
+   }
+}
+
+
+void FrozenAtomsConstraint::dump() const
+{
+  for (int i = 0; i < m_atomIndices.size(); ++i) {
+      qDebug() << "Constraint:" << m_atomIndices[i] << "Position:" 
+               << m_positions[i].x << m_positions[i].y << m_positions[i].z;
+  }
+}
+
+
 } } // end namespace IQmol::Data

@@ -35,8 +35,9 @@ OrbitalEvaluator::OrbitalEvaluator(Data::GridDataList& grids, Data::ShellList& s
    Matrix const& coefficients, QList<int> indices) : m_grids(grids), m_shellList(shellList),
    m_coefficients(coefficients), m_indices(indices)
 {
+   m_shellList.setOrbitalVectors(coefficients, indices);
    m_returnValues.resize(m_indices.size());
-   m_function = boost::bind(&OrbitalEvaluator::evaluate, this, _1, _2, _3);
+   m_function = boost::bind(&Data::ShellList::orbitalValues, &m_shellList, _1, _2, _3);
 
    double thresh(0.001);
    m_evaluator = new MultiGridEvaluator(m_grids, m_function, thresh);
@@ -45,7 +46,6 @@ OrbitalEvaluator::OrbitalEvaluator(Data::GridDataList& grids, Data::ShellList& s
 
    m_totalProgress = m_evaluator->totalProgress();
 }
-
 
 
 void OrbitalEvaluator::run()
@@ -71,10 +71,11 @@ void OrbitalEvaluator::evaluatorFinished()
 }
 
 
-
+/*
 Vector const& OrbitalEvaluator::evaluate(double const x, double const y, double const z)
 {
-   Vector const& s1(m_shellList.shellValues(Vec(x,y,z)));
+   Vector const& s1(m_shellList.shellValues(x,y,z));
+   //Vector const& s1(m_shellList.shellValues(Vec(x,y,z)));
    unsigned size(m_indices.size()); 
 
    for (unsigned i = 0; i < size; ++i) {
@@ -84,5 +85,6 @@ Vector const& OrbitalEvaluator::evaluate(double const x, double const y, double 
     
    return m_returnValues;
 }
+*/
 
 } // end namespace IQmol

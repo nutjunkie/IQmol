@@ -103,6 +103,8 @@ Viewer::Viewer(QGLContext* context, ViewerModel& model, QWidget* parent) :
    // The following two lines must be in this order
    setDefaultBuildElement(6);
    setActiveViewerMode(BuildAtom);  // this should get overwritten by the MainWindow class
+
+   m_recordTimer.setInterval(30);  // ~15 frames per second
 }
 
 
@@ -787,15 +789,21 @@ void Viewer::setRecord(bool activate)
          QLOG_WARN() << "Animation recording started with existing Snapshot object";
       }else {
          m_snapper = new Snapshot(this, Snapshot::Movie);
+         // For continuous snapping:
+         //connect(&m_recordTimer, SIGNAL(timeout()), m_snapper, SLOT(capture()));
          connect(this, SIGNAL(animationStep()), m_snapper, SLOT(capture()));
          connect(m_snapper, SIGNAL(movieFinished()), this, SLOT(movieMakingFinished()));
          if (!m_snapper->requestFileName()) {
             delete m_snapper;
             m_snapper = 0;
             recordingCanceled();
+         }else {
+            m_recordTimer.start();
          }
       } 
    }else {
+       m_recordTimer.stop();
+       disconnect(&m_recordTimer, SIGNAL(timeout()), m_snapper, SLOT(capture()));
       //if (m_snapper) m_snapper->makeFfmpegMovie();
       if (m_snapper) m_snapper->makeMovie();
    }

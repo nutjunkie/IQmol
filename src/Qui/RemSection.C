@@ -272,7 +272,7 @@ bool RemSection::fixOptionForQChem(QString& name, QString& value) const
 
    //fix logicals
    if (inDatabase && opt.getType() == Option::Type_Logical) {
-      if (name == "GUI") {
+      if (name == "GUI" || name == "NBO") {
          value = value.toInt() == 0 ? QString::number(0) : QString::number(2);
       }else if (value.toInt() == Qt::Checked) {
          value = QString::number(1);
@@ -304,11 +304,18 @@ bool RemSection::fixOptionForQChem(QString& name, QString& value) const
       value = QString::number(value.toInt()/10);
    }
 
-   if (name == "QUI_FROZEN_CORE" && value.toInt() != 0) {
+//   if (name == "QUI_FROZEN_CORE" && value.toInt() != 0) {
+//      name = "N_FROZEN_CORE";
+//      value = "FC";
+//      shouldPrint = true;
+//   }
+
+/*
+   if (name == "QUI_FROZEN_CORE" && value.toInt() == 0) {
       name = "N_FROZEN_CORE";
-      value = "FC";
       shouldPrint = true;
    }
+*/
 
    if (name == "XC_GRID" || name == "NL_GRID") {
       QStringList tokens(value.split(","));

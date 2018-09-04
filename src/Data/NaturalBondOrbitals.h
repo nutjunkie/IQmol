@@ -38,15 +38,29 @@ namespace Data {
 
          NaturalBondOrbitals(unsigned const nAlpha, unsigned const nBeta, 
             ShellList const& shells, QList<double> const& alphaCoefficients, 
-            QList<double> const& alphaEnergies, QList<double> const& betaCoefficients,  
-            QList<double> const& betaEnergies, QString const& label);
+            QList<double> const& alphaOccupancies, QList<double> const& betaCoefficients,  
+            QList<double> const& betaOccupancies, QString const& label);
 
-         double alphaOrbitalEnergy(unsigned i) const;
-         double betaOrbitalEnergy(unsigned i) const;
+         double alphaOccupancy(unsigned i) const;
+         double betaOccupancy(unsigned i) const;
          bool   consistent() const;
 
          unsigned nAlpha() const { return m_nAlpha; }
          unsigned nBeta()  const { return m_nBeta; }
+
+         QString label(unsigned index, bool alpha = true) const
+         {
+             QString s(QString::number(index+1));
+             unsigned n(alpha ? m_nAlpha : m_nBeta);
+             if (index < n)  s += " (occ)";
+             return s;
+         }
+
+         unsigned labelIndex(bool const alpha) const
+         {
+            int n(alpha ? m_nAlpha : m_nBeta);
+            return std::max(0,n-1);
+         }
 
          void serialize(InputArchive& ar, unsigned const version = 0) 
          {
@@ -66,14 +80,14 @@ namespace Data {
          template <class Archive>
          void privateSerialize(Archive& ar, unsigned const /* version */) 
          {
-            ar & m_alphaEnergies;
-            ar & m_betaEnergies;
+            ar & m_alphaOccupancies;
+            ar & m_betaOccupancies;
             ar & m_nAlpha;
             ar & m_nBeta;
          }
 
-         QList<double> m_alphaEnergies;
-         QList<double> m_betaEnergies;
+         QList<double> m_alphaOccupancies;
+         QList<double> m_betaOccupancies;
          unsigned      m_nAlpha;
          unsigned      m_nBeta;
    };

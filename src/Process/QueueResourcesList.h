@@ -49,6 +49,7 @@ namespace Process {
 
          void fromPbsQueueInfoString(QString const&);
          void fromSgeQueueInfoString(QString const&);
+         void fromSlurmQueueInfoString(QString const&);
 
          QueueResourcesList& operator=(QueueResourcesList const& that) {
             if (this != &that) copy(that);  return *this;

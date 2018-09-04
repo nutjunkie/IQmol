@@ -210,7 +210,7 @@ void Info::setCharge(int const charge)
 }
 
 
-void Info::setMultiplicity(unsigned int const multiplicity)
+void Info::setMultiplicity(unsigned const multiplicity)
 {
    m_multiplicity = multiplicity;
    int n(numberOfElectrons());
@@ -229,19 +229,19 @@ void Info::setMultiplicity(unsigned int const multiplicity)
 }
 
 
-unsigned int Info::numberOfElectrons() const
+unsigned Info::numberOfElectrons() const
 { 
    return m_nuclearCharge - m_charge;
 }
 
 
-unsigned int Info::numberOfAlphaElectrons() const
+unsigned Info::numberOfAlphaElectrons() const
 { 
    return (numberOfElectrons() + m_multiplicity - 1) / 2;
 }
 
 
-unsigned int Info::numberOfBetaElectrons() const
+unsigned Info::numberOfBetaElectrons() const
 { 
    return (numberOfElectrons() - m_multiplicity + 1) / 2;
 }

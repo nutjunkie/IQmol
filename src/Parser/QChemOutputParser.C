@@ -25,19 +25,23 @@
 #include "QChemInputParser.h"
 #include "XyzParser.h"
 #include "TextStream.h"
+
 #include "AtomicProperty.h"
 #include "Constraint.h"
-#include "Energy.h"
-#include "Frequencies.h"
-#include "Hessian.h"
-#include "PointGroup.h"
-#include "Geometry.h"
 #include "DipoleMoment.h"
 #include "EfpFragmentLibrary.h"
+#include "EfpFragment.h"
+#include "Energy.h"
+#include "Frequencies.h"
+#include "Geometry.h"
+#include "Hessian.h"
+#include "DysonOrbitals.h"
+#include "OrbitalsList.h"
+#include "PointGroup.h"
 #include "MultipoleExpansion.h"
 #include "NmrReference.h"
-#include "EfpFragment.h"
 #include "Constants.h"
+#include "ShellList.h"
 #include "RemSectionData.h"
 #include "Numerical.h"
 #include "NmrData.h"
@@ -142,16 +146,29 @@ QStringList QChemOutput::parseForErrors(TextStream& textStream)
 }
 
 
+struct DysonData {
+   QString       label;
+   QStringList   labels;
+   QList<double> leftCoefficients;
+   QList<double> rightCoefficients;
+   QList<double> energies;
+};
+
+
 bool QChemOutput::parse(TextStream& textStream)
 {
    // A single output file can contain multiple jobs, but they all must
    // correspond to a single molecule (possibly with different geometries).
    // We use the first Geometry found to check all the others.
-   Data::Geometry* firstGeometry(0);
-   Data::Geometry* currentGeometry(0);
+   Data::Geometry*     firstGeometry(0);
+   Data::Geometry*     currentGeometry(0);
    Data::GeometryList* geometryList(0);
    Data::GeometryList* scanGeometries(0);
+   Data::ShellList*    shellList(0);
    Data::Nmr* nmr(0);
+
+
+   DysonData dysonData;
 
    m_nAlpha = 0;
    m_nBeta  = 0;
@@ -447,6 +464,16 @@ bool QChemOutput::parse(TextStream& textStream)
          textStream.skipLine(4);
          if (currentGeometry) readDMA(textStream, *currentGeometry);
 
+      }else if (line.contains("Basis set in general basis input format:")) {
+         if (currentGeometry) shellList = readBasis(textStream, *currentGeometry);
+
+      // Dyson orbitals
+      }else if (line.contains("transition") && 
+                line.contains("state")      && 
+                line.contains("EOM") ) {
+         dysonData.label = line;
+         readDyson(textStream, dysonData);
+
       // There is a typo in the print out of the word Coordinates
       }else if (line.contains("atoms in the effective region (ANGSTROMS)")) {
          textStream.skipLine();
@@ -471,6 +498,27 @@ bool QChemOutput::parse(TextStream& textStream)
       }
    }
 
+   if (shellList) {
+      int n(dysonData.labels.size());
+
+      if (n > 0) {
+         dumpDyson(dysonData);
+
+         Data::Orbitals* dyson = new Data::DysonOrbitals(*shellList, 
+            dysonData.leftCoefficients, dysonData.rightCoefficients, 
+            dysonData.energies, dysonData.labels);
+              
+         if (dyson->consistent()) {
+            dyson->reorderFromQChem();
+            Data::OrbitalsList* orbitalsList(new Data::OrbitalsList());
+            orbitalsList->append(dyson);
+            m_dataBank.append(orbitalsList);
+         }else {
+            m_errors.append("Inconsistent Dyson data encountered");
+         }
+      }
+   }
+
    if (nmr) {
       nmr->dump();
       m_dataBank.append(nmr);
@@ -479,6 +527,196 @@ bool QChemOutput::parse(TextStream& textStream)
    return m_errors.isEmpty();
 }
 
+
+
+void QChemOutput::dumpDyson(DysonData const& dysonData)
+{
+qDebug() << "Dumping Dyson data from outout file:";
+
+   for (int i = 0; i < dysonData.labels.size(); ++i) {
+       qDebug() << "Dyson label" << dysonData.labels[i];
+   }
+   for (int i = 0; i < dysonData.energies.size(); ++i) {
+       qDebug() << "Dyson energy" << dysonData.energies[i];
+   }
+
+   qDebug() << dysonData.labels.size();
+   qDebug() << dysonData.energies.size();
+   qDebug() << dysonData.leftCoefficients.size() << dysonData.rightCoefficients.size();
+}
+
+
+void QChemOutput::readDyson(TextStream& textStream, DysonData& dysonData)
+{  
+qDebug() << "QChemOutput::readDyson called with label" << dysonData.label;
+   QStringList tokens(textStream.nextLineAsTokens());
+   if (tokens.size() < 4 || tokens[0] != "Energy" || tokens[1] != "difference") return;
+
+   bool ok;
+   double energy(tokens[3].toDouble(&ok)), x;
+   if (!ok) return;
+
+   textStream.skipLine();
+   QString line(textStream.nextLine());
+   if (!line.contains("Left Dyson")) return;
+
+   dysonData.label.remove("transition");
+   dysonData.label = dysonData.label.trimmed();
+
+   QChar alpha(0x3b1);
+   QChar beta(0x3b2);
+
+   while (!textStream.atEnd()) {
+      line = textStream.readLine();
+      if (line.contains("End transition")) return;
+
+      if (line.contains("Decomposition over AOs for the left alpha Dyson orbital")) {
+         dysonData.labels.append(dysonData.label + " " + alpha);
+         dysonData.energies.append(energy);
+         
+         line = textStream.nextLine();
+         while (!line.contains("****")) {
+            x = line.toDouble(&ok);
+            if (ok) dysonData.leftCoefficients.append(x);
+            line = textStream.nextLine();
+         }
+
+      }else if (line.contains("Decomposition over AOs for the right alpha Dyson orbital")) {
+         //dysonData.labels.append(dysonData.label + " (right alpha)");
+         //dysonData.energies.append(energy);
+
+         line = textStream.nextLine();
+         while (!line.contains("****")) {
+            x = line.toDouble(&ok);
+            if (ok) dysonData.rightCoefficients.append(x);
+            line = textStream.nextLine();
+         }
+
+      }else if (line.contains("Decomposition over AOs for the left beta Dyson orbital")) {
+         dysonData.labels.append(dysonData.label + " " + beta);
+         dysonData.energies.append(energy);
+
+         line = textStream.nextLine();
+         while (!line.contains("****")) {
+            x = line.toDouble(&ok);
+            if (ok) dysonData.leftCoefficients.append(x);
+            line = textStream.nextLine();
+         }
+
+      }else if (line.contains("Decomposition over AOs for the right beta Dyson orbital")) {
+         //dysonData.labels.append(dysonData.label + " (right beta)");
+         //dysonData.energies.append(energy);
+
+         line = textStream.nextLine();
+         while (!line.contains("****")) {
+            x = line.toDouble(&ok);
+            if (ok) dysonData.rightCoefficients.append(x);
+            line = textStream.nextLine();
+         }
+      }
+   }
+}
+
+
+
+// This assumes bases are printed for all the atoms in the same order as the geometry
+Data::ShellList* QChemOutput::readBasis(TextStream& textStream, Data::Geometry& geometry)
+{
+   Data::ShellData shellData;
+   QStringList tokens;
+   QString line;
+   QList<double> x;
+   unsigned index(1), K;
+   unsigned nBasis(0);
+   bool ok;
+
+   textStream.seek("$basis");
+   textStream.skipLine();  // skip over the first element and '0' line
+
+   Data::ShellList* shells(0);
+
+   while (!textStream.atEnd()) {
+      line = textStream.readLine();
+
+      if (line.contains("****")) {
+         ++index;
+         line = textStream.readLine();
+         if (line.contains("$end")) break;
+      }else {
+         tokens = TextStream::tokenize(line);
+         if (tokens.size() != 3) goto error;
+         K = tokens[1].toUInt(&ok);
+         if (!ok) goto error;
+
+         // We assume cartesian for the time being, but will fix
+         // this later if we have the wrong number of basis functions.
+         if (tokens[0] == "S")  { shellData.shellTypes.append( 0);  nBasis +=  1; }
+         if (tokens[0] == "P")  { shellData.shellTypes.append( 1);  nBasis +=  3; }
+         if (tokens[0] == "SP") { shellData.shellTypes.append(-1);  nBasis +=  4; }
+         if (tokens[0] == "D")  { shellData.shellTypes.append( 2);  nBasis +=  6; }
+         if (tokens[0] == "F")  { shellData.shellTypes.append( 3);  nBasis += 10; }
+         if (tokens[0] == "G")  { shellData.shellTypes.append( 4);  nBasis += 15; }
+
+         shellData.shellToAtom.append(index);
+         shellData.shellPrimitives.append(K);
+
+         qDebug() << "Reading " << K << "primitives for shell L =" << tokens[0];   
+
+         for (unsigned i = 0; i < K; ++i) {
+             x = textStream.nextLineAsDoubles();
+             if (x.size() == 2) {
+                shellData.exponents.append(x[0]);
+                shellData.contractionCoefficients.append(x[1]);
+                shellData.contractionCoefficientsSP.append(0.0);
+             }else if (x.size() == 3) { 
+                shellData.exponents.append(x[0]);
+                shellData.contractionCoefficients.append(x[1]);
+                shellData.contractionCoefficientsSP.append(x[2]);
+             }
+         }
+         
+      }
+   }
+
+   // Fix the pure/cart status if we have the wrong number of basis functions
+   textStream.skipLine();  // skip over the ------------------------------ line
+   line = textStream.readLine();
+   if (line.contains("There are") && line.contains("basis functions")) {
+      tokens = TextStream::tokenize(line);
+      if (tokens.size() >= 6) {
+         unsigned n(0);
+         n = tokens[5].toUInt(&ok);
+         if (ok && n != nBasis) {
+            nBasis = n;
+            QLOG_INFO() << "Non-cartesian functions detected, pure conversion applied";
+
+            int nShells(shellData.shellTypes.size());
+            for (int i = 0; i < nShells; ++i) {
+                if (shellData.shellTypes[i] > 1)  {
+                    shellData.shellTypes[i] = -shellData.shellTypes[i];
+                }
+            }
+         }
+      }
+   }
+   
+   qDebug() << "ShellData" << shellData.exponents.size();
+   qDebug() << "ShellData" << shellData.contractionCoefficients.size();
+   qDebug() << "ShellData" << shellData.contractionCoefficientsSP.size();
+   qDebug() << shellData.shellToAtom;
+   qDebug() << shellData.shellPrimitives;
+
+   shells = new Data::ShellList(shellData, geometry);
+   if (shells->nBasis() == nBasis)  return shells;
+
+   delete shells;
+
+   error:
+     QString msg("Problem parsing general basis section, line number ");
+     m_errors.append(msg += QString::number(textStream.lineNumber()));
+
+   return 0;
+}
 
 
 void QChemOutput::readCisStates(TextStream& textStream, 

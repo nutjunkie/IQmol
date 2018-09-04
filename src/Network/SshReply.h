@@ -100,6 +100,24 @@ namespace Network {
    };
 
 
+   class SftpPutFile : public SshReply {
+
+      Q_OBJECT
+
+      public:
+         SftpPutFile(SshConnection* connection, QString const& sourcePath, 
+            QString const& destinationPath) : SshReply(connection), 
+            m_sourcePath(subEnv(sourcePath)), m_destinationPath(subEnv(destinationPath)) { }
+
+      protected:
+         void runDelegate();
+
+      private:
+         QString m_sourcePath;
+         QString m_destinationPath;
+   };
+
+
    class SshGetFile : public SshReply {
 
       Q_OBJECT
@@ -108,6 +126,28 @@ namespace Network {
 
       public:
          SshGetFile(SshConnection* connection, QString const& sourcePath, 
+            QString const& destinationPath) : SshReply(connection), m_getFilesInterrupt(false),
+            m_sourcePath(subEnv(sourcePath)), m_destinationPath(subEnv(destinationPath)) { }
+
+      protected:
+         void runDelegate();
+         void runDelegate(bool& getFilesInterrupt);
+         bool m_getFilesInterrupt;
+
+      private:
+         QString m_sourcePath;
+         QString m_destinationPath;
+   };
+
+
+   class SftpGetFile : public SshReply {
+
+      Q_OBJECT
+
+      friend class SftpGetFiles;
+
+      public:
+         SftpGetFile(SshConnection* connection, QString const& sourcePath, 
             QString const& destinationPath) : SshReply(connection), m_getFilesInterrupt(false),
             m_sourcePath(subEnv(sourcePath)), m_destinationPath(subEnv(destinationPath)) { }
 
@@ -138,6 +178,25 @@ namespace Network {
          QStringList m_fileList;
          QString m_destinationDirectory;
    };
+
+
+   class SftpGetFiles : public SshReply {
+
+      Q_OBJECT
+
+      public:
+         SftpGetFiles(SshConnection* connection, QStringList const& fileList, 
+            QString const& destinationDirectory) : SshReply(connection), 
+            m_fileList(fileList), m_destinationDirectory(destinationDirectory) { }
+
+      protected:
+         void runDelegate();
+
+      private:
+         QStringList m_fileList;
+         QString m_destinationDirectory;
+   };
+
 
 } } // end namespace IQmol::Network
 

@@ -74,6 +74,7 @@ QString ServerConfiguration::toString(ConnectionT const connection)
    switch (connection) {
       case Local:  s = "Local";  break;
       case SSH:    s = "SSH";    break;
+      case SFTP:   s = "SFTP";   break;
       case HTTP:   s = "HTTP";   break;
       case HTTPS:  s = "HTTPS";  break;
    }
@@ -89,6 +90,7 @@ QString ServerConfiguration::toString(QueueSystemT const queue)
       case PBS:    s = "PBS";    break;
       case SGE:    s = "SGE";    break;
       case Web:    s = "Web";    break;
+      case SLURM:  s = "SLURM";  break;
    }
    return s;
 }
@@ -123,6 +125,7 @@ ServerConfiguration::FieldT ServerConfiguration::toFieldT(QString const& field)
 ServerConfiguration::ConnectionT ServerConfiguration::toConnectionT(QString const& connection)
 {
    if (connection.contains("ssh",   Qt::CaseInsensitive))  return SSH;
+   if (connection.contains("sftp",  Qt::CaseInsensitive))  return SFTP;
    if (connection.contains("https", Qt::CaseInsensitive))  return HTTPS;
    if (connection.contains("http",  Qt::CaseInsensitive))  return HTTP;
 
@@ -133,9 +136,10 @@ ServerConfiguration::ConnectionT ServerConfiguration::toConnectionT(QString cons
 ServerConfiguration::QueueSystemT ServerConfiguration::toQueueSystemT(
    QString const& queueSystem)
 {
-   if (queueSystem.contains("pbs", Qt::CaseInsensitive)) return PBS;
-   if (queueSystem.contains("sge", Qt::CaseInsensitive)) return SGE;
-   if (queueSystem.contains("web", Qt::CaseInsensitive)) return Web;
+   if (queueSystem.contains("pbs",   Qt::CaseInsensitive)) return PBS;
+   if (queueSystem.contains("sge",   Qt::CaseInsensitive)) return SGE;
+   if (queueSystem.contains("web",   Qt::CaseInsensitive)) return Web;
+   if (queueSystem.contains("slurm", Qt::CaseInsensitive)) return SLURM;
 
    return Basic;
 }
@@ -309,6 +313,14 @@ void ServerConfiguration::setDefaults(ConnectionT const connection)
          m_configuration.insert(WorkingDirectory, "");
          break;
 
+      case SFTP:
+         m_configuration.insert(ServerName, "Server");
+         m_configuration.insert(Port, 22);
+         m_configuration.insert(Authentication, Network::Connection::Password);
+         m_configuration.insert(UserName, QString(qgetenv("USER")));
+         m_configuration.insert(WorkingDirectory, "");
+         break;
+
       case HTTP:
          m_configuration.insert(ServerName, "QChem");
          m_configuration.insert(Port, 80);
@@ -403,11 +415,46 @@ qDebug() << "Setting defaults for " << toString(queueSystem);
                  << "setenv QCSCRATCH $TMPDIR"
                  << "if (-e $QC/bin/qchem.setup) source $QC/bin/qchem.setup"
                  << ""
-                 << "qchem ${JOB_NAME}.inp ${JOB_NAME}.out";
+                 << "qchem -seq ${JOB_NAME}.inp ${JOB_NAME}.out";
 
          m_configuration.insert(RunFileTemplate, runFile.join("\n"));
 
       } break;
+
+      case SLURM: {
+         m_configuration.insert(Submit, "cd ${JOB_DIR} && sbatch ${JOB_NAME}.run");
+         m_configuration.insert(Query, "squeue -j ${JOB_ID} -o %20T");
+         // ? m_configuration.insert(Query, "scontrol show job ${JOB_ID}");
+         m_configuration.insert(Kill, "scancel ${JOB_ID}");
+         m_configuration.insert(JobFileList, "find ${JOB_DIR} -type f");
+
+         m_configuration.insert(QueueInfo, "sinfo");
+
+   
+         QStringList runFile;
+         runFile << "#!/bin/csh"
+                 << "#SBATCH --partition=${QUEUE}"
+                 << "#SBATCH --time=${WALLTIME}"
+                 << "#SBATCH --mem=${MEMORY}M"
+                 << "#SBATCH --tmp=${SCRATCH}M"
+                 << "#SBATCH --nodes=1"
+                 << "#SBATCH --cpus-per-task=${NCPUS}"
+                 << "#SBATCH --output=${JOB_NAME}.err"
+                 << "#SBATCH --error=${JOB_NAME}.err"
+                 << ""
+                 << "setenv QCSCRATCH $TMPDIR"
+                 << "setenv QC /usr/local/qchem"
+                 << "setenv QCAUX $QC/aux"
+                 << ""
+                 << "if (-e $QC/bin/qchem.setup) source $QC/bin/qchem.setup"
+                 << ""
+                 << "qchem -seq ${JOB_NAME}.inp ${JOB_NAME}.out";
+ 
+         m_configuration.insert(RunFileTemplate, runFile.join("\n"));
+
+      } break;
+
+
 
       case Web: {
          m_configuration.insert(Kill,      "GET  /delete?cookie=${COOKIE}&jobid=${JOB_ID}");

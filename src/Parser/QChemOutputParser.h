@@ -25,6 +25,7 @@
 #include "Parser.h"
 #include "ExcitedStates.h"
 #include "Data.h"
+#include "ShellList.h"
 
 
 namespace IQmol {
@@ -35,6 +36,8 @@ namespace Data {
 }
 
 namespace Parser {
+
+   struct DysonData;
 
    class QChemOutput : public Base {
 
@@ -64,6 +67,12 @@ namespace Parser {
          void readCisStates(TextStream&, Data::ExcitedStates::ExcitedStatesT);
          void readCisdStates(TextStream&);
          void readOrbitalSymmetries(TextStream&, bool const readSymmetries);
+         void readDyson(TextStream&, DysonData&);
+
+         Data::ShellList* readBasis(TextStream&, Data::Geometry&);
+
+void dumpDyson(DysonData const&);
+
          void setTotalEnergy(QString const&, Data::Geometry*, QString const& label = QString());
 
          unsigned m_nAlpha;

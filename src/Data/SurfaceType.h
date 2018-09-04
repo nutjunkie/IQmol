@@ -37,7 +37,7 @@ namespace Data {
             SpinDensity, AlphaDensity, BetaDensity, DensityCombo, CubeData, 
             VanDerWaals, Promolecule, SolventExcluded, SID, ElectrostaticPotential,
             Geminal, Correlation, CustomDensity, BasisFunction, DysonLeft, DysonRight,
-            MullikenAtomic, MullikenDiatomic
+            MullikenAtomic, MullikenDiatomic, GenericOrbital
 // TODO
 //            AlphaHole Density, BetaHole Density,
 //            AlphaExcitationDensity, BetaExcitationDensity,

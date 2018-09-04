@@ -81,6 +81,10 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
    boysData.orbitalType = Data::Orbitals::Localized;
    boysData.label = "Localized MOs (Boys)";
 
+   OrbitalData virtLocData;
+   virtLocData.orbitalType = Data::Orbitals::Localized;
+   virtLocData.label = "Localized MOs (VirtLoc)";
+
    OrbitalData ntoData;
    ntoData.orbitalType = Data::Orbitals::NaturalTransition;
    ntoData.label = "Natural Transition Orbitals";
@@ -93,6 +97,10 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
    dysonData.orbitalType = Data::Orbitals::Dyson;
    dysonData.label = "Dyson Orbitals";
 
+   OrbitalData genericData;
+   genericData.orbitalType = Data::Orbitals::Generic;
+   genericData.label = "Generic Orbitals";
+
 
    unsigned nAlpha(0);
    unsigned nBeta(0);
@@ -100,7 +108,8 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
    unsigned n(0);
 
    GeomData  geomData;
-   ShellData shellData;
+   Data::ShellData shellData;
+
    GmoData   gmoData;
    ExtData   extData;   
    extData.nState = 0;
@@ -304,6 +313,15 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          if (!toInt(n, list, 2)) goto error;
          boysData.betaCoefficients = readDoubleArray(textStream, n);
 
+      }else if (key == "Localized Alpha MO Coefficients (VirtLoc)") {
+         if (!toInt(n, list, 2)) goto error;
+         virtLocData.alphaCoefficients = readDoubleArray(textStream, n);
+
+      }else if (key == "Localized Beta  MO Coefficients (VirtLoc)") {
+         if (!toInt(n, list, 2)) goto error;
+         virtLocData.betaCoefficients = readDoubleArray(textStream, n);
+
+
       // Dyson Orbitals
 
       }else if (key.contains("EOM-IP") || 
@@ -322,6 +340,11 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          if (!toInt(n, list, 2)) goto error;
          dysonData.betaCoefficients.append(readDoubleArray(textStream, n));
          
+      // Generic Orbitals
+      }else if (key.contains("Orbital Coefficients")) {
+         if (!toInt(n, list, 2)) goto error;
+         genericData.alphaCoefficients.append(readDoubleArray(textStream, n));
+
       // Geminals
 
       }else if (key == "Alpha GMO coefficients") {
@@ -360,10 +383,15 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       }else if (key.endsWith("Surface Title") || key == "NBO Ground State" ) {
          if (!geometry || !toInt(n, list, 1)) goto error;
 
-         key.replace("NBO ","");
-         key.replace("Surface Title","");
-  	     ntoData.label = key + " State: " + QString::number(n);
-  	     nboData.label = key + " State: " + QString::number(n);
+         if (key.contains("Surface Title")) {
+            key.replace("NBO ","");
+            key.replace("Surface Title","");
+  	        ntoData.label = key + " State: " + QString::number(n);
+  	        nboData.label = key + " State: " + QString::number(n);
+         }else {
+  	        nboData.label = key;
+  	        ntoData.label = key;
+         }
     
          Data::Orbitals* ntos(makeOrbitals(nAlpha, nBeta, ntoData, 
             shellData, *geometry));   // returns 0 if no alpha coefficients exist
@@ -454,7 +482,13 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       orbitals = makeOrbitals(nAlpha, nBeta, boysData, shellData, *geometry); 
       if (orbitals) orbitalsList->append(orbitals);
 
+      orbitals = makeOrbitals(nAlpha, nBeta, virtLocData, shellData, *geometry); 
+      if (orbitals) orbitalsList->append(orbitals);
+
       orbitals = makeOrbitals(nAlpha, nBeta, dysonData, shellData, *geometry); 
+      if (orbitals) orbitalsList->append(orbitals);
+
+      orbitals = makeOrbitals(nAlpha, nBeta, genericData, shellData, *geometry); 
       if (orbitals) orbitalsList->append(orbitals);
 
       Data::GeminalOrbitals* gmos(makeGeminalOrbitals(nAlpha, nBeta, gmoData, 
@@ -526,7 +560,8 @@ Data::Geometry* FormattedCheckpoint::makeGeometry(GeomData const& geomData)
 }
 
 
-bool FormattedCheckpoint::dataAreConsistent(ShellData const& shellData, unsigned const nAtoms)
+bool FormattedCheckpoint::dataAreConsistent(Data::ShellData const& shellData, 
+   unsigned const nAtoms)
 {
    for (int i = 0; i < shellData.shellToAtom.size(); ++i) {
        int atomIndex(shellData.shellToAtom[i]);
@@ -566,12 +601,13 @@ bool FormattedCheckpoint::dataAreConsistent(ShellData const& shellData, unsigned
 
 
 Data::Orbitals* FormattedCheckpoint::makeOrbitals(unsigned const nAlpha, 
-   unsigned const nBeta, OrbitalData const& orbitalData, ShellData const& shellData, 
+   unsigned const nBeta, OrbitalData const& orbitalData, Data::ShellData const& shellData, 
    Data::Geometry const& geometry, Data::DensityList densityList)
 {
    if (orbitalData.alphaCoefficients.isEmpty()) return 0;
    // TODO: This needs to move to avoid duplication 
-   Data::ShellList* shellList = makeShellList(shellData, geometry);
+   //Data::ShellList* shellList = makeShellList(shellData, geometry);
+   Data::ShellList* shellList = new Data::ShellList(shellData, geometry);
    if (!shellList) return 0;
 
    Data::Orbitals* orbitals(0);
@@ -605,12 +641,17 @@ Data::Orbitals* FormattedCheckpoint::makeOrbitals(unsigned const nAlpha,
             orbitalData.betaCoefficients, orbitalData.alphaEnergies, orbitalData.labels);
       } break;
 
-
       case Data::Orbitals::NaturalBond: {
          orbitals = new Data::NaturalBondOrbitals(nAlpha, nBeta, *shellList,
             orbitalData.alphaCoefficients, orbitalData.alphaEnergies, 
             orbitalData.betaCoefficients,  orbitalData.betaEnergies, orbitalData.label);
       }  break;
+
+      case Data::Orbitals::Generic: {
+         orbitals = new Data::Orbitals(Data::Orbitals::Generic, *shellList, 
+            orbitalData.alphaCoefficients, orbitalData.betaCoefficients, "Generic");
+            
+      } break;
 
       default:
          QLOG_WARN() << "Unknown oribital type in FormattedCheckpoint::makeOrbitals";
@@ -630,7 +671,7 @@ Data::Orbitals* FormattedCheckpoint::makeOrbitals(unsigned const nAlpha,
 
 
 Data::GeminalOrbitals* FormattedCheckpoint::makeGeminalOrbitals(unsigned const nAlpha,
-   unsigned const nBeta, GmoData const& gmoData, ShellData const& shellData, 
+   unsigned const nBeta, GmoData const& gmoData, Data::ShellData const& shellData, 
    Data::Geometry const& geometry)
 {
    // This needs fixing.  Newer versions of QChem only print the orbitals for the
@@ -661,7 +702,9 @@ Data::GeminalOrbitals* FormattedCheckpoint::makeGeminalOrbitals(unsigned const n
 }
 
 
-Data::ShellList* FormattedCheckpoint::makeShellList(ShellData const& shellData, 
+// This has been moved to Data::ShellList so Parser::QChemOutputFile can use it.
+// To be removed
+Data::ShellList* FormattedCheckpoint::makeShellList(Data::ShellData const& shellData, 
    Data::Geometry const& geometry)
 {
    if (!dataAreConsistent(shellData, geometry.nAtoms())) return 0;

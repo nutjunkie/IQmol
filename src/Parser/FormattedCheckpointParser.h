@@ -59,18 +59,8 @@ namespace Parser {
 
          Data::Geometry* makeGeometry(GeomData const&);
 
-         struct ShellData {
-               QList<int>      shellTypes;
-               QList<unsigned> shellToAtom;
-               QList<unsigned> shellPrimitives;
-               QList<double>   exponents;
-               QList<double>   contractionCoefficients;
-               QList<double>   contractionCoefficientsSP;
-               QList<double>   overlapMatrix;
-         };
-
-         bool dataAreConsistent(ShellData const&, unsigned const nAtoms);
-         Data::ShellList* makeShellList(ShellData const&, Data::Geometry const& geometry);
+         bool dataAreConsistent(Data::ShellData const&, unsigned const nAtoms);
+         Data::ShellList* makeShellList(Data::ShellData const&, Data::Geometry const& geometry);
 
          struct OrbitalData {
             Data::Orbitals::OrbitalType orbitalType;
@@ -86,7 +76,7 @@ namespace Parser {
 
          void clear(OrbitalData&);
          Data::Orbitals* makeOrbitals(unsigned const nAlpha, unsigned const nBeta,
-            OrbitalData const&, ShellData const&, Data::Geometry const&,
+            OrbitalData const&, Data::ShellData const&, Data::Geometry const&,
             Data::DensityList densities = Data::DensityList()); 
 
          struct GmoData {
@@ -99,7 +89,7 @@ namespace Parser {
 
          void clear(GmoData&);
          Data::GeminalOrbitals* makeGeminalOrbitals(unsigned const nAlpha, 
-            unsigned const nBeta, GmoData const&, ShellData const&, Data::Geometry const&);
+            unsigned const nBeta, GmoData const&, Data::ShellData const&, Data::Geometry const&);
             
          struct ExtData {
            unsigned nState;

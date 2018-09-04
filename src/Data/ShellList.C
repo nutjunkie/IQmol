@@ -21,6 +21,8 @@
 ********************************************************************************/
 
 #include "ShellList.h"
+#include "Geometry.h"
+#include "Constants.h"
 #include "QsLog.h"
 #include <QDebug>
 #include <cmath>
@@ -30,6 +32,89 @@ namespace IQmol {
 namespace Data {
 
 template<> const Type::ID List<Shell>::TypeID = Type::ShellList;
+
+
+ShellList::ShellList(ShellData const& shellData, Geometry const& geometry) : m_sigBasis(0),
+   m_orbitalCoefficients(0)
+{
+   static double const convExponents(std::pow(Constants::BohrToAngstrom, -2.0));
+   unsigned nShells(shellData.shellTypes.size());
+   unsigned cnt(0);
+
+   for (unsigned shell = 0; shell < nShells; ++shell) {
+
+       QList<double> expts;
+       QList<double> coefs;
+       QList<double> coefsSP;
+
+       unsigned atom(shellData.shellToAtom.at(shell)-1);
+       qglviewer::Vec pos(geometry.position(atom));
+
+       for (unsigned i = 0; i < shellData.shellPrimitives.at(shell); ++i, ++cnt) {
+           // Convert exponents from bohr to angstrom.  The conversion factor
+           // for the coefficients depends on the angular momentum and the 
+           // conversion is effectively done in the  Shell constructor
+           expts.append(shellData.exponents.at(cnt)*convExponents);
+
+           coefs.append(shellData.contractionCoefficients.at(cnt));
+           if (!shellData.contractionCoefficientsSP.isEmpty()) {
+              coefsSP.append(shellData.contractionCoefficientsSP.at(cnt));
+           }   
+       }   
+
+       // These cases are from the formatted checkpoint file format
+       switch (shellData.shellTypes.at(shell)) {
+          case 0:
+             append( new Data::Shell(Data::Shell::S, atom, pos, expts, coefs) );
+             break;
+          case -1: 
+             append( new Data::Shell(Data::Shell::S, atom, pos, expts, coefs) );
+             append( new Data::Shell(Data::Shell::P, atom, pos, expts, coefsSP) );
+             break;
+          case 1:
+             append( new Data::Shell(Data::Shell::P, atom, pos, expts, coefs) );
+             break;
+          case -2: 
+             append( new Data::Shell(Data::Shell::D5, atom, pos, expts, coefs) );
+             break;
+          case 2:
+             append( new Data::Shell(Data::Shell::D6, atom, pos, expts, coefs) );
+             break;
+          case -3: 
+             append( new Data::Shell(Data::Shell::F7, atom, pos, expts, coefs) );
+             break;
+          case 3:
+             append( new Data::Shell(Data::Shell::F10, atom, pos, expts, coefs) );
+             break;
+          case -4: 
+             append( new Data::Shell(Data::Shell::G9, atom, pos, expts, coefs) );
+             break;
+          case 4:
+             append( new Data::Shell(Data::Shell::G15, atom, pos, expts, coefs) );
+             break;
+
+          default:
+             QString msg("Unknown Shell type found at position ");
+             msg += QString::number(shell);
+             msg += ", type: "+ QString::number(shellData.shellTypes.at(shell));
+             qDebug() << msg;
+             break;
+       }   
+   }   
+
+   unsigned n(nBasis());
+   if (shellData.overlapMatrix.size() == (n+1)*n/2) {
+      setOverlapMatrix(shellData.overlapMatrix);
+   }   
+
+   resize();
+}
+
+
+ShellList::~ShellList() 
+{
+   if (m_sigBasis) delete [] m_sigBasis;
+}
 
 unsigned ShellList::nBasis() const
 {
@@ -100,20 +185,24 @@ void ShellList::dump() const
 void ShellList::resize()
 {
    m_nBasis = nBasis();
-   m_shellValues.resize(m_nBasis);
+   m_basisValues.resize(m_nBasis);
+
+   if (m_sigBasis) delete [] m_sigBasis;
+   m_sigBasis = new unsigned[m_nBasis];
+
    unsigned size(m_nBasis*(m_nBasis+1)/2);
    if (2*size != m_nBasis*(m_nBasis+1)) {
       QLOG_WARN() << "Round error in ShellList::resize()";
       ++size;
    }
-   m_shellPairValues.resize(size);
+   m_basisPairValues.resize(size);
 
    qDebug() << shellAtomOffsets();
    qDebug() << basisAtomOffsets();
 }
 
 
-QList<unsigned>ShellList::shellAtomOffsets() const
+QList<unsigned> ShellList::shellAtomOffsets() const
 {
    QList<unsigned> offsets;
    offsets.append(0);
@@ -132,7 +221,7 @@ QList<unsigned>ShellList::shellAtomOffsets() const
    return offsets;
 }
 
-QList<unsigned>ShellList::basisAtomOffsets() const
+QList<unsigned> ShellList::basisAtomOffsets() const
 {
    QList<unsigned> offsets;
    offsets.append(0);
@@ -165,14 +254,38 @@ Vector const& ShellList::shellValues(qglviewer::Vec const& gridPoint)
    for (shell = begin(); shell != end(); ++shell) {
        values = (*shell)->evaluate(gridPoint);
        for (unsigned s = 0; s < (*shell)->nBasis(); ++s, ++offset) {
-           m_shellValues[offset] = values[s];
+           m_basisValues[offset] = values[s];
        }
    }
 
-   return m_shellValues;
+   return m_basisValues;
 }
 
 
+Vector const& ShellList::shellValues(double const x, double const y, double const z)
+{
+   double const* values;
+   unsigned offset(0);
+
+   ShellList::const_iterator shell;
+   for (shell = begin(); shell != end(); ++shell) {
+       values = (*shell)->evaluate(x, y, z);
+       if (values) {
+          for (unsigned s = 0; s < (*shell)->nBasis(); ++s, ++offset) {
+              m_basisValues[offset] = values[s];
+          }
+       }else{
+          for (unsigned s = 0; s < (*shell)->nBasis(); ++s, ++offset) {
+              m_basisValues[offset] = 0;
+          }
+       }
+   }
+
+   return m_basisValues;
+}
+
+
+// DEPRECATE
 Vector const& ShellList::shellPairValues(qglviewer::Vec const& gridPoint)
 {
    shellValues(gridPoint);
@@ -180,16 +293,118 @@ Vector const& ShellList::shellPairValues(qglviewer::Vec const& gridPoint)
    unsigned k(0);
    double xi, xj; 
    for (unsigned i = 0; i < m_nBasis; ++i) {
-       xi = m_shellValues[i];
+       xi = m_basisValues[i];
        for (unsigned j = 0; j < i; ++j, ++k) {
-           xj = m_shellValues[j];
-           m_shellPairValues[k] = 2.0*xi*xj;
+           xj = m_basisValues[j];
+           m_basisPairValues[k] = 2.0*xi*xj;
        }   
-       m_shellPairValues[k] = xi*xi;
+       m_basisPairValues[k] = xi*xi;
        ++k;
    }
 
-   return m_shellPairValues;
+   return m_basisPairValues;
+}
+// DEPRECATE
+
+
+
+void ShellList::setDensityVectors(QList<Vector const*> const& densityVectors)
+{
+   m_densityVectors = densityVectors;
+   m_densityValues.resize(m_densityVectors.size());
+}
+
+
+Vector const& ShellList::densityValues(double const x, double const y, double const z)
+{
+   unsigned numbas, nSigBas(0), basoff(0);
+   double const* values;
+
+   // Determine the significant shells, and corresponding basis function indices
+   ShellList::const_iterator shell;
+   for (shell = begin(); shell != end(); ++shell) {
+       values = (*shell)->evaluate(x,y,z);
+       numbas = (*shell)->nBasis();
+
+       if (values) { // only add the significant shells
+          for (unsigned i = 0; i < numbas; ++i, ++nSigBas, ++basoff) {
+              m_basisValues[nSigBas] = values[i];
+              m_sigBasis[nSigBas]    = basoff;
+          }
+       }else {
+          basoff += numbas;
+       }
+   }
+
+   double   xi, xij; 
+   unsigned ii, jj, Ti;
+   unsigned nden(m_densityVectors.size());
+
+   for (unsigned k = 0; k < nden; ++k) {
+       m_densityValues[k] = 0.0;
+   }
+
+   // Now compute the basis function pair values on the grid
+   for (unsigned i = 0; i < nSigBas; ++i) {
+       xi = m_basisValues[i];
+       ii = m_sigBasis[i];
+       Ti = (ii*(ii+1))/2;
+       for (unsigned j = 0; j < i; ++j) {
+           xij = 2.0*xi*m_basisValues[j];
+           jj  = m_sigBasis[j];
+
+           for (unsigned k = 0; k < nden; ++k) {
+               m_densityValues[k] += 2.0*xij*(*m_densityVectors[k])[Ti+jj];
+           }
+
+       }
+       
+       for (unsigned k = 0; k < nden; ++k) {
+           m_densityValues[k] += xi*xi*(*m_densityVectors[k])[Ti+ii];
+       }
+   }
+
+   return m_densityValues;
+}
+
+
+void ShellList::setOrbitalVectors(Matrix const& coefficients, QList<int> const& indices)
+{
+   m_orbitalIndices      = indices;
+   m_orbitalCoefficients = &coefficients;
+   m_orbitalValues.resize(m_orbitalIndices.size());
+}
+
+
+Vector const& ShellList::orbitalValues(double const x, double const y, double const z)
+{
+   unsigned norb(m_orbitalIndices.size());
+   unsigned basoff(0);
+   unsigned numbas;
+   double const* values;
+
+   for (unsigned k = 0; k < norb; ++k) {
+       m_orbitalValues[k] = 0.0;
+   }
+
+   // Determine the significant shells, and corresponding basis function indices
+   ShellList::const_iterator shell;
+   for (shell = begin(); shell != end(); ++shell) {
+       values = (*shell)->evaluate(x,y,z);
+       numbas = (*shell)->nBasis();
+
+       if (values) { // only add the significant shells
+          for (unsigned i = 0; i < numbas; ++i) {
+              for (unsigned k = 0; k < norb; ++k) {
+                  m_orbitalValues[k] += 
+                      (*m_orbitalCoefficients)(m_orbitalIndices[k], basoff+i) * values[i];
+              }
+          }
+       }
+       basoff += numbas;
+   }
+
+   return m_orbitalValues;
 }
 
 } } // end namespace IQmol::Data

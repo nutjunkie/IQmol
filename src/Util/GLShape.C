@@ -152,12 +152,25 @@ void GLTorus::draw()
 }
 
 
+void Circle(double const radius, double const resolution, double const angle)
+{
+   GLfloat arcLength(radius*fabs(angle));
+   int segments(ceil(arcLength/resolution));
+
+   GLfloat r(radius);
+   GLfloat da(angle/segments);
+   
+   glLineWidth(2.0);
+   glBegin(GL_LINE_STRIP);
+
+   for (int i = 0; i <= segments; ++i) {
+       glVertex3f(r*cos(i*da), r*sin(i*da), 0.0);
+   }
+
+   glEnd();
+}
 
 
-////-------------------------------------------------------
-////-------------------------------------------------------
-////-------------------------------------------------------
-////-------------------------------------------------------
 void Torus(double const majorRadius, double const minorRadius, double const resolution, 
    double const angle)
 {

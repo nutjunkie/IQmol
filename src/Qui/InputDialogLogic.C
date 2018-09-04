@@ -309,6 +309,7 @@ void InputDialog::initializeQuiLogic()
          << "Reaction Path" 
          << "Ab Initio MD" 
          << "Transition State"
+         << "Freezing String"
          << "Energy Decomposition"
          << "BSSE"
          << "Properties";
@@ -579,10 +580,12 @@ void InputDialog::initializeQuiLogic()
 
 
    // Setup -> Wavefunction Analysis
+/*
    QtNode& dma(reg.get("DMA"));
    dma.addRule(
       If(dma == QtTrue, Enable(m_ui.dma_midpoints), Disable(m_ui.dma_midpoints))
    );
+*/
 
 
 
@@ -879,6 +882,12 @@ void InputDialog::initializeQuiLogic()
       )
    );
 
+   // MOM
+   QtNode& mom_method(reg.get("MOM_METHOD"));
+   QtNode& scf_guess(reg.get("SCF_GUESS"));
+   mom_method.addRule(
+     If(mom_method == "IMOM", scf_guess.shouldBe("READ"))
+   );
 
    // Advanced -> SCF Control -> Print Options
    QtNode& qui_print_orbitals(reg.get("QUI_PRINT_ORBITALS"));
@@ -1142,8 +1151,11 @@ void InputDialog::initializeQuiLogic()
    node2->addRule(rule);
 
 
-   // Advanced -> Correlated Methods
+   // Advanced -> Post Hartree Fock
    node = &reg.get("QUI_FROZEN_CORE");
+   QtNode& n_frozen_core(reg.get("N_FROZEN_CORE"));
+   QtNode& n_frozen_virtual(reg.get("N_FROZEN_VIRTUAL"));
+
    node->addRule(
       If(*node == QtTrue,
          Disable(m_ui.n_frozen_core)
@@ -1153,6 +1165,10 @@ void InputDialog::initializeQuiLogic()
       ) 
    );
 
+   node->addRule(
+     If(*node == QtFalse,
+        n_frozen_core.shouldBe("0") + n_frozen_virtual.shouldBe("0"))
+   );
 
 
    // Advanced -> Excited States -> CIS

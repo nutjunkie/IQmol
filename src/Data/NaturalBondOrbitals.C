@@ -33,30 +33,30 @@ NaturalBondOrbitals::NaturalBondOrbitals(
    unsigned const nBeta, 
    ShellList const& shells, 
    QList<double> const& alphaCoefficients, 
-   QList<double> const& alphaEnergies,  
+   QList<double> const& alphaOccupancies,  
    QList<double> const& betaCoefficients,  
-   QList<double> const& betaEnergies,
+   QList<double> const& betaOccupancies,
    QString const& label)
- : Orbitals(Orbitals::NaturalTransition, shells, alphaCoefficients, betaCoefficients, label), 
-   m_alphaEnergies(alphaEnergies), m_betaEnergies(betaEnergies),
+ : Orbitals(Orbitals::NaturalBond, shells, alphaCoefficients, betaCoefficients, label), 
+   m_alphaOccupancies(alphaOccupancies), m_betaOccupancies(betaOccupancies),
    m_nAlpha(nAlpha), m_nBeta(nBeta)
 {
 }
 
 
-double NaturalBondOrbitals::alphaOrbitalEnergy(unsigned i) const 
+double NaturalBondOrbitals::alphaOccupancy(unsigned i) const 
 {
-   return ((int)i < m_alphaEnergies.size()) ? m_alphaEnergies[i] : 0.0;
+   return ((int)i < m_alphaOccupancies.size()) ? m_alphaOccupancies[i] : 0.0;
 }
 
 
-double NaturalBondOrbitals::betaOrbitalEnergy(unsigned i) const 
+double NaturalBondOrbitals::betaOccupancy(unsigned i) const 
 {
    double energy(0.0);
    if (m_restricted) {
-      energy = alphaOrbitalEnergy(i);
-   }else if ((int)i < m_betaEnergies.size()) {
-      energy = m_betaEnergies[i];
+      energy = alphaOccupancy(i);
+   }else if ((int)i < m_betaOccupancies.size()) {
+      energy = m_betaOccupancies[i];
    }
    return energy;
 }
@@ -66,11 +66,8 @@ bool NaturalBondOrbitals::consistent() const
 {
    bool ok(Orbitals::consistent());
 
-   //TODO: remove when NTOs/NBOs properly subclassed.
-   if (orbitalType() == Orbitals::NaturalTransition) {
-      ok = ok && m_alphaEnergies.size() == (int)m_nOrbitals;
-      if (!m_restricted) ok = ok && m_betaEnergies.size() == (int)m_nOrbitals;
-   }
+   ok = ok && m_alphaOccupancies.size() == (int)m_nOrbitals;
+   if (!m_restricted) ok = ok && m_betaOccupancies.size() == (int)m_nOrbitals;
       
    return ok; 
 }

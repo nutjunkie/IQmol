@@ -45,9 +45,9 @@ namespace Process {
                        QueueResources, JobFileList, MaxFieldT };
                        
 
-         enum ConnectionT { Local, SSH, HTTP, HTTPS };
+         enum ConnectionT { Local, SSH, SFTP, HTTP, HTTPS };
 
-         enum QueueSystemT { Basic, PBS, SGE, Web };
+         enum QueueSystemT { Basic, PBS, SGE, Web, SLURM };
 
          typedef QMap<FieldT, QVariant> ConfigMap;
 
@@ -71,8 +71,8 @@ namespace Process {
          ConnectionT connection() const;
          QueueSystemT queueSystem() const;
          AuthenticationT authentication() const;
-         int port() const;
-         int updateInterval() const;
+         int  port() const;
+         int  updateInterval() const;
          QVariantList queueResourcesList() const;
 
          bool isWebBased() const {
@@ -84,7 +84,7 @@ namespace Process {
          }
 
          bool needsResourceLimits() const {
-            return (queueSystem() == PBS || queueSystem() == SGE);
+            return (queueSystem() == PBS || queueSystem() == SGE || queueSystem() == SLURM);
          }
 
 		 // These are to facilitate saving the configuration in the user Preferences.

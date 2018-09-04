@@ -31,11 +31,31 @@
 namespace IQmol {
 namespace Data {
 
+    class Geometry;
+
+   // This is a POD structure to accumulate the data in the parsers (taken from
+   // FormattedCheckpoingParser).
+   struct ShellData {
+      QList<int>      shellTypes;
+      QList<unsigned> shellToAtom;
+      QList<unsigned> shellPrimitives;
+      QList<double>   exponents;
+      QList<double>   contractionCoefficients;
+      QList<double>   contractionCoefficientsSP;
+      QList<double>   overlapMatrix;
+   };
+
    class ShellList : public List<Shell> {
 
       friend class boost::serialization::access;
 
       public:
+         ShellList() { }
+
+         ShellList(ShellData const& shellData, Geometry const& geometry);
+
+         ~ShellList();
+
          /// Returns the (-1,-1,-1) and (1,1,1) octant corners of a rectangular
          /// box that encloses the significant region of the Shells where 
          /// significance is determined by thresh.  
@@ -59,10 +79,27 @@ namespace Data {
          /// to the list and before shellValues or shellPairValues is called.
          void resize();
 
+         Vector const& shellValues(double const x, double const y, double const z);
          Vector const& shellValues(qglviewer::Vec const& gridPoint);
+
          // Returns the vectorized upper triangular array of unique shell 
          // values at the grid point pairs.
          Vector const& shellPairValues(qglviewer::Vec const& gridPoint);
+
+		 // Initializes the list of densities to be evaluated a grid points
+		 // with subsequent densityValues calls.
+         void setDensityVectors(QList<Vector const*> const& densities);
+
+         // Returns a list of the densities evaulated at the given grid point
+         // Density vectors are upper triangular
+         Vector const& densityValues(double const x, double const y, double const z);
+
+		 // Initializes the list of orbitlas to be evaluated a grid points
+		 // with subsequent orbitalValues calls.
+         void setOrbitalVectors(Matrix const& coefficients, QList<int> const& indices);
+
+         // Returns a list of the orbitals evaulated at the given grid point
+         Vector const& orbitalValues(double const x, double const y, double const z);
 
          // Shell offset for each atom
          QList<unsigned> shellAtomOffsets() const;
@@ -82,9 +119,19 @@ namespace Data {
 
       private:
          unsigned m_nBasis;
-         Vector   m_shellValues;
-         Vector   m_shellPairValues;
          Vector   m_overlapMatrix;   // upper triangular
+
+         // These arrays are workspace buffers for gridpoint evaluations;
+         unsigned* m_sigBasis;
+         Vector    m_basisValues;
+         Vector    m_densityValues;
+         Vector    m_orbitalValues;
+
+         Matrix const*        m_orbitalCoefficients;
+         QList<int>           m_orbitalIndices;
+         QList<Vector const*> m_densityVectors;
+
+         Vector    m_basisPairValues;  // Deprecate
    };
 
 } } // end namespace IQmol::Data

@@ -81,10 +81,11 @@ void MolecularGridEvaluator::run()
        Data::GridDataList betaGrids;
        Data::GridDataList basisGrids;
 
-       QList<Vector*> densityVectors;
-       QList<int>     alphaOrbitals;
-       QList<int>     betaOrbitals;
-       QList<int>     basisFunctions;
+       QList<Vector const*> densityVectors;
+
+       QList<int>  alphaOrbitals;
+       QList<int>  betaOrbitals;
+       QList<int>  basisFunctions;
 
        for (iter = m_grids.begin(); iter != m_grids.end(); ++iter) {
            if ((*iter)->size() == *size) {
@@ -108,7 +109,8 @@ void MolecularGridEvaluator::run()
                  basisGrids.append(*iter);
                  basisFunctions.append(type.index());
 
-              }else if (type.kind() == Data::SurfaceType::AlphaOrbital) {
+              }else if (type.kind() == Data::SurfaceType::GenericOrbital ||
+                        type.kind() == Data::SurfaceType::AlphaOrbital) {
                  found = true;
                  alphaGrids.append(*iter);
                  alphaOrbitals.append(type.index());

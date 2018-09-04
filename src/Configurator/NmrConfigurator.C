@@ -45,8 +45,8 @@ Nmr::Nmr(Layer::Nmr& layer, Data::Nmr& data) : m_layer(layer), m_data(data), m_u
 {
    m_ui = new Ui::NmrConfigurator();
    m_ui->setupUi(this);
-   //m_ui->widthSlider->setEnabled(false);
-   //m_ui->widthLabel->setEnabled(false);
+   m_ui->widthSlider->setEnabled(false);
+   m_ui->widthLabel->setEnabled(false);
    m_ui->widthLabel->setText("Resolution");
 
    QTableWidget* table(m_ui->shieldingsTable);
@@ -214,6 +214,7 @@ void Nmr::plotImpulse(QList<double> const& data, QPair<double, double> const& do
    // Signals that are within the resolution are considered to be the same.
    double width(m_ui->widthSlider->value()/20000.0);
    double resolution(width*(domain.second-domain.first));
+   resolution = 0.01;
 
    m_graphToRows.clear();
 
@@ -368,16 +369,16 @@ void Nmr::on_methodCombo_currentIndexChanged(QString const& /*text*/)
 
 void Nmr::on_impulseButton_clicked(bool)
 {
-   //m_ui->widthSlider->setEnabled(false);
-   //m_ui->widthLabel->setEnabled(false);
+   m_ui->widthSlider->setEnabled(false);
+   m_ui->widthLabel->setEnabled(false);
    updatePlot();
 }
 
 
 void Nmr::on_lorentzianButton_clicked(bool)
 {
-   //m_ui->widthSlider->setEnabled(true);
-   //m_ui->widthLabel->setEnabled(true);
+   m_ui->widthSlider->setEnabled(true);
+   m_ui->widthLabel->setEnabled(true);
    updatePlot();
 }
 

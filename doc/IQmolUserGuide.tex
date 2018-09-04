@@ -635,6 +635,28 @@ attachment/detachment densities are all possible.
 \end{center}
 \end{figure}
 
+Dyson orbitals can be also displayed, either from the checkpoint file (requires
+\qchem{} $\ge$ v5.1) or from the output file using an older version of \qchem{}.
+In the latter case, the PRINT\_GENERAL\_BASIS option should be set to true in
+order for \iqmol{} to generate the basis function data.
+
+{\small
+\begin{verbatim}
+$rem
+   METHOD               = EOM_CCSD
+   BASIS                = cc-pVTZ
+   EOM_EA_BETA          = [1,1,1,0]
+   CC_DO_DYSON          = TRUE
+   GUI                  = 2
+   PRINT_GENERAL_BASIS  = TRUE   ! Ony required for QChem < v5.1
+$end
+\end{verbatim}
+}
+
+If available, Dyson Orbitals appear under the Surfaces item in the Model View
+and behave similarly to the Canonical Orbitals.
+
+
 
 
 

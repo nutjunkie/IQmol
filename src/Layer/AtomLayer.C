@@ -24,6 +24,7 @@
 #include "Preferences.h"
 #include "Viewer.h"
 #include "PovRayGen.h"
+#include "GLShape.h"
 #include <openbabel/mol.h>
 #include <openbabel/data.h>
 #include <QColor>
@@ -231,6 +232,35 @@ void Atom::drawPrivate(bool selected)
       gluDeleteQuadric(quad); 
    }
 
+
+/*
+if (true) {
+   glEnable(GL_BLEND);
+   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+   glEnable(GL_LINE_SMOOTH);
+   glDisable(GL_LIGHTING);
+
+   glPointSize(2.0);
+   glColor3f(0.4, 0.4, 0.4);
+   GLfloat r(1.001*getRadius(false));
+   GLShape::Circle(r, r/Primitive::s_resolution);
+
+   glPushMatrix();
+   glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+   GLShape::Circle(r, r/Primitive::s_resolution);
+   glPopMatrix();
+
+   glPushMatrix();
+   glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+   GLShape::Circle(r, r/Primitive::s_resolution);
+   glPopMatrix();
+
+   glDisable(GL_BLEND);
+   glDisable(GL_LINE_SMOOTH);
+   glEnable(GL_LIGHTING);
+}
+*/
+
    glPopMatrix();
 }
 
@@ -278,8 +308,8 @@ void Atom::drawLabel(Viewer& viewer, LabelType const type, QFontMetrics& fontMet
    pos.x -= fontMetrics.width(label)/2.0;
    pos.y += fontMetrics.height()/4.0;
    pos = viewer.camera()->unprojectedCoordinatesOf(pos);
-   glColor3f(0.1, 0.1, 0.1);
 
+   glColor3f(0.1, 0.1, 0.1);
    viewer.renderText(pos[0], pos[1], pos[2], label, viewer.labelFont());
 }
 

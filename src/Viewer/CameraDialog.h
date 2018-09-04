@@ -50,8 +50,11 @@ class CameraDialog : public QDialog {
       void on_thetaValue_valueChanged(int) { updatePosition(); }
       void on_phiValue_valueChanged(int)   { updatePosition(); }
       void on_addFrameButton_clicked(bool);
+      void on_deleteFrameButton_clicked(bool);
       void on_okButton_clicked(bool);
       void on_playButton_clicked(bool);
+      void on_stopButton_clicked(bool);
+      void on_playButton2_clicked(bool);
       void on_resetButton_clicked(bool);
       void on_fieldOfView_valueChanged(int angle);
       void on_perspectiveButton_clicked(bool tf);
@@ -62,6 +65,7 @@ class CameraDialog : public QDialog {
       void stopSpinning();
       void updateSpinAngle();
       void updatePosition();
+      void runFrame();
 
    private:
       qglviewer::Camera& m_camera;
@@ -69,6 +73,8 @@ class CameraDialog : public QDialog {
       bool m_emitSignals;
       double m_angleIncrement;
       double m_spinAngle;
+      unsigned m_keyFrameRow;
+      bool m_bounceStop;
 };
 
 } // end namespace IQmol

@@ -40,7 +40,8 @@ namespace Data {
                             Localized, 
                             NaturalTransition, 
                             NaturalBond,
-                            Dyson
+                            Dyson,
+                            Generic
                           };
 
          static QString toString(OrbitalType const);
@@ -75,7 +76,7 @@ namespace Data {
          virtual QString label(unsigned index, bool alpha = true) const;
 
          // Returns a list of the above labels
-         QStringList labels(bool alpha = true) const;
+         virtual QStringList labels(bool alpha = true) const;
 
          // Returns the recommended index for displaying in the configurator.
          virtual unsigned labelIndex(bool /* alpha = true */) const { return 0; }
@@ -84,6 +85,12 @@ namespace Data {
          virtual unsigned nAlpha() const { return 0; }
          virtual unsigned nBeta() const { return 0; }
 
+         // Reorders the coefficients from QChem to FChk/Molden order.  
+         void reorderFromQChem()
+         {
+             reorderFromQChem(m_alphaCoefficients);
+             if (!m_restricted) reorderFromQChem(m_betaCoefficients);
+         }
 
          void serialize(InputArchive& ar, unsigned const version = 0)
          {
@@ -97,6 +104,7 @@ namespace Data {
 
          void dump() const;
 
+
 		 // TODO: This is here to enable  archiving of the surfaces associated
 		 // with the orbitals, needs testing.
          //SurfaceList& surfaceList() { return m_surfaceList; }
@@ -106,6 +114,8 @@ namespace Data {
 
 
       protected:
+         // Reorders the coefficients from QChem to FChk order.  
+         void reorderFromQChem(Matrix&);
          bool areOrthonormal() const;
 
          template <class Archive>

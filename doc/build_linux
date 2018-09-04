@@ -85,9 +85,17 @@ To include cml support in openbabel:
 
 
 6) Compile IQmol  
-   You may need to edit the IQmol/src/common.pri file to reflect the locations
+   You may need to edit the IQmol/src/linux.pri file to reflect the locations
    of the various installed packages.  I put all the compiled libraries above
    in the $DEV directory which I specify in .bashrc
 
        qmake IQmol.pro
        make
+
+7) The share data is expected to be in /usr/share/iqmol:
+
+      sudo mkdir /usr/share/iqmol 
+      sudo cp -R IQmol/src/share/* /usr/share/iqmol
+
+   In particular, if the iqmol_povray.inc file is not found then IQmol may
+   crash on startup.

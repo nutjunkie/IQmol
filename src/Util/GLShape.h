@@ -90,6 +90,7 @@ namespace GLShape {
    void Torus(double const majorRadius, double const minorRadius, int const majorSegments,
       int const minorSegments, double const angle = 2.0*M_PI);
 
+   void Circle(double const radius, double const resolution, double const angle = 2.0*M_PI);
 
    /// Draws a 2D sector starting from the x-axis going counter-clockwise.  
    /// The line segments have a maximum length of resolution.
@@ -120,6 +121,7 @@ namespace GLShape {
 
    /// Convenience function that draws a sphere at a point
    void Sphere(qglviewer::Vec const& center, double const radius, int const divisions);
+
 
 
 } } // end namespace IQmol::GLShape

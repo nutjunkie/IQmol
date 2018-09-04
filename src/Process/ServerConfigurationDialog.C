@@ -139,6 +139,24 @@ void ServerConfigurationDialog::on_sshRadioButton_toggled(bool tf)
 }
 
 
+void ServerConfigurationDialog::on_sftpRadioButton_toggled(bool tf)
+{
+   if (!tf) return;
+
+   m_dialog.remoteHostGroupBox->setEnabled(true);
+   m_dialog.configureConnectionButton->setEnabled(true);
+   m_dialog.authentication->setEnabled(true);
+   m_dialog.userName->setEnabled(true);
+   m_dialog.workingDirectory->setEnabled(true);
+   updateAllowedQueueSystems(false);
+
+   if (blockUpdate()) return;
+
+   m_currentConfiguration.setDefaults(ServerConfiguration::SFTP);
+   copyFrom(m_currentConfiguration);
+}
+
+
 void ServerConfigurationDialog::on_httpRadioButton_toggled(bool tf)
 {
    if (!tf) return;
@@ -210,6 +228,10 @@ void ServerConfigurationDialog::copyFrom(ServerConfiguration const& config)
          m_dialog.sshRadioButton->setChecked(true);
          m_dialog.queueSystem->setCurrentIndex(config.queueSystem());
          break;
+      case ServerConfiguration::SFTP:
+         m_dialog.sftpRadioButton->setChecked(true);
+         m_dialog.queueSystem->setCurrentIndex(config.queueSystem());
+         break;
       case ServerConfiguration::HTTP:
          m_dialog.httpRadioButton->setChecked(true);
          break;
@@ -242,6 +264,8 @@ bool ServerConfigurationDialog::copyTo(ServerConfiguration* config)
    ServerConfiguration::ConnectionT connection(ServerConfiguration::Local);
    if (m_dialog.sshRadioButton->isChecked()) {
       connection = ServerConfiguration::SSH;
+   }else if (m_dialog.sftpRadioButton->isChecked()) {
+      connection = ServerConfiguration::SFTP;
    }else if (m_dialog.httpRadioButton->isChecked()) {
       connection = ServerConfiguration::HTTP;
    }else if (m_dialog.httpsRadioButton->isChecked()) {
@@ -255,7 +279,7 @@ bool ServerConfigurationDialog::copyTo(ServerConfiguration* config)
       }
    }
 
-   if (connection == ServerConfiguration::SSH) {
+   if (connection == ServerConfiguration::SSH || connection == ServerConfiguration::SFTP) {
       if (m_dialog.userName->text().trimmed().isEmpty()) {
          QMsgBox::warning(this, "IQmol", "User name must be set");
          return false;
@@ -319,6 +343,7 @@ bool ServerConfigurationDialog::testConnection()
          QMsgBox::information(this, "IQmol", "Local connection just fine");
          break;
       case ServerConfiguration::SSH:
+      case ServerConfiguration::SFTP:
          okay = testSshConnection(m_currentConfiguration);
          break;
       case ServerConfiguration::HTTP:

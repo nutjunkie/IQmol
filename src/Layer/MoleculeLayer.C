@@ -327,6 +327,7 @@ bool Molecule::save(bool prompt)
                  << tr("MDL SDfile") + "(*.mol)"
                  << tr("PDB") + " (*.pdb)"
                  << tr("Sybyl Mol2") + " (*.mol2)"
+                 << tr("SMILES") + " (*.smi)"
                  << tr("IQmol Archive") + " (*.iqmol)";
 
       QString fileName(QFileDialog::getSaveFileName(0, tr("Save File"), 
@@ -1720,6 +1721,7 @@ Process::QChemJobInfo Molecule::qchemJobInfo()
    jobInfo.set(Process::QChemJobInfo::ExternalCharges, externalChargesAsString());
    jobInfo.set(Process::QChemJobInfo::OnsagerRadius,   QString::number(onsagerRadius(),'f',4));
    jobInfo.set(Process::QChemJobInfo::Isotopes,        isotopesAsString());
+   jobInfo.set(Process::QChemJobInfo::NElectrons,      m_info.numberOfElectrons());
 
    AtomList atomList(findLayers<Atom>(Children | Visible));
    if (atomList.isEmpty()) jobInfo.setEfpOnlyJob(true);
@@ -2553,18 +2555,18 @@ void Molecule::initProperties()
       chargeTypes->addAction(action);
       connect(action, SIGNAL(triggered()), this, SLOT(updateAtomicCharges()));
       m_properties 
-        << new PointChargePotential(Data::Type::ChelpgCharge, "ESP (Hirshfeld)", this);
+        << new PointChargePotential(Data::Type::HirshfeldCharge, "ESP (Hirshfeld)", this);
    }
 
    // Lowdin
-   if (m_currentGeometry->hasProperty<Data::ChelpgCharge>()) {
+   if (m_currentGeometry->hasProperty<Data::LowdinCharge>()) {
       action = menu->addAction("Lowdin");
       action->setCheckable(true);
       action->setData(Data::Type::LowdinCharge);
       chargeTypes->addAction(action);
       connect(action, SIGNAL(triggered()), this, SLOT(updateAtomicCharges()));
       m_properties 
-        << new PointChargePotential(Data::Type::ChelpgCharge, "ESP (Lowdin)", this);
+        << new PointChargePotential(Data::Type::LowdinCharge, "ESP (Lowdin)", this);
    }
 
    if (m_currentGeometry->hasProperty<Data::MultipoleExpansionList>()) {
