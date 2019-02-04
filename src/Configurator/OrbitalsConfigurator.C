@@ -35,6 +35,13 @@
 namespace IQmol {
 namespace Configurator {
 
+
+void Orbitals::on_densityMatrixButton_clicked(bool)
+{
+  Layer::CanonicalOrbitals& orbitals(dynamic_cast<Layer::CanonicalOrbitals&>(m_orbitals));
+  orbitals.computeFirstOrderDensityMatrix();
+}
+
 Orbitals::Orbitals(Layer::Orbitals& orbitals)
   : m_orbitals(orbitals), m_nAlpha(0), m_nBeta(0), m_nOrbitals(0), m_customPlot(0)
 {
@@ -75,6 +82,8 @@ Orbitals::Orbitals(Layer::Orbitals& orbitals)
    m_selectedPen.setColor(Qt::red);
    m_selectedPen.setStyle(Qt::SolidLine);
    m_selectedPen.setWidth(3);
+
+   m_configurator.densityMatrixButton->hide();
 }
 
 

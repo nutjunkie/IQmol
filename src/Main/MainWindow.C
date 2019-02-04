@@ -797,8 +797,8 @@ void MainWindow::fileOpened(QString const& filePath)
 
 void MainWindow::reindexAtoms()
 {
-   bool all(false); // we only want the visible molecules;
-   MoleculeList molecules(m_viewerModel.moleculeList(all));
+   bool visibleOnly(true); // we only want the visible molecules;
+   MoleculeList molecules(m_viewerModel.moleculeList(visibleOnly));
 
    if (molecules.size() == 0) return;
    if (molecules.size() > 1) {

@@ -834,9 +834,10 @@ void Viewer::blockUpdate(bool tf)
 
 
 // ---------------- Selection functions ---------------
-
 void Viewer::drawWithNames() 
 {
+   glInitNames(); 
+
    int i;
    for (i = 0; i < int(m_objects.size()); ++i) {
        glPushName(i);
@@ -865,7 +866,14 @@ void Viewer::endSelection(const QPoint&)
    setSelectRegionWidth(5);
    setSelectRegionHeight(5);
 
-   if (m_selectionHits == 0) return;
+   if (m_selectionHits == -1) {
+      QLOG_WARN() << "Selection overflow";
+      setSelectedName(-1);
+      return;
+   } else if (m_selectionHits == 0) {
+      setSelectedName(-1);
+      return;
+   }
 
    // If the user clicks, then we only select the front object
    Handler::SelectionMode selectionMode(m_currentHandler->selectionMode());
@@ -879,6 +887,8 @@ void Viewer::endSelection(const QPoint&)
              zMin = (selectBuffer())[4*i+1];
           }
       }
+
+      //setSelectedName(4*iMin+3);
 
       if (selectionMode == Handler::AddClick) {
          addToSelection((selectBuffer())[4*iMin+3]);

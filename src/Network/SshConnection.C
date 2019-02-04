@@ -29,6 +29,7 @@
 #include <QInputDialog>
 #include <QFileInfo>
 #include <QEventLoop>
+#include <QDebug>
 
 #ifdef WIN32
 #include <winsock2.h>
@@ -68,11 +69,15 @@ SshConnection::SshConnection(QString const& hostname, int const port, bool const
 void SshConnection::open()
 {
    QLOG_TRACE() << "Opening connection to" << m_hostname;
-   if (s_numberOfConnections == 0) init();
+   try {
+      if (s_numberOfConnections == 0) init();
 
-   openSocket(m_timeout);
-   ++s_numberOfConnections;
-   m_status = Connection::Opened;
+      openSocket(m_timeout);
+      ++s_numberOfConnections;
+      m_status = Connection::Opened;
+   }catch (...)  {
+      qDebug() << "Error opening SSH connection";
+   }
 }
 
 
@@ -203,7 +208,8 @@ void SshConnection::openSocket(unsigned const timeout)
 
             // Check the value returned... 
             if (errorStatus) {
-               QString msg("Connection failed: ");
+               QString msg("Connection failed ");
+               msg += QString::number(errorStatus) + ": ";
                throw Exception(msg + lastError());
             }
             break;
@@ -234,7 +240,8 @@ void SshConnection::authenticate(AuthenticationT const authentication, QString& 
    while ((rc = libssh2_session_handshake(m_session, m_socket)) == LIBSSH2_ERROR_EAGAIN);
 
    if (rc) {
-      QString msg("Failed to establish a valid SSH session ");
+      QString msg("Failed to establish a valid SSH session (");
+     msg += QString::number(rc) + "): ";
       throw Exception(msg + lastSessionError());
    }
 

@@ -137,7 +137,7 @@ Use Web for HTTP/HTTPS servers</string>
        <item>
         <widget class="QPushButton" name="configureQueueButton">
          <property name="text">
-          <string>Configure</string>
+          <string>Configure SSH</string>
          </property>
         </widget>
        </item>
