@@ -69,6 +69,8 @@ namespace Configurator {
          void clearSelectedOrbitals(int);
          void setMullikenDecompositions(Matrix const&);
 
+         void on_densityMatrixButton_clicked(bool);
+
       private:
          void enableOrbitalSelection(bool);
          void enableNegativeColor(bool);

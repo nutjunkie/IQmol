@@ -834,7 +834,6 @@ void Viewer::blockUpdate(bool tf)
 
 
 // ---------------- Selection functions ---------------
-
 void Viewer::drawWithNames() 
 {
    int i;

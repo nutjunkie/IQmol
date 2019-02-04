@@ -107,6 +107,14 @@ void GridData::getBoundingBox(qglviewer::Vec& min, qglviewer::Vec& max) const
 }
 
 
+double GridData::maxR() const 
+{ 
+   qglviewer::Vec min, max;
+   getBoundingBox(min, max);
+   return (max-min).norm(); 
+}
+
+
 void GridData::getRange(double& min, double& max)
 {
    if (m_data.num_elements() == 0) {

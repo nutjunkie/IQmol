@@ -20,7 +20,10 @@
 
 ********************************************************************************/
 
+#include <QProgressDialog>
 #include "CanonicalOrbitalsLayer.h"
+#include "GridProduct.h"
+#include "QsLog.h"
 
 
 using namespace qglviewer;
@@ -29,7 +32,8 @@ namespace IQmol {
 namespace Layer {
 
 CanonicalOrbitals::CanonicalOrbitals(Data::CanonicalOrbitals& canonicalOrbitals)
- : Orbitals(canonicalOrbitals), m_canonicalOrbitals(canonicalOrbitals)
+ : Orbitals(canonicalOrbitals), m_canonicalOrbitals(canonicalOrbitals), m_progressDialog(0),
+   m_gridProduct(0)
 {
    if (orbitalType() == Data::Orbitals::Canonical) {
       computeDensityVectors();
@@ -39,16 +43,19 @@ CanonicalOrbitals::CanonicalOrbitals(Data::CanonicalOrbitals& canonicalOrbitals)
 }
 
 
+
 double CanonicalOrbitals::alphaOrbitalEnergy(unsigned const i) const 
 { 
    return m_canonicalOrbitals.alphaOrbitalEnergy(i);
 }
 
 
+
 double CanonicalOrbitals::betaOrbitalEnergy(unsigned const i) const 
 { 
    return m_canonicalOrbitals.betaOrbitalEnergy(i);
 }
+
 
 
 void CanonicalOrbitals::computeDensityVectors()
@@ -124,6 +131,7 @@ void CanonicalOrbitals::computeDensityVectors()
 }
 
 
+
 QString CanonicalOrbitals::description(Data::SurfaceInfo const& info, 
    bool const tooltip)
 {
@@ -135,7 +143,7 @@ QString CanonicalOrbitals::description(Data::SurfaceInfo const& info,
       label = m_canonicalOrbitals.label(index);
 
       if (tooltip) {
-         double   orbitalEnergy(0.0);
+         double orbitalEnergy(0.0);
          Data::SurfaceType::Kind kind(type.kind());
          if (kind == Data::SurfaceType::AlphaOrbital) {
             orbitalEnergy = m_canonicalOrbitals.alphaOrbitalEnergy(index);
@@ -153,5 +161,55 @@ QString CanonicalOrbitals::description(Data::SurfaceInfo const& info,
  
    return label;
 }
+
+
+
+void CanonicalOrbitals::computeFirstOrderDensityMatrix()
+{
+   unsigned Na(nAlpha());
+
+   // Just restricted for now
+   QList<Data::GridData const*> orbitalGrids(findGrids(Data::SurfaceType::AlphaOrbital));
+
+   if (orbitalGrids.size() != (int)Na) {
+      QLOG_ERROR() << "Not all orbitals available";
+      return;
+   }
+
+   // Assume we have all the occupieds 
+
+   double const binSize(0.1);
+   m_gridProduct = new GridProduct(m_values, orbitalGrids, binSize);
+
+   m_progressDialog = new QProgressDialog();
+   m_progressDialog->setWindowModality(Qt::NonModal);
+   m_progressDialog->show();
+   m_progressDialog->setMaximum(m_gridProduct->totalProgress());
+
+   connect(m_gridProduct, SIGNAL(progressValue(int)), 
+      m_progressDialog, SLOT(setValue(int)));
+
+   connect(m_gridProduct, SIGNAL(finished()), 
+      this, SLOT(firstOrderDensityMatrixFinished()));
+
+      QLOG_INFO() << "Starting grid calc";
+   m_gridProduct->start();
+}
+
+
+
+void CanonicalOrbitals::firstOrderDensityMatrixFinished()
+{
+    m_progressDialog->deleteLater();
+    m_progressDialog = 0;
+
+    double const binSize(0.1);
+
+    for (unsigned i(0); i < m_values.size(); ++i) {
+        qDebug() <<  i*binSize << "  " << m_values[i];
+    }
+    
+}
+
 
 } } // end namespace IQmol::Layer
