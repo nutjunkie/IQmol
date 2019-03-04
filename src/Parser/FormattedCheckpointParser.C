@@ -183,7 +183,8 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          }
 
       }else if (key == "Number of basis functions") {
-         // This is determined from the shell data
+         if (!toInt(n, list, 1)) goto error;
+         shellData.nBasis = n;
 
       }else if (key == "Shell types") {
          if (!toInt(n, list, 2)) goto error;
@@ -371,12 +372,15 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       }else if (key.contains("RMS Density")) {
          // Skip this
 
-      }else if (key.contains("Density")) {
+      }else if (key.contains("Density", Qt::CaseInsensitive)) {
          if (!toInt(n, list, 2)) goto error;
          QList<double> data(readDoubleArray(textStream, n));
          Data::SurfaceType type(Data::SurfaceType::Custom);
          type.setLabel(key);
-         Data::Density* density(new Data::Density(type, data, key));
+         // check if the density matrix is square
+         bool square(n == shellData.nBasis*shellData.nBasis);
+qDebug() << "Density matrix is square?" << square;
+         Data::Density* density(new Data::Density(type, data, key, square));
          density->dump();
          densityList.append(density);
 

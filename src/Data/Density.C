@@ -33,18 +33,42 @@ namespace Data {
 template<> const Type::ID List<Density>::TypeID = Type::DensityList;
 
 Density::Density(SurfaceType const& surfaceType, QList<double> const& elements, 
-   QString const& label) : m_surfaceType(surfaceType), m_label(label)
+   QString const& label, bool square) : m_surfaceType(surfaceType), m_label(label)
 {
+   // This assumes a symmetric density
    unsigned nElements(elements.size());
-   m_nBasis = round((std::sqrt(1.0+8.0*nElements) -1.0)/2.0);
-   if (m_nBasis*(m_nBasis+1)/2 != nElements) {
-      qDebug() << "Invalid number of density matrix elements";
-      return;
-   }
+
+   if (square) {
+      m_nBasis = round(std::sqrt(nElements));
+      if (m_nBasis*m_nBasis != nElements) {
+         qDebug() << "Invalid number of square density matrix elements";
+         return;
+      }
+
+      m_elements.resize((m_nBasis*(m_nBasis+1))/2);
+      qDebug() << "m_nBasis set to      " << m_nBasis;
+      qDebug() << "Resizing elements to " << m_elements.size();
+
+      size_t k(0);
+      for (size_t i(0); i < m_nBasis; ++i) {
+          m_elements[k] = elements[i*m_nBasis+i];
+          ++k;
+          for (size_t j(i+1); j < m_nBasis; ++j, ++k) {
+              m_elements[k] = elements[i*m_nBasis+j];
+          }
+      }
+
+   }else {
+      m_nBasis = round((std::sqrt(1.0+8.0*nElements) -1.0)/2.0);
+      if ((m_nBasis*(m_nBasis+1))/2 != nElements) {
+         qDebug() << "Invalid number of density matrix elements";
+         return;
+      }
    
-   m_elements.resize(nElements);
-   for (unsigned i = 0; i < nElements; ++i) {
-       m_elements[i] = elements[i];
+      m_elements.resize(nElements);
+      for (unsigned i = 0; i < nElements; ++i) {
+          m_elements[i] = elements[i];
+      }
    }
 }
 
