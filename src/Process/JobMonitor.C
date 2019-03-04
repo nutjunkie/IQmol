@@ -225,7 +225,13 @@ void JobMonitor::loadJobListFromPreferences()
       if (job) s_deletedJobs.append(job);
       postUpdateMessage("");
       QMsgBox::warning(this, "IQmol", ex.what());
+
+   }catch (...) {
+      if (job) s_deletedJobs.append(job);
+      postUpdateMessage("");
+      QMsgBox::warning(this, "IQmol", "Error encountered");
    }
+
 }
 
 
@@ -314,10 +320,21 @@ void JobMonitor::submitJob(QChemJobInfo& qchemJobInfo)
       postUpdateMessage("");
       QMsgBox::warning(this, "IQmol", "Invalid username or password");
 
+   }catch (Network::NetworkTimeout& ex) {
+      if (job) s_deletedJobs.append(job);
+      server->closeConnection();
+      postUpdateMessage("");
+      QMsgBox::warning(this, "IQmol", "Network timeout");
+
    }catch (Exception& ex) {
       if (job) s_deletedJobs.append(job);
       postUpdateMessage("");
       QMsgBox::warning(this, "IQmol", ex.what());
+
+   }catch (...) {
+      if (job) s_deletedJobs.append(job);
+      postUpdateMessage("");
+      QMsgBox::warning(this, "IQmol", "Error encountered");
    }
 }
 

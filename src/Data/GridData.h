@@ -67,6 +67,8 @@ namespace Data {
 
          qglviewer::Vec const& delta() const {return m_delta; }
 
+         double maxR() const;
+
          bool saveToCubeFile(QString const& filePath, QStringList const& coordinates,
             bool const invertSign) const;
            

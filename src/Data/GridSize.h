@@ -31,6 +31,7 @@ namespace Data {
    class GridSize {
 
       public:
+         GridSize() : m_nx(0), m_ny(0), m_nz(0) { }
 
          GridSize(qglviewer::Vec const& origin, qglviewer::Vec const& delta,
             unsigned const nx, unsigned const ny, unsigned const nz);
@@ -49,6 +50,7 @@ namespace Data {
          bool operator==(GridSize const& that) const;
          bool operator!=(GridSize const& that) const;
          bool operator<(GridSize const& that) const;
+         GridSize& operator=(GridSize const& that);
 
          void dump() const;
 

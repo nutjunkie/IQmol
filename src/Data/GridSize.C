@@ -105,6 +105,20 @@ bool GridSize::operator<(GridSize const& that) const
 }
 
 
+GridSize& GridSize::operator=(GridSize const& that)
+{
+   m_origin = that.m_origin;
+   m_delta  = that.m_delta;
+   m_nx     = that.m_nx;
+   m_ny     = that.m_ny;
+   m_nz     = that.m_nz;
+
+   return *this;
+}
+
+
+
+
 void GridSize::dump() const
 {
    qglviewer::Vec max(m_nx*m_delta.x, m_ny*m_delta.y, m_nz*m_delta.z);

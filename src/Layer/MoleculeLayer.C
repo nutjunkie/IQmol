@@ -59,9 +59,7 @@
 #include "QsLog.h"
 #include "QMsgBox.h"
 #include "QChemJobInfo.h" 
-#include "ProgressDialog.h"
 #include "Preferences.h"
-//#include "GridEvaluator.h"
 #include "IQmolParser.h"
 
 #include "openbabel/mol.h"
