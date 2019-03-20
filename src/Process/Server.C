@@ -604,12 +604,10 @@ bool Server::parseQueryMessage(Job* job, QString const& message)
       } break;
 
       case ServerConfiguration::SLURM: {
-         if (message.isEmpty() || message.contains("COMPLETED") 
-                               || message.contains("FAILED") 
-                               || message.contains("TIMEOUT")) {
+         if (message.isEmpty() || message.contains("COMPLETED") ) {
             status = Job::Finished;
 
-         }else if (message.contains("PENDING") || message.contains("CONFIGURING")) {
+         }else if (message.contains("PENDING") || message.contains("REQUEUED")) {
             status = Job::Queued;
 
          }else if (message.contains("RUNNING")) {
@@ -617,6 +615,10 @@ bool Server::parseQueryMessage(Job* job, QString const& message)
 
          }else if (message.contains("SUSPENDED")) {
             status = Job::Suspended;
+
+         }else {
+            statusMessage = message;
+            status = Job::Error;
          }
       } break;
 
