@@ -493,10 +493,23 @@ bool JobMonitor::getQueueResources(Server* server, QChemJobInfo& qchemJobInfo)
       QLOG_DEBUG() << "QueueResources List is empty, getting queue information";
       QString info(server->queueInfo());
       ServerConfiguration::QueueSystemT queueSystem(configuration.queueSystem());
-      if (queueSystem == ServerConfiguration::PBS) {
-         list.fromPbsQueueInfoString(info);
-      }else if (queueSystem == ServerConfiguration::SGE) {
-         list.fromSgeQueueInfoString(info);
+
+      switch (queueSystem) {  
+         case ServerConfiguration::Basic:
+            // nothing to parse
+            break;
+         case ServerConfiguration::PBS:
+            list.fromPbsQueueInfoString(info);
+            break;
+         case ServerConfiguration::SGE:
+             list.fromSgeQueueInfoString(info);
+            break;
+         case ServerConfiguration::SLURM:
+            list.fromSlurmQueueInfoString(info);
+            break;
+         case ServerConfiguration::Web:
+            // nothing to parse
+            break;
       }
    }
 

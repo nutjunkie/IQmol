@@ -137,6 +137,13 @@ void QueueResourcesList::fromSgeQueueInfoString(QString const& queueInfo)
 // I can't figure out how to get much information from the SLURM sinfo, so we
 // just settle on a list of queue names and rely on the default limits given
 // in ServerQueue.h
+
+/* output of the form
+ # sinfo
+ PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
+ queue*       up   infinite      2    mix xxxx             
+*/
+
 void QueueResourcesList::fromSlurmQueueInfoString(QString const& queueInfo)
 {  
    QString info(queueInfo);
@@ -148,8 +155,9 @@ void QueueResourcesList::fromSlurmQueueInfoString(QString const& queueInfo)
       
    while (!textStream.atEnd()) {
       tokens = textStream.nextLineAsTokens();
-      if (tokens.size() >= 3) {
-         QString queue(tokens[2]);
+      if (tokens.size() >= 1) {
+         QString queue(tokens[0]);
+         queue.remove("*"); // An asterix is used to indicate the default queue
          bool exists(false);
          QueueResourcesList::iterator iter;
          for (iter = begin(); iter != end(); ++iter) {
@@ -164,6 +172,7 @@ void QueueResourcesList::fromSlurmQueueInfoString(QString const& queueInfo)
       }
    }     
 }
+
 
 void QueueResourcesList::copy(QueueResourcesList const& list) 
 { 

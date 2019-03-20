@@ -182,9 +182,9 @@ void Molecule::appendData(IQmol::Data::Bank& bank)
 
    QList<Data::GeometryList*> list(m_bank.findData<Data::GeometryList>());
    if (!list.isEmpty()) {
-      m_addGeometryMenu->setEnabled(false);
       unsigned index(list.first()->defaultIndex());
       setGeometry(*(list.first()->at(index)));
+      m_addGeometryMenu->setEnabled(list.size() == 1);
    }
 }
 

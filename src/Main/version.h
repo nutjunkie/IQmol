@@ -1,5 +1,5 @@
-// Version file generated on "Wed 28 Mar 2018 21:36:32 AEDT"
+// Version file generated on "Mon  4 Mar 2019 15:12:30 AEDT"
 // Automatically generated file, do not edit
-#define IQMOL_YEAR "2018"
-#define IQMOL_VERSION "v2.11.2"
-#define GIT_VERSION "v2.11.0"
+#define IQMOL_YEAR "2019"
+#define IQMOL_VERSION "v2.13.0b"
+#define GIT_VERSION "v2.13.0b"
