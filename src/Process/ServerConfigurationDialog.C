@@ -98,6 +98,8 @@ void ServerConfigurationDialog::updateAllowedQueueSystems(bool httpOnly)
          ServerConfiguration::toString(ServerConfiguration::PBS));
       m_dialog.queueSystem->addItem(
          ServerConfiguration::toString(ServerConfiguration::SGE));
+      m_dialog.queueSystem->addItem(
+         ServerConfiguration::toString(ServerConfiguration::SLURM));
    }
    m_tested = false;
 }

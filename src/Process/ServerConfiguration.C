@@ -423,8 +423,9 @@ qDebug() << "Setting defaults for " << toString(queueSystem);
 
       case SLURM: {
          m_configuration.insert(Submit, "cd ${JOB_DIR} && sbatch ${JOB_NAME}.run");
-         m_configuration.insert(Query, "squeue -j ${JOB_ID} -o %20T");
+         //m_configuration.insert(Query, "squeue -j ${JOB_ID} -o %20T");
          // ? m_configuration.insert(Query, "scontrol show job ${JOB_ID}");
+         m_configuration.insert(Query, "sacct -X -n -ostate -j ${JOB_ID}");
          m_configuration.insert(Kill, "scancel ${JOB_ID}");
          m_configuration.insert(JobFileList, "find ${JOB_DIR} -type f");
 
