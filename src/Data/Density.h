@@ -41,7 +41,7 @@ namespace Data {
          Density() { }
 
          Density(SurfaceType const& surfaceType, QList<double> const& vectorElements,
-            QString const& label = QString());
+            QString const& label = QString(), bool square = false);
 
          Density(SurfaceType const& surfaceType, Matrix const& matrix,
             QString const& label = QString());

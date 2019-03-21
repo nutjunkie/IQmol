@@ -225,7 +225,13 @@ void JobMonitor::loadJobListFromPreferences()
       if (job) s_deletedJobs.append(job);
       postUpdateMessage("");
       QMsgBox::warning(this, "IQmol", ex.what());
+
+   }catch (...) {
+      if (job) s_deletedJobs.append(job);
+      postUpdateMessage("");
+      QMsgBox::warning(this, "IQmol", "Error encountered");
    }
+
 }
 
 
@@ -314,10 +320,21 @@ void JobMonitor::submitJob(QChemJobInfo& qchemJobInfo)
       postUpdateMessage("");
       QMsgBox::warning(this, "IQmol", "Invalid username or password");
 
+   }catch (Network::NetworkTimeout& ex) {
+      if (job) s_deletedJobs.append(job);
+      server->closeConnection();
+      postUpdateMessage("");
+      QMsgBox::warning(this, "IQmol", "Network timeout");
+
    }catch (Exception& ex) {
       if (job) s_deletedJobs.append(job);
       postUpdateMessage("");
       QMsgBox::warning(this, "IQmol", ex.what());
+
+   }catch (...) {
+      if (job) s_deletedJobs.append(job);
+      postUpdateMessage("");
+      QMsgBox::warning(this, "IQmol", "Error encountered");
    }
 }
 
@@ -476,10 +493,23 @@ bool JobMonitor::getQueueResources(Server* server, QChemJobInfo& qchemJobInfo)
       QLOG_DEBUG() << "QueueResources List is empty, getting queue information";
       QString info(server->queueInfo());
       ServerConfiguration::QueueSystemT queueSystem(configuration.queueSystem());
-      if (queueSystem == ServerConfiguration::PBS) {
-         list.fromPbsQueueInfoString(info);
-      }else if (queueSystem == ServerConfiguration::SGE) {
-         list.fromSgeQueueInfoString(info);
+
+      switch (queueSystem) {  
+         case ServerConfiguration::Basic:
+            // nothing to parse
+            break;
+         case ServerConfiguration::PBS:
+            list.fromPbsQueueInfoString(info);
+            break;
+         case ServerConfiguration::SGE:
+             list.fromSgeQueueInfoString(info);
+            break;
+         case ServerConfiguration::SLURM:
+            list.fromSlurmQueueInfoString(info);
+            break;
+         case ServerConfiguration::Web:
+            // nothing to parse
+            break;
       }
    }
 

@@ -11,6 +11,7 @@ SOURCES += \
    $$PWD/DensityEvaluator.C \
    $$PWD/GridEvaluator.C \
    $$PWD/GridInfoDialog.C \
+   $$PWD/GridProduct.C \
    $$PWD/Lebedev.C \
    $$PWD/MarchingCubes.C \
    $$PWD/MeshDecimator.C \
@@ -26,6 +27,7 @@ HEADERS += \
    $$PWD/DensityEvaluator.h \
    $$PWD/GridEvaluator.h \
    $$PWD/GridInfoDialog.h \
+   $$PWD/GridProduct.h \
    $$PWD/Lebedev.h \
    $$PWD/MarchingCubes.h \
    $$PWD/MeshDecimator.h \

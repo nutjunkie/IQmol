@@ -34,7 +34,7 @@ namespace Data {
     class Geometry;
 
    // This is a POD structure to accumulate the data in the parsers (taken from
-   // FormattedCheckpoingParser).
+   // FormattedCheckpointParser).
    struct ShellData {
       QList<int>      shellTypes;
       QList<unsigned> shellToAtom;
@@ -43,6 +43,7 @@ namespace Data {
       QList<double>   contractionCoefficients;
       QList<double>   contractionCoefficientsSP;
       QList<double>   overlapMatrix;
+      unsigned        nBasis;   // recomputed once the ShellList has been formed
    };
 
    class ShellList : public List<Shell> {

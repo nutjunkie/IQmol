@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>584</width>
+    <width>607</width>
     <height>401</height>
    </rect>
   </property>
@@ -116,6 +116,11 @@ Use Web for HTTP/HTTPS servers</string>
          </item>
          <item>
           <property name="text">
+           <string>SLURM</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>Web</string>
           </property>
          </item>
@@ -206,7 +211,7 @@ Use Web for HTTP/HTTPS servers</string>
        <item>
         <widget class="QPushButton" name="configureConnectionButton">
          <property name="text">
-          <string>Configure</string>
+          <string>Configure SSH</string>
          </property>
         </widget>
        </item>

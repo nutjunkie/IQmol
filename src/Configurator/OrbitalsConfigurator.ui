@@ -396,6 +396,13 @@ QToolButton:pressed {
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="densityMatrixButton">
+         <property name="text">
+          <string>1st DM</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="horizontalSpacer_6">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>

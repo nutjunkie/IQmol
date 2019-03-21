@@ -25,8 +25,11 @@
 #include "OrbitalsLayer.h"
 #include "CanonicalOrbitals.h"
 
+class QProgressDialog;
 
 namespace IQmol {
+
+class GridProduct;
 
 namespace Configurator {
    class Orbitals;
@@ -43,6 +46,8 @@ namespace Layer {
       public:
          CanonicalOrbitals(Data::CanonicalOrbitals&);
          ~CanonicalOrbitals() { }
+
+         void computeFirstOrderDensityMatrix();
          
       protected:
          double alphaOrbitalEnergy(unsigned const i) const;
@@ -50,9 +55,17 @@ namespace Layer {
 
          QString description(Data::SurfaceInfo const&, bool const tooltip);
 
+      private Q_SLOTS:
+         void firstOrderDensityMatrixFinished();
+
       private:
          void computeDensityVectors();
          Data::CanonicalOrbitals& m_canonicalOrbitals;  // true cast of Orbitals::m_orbitals
+
+         // Temporary stuff for the grid product
+         QProgressDialog* m_progressDialog;
+         GridProduct* m_gridProduct;
+         Vector m_values;
    };
 
 } } // End namespace IQmol::Layer 

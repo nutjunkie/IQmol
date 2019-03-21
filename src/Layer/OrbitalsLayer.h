@@ -89,6 +89,11 @@ namespace Layer {
             return m_orbitals.orbitalType();
          }
 
+      protected:
+         // Used for the first-order density matrix
+         QList<Data::GridData const*> findGrids(Data::SurfaceType::Kind const&);
+
+
       private Q_SLOTS:
          void showGridInfo();
          void editBoundingBox();

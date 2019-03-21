@@ -44,10 +44,11 @@ namespace Process {
                        UpdateInterval, JobLimit, RunFileTemplate, Cookie, 
                        QueueResources, JobFileList, MaxFieldT };
                        
-
          enum ConnectionT { Local, SSH, SFTP, HTTP, HTTPS };
 
-         enum QueueSystemT { Basic, PBS, SGE, Web, SLURM };
+         // The order of these is used to set the queueSystem combo box
+         // in the ServerConfigutationDialog.C
+         enum QueueSystemT { Basic, PBS, SGE, SLURM, Web };
 
          typedef QMap<FieldT, QVariant> ConfigMap;
 

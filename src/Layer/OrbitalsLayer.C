@@ -174,6 +174,35 @@ Data::GridData* Orbitals::findGrid(Data::SurfaceType const& type,
 
 
 
+QList<Data::GridData const*> Orbitals::findGrids(Data::SurfaceType::Kind const& kind)
+{
+   QList<Data::GridData const*> grids;
+
+   // We don't reall care about the grid size, but we 
+   // should ensure all the grids have the same size
+   Data::GridSize gridSize;
+   bool sizeSet(false);
+
+   Data::GridDataList::const_iterator iter;
+   for (iter = m_availableGrids.begin(); iter != m_availableGrids.end(); ++iter) {
+
+       if ( (*iter)->surfaceType().kind() == kind) {
+          if (!sizeSet) {
+             gridSize = (*iter)->size();
+             sizeSet = true;
+          }
+
+          if ( (*iter)->size() == gridSize) {
+             grids.append(*iter);
+          }
+       }
+   }
+
+   return grids;
+}
+
+
+
 // The default description is appropriate for localized orbitals
 QString Orbitals::description(Data::SurfaceInfo const& info, bool const tooltip)
 {
