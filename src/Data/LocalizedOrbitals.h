@@ -53,10 +53,11 @@ namespace Data {
 
          QString label(unsigned index, bool alpha = true) const
          {
-             QString s(QString::number(index+1));
-             unsigned n(alpha ? m_nAlpha : m_nBeta);
-             if (index < n)  s += " (occ)";
-             return s;
+            unsigned n(alpha ? m_nAlpha : m_nBeta);
+            QString  s(alpha ? "Alpha " : "Beta ");
+            s += QString::number(index+1);
+            if (index < n)  s += " (occ)";
+            return s;
          }
 
          unsigned labelIndex(bool const alpha) const
