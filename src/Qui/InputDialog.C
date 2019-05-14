@@ -69,6 +69,18 @@ namespace Qui {
 
 
 InputDialog::InputDialog(QWidget* parent) : QMainWindow(parent),
+   m_adcTab(this),
+   m_aimdTab(this),
+   m_attenuationParameterTab(this),
+   m_auxiliaryBasisTab(this),
+   m_cisTab(this),
+   m_eomTab(this),
+   m_freezingStringTab(this),
+   m_frequenciesTab(this),
+   m_primaryBasisTab(this),
+   m_propertiesTab(this),
+   m_reactionPathTab(this),
+   m_transitionStateTab(this),
    m_db(OptionDatabase::instance()), m_reg(OptionRegister::instance()), 
    m_taint(false), m_currentJob(0), m_fileIn("")
 {
@@ -131,7 +143,8 @@ InputDialog::~InputDialog()
 
 void InputDialog::initializeToolBoxOptions() 
 {
-   int numberOfUndeletedPages(2);
+/*
+   int numberOfUndeletedPages(2);  // wtf are these?
    while (m_ui.toolBoxOptions->count() > numberOfUndeletedPages) {
       QWidget* widget(m_ui.toolBoxOptions->widget(0)); 
       QString name(m_ui.toolBoxOptions->itemText(0)); 
@@ -139,6 +152,31 @@ void InputDialog::initializeToolBoxOptions()
       m_ui.toolBoxOptions->removeItem(0);
       m_toolBoxOptions.insert(name, widget);
    }
+*/
+   m_toolBoxOptions.insert("ADC",                   &m_adcTab);
+   m_adcTab.hide();
+   m_toolBoxOptions.insert("Ab Initio MD",          &m_aimdTab);
+   m_aimdTab.hide();
+   m_toolBoxOptions.insert("Attenuation Parameter", &m_attenuationParameterTab);
+   m_attenuationParameterTab.hide();
+   m_toolBoxOptions.insert("Auxiliary Basis",       &m_auxiliaryBasisTab);
+   m_auxiliaryBasisTab.hide();
+   m_toolBoxOptions.insert("CIS/TD-DFT",            &m_cisTab);
+   m_cisTab.hide();
+   m_toolBoxOptions.insert("EOM",                   &m_eomTab);
+   m_eomTab.hide();
+   m_toolBoxOptions.insert("Freezing String",       &m_freezingStringTab);
+   m_freezingStringTab.hide();
+   m_toolBoxOptions.insert("Frequencies",           &m_frequenciesTab);
+   m_frequenciesTab.hide();
+   m_toolBoxOptions.insert("Primary Basis",         &m_primaryBasisTab);
+   m_primaryBasisTab.hide();
+   m_toolBoxOptions.insert("Properties",            &m_propertiesTab);
+   m_propertiesTab.hide();
+   m_toolBoxOptions.insert("Reaction Path",         &m_reactionPathTab);
+   m_reactionPathTab.hide();
+   m_toolBoxOptions.insert("Transition State",      &m_transitionStateTab);
+   m_transitionStateTab.hide();
 }
 
 
