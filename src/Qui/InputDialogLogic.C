@@ -468,6 +468,30 @@ void InputDialog::initializeQuiLogic()
          Disable(m_ui.scf_guess_mix) + Disable(m_ui.label_scf_guess_mix))
    );
 
+   // GenScfMan
+
+   QtNode& gen_scfman(reg.get("GEN_SCFMAN"));
+   gen_scfman.addRule(
+      If(gen_scfman == QtTrue, 
+         Enable(m_ui.internal_stability)  
+          + Enable(m_ui.os_roscf) 
+          + Enable(m_ui.ghf)
+          + Enable(m_ui.complex),
+         Disable(m_ui.internal_stability)  
+          + Disable(m_ui.os_roscf) 
+          + Disable(m_ui.ghf)
+          + Disable(m_ui.complex)
+      )
+   );
+
+   QtNode& complexNode(reg.get("COMPLEX"));
+   complexNode.addRule(
+      If(complexNode == QtTrue, 
+         Enable(m_ui.complex_mix)  + Enable(m_ui.label_complex_mix),
+         Disable(m_ui.complex_mix) + Disable(m_ui.label_complex_mix)
+      )
+   );
+
 
    QtNode& dualBasisEnergy(reg.get("DUAL_BASIS_ENERGY"));
 

@@ -943,6 +943,12 @@ void InputDialog::toggleStack(QStackedWidget* stack, bool on, QString model)
 }
 
 
+void InputDialog::on_qui_none(bool on) 
+{
+   toggleStack(m_ui.largeMoleculesStack, on, "LargeMoleculesNone");
+}
+
+
 void InputDialog::on_qui_cfmm_toggled(bool on) 
 {
    toggleStack(m_ui.largeMoleculesStack, on, "LargeMoleculesCFMM");
@@ -957,6 +963,12 @@ void InputDialog::on_ftc_toggled(bool on)
 {
    toggleStack(m_ui.largeMoleculesStack, on, "LargeMoleculesFTC");
 }
+
+void InputDialog::on_qui_use_ri_toggled(bool on) 
+{
+   toggleStack(m_ui.largeMoleculesStack, on, "LargeMoleculesRI");
+}
+
 
 
 /*

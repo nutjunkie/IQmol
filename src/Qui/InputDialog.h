@@ -108,6 +108,8 @@ class InputDialog : public QMainWindow {
       void on_qui_use_case_toggled(bool);
       void on_ftc_toggled(bool);
       void on_qui_cfmm_toggled(bool);
+      void on_qui_use_ri_toggled(bool);
+      void on_qui_none(bool on);
 
       void on_solvent_method_currentTextChanged(QString const&);
 

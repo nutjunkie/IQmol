@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>982</width>
-    <height>854</height>
+    <width>980</width>
+    <height>707</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -447,7 +447,7 @@ QToolButton:checked {
              <x>0</x>
              <y>0</y>
              <width>523</width>
-             <height>526</height>
+             <height>379</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -457,7 +457,7 @@ QToolButton:checked {
                <bool>true</bool>
               </property>
               <property name="currentIndex">
-               <number>1</number>
+               <number>0</number>
               </property>
               <property name="tabSpacing">
                <number>-1</number>
@@ -468,7 +468,7 @@ QToolButton:checked {
                  <x>0</x>
                  <y>0</y>
                  <width>499</width>
-                 <height>434</height>
+                 <height>287</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -477,6 +477,13 @@ QToolButton:checked {
                <layout class="QVBoxLayout" name="verticalLayout_34">
                 <item>
                  <layout class="QGridLayout" name="_8">
+                  <item row="2" column="3">
+                   <widget class="QSpinBox" name="scf_guess_mix">
+                    <property name="suffix">
+                     <string> %</string>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="1" column="0">
                    <widget class="QLabel" name="label_209">
                     <property name="text">
@@ -487,10 +494,13 @@ QToolButton:checked {
                     </property>
                    </widget>
                   </item>
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="label_210">
-                    <property name="text">
-                     <string>Algorithm</string>
+                  <item row="0" column="3">
+                   <widget class="QSpinBox" name="scf_convergence">
+                    <property name="minimum">
+                     <number>-1</number>
+                    </property>
+                    <property name="maximum">
+                     <number>20</number>
                     </property>
                    </widget>
                   </item>
@@ -507,26 +517,10 @@ QToolButton:checked {
                     </property>
                    </widget>
                   </item>
-                  <item row="0" column="3">
-                   <widget class="QSpinBox" name="scf_convergence">
-                    <property name="minimum">
-                     <number>-1</number>
-                    </property>
-                    <property name="maximum">
-                     <number>20</number>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="3">
-                   <widget class="QSpinBox" name="scf_max_cycles"/>
-                  </item>
-                  <item row="1" column="2">
-                   <widget class="QLabel" name="label_18">
+                  <item row="6" column="0" colspan="2">
+                   <widget class="QCheckBox" name="complex">
                     <property name="text">
-                     <string>Max Cycles</string>
-                    </property>
-                    <property name="buddy">
-                     <cstring>scf_max_cycles</cstring>
+                     <string>Complex SCF</string>
                     </property>
                    </widget>
                   </item>
@@ -540,12 +534,8 @@ QToolButton:checked {
                     </property>
                    </widget>
                   </item>
-                  <item row="2" column="3">
-                   <widget class="QSpinBox" name="scf_guess_mix">
-                    <property name="suffix">
-                     <string>%</string>
-                    </property>
-                   </widget>
+                  <item row="1" column="3">
+                   <widget class="QSpinBox" name="scf_max_cycles"/>
                   </item>
                   <item row="2" column="0">
                    <widget class="QLabel" name="label_145">
@@ -557,17 +547,55 @@ QToolButton:checked {
                     </property>
                    </widget>
                   </item>
+                  <item row="5" column="2" colspan="3">
+                   <widget class="QCheckBox" name="ghf">
+                    <property name="text">
+                     <string>Generalized Hartree-Fock</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_210">
+                    <property name="text">
+                     <string>Algorithm</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="0" colspan="2">
+                   <widget class="QCheckBox" name="os_roscf">
+                    <property name="text">
+                     <string>Open-shell Singlet ROSCF</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="2" colspan="2">
+                   <widget class="QCheckBox" name="dual_basis_energy">
+                    <property name="text">
+                     <string>Dual Basis Energy</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="2">
+                   <widget class="QLabel" name="label_18">
+                    <property name="text">
+                     <string>Max Cycles</string>
+                    </property>
+                    <property name="buddy">
+                     <cstring>scf_max_cycles</cstring>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="0" colspan="2">
+                   <widget class="QCheckBox" name="gen_scfman">
+                    <property name="text">
+                     <string>Use GEN_SCFMAN</string>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="2" column="1">
                    <widget class="QComboBox" name="basis2">
                     <property name="editable">
                      <bool>false</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="0" colspan="2">
-                   <widget class="QCheckBox" name="dual_basis_energy">
-                    <property name="text">
-                     <string>Dual Basis Energy</string>
                     </property>
                    </widget>
                   </item>
@@ -584,7 +612,34 @@ QToolButton:checked {
                     </property>
                    </spacer>
                   </item>
-                  <item row="3" column="2">
+                  <item row="6" column="3">
+                   <widget class="QSpinBox" name="complex_mix">
+                    <property name="suffix">
+                     <string> %</string>
+                    </property>
+                    <property name="minimum">
+                     <number>0</number>
+                    </property>
+                    <property name="value">
+                     <number>0</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="2">
+                   <widget class="QLabel" name="label_complex_mix">
+                    <property name="text">
+                     <string>Complex Mix</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="2" colspan="2">
+                   <widget class="QCheckBox" name="internal_stability">
+                    <property name="text">
+                     <string>Stability Analysis</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="0" colspan="2">
                    <widget class="QCheckBox" name="unrestricted">
                     <property name="text">
                      <string>Unrestricted</string>
@@ -614,7 +669,7 @@ QToolButton:checked {
                  <x>0</x>
                  <y>0</y>
                  <width>499</width>
-                 <height>434</height>
+                 <height>287</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -627,13 +682,6 @@ QToolButton:checked {
                    <widget class="QCheckBox" name="gui">
                     <property name="text">
                      <string>Generate Checkpoint File</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="0">
-                   <widget class="QCheckBox" name="stability_analysis">
-                    <property name="text">
-                     <string>Stability Analysis</string>
                     </property>
                    </widget>
                   </item>
@@ -730,6 +778,11 @@ QToolButton:checked {
            <item>
             <property name="text">
              <string>PAO</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Internal Stability</string>
             </property>
            </item>
            <item>
@@ -891,7 +944,7 @@ QToolButton:checked {
            <enum>QFrame::Sunken</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>3</number>
           </property>
           <widget class="QWidget" name="AdvancedSCFControl">
            <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -1052,29 +1105,6 @@ QToolButton:checked {
            <layout class="QVBoxLayout">
             <item>
              <layout class="QGridLayout">
-              <item row="2" column="1">
-               <widget class="QSpinBox" name="diis_switch_thresh"/>
-              </item>
-              <item row="1" column="1">
-               <widget class="QSpinBox" name="diis_print"/>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_35">
-                <property name="text">
-                 <string>Print Level</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_36">
-                <property name="text">
-                 <string>Threshold</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QSpinBox" name="diis_max_cycles"/>
-              </item>
               <item row="0" column="0">
                <widget class="QLabel" name="label_34">
                 <property name="text">
@@ -1089,8 +1119,35 @@ QToolButton:checked {
                 </property>
                </widget>
               </item>
-              <item row="0" column="1">
-               <widget class="QSpinBox" name="diis_subspace_size"/>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_94">
+                <property name="text">
+                 <string>DIIS Metric</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QSpinBox" name="diis_print"/>
+              </item>
+              <item row="2" column="1">
+               <widget class="QSpinBox" name="diis_switch_thresh"/>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_35">
+                <property name="text">
+                 <string>Print Level</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QSpinBox" name="diis_max_cycles"/>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_36">
+                <property name="text">
+                 <string>Threshold</string>
+                </property>
+               </widget>
               </item>
               <item row="0" column="2">
                <spacer>
@@ -1104,13 +1161,6 @@ QToolButton:checked {
                  </size>
                 </property>
                </spacer>
-              </item>
-              <item row="4" column="0">
-               <widget class="QLabel" name="label_94">
-                <property name="text">
-                 <string>DIIS Metric</string>
-                </property>
-               </widget>
               </item>
               <item row="4" column="1" colspan="2">
                <layout class="QHBoxLayout">
@@ -1131,6 +1181,9 @@ QToolButton:checked {
                  </spacer>
                 </item>
                </layout>
+              </item>
+              <item row="0" column="1">
+               <widget class="QSpinBox" name="diis_subspace_size"/>
               </item>
              </layout>
             </item>
@@ -1291,14 +1344,21 @@ QToolButton:checked {
            </layout>
           </widget>
           <widget class="QWidget" name="AdvancedLargeMoleculeMethods">
-           <layout class="QVBoxLayout" name="verticalLayout_25">
+           <layout class="QVBoxLayout" name="verticalLayout_16">
             <item>
              <widget class="QGroupBox" name="groupBox_0">
               <property name="title">
                <string>Method</string>
               </property>
-              <layout class="QHBoxLayout">
-               <item>
+              <layout class="QGridLayout" name="gridLayout_25">
+               <item row="0" column="2">
+                <widget class="QRadioButton" name="qui_use_case">
+                 <property name="text">
+                  <string>CASE</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
                 <widget class="QRadioButton" name="qui_cfmm">
                  <property name="text">
                   <string>CFMM</string>
@@ -1308,17 +1368,24 @@ QToolButton:checked {
                  </property>
                 </widget>
                </item>
-               <item>
-                <widget class="QRadioButton" name="ftc">
+               <item row="0" column="0">
+                <widget class="QRadioButton" name="qui_none">
                  <property name="text">
-                  <string>FTC</string>
+                  <string>None</string>
                  </property>
                 </widget>
                </item>
-               <item>
-                <widget class="QRadioButton" name="qui_use_case">
+               <item row="1" column="1">
+                <widget class="QRadioButton" name="qui_use_ri">
                  <property name="text">
-                  <string>CASE</string>
+                  <string>RI</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QRadioButton" name="ftc">
+                 <property name="text">
+                  <string>FTC</string>
                  </property>
                 </widget>
                </item>
@@ -1342,6 +1409,7 @@ QToolButton:checked {
               <property name="currentIndex">
                <number>0</number>
               </property>
+              <widget class="QWidget" name="LargeMoleculesNone"/>
               <widget class="QWidget" name="LargeMoleculesCFMM">
                <layout class="QVBoxLayout" name="verticalLayout_24">
                 <item>
@@ -1493,6 +1561,81 @@ QToolButton:checked {
                    <size>
                     <width>20</width>
                     <height>100</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="LargeMoleculesRI">
+               <layout class="QVBoxLayout" name="verticalLayout_15">
+                <item>
+                 <layout class="QGridLayout" name="gridLayout_12">
+                  <item row="1" column="2">
+                   <widget class="QSpinBox" name="ari_r0"/>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QCheckBox" name="checkBox_3">
+                    <property name="text">
+                     <string>ARI</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QLabel" name="label_77">
+                    <property name="text">
+                     <string>Outer Radius</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="2">
+                   <widget class="QSpinBox" name="ari_r1"/>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QCheckBox" name="checkBox_2">
+                    <property name="text">
+                     <string>RI-K</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QLabel" name="label_55">
+                    <property name="text">
+                     <string>Inner Radius</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="0">
+                   <widget class="QCheckBox" name="checkBox">
+                    <property name="text">
+                     <string>RI-J</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="3">
+                   <spacer name="horizontalSpacer_13">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_5">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
                    </size>
                   </property>
                  </spacer>
@@ -1677,6 +1820,87 @@ QToolButton:checked {
                <size>
                 <width>20</width>
                 <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="AdvancedInternalStability">
+           <layout class="QVBoxLayout" name="verticalLayout_6">
+            <item>
+             <layout class="QGridLayout" name="gridLayout_7">
+              <item row="2" column="1">
+               <widget class="QSpinBox" name="internal_stability_conv"/>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_67">
+                <property name="text">
+                 <string>Convergence</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QSpinBox" name="internal_stability_roots"/>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_61">
+                <property name="text">
+                 <string>Davidson Iterations</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QSpinBox" name="internal_stability_iter"/>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_57">
+                <property name="text">
+                 <string>Max SCFs</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QSpinBox" name="internal_stability_davidson_iter"/>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_69">
+                <property name="text">
+                 <string>Number of Roots</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <spacer name="horizontalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="4" column="0" colspan="3">
+               <widget class="QRadioButton" name="fd_mat_vec_prod">
+                <property name="text">
+                 <string>Compute Vec-Mat Poduct By FD</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>394</height>
                </size>
               </property>
              </spacer>
@@ -2611,7 +2835,7 @@ QToolButton:checked {
            </layout>
           </widget>
           <widget class="QWidget" name="AdvancedCIS">
-           <layout class="QVBoxLayout" name="verticalLayout_15">
+           <layout class="QVBoxLayout" name="verticalLayout_11">
             <item>
              <widget class="QGroupBox" name="groupBox_2">
               <property name="title">
@@ -2620,18 +2844,11 @@ QToolButton:checked {
               <layout class="QVBoxLayout" name="verticalLayout_9">
                <item>
                 <layout class="QGridLayout">
-                 <item row="0" column="1">
-                  <widget class="QSpinBox" name="cis_max_cycles"/>
-                 </item>
                  <item row="1" column="1">
                   <widget class="QSpinBox" name="cis_convergence"/>
                  </item>
-                 <item row="1" column="0">
-                  <widget class="QLabel" name="label_66">
-                   <property name="text">
-                    <string>Convergence</string>
-                   </property>
-                  </widget>
+                 <item row="2" column="1">
+                  <widget class="QSpinBox" name="max_cis_subspace"/>
                  </item>
                  <item row="0" column="0">
                   <widget class="QLabel" name="label_166">
@@ -2639,6 +2856,16 @@ QToolButton:checked {
                     <string>Max Cycles</string>
                    </property>
                   </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="label_22">
+                   <property name="text">
+                    <string>Max Subspace</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QSpinBox" name="cis_max_cycles"/>
                  </item>
                  <item row="0" column="2">
                   <spacer>
@@ -2653,29 +2880,22 @@ QToolButton:checked {
                    </property>
                   </spacer>
                  </item>
-                 <item row="2" column="1">
-                  <widget class="QSpinBox" name="max_cis_subspace"/>
-                 </item>
-                 <item row="2" column="0">
-                  <widget class="QLabel" name="label_22">
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_66">
                    <property name="text">
-                    <string>Max Subspace</string>
+                    <string>Convergence</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="3" column="0" colspan="3">
-                  <layout class="QHBoxLayout" name="horizontalLayout_5">
-                   <item>
-                    <widget class="QLabel" name="label_90">
-                     <property name="text">
-                      <string>Guess Type</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QComboBox" name="qui_cis_guess"/>
-                   </item>
-                  </layout>
+                 <item row="3" column="0">
+                  <widget class="QLabel" name="label_90">
+                   <property name="text">
+                    <string>Guess Type</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="1" colspan="2">
+                  <widget class="QComboBox" name="qui_cis_guess"/>
                  </item>
                 </layout>
                </item>
@@ -2697,48 +2917,61 @@ QToolButton:checked {
               <layout class="QVBoxLayout" name="verticalLayout_14">
                <item>
                 <layout class="QGridLayout" name="gridLayout_22">
-                 <item row="0" column="0" colspan="2">
-                  <widget class="QCheckBox" name="cis_ras">
-                   <property name="text">
-                    <string>Use Reduced Active Space</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QLabel" name="label_cis_ras_cutoff_occupied">
-                   <property name="text">
-                    <string>Occupied Cutoff</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="0">
+                 <item row="3" column="0">
                   <widget class="QLabel" name="label_cis_ras_cutoff_virtual">
                    <property name="text">
                     <string>Virtual Cutoff</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="1" column="1">
-                  <widget class="QDoubleSpinBox" name="cis_ras_cutoff_occupied"/>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="label_cis_ras_cutoff_occupied">
+                   <property name="text">
+                    <string>Occupied Cutoff</string>
+                   </property>
+                  </widget>
                  </item>
                  <item row="2" column="1">
-                  <widget class="QDoubleSpinBox" name="cis_ras_cutoff_virtual"/>
+                  <widget class="QDoubleSpinBox" name="cis_ras_cutoff_occupied"/>
                  </item>
-                 <item row="3" column="0">
+                 <item row="4" column="0">
                   <widget class="QLabel" name="label_cis_ras_type">
                    <property name="text">
                     <string>Subspace</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="4" column="0" colspan="2">
+                 <item row="3" column="1">
+                  <widget class="QDoubleSpinBox" name="cis_ras_cutoff_virtual"/>
+                 </item>
+                 <item row="2" column="2">
+                  <spacer name="horizontalSpacer_11">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="0" column="0" colspan="3">
+                  <widget class="QCheckBox" name="cis_ras">
+                   <property name="text">
+                    <string>Use Reduced Active Space</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0" colspan="3">
                   <widget class="QCheckBox" name="cis_ras_print">
                    <property name="text">
                     <string>Increase Printout</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="3" column="1">
+                 <item row="4" column="1" colspan="2">
                   <widget class="QComboBox" name="cis_ras_type"/>
                  </item>
                 </layout>
@@ -5437,7 +5670,7 @@ Eventually this should go.</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>982</width>
+     <width>980</width>
      <height>22</height>
     </rect>
    </property>
@@ -5526,8 +5759,6 @@ Eventually this should go.</string>
   <tabstop>multipole_order</tabstop>
   <tabstop>qui_plots_points</tabstop>
   <tabstop>skip_cis_rpa</tabstop>
-  <tabstop>qui_cfmm</tabstop>
-  <tabstop>ftc</tabstop>
   <tabstop>qui_use_case</tabstop>
   <tabstop>ftc_fast</tabstop>
   <tabstop>ftc_class_thresh_mult</tabstop>
