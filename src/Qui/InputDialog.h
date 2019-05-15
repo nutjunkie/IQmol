@@ -28,6 +28,19 @@
 #include "ui_QuiMainWindow.h"
 #include "QChemJobInfo.h"
 
+#include "AdcTab.h"
+#include "AimdTab.h"
+#include "AttenuationParameterTab.h"
+#include "AuxiliaryBasisTab.h"
+#include "CisTab.h"
+#include "EomTab.h"
+#include "FreezingStringTab.h"
+#include "FrequenciesTab.h"
+#include "PrimaryBasisTab.h"
+#include "PropertiesTab.h"
+#include "ReactionPathTab.h"
+#include "TransitionStateTab.h"
+
 #include <QFileInfo>
 #include <QStatusBar>
 
@@ -95,6 +108,8 @@ class InputDialog : public QMainWindow {
       void on_qui_use_case_toggled(bool);
       void on_ftc_toggled(bool);
       void on_qui_cfmm_toggled(bool);
+      void on_qui_use_ri_toggled(bool);
+      void on_qui_none(bool on);
 
       void on_solvent_method_currentTextChanged(QString const&);
 
@@ -133,6 +148,22 @@ class InputDialog : public QMainWindow {
    private:
       // ---------- Data ----------
       Ui::MainWindow  m_ui;
+      // Tool Box tabs
+      AdcTab                  m_adcTab;
+      AimdTab                 m_aimdTab;
+      AttenuationParameterTab m_attenuationParameterTab;
+      AuxiliaryBasisTab       m_auxiliaryBasisTab;
+      CisTab                  m_cisTab;
+      EomTab                  m_eomTab;
+      FreezingStringTab       m_freezingStringTab;
+      FrequenciesTab          m_frequenciesTab;
+      PrimaryBasisTab         m_primaryBasisTab;
+      PropertiesTab           m_propertiesTab;
+      ReactionPathTab         m_reactionPathTab;
+      TransitionStateTab      m_transitionStateTab;
+
+
+
       IQmol::Process::QChemJobInfo m_qchemJobInfo;
 
       OptionDatabase& m_db;
@@ -147,6 +178,7 @@ class InputDialog : public QMainWindow {
       QStatusBar m_statusBar;
 
       QMap<QString, QWidget*> m_toolBoxOptions;
+
 
 
       // ---------- Functions ----------

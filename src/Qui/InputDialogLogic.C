@@ -402,7 +402,7 @@ void InputDialog::initializeQuiLogic()
    method.addRule(rule);
 
 
-   s = "Atenuation Parameter";
+   s = "Attenuation Parameter";
    rule = If(requiresOmega, 
              AddPage(m_ui.toolBoxOptions, m_toolBoxOptions.value(s), s),
              RemovePage(m_ui.toolBoxOptions, s)
@@ -442,21 +442,21 @@ void InputDialog::initializeQuiLogic()
 
    method.addRule(
       If(isADC,
-         Disable(m_ui.adc_prop_cd) + Disable(m_ui.adc_prop_soc)
+         Disable(m_adcTab.m_ui.adc_prop_cd) + Disable(m_adcTab.m_ui.adc_prop_soc)
       )
    );
 
    method.addRule(
          If(method == "ADC(2)" || method == "SOS-ADC(2)",
-         Enable(m_ui.adc_do_diis),
-         Disable(m_ui.adc_do_diis)
+         Enable(m_adcTab.m_ui.adc_do_diis),
+         Disable(m_adcTab.m_ui.adc_do_diis)
       )
    );
 
    method.addRule(
        If(isCVS_ADC,
-          Show(m_ui.qui_adc_core) + Show(m_ui.label_adc_core),
-          Hide(m_ui.qui_adc_core) + Hide(m_ui.label_adc_core)
+          Show(m_adcTab.m_ui.qui_adc_core) + Show(m_adcTab.m_ui.label_adc_core),
+          Hide(m_adcTab.m_ui.qui_adc_core) + Hide(m_adcTab.m_ui.label_adc_core)
        )
    );
 
@@ -466,6 +466,30 @@ void InputDialog::initializeQuiLogic()
       If(unrestricted == QtTrue, 
          Enable(m_ui.scf_guess_mix)  + Enable(m_ui.label_scf_guess_mix),
          Disable(m_ui.scf_guess_mix) + Disable(m_ui.label_scf_guess_mix))
+   );
+
+   // GenScfMan
+
+   QtNode& gen_scfman(reg.get("GEN_SCFMAN"));
+   gen_scfman.addRule(
+      If(gen_scfman == QtTrue, 
+         Enable(m_ui.internal_stability)  
+          + Enable(m_ui.os_roscf) 
+          + Enable(m_ui.ghf)
+          + Enable(m_ui.complex),
+         Disable(m_ui.internal_stability)  
+          + Disable(m_ui.os_roscf) 
+          + Disable(m_ui.ghf)
+          + Disable(m_ui.complex)
+      )
+   );
+
+   QtNode& complexNode(reg.get("COMPLEX"));
+   complexNode.addRule(
+      If(complexNode == QtTrue, 
+         Enable(m_ui.complex_mix)  + Enable(m_ui.label_complex_mix),
+         Disable(m_ui.complex_mix) + Disable(m_ui.label_complex_mix)
+      )
    );
 
 
@@ -593,8 +617,8 @@ void InputDialog::initializeQuiLogic()
    QtNode& anharmonic(reg.get("ANHARMONIC"));
    anharmonic.addRule( 
        If (anharmonic == QtTrue, 
-          Enable(m_ui.vci),  
-          Disable(m_ui.vci)
+          Enable(m_frequenciesTab.m_ui.vci),  
+          Disable(m_frequenciesTab.m_ui.vci)
        )
    );
 
@@ -603,16 +627,16 @@ void InputDialog::initializeQuiLogic()
    QtNode& aimd_method(reg.get("AIMD_METHOD"));
    aimd_method.addRule(
       If (aimd_method == "BOMD", 
-         Disable(m_ui.deuterate),
-         Enable(m_ui.deuterate)
+         Disable(m_aimdTab.m_ui.deuterate),
+         Enable(m_aimdTab.m_ui.deuterate)
       )
    );
 
    QtNode& aimd_initial_velocities(reg.get("AIMD_INITIAL_VELOCITIES"));
    aimd_initial_velocities.addRule(
       If (aimd_initial_velocities == QString("Thermal"), 
-          Enable(m_ui.aimd_temp), 
-          Disable(m_ui.aimd_temp) 
+          Enable(m_aimdTab.m_ui.aimd_temp), 
+          Disable(m_aimdTab.m_ui.aimd_temp) 
       )
    );
 
@@ -620,8 +644,8 @@ void InputDialog::initializeQuiLogic()
    // Setup -> Transition State
    job_type.addRule(
       If (job_type == "Transition State", 
-         Enable(m_ui.geom_opt_mode), 
-         Disable(m_ui.geom_opt_mode))
+         Enable(m_transitionStateTab.m_ui.geom_opt_mode), 
+         Disable(m_transitionStateTab.m_ui.geom_opt_mode))
    );
 
 
@@ -630,8 +654,10 @@ void InputDialog::initializeQuiLogic()
       If(job_type == "Geometry"    || job_type == "Reaction Path"    ||
          job_type == "Frequencies" || job_type == "Transition State" ||
          job_type == "Forces"      || job_type == "PES Scan", 
-         Enable(m_ui.cis_state_derivative)  + Enable(m_ui.label_cis_state_derivative), 
-         Disable(m_ui.cis_state_derivative) + Disable(m_ui.label_cis_state_derivative) 
+         Enable(m_cisTab.m_ui.cis_state_derivative)  + 
+           Enable(m_cisTab.m_ui.label_cis_state_derivative), 
+         Disable(m_cisTab.m_ui.cis_state_derivative) + 
+           Disable(m_cisTab.m_ui.label_cis_state_derivative) 
       )
    );
 
@@ -647,11 +673,11 @@ void InputDialog::initializeQuiLogic()
    );
 
    spin_flip_xcis.addRule(
-      If(spin_flip_xcis == QtTrue, Disable(m_ui.sts_mom), Enable(m_ui.sts_mom))
+      If(spin_flip_xcis == QtTrue, Disable(m_cisTab.m_ui.sts_mom), Enable(m_cisTab.m_ui.sts_mom))
    );
 
    QtNode& spin_flip(reg.get("SPIN_FLIP"));
-   rule = If(method == "TD-DFT" && spin_flip == QtTrue, Disable(m_ui.rpa), Enable(m_ui.rpa));
+   rule = If(method == "TD-DFT" && spin_flip == QtTrue, Disable(m_cisTab.m_ui.rpa), Enable(m_cisTab.m_ui.rpa));
    method.addRule(rule);
    spin_flip.addRule(rule);
 
@@ -669,8 +695,10 @@ void InputDialog::initializeQuiLogic()
    QtNode& qui_eom_states2(reg.get("QUI_EOM_STATES2"));
    
    rule = If((qui_eom_ee == QtTrue || qui_eom_dip == QtTrue) && multiplicity != "1",
-      Hide(m_ui.label_eom2) + Hide(m_ui.qui_eom_states2),
-      Show(m_ui.label_eom2) + Show(m_ui.qui_eom_states2));
+      Hide(m_eomTab.m_ui.label_eom2) 
+       + Hide(m_eomTab.m_ui.qui_eom_states2),
+      Show(m_eomTab.m_ui.label_eom2) 
+       + Show(m_eomTab.m_ui.qui_eom_states2));
 
    qui_eom_ee.addRule(rule);   qui_eom_sf.addRule(rule);   qui_eom_ip.addRule(rule);   
    qui_eom_ea.addRule(rule);   qui_eom_dip.addRule(rule);  multiplicity.addRule(rule);
@@ -681,24 +709,33 @@ void InputDialog::initializeQuiLogic()
    QtNode& ee_triplets(reg.get("EE_TRIPLETS"));
  
    rule = If(qui_eom_ee == QtTrue && multiplicity == "1",
-      Enable(m_ui.ee_singlets) + Enable(m_ui.ee_triplets) + Disable(m_ui.ee_states)
-       + ee_singlets.makeSameAs(qui_eom_states1) + ee_triplets.makeSameAs(qui_eom_states2)
-       + SetLabel(m_ui.label_eom1, "Singlets") + SetLabel(m_ui.label_eom2, "Triplets")
+      Enable(m_ui.ee_singlets)
+       + Enable(m_ui.ee_triplets)
+       + Disable(m_ui.ee_states)
+       + ee_singlets.makeSameAs(qui_eom_states1)
+       + ee_triplets.makeSameAs(qui_eom_states2)
+       + SetLabel(m_eomTab.m_ui.label_eom1, "Singlets")
+       + SetLabel(m_eomTab.m_ui.label_eom2, "Triplets")
    );
 
    qui_eom_ee.addRule(rule);    qui_eom_states1.addRule(rule);
    multiplicity.addRule(rule);  qui_eom_states2.addRule(rule);
    
    rule = If(qui_eom_ee == QtTrue && multiplicity != "1",
-      Disable(m_ui.ee_singlets) + Disable(m_ui.ee_triplets) + Enable(m_ui.ee_states)
-       + ee_states.makeSameAs(qui_eom_states1) + SetLabel(m_ui.label_eom1, "States")
+      Disable(m_ui.ee_singlets) 
+       + Disable(m_ui.ee_triplets) 
+       + Enable(m_ui.ee_states)
+       + ee_states.makeSameAs(qui_eom_states1) 
+       + SetLabel(m_eomTab.m_ui.label_eom1, "States")
    );
 
    qui_eom_ee.addRule(rule);    qui_eom_states1.addRule(rule);
    multiplicity.addRule(rule);  
 
    rule = If(qui_eom_ee == QtFalse,
-      Disable(m_ui.ee_singlets) + Disable(m_ui.ee_triplets) + Disable(m_ui.ee_states));
+      Disable(m_ui.ee_singlets) 
+       + Disable(m_ui.ee_triplets) 
+       + Disable(m_ui.ee_states));
 
    qui_eom_ee.addRule(rule);   qui_eom_sf.addRule(rule);  qui_eom_dip.addRule(rule);
    qui_eom_ip.addRule(rule);   qui_eom_ea.addRule(rule);
@@ -710,17 +747,24 @@ void InputDialog::initializeQuiLogic()
    QtNode& dip_triplets(reg.get("DIP_TRIPLETS"));
  
    rule = If(qui_eom_dip == QtTrue && multiplicity == "1",
-      Enable(m_ui.dip_singlets) + Enable(m_ui.dip_triplets) + Disable(m_ui.dip_states)
-       + dip_singlets.makeSameAs(qui_eom_states1) + dip_triplets.makeSameAs(qui_eom_states2)
-       + SetLabel(m_ui.label_eom1, "Singlets") + SetLabel(m_ui.label_eom2, "Triplets")
+      Enable(m_ui.dip_singlets) 
+       + Enable(m_ui.dip_triplets) 
+       + Disable(m_ui.dip_states)
+       + dip_singlets.makeSameAs(qui_eom_states1) 
+       + dip_triplets.makeSameAs(qui_eom_states2)
+       + SetLabel(m_eomTab.m_ui.label_eom1, "Singlets") 
+       + SetLabel(m_eomTab.m_ui.label_eom2, "Triplets")
    );
 
    qui_eom_dip.addRule(rule);   qui_eom_states1.addRule(rule);
    multiplicity.addRule(rule);  qui_eom_states2.addRule(rule);
    
    rule = If(qui_eom_dip == QtTrue && multiplicity != "1",
-      Disable(m_ui.dip_singlets) + Disable(m_ui.dip_triplets) + Enable(m_ui.dip_states)
-       + dip_states.makeSameAs(qui_eom_states1) + SetLabel(m_ui.label_eom1, "States")
+      Disable(m_ui.dip_singlets) 
+       + Disable(m_ui.dip_triplets) 
+       + Enable(m_ui.dip_states)
+       + dip_states.makeSameAs(qui_eom_states1) 
+       + SetLabel(m_eomTab.m_ui.label_eom1, "States")
    );
 
    qui_eom_dip.addRule(rule);    qui_eom_states1.addRule(rule);
@@ -738,9 +782,12 @@ void InputDialog::initializeQuiLogic()
    QtNode& dsf_states(reg.get("DSF_STATES"));
  
    rule = If(qui_eom_sf == QtTrue, 
-      Enable(m_ui.sf_states) + Enable(m_ui.dsf_states)
-       + sf_states.makeSameAs(qui_eom_states1) + dsf_states.makeSameAs(qui_eom_states2)
-       + SetLabel(m_ui.label_eom1, "Spin-Flip") + SetLabel(m_ui.label_eom2, "Double SF")
+      Enable(m_ui.sf_states) 
+       + Enable(m_ui.dsf_states)
+       + sf_states.makeSameAs(qui_eom_states1) 
+       + dsf_states.makeSameAs(qui_eom_states2)
+       + SetLabel(m_eomTab.m_ui.label_eom1, "Spin-Flip") 
+       + SetLabel(m_eomTab.m_ui.label_eom2, "Double SF")
    );
 
    qui_eom_sf.addRule(rule);   qui_eom_states1.addRule(rule);  qui_eom_states2.addRule(rule);
@@ -755,9 +802,12 @@ void InputDialog::initializeQuiLogic()
    QtNode& ip_beta(reg.get("EOM_IP_BETA"));
  
    rule = If(qui_eom_ip == QtTrue, 
-      Enable(m_ui.eom_ip_alpha) + Enable(m_ui.eom_ip_beta)
-       + ip_beta.makeSameAs(qui_eom_states1) + ip_alpha.makeSameAs(qui_eom_states2)
-       + SetLabel(m_ui.label_eom1, "Beta") + SetLabel(m_ui.label_eom2, "Alpha")
+      Enable(m_ui.eom_ip_alpha) 
+       + Enable(m_ui.eom_ip_beta)
+       + ip_beta.makeSameAs(qui_eom_states1) 
+       + ip_alpha.makeSameAs(qui_eom_states2)
+       + SetLabel(m_eomTab.m_ui.label_eom1, "Beta") 
+       + SetLabel(m_eomTab.m_ui.label_eom2, "Alpha")
    );
 
    qui_eom_ip.addRule(rule);   qui_eom_states1.addRule(rule);  qui_eom_states2.addRule(rule);
@@ -774,7 +824,7 @@ void InputDialog::initializeQuiLogic()
    rule = If(qui_eom_ea == QtTrue, 
       Enable(m_ui.eom_ea_alpha) + Enable(m_ui.eom_ea_beta)
        + ea_beta.makeSameAs(qui_eom_states1) + ea_alpha.makeSameAs(qui_eom_states2)
-       + SetLabel(m_ui.label_eom1, "Beta") + SetLabel(m_ui.label_eom2, "Alpha")
+       + SetLabel(m_eomTab.m_ui.label_eom1, "Beta") + SetLabel(m_eomTab.m_ui.label_eom2, "Alpha")
    );
 
    qui_eom_ea.addRule(rule);   qui_eom_states1.addRule(rule);  qui_eom_states2.addRule(rule);
@@ -789,8 +839,8 @@ void InputDialog::initializeQuiLogic()
       If(job_type == "Geometry"    || job_type == "Reaction Path"    ||
          job_type == "Frequencies" || job_type == "Transition State" ||
          job_type == "Forces", 
-         Enable(m_ui.cc_state_to_opt)  + Enable(m_ui.label_cc_state_to_opt), 
-         Disable(m_ui.cc_state_to_opt) + Disable(m_ui.label_cc_state_to_opt) 
+         Enable(m_eomTab.m_ui.cc_state_to_opt)  + Enable(m_eomTab.m_ui.label_cc_state_to_opt), 
+         Disable(m_eomTab.m_ui.cc_state_to_opt) + Disable(m_eomTab.m_ui.label_cc_state_to_opt) 
       )
    );
 
@@ -798,19 +848,19 @@ void InputDialog::initializeQuiLogic()
    QtNode& qui_adc_es1(reg.get("QUI_ADC_STATES1"));
    QtNode& qui_adc_es2(reg.get("QUI_ADC_STATES2"));
 
-   rule = If(isADCandCS, Show(m_ui.label_adc2) + Show(m_ui.qui_adc_states2));
+   rule = If(isADCandCS, Show(m_adcTab.m_ui.label_adc2) + Show(m_adcTab.m_ui.qui_adc_states2));
 
    method.addRule(rule);
    multiplicity.addRule(rule);
 
-   rule = If(isADCandOS, Hide(m_ui.label_adc2) + Hide(m_ui.qui_adc_states2));
+   rule = If(isADCandOS, Hide(m_adcTab.m_ui.label_adc2) + Hide(m_adcTab.m_ui.qui_adc_states2));
 
    method.addRule(rule);
    multiplicity.addRule(rule);
 
    rule = If(isADCandCS,
        Enable(m_ui.ee_singlets) + Enable(m_ui.ee_triplets) + Disable(m_ui.ee_states)
-       + SetLabel(m_ui.label_adc1, "Singlets") + SetLabel(m_ui.label_adc2, "Triplets")
+       + SetLabel(m_adcTab.m_ui.label_adc1, "Singlets") + SetLabel(m_adcTab.m_ui.label_adc2, "Triplets")
        + ee_singlets.makeSameAs(qui_adc_es1) + ee_triplets.makeSameAs(qui_adc_es2));
 
    method.addRule(rule);
@@ -820,7 +870,7 @@ void InputDialog::initializeQuiLogic()
 
    rule = If(isADCandOS,
        Disable(m_ui.ee_singlets) + Disable(m_ui.ee_triplets) + Enable(m_ui.ee_states)
-       + SetLabel(m_ui.label_adc1, "States")
+       + SetLabel(m_adcTab.m_ui.label_adc1, "States")
        + ee_states.makeSameAs(qui_adc_es1));
 
    method.addRule(rule);
@@ -839,9 +889,14 @@ void InputDialog::initializeQuiLogic()
        )
    );
 
-   method.addRule(If(isADC, Enable(m_ui.adc_ecorr)));
-   method.addRule(If(isCVS_ADC, Disable(m_ui.adc_ecorr)));
-   method.addRule(If(method == "SOS-ADC(2)" || method == "SOS-ADC(2)-x", Disable(m_ui.adc_ecorr)));
+   method.addRule(If(isADC, Enable(m_adcTab.m_ui.adc_ecorr)));
+   method.addRule(If(isCVS_ADC, Disable(m_adcTab.m_ui.adc_ecorr)));
+   method.addRule(
+     If(method == "SOS-ADC(2)" || 
+        method == "SOS-ADC(2)-x", 
+        Disable(m_adcTab.m_ui.adc_ecorr)
+     )
+   );
 
    QtNode& qui_adc_core(reg.get("QUI_ADC_CORE"));
    QtNode& cc_rest_occ(reg.get("CC_REST_OCC"));

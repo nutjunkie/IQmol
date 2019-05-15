@@ -27,10 +27,19 @@ SOURCES += \
    $$PWD/RemSection.C \
    $$PWD/ReadInput.C \
 
+
 HEADERS += \
    $$PWD/Actions.h \
+   $$PWD/AdcTab.h \
+   $$PWD/AimdTab.h \
+   $$PWD/AttenuationParameterTab.h \
+   $$PWD/AuxiliaryBasisTab.h \
+   $$PWD/CisTab.h \
    $$PWD/Conditions.h \
+   $$PWD/EomTab.h \
    $$PWD/ExternalChargesSection.h \
+   $$PWD/FreezingStringTab.h \
+   $$PWD/FrequenciesTab.h \
    $$PWD/GeometryConstraint.h \
    $$PWD/InputDialog.h \
    $$PWD/KeywordSection.h \
@@ -44,17 +53,33 @@ HEADERS += \
    $$PWD/OptionEditors.h \
    $$PWD/OptSection.h \
    $$PWD/PcmSection.h \
+   $$PWD/PrimaryBasisTab.h \
+   $$PWD/PropertiesTab.h \
    $$PWD/QuiJob.h \
    $$PWD/Qui.h \
    $$PWD/QuiMolecule.h \
    $$PWD/QtNode.h \
+   $$PWD/ReactionPathTab.h \
    $$PWD/Register.h \
    $$PWD/RemSection.h \
+   $$PWD/TransitionStateTab.h \
 
 
 FORMS += \
+   $$PWD/AdcTab.ui \
+   $$PWD/AimdTab.ui \
+   $$PWD/AttenuationParameterTab.ui \
+   $$PWD/AuxiliaryBasisTab.ui \
+   $$PWD/CisTab.ui \
+   $$PWD/EomTab.ui \
+   $$PWD/FreezingStringTab.ui \
+   $$PWD/FrequenciesTab.ui \
    $$PWD/GeometryConstraintDialog.ui \
    $$PWD/OptionDatabaseForm.ui \
    $$PWD/OptionListEditor.ui \
    $$PWD/OptionNumberEditor.ui \
-   $$PWD/QuiMainWindow.ui
+   $$PWD/PrimaryBasisTab.ui \
+   $$PWD/PropertiesTab.ui \
+   $$PWD/QuiMainWindow.ui \
+   $$PWD/ReactionPathTab.ui \
+   $$PWD/TransitionStateTab.ui \

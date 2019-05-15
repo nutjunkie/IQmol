@@ -492,6 +492,8 @@ bool JobMonitor::getQueueResources(Server* server, QChemJobInfo& qchemJobInfo)
    if (list.isEmpty()) {
       QLOG_DEBUG() << "QueueResources List is empty, getting queue information";
       QString info(server->queueInfo());
+      QLOG_TRACE() << info;
+
       ServerConfiguration::QueueSystemT queueSystem(configuration.queueSystem());
 
       switch (queueSystem) {  
