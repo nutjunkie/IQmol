@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>980</width>
-    <height>707</height>
+    <width>1306</width>
+    <height>928</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,18 +25,18 @@
 }</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_24">
+   <layout class="QHBoxLayout" name="horizontalLayout_3">
     <item>
      <widget class="QTabWidget" name="setupTabWidget">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
       <property name="maximumSize">
        <size>
-        <width>555</width>
+        <width>900</width>
         <height>16777215</height>
        </size>
       </property>
@@ -446,8 +446,8 @@ QToolButton:checked {
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>523</width>
-             <height>379</height>
+             <width>661</width>
+             <height>481</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -460,15 +460,15 @@ QToolButton:checked {
                <number>0</number>
               </property>
               <property name="tabSpacing">
-               <number>-1</number>
+               <number>11</number>
               </property>
               <widget class="QWidget" name="pageScfControl">
                <property name="geometry">
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>499</width>
-                 <height>287</height>
+                 <width>627</width>
+                 <height>359</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -668,8 +668,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>499</width>
-                 <height>287</height>
+                 <width>627</width>
+                 <height>359</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -678,21 +678,21 @@ QToolButton:checked {
                <layout class="QVBoxLayout" name="verticalLayout_44">
                 <item>
                  <layout class="QGridLayout" name="gridLayout_13">
-                  <item row="0" column="0">
+                  <item row="1" column="0">
                    <widget class="QCheckBox" name="gui">
                     <property name="text">
                      <string>Generate Checkpoint File</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="0" column="1">
+                  <item row="1" column="1">
                    <widget class="QCheckBox" name="chelpg">
                     <property name="text">
                      <string>CHELPG Charges</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="1">
+                  <item row="2" column="0">
                    <widget class="QCheckBox" name="nbo">
                     <property name="text">
                      <string>NBO Analysis</string>
@@ -5558,7 +5558,7 @@ Eventually this should go.</string>
       <property name="title">
        <string>Generated Input File:</string>
       </property>
-      <layout class="QVBoxLayout">
+      <layout class="QVBoxLayout" name="verticalLayout_18">
        <item>
         <widget class="QTextEdit" name="previewText">
          <property name="sizePolicy">
@@ -5670,8 +5670,8 @@ Eventually this should go.</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>980</width>
-     <height>22</height>
+     <width>1306</width>
+     <height>38</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
