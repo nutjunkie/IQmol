@@ -140,12 +140,13 @@ QString CanonicalOrbitals::description(Data::SurfaceInfo const& info,
 
    if (type.isOrbital()) {
       unsigned index(type.index());
-      label = m_canonicalOrbitals.label(index);
+      bool     isAlpha(type.kind() == Data::SurfaceType::AlphaOrbital);
+
+      label = m_canonicalOrbitals.label(index, isAlpha);
 
       if (tooltip) {
          double orbitalEnergy(0.0);
-         Data::SurfaceType::Kind kind(type.kind());
-         if (kind == Data::SurfaceType::AlphaOrbital) {
+         if (isAlpha) {
             orbitalEnergy = m_canonicalOrbitals.alphaOrbitalEnergy(index);
          }else {
             orbitalEnergy = m_canonicalOrbitals.betaOrbitalEnergy(index);

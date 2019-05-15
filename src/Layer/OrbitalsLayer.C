@@ -207,17 +207,13 @@ QList<Data::GridData const*> Orbitals::findGrids(Data::SurfaceType::Kind const& 
 QString Orbitals::description(Data::SurfaceInfo const& info, bool const tooltip)
 {
    Data::SurfaceType const& type(info.type());
-   QString label(type.toString());
+   QString label;
 
    if (type.isOrbital()) {
-      Data::SurfaceType::Kind kind(type.kind());
-
-      unsigned nElectrons = kind == Data::SurfaceType::AlphaOrbital ? nAlpha() : nBeta();
       unsigned index(type.index());
+      bool     isAlpha(type.kind() == Data::SurfaceType::AlphaOrbital);
 
-      if (index <= nElectrons) {
-         label += " (occ)";
-      }
+      label = m_orbitals.label(index, isAlpha);
    }
 
    if (tooltip) label += "\nIsovalue = " + QString::number(info.isovalue(), 'f', 3);

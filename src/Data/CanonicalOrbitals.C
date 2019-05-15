@@ -78,8 +78,9 @@ bool CanonicalOrbitals::consistent() const
 
 QString CanonicalOrbitals::label(unsigned index, bool alpha) const
 {
-   QString s(QString::number(index+1));
    unsigned n(alpha ? m_nAlpha : m_nBeta);
+   QString  s(alpha ? "Alpha " : "Beta ");
+   s += QString::number(index+1);
 
    if (n == index+2) {
       s += " (HOMO-1)";

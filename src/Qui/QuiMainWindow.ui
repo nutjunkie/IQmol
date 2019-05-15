@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>982</width>
-    <height>645</height>
+    <width>980</width>
+    <height>707</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -447,7 +447,7 @@ QToolButton:checked {
              <x>0</x>
              <y>0</y>
              <width>523</width>
-             <height>577</height>
+             <height>379</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -457,1147 +457,18 @@ QToolButton:checked {
                <bool>true</bool>
               </property>
               <property name="currentIndex">
-               <number>5</number>
+               <number>0</number>
               </property>
               <property name="tabSpacing">
                <number>-1</number>
               </property>
-              <widget class="QWidget" name="pageAuxiliaryBasis">
-               <property name="geometry">
-                <rect>
-                 <x>0</x>
-                 <y>0</y>
-                 <width>499</width>
-                 <height>77</height>
-                </rect>
-               </property>
-               <attribute name="label">
-                <string>Auxiliary Basis</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_32">
-                <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_18">
-                  <item>
-                   <widget class="QLabel" name="label_146">
-                    <property name="text">
-                     <string>RI Basis</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QComboBox" name="auxiliary_basis"/>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer_26">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_18">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>9</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="pagePrimaryBasis">
-               <property name="geometry">
-                <rect>
-                 <x>0</x>
-                 <y>0</y>
-                 <width>136</width>
-                 <height>60</height>
-                </rect>
-               </property>
-               <attribute name="label">
-                <string>Primary Basis</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_33">
-                <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_9">
-                  <item>
-                   <widget class="QComboBox" name="qui_primary_basis"/>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer_39">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_4">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>197</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="pageAtenuationParameter">
-               <property name="geometry">
-                <rect>
-                 <x>0</x>
-                 <y>0</y>
-                 <width>160</width>
-                 <height>60</height>
-                </rect>
-               </property>
-               <attribute name="label">
-                <string>Atenuation Parameter</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_16">
-                <item>
-                 <layout class="QHBoxLayout" name="_2">
-                  <item>
-                   <widget class="QLabel" name="label_53">
-                    <property name="text">
-                     <string>Omega</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QDoubleSpinBox" name="omega">
-                    <property name="decimals">
-                     <number>3</number>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer>
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_17">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>8</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="pageTransitionState">
-               <property name="geometry">
-                <rect>
-                 <x>0</x>
-                 <y>0</y>
-                 <width>165</width>
-                 <height>60</height>
-                </rect>
-               </property>
-               <attribute name="label">
-                <string>Transition State</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_45">
-                <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_27">
-                  <item>
-                   <widget class="QLabel" name="label_212">
-                    <property name="text">
-                     <string>Follow Mode</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QSpinBox" name="geom_opt_mode"/>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer_27">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_25">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>8</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="pageFreezingString">
-               <property name="geometry">
-                <rect>
-                 <x>0</x>
-                 <y>0</y>
-                 <width>100</width>
-                 <height>30</height>
-                </rect>
-               </property>
-               <attribute name="label">
-                <string>Freezing String</string>
-               </attribute>
-               <widget class="QWidget" name="layoutWidget">
-                <property name="geometry">
-                 <rect>
-                  <x>10</x>
-                  <y>0</y>
-                  <width>392</width>
-                  <height>64</height>
-                 </rect>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_12">
-                 <item row="0" column="0" colspan="2">
-                  <widget class="QLabel" name="label_67">
-                   <property name="text">
-                    <string>Nodes</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="2">
-                  <widget class="QSpinBox" name="fsm_nnode"/>
-                 </item>
-                 <item row="0" column="3">
-                  <widget class="QLabel" name="label_77">
-                   <property name="text">
-                    <string>Interpolation</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="4">
-                  <widget class="QComboBox" name="fsm_mode"/>
-                 </item>
-                 <item row="0" column="5">
-                  <spacer name="horizontalSpacer_40">
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                 <item row="1" column="0" rowspan="2" colspan="2">
-                  <widget class="QLabel" name="label_69">
-                   <property name="text">
-                    <string>Gradient Steps</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="2" rowspan="2">
-                  <widget class="QSpinBox" name="fsm_ngrad"/>
-                 </item>
-                 <item row="1" column="3" rowspan="2">
-                  <widget class="QLabel" name="label_78">
-                   <property name="text">
-                    <string>Opt Method</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="4" rowspan="2">
-                  <widget class="QComboBox" name="fsm_opt_mode"/>
-                 </item>
-                 <item row="2" column="1">
-                  <spacer name="verticalSpacer_6">
-                   <property name="orientation">
-                    <enum>Qt::Vertical</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>20</width>
-                     <height>13</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                </layout>
-               </widget>
-              </widget>
-              <widget class="QWidget" name="pageCIS">
-               <property name="geometry">
-                <rect>
-                 <x>0</x>
-                 <y>0</y>
-                 <width>499</width>
-                 <height>200</height>
-                </rect>
-               </property>
-               <attribute name="label">
-                <string>CIS/TD-DFT</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_11">
-                <item>
-                 <layout class="QGridLayout" name="_3">
-                  <item row="4" column="2" colspan="4">
-                   <widget class="QCheckBox" name="cis_ampl_anal">
-                    <property name="text">
-                     <string>Analyze Amplitudes</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="0">
-                   <widget class="QLabel" name="label_cis_state_derivative">
-                    <property name="text">
-                     <string>State To Optimize</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="4" column="0" colspan="2">
-                   <widget class="QCheckBox" name="cis_moments">
-                    <property name="text">
-                     <string>Excited State Moments</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="QSpinBox" name="cis_state_derivative"/>
-                  </item>
-                  <item row="0" column="5">
-                   <spacer>
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item row="1" column="3">
-                   <widget class="QCheckBox" name="xcis">
-                    <property name="text">
-                     <string>XCIS</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="1">
-                   <widget class="QSpinBox" name="cis_n_roots"/>
-                  </item>
-                  <item row="5" column="0" colspan="2">
-                   <widget class="QCheckBox" name="sts_mom">
-                    <property name="text">
-                     <string>Transition Moments</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="4">
-                   <widget class="QCheckBox" name="spin_flip_xcis">
-                    <property name="text">
-                     <string>SF-XCIS</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="label_91">
-                    <property name="text">
-                     <string>Number of Roots</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="3">
-                   <widget class="QCheckBox" name="rpa">
-                    <property name="text">
-                     <string>RPA</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="2">
-                   <widget class="QCheckBox" name="cis_singlets">
-                    <property name="text">
-                     <string>Singlets</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="4">
-                   <widget class="QCheckBox" name="spin_flip">
-                    <property name="text">
-                     <string>Spin Flip</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="0" colspan="2">
-                   <widget class="QCheckBox" name="cis_mulliken">
-                    <property name="text">
-                     <string>State Mulliken Charges</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="2">
-                   <widget class="QCheckBox" name="cis_triplets">
-                    <property name="text">
-                     <string>Triplets</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="2" colspan="4">
-                   <widget class="QCheckBox" name="cis_relaxed_density">
-                    <property name="text">
-                     <string>Analyze Relaxed Density</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="0">
-                   <widget class="QLabel" name="label_118">
-                    <property name="text">
-                     <string>NTO Pairs</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="1">
-                   <widget class="QSpinBox" name="nto_pairs"/>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_28">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>18</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="pageEOM">
-               <property name="geometry">
-                <rect>
-                 <x>0</x>
-                 <y>0</y>
-                 <width>383</width>
-                 <height>162</height>
-                </rect>
-               </property>
-               <attribute name="label">
-                <string>EOM</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_6">
-                <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_6">
-                  <item>
-                   <widget class="QRadioButton" name="qui_eom_ee">
-                    <property name="text">
-                     <string>EE</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QRadioButton" name="qui_eom_sf">
-                    <property name="text">
-                     <string>SF</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QRadioButton" name="qui_eom_ip">
-                    <property name="text">
-                     <string>IP</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QRadioButton" name="qui_eom_ea">
-                    <property name="text">
-                     <string>EA</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QRadioButton" name="qui_eom_dip">
-                    <property name="text">
-                     <string>DIP</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer_11">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <layout class="QGridLayout" name="gridLayout_7">
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="label_eom1">
-                    <property name="text">
-                     <string>Singlets</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="1">
-                   <widget class="QLineEdit" name="qui_eom_states1"/>
-                  </item>
-                  <item row="0" column="3">
-                   <spacer name="horizontalSpacer_16">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item row="1" column="0">
-                   <widget class="QLabel" name="label_eom2">
-                    <property name="text">
-                     <string>Triplets</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="QLineEdit" name="qui_eom_states2"/>
-                  </item>
-                  <item row="2" column="0" colspan="2">
-                   <layout class="QHBoxLayout" name="horizontalLayout_7">
-                    <item>
-                     <widget class="QLabel" name="label_cc_state_to_opt">
-                      <property name="text">
-                       <string>State to optimize</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLineEdit" name="cc_state_to_opt">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>105</width>
-                        <height>16777215</height>
-                       </size>
-                      </property>
-                      <property name="sizeIncrement">
-                       <size>
-                        <width>0</width>
-                        <height>0</height>
-                       </size>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </item>
-                  <item row="0" column="2">
-                   <widget class="QCheckBox" name="cc_eom_properties">
-                    <property name="text">
-                     <string>Excited State Properties</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="2">
-                   <widget class="QCheckBox" name="cc_eom_transition_properties">
-                    <property name="text">
-                     <string>Transition Properties</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="2">
-                   <widget class="QCheckBox" name="eom_ref_prop_te">
-                    <property name="text">
-                     <string>2 Electron Transition Properties</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_5">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>40</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="pageADC">
-               <property name="geometry">
-                <rect>
-                 <x>0</x>
-                 <y>0</y>
-                 <width>379</width>
-                 <height>211</height>
-                </rect>
-               </property>
-               <attribute name="label">
-                <string>ADC</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_18">
-                <item>
-                 <layout class="QVBoxLayout" name="verticalLayoutADC1">
-                  <item>
-                   <layout class="QGridLayout" name="gridLayoutADC1">
-                    <item row="1" column="0">
-                     <widget class="QLabel" name="label_adc1">
-                      <property name="text">
-                       <string>Singlet States</string>
-                      </property>
-                      <property name="buddy">
-                       <cstring>qui_adc_states1</cstring>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="2">
-                     <widget class="QLineEdit" name="qui_adc_states1"/>
-                    </item>
-                    <item row="2" column="0">
-                     <widget class="QLabel" name="label_adc2">
-                      <property name="text">
-                       <string>Triplet States</string>
-                      </property>
-                      <property name="buddy">
-                       <cstring>qui_adc_states2</cstring>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="2" column="2">
-                     <widget class="QLineEdit" name="qui_adc_states2"/>
-                    </item>
-                    <item row="1" column="3">
-                     <spacer name="horizontalSpacerADC1">
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>40</width>
-                        <height>20</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                    <item row="3" column="0">
-                     <widget class="QLabel" name="label_adc_core">
-                      <property name="text">
-                       <string>Core Orbitals</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="3" column="2">
-                     <layout class="QHBoxLayout" name="adc_core_layout">
-                      <item>
-                       <widget class="QSpinBox" name="qui_adc_core"/>
-                      </item>
-                      <item>
-                       <spacer name="horizontalSpacer_24">
-                        <property name="orientation">
-                         <enum>Qt::Horizontal</enum>
-                        </property>
-                        <property name="sizeHint" stdset="0">
-                         <size>
-                          <width>40</width>
-                          <height>20</height>
-                         </size>
-                        </property>
-                       </spacer>
-                      </item>
-                     </layout>
-                    </item>
-                   </layout>
-                  </item>
-                  <item>
-                   <layout class="QGridLayout" name="gridLayoutADC2">
-                    <item row="0" column="0">
-                     <widget class="QCheckBox" name="adc_do_diis">
-                      <property name="text">
-                       <string>Use DIIS</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="1">
-                     <widget class="QCheckBox" name="adc_prop_es2es">
-                      <property name="text">
-                       <string>State-to-State Properties</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="2" column="0">
-                     <widget class="QCheckBox" name="adc_prop_tpa">
-                      <property name="text">
-                       <string>Two-Photon Absorption</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="0">
-                     <widget class="QCheckBox" name="adc_prop_es">
-                      <property name="text">
-                       <string>Excited State Properties</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="3" column="1">
-                     <widget class="QCheckBox" name="adc_prop_soc">
-                      <property name="text">
-                       <string>Spin-Orbit Coupling</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="2" column="1">
-                     <widget class="QCheckBox" name="adc_ecorr">
-                      <property name="text">
-                       <string>Energy Corrections</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="3" column="0">
-                     <widget class="QCheckBox" name="adc_prop_cd">
-                      <property name="text">
-                       <string>Circular Dichroism</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </item>
-                 </layout>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="pageAbInitioMD">
-               <property name="geometry">
-                <rect>
-                 <x>0</x>
-                 <y>0</y>
-                 <width>447</width>
-                 <height>163</height>
-                </rect>
-               </property>
-               <attribute name="label">
-                <string>Ab Initio MD</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_31">
-                <item>
-                 <layout class="QGridLayout" name="_4">
-                  <item row="2" column="0">
-                   <widget class="QCheckBox" name="deuterate">
-                    <property name="text">
-                     <string>Deuterate</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="QComboBox" name="aimd_initial_velocities"/>
-                  </item>
-                  <item row="0" column="3">
-                   <widget class="QSpinBox" name="aimd_steps"/>
-                  </item>
-                  <item row="1" column="3">
-                   <widget class="QSpinBox" name="aimd_time_step">
-                    <property name="suffix">
-                     <string> a.u.</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="2">
-                   <widget class="QLabel" name="label_82">
-                    <property name="text">
-                     <string>Electron Mass</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="2">
-                   <widget class="QLabel" name="label_61">
-                    <property name="text">
-                     <string>Time Step</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="3">
-                   <widget class="QSpinBox" name="aimd_fictitious_mass">
-                    <property name="suffix">
-                     <string> a.u.</string>
-                    </property>
-                    <property name="maximum">
-                     <number>9999</number>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="0">
-                   <widget class="QLabel" name="label_83">
-                    <property name="text">
-                     <string>Initial Velocities</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="1">
-                   <widget class="QComboBox" name="aimd_method"/>
-                  </item>
-                  <item row="2" column="3">
-                   <widget class="QSpinBox" name="aimd_temp">
-                    <property name="suffix">
-                     <string> K</string>
-                    </property>
-                    <property name="maximum">
-                     <number>9999</number>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="label_84">
-                    <property name="text">
-                     <string>Method</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="2">
-                   <widget class="QLabel" name="label_86">
-                    <property name="text">
-                     <string>Number of Steps</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="2">
-                   <widget class="QLabel" name="label_87">
-                    <property name="text">
-                     <string>Temperature</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="4">
-                   <spacer name="horizontalSpacer_18">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_16">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>112</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="pageReactionPath">
-               <property name="geometry">
-                <rect>
-                 <x>0</x>
-                 <y>0</y>
-                 <width>329</width>
-                 <height>64</height>
-                </rect>
-               </property>
-               <attribute name="label">
-                <string>Reaction Path</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_38">
-                <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_3">
-                  <item>
-                   <widget class="QLabel" name="label_55">
-                    <property name="text">
-                     <string>Direction</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QComboBox" name="rpath_direction"/>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="label_57">
-                    <property name="text">
-                     <string>Max Cycles</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QSpinBox" name="rpath_max_cycles"/>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer_19">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <spacer>
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>40</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="pageFrequencies">
-               <property name="geometry">
-                <rect>
-                 <x>0</x>
-                 <y>0</y>
-                 <width>410</width>
-                 <height>146</height>
-                </rect>
-               </property>
-               <attribute name="label">
-                <string>Frequencies</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_30">
-                <item>
-                 <widget class="QCheckBox" name="raman">
-                  <property name="text">
-                   <string>Raman Frequencies</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="isotopes">
-                  <property name="text">
-                   <string>Isotopic Analysis</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="hess_proj_trm">
-                  <property name="text">
-                   <string>Project Out Translational And Rotational Degrees Of Freedom</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="anharmonic">
-                  <property name="text">
-                   <string>Compute Anharmonic Corrections</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <layout class="QHBoxLayout" name="_6">
-                  <item>
-                   <spacer>
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeType">
-                     <enum>QSizePolicy::Fixed</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="vciLabel">
-                    <property name="text">
-                     <string>VCI Quanta</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QSpinBox" name="vci"/>
-                  </item>
-                  <item>
-                   <spacer>
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_15">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>11</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="pageProperties">
-               <property name="geometry">
-                <rect>
-                 <x>0</x>
-                 <y>0</y>
-                 <width>195</width>
-                 <height>83</height>
-                </rect>
-               </property>
-               <attribute name="label">
-                <string>Properties</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_43">
-                <item>
-                 <layout class="QHBoxLayout" name="_7">
-                  <item>
-                   <widget class="QLabel" name="label_169">
-                    <property name="text">
-                     <string>Property</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QComboBox" name="moprop"/>
-                  </item>
-                  <item>
-                   <spacer>
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="moprop_save_last_gpx">
-                  <property name="text">
-                   <string>Save G[Px] Data</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_23">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>15</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </widget>
               <widget class="QWidget" name="pageScfControl">
                <property name="geometry">
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>391</width>
-                 <height>155</height>
+                 <width>499</width>
+                 <height>287</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1606,6 +477,13 @@ QToolButton:checked {
                <layout class="QVBoxLayout" name="verticalLayout_34">
                 <item>
                  <layout class="QGridLayout" name="_8">
+                  <item row="2" column="3">
+                   <widget class="QSpinBox" name="scf_guess_mix">
+                    <property name="suffix">
+                     <string> %</string>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="1" column="0">
                    <widget class="QLabel" name="label_209">
                     <property name="text">
@@ -1616,10 +494,13 @@ QToolButton:checked {
                     </property>
                    </widget>
                   </item>
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="label_210">
-                    <property name="text">
-                     <string>Algorithm</string>
+                  <item row="0" column="3">
+                   <widget class="QSpinBox" name="scf_convergence">
+                    <property name="minimum">
+                     <number>-1</number>
+                    </property>
+                    <property name="maximum">
+                     <number>20</number>
                     </property>
                    </widget>
                   </item>
@@ -1636,26 +517,10 @@ QToolButton:checked {
                     </property>
                    </widget>
                   </item>
-                  <item row="0" column="3">
-                   <widget class="QSpinBox" name="scf_convergence">
-                    <property name="minimum">
-                     <number>-1</number>
-                    </property>
-                    <property name="maximum">
-                     <number>20</number>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="3">
-                   <widget class="QSpinBox" name="scf_max_cycles"/>
-                  </item>
-                  <item row="1" column="2">
-                   <widget class="QLabel" name="label_18">
+                  <item row="6" column="0" colspan="2">
+                   <widget class="QCheckBox" name="complex">
                     <property name="text">
-                     <string>Max Cycles</string>
-                    </property>
-                    <property name="buddy">
-                     <cstring>scf_max_cycles</cstring>
+                     <string>Complex SCF</string>
                     </property>
                    </widget>
                   </item>
@@ -1669,12 +534,8 @@ QToolButton:checked {
                     </property>
                    </widget>
                   </item>
-                  <item row="2" column="3">
-                   <widget class="QSpinBox" name="scf_guess_mix">
-                    <property name="suffix">
-                     <string>%</string>
-                    </property>
-                   </widget>
+                  <item row="1" column="3">
+                   <widget class="QSpinBox" name="scf_max_cycles"/>
                   </item>
                   <item row="2" column="0">
                    <widget class="QLabel" name="label_145">
@@ -1686,17 +547,55 @@ QToolButton:checked {
                     </property>
                    </widget>
                   </item>
+                  <item row="5" column="2" colspan="3">
+                   <widget class="QCheckBox" name="ghf">
+                    <property name="text">
+                     <string>Generalized Hartree-Fock</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_210">
+                    <property name="text">
+                     <string>Algorithm</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="0" colspan="2">
+                   <widget class="QCheckBox" name="os_roscf">
+                    <property name="text">
+                     <string>Open-shell Singlet ROSCF</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="2" colspan="2">
+                   <widget class="QCheckBox" name="dual_basis_energy">
+                    <property name="text">
+                     <string>Dual Basis Energy</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="2">
+                   <widget class="QLabel" name="label_18">
+                    <property name="text">
+                     <string>Max Cycles</string>
+                    </property>
+                    <property name="buddy">
+                     <cstring>scf_max_cycles</cstring>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="0" colspan="2">
+                   <widget class="QCheckBox" name="gen_scfman">
+                    <property name="text">
+                     <string>Use GEN_SCFMAN</string>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="2" column="1">
                    <widget class="QComboBox" name="basis2">
                     <property name="editable">
                      <bool>false</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="0" colspan="2">
-                   <widget class="QCheckBox" name="dual_basis_energy">
-                    <property name="text">
-                     <string>Dual Basis Energy</string>
                     </property>
                    </widget>
                   </item>
@@ -1713,7 +612,34 @@ QToolButton:checked {
                     </property>
                    </spacer>
                   </item>
-                  <item row="3" column="2">
+                  <item row="6" column="3">
+                   <widget class="QSpinBox" name="complex_mix">
+                    <property name="suffix">
+                     <string> %</string>
+                    </property>
+                    <property name="minimum">
+                     <number>0</number>
+                    </property>
+                    <property name="value">
+                     <number>0</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="2">
+                   <widget class="QLabel" name="label_complex_mix">
+                    <property name="text">
+                     <string>Complex Mix</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="2" colspan="2">
+                   <widget class="QCheckBox" name="internal_stability">
+                    <property name="text">
+                     <string>Stability Analysis</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="0" colspan="2">
                    <widget class="QCheckBox" name="unrestricted">
                     <property name="text">
                      <string>Unrestricted</string>
@@ -1742,8 +668,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>334</width>
-                 <height>89</height>
+                 <width>499</width>
+                 <height>287</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1758,33 +684,6 @@ QToolButton:checked {
                      <string>Generate Checkpoint File</string>
                     </property>
                    </widget>
-                  </item>
-                  <item row="1" column="0">
-                   <widget class="QCheckBox" name="stability_analysis">
-                    <property name="text">
-                     <string>Stability Analysis</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="1">
-                   <layout class="QHBoxLayout" name="_9">
-                    <item>
-                     <spacer>
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                      <property name="sizeType">
-                       <enum>QSizePolicy::Fixed</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>10</width>
-                        <height>5</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                   </layout>
                   </item>
                   <item row="0" column="1">
                    <widget class="QCheckBox" name="chelpg">
@@ -1879,6 +778,11 @@ QToolButton:checked {
            <item>
             <property name="text">
              <string>PAO</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Internal Stability</string>
             </property>
            </item>
            <item>
@@ -2040,7 +944,7 @@ QToolButton:checked {
            <enum>QFrame::Sunken</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>3</number>
           </property>
           <widget class="QWidget" name="AdvancedSCFControl">
            <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -2201,29 +1105,6 @@ QToolButton:checked {
            <layout class="QVBoxLayout">
             <item>
              <layout class="QGridLayout">
-              <item row="2" column="1">
-               <widget class="QSpinBox" name="diis_switch_thresh"/>
-              </item>
-              <item row="1" column="1">
-               <widget class="QSpinBox" name="diis_print"/>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_35">
-                <property name="text">
-                 <string>Print Level</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_36">
-                <property name="text">
-                 <string>Threshold</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QSpinBox" name="diis_max_cycles"/>
-              </item>
               <item row="0" column="0">
                <widget class="QLabel" name="label_34">
                 <property name="text">
@@ -2238,8 +1119,35 @@ QToolButton:checked {
                 </property>
                </widget>
               </item>
-              <item row="0" column="1">
-               <widget class="QSpinBox" name="diis_subspace_size"/>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_94">
+                <property name="text">
+                 <string>DIIS Metric</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QSpinBox" name="diis_print"/>
+              </item>
+              <item row="2" column="1">
+               <widget class="QSpinBox" name="diis_switch_thresh"/>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_35">
+                <property name="text">
+                 <string>Print Level</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QSpinBox" name="diis_max_cycles"/>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_36">
+                <property name="text">
+                 <string>Threshold</string>
+                </property>
+               </widget>
               </item>
               <item row="0" column="2">
                <spacer>
@@ -2253,13 +1161,6 @@ QToolButton:checked {
                  </size>
                 </property>
                </spacer>
-              </item>
-              <item row="4" column="0">
-               <widget class="QLabel" name="label_94">
-                <property name="text">
-                 <string>DIIS Metric</string>
-                </property>
-               </widget>
               </item>
               <item row="4" column="1" colspan="2">
                <layout class="QHBoxLayout">
@@ -2280,6 +1181,9 @@ QToolButton:checked {
                  </spacer>
                 </item>
                </layout>
+              </item>
+              <item row="0" column="1">
+               <widget class="QSpinBox" name="diis_subspace_size"/>
               </item>
              </layout>
             </item>
@@ -2440,14 +1344,21 @@ QToolButton:checked {
            </layout>
           </widget>
           <widget class="QWidget" name="AdvancedLargeMoleculeMethods">
-           <layout class="QVBoxLayout" name="verticalLayout_25">
+           <layout class="QVBoxLayout" name="verticalLayout_16">
             <item>
              <widget class="QGroupBox" name="groupBox_0">
               <property name="title">
                <string>Method</string>
               </property>
-              <layout class="QHBoxLayout">
-               <item>
+              <layout class="QGridLayout" name="gridLayout_25">
+               <item row="0" column="2">
+                <widget class="QRadioButton" name="qui_use_case">
+                 <property name="text">
+                  <string>CASE</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
                 <widget class="QRadioButton" name="qui_cfmm">
                  <property name="text">
                   <string>CFMM</string>
@@ -2457,17 +1368,24 @@ QToolButton:checked {
                  </property>
                 </widget>
                </item>
-               <item>
-                <widget class="QRadioButton" name="ftc">
+               <item row="0" column="0">
+                <widget class="QRadioButton" name="qui_none">
                  <property name="text">
-                  <string>FTC</string>
+                  <string>None</string>
                  </property>
                 </widget>
                </item>
-               <item>
-                <widget class="QRadioButton" name="qui_use_case">
+               <item row="1" column="1">
+                <widget class="QRadioButton" name="qui_use_ri">
                  <property name="text">
-                  <string>CASE</string>
+                  <string>RI</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QRadioButton" name="ftc">
+                 <property name="text">
+                  <string>FTC</string>
                  </property>
                 </widget>
                </item>
@@ -2491,6 +1409,7 @@ QToolButton:checked {
               <property name="currentIndex">
                <number>0</number>
               </property>
+              <widget class="QWidget" name="LargeMoleculesNone"/>
               <widget class="QWidget" name="LargeMoleculesCFMM">
                <layout class="QVBoxLayout" name="verticalLayout_24">
                 <item>
@@ -2642,6 +1561,81 @@ QToolButton:checked {
                    <size>
                     <width>20</width>
                     <height>100</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="LargeMoleculesRI">
+               <layout class="QVBoxLayout" name="verticalLayout_15">
+                <item>
+                 <layout class="QGridLayout" name="gridLayout_12">
+                  <item row="1" column="2">
+                   <widget class="QSpinBox" name="ari_r0"/>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QCheckBox" name="checkBox_3">
+                    <property name="text">
+                     <string>ARI</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QLabel" name="label_77">
+                    <property name="text">
+                     <string>Outer Radius</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="2">
+                   <widget class="QSpinBox" name="ari_r1"/>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QCheckBox" name="checkBox_2">
+                    <property name="text">
+                     <string>RI-K</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QLabel" name="label_55">
+                    <property name="text">
+                     <string>Inner Radius</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="0">
+                   <widget class="QCheckBox" name="checkBox">
+                    <property name="text">
+                     <string>RI-J</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="3">
+                   <spacer name="horizontalSpacer_13">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_5">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
                    </size>
                   </property>
                  </spacer>
@@ -2826,6 +1820,87 @@ QToolButton:checked {
                <size>
                 <width>20</width>
                 <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="AdvancedInternalStability">
+           <layout class="QVBoxLayout" name="verticalLayout_6">
+            <item>
+             <layout class="QGridLayout" name="gridLayout_7">
+              <item row="2" column="1">
+               <widget class="QSpinBox" name="internal_stability_conv"/>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_67">
+                <property name="text">
+                 <string>Convergence</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QSpinBox" name="internal_stability_roots"/>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_61">
+                <property name="text">
+                 <string>Davidson Iterations</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QSpinBox" name="internal_stability_iter"/>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_57">
+                <property name="text">
+                 <string>Max SCFs</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QSpinBox" name="internal_stability_davidson_iter"/>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_69">
+                <property name="text">
+                 <string>Number of Roots</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <spacer name="horizontalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="4" column="0" colspan="3">
+               <widget class="QRadioButton" name="fd_mat_vec_prod">
+                <property name="text">
+                 <string>Compute Vec-Mat Poduct By FD</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>394</height>
                </size>
               </property>
              </spacer>
@@ -3760,7 +2835,7 @@ QToolButton:checked {
            </layout>
           </widget>
           <widget class="QWidget" name="AdvancedCIS">
-           <layout class="QVBoxLayout" name="verticalLayout_15">
+           <layout class="QVBoxLayout" name="verticalLayout_11">
             <item>
              <widget class="QGroupBox" name="groupBox_2">
               <property name="title">
@@ -3769,18 +2844,11 @@ QToolButton:checked {
               <layout class="QVBoxLayout" name="verticalLayout_9">
                <item>
                 <layout class="QGridLayout">
-                 <item row="0" column="1">
-                  <widget class="QSpinBox" name="cis_max_cycles"/>
-                 </item>
                  <item row="1" column="1">
                   <widget class="QSpinBox" name="cis_convergence"/>
                  </item>
-                 <item row="1" column="0">
-                  <widget class="QLabel" name="label_66">
-                   <property name="text">
-                    <string>Convergence</string>
-                   </property>
-                  </widget>
+                 <item row="2" column="1">
+                  <widget class="QSpinBox" name="max_cis_subspace"/>
                  </item>
                  <item row="0" column="0">
                   <widget class="QLabel" name="label_166">
@@ -3788,6 +2856,16 @@ QToolButton:checked {
                     <string>Max Cycles</string>
                    </property>
                   </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="label_22">
+                   <property name="text">
+                    <string>Max Subspace</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QSpinBox" name="cis_max_cycles"/>
                  </item>
                  <item row="0" column="2">
                   <spacer>
@@ -3802,29 +2880,22 @@ QToolButton:checked {
                    </property>
                   </spacer>
                  </item>
-                 <item row="2" column="1">
-                  <widget class="QSpinBox" name="max_cis_subspace"/>
-                 </item>
-                 <item row="2" column="0">
-                  <widget class="QLabel" name="label_22">
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_66">
                    <property name="text">
-                    <string>Max Subspace</string>
+                    <string>Convergence</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="3" column="0" colspan="3">
-                  <layout class="QHBoxLayout" name="horizontalLayout_5">
-                   <item>
-                    <widget class="QLabel" name="label_90">
-                     <property name="text">
-                      <string>Guess Type</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QComboBox" name="qui_cis_guess"/>
-                   </item>
-                  </layout>
+                 <item row="3" column="0">
+                  <widget class="QLabel" name="label_90">
+                   <property name="text">
+                    <string>Guess Type</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="1" colspan="2">
+                  <widget class="QComboBox" name="qui_cis_guess"/>
                  </item>
                 </layout>
                </item>
@@ -3846,48 +2917,61 @@ QToolButton:checked {
               <layout class="QVBoxLayout" name="verticalLayout_14">
                <item>
                 <layout class="QGridLayout" name="gridLayout_22">
-                 <item row="0" column="0" colspan="2">
-                  <widget class="QCheckBox" name="cis_ras">
-                   <property name="text">
-                    <string>Use Reduced Active Space</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QLabel" name="label_cis_ras_cutoff_occupied">
-                   <property name="text">
-                    <string>Occupied Cutoff</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="0">
+                 <item row="3" column="0">
                   <widget class="QLabel" name="label_cis_ras_cutoff_virtual">
                    <property name="text">
                     <string>Virtual Cutoff</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="1" column="1">
-                  <widget class="QDoubleSpinBox" name="cis_ras_cutoff_occupied"/>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="label_cis_ras_cutoff_occupied">
+                   <property name="text">
+                    <string>Occupied Cutoff</string>
+                   </property>
+                  </widget>
                  </item>
                  <item row="2" column="1">
-                  <widget class="QDoubleSpinBox" name="cis_ras_cutoff_virtual"/>
+                  <widget class="QDoubleSpinBox" name="cis_ras_cutoff_occupied"/>
                  </item>
-                 <item row="3" column="0">
+                 <item row="4" column="0">
                   <widget class="QLabel" name="label_cis_ras_type">
                    <property name="text">
                     <string>Subspace</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="4" column="0" colspan="2">
+                 <item row="3" column="1">
+                  <widget class="QDoubleSpinBox" name="cis_ras_cutoff_virtual"/>
+                 </item>
+                 <item row="2" column="2">
+                  <spacer name="horizontalSpacer_11">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="0" column="0" colspan="3">
+                  <widget class="QCheckBox" name="cis_ras">
+                   <property name="text">
+                    <string>Use Reduced Active Space</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0" colspan="3">
                   <widget class="QCheckBox" name="cis_ras_print">
                    <property name="text">
                     <string>Increase Printout</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="3" column="1">
+                 <item row="4" column="1" colspan="2">
                   <widget class="QComboBox" name="cis_ras_type"/>
                  </item>
                 </layout>
@@ -6586,7 +5670,7 @@ Eventually this should go.</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>982</width>
+     <width>980</width>
      <height>22</height>
     </rect>
    </property>
@@ -6675,8 +5759,6 @@ Eventually this should go.</string>
   <tabstop>multipole_order</tabstop>
   <tabstop>qui_plots_points</tabstop>
   <tabstop>skip_cis_rpa</tabstop>
-  <tabstop>qui_cfmm</tabstop>
-  <tabstop>ftc</tabstop>
   <tabstop>qui_use_case</tabstop>
   <tabstop>ftc_fast</tabstop>
   <tabstop>ftc_class_thresh_mult</tabstop>
