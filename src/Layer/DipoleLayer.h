@@ -47,6 +47,8 @@ namespace Layer {
 
          double value() const;
 
+         qglviewer::Vec const& vector() const { return m_dipoleMoment; }
+
          void draw();
          void drawFast();
          void drawSelected() { }

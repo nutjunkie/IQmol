@@ -52,17 +52,20 @@ namespace Configurator{
          void on_positiveColorButton_clicked(bool);
          void on_negativeColorButton_clicked(bool);
          void on_swapColorsButton_clicked(bool);
-         void on_scaleButton_clicked(bool);
+         void on_centerButton_clicked(bool);
          void on_propertyCombo_currentIndexChanged(int);
          void on_fillButton_clicked(bool);
          void on_linesButton_clicked(bool);
          void on_dotsButton_clicked(bool);
          void on_transparencySlider_valueChanged(int);
          void on_clipCheckBox_clicked(bool);
+         void on_maxValue_valueChanged(double);
+         void on_minValue_valueChanged(double);
+
          void editGradientColors(bool);
 
       private:
-         Ui::SurfaceConfigurator m_surfaceConfigurator;
+         Ui::SurfaceConfigurator m_ui;
 
          void setPositiveColor(QColor const& color);
          void setPositiveColor(QList<QColor> const& colors);

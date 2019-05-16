@@ -36,9 +36,12 @@ namespace Configurator {
 Surface::Surface(Layer::Surface& surface) : m_surface(surface), 
    m_gradientColors(Preferences::DefaultGradientColors()), m_initialized(false)
 {        
-   m_surfaceConfigurator.setupUi(this);
-   m_surfaceConfigurator.ambientOcclusionCheckBox->setVisible(false);
-   m_surfaceConfigurator.scaleButton->setEnabled(false);
+   m_ui.setupUi(this);
+   m_ui.ambientOcclusionCheckBox->setVisible(false);
+   m_ui.centerButton->setEnabled(false);
+
+   m_ui.minValue->setVisible(false);
+   m_ui.maxValue->setVisible(false);
 }
 
 
@@ -51,31 +54,20 @@ void Surface::sync()
    setPositiveColor(m_surface.colorPositive());
    setNegativeColor(m_surface.colorNegative());
 
-   if (!m_surface.isSigned()) {
-      m_surfaceConfigurator.negativeColorButton->setVisible(false);
-      m_surfaceConfigurator.negativeLabel->setVisible(false);
-      m_surfaceConfigurator.swapColorsButton->setEnabled(false);
-   }
-
-   if (m_surface.hasProperty()) {
-      m_gradientColors = m_surface.colors();
-      m_surfaceConfigurator.scaleButton->setEnabled(m_surface.propertyIsSigned());
-   }
-
    double area(m_surface.area());
-   m_surfaceConfigurator.areaLabel->setText(QString::number(area, 'f', 3));
+   m_ui.areaLabel->setText(QString::number(area, 'f', 3));
 
-   m_surfaceConfigurator.transparencySlider->setValue(100*m_surface.getAlpha());
+   m_ui.transparencySlider->setValue(100*m_surface.getAlpha());
    
    switch (m_surface.m_drawMode) {
       case Layer::Surface::Fill:
-           m_surfaceConfigurator.fillButton->setChecked(true);
+           m_ui.fillButton->setChecked(true);
          break;
       case Layer::Surface::Lines:
-           m_surfaceConfigurator.linesButton->setChecked(true);
+           m_ui.linesButton->setChecked(true);
          break;
       case Layer::Surface::Dots:
-           m_surfaceConfigurator.dotsButton->setChecked(true);
+           m_ui.dotsButton->setChecked(true);
          break;
    }  
 
@@ -88,34 +80,48 @@ void Surface::sync()
       if (!m_surface.isVdW()) {
          properties.removeAll("Nuclei");
       }
-      m_surfaceConfigurator.propertyCombo->addItems(properties);
+      m_ui.propertyCombo->addItems(properties);
    }
 }  
 
 
 void Surface::on_propertyCombo_currentIndexChanged(int)
 {
-   QString type(m_surfaceConfigurator.propertyCombo->currentText());
-   disconnect(m_surfaceConfigurator.positiveColorButton, 0, 0, 0);
+   disconnect(m_ui.positiveColorButton, 0, 0, 0);
+   QString type(m_ui.propertyCombo->currentText());
 
    if (type == "None") {
-      m_surfaceConfigurator.positiveColorButton->setProperty("gradient",false);
-      m_surfaceConfigurator.negativeLabel->setVisible(false);
-      m_surfaceConfigurator.positiveLabel->setText("Positive");
-      m_surfaceConfigurator.scaleButton->setEnabled(false);
+
+      m_ui.minValue->setVisible(false);
+      m_ui.maxValue->setVisible(false);
+      m_ui.centerButton->setEnabled(false);
+      m_ui.swapColorsButton->setEnabled(m_surface.isSigned());
+      m_ui.negativeColorButton->setVisible(m_surface.isSigned());
+      m_ui.negativeLabel->setVisible(m_surface.isSigned());
+      m_ui.positiveLabel->setVisible(true);
+
       setPositiveColor(m_surface.colorPositive());
-      connect(m_surfaceConfigurator.positiveColorButton, SIGNAL(clicked(bool)),
+      connect(m_ui.positiveColorButton, SIGNAL(clicked(bool)),
          this, SLOT(on_positiveColorButton_clicked(bool)));
 
       if (m_surface.isSigned()) {
-         m_surfaceConfigurator.negativeColorButton->setVisible(true);
-         m_surfaceConfigurator.negativeLabel->setText("Negative");
-         m_surfaceConfigurator.swapColorsButton->setEnabled(true);
+         m_ui.negativeColorButton->setVisible(true);
+         m_ui.swapColorsButton->setEnabled(true);
       }
  
       m_surface.clearPropertyData();
 
    }else if (type == "Nuclei") {
+
+      m_ui.minValue->setVisible(false);
+      m_ui.maxValue->setVisible(false);
+      m_ui.centerButton->setEnabled(false);
+      m_ui.negativeColorButton->setVisible(false);
+      m_ui.swapColorsButton->setEnabled(false);
+      m_ui.negativeLabel->setVisible(false);
+      m_ui.positiveLabel->setVisible(true);
+
+      setPositiveColor(m_surface.colorPositive());
 
       QList<Layer::Molecule*> parents = m_surface.findLayers<Layer::Molecule>(Layer::Parents);
       if (parents.isEmpty()) {
@@ -127,15 +133,19 @@ void Surface::on_propertyCombo_currentIndexChanged(int)
       }
 
    }else {
-      m_surfaceConfigurator.positiveColorButton->setProperty("gradient",true);
+
+      m_ui.minValue->setVisible(true);
+      m_ui.maxValue->setVisible(true);
+      m_ui.centerButton->setEnabled(true);
+      m_ui.swapColorsButton->setEnabled(false);
+      m_ui.negativeColorButton->setVisible(false);
+      m_ui.negativeLabel->setVisible(false);
+      m_ui.positiveLabel->setVisible(false);
+
       setPositiveColor(m_gradientColors);
 
-      connect(m_surfaceConfigurator.positiveColorButton, SIGNAL(clicked(bool)),
+      connect(m_ui.positiveColorButton, SIGNAL(clicked(bool)),
          this, SLOT(editGradientColors(bool)));
-
-      m_surfaceConfigurator.negativeLabel->setVisible(true);
-      m_surfaceConfigurator.negativeColorButton->setVisible(false);
-      m_surfaceConfigurator.swapColorsButton->setEnabled(false);
 
       QList<Layer::Molecule*> parents(m_surface.findLayers<Layer::Molecule>(Layer::Parents));
 
@@ -146,11 +156,24 @@ void Surface::on_propertyCombo_currentIndexChanged(int)
          m_surface.computePropertyData(parents.first()->getPropertyEvaluator(type));
       }
 
-      m_surfaceConfigurator.scaleButton->setEnabled(m_surface.propertyIsSigned());
+      m_ui.centerButton->setEnabled(m_surface.propertyIsSigned());
 
       updateScale();
    }
 
+   m_surface.updated();
+}
+
+
+void Surface::on_minValue_valueChanged(double)
+{
+   m_surface.setPropertyRange(m_ui.minValue->value(), m_ui.maxValue->value());
+   m_surface.updated();
+}
+
+void Surface::on_maxValue_valueChanged(double)
+{
+   m_surface.setPropertyRange(m_ui.minValue->value(), m_ui.maxValue->value());
    m_surface.updated();
 }
 
@@ -171,7 +194,7 @@ void Surface::on_negativeColorButton_clicked(bool)
 }
 
 
-void Surface::on_scaleButton_clicked(bool tf)
+void Surface::on_centerButton_clicked(bool tf)
 {
    m_surface.balanceScale(tf);
    updateScale();
@@ -184,9 +207,8 @@ void Surface::updateScale()
    m_surface.getPropertyRange(min, max);
    QString v1(QString::number(min, 'f', 4));
    QString v2(QString::number(max, 'f', 4));
-
-   m_surfaceConfigurator.negativeLabel->setText(v1);
-   m_surfaceConfigurator.positiveLabel->setText(v2);
+   m_ui.minValue->setValue(min);
+   m_ui.maxValue->setValue(max);
 }
 
 
@@ -232,9 +254,10 @@ void Surface::editGradientColors(bool)
 
 void Surface::setPositiveColor(QList<QColor> const& colors)
 {
+   m_ui.positiveColorButton->setProperty("gradient",true);
    QString bg("background-color: ");
    bg += ColorGradient::ToString(colors);
-   m_surfaceConfigurator.positiveColorButton->setStyleSheet(bg);
+   m_ui.positiveColorButton->setStyleSheet(bg);
    m_surface.setColors(colors);
 }
 
@@ -242,9 +265,10 @@ void Surface::setPositiveColor(QList<QColor> const& colors)
 void Surface::setPositiveColor(QColor const& color)
 {
    if (color.isValid()) {
+      m_ui.positiveColorButton->setProperty("gradient",false);
       QString bg("background-color: ");
       bg += color.name();
-      m_surfaceConfigurator.positiveColorButton->setStyleSheet(bg);
+      m_ui.positiveColorButton->setStyleSheet(bg);
 
       QColor negative(m_surface.colorNegative());
       m_surface.setColors(negative, color);
@@ -257,7 +281,7 @@ void Surface::setNegativeColor(QColor const& color)
    if (color.isValid()) {
       QString bg("background-color: ");
       bg += color.name();
-      m_surfaceConfigurator.negativeColorButton->setStyleSheet(bg);
+      m_ui.negativeColorButton->setStyleSheet(bg);
 
       QColor positive(m_surface.colorPositive());
       m_surface.setColors(color, positive);
@@ -267,7 +291,7 @@ void Surface::setNegativeColor(QColor const& color)
 
 void Surface::setArea(double const area)
 {
-   m_surfaceConfigurator.areaLabel->setText(QString::number(area, 'f', 3));
+   m_ui.areaLabel->setText(QString::number(area, 'f', 3));
 }
 
 

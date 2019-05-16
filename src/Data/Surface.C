@@ -93,6 +93,13 @@ bool Surface::propertyIsSigned() const
 }
 
 
+void Surface::setPropertyRange(double const min, double const max)
+{
+   m_min = min;
+   m_max = max;
+}
+
+
 void Surface::getPropertyRange(double& min, double& max) const
 {
    min = m_min;
