@@ -861,8 +861,6 @@ void Viewer::endSelection(const QPoint&)
 
    // Get the number of objects that were seen through the pick matrix frustum.
    m_selectionHits = glRenderMode(GL_RENDER);
-   //qDebug() << "Viewer::endSelection with nhits:" << m_selectionHits << m_objects.size() ;
-   //for (int i = 0; i < m_objects.size(); ++i) qDebug() << m_objects[i];
    setSelectRegionWidth(5);
    setSelectRegionHeight(5);
 
@@ -875,12 +873,15 @@ void Viewer::endSelection(const QPoint&)
       return;
    }
 
+
    // If the user clicks, then we only select the front object
    Handler::SelectionMode selectionMode(m_currentHandler->selectionMode());
    if ( (selectionMode == Handler::AddClick) || (selectionMode == Handler::RemoveClick) ||
         (selectionMode == Handler::ToggleClick) ) {
+
       GLuint zMin = (selectBuffer())[1];
       int iMin = 0;
+
       for (int i = 1; i < m_selectionHits; ++i) {
           if ((selectBuffer())[4*i+1] < zMin) {
              iMin = i;
@@ -888,15 +889,31 @@ void Viewer::endSelection(const QPoint&)
           }
       }
 
-      //setSelectedName(4*iMin+3);
+      GLuint name = (selectBuffer())[4*iMin+3];
+
+/*
+      QLOG_TRACE() << "Viewer::endSelection with nhits:" 
+                   << m_selectionHits << m_objects.size();
+      if (name < m_objects.size()) {
+         QLOG_TRACE() << "  Selection made:" << iMin << name << m_objects[name]->index();
+      }else {
+         QLOG_TRACE() << "  Selection made:" << iMin << name << "Out of range!";
+      }
+*/
+
+      enableUpdate(false);
+      setSelectedName(4*iMin+3);
 
       if (selectionMode == Handler::AddClick) {
-         addToSelection((selectBuffer())[4*iMin+3]);
+         addToSelection(name);
       }else if (selectionMode == Handler::RemoveClick) {
-         removeFromSelection((selectBuffer())[4*iMin+3]);
+         removeFromSelection(name);
       }else {
-         toggleSelection((selectBuffer())[4*iMin+3]);
+         toggleSelection(name);
       }
+
+      enableUpdate(true);
+      updateGL();
 
    }else {
       // The selection rectangle is non-zero so we select all the objects

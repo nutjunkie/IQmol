@@ -199,7 +199,7 @@ QString TemplateForRunFile(bool const local)
             "if not [%1] == [] (\n"
             "   echo.\"%QCProc%\" | findstr /C:^:%1^: 1>nul\n"
             "   if errorlevel 1 ( set ProcessId=%1 )\n"
-            ")\n"
+            ")\n";
 #endif
    }
    return cmd;

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>980</width>
-    <height>707</height>
+    <width>1306</width>
+    <height>855</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,18 +25,18 @@
 }</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_24">
+   <layout class="QHBoxLayout" name="horizontalLayout_3">
     <item>
      <widget class="QTabWidget" name="setupTabWidget">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
       <property name="maximumSize">
        <size>
-        <width>555</width>
+        <width>900</width>
         <height>16777215</height>
        </size>
       </property>
@@ -446,8 +446,8 @@ QToolButton:checked {
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>523</width>
-             <height>379</height>
+             <width>617</width>
+             <height>527</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -457,18 +457,18 @@ QToolButton:checked {
                <bool>true</bool>
               </property>
               <property name="currentIndex">
-               <number>0</number>
+               <number>1</number>
               </property>
               <property name="tabSpacing">
-               <number>-1</number>
+               <number>11</number>
               </property>
               <widget class="QWidget" name="pageScfControl">
                <property name="geometry">
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>499</width>
-                 <height>287</height>
+                 <width>593</width>
+                 <height>433</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -668,14 +668,14 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>499</width>
-                 <height>287</height>
+                 <width>593</width>
+                 <height>433</height>
                 </rect>
                </property>
                <attribute name="label">
                 <string>Wavefunction Analysis</string>
                </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_44">
+               <layout class="QVBoxLayout" name="verticalLayout_25">
                 <item>
                  <layout class="QGridLayout" name="gridLayout_13">
                   <item row="0" column="0">
@@ -5558,7 +5558,7 @@ Eventually this should go.</string>
       <property name="title">
        <string>Generated Input File:</string>
       </property>
-      <layout class="QVBoxLayout">
+      <layout class="QVBoxLayout" name="verticalLayout_18">
        <item>
         <widget class="QTextEdit" name="previewText">
          <property name="sizePolicy">
@@ -5670,7 +5670,7 @@ Eventually this should go.</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>980</width>
+     <width>1306</width>
      <height>22</height>
     </rect>
    </property>
