@@ -2065,7 +2065,7 @@ void Molecule::translate(Vec const& displacement)
    for (iter = objects.begin(); iter != objects.end(); ++iter) {
        (*iter)->setPosition((*iter)->getPosition()+displacement);
    }
-   m_frame.setPosition(m_frame.position()+displacement);
+   //m_frame.setPosition(m_frame.position()+displacement);
 }
 
 
