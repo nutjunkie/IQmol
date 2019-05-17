@@ -47,6 +47,7 @@ namespace Data {
          void computeIndexProperty();
          void clearSurfaceProperty();
          void getPropertyRange(double& min, double& max) const;
+         void setPropertyRange(double const min, double const max);
 
          QList<QColor> const& colors() const { return m_colors; }
          void setColors(QList<QColor> const& colors);
