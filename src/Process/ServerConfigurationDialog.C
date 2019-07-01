@@ -22,6 +22,7 @@
 
 #include "ServerConfigurationDialog.h"
 #include "QueueOptionsDialog.h"
+#include "QueueResourcesList.h"
 #include "SshConnection.h"
 #include "SshReply.h"
 #include "HttpConnection.h"
@@ -478,6 +479,22 @@ void ServerConfigurationDialog::on_loadButton_clicked(bool)
       filePath, tr("Configuration Files (*.cfg)"));
 
    if (filePath.isEmpty()) return;
+   
+// --------------------------------------------------------
+   QFile file(filePath);
+   if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      QLOG_ERROR() << "File does not exist";
+      return;
+   }
+
+   QTextStream in(&file);
+   QueueResourcesList qrl;
+   qrl.fromPbsQueueInfoString(in.readAll());
+   qDebug() << "Server configuration read in from file:";
+   qDebug() << qrl.toQVariantList();
+
+   return;
+// --------------------------------------------------------
 
    try {
       Parser::ParseFile parser(filePath);
