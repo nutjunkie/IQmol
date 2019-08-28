@@ -472,6 +472,7 @@ void ServerConfigurationDialog::verify()
 }
 
 
+// This should be refactored to use the ServerRegistry::loadFromFile() code.
 void ServerConfigurationDialog::on_loadButton_clicked(bool)
 {
    QString filePath(QDir::homePath()); 
@@ -480,7 +481,7 @@ void ServerConfigurationDialog::on_loadButton_clicked(bool)
 
    if (filePath.isEmpty()) return;
    
-// --------------------------------------------------------
+/* -------------------------------------------------------- *\
    QFile file(filePath);
    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
       QLOG_ERROR() << "File does not exist";
@@ -494,7 +495,7 @@ void ServerConfigurationDialog::on_loadButton_clicked(bool)
    qDebug() << qrl.toQVariantList();
 
    return;
-// --------------------------------------------------------
+\* -------------------------------------------------------- */
 
    try {
       Parser::ParseFile parser(filePath);
