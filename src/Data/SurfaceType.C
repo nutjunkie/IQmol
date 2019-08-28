@@ -53,10 +53,10 @@ QString SurfaceType::toString() const
       case DysonRight:             label = "Dyson (right)";           break;
       case MullikenAtomic:         label = "Mulliken Atomic";         break;
       case MullikenDiatomic:       label = "Mulliken Diatomic";       break;
-      case GenericOrbital:         label = "Generic Orbital";         break;
+      case GenericOrbital:         label = "Orbital";                 break;
    }
 
-   if (isIndexed()) label += " " + QString::number(m_index);
+   if (isIndexed()) label += " " + QString::number(m_index+1);
    return label;
 }
 

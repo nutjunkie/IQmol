@@ -215,7 +215,7 @@ QString Orbitals::description(Data::SurfaceInfo const& info, bool const tooltip)
       unsigned nElectrons = kind == Data::SurfaceType::AlphaOrbital ? nAlpha() : nBeta();
       unsigned index(type.index());
 
-      if (index <= nElectrons) {
+      if (index < nElectrons) {
          label += " (occ)";
       }
    }
