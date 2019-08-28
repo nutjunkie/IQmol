@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>311</width>
-    <height>140</height>
+    <width>386</width>
+    <height>169</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -68,55 +68,22 @@ QToolTip {
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Dipole:  </string>
-       </property>
-      </widget>
-     </item>
-     <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="1">
       <widget class="QLabel" name="dipoleLabel">
        <property name="text">
         <string>value</string>
        </property>
       </widget>
      </item>
-     <item>
-      <spacer name="horizontalSpacer_3">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_4">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>Color</string>
+        <string>Dipole:   </string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QToolButton" name="colorButton">
-       <property name="toolTip">
-        <string/>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item>
+     <item row="0" column="2">
       <spacer name="horizontalSpacer_2">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -128,6 +95,13 @@ QToolTip {
         </size>
        </property>
       </spacer>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="dipoleVector">
+       <property name="text">
+        <string>vector</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -156,6 +130,23 @@ QToolTip {
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Color</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="colorButton">
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </item>
@@ -191,7 +182,7 @@ QToolTip {
   </layout>
  </widget>
  <resources>
-  <include location="IQmol.qrc"/>
+  <include location="../Main/IQmol.qrc"/>
  </resources>
  <connections>
   <connection>

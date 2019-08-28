@@ -39,6 +39,17 @@ void Dipole::sync()
 {
    QString s(QString::number(m_dipole.value(), 'f', 3));
    m_dipoleConfigurator.dipoleLabel->setText(s+" D");
+
+   qglviewer::Vec const& mu(m_dipole.vector());
+   QString v("(");
+   v += QString::number(mu.x, 'f', 3);
+   v += ", ";
+   v += QString::number(mu.y, 'f', 3);
+   v += ", ";
+   v += QString::number(mu.z, 'f', 3);
+   v += ")";
+   m_dipoleConfigurator.dipoleVector->setText(v);
+
    Util::SetButtonColor(*(m_dipoleConfigurator.colorButton), m_dipole.m_color);
 }
 

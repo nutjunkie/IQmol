@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AdcTab</class>
+ <widget class="QWidget" name="AdcTab">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>391</width>
+    <height>234</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QGridLayout" name="gridLayoutADC2">
+     <item row="3" column="0">
+      <widget class="QCheckBox" name="adc_prop_cd">
+       <property name="text">
+        <string>Circular Dichroism</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QCheckBox" name="adc_prop_soc">
+       <property name="text">
+        <string>Spin-Orbit Coupling</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QCheckBox" name="adc_ecorr">
+       <property name="text">
+        <string>Energy Corrections</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_adc1">
+         <property name="text">
+          <string>Singlet States</string>
+         </property>
+         <property name="buddy">
+          <cstring>qui_adc_states1</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="qui_adc_states2"/>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_adc2">
+         <property name="text">
+          <string>Triplet States</string>
+         </property>
+         <property name="buddy">
+          <cstring>qui_adc_states2</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="qui_adc_states1"/>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_adc_core">
+         <property name="text">
+          <string>Core Orbitals</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QSpinBox" name="qui_adc_core"/>
+       </item>
+      </layout>
+     </item>
+     <item row="2" column="0">
+      <widget class="QCheckBox" name="adc_prop_tpa">
+       <property name="text">
+        <string>Two-Photon Absorption</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QCheckBox" name="adc_prop_es">
+       <property name="text">
+        <string>Excited State Properties</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>166</width>
+         <height>18</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="1" column="1">
+      <widget class="QCheckBox" name="adc_prop_es2es">
+       <property name="text">
+        <string>State-to-State Properties</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QCheckBox" name="adc_do_diis">
+       <property name="text">
+        <string>Use DIIS</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>21</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

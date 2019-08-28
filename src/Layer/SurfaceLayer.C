@@ -79,6 +79,13 @@ Surface::Surface(Data::Surface& surface) : m_surface(surface), m_configurator(*t
 }
 
 
+Surface::~Surface()
+{
+   if (m_callListPositive) glDeleteLists(m_callListPositive, 1);
+   if (m_callListNegative) glDeleteLists(m_callListNegative, 1);
+}
+
+
 void Surface::setMolecule(Molecule* molecule) 
 {
    m_molecule = molecule;
@@ -101,6 +108,13 @@ void Surface::setCheckStatus(Qt::CheckState const state)
 }
 
 
+void Surface::setPropertyRange(double const min, double const max)
+{
+   m_surface.setPropertyRange(min,max);
+   recompile();
+}
+
+
 void Surface::getPropertyRange(double& min, double& max) const
 {
    m_surface.getPropertyRange(min, max);
@@ -108,13 +122,6 @@ void Surface::getPropertyRange(double& min, double& max) const
       min = std::min(min, -max);
       max = std::max(max, -min);
    }
-}
-
-
-Surface::~Surface()
-{
-   if (m_callListPositive) glDeleteLists(m_callListPositive, 1);
-   if (m_callListNegative) glDeleteLists(m_callListNegative, 1);
 }
 
 

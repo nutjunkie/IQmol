@@ -11,6 +11,9 @@
 #include "yaml-cpp/node/detail/node_iterator.h"
 #include <boost/iterator/iterator_adaptor.hpp>
 #include <boost/utility.hpp>
+#if BOOST_VERSION >= 106600
+#include <boost/next_prior.hpp>
+#endif
 
 namespace YAML
 {

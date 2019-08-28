@@ -305,6 +305,7 @@ void SshConnection::authenticate(AuthenticationT const authentication, QString& 
    switch (rc) {
       case LIBSSH2_ERROR_NONE:
          m_status = Connection::Authenticated;
+         QLOG_INFO() << "SSH Connection established";
          break;
 
       case LIBSSH2_ERROR_PUBLICKEY_NOT_FOUND:

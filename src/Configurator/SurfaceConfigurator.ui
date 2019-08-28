@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>375</width>
-    <height>278</height>
+    <width>523</width>
+    <height>248</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -81,6 +81,19 @@ QToolButton:pressed {
         </widget>
        </item>
        <item>
+        <widget class="QDoubleSpinBox" name="minValue">
+         <property name="decimals">
+          <number>4</number>
+         </property>
+         <property name="minimum">
+          <double>-99.989999999999995</double>
+         </property>
+         <property name="singleStep">
+          <double>0.010000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QToolButton" name="positiveColorButton">
          <property name="styleSheet">
           <string notr="true">QToolButton {
@@ -102,6 +115,16 @@ QToolButton:pressed {
         <widget class="QLabel" name="positiveLabel">
          <property name="text">
           <string>Positive</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QDoubleSpinBox" name="maxValue">
+         <property name="decimals">
+          <number>4</number>
+         </property>
+         <property name="singleStep">
+          <double>0.010000000000000</double>
          </property>
         </widget>
        </item>
@@ -129,6 +152,36 @@ QToolButton:pressed {
            <string>None</string>
           </property>
          </item>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Surface Area:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="areaLabel">
+         <property name="text">
+          <string>area</string>
+         </property>
         </widget>
        </item>
        <item>
@@ -183,6 +236,29 @@ QToolButton:pressed {
         </widget>
        </item>
        <item>
+        <spacer name="horizontalSpacer_6">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="clipCheckBox">
+         <property name="text">
+          <string>Clip</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="horizontalSpacer">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -228,7 +304,7 @@ QToolButton:pressed {
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="scaleButton">
+        <widget class="QCheckBox" name="centerButton">
          <property name="text">
           <string>Center Gradient</string>
          </property>
@@ -267,45 +343,7 @@ QToolButton:pressed {
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QCheckBox" name="clipCheckBox">
-         <property name="text">
-          <string>Clip</string>
-         </property>
-        </widget>
-       </item>
       </layout>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_5">
-     <item>
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>Surface Area:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="areaLabel">
-       <property name="text">
-        <string>area</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_4">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
      </item>
     </layout>
    </item>
@@ -328,6 +366,9 @@ QToolButton:pressed {
       <widget class="QPushButton" name="okButton">
        <property name="text">
         <string>OK</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
        </property>
       </widget>
      </item>

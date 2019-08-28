@@ -85,6 +85,7 @@ namespace IQmol {
             bool propertyIsSigned() const { return m_surface.propertyIsSigned(); }
             bool isVdW() const;
             void getPropertyRange(double& min, double& max) const;
+            void setPropertyRange(double const min, double const max);
             double area() const { return m_surface.area(); }
             void balanceScale(bool const);
 
