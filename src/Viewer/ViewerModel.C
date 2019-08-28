@@ -640,6 +640,7 @@ void ViewerModel::selectNone()
 void ViewerModel::setConstraint()
 {
    int n(m_selectedObjects.size());
+   if (n < 1) return;
 
    // Check all the selected atoms belong to the same Molecule.
    unsigned int findFlags(Layer::Parents | Layer::Visible);
