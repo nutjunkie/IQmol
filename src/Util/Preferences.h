@@ -143,6 +143,9 @@ namespace Preferences {
    QString ServerQueryJobFinished();
    void    ServerQueryJobFinished(QString const& repsonse);
 
+   QString DefaultServerFile();
+   void DefaultServerFile(QString const& filePath);
+
    int  DaysToRememberJobs();
    void DaysToRememberJobs(int const& numberOfDays);
    

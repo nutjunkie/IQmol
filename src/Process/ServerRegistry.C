@@ -25,6 +25,8 @@
 #include "Server.h"
 #include "QMsgBox.h"
 #include "Exception.h"
+#include "YamlNode.h"
+#include "ParseFile.h"
 
 
 namespace IQmol {
@@ -170,14 +172,51 @@ void ServerRegistry::loadFromPreferences()
           s_servers.append(new Server(ServerConfiguration(*iter)));
       }
 
+      // Look for a bundled configuration file
+      if (s_servers.isEmpty()) {
+         qDebug() << "Looking for default server in file:" << Preferences::DefaultServerFile();
+         loadFromFile(Preferences::DefaultServerFile());
+      }
+
       // Default iqmol.q-chem.com server
-      if (s_servers.isEmpty()) s_servers.append(new Server(ServerConfiguration()));
+      if (s_servers.isEmpty()) {
+         qDebug() << "Appending Q-Chem server";
+         s_servers.append(new Server(ServerConfiguration()));
+      }
 
    } catch (Exception& ex) {
       QString msg("Problem loading servers from Preferences file:\n");
       msg += ex.what();
       QMsgBox::warning(0, "IQmol", msg);
    }
+}
+
+
+void ServerRegistry::loadFromFile(QString const& filePath)
+{
+   if (filePath.isEmpty()) return;
+
+   try {
+      Parser::ParseFile parser(filePath);
+      parser.start();
+      parser.wait();
+
+      QStringList errors(parser.errors());
+      if (!errors.isEmpty()) {
+         QMsgBox::warning(0, "IQmol", errors.join("\n"));
+      }   
+
+      Data::Bank& bank(parser.data());
+      QList<Data::YamlNode*> yaml(bank.findData<Data::YamlNode>());
+      if (yaml.first()) {
+         yaml.first()->dump();
+         s_servers.append(new Server(ServerConfiguration(*(yaml.first()))));
+      }   
+
+   } catch (YAML::Exception& err) {
+      QString msg(QString::fromStdString(err.what()));
+      QMsgBox::warning(0, "IQmol", msg);
+   }   
 }
 
 

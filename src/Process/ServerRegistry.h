@@ -74,7 +74,6 @@ namespace Process {
 
          static void save() { s_instance->saveToPreferences(); }
 
-
       private:
          static ServerRegistry* s_instance;
          static QList<Server*>  s_servers;
@@ -82,6 +81,7 @@ namespace Process {
 
          static void destroy();
          static int  indexOf(QString const& serverName);
+         static void loadFromFile(QString const& filePath);
          static void loadFromPreferences();
          static void saveToPreferences();
 

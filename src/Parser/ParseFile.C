@@ -128,12 +128,14 @@ void ParseFile::run()
    bool addToFileList(true);
    QStringList::const_iterator file;
    for (file = m_filePaths.begin(); file != m_filePaths.end(); ++file) {
-       QString fileName(*file);
-       QLOG_INFO() << "Parsing file: " << fileName;
-       //if (parse(fileName, addToFileList)) {
-          parse(fileName, addToFileList); //ignore return for the moment
-          if (addToFileList) fileList->append(new Data::File(fileName));
-       //}
+       QFileInfo info(*file);
+       if (info.exists()) {
+          QLOG_INFO() << "Parsing file: " << *file;
+          parse(*file, addToFileList); //ignore return for the moment
+          if (addToFileList) fileList->append(new Data::File(*file));
+       }else {
+          QLOG_WARN() << "File not found:" << *file;
+       }
    }
 
    if (fileList->isEmpty()) {

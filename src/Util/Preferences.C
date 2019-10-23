@@ -730,6 +730,35 @@ void ServerQueryJobFinished(QString const& repsonse) {
 
 
 // ---------
+QString DefaultServerFile() 
+{
+   QString filePath;
+   QVariant value(Get("DefaultServerFile"));
+
+   if (value.isNull() || value.toString().isEmpty()) {
+      QDir dir;
+#if defined(Q_OS_MAC) || defined(Q_OS_WIN32)
+      dir.setPath(QApplication::applicationDirPath());
+      dir.cdUp();
+      dir.cd("share");
+#else
+      dir.setPath("/usr/share/iqmol";
+#endif
+      QFileInfo info(dir,"default_server.cfg");
+      filePath = info.absoluteFilePath(); 
+   }else {
+      filePath = value.value<QString>();
+   }
+   return filePath;
+}
+
+void DefaultServerFile(QString const& filePath) 
+{
+   Set("DefaultServerFile", QVariant::fromValue(filePath));
+}
+
+
+// ---------
 
 int DaysToRememberJobs() {
    QVariant value(Get("DaysToRememberJobs"));

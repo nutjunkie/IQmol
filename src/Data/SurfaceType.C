@@ -117,7 +117,8 @@ bool SurfaceType::isSigned() const
           (m_kind == SpinDensity)    || (m_kind == DensityCombo)     ||
           (m_kind == MullikenAtomic) || (m_kind == MullikenDiatomic) ||
           (m_kind == Geminal)        || (m_kind == Correlation)      ||
-          (m_kind == BasisFunction)  || (m_kind == GenericOrbital);
+          (m_kind == BasisFunction)  || (m_kind == GenericOrbital)   ||
+          (m_kind == CustomDensity) ;
 }
 
 

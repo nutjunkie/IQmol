@@ -129,11 +129,18 @@ void Orbitals::init()
    Data::DensityList::iterator density;
    for (density = densities.begin(); density != densities.end(); ++density) {
        (*density)->surfaceType().dump();
+/*
+        if ((*density)->surfaceType().kind() == Data::SurfaceType::SpinDensity) {
+           m_configurator.surfaceType->addItem((*density)->label(),  Data::SurfaceType::SpinDensity);
+        }
         //if ((*density)->surfaceType().kind() == Data::SurfaceType::Custom) {
         //   m_configurator.surfaceType->addItem((*density)->label(),  CustomDensity);
        // }
         m_configurator.surfaceType->addItem((*density)->label(),  
             Data::SurfaceType::CustomDensity);
+*/
+        m_configurator.surfaceType->addItem((*density)->label(),  
+            (*density)->surfaceType().kind() );
    }
 
    if (!m_orbitals.hasMullikenDecompositions()) {
@@ -402,7 +409,7 @@ void Orbitals::on_surfaceType_currentIndexChanged(int index)
 
       case Data::SurfaceType::CustomDensity:
          enableOrbitalSelection(false);
-         enableNegativeColor(false);
+         enableNegativeColor(true);
          enableMullikenDecompositions(true);
          break;
 
