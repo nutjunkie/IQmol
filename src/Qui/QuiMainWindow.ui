@@ -447,7 +447,7 @@ QToolButton:checked {
              <x>0</x>
              <y>0</y>
              <width>617</width>
-             <height>527</height>
+             <height>573</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -457,7 +457,7 @@ QToolButton:checked {
                <bool>true</bool>
               </property>
               <property name="currentIndex">
-               <number>1</number>
+               <number>0</number>
               </property>
               <property name="tabSpacing">
                <number>11</number>
@@ -467,8 +467,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>593</width>
-                 <height>433</height>
+                 <width>599</width>
+                 <height>489</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -668,8 +668,8 @@ QToolButton:checked {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>593</width>
-                 <height>433</height>
+                 <width>599</width>
+                 <height>489</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -5671,7 +5671,7 @@ Eventually this should go.</string>
      <x>0</x>
      <y>0</y>
      <width>1306</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

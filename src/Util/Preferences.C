@@ -730,6 +730,39 @@ void ServerQueryJobFinished(QString const& repsonse) {
 
 
 // ---------
+
+
+QString ServerDirectory() 
+{
+   QString directory;
+   QVariant value(Get("ServerDirectory"));
+qDebug() << "Server Directory set to" << value.toString();
+
+   if (value.isNull() || value.toString().isEmpty()) {
+      QDir dir;
+#if defined(Q_OS_MAC) || defined(Q_OS_WIN32)
+      dir.setPath(QApplication::applicationDirPath());
+      dir.cdUp();
+      dir.cd("share/servers");
+#else
+      dir.setPath("/usr/share/iqmol/servers");
+#endif
+      directory = dir.absolutePath();
+   }else {
+      directory = value.value<QString>();
+   }
+   return directory;
+}
+
+void ServerDirectory(QString const& filePath) 
+{
+   Set("ServerDirectory", QVariant::fromValue(filePath));
+}
+
+
+// ---------
+
+
 QString DefaultServerFile() 
 {
    QString filePath;

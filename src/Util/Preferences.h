@@ -71,6 +71,9 @@ namespace Preferences {
    QString FragmentDirectory();
    void    FragmentDirectory(QString const&);
 
+   QString ServerDirectory();
+   void    ServerDirectory(QString const&);
+
    QString ShaderDirectory();
    void    ShaderDirectory(QString const&);
 

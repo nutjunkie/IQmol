@@ -41,6 +41,7 @@ namespace Data {
                             NaturalTransition, 
                             NaturalBond,
                             Dyson,
+                            Complex,
                             Generic
                           };
 

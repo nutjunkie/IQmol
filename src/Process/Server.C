@@ -615,6 +615,7 @@ bool Server::parseQueryMessage(Job* job, QString const& message)
 
          }else if (message.contains("SUSPENDED")) {
             status = Job::Suspended;
+
          }else {
             statusMessage = message;
             status = Job::Error;
