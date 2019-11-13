@@ -47,7 +47,7 @@ namespace Process {
          QString name() const;
          QStringList tableFields() const;
 
-         void open();
+         bool open();
          void closeConnection();
 
          bool isLocal() const { 

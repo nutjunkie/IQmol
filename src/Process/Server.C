@@ -81,10 +81,10 @@ void Server::closeConnection()
 }
 
 
-void Server::open()
+bool Server::open()
 {
-   if (m_connection && 
-       m_connection->status() == Network::Connection::Authenticated) return;
+   // Short circuit the open if we have already been authenticated.
+   if (m_connection && m_connection->status() == Network::Connection::Authenticated) return true;
 
    if (!m_connection) {
       QLOG_TRACE() << "Creating connection" 
@@ -118,6 +118,7 @@ void Server::open()
    }
 
    if (m_connection->status() == Network::Connection::Opened) {
+      QLOG_TRACE() << "Authenticating connection";
       Network::Connection::AuthenticationT 
          authentication(m_configuration.authentication());
 
@@ -137,45 +138,47 @@ void Server::open()
          queryAllJobs();
          startUpdates();
       }
-      return;
+      return true;
    }
 
-   delete m_connection;
-   m_connection = 0;
+   if (m_connection->status() == Network::Connection::Error) {
+      QLOG_ERROR() << "Failed to connect to server " + name();
+      delete m_connection;
+      m_connection = 0;
+   }
 
-   throw Exception(QString("Failed to connect to server ") + name());
+   return false;
 }
 
 
 bool Server::exists(QString const& filePath)
 {
-   open();
-   return m_connection->exists(filePath);
+   
+   return open() && m_connection->exists(filePath);
 }
 
 
 QString Server::queueInfo()
 {
-   open();
-   QString cmd(m_configuration.value(ServerConfiguration::QueueInfo));
-   cmd = substituteMacros(cmd);
    QString info;
-   m_connection->blockingExecute(cmd, &info);
+   if (open() ) {
+      QString cmd(m_configuration.value(ServerConfiguration::QueueInfo));
+      cmd = substituteMacros(cmd);
+      m_connection->blockingExecute(cmd, &info);
+   }
    return info;
 }
 
 
 bool Server::removeDirectory(QString const& path)
 {
-   open();
-   return m_connection->removeDirectory(path);
+   return open() && m_connection->removeDirectory(path);
 }
 
 
 bool Server::makeDirectory(QString const& path)
 {
-   open();
-   return m_connection->makeDirectory(path);
+   return open() && m_connection->makeDirectory(path);
 }
 
 
@@ -191,11 +194,11 @@ void Server::queryAllJobs()
       return;
    }
 
-   open();
-
-   QList<Job*>::iterator iter;
-   for (iter = m_watchedJobs.begin(); iter != m_watchedJobs.end(); ++iter) {
-       query(*iter);
+   if (open()) {
+      QList<Job*>::iterator iter;
+      for (iter = m_watchedJobs.begin(); iter != m_watchedJobs.end(); ++iter) {
+          query(*iter);
+      }
    }
 }
 
@@ -209,7 +212,7 @@ void Server::submit(Job* job)
    if (m_watchedJobs.contains(job)) throw Exception("Attempt to submit duplicate job");
    if (!keys.isEmpty()) throw Exception("Attempt to submit busy job");
 
-   open();
+   if (!open()) return;
 
    QString contents(job->jobInfo().get(QChemJobInfo::InputString));
    QString fileName(Util::WriteToTemporaryFile(contents));
@@ -456,7 +459,11 @@ bool Server::parseSubmitMessage(Job* job, QString const& message)
 // ---------- Query ----------
 void Server::query(Job* job)
 {
-   if (!job) throw Exception("Query called on invalid job");
+   if (!job) {
+      QLOG_WARN() << "Query called on invalid job";
+      return;
+   }
+
    QList<Network::Reply*> keys(m_activeRequests.keys(job));
 
    if (!keys.isEmpty()) {
@@ -464,7 +471,7 @@ void Server::query(Job* job)
       return;
    }
 
-   open();
+   if (!open()) return;
 
    QString query(m_configuration.value(ServerConfiguration::Query));
    query = substituteMacros(query);
@@ -481,7 +488,6 @@ void Server::query(Job* job)
 
 void Server::queryFinished()
 {
-qDebug() << "QJI - trace Server::queryFinsihed()";
    Network::Reply* reply(qobject_cast<Network::Reply*>(sender()));
 
    if (reply && m_activeRequests.contains(reply)) {
@@ -661,14 +667,21 @@ void Server::kill(Job* job)
 {
    QList<Network::Reply*> keys(m_activeRequests.keys(job));
 
-   if (!job) throw Exception("Query called on invalid job");
-   if (!keys.isEmpty()) throw Exception("Job busy");
+   if (!job) {
+       QLOG_WARN() << "Kill called on invalid job";
+       return;
+   }
+
+   if (!keys.isEmpty()) {
+      QLOG_WARN() << "Kill called on busy job";
+      return;
+   }
 
    if (isLocal()) {
       //we currently 
    }
 
-   open();
+   if (!open()) return;
 
    QString kill(m_configuration.value(ServerConfiguration::Kill));
    kill = substituteMacros(kill);
@@ -714,10 +727,17 @@ void Server::copyResults(Job* job)
 
    QList<Network::Reply*> keys(m_activeRequests.keys(job));
 
-   if (!job) throw Exception("Invalid job");
-   if (!keys.isEmpty()) throw  "Job busy";
+   if (!job) {
+       QLOG_WARN() << "Copy called on invalid job";
+       return;
+   }
 
-   open();
+   if (!keys.isEmpty()) {
+      QLOG_WARN() << "Copy called on busy job";
+      return;
+   }
+
+   if (!open()) return;
 
    QString listCmd(m_configuration.value(ServerConfiguration::JobFileList));
    listCmd = substituteMacros(listCmd);

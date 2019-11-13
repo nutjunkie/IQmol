@@ -44,7 +44,7 @@ namespace Network {
      Q_OBJECT
 
       public:
-         enum Status { Closed, Opened, Authenticated };
+         enum Status { Closed, Opened, Authenticated, Error };
 
          enum AuthenticationT { None, Agent, HostBased, KeyboardInteractive, Password,
             PublicKey };
@@ -80,6 +80,7 @@ namespace Network {
          unsigned timeout() const { return m_timeout; }
 
          Status status() const { return m_status; }
+         QString const& message() const { return m_message; }
          QString const& hostname() const { return m_hostname; }
          int port() const { return m_port; }
 
@@ -93,6 +94,7 @@ namespace Network {
          int      m_port;
          Status   m_status;
          unsigned m_timeout;
+         QString  m_message;
 
          void     thread(Reply*);
 

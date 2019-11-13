@@ -93,9 +93,9 @@ namespace Network {
          bool m_useSftp;
 
          void init();
-         void openSocket(unsigned const timeout);
-         void setNonBlocking();
-         void setBlocking();
+         bool openSocket(unsigned const timeout);
+         bool setNonBlocking();
+         bool setBlocking();
          void killAgent();
 
          int connectAgent();
