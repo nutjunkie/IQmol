@@ -1370,7 +1370,6 @@ PrimitiveList Molecule::getSelected(bool danglingBonds)
 
 void Molecule::groupSelection()
 {
-/*
    qDebug() << "Molecule::groupSelection called()";
    PrimitiveList primitives(findLayers<Primitive>(Visible|Children));
    PrimitiveList selected;
@@ -1393,72 +1392,71 @@ void Molecule::groupSelection()
    }
 
    takePrimitives(selected);
-   appendPrimitive(new Layer::Fragment(selected));
+   appendPrimitive(new Layer::Group(selected));
 
    //postCommand(new Command::GroupPrimitives(this, selected));
    m_modified = true;
-*/
 }
 
 
 void Molecule::ungroupSelection() 
 {
-/*
    qDebug() << "Molecule::ungroupSelection called()";
-   FragmentList fragments(findLayers<Fragment>(Visible|Children));
-   FragmentList selected;
-   FragmentList parents;
+   GroupList groups(findLayers<Group>(Visible|Children));
+   GroupList selected;
+   GroupList parents;
 
-   FragmentList::iterator frag, parent;
+   GroupList::iterator group, parent;
 
-   qDebug() << "   Number of fragments found:" << fragments.size();
-   for (frag = fragments.begin(); frag != fragments.end(); ++frag) {
-       if ((*frag)->isSelected()) selected.append(*frag);
+   qDebug() << "   Number of groups found:" << groups.size();
+   for (group = groups.begin(); group != groups.end(); ++group) {
+       if ((*group)->isSelected()) selected.append(*group);
    } 
 
-   
-   qDebug() << "   Number of selected fragments :" << selected.size();
+   qDebug() << "   Number of selected groups:" << selected.size();
 
-   fragments.clear();
+   groups.clear();
 
-   // We only want the top-most selected fragments, so if any of the parent
-   // fragments are also selected we skip.
-   for (frag = selected.begin(); frag != selected.end(); ++frag) {
-       parents = (*frag)->findLayers<Fragment>(Parents);
+   // We only want the top-most selected group, so if any of the parent
+   // groups are also selected we skip.
+   for (group = selected.begin(); group != selected.end(); ++group) {
+       parents = (*group)->findLayers<Group>(Parents);
        bool append(true);
        for (parent = parents.begin(); parent != parents.end(); ++parent) {
            if (selected.contains(*parent)) append = false;
        }
 
-       if (append) fragments.append(*frag);
+       if (append) groups.append(*group);
    } 
 
-   //takePrimitives(fragments);
-   qDebug() << "   Number of fragments to remove:" << fragments.size();
+   qDebug() << "   Number of groups to remove:" << groups.size();
  
    PrimitiveList primitiveList;
-   for (frag = fragments.begin(); frag != fragments.end(); ++frag) {
+   for (group = groups.begin(); group != groups.end(); ++group) {
       
-       Base* base( QVariantPointer<Base>::toPointer((*frag)->QStandardItem::parent()->data()) );
-       Fragment* fragment;
+       Base* base(QVariantPointer<Base>::toPointer((*group)->QStandardItem::parent()->data()));
+       Group* g;
        if ((dynamic_cast<Molecule*>(base) == this)) {
-          qDebug() << "   removing " << (*frag)->text();
-          takePrimitive(*frag);
-          appendPrimitives((*frag)->ungroup());
-       } else if ( (fragment = dynamic_cast<Fragment*>(base)) ) {
-          qDebug() << "   removing " << (*frag)->text();
-          takePrimitive(*frag);
-          fragment->group((*frag)->ungroup());
+          qDebug() << "   removing " << (*group)->text();
+          takePrimitive(*group);
+          appendPrimitives((*group)->ungroup());
+       } else if ( (g = dynamic_cast<Group*>(base)) ) {
+          qDebug() << "   removing " << (*group)->text();
+          takePrimitive(*group);
+          //g->group((*group)->ungroup());
+          qDebug() << "WARNING: group/ungroup NYI";
        }else {
           qDebug() << "Molecule/Fragment parent not found in ungroupSelection()";
        }
 
-       //delete *frag;
    } 
+
+   for (group = groups.begin(); group != groups.end(); ++group) {
+       //delete *group;
+   }
 
    //postCommand(new Command::UngroupFragments(this, fragments));
    m_modified = true;
-*/
 }
 
 
@@ -1704,8 +1702,28 @@ Charge* Molecule::createCharge(double const Q, Vec const& position)
 }
 
 
+bool Molecule::sanityCheck() 
+{
+   bool valid(true);
+   AtomList atoms(findLayers<Atom>(Children | Visible));
+   AtomList::iterator iter, jter;
+
+   for (iter = atoms.begin(); iter != atoms.end(); ++iter) {
+       for (jter = iter+1; jter != atoms.end(); ++jter) {
+           qglviewer::Vec r((*iter)->getPosition() - (*jter)->getPosition());
+           valid = valid && r.norm() > 0.1;
+       }
+   }
+
+
+   return valid;
+   // check if the molecule has been drawn, that an optimization has beeen performed.
+}
+
+
 Process::QChemJobInfo Molecule::qchemJobInfo()
 {
+
    Process::QChemJobInfo jobInfo;
 
    jobInfo.set(Process::QChemJobInfo::Charge,          totalCharge());

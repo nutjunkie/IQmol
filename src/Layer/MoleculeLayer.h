@@ -142,6 +142,7 @@ namespace IQmol {
             void setFile(QString const& fileName);
             QString fileName() const { return m_inputFile.fileName(); }
    
+            bool sanityCheck();
             Process::QChemJobInfo qchemJobInfo();
             void qchemJobInfoChanged(Process::QChemJobInfo const&);
    

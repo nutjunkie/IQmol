@@ -114,6 +114,23 @@ QString Geometry::coordinatesAsString() const
 }
 
 
+// Currently this just checks to see that there aren't any atoms
+// sitting on top of one another.
+bool Geometry::isValid() const
+{
+   bool valid(true);
+
+   for (unsigned i = 0; i < nAtoms(); ++i) {
+       for (unsigned j = i+1; j < nAtoms(); ++j) {
+           qglviewer::Vec r(m_coordinates[i]-m_coordinates[j]);
+           valid = valid && r.norm() > 0.1;
+       }
+   }
+    
+   return valid;
+}
+
+
 bool Geometry::sameAtoms(Geometry const& that) const
 {
    bool same(m_atoms.size() == that.m_atoms.size());
