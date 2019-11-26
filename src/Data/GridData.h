@@ -27,6 +27,7 @@
 #include "SurfaceType.h"
 #include "Geometry.h"
 #include "Matrix.h"
+#include <vector>
 
 
 namespace IQmol {
@@ -54,6 +55,8 @@ namespace Data {
          void getBoundingBox(qglviewer::Vec& min, qglviewer::Vec& max) const;
 
          void getRange(double& min, double& max);
+
+         double percentToIsovalue(int percent);
 
          double dataSizeInKb() const;
 
@@ -114,6 +117,7 @@ namespace Data {
 
       private:
          void copy(GridData const&);
+         std::vector<double> sortData(bool const squareData);
 
          template <class Archive>
          void privateSerialize(Archive& ar, unsigned const) 
@@ -128,6 +132,8 @@ namespace Data {
          qglviewer::Vec m_origin;
          qglviewer::Vec m_delta;
          Array3D m_data;
+         Vector  m_percentToIsovaluePositive; 
+         Vector  m_percentToIsovalueNegative; 
    };
 
 

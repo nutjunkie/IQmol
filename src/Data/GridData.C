@@ -29,6 +29,9 @@
 #include <QStringList>
 #include <stdexcept>
 
+#include <algorithm>
+#include <numeric>
+
 
 namespace IQmol {
 namespace Data {
@@ -63,6 +66,7 @@ GridData::GridData(GridSize const& size, SurfaceType const& type, QList<double> 
            }
        }
    }
+
 }
 
 
@@ -83,6 +87,9 @@ void GridData::copy(GridData const& that)
    Array3D::extent_gen extents;
    m_data.resize(extents[nx][ny][nz]);
    m_data = that.m_data;
+   
+   m_percentToIsovaluePositive = that.m_percentToIsovaluePositive;
+   m_percentToIsovalueNegative = that.m_percentToIsovalueNegative;
 }
 
 
@@ -152,6 +159,104 @@ GridSize GridData::size() const
    unsigned nx, ny, nz;
    getNumberOfPoints(nx, ny, nz);
    return GridSize(m_origin, m_delta, nx, ny, nz);
+}
+
+
+bool isNegative(double const x) { return x < 0; }
+
+
+double GridData::percentToIsovalue(int percent)
+{
+   // Create the percentage maps, if they haven't been created already
+   if (m_percentToIsovaluePositive.empty()) {
+      m_percentToIsovaluePositive.resize(100);
+      m_percentToIsovalueNegative.resize(100);
+
+      std::fill(m_percentToIsovaluePositive.begin(), m_percentToIsovaluePositive.end(), 0.0);
+      std::fill(m_percentToIsovalueNegative.begin(), m_percentToIsovalueNegative.end(), 0.0);
+
+      std::vector<double> data(sortData(m_surfaceType.isOrbital()));
+      double dr(m_delta.x*m_delta.y*m_delta.z);
+
+      if (m_surfaceType.isSigned() && !m_surfaceType.isOrbital() ) {
+         // need both positive and negative maps
+         std::vector<double>::iterator zero = 
+            std::find_if(data.begin(), data.end(), isNegative);
+
+         double sumPos(std::accumulate(data.begin(), zero-1, 0.0));
+         QLOG_TRACE() << "Grid quadrature yielded a value of (+ve)" << dr*sumPos;
+
+         double sum(0);
+         unsigned k(0);
+         for (unsigned pc = 0; pc < 100; ++pc) {
+             while (sum < 0.01*pc*sumPos) { sum += data[k++]; }
+             m_percentToIsovaluePositive[pc] = data[k];
+         }
+
+         double sumNeg(std::accumulate(zero, data.end(), 0.0));
+         QLOG_TRACE() << "Grid quadrature yielded a value of (-ve)" << dr*sumNeg;
+
+         sum = 0.0;
+         k = data.size()-1;
+         for (unsigned pc = 0; pc < 100; ++pc) {
+             while (sum > 0.01*pc*sumNeg) { sum += data[k--]; }
+             m_percentToIsovalueNegative[pc] = data[k];
+         }
+        
+      }else {
+         double sumPos(std::accumulate(data.begin(),data.end(), 0.0));
+         QLOG_TRACE() << "Grid quadrature yielded a value of" << dr*sumPos;
+
+         double sum(0);
+         unsigned k(0);
+         for (unsigned pc = 0; pc < 100; ++pc) {
+             while (sum < 0.01*pc*sumPos) { sum += data[k++]; }
+             m_percentToIsovaluePositive[pc] =  data[k];
+             m_percentToIsovalueNegative[pc] = -data[k];
+         }
+      }
+   }
+
+   // Ensure we are in the correct range
+   percent = std::min( 99, percent);
+   percent = std::max(-99, percent);
+
+   double isovalue(percent > 0 ? m_percentToIsovaluePositive[percent] 
+                               : m_percentToIsovalueNegative[-percent]);
+   QLOG_TRACE() << "Mapping percentage to isovalue:" << percent << "->" << isovalue;
+
+   return isovalue;
+}
+
+
+std::vector<double> GridData::sortData(bool const squareData)
+{
+   std::vector<double> data;
+
+   unsigned nx, ny, nz;
+   getNumberOfPoints(nx, ny, nz);
+   data.reserve(nx*ny*nz);
+
+   if (squareData) {
+      for (unsigned i = 0; i < nx; ++i) {
+          for (unsigned j = 0; j < ny; ++j) {
+              for (unsigned k = 0; k < nz; ++k) {
+                  data.push_back(m_data[i][j][k]*m_data[i][j][k]);
+              }
+          }
+      }
+   }else {
+      for (unsigned i = 0; i < nx; ++i) {
+          for (unsigned j = 0; j < ny; ++j) {
+              for (unsigned k = 0; k < nz; ++k) {
+                  data.push_back(m_data[i][j][k]);
+              }
+          }
+      }
+   }
+
+   std::sort(data.rbegin(), data.rend());
+   return data;
 }
 
 

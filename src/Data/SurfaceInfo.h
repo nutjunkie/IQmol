@@ -41,7 +41,8 @@ namespace Data {
          SurfaceInfo(SurfaceType const&, unsigned const quality = 3,  
             double const isovalue = 0.02, QColor const& positive = QColor(), 
             QColor const& negative = QColor(), bool isSigned = false,
-            bool simplifyMesh = false, double const opacity = 0.999); 
+            bool simplifyMesh = false, double const opacity = 0.999, 
+            bool const isovalueIsPercent = false); 
 			// Note the opacity is set to slightly less than 1.0 to ensure all
 			// surfaces are draw after the Primitives when sorted, however,
 			// because it is > 0.99 it won't trigger the transparency overhead
@@ -55,9 +56,13 @@ namespace Data {
          double isovalue() const { return m_isovalue; }
          double opacity() const { return m_opacity; }
          bool isSigned() const;
+         bool isovalueIsPercent() const { return m_isovalueIsPercent; }
          bool simplifyMesh() const { return m_simplifyMesh; }
          void setIsSigned(bool const tf) { m_isSigned = tf; }
          QString toString() const;
+
+         void isovalueIsPercent(bool const tf) { m_isovalueIsPercent = tf; }
+         void setIsovalue(double const isovalue) { m_isovalue = isovalue; }
 
          QColor const& positiveColor() const { return m_positiveColor; }
          QColor const& negativeColor() const { return m_negativeColor; }
@@ -86,6 +91,7 @@ namespace Data {
             ar & m_isSigned;
             ar & m_simplifyMesh;
             ar & m_opacity;
+            ar & m_isovalueIsPercent;
          }
 
          SurfaceType m_surfaceType;
@@ -96,6 +102,7 @@ namespace Data {
          bool        m_isSigned;
          bool        m_simplifyMesh;
          double      m_opacity;
+         bool        m_isovalueIsPercent;
    };
 
    typedef Data::List<Data::SurfaceInfo> SurfaceInfoList;
