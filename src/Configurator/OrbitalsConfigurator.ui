@@ -398,10 +398,10 @@ QToolButton:pressed {
           <number>4</number>
          </property>
          <property name="minimum">
-          <double>0.000400000000000</double>
+          <double>0.000100000000000</double>
          </property>
          <property name="maximum">
-          <double>99.998999999999995</double>
+          <double>99.999900000000000</double>
          </property>
          <property name="singleStep">
           <double>0.001000000000000</double>

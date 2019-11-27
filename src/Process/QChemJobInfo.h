@@ -63,7 +63,9 @@ namespace Process {
                  ExternalCharges,         // 20
                  OnsagerRadius,
                  Isotopes,
-                 NElectrons
+                 NElectrons,
+                 InputFileTemplate        // This effectively holds the contents of the 
+                                          // any input file loaded in the molecule.
               };
             
 
@@ -113,6 +115,7 @@ namespace Process {
 
          void  setMoleculePointer(void* moleculePointer) { m_moleculePointer = moleculePointer; }
          void* moleculePointer() const { return m_moleculePointer; }
+
 
       private:
          void copy(QChemJobInfo const&);

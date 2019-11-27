@@ -22,6 +22,7 @@
 
 #include "FileLayer.h"
 #include <QFileInfo>
+#include <QFile>
 
 
 namespace IQmol {
@@ -47,6 +48,21 @@ void File::tail(int const interval)
 {
    configure();
    m_configurator.tail(interval);
+}
+
+
+QString File::contents() const
+{
+   QString contents;
+   QFile qfile;
+   qfile.setFileName(m_filePath);
+
+   if (qfile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      contents = QString(qfile.readAll());
+      qfile.close();
+   }
+
+   return contents;
 }
 
 } } // end namespace IQmol::Layer

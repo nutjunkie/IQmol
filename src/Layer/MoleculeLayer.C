@@ -228,6 +228,7 @@ void Molecule::appendData(Layer::List& list)
           FileList::iterator file;
           for (file = fileList.begin(); file != fileList.end(); ++file) {
               files->removeLayer(*file);
+              // Need to flag files with viable rem inputs
               m_fileList.appendLayer(*file);
           }
 
@@ -1723,7 +1724,6 @@ bool Molecule::sanityCheck()
 
 Process::QChemJobInfo Molecule::qchemJobInfo()
 {
-
    Process::QChemJobInfo jobInfo;
 
    jobInfo.set(Process::QChemJobInfo::Charge,          totalCharge());
@@ -1755,6 +1755,17 @@ Process::QChemJobInfo Molecule::qchemJobInfo()
    }
 
    jobInfo.setMoleculePointer(this);
+
+   // input file format
+   FileList fileList(findLayers<File>(Children));
+   FileList::iterator file;
+   for (file = fileList.begin(); file != fileList.end(); ++file) {
+       if ((*file)->fileName().endsWith(".inp")) {
+          jobInfo.set(Process::QChemJobInfo::InputFileTemplate, (*file)->contents());
+          break;
+       }
+   }
+
    return jobInfo;
 }
 
