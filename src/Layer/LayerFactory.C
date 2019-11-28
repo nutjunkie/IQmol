@@ -197,9 +197,10 @@ Layer::List Factory::toLayers(Data::Base& data)
          } break;
 
          case Data::Type::RemSection: {
-            Data::RemSection&  remSection(dynamic_cast<Data::RemSection&>(data));
-            Layer::Rem* remLayer(new Rem(remSection));
-            layers.append(remLayer);
+            // These are re-parsed from the input file, so no need 
+            //Data::RemSection&  remSection(dynamic_cast<Data::RemSection&>(data));
+            //Layer::Rem* remLayer(new Rem(remSection));
+            //layers.append(remLayer);
          } break;
 
 
