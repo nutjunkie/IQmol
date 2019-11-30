@@ -30,6 +30,7 @@
 #include "DipoleMoment.h"
 #include "EfpFragment.h"
 #include "Energy.h"
+#include "ExcitedStates.h"
 #include "File.h"
 #include "Frequencies.h"
 #include "GeminalOrbitals.h"
@@ -150,9 +151,11 @@ Base* Factory::create(Type::ID const id)
       case Type::YamlNode:                data = new YamlNode();                break;
       case Type::PovRay:                  data = new PovRay();                  break;
 
+      case Type::ExcitedStates:           data = new ExcitedStates();           break;
       case Type::GeminalOrbitals:         data = new GeminalOrbitals();         break;
+
    default: 
-      qDebug() << "TypeID:" << id;
+      qDebug() << "Unhandled TypeID:" << id << toString(id) << "in Data::Factory";
       throw std::runtime_error("Unrecognized type in Data::Factory");
       break;
    }
