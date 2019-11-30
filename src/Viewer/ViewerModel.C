@@ -311,16 +311,13 @@ void ViewerModel::processParsedData(ParseJobFiles* parser)
    }
 
    if (makeActive) {
-qDebug() << "QJI: making molecules inactive";
       forAllMolecules(boost::bind(&Layer::Molecule::setCheckState, _1, Qt::Unchecked));
-qDebug() << "QJI: making new molecule active";
       molecule->setCheckState(Qt::Checked);
       sceneRadiusChanged(sceneRadius());
       changeActiveViewerMode(Viewer::Manipulate);
    }
 
    fileOpened(parser->filePath());
-qDebug() << "QJI: finished process parse data";
 }
 
 
