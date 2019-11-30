@@ -1106,6 +1106,8 @@ public Q_SLOTS:
 	virtual void resetVisualHints();
 	//@}
 #endif
+protected:
+	QString message_;
 
 private Q_SLOTS:
 	// Patch for a Qt bug with fullScreen on startup
@@ -1154,7 +1156,6 @@ private:
 	qreal f_p_s_;
 
 	// M e s s a g e s
-	QString message_;
 	bool displayMessage_;
 	QTimer messageTimer_;
 
