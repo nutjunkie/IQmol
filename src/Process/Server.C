@@ -289,7 +289,6 @@ void Server::copyRunFile()
 
 void Server::queueJob()
 {
-qDebug() << "QJI - trace Server::queueJob()";
    Network::Reply* reply(qobject_cast<Network::Reply*>(sender()));
 
    if (reply && m_activeRequests.contains(reply)) {
@@ -340,8 +339,6 @@ void Server::submitFinished()
       m_activeRequests.remove(reply);
 
       if (job) {
-qDebug() << "Server.C job info dump:";
-job->jobInfo().dump();
          if (reply->status() == Network::Reply::Finished && 
               parseSubmitMessage(job, reply->message())) {
             job->setStatus(Job::Queued);
