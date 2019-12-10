@@ -322,7 +322,7 @@ void ServerConfiguration::setDefaults(ConnectionT const connection)
          break;
 
       case HTTP:
-         m_configuration.insert(ServerName, "QChem");
+         m_configuration.insert(ServerName, "Q-Chem");
          m_configuration.insert(Port, 80);
          m_configuration.insert(HostAddress, "iqmol.q-chem.com");
          m_configuration.insert(UserName, "guest");
@@ -331,7 +331,7 @@ void ServerConfiguration::setDefaults(ConnectionT const connection)
          break;
 
       case HTTPS:
-         m_configuration.insert(ServerName, "QChem");
+         m_configuration.insert(ServerName, "Q-Chem");
          m_configuration.insert(Port, 443);
          m_configuration.insert(HostAddress, "iqmol.q-chem.com");
          m_configuration.insert(UserName, "guest");
