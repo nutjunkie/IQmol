@@ -49,11 +49,10 @@ bool Gdma::parse(TextStream& textStream)
    QString label;
    QStringList tokens;
 
-   // Skip to the good stuff
-   textStream.seek("Multipole moments in atomic units");
 
    while (!textStream.atEnd()) {
       line = textStream.nextLine();
+qDebug() << "parsing line:" << line;
       if (line.contains("Total multipoles referred to origin")) {
 
          tokens = textStream.seekAndSplit("Q00");
@@ -62,14 +61,15 @@ bool Gdma::parse(TextStream& textStream)
          geometry->setCharge(Util::round(q));
 
          tokens = textStream.nextLineAsTokens();
-         if (tokens.size() < 12) goto error;
+         if (tokens.size() < 9) goto error;
          // order changes due to spherical -> cartesian
-         double z(tokens[ 5].toDouble(&ok));  if (!ok) goto error;
-         double x(tokens[ 8].toDouble(&ok));  if (!ok) goto error;
-         double y(tokens[11].toDouble(&ok));  if (!ok) goto error;
+         double z(tokens[2].toDouble(&ok));  if (!ok) goto error;
+         double x(tokens[5].toDouble(&ok));  if (!ok) goto error;
+         double y(tokens[8].toDouble(&ok));  if (!ok) goto error;
          geometry->appendProperty(new Data::DipoleMoment(Vec(x,y,z)));
 
-      } else if (line.contains("angstrom")) {
+      } else if (line.contains("x = ") && line.contains("y = ") && line.contains("z = ") ) {
+         // watch units 
 
          tokens = TextStream::tokenize(line);
          // We are parsing a line such as:
@@ -83,6 +83,7 @@ bool Gdma::parse(TextStream& textStream)
 
          // If the site is an atom center, add that to the geometry
          int atomicNumber(Data::Atom::atomicNumber(tokens[0]));
+qDebug() << "atomic number =" << atomicNumber;
          if (atomicNumber > 0) {
             geometry->append(atomicNumber, Vec(x, y, z));
          }
@@ -99,10 +100,10 @@ bool Gdma::parse(TextStream& textStream)
          site->addCharge(q);
 
          tokens = textStream.seekAndSplit("|Q1|");
-         if (tokens.size() < 12) goto error;
-         z = tokens[ 5].toDouble(&ok);  if (!ok) goto error;
-         x = tokens[ 8].toDouble(&ok);  if (!ok) goto error;
-         y = tokens[11].toDouble(&ok);  if (!ok) goto error;
+         if (tokens.size() < 9) goto error;
+         z = tokens[2].toDouble(&ok);  if (!ok) goto error;
+         x = tokens[5].toDouble(&ok);  if (!ok) goto error;
+         y = tokens[8].toDouble(&ok);  if (!ok) goto error;
          site->addDipole(x,y,z);
       }
    }
