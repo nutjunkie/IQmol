@@ -35,7 +35,11 @@ LocalExecute::LocalExecute(LocalConnection* connection, QString const& command,
 {
    m_timer.setSingleShot(true);
    m_timer.setInterval(connection->timeout());
-   m_process.setWorkingDirectory(workingDirectory);
+   if (workingDirectory.isEmpty()) {
+      m_process.setWorkingDirectory(QDir::currentPath());
+   }else {
+      m_process.setWorkingDirectory(workingDirectory);
+   }
 }
 
 
@@ -116,10 +120,10 @@ void LocalExecute::run()
    m_status = Running;
 
    m_process.start(cmd.filePath(), arguments);
-qDebug() << "QProcess:" << m_process.program();
-qDebug() << "QProcess:" << m_process.arguments();
-qDebug() << "QProcess:" << m_process.workingDirectory();
-qDebug() << "QProcess:" << m_process.processId();
+qDebug() << "QProcess prog:" << m_process.program();
+qDebug() << "QProcess args:" << m_process.arguments();
+qDebug() << "QProcess pwd: " << m_process.workingDirectory();
+qDebug() << "QProcess pid: " << m_process.processId();
    m_timer.start();
 }
 
@@ -146,6 +150,8 @@ void LocalExecute::runFinished(int /* exitCode */, QProcess::ExitStatus status)
          m_status  = Error;
          break;
    }
+
+   qDebug() << "QProcess stderr:" << m_process.readAllStandardError();
 
    finished();
 }
