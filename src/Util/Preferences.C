@@ -775,7 +775,7 @@ QString DefaultServerFile()
       dir.cdUp();
       dir.cd("share");
 #else
-      dir.setPath("/usr/share/iqmol";
+      dir.setPath("/usr/share/iqmol");
 #endif
       QFileInfo info(dir,"default_server.cfg");
       filePath = info.absoluteFilePath(); 
