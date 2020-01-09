@@ -1,7 +1,7 @@
 #! /bin/sh
 
 GIT_VERSION=`git describe --always --tags`
-IQMOL_VERSION=`git describe --abbrev=0`
+IQMOL_VERSION=`git describe --tags  --abbrev=0`
 IQMOL_YEAR=`date +%Y`
 IQMOL_DATE=`date `
 

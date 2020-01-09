@@ -1052,14 +1052,17 @@ void Molecule::applyAngleConstraint(Constraint* constraint)
        if (fragC.contains(*iter)) return applyRingConstraint();
    }
 
+   // Could check if any of the atoms in either of the fragments are fixed, 
+   // if so, then only rotate the other.
+
    double delta( 0.5*(Atom::angle(A,B,C) - constraint->targetValue()) );
    delta = delta * M_PI / 180.0;
    Vec b(B->getPosition());
    Vec ab(b - A->getPosition());
    Vec cb(b - C->getPosition());
-   Quaternion quaternion(cross(ab, cb), delta);
-
    Vec x;
+
+   Quaternion quaternion(cross(ab, cb), delta);
    for (iter = fragA.begin(); iter != fragA.end(); ++iter) {
        x = (*iter)->getPosition(); 
        x = quaternion.rotate(x-b) + b;

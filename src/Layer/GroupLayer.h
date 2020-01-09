@@ -36,6 +36,7 @@ namespace Layer {
 
       public:
          Group(QString const& label = QString());
+         Group(PrimitiveList const&, QString const& label = QString());
          ~Group();
 
          void loadFromFile(QString const& filePath);
@@ -62,6 +63,7 @@ namespace Layer {
       protected:
          void addAtoms(AtomList const&);
          void addBonds(BondList const&);
+         void addPrimitives(PrimitiveList const&);
 
       private:
          AtomList m_atoms;

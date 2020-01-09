@@ -43,6 +43,13 @@ Group::Group(QString const& label) : Primitive(label)
    setFlags(Qt::ItemIsSelectable |  Qt::ItemIsEnabled | Qt::ItemIsEditable);
 }
 
+Group::Group(PrimitiveList const& primitives, QString const& label) : Primitive(label)
+{
+   setFlags(Qt::ItemIsSelectable |  Qt::ItemIsEnabled | Qt::ItemIsEditable);
+   addPrimitives(primitives);
+}
+
+
 
 Group::~Group()
 {
@@ -97,6 +104,28 @@ void Group::loadFromFile(QString const& filePath)
        addBonds((*iter)->findLayers<Bond>(Children));
   }
 }
+
+
+void Group::addPrimitives(PrimitiveList const& primitives)
+{
+   AtomList atoms;
+   BondList bonds;
+   Atom* atom;
+   Bond* bond;
+
+   PrimitiveList::const_iterator primitive;
+   for (primitive = primitives.begin(); primitive != primitives.end(); ++primitive) {
+       if (atom = dynamic_cast<Atom*>(*primitive)) {
+          atoms.append(atom);
+       }else if (bond = dynamic_cast<Bond*>(*primitive)) {
+          bonds.append(bond);
+       }
+   }
+
+   addAtoms(atoms);
+   addBonds(bonds);
+}
+
 
 
 void Group::addAtoms(AtomList const& atoms)
