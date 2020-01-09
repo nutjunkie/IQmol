@@ -194,9 +194,15 @@ void InputDialog::setQChemJobInfo(IQmol::Process::QChemJobInfo const& jobInfo)
 
    m_currentJob->setCoordinates(
       m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::Coordinates));
+
+   QString inputFileTemplate = 
+      m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::InputFileTemplate);
+   if (!inputFileTemplate.isEmpty()) {
+      loadPreviewText(inputFileTemplate);
+   }
+
    m_currentJob->setCoordinatesFsm(
       m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::CoordinatesFsm));
-
    m_currentJob->setEfpFragments(
       m_qchemJobInfo.get(IQmol::Process::QChemJobInfo::EfpFragments));
    m_currentJob->setConstraints(
@@ -519,6 +525,7 @@ void InputDialog::addNewJob()
 
 void InputDialog::resetInput() 
 {
+   m_qchemJobInfo.set(IQmol::Process::QChemJobInfo::InputFileTemplate, "");
    resetControls();
    bool prompt(false);
    deleteAllJobs(prompt);
@@ -641,11 +648,16 @@ QString InputDialog::generateInputString()
 
 void InputDialog::capturePreviewTextChanges() 
 {
-//qDebug() << "capturePreviewTextChanges() called";
    if (!m_taint) return;
-//qDebug() << "    with changes";
 
    QString text(m_ui.previewText->toPlainText());
+   loadPreviewText(text);
+   TAINT(false);
+}
+
+
+void InputDialog::loadPreviewText(QString const& text)
+{
    JobList jobs(ParseQChemFileContents(text));
    if (jobs.isEmpty()) jobs.append(new Job());
    int index(m_jobs.indexOf(m_currentJob));
@@ -670,7 +682,6 @@ void InputDialog::capturePreviewTextChanges()
 
    m_currentJob = m_jobs[index];
    m_ui.jobList->setCurrentIndex(index);
-   TAINT(false);
 }
 
 

@@ -71,9 +71,12 @@ QStringList RunCommand(QString const& command, QStringList const& arguments,
 }
 
 
+
 QString QueryCommand(bool const local)
 {
-   QString cmd("/bin/ps xc -S -o command=,pid=,time= ${JOB_ID}");
+   // Expected output is a single line:
+   // vi 19573   0:00.74
+   QString cmd("/bin/ps -o command=,pid=,time= ${JOB_ID}");
 
    if (local) {
       // The command only changes for Windows boxes 
@@ -87,6 +90,11 @@ QString QueryCommand(bool const local)
       }else {
          return QString("Error: tasklist.exe not found");
       }
+#endif
+
+      // ...and OS X
+#ifdef Q_OS_MAC
+   cmd = "/bin/ps xc -S -o command=,pid=,time= ${JOB_ID}";
 #endif
    }
 
@@ -116,7 +124,7 @@ QString KillCommand(bool const local)
 
 QString SubmitCommand(bool const local)
 {
-   QString cmd("/bin/csh ${JOB_NAME}.run");
+   QString cmd("/bin/bash ${JOB_NAME}.run");
    if (local) {
 #ifdef Q_OS_WIN32
       cmd = "${JOB_DIR}/${JOB_NAME}.bat";
@@ -141,24 +149,13 @@ QString JobFileListCommand(bool const local)
 QString TemplateForRunFile(bool const local)
 {
    QString cmd;
-   cmd = "#! /bin/csh\n"
+   cmd = "#! /bin/bash\n"
          "# --- Q-Chem environment variable setup\n"
-         "# The following variables MUST be set with correct values.\n"
-         "#    QC:        Q-Chem top directory. \n"
-         "#    QCSCRATCH: the full path of the directory for scratch files.\n"
-         "#\n"
-         "#  The QC, QCSCRATCH and QCAUX variables provided below\n"
-         "#  are examples - you should set your own values.\n"
-         "#  Do NOT use double quote in setting these variables.\n"
+         "# . $HOME/qchem/qcenv.sh\n"
          "\n"
-         "setenv QC        /usr/local/qchem\n"
-         "setenv QCSCRATCH /scratch\n"
-         "setenv QCAUX     $QC/aux\n"
-         "setenv PATH      $QC/bin:$PATH\n"
-         "\n"
-         "#  <-- End user configuration -->\n"
-         "\n"
-         "qchem ${JOB_NAME}.inp ${JOB_NAME}.out &";
+         "qchem ${JOB_NAME}.inp ${JOB_NAME}.out &\n"
+         "echo 'JobId:' $!\n"
+         "sleep 5\n";
 
    if (local) {
 #ifdef Q_OS_WIN32
@@ -173,7 +170,7 @@ QString TemplateForRunFile(bool const local)
             ":: The values below are examples only, you should set your own values.\n"
             "\n"
             ":: <-- Start user configuration -->\n"
-            "set QC=C:\\QChem\\5.2.0\n"
+            "set QC=C:\\QChem\\5.2.2\n"
             ":: <-- End user configuration -->\n"
             "\n"
             "set QCEXE=qcprog.exe\n"
@@ -183,7 +180,7 @@ QString TemplateForRunFile(bool const local)
             "set QCproc=:\n"
             "for /F \"tokens=2 delims= \" %%A IN ('tasklist /fi ^\"imagename eq %QCEXE%^\" /nh') do set QCproc=!QCproc!%%A:\n"
             "\n"
-            "start \"\" /b %QC%\\qcenv ${JOB_NAME}.inp  > ${JOB_NAME}.out  2> ${JOB_NAME}.err\n"
+            "start \"\" /b %QC%\\bin\\qchem ${JOB_NAME}.inp  ${JOB_NAME}.out  2> ${JOB_NAME}.err\n"
             "\n"
             "timeout /t 1 >nul\n"
             "tasklist /v /fo csv >nul\n"

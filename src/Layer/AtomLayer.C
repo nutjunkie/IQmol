@@ -311,6 +311,13 @@ void Atom::drawLabel(Viewer& viewer, LabelType const type, QFontMetrics& fontMet
 
    glColor3f(0.1, 0.1, 0.1);
    viewer.renderText(pos[0], pos[1], pos[2], label, viewer.labelFont());
+
+/*
+QString t(getLabel(Index));
+Vec p(getPosition());
+qDebug() << "Rendering text at: " << pos[0] << pos[1] << pos[2] << "    location" <<t << p[0] << p[1] << p[2];
+*/
+
 }
 
 

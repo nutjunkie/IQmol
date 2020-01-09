@@ -311,16 +311,13 @@ void ViewerModel::processParsedData(ParseJobFiles* parser)
    }
 
    if (makeActive) {
-qDebug() << "QJI: making molecules inactive";
       forAllMolecules(boost::bind(&Layer::Molecule::setCheckState, _1, Qt::Unchecked));
-qDebug() << "QJI: making new molecule active";
       molecule->setCheckState(Qt::Checked);
       sceneRadiusChanged(sceneRadius());
       changeActiveViewerMode(Viewer::Manipulate);
    }
 
    fileOpened(parser->filePath());
-qDebug() << "QJI: finished process parse data";
 }
 
 
@@ -640,6 +637,7 @@ void ViewerModel::selectNone()
 void ViewerModel::setConstraint()
 {
    int n(m_selectedObjects.size());
+   if (n < 1) return;
 
    // Check all the selected atoms belong to the same Molecule.
    unsigned int findFlags(Layer::Parents | Layer::Visible);

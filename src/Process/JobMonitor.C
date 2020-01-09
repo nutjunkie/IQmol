@@ -289,7 +289,11 @@ void JobMonitor::submitJob(QChemJobInfo& qchemJobInfo)
       // stop the update timer while we are doing this
       BlockServerUpdates bs(server);
       postUpdateMessage("Connecting to server...");
-      server->open();
+      if (!server->open()) {
+         QMsgBox::warning(this, "IQmol", "Failed to connnect to server");
+         postUpdateMessage("");
+         return;
+      }
 
       if (!getWorkingDirectory(server, qchemJobInfo)) {
          postUpdateMessage("");
@@ -412,7 +416,7 @@ bool JobMonitor::getRemoteWorkingDirectory(Server* server, QString& name)
    } while (exists);
 
    if (!server->makeDirectory(pathName)) {
-      QString msg("Failed to create directory on server: ");
+      QString msg("Failed to create directory: ");
       msg += pathName;
       QMsgBox::warning(QApplication::activeWindow(), "IQmol", msg);
       return false;

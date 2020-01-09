@@ -158,7 +158,13 @@ QString CanonicalOrbitals::description(Data::SurfaceInfo const& info,
       label = type.toString();
    }
 
-   if (tooltip) label += "\nIsovalue = " + QString::number(info.isovalue(), 'f', 3);
+   if (tooltip) {
+      if (info.isovalueIsPercent()) {
+         label += "\nIsovalue = " + QString::number(info.isovalue(), 'f', 0) + "%";
+      }else {
+         label += "\nIsovalue = " + QString::number(info.isovalue(), 'f', 3);
+      }
+   }
  
    return label;
 }

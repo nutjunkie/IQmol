@@ -97,6 +97,7 @@ void Frequencies::configure()
 void Frequencies::setActiveMode(Mode const& mode)
 {  
    if (!m_molecule) return;
+   clearActiveMode();
 
    bool currentPlay(m_play);
    setPlay(false);
@@ -155,8 +156,6 @@ void Frequencies::setLoop(bool const loop)
 
 void Frequencies::playMode(Mode const& mode)
 {
-   clearActiveMode();
-
    if (m_activeMode == &mode) {
       m_activeMode = 0;
       setActiveMode(mode);

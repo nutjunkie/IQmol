@@ -246,7 +246,8 @@ void Orbitals::processSurfaceQueue()
 
        if (!grid) {
           // If the user requests an alpha, beta, spin or total density, we compute
-          // the alpha and beta densities and combine them later for efficiency.
+          // the alpha and beta densities and combine them later.  A subsequent
+          // request for either the alpha or beta density will then be more efficient.
           if (type.isRegularDensity()) {
              type.setKind(Data::SurfaceType::AlphaDensity);
              gridQueue.append(qMakePair(type, size));
@@ -399,16 +400,21 @@ Data::Surface* Orbitals::generateSurface(Data::SurfaceInfo const& surfaceInfo)
    Data::GridSize size(m_bbMin, m_bbMax, surfaceInfo.quality());
    Data::GridData* grid(findGrid(type, size, m_availableGrids));
 
-   double delta(Data::GridSize::stepSize(surfaceInfo.quality()));
-
    // If the grid data is not found, it is probably because the user quit the
    // calculation or edited the bounding box.
    if (!grid)  return 0;
 
-   MarchingCubes mc(*grid);
+   double delta(Data::GridSize::stepSize(surfaceInfo.quality()));
+   bool isovalueIsPercent(surfaceInfo.isovalueIsPercent());
+
    Data::Surface* surfaceData(new Data::Surface(surfaceInfo));
+
    if (surfaceData) {
-      mc.generateMesh(surfaceInfo.isovalue(), surfaceData->meshPositive());
+      double isovalue(isovalueIsPercent ? 
+         grid->percentToIsovalue(surfaceInfo.isovalue()) : surfaceInfo.isovalue());
+
+      MarchingCubes mc(*grid);
+      mc.generateMesh(isovalue, surfaceData->meshPositive());
 
       if (surfaceInfo.simplifyMesh()) {
          MeshDecimator decimator(surfaceData->meshPositive());
@@ -418,7 +424,9 @@ Data::Surface* Orbitals::generateSurface(Data::SurfaceInfo const& surfaceInfo)
       }
 
       if (type.isSigned()) {
-         mc.generateMesh(-surfaceInfo.isovalue(), surfaceData->meshNegative());
+         isovalue = isovalueIsPercent ? 
+            grid->percentToIsovalue(-surfaceInfo.isovalue()) : -isovalue;
+         mc.generateMesh(isovalue, surfaceData->meshNegative());
          if (surfaceInfo.simplifyMesh()) {
             MeshDecimator decimator(surfaceData->meshNegative());
             if (!decimator.decimate(delta)) {

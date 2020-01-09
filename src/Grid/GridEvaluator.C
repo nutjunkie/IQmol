@@ -114,6 +114,7 @@ void MultiGridEvaluator::run()
        progress(i); 
        if (m_terminate) break;
    }
+   
    progress(m_totalProgress); 
 }
 

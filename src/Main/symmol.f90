@@ -134,10 +134,10 @@
       ALLOCATE (PPU(3,nmv))
       ALLOCATE (PPO(3,nmv))
 
-      WRITE(*,*)'                     SYMMOL'
-      WRITE(*,*)' A PROGRAM FOR THE SYMMETRIZATION OF GROUPS OF ATOMS'
-      WRITE(*,*)'       By Tullio Pilati and Alessandra Forni'
-      WRITE(*,*)'               Version November 4th 2002'
+!     WRITE(*,*)'                     SYMMOL'
+!     WRITE(*,*)' A PROGRAM FOR THE SYMMETRIZATION OF GROUPS OF ATOMS'
+!     WRITE(*,*)'       By Tullio Pilati and Alessandra Forni'
+!     WRITE(*,*)'               Version November 4th 2002'
 
 !     Hard-wired cell parameters
       PC(1) =  1.0d0

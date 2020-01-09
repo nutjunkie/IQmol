@@ -71,6 +71,9 @@ namespace Preferences {
    QString FragmentDirectory();
    void    FragmentDirectory(QString const&);
 
+   QString ServerDirectory();
+   void    ServerDirectory(QString const&);
+
    QString ShaderDirectory();
    void    ShaderDirectory(QString const&);
 
@@ -142,6 +145,9 @@ namespace Preferences {
 
    QString ServerQueryJobFinished();
    void    ServerQueryJobFinished(QString const& repsonse);
+
+   QString DefaultServerFile();
+   void DefaultServerFile(QString const& filePath);
 
    int  DaysToRememberJobs();
    void DaysToRememberJobs(int const& numberOfDays);

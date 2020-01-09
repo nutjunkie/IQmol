@@ -40,6 +40,9 @@ namespace IQmol {
 typedef boost::numeric::ublas::matrix<double> Matrix;
 typedef boost::numeric::ublas::vector<double> Vector;
 
+typedef boost::numeric::ublas::matrix< std::complex<double> > CMatrix;
+typedef boost::numeric::ublas::vector< std::complex<double> > CVector;
+
 typedef boost::numeric::ublas::matrix_column<Matrix const> MatrixColumn;
 typedef boost::numeric::ublas::matrix_row<Matrix const>    MatrixRow;
 

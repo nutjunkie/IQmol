@@ -56,6 +56,7 @@
 #include "OrbitalsLayer.h"
 #include "GeminalOrbitalsLayer.h"
 #include "NmrLayer.h"
+#include "RemLayer.h"
 #include "QsLog.h"
 #include "openbabel/mol.h"
 
@@ -194,6 +195,15 @@ Layer::List Factory::toLayers(Data::Base& data)
             Layer::Nmr* nmrLayer(new Nmr(nmrData));
             layers.append(nmrLayer);
          } break;
+
+         case Data::Type::RemSection: {
+            // These are re-parsed from the input file, so no need 
+            //Data::RemSection&  remSection(dynamic_cast<Data::RemSection&>(data));
+            //Layer::Rem* remLayer(new Rem(remSection));
+            //layers.append(remLayer);
+         } break;
+
+
 
          default:
             QLOG_WARN() << "Unimplemented data type in Layer::Factory"

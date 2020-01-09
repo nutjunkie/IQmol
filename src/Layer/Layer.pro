@@ -40,6 +40,7 @@ SOURCES = \
    $$PWD/NmrLayer.C \
    $$PWD/OrbitalsLayer.C \
    $$PWD/PrimitiveLayer.C \
+   $$PWD/RemLayer.C \
    $$PWD/SurfaceLayer.C \
    $$PWD/SymmetryLayer.C \
 
@@ -80,5 +81,6 @@ HEADERS = \
    $$PWD/NmrLayer.h \
    $$PWD/OrbitalsLayer.h \
    $$PWD/PrimitiveLayer.h \
+   $$PWD/RemLayer.h \
    $$PWD/SurfaceLayer.h \
    $$PWD/SymmetryLayer.h \

@@ -52,6 +52,7 @@ namespace Network {
   // }
 
 
+
 bool TestNetworkConnection()
 {
    bool okay(true);
@@ -175,13 +176,15 @@ in_addr_t HostLookup(QString const& hostname)
    if (ipv4Validator.validate(tmp,pos) == QValidator::Acceptable) {
       address = inet_addr(hostname.toLatin1().data());
       if (address == INADDR_ANY || address == INADDR_NONE) {
-         throw InvalidHostname(hostname);
+         QLOG_ERROR() << "Invalid hostname: " + hostname;
+         address = INADDR_NONE;
       }
    }else {
       struct hostent* host;
       host = gethostbyname(hostname.toLatin1().data());
       if (host->h_addrtype == AF_INET6) {
-         throw Exception("IPv6 addresses are not supported");
+         QLOG_ERROR() << "IPv6 addresses are not supported";
+         address = INADDR_NONE;
       }else if (host) {
          address = *(in_addr_t*)host->h_addr;
       }
@@ -200,24 +203,28 @@ in_addr_t HostLookup(QString const& hostname)
    hints.ai_flags |= AI_CANONNAME;
 
    errcode = getaddrinfo(hostname.toLatin1().data(), NULL, &hints, &res);
-   if (errcode != 0) throw InvalidHostname(hostname);
- 
-   inet_ntop(res->ai_family, res->ai_addr->sa_data, addrstr, 100);
+   if (errcode == 0) {
+      inet_ntop(res->ai_family, res->ai_addr->sa_data, addrstr, 100);
 
-   switch (res->ai_family) {
-      case AF_INET:
-         ptr = &((struct sockaddr_in *) res->ai_addr)->sin_addr;
-         break;
-      case AF_INET6:
-         ptr = &((struct sockaddr_in6 *) res->ai_addr)->sin6_addr;
-         break;
+      switch (res->ai_family) {
+         case AF_INET:
+            ptr = &((struct sockaddr_in *) res->ai_addr)->sin_addr;
+            break;
+         case AF_INET6:
+            ptr = &((struct sockaddr_in6 *) res->ai_addr)->sin6_addr;
+            break;
+      }
+
+      inet_ntop(res->ai_family, ptr, addrstr, 100);
+      address = inet_addr(addrstr);
+
+      QString ipv((res->ai_family == PF_INET6) ? "IPv6 address:" : "IPv4 address:");
+      QLOG_DEBUG() << ipv << QString(addrstr) << "=>" << QString(res->ai_canonname);
+
+   }else {
+      QLOG_ERROR() << "Invalid hostname: " + hostname;
+      address = INADDR_NONE;
    }
-
-   inet_ntop(res->ai_family, ptr, addrstr, 100);
-   address = inet_addr(addrstr);
-
-   QString ipv((res->ai_family == PF_INET6) ? "IPv6 address:" : "IPv4 address:");
-   QLOG_DEBUG() << ipv << QString(addrstr) << "=>" << QString(res->ai_canonname);
 
 #endif
 

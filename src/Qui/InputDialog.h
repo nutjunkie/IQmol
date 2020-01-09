@@ -189,6 +189,7 @@ class InputDialog : public QMainWindow {
       void deleteAllJobs(bool const prompt = true);
 
       void capturePreviewTextChanges();
+      void loadPreviewText(QString const& text);
       void updatePreviewText(JobList const&, Job const* currentJob);
 
       void setControls(Job* job);

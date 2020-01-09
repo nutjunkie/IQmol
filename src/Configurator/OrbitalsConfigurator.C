@@ -83,6 +83,7 @@ Orbitals::Orbitals(Layer::Orbitals& orbitals)
    m_selectedPen.setStyle(Qt::SolidLine);
    m_selectedPen.setWidth(3);
 
+   on_isovalueRadio_clicked(true);
    m_configurator.densityMatrixButton->hide();
 }
 
@@ -129,11 +130,18 @@ void Orbitals::init()
    Data::DensityList::iterator density;
    for (density = densities.begin(); density != densities.end(); ++density) {
        (*density)->surfaceType().dump();
+/*
+        if ((*density)->surfaceType().kind() == Data::SurfaceType::SpinDensity) {
+           m_configurator.surfaceType->addItem((*density)->label(),  Data::SurfaceType::SpinDensity);
+        }
         //if ((*density)->surfaceType().kind() == Data::SurfaceType::Custom) {
         //   m_configurator.surfaceType->addItem((*density)->label(),  CustomDensity);
        // }
         m_configurator.surfaceType->addItem((*density)->label(),  
             Data::SurfaceType::CustomDensity);
+*/
+        m_configurator.surfaceType->addItem((*density)->label(),  
+            (*density)->surfaceType().kind() );
    }
 
    if (!m_orbitals.hasMullikenDecompositions()) {
@@ -402,7 +410,7 @@ void Orbitals::on_surfaceType_currentIndexChanged(int index)
 
       case Data::SurfaceType::CustomDensity:
          enableOrbitalSelection(false);
-         enableNegativeColor(false);
+         enableNegativeColor(true);
          enableMullikenDecompositions(true);
          break;
 
@@ -410,6 +418,26 @@ void Orbitals::on_surfaceType_currentIndexChanged(int index)
          enableOrbitalSelection(false);
          break;
    }
+}
+
+
+void Orbitals::on_isovalueRadio_clicked(bool)
+{
+   m_configurator.isovalue->setDecimals(4);
+   m_configurator.isovalue->setRange(0.0001, 99.9999);
+   m_configurator.isovalue->setSingleStep(0.0001);
+   m_configurator.isovalue->setValue(0.0200);
+   m_configurator.isovalue->setSuffix("");
+}
+
+
+void Orbitals::on_percentageRadio_clicked(bool)
+{
+   m_configurator.isovalue->setDecimals(0);
+   m_configurator.isovalue->setRange(1.0, 99.0);
+   m_configurator.isovalue->setSingleStep(1.0);
+   m_configurator.isovalue->setValue(90.0);
+   m_configurator.isovalue->setSuffix(" %  ");
 }
 
 
@@ -506,7 +534,9 @@ void Orbitals::on_calculateButton_clicked(bool)
 void Orbitals::on_addToQueueButton_clicked(bool) 
 {
    int quality(m_configurator.quality->value());
+
    double isovalue(m_configurator.isovalue->value());
+
    QColor positive(Preferences::PositiveSurfaceColor());
    QColor negative(Preferences::NegativeSurfaceColor());
    bool simplifyMesh(m_configurator.simplifyMeshCheckBox->isChecked());
@@ -518,8 +548,10 @@ void Orbitals::on_addToQueueButton_clicked(bool)
    int op(m_configurator.opacity->value());
    double opacity = op == 100 ? 0.999 : double(op)/100.0;
 
+   bool isovalueIsPercent(m_configurator.percentageRadio->isChecked());
+
    Data::SurfaceInfo info(Data::SurfaceType::Custom, quality, isovalue, 
-     positive, negative, isSigned, simplifyMesh, opacity);
+     positive, negative, isSigned, simplifyMesh, opacity, isovalueIsPercent);
 
    switch (qvar.toUInt()) {
 

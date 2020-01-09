@@ -29,7 +29,6 @@
 #include <QInputDialog>
 #include <QFileInfo>
 #include <QEventLoop>
-#include <QDebug>
 
 #ifdef WIN32
 #include <winsock2.h>
@@ -72,11 +71,13 @@ void SshConnection::open()
    try {
       if (s_numberOfConnections == 0) init();
 
-      openSocket(m_timeout);
-      ++s_numberOfConnections;
-      m_status = Connection::Opened;
+      if (openSocket(m_timeout)) {
+         ++s_numberOfConnections;
+         m_status = Connection::Opened;
+      }else {
+      }
    }catch (...)  {
-      qDebug() << "Error opening SSH connection";
+      QLOG_ERROR() << "Error opening SSH connection";
    }
 }
 
@@ -144,19 +145,36 @@ void SshConnection::init()
 }
 
 
-void SshConnection::openSocket(unsigned const timeout)
+bool SshConnection::openSocket(unsigned const timeout)
 {
    // Create the socket
    m_socket = socket(AF_INET, SOCK_STREAM, 0);
-   if (m_socket < 0) throw Exception("Failed to create socket");
+   if (m_socket < 0)  {
+      m_message = "Failed to create SSH socket";
+      m_status = Error;
+      QLOG_ERROR() << m_message;
+      return false;
+   }
 
-   setNonBlocking();
+   if (!setNonBlocking()) {
+      m_message = "Failed to set non-blocking on socket";
+      m_status = Error;
+      QLOG_ERROR() << m_message;
+      return false;
+   }
 
    // Now try and connect with timout
    struct sockaddr_in sin;
    sin.sin_family = AF_INET;
    sin.sin_port = htons(m_port);
    sin.sin_addr.s_addr = HostLookup(m_hostname);
+
+   if (sin.sin_addr.s_addr == INADDR_NONE) {
+      m_message = "Invalid hostname: " + m_hostname;
+      m_status = Error;
+      QLOG_ERROR() << m_message;
+      return false;
+   }
 
    int rc(::connect(m_socket, (struct sockaddr*)&sin, sizeof(struct sockaddr_in)));
 
@@ -170,8 +188,10 @@ void SshConnection::openSocket(unsigned const timeout)
    if (rc < 0) {
 
       if (errno != ok) {
-         QString msg("Connection failed: ");
-         throw Exception(msg + lastError());
+         m_message = "SSH connection to " + m_hostname + " failed";
+         m_status = Error;
+         QLOG_ERROR() << m_message;
+         return false;
       }
 
       do {
@@ -186,11 +206,16 @@ void SshConnection::openSocket(unsigned const timeout)
          rc = select(m_socket+1, NULL, &myset, NULL, &tv);
 
          if (rc == 0) {
-            throw NetworkTimeout();
+            m_message = "Connection to " + m_hostname + " timed out";
+            m_status = Error;
+            QLOG_ERROR() << m_message;
+            return false;
 
          }else if (rc < 0 && errno != EINTR) {
-            QString msg("Connection failed: ");
-            throw Exception(msg + lastError());
+            m_message = "Connection to " + m_hostname + " failed: " + lastError();
+            m_status = Error;
+            QLOG_ERROR() << m_message;
+            return false;
 
          }else if (rc > 0) {
             // Socket selected for write 
@@ -202,15 +227,19 @@ void SshConnection::openSocket(unsigned const timeout)
 #else
             if (getsockopt(m_socket, SOL_SOCKET, SO_ERROR, (void*)(&errorStatus), &lon) < 0) {
 #endif
-               QString msg("Error check on socket: ");
-               throw Exception(msg + lastError());
+               QString msg(": ");
+               m_message = "Error check on socket: " + m_hostname + " " + lastError();
+               m_status = Error;
+               QLOG_ERROR() << m_message;
             }
 
             // Check the value returned... 
             if (errorStatus) {
-               QString msg("Connection failed ");
-               msg += QString::number(errorStatus) + ": ";
-               throw Exception(msg + lastError());
+               m_message  = "Connection failed ";
+               m_message += QString::number(errorStatus) + ": " + lastError();
+               m_status   = Error;
+               QLOG_ERROR() << m_message;
+               return false;
             }
             break;
          }
@@ -218,7 +247,12 @@ void SshConnection::openSocket(unsigned const timeout)
       } while (1);
    }
 
-   setBlocking();
+   if (!setBlocking()) {
+      QLOG_ERROR() << "Failed to set blocking on socket.";
+      return false;
+   }
+
+   return true;
 }
 
 
@@ -228,11 +262,21 @@ void SshConnection::authenticate(AuthenticationT const authentication, QString& 
 {
    m_username = username;
 
-   if (m_socket <= 0) throw Exception("Authentication on invalid socket");
+   if (m_socket <= 0) {
+      m_message  = "Authentication attempt on invalid socket";
+      m_status   = Error;
+      QLOG_ERROR() << m_message;
+      return;
+   }
 
    // Create a session instance
    m_session = libssh2_session_init();
-   if (!m_session) throw Exception("Failed to initialize SSH session");
+   if (!m_session) {
+      m_message  = "Failed to initialize SSH session";
+      m_status   = Error;
+      QLOG_ERROR() << m_message;
+      return;
+   }
 
    // This trades welcome banners, exchange keys,
    // and sets up crypto, compression, and MAC layers
@@ -240,9 +284,12 @@ void SshConnection::authenticate(AuthenticationT const authentication, QString& 
    while ((rc = libssh2_session_handshake(m_session, m_socket)) == LIBSSH2_ERROR_EAGAIN);
 
    if (rc) {
-      QString msg("Failed to establish a valid SSH session (");
-     msg += QString::number(rc) + "): ";
-      throw Exception(msg + lastSessionError());
+      m_message  = "Failed to establish a valid SSH session (";
+      m_message += QString::number(rc) + "): " + lastSessionError();
+      m_status   = Error;
+      QLOG_ERROR() << m_message;
+      return;
+
    }
 
 /* Can't get this working at the moment
@@ -300,8 +347,6 @@ void SshConnection::authenticate(AuthenticationT const authentication, QString& 
          break;
    }
 
-   QString msg;
-
    switch (rc) {
       case LIBSSH2_ERROR_NONE:
          m_status = Connection::Authenticated;
@@ -309,29 +354,34 @@ void SshConnection::authenticate(AuthenticationT const authentication, QString& 
          break;
 
       case LIBSSH2_ERROR_PUBLICKEY_NOT_FOUND:
-         msg = "Public key not found for host " + m_hostname;
-         throw Exception(msg);
+         m_message = "Public key not found for host " + m_hostname;
+         m_status  = Error;
+         QLOG_ERROR() << m_message;
          break;
 
       case LIBSSH2_ERROR_AUTHENTICATION_FAILED:
-         throw AuthenticationError();
+         m_message  = "SSH authentication error: " + m_hostname;
+         m_status   = Error;
+         QLOG_ERROR() << m_message;
          break;
 
       case LIBSSH2_ERROR_METHOD_NOT_SUPPORTED:
-         msg  = toString(authentication) + " authentication not supported\n\n";
-         msg += "Supported methods: ";
-         msg += QString(authenticationMethods).replace(",",", ");
-         throw Exception(msg);
+         m_message  = toString(authentication) + " authentication not supported\n\n";
+         m_message += "Supported methods: ";
+         m_message += QString(authenticationMethods).replace(",",", ");
+         m_status   = Error;
+         QLOG_ERROR() << m_message;
          break;
 
       case LIBSSH2_ERROR_AUTHENTICATION_CANCELLED:
-         throw AuthenticationCancelled();
+         m_message  = "Authentication cancelled";
+         QLOG_ERROR() << m_message;
          break;
 
       default:
-         QString msg("Authentication failed:\n");
-         msg += lastSessionError();
-         throw Exception(msg);
+         m_message = "Authentication failed:\n" + lastSessionError();
+         m_status   = Error;
+         QLOG_ERROR() << m_message;
          break;
    }
 }
@@ -342,22 +392,20 @@ int SshConnection::connectAgent()
    QLOG_TRACE() << "SshConnection::connectAgent()";
    m_agent = libssh2_agent_init(m_session);
    if (!m_agent) {
-      QString msg("Failed to initialize ssh-agent support\n");
-      throw Exception(msg + lastSessionError());
+      QLOG_ERROR() << "Failed to initialize ssh-agent support";
+      return -1;  // LIBSSH2_ERROR_SOCKET_NONE - generic error code.
    }
 
    if (libssh2_agent_connect(m_agent)) {
-      QString msg("Failed to connect to ssh-agent\n");
-      msg += lastSessionError();
       killAgent();
-      throw Exception(msg);
+      QLOG_ERROR() << "Failed to connect to ssh-agent";
+      return -1;  // LIBSSH2_ERROR_SOCKET_NONE - generic error code.
    }
 
    if (libssh2_agent_list_identities(m_agent)) {
-      QString msg("Failed to request identities from ssh-agent\n");
-      msg += lastSessionError();
       killAgent();
-      throw Exception(msg);
+      QLOG_ERROR() << "Failed to request identities from ssh-agent";
+      return -1;  // LIBSSH2_ERROR_SOCKET_NONE - generic error code.
    }
 
    int rc;
@@ -366,10 +414,9 @@ int SshConnection::connectAgent()
    while (1) {
       rc = libssh2_agent_get_identity(m_agent, &identity, prev_identity);
       if (rc == 1 || rc < 0) {
-         QString msg("Failed to obtain identity from ssh-agent\n"); 
-         msg += lastSessionError();
          killAgent();
-         throw Exception(msg);
+         QLOG_ERROR() << "Failed to obtain identity from ssh-agent"; 
+         return -1;  // LIBSSH2_ERROR_SOCKET_NONE - generic error code.
       }
 
       rc = libssh2_agent_userauth(m_agent, m_username.toLatin1().data(), identity);
@@ -383,7 +430,7 @@ int SshConnection::connectAgent()
 
 int SshConnection::connectHostBased()
 {
-qDebug() << "WARNING connectHostBased() not wired correctly";
+   QLOG_WARN() << "WARNING connectHostBased() not wired correctly";
    QString passphrase;
 
    QLOG_TRACE() << "SshConnection::connectHostBased";
@@ -480,7 +527,7 @@ int SshConnection::connectPublicKey()
    QLOG_TRACE() << "SshConnection::connectPublicKey";
    QString privateKey(getPrivateKeyFile());
    QString publicKey(getPublicKeyFile());
-qDebug() << "WARNING connectHostBased() not wired correctly";
+   QLOG_WARN() << "WARNING connectHostBased() not wired correctly";
    QString passphrase;
 
    int rc;
@@ -499,7 +546,7 @@ QString SshConnection::getPublicKeyFile()
    QString fileName(Preferences::SSHPublicIdentityFile());
    QFileInfo info(fileName);
    if (!info.exists()) {
-      throw Exception(QString("Failed to find SSH public identity file:\n") + fileName);
+      QLOG_ERROR() << "Failed to find SSH public identity file:\n" + fileName;
    }
    return fileName;
 }
@@ -510,7 +557,7 @@ QString SshConnection::getPrivateKeyFile()
    QString fileName(Preferences::SSHPrivateIdentityFile());
    QFileInfo info(fileName);
    if (!info.exists()) {
-      throw Exception(QString("Failed to find SSH private identity file:\n") + fileName);
+      QLOG_ERROR() << "Failed to find SSH private identity file:\n" + fileName;
    }
    return fileName;
 }
@@ -543,45 +590,47 @@ QString SshConnection::lastSessionError()
 }
 
 
-void SshConnection::setNonBlocking()
+bool SshConnection::setNonBlocking()
 {
 #ifdef WIN32
    unsigned long arg(0);
    int ret(0);
    if ( (ret = ioctlsocket(m_socket, FIONBIO, &arg)) == SOCKET_ERROR) {
-      throw Exception("Failed to set non-blocking on socket.\n");
+      return false;
    }
 #else
    long arg(0);
    if ( (arg = fcntl(m_socket, F_GETFL, NULL)) < 0) {
-      throw Exception("Failed to set non-blocking on socket.\n");
+      return false;
    }
    arg |= O_NONBLOCK;
    if (fcntl(m_socket, F_SETFL, arg) < 0) {
-      throw Exception("Failed to set non-blocking on socket.\n");
+      return false;
    }
 #endif
+   return true;
 }
 
 
-void SshConnection::setBlocking()
+bool SshConnection::setBlocking()
 {
 #ifdef WIN32
    unsigned long arg(1);
    int ret(0);
    if ( (ret = ioctlsocket(m_socket, FIONBIO, &arg)) == SOCKET_ERROR) {
-      throw Exception("Failed to set blocking on socket.\n");
+      return false;
    }
 #else
    long arg(0);
    if ((arg = fcntl(m_socket, F_GETFL, NULL)) < 0) {
-      throw Exception("Failed to set blocking on socket.\n");
+      return false;
    }
    arg &= (~O_NONBLOCK);
    if (fcntl(m_socket, F_SETFL, arg) < 0) {
-      throw Exception("Failed to set blocking on socket.\n");
+      return false;
    }
 #endif
+   return true;
 }
 
 

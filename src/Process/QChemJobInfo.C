@@ -84,6 +84,7 @@ void QChemJobInfo::set(Field const field, QString const& value)
       case EfpFragments:
       case EfpParameters:
       case OnsagerRadius:
+      case InputFileTemplate:
       case Isotopes:
          m_data[field] = value;
          break;

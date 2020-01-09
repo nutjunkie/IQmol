@@ -68,6 +68,8 @@ namespace Configurator {
          void plotSelectionChanged(bool tf);
          void clearSelectedOrbitals(int);
          void setMullikenDecompositions(Matrix const&);
+         void on_isovalueRadio_clicked(bool);
+         void on_percentageRadio_clicked(bool);
 
          void on_densityMatrixButton_clicked(bool);
 

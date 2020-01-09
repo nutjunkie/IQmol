@@ -43,8 +43,13 @@ HttpConnection::HttpConnection(QString const& hostname, int const port, bool con
 void HttpConnection::open()
 {
    m_networkAccessManager = new QNetworkAccessManager(this);
-   if (!m_networkAccessManager) throw Exception("HTTP open connection failed");
-   m_status = Opened;
+   if (!m_networkAccessManager) {
+      m_message = "Failed to open HTTP connection to " + m_hostname;
+      m_status = Error;
+      QLOG_DEBUG() << m_message;
+   }else {
+      m_status = Opened;
+   }
 }
 
 
@@ -77,7 +82,12 @@ QString HttpConnection::obtainCookie()
    reply->start();
    loop.exec();
 
-   if (reply->status() == Reply::TimedOut) throw NetworkTimeout();
+   // This is not getting caught (no thread saftey)
+   if (reply->status() == Reply::TimedOut) {
+      m_message = "Connection timeout to " + m_hostname;
+      m_status = Error;
+      QLOG_DEBUG() << m_message;
+   }
 
    if (reply->status() == Reply::Finished) {
       QString msg(reply->message());
@@ -85,7 +95,7 @@ QString HttpConnection::obtainCookie()
       if (msg.contains("Qchemserv-Status::OK") && rx.indexIn(msg,0) != -1) {
          cookie = rx.cap(1);
       }
-      qDebug() << "Returning cookie:" << cookie;
+      QLOG_DEBUG() << "Returning cookie:" << cookie;
    }
 
    reply->deleteLater();

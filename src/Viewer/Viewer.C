@@ -529,6 +529,7 @@ void Viewer::drawLabels(GLObjectList const& objects)
    bool selectedOnly = (m_selectedObjects.count() > 0);
 
    glDisable(GL_LIGHTING);
+   glEnable(GL_DEPTH_TEST);
 
    GLObjectList::const_iterator object;
    for (object = objects.begin(); object!= objects.end(); ++object) {
@@ -584,6 +585,7 @@ void Viewer::drawLabels(GLObjectList const& objects)
       drawText(width()-s_labelFontMetrics.width(msg), height()-10, msg);
    }
 
+   glDisable(GL_DEPTH_TEST);
    glEnable(GL_LIGHTING);
 }
 
@@ -654,7 +656,7 @@ void Viewer::displayGeometricParameter(GLObjectList const& selection)
    // We cannot use displayMessage here as it triggers an update
    //displayMessage(""); 
 
-   drawText(10, height()-10, msg);
+   if (message_.isEmpty()) drawText(10, height()-10, msg);
 }
 
 

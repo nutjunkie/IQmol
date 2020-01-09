@@ -49,7 +49,6 @@ namespace Parser {
          static QStringList parseForErrors(TextStream&);
 
       private:
-         Data::Geometry* readStandardCoordinates(TextStream&);
          void readStandardCoordinates(TextStream&, Data::Geometry&);
          void readCharges(TextStream&, Data::Geometry&, Data::Type::ID);
          void readNmrShifts(TextStream&, Data::Geometry&, Data::Nmr&);
@@ -64,16 +63,17 @@ namespace Parser {
             QList<unsigned> const& partialHessianAtomList);
          void readEffectiveRegion(TextStream&);
          void readDMA(TextStream&, Data::Geometry&);
-         void readCisStates(TextStream&, Data::ExcitedStates::ExcitedStatesT);
          void readCisdStates(TextStream&);
          void readOrbitalSymmetries(TextStream&, bool const readSymmetries);
          void readDyson(TextStream&, DysonData&);
 
+         Data::Geometry* readStandardCoordinates(TextStream&);
          Data::ShellList* readBasis(TextStream&, Data::Geometry&);
-
-void dumpDyson(DysonData const&);
+         Data::ExcitedStates* readCisStates(TextStream&, Data::ExcitedStates::ExcitedStatesT);
 
          void setTotalEnergy(QString const&, Data::Geometry*, QString const& label = QString());
+
+         void dumpDyson(DysonData const&);
 
          unsigned m_nAlpha;
          unsigned m_nBeta;

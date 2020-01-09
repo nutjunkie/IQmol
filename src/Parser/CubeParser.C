@@ -97,6 +97,11 @@ int Cube::parseGridAxes(TextStream& textStream)
    QStringList tokens(textStream.nextLineAsTokens());
    if (tokens.size() != 4) return 0;
    nAtoms = tokens[0].toInt(&ok);
+   if (nAtoms < 0) {
+      nAtoms = -nAtoms;
+      QLOG_WARN() << "Negative number of atoms in cube file";
+   }
+
    x = tokens[1].toDouble(&xOk);
    y = tokens[2].toDouble(&yOk);
    z = tokens[3].toDouble(&zOk);

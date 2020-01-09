@@ -46,6 +46,21 @@ bool RemSection::isSet(QString const& key) const
 }
 
 
+QString RemSection::format() const
+{
+   QString rem("$rem\n");
+
+   QMap<QString, QString>::const_iterator iter;
+   for (iter = m_rem.begin(); iter != m_rem.end(); ++iter) {
+       rem +=  "  " + iter.key() + " = " + iter.value() + "\n";
+   }
+
+   rem += "$end";
+
+   return rem;
+}
+
+
 void RemSection::dump() const
 {
    QMap<QString, QString>::const_iterator iter;

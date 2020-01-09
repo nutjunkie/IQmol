@@ -43,6 +43,7 @@ namespace Data {
 
          Type::ID typeID() const { return Type::Geometry; }
          
+         bool isValid() const;
          unsigned nAtoms() const { return (unsigned)m_atoms.size(); }
          QString atomicSymbol(unsigned const i) const;
          unsigned atomicNumber(unsigned const i) const;

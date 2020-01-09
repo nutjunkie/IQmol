@@ -184,6 +184,8 @@ bool QChemOutput::parse(TextStream& textStream)
    // Another hack.  We need a petite list of atoms for partial hessian calculations
    QList<unsigned> partialHessianAtomList;
 
+   // More hacks.  This time for excited state PES scans.
+   double finalEnergy(0);
 
    while (!textStream.atEnd()) {
       line = textStream.nextLine();
@@ -217,8 +219,9 @@ bool QChemOutput::parse(TextStream& textStream)
          textStream.skipLine();
          QChemInput parser;
          if (parser.parse(textStream)) {
-            // Remove the input geometry list
             Data::Bank& bank(parser.data());
+
+            // Remove the input geometry list
             bank.deleteData<Data::GeometryList>();
             bank.deleteData<Data::Geometry>();
             m_dataBank.merge(bank);
@@ -259,6 +262,14 @@ bool QChemOutput::parse(TextStream& textStream)
       }else if (line.contains("Starting FSM Calculation")) {
          isFSM = true;
 
+      }else if (line.contains("Final energy is")) {
+         tokens = TextStream::tokenize(line);
+         if (tokens.size() > 3) {
+            bool ok(false);
+            finalEnergy = tokens[3].toDouble(&ok);
+            if (!ok) { QLOG_WARN() << "Invalid final energy" << tokens[3];}
+         }
+
       }else if (line.contains("PES scan, value:")) {
          tokens = TextStream::tokenize(line);
          if (tokens.size() > 5 && currentGeometry) {
@@ -269,8 +280,9 @@ bool QChemOutput::parse(TextStream& textStream)
             if (energyOk && valueOk) {
                if (!scanGeometries) scanGeometries = new Data::GeometryList("Scan Geometries");
                Data::Geometry* geom(new Data::Geometry(*currentGeometry));
-               Data::TotalEnergy& total(currentGeometry->getProperty<Data::TotalEnergy>());
-               total.setValue(energy, Data::Energy::Hartree);
+               Data::TotalEnergy& total(geom->getProperty<Data::TotalEnergy>());
+               //total.setValue(energy, Data::Energy::Hartree);
+               total.setValue(finalEnergy, Data::Energy::Hartree);
                Data::Constraint& constraint(geom->getProperty<Data::Constraint>());
                constraint.setValue(value);
                scanGeometries->append(geom);
@@ -374,7 +386,7 @@ bool QChemOutput::parse(TextStream& textStream)
          tokens = TextStream::tokenize(line);
          if (tokens.size() == 3) setTotalEnergy(tokens[2], currentGeometry, "MP4");
 
-      }else if (line.contains("Energy is  ")) { 
+      }else if (line.contains("   Energy is   ")) { 
          // Over-ride for geometry optimizations, which might be on an excited state
          tokens = TextStream::tokenize(line);
          if (tokens.size() == 3) setTotalEnergy(tokens[2], currentGeometry);
@@ -416,12 +428,14 @@ bool QChemOutput::parse(TextStream& textStream)
 
       }else if (line.contains("TDDFT Excitation Energies")) {
          textStream.skipLine(2);
-         readCisStates(textStream, Data::ExcitedStates::TDDFT);
-
+         Data::ExcitedStates* states(readCisStates(textStream, Data::ExcitedStates::TDDFT));
+         if (states) { m_dataBank.append(states); }
+         
       }else if (line.contains("CIS Excitation Energies") ||
                 line.contains("TDDFT/TDA Excitation Energies")) {
          textStream.skipLine(2);
-         readCisStates(textStream, Data::ExcitedStates::CIS);
+         Data::ExcitedStates* states(readCisStates(textStream, Data::ExcitedStates::CIS));
+         if (states) { m_dataBank.append(states); }
 
       }else if (line.contains("CIS(D) Excitation Energies")) {
          textStream.skipLine(2);
@@ -719,11 +733,11 @@ Data::ShellList* QChemOutput::readBasis(TextStream& textStream, Data::Geometry& 
 }
 
 
-void QChemOutput::readCisStates(TextStream& textStream, 
+Data::ExcitedStates* QChemOutput::readCisStates(TextStream& textStream,
    Data::ExcitedStates::ExcitedStatesT type)
 {
    Data::ExcitedStates* states(new Data::ExcitedStates(type));
-qDebug() << "Reading" << states->typeLabel() << "States";
+//qDebug() << "Reading" << states->typeLabel() << "States";
 
    QStringList tokens;
 
@@ -747,7 +761,6 @@ qDebug() << "Reading" << states->typeLabel() << "States";
          break;
 
       }else if (size >= 8 && tokens[0].contains("Excited")) {
-      
          energy = tokens[7].toDouble(&ok);
          if (!ok) goto error;
 
@@ -768,18 +781,12 @@ qDebug() << "Reading" << states->typeLabel() << "States";
 
       }else if (size >= 8 && tokens[0].contains("Trans")) {
 
-         moment.x = tokens[2].toDouble(&ok);
-         if (!ok) goto error;
-
-         moment.y = tokens[4].toDouble(&ok);
-         if (!ok) goto error;
-
-         moment.z = tokens[6].toDouble(&ok);
-         if (!ok) goto error;
+         moment.x = tokens[2].toDouble(&ok);  if (!ok) goto error;
+         moment.y = tokens[4].toDouble(&ok);  if (!ok) goto error;
+         moment.z = tokens[6].toDouble(&ok);  if (!ok) goto error;
 
       }else if (size >= 3 && tokens[0].contains("Strength")) {
-         strength = tokens[2].toDouble(&ok);
-         if (!ok) goto error;
+         strength = tokens[2].toDouble(&ok);  if (!ok) goto error;
 
          Data::ElectronicTransition* transition(
             new Data::ElectronicTransition(energy, strength, moment, s2));
@@ -798,21 +805,26 @@ qDebug() << "Reading" << states->typeLabel() << "States";
 
    //states->dump();
 
-   if (states->nTransitions() > 0) {
-      m_dataBank.append(states);
+   if (states->nTransitions() == 0) {
+      delete states;
+      states = 0;
    }
 
-   return;
+   return states;
 
    error:
      QString msg("Problem parsing excited states section, line number ");
      m_errors.append(msg += QString::number(textStream.lineNumber()));
+     delete states;
+
+     return 0;
 }
+
 
 
 void QChemOutput::readCisdStates(TextStream& textStream)
 {
-qDebug() << "Reading CIS(D) Energies";
+   qDebug() << "Reading CIS(D) Energies";
    // We should already have the CIS energies lying around
    QList<Data::ExcitedStates*> es(m_dataBank.findData<Data::ExcitedStates>());
    if (es.isEmpty()) return;
@@ -1550,7 +1562,7 @@ void QChemOutput::readNmrCouplings(TextStream& textStream, Data::Geometry& geome
 void QChemOutput::readCharges(TextStream& textStream, Data::Geometry& geometry, 
    Data::Type::ID type)
 {
-qDebug() << "Reading charge group" << Data::Type::toString(type);
+   //qDebug() << "Reading charge group" << Data::Type::toString(type);
    QStringList tokens;
 
    QList<double> charges;

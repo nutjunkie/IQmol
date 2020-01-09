@@ -1,3 +1,5 @@
+#ifndef IQMOL_LAYER_REM_H
+#define IQMOL_LAYER_REM_H
 /*******************************************************************************
        
   Copyright (C) 2011-2015 Andrew Gilbert
@@ -20,49 +22,26 @@
    
 ********************************************************************************/
 
-#include "FileLayer.h"
-#include <QFileInfo>
-#include <QFile>
+#include "Layer.h"
+#include "RemSectionData.h"
 
 
 namespace IQmol {
 namespace Layer {
 
-File::File(Data::File const& file) : m_filePath(file.path()), m_configurator(*this)
-{
-   QFileInfo fileInfo(m_filePath);
-   setText(fileInfo.fileName());
-   setConfigurator(&m_configurator);
-}
+   /// Simple Layer holding a set of REM options.
+   class Rem : public Base {
 
+      Q_OBJECT
 
-File::File(QString const& filePath) : m_filePath(filePath), m_configurator(*this)
-{
-   QFileInfo fileInfo(m_filePath);
-   setText(fileInfo.fileName());
-   setConfigurator(&m_configurator);
-}
+      public:
+         Rem(Data::RemSection const& remSection);
+         QString formatSection() const { return m_remSection.format(); }
 
+      private:
+         Data::RemSection m_remSection;
+   };
 
-void File::tail(int const interval) 
-{
-   configure();
-   m_configurator.tail(interval);
-}
+} }  // end namespace IQmol::Layer
 
-
-QString File::contents() const
-{
-   QString contents;
-   QFile qfile;
-   qfile.setFileName(m_filePath);
-
-   if (qfile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-      contents = QString(qfile.readAll());
-      qfile.close();
-   }
-
-   return contents;
-}
-
-} } // end namespace IQmol::Layer
+#endif

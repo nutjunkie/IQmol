@@ -39,6 +39,7 @@ namespace Data {
          void insert(QString const& key, QString const& value);
          bool isSet(QString const& key) const;
          void dump() const;
+         QString format() const;
 
          void serialize(InputArchive& ar, unsigned int const version = 0) {
             privateSerialize(ar, version);

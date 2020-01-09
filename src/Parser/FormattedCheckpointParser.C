@@ -345,6 +345,8 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
       }else if (key.contains("Orbital Coefficients")) {
          if (!toInt(n, list, 2)) goto error;
          genericData.alphaCoefficients.append(readDoubleArray(textStream, n));
+         key.replace("Orbital Coefficients", "");
+         genericData.label = key.trimmed();
 
       // Geminals
 
@@ -653,12 +655,12 @@ Data::Orbitals* FormattedCheckpoint::makeOrbitals(unsigned const nAlpha,
 
       case Data::Orbitals::Generic: {
          orbitals = new Data::Orbitals(Data::Orbitals::Generic, *shellList, 
-            orbitalData.alphaCoefficients, orbitalData.betaCoefficients, "Generic");
+            orbitalData.alphaCoefficients, orbitalData.betaCoefficients, orbitalData.label);
             
       } break;
 
       default:
-         QLOG_WARN() << "Unknown oribital type in FormattedCheckpoint::makeOrbitals";
+         QLOG_WARN() << "Unknown orbital type in FormattedCheckpoint::makeOrbitals";
          break;
    }
 

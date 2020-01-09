@@ -44,7 +44,7 @@ namespace Process {
          QStringList availableServers() const;
 
          /// Config is not const as the name can change if it already exists
-         Server* addServer(ServerConfiguration&);
+         static Server* addServer(ServerConfiguration&);
 
          /// Closes all server connections, mainly for debugging
          void closeAllConnections();
@@ -54,7 +54,7 @@ namespace Process {
 
 		 /// Checks if the named Server exists in the ServerRegistry and, if
 		 /// so, returns the correponding pointer.  If not, it returns null.
-         Server* find(QString const& serverName) const;
+         static Server* find(QString const& serverName);
 
 		 /// Removes the Server from the ServerRegistry so that it can no 
 		 /// longer be accessed.  Although the Server configuration cannot 
@@ -74,7 +74,6 @@ namespace Process {
 
          static void save() { s_instance->saveToPreferences(); }
 
-
       private:
          static ServerRegistry* s_instance;
          static QList<Server*>  s_servers;
@@ -84,6 +83,7 @@ namespace Process {
          static int  indexOf(QString const& serverName);
          static void loadFromPreferences();
          static void saveToPreferences();
+         static bool loadFromFile(QString const& filePath, ServerConfiguration& serverConfig);
 
          // Hide these to prevent multiple instances
          ServerRegistry() { }

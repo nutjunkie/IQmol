@@ -25,6 +25,9 @@
 #include "Server.h"
 #include "QMsgBox.h"
 #include "Exception.h"
+#include "YamlNode.h"
+#include "ParseFile.h"
+#include <QDir>
 
 
 namespace IQmol {
@@ -99,7 +102,7 @@ void ServerRegistry::connectServers(QStringList const& servers)
 }
 
 
-Server* ServerRegistry::find(QString const& serverName) const
+Server* ServerRegistry::find(QString const& serverName)
 {
    int index(indexOf(serverName));
    if (index >= 0) return s_servers[index];
@@ -170,8 +173,34 @@ void ServerRegistry::loadFromPreferences()
           s_servers.append(new Server(ServerConfiguration(*iter)));
       }
 
-      // Default iqmol.q-chem.com server
-      if (s_servers.isEmpty()) s_servers.append(new Server(ServerConfiguration()));
+
+      // Look for default servers in the share directory
+      if (s_servers.isEmpty()) {
+         QDir dir(Preferences::ServerDirectory());
+         qDebug() << "Server Directory set to: " << dir.absolutePath();
+         if (dir.exists()) {
+            QStringList filters;
+            filters << "*.cfg";
+            QStringList listing(dir.entryList(filters, QDir::Files));
+         
+            QStringList::iterator iter;
+            for (iter = listing.begin(); iter != listing.end(); ++iter) {
+                QFileInfo info(dir, *iter);
+                qDebug() << "Reading server configutation from: " << info.absoluteFilePath();
+                ServerConfiguration serverConfiguration;
+                if (loadFromFile(info.absoluteFilePath(), serverConfiguration)) {
+                   addServer(serverConfiguration);
+                   //s_servers.append(new Server(serverConfiguration));
+                }
+            }
+         }
+      }
+
+      // Finally, if there are no servers, add the eefault iqmol.q-chem.com server
+      if (s_servers.isEmpty()) {
+         qDebug() << "Appending Q-Chem server";
+         s_servers.append(new Server(ServerConfiguration()));
+      }
 
    } catch (Exception& ex) {
       QString msg("Problem loading servers from Preferences file:\n");
@@ -190,5 +219,37 @@ void ServerRegistry::saveToPreferences()
    }
    Preferences::ServerConfigurationList(list);
 }
+
+
+bool ServerRegistry::loadFromFile(QString const& filePath, ServerConfiguration& serverConfig)
+{
+   bool ok(false);
+
+   QFile file(filePath);
+   if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      QLOG_ERROR() << "Server configuraiton file does not exist" << filePath;
+      return ok;
+   }   
+
+   Parser::ParseFile parser(filePath);
+   parser.start();
+   parser.wait();
+
+   QStringList errors(parser.errors());
+   if (!errors.isEmpty()) {
+      QLOG_ERROR() << errors.join("\n");
+   }   
+
+   Data::Bank& bank(parser.data());
+   QList<Data::YamlNode*> yaml(bank.findData<Data::YamlNode>());
+   if (yaml.first()) {
+      yaml.first()->dump();
+      serverConfig = ServerConfiguration(*(yaml.first()));
+      ok = true;
+   }   
+
+   return ok;
+}
+
 
 } } // end namespace IQmol::Process

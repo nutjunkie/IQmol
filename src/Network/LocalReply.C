@@ -87,7 +87,6 @@ void LocalExecute::run()
    }
 
    QLOG_DEBUG() << "Executing command" << command << "with args:" << arguments;
-   qDebug() << "Executing command" << command << "with args:" << arguments;
 
    if (!cmd.isExecutable()) {
       QFile file(command);

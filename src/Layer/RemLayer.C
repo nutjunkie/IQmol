@@ -20,49 +20,14 @@
    
 ********************************************************************************/
 
-#include "FileLayer.h"
-#include <QFileInfo>
-#include <QFile>
+#include "RemLayer.h"
 
 
 namespace IQmol {
 namespace Layer {
 
-File::File(Data::File const& file) : m_filePath(file.path()), m_configurator(*this)
-{
-   QFileInfo fileInfo(m_filePath);
-   setText(fileInfo.fileName());
-   setConfigurator(&m_configurator);
-}
-
-
-File::File(QString const& filePath) : m_filePath(filePath), m_configurator(*this)
-{
-   QFileInfo fileInfo(m_filePath);
-   setText(fileInfo.fileName());
-   setConfigurator(&m_configurator);
-}
-
-
-void File::tail(int const interval) 
-{
-   configure();
-   m_configurator.tail(interval);
-}
-
-
-QString File::contents() const
-{
-   QString contents;
-   QFile qfile;
-   qfile.setFileName(m_filePath);
-
-   if (qfile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-      contents = QString(qfile.readAll());
-      qfile.close();
-   }
-
-   return contents;
+Rem::Rem(Data::RemSection const& remSection) : m_remSection(remSection) 
+{ 
 }
 
 } } // end namespace IQmol::Layer

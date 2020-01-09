@@ -33,7 +33,7 @@ using namespace qglviewer;
 namespace IQmol {
 namespace Layer {
 
-Info::Info(Molecule* molecule) : m_dipoleEstimated(true), m_configurator(*this),
+Info::Info(Molecule* molecule) : m_dipoleValue(0), m_dipoleEstimated(true), m_configurator(*this),
    m_symmetry(m_pointGroup)
 {
    clear();

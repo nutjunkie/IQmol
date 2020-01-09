@@ -41,6 +41,7 @@ namespace Layer {
 
          void tail(int const interval = 2000);
          QString fileName() const { return m_filePath; }
+         QString contents() const;
         
       private:
          QString m_filePath;

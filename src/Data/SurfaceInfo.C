@@ -32,9 +32,11 @@ template<> const Type::ID SurfaceInfoList::TypeID = Type::SurfaceInfoList;
 
 SurfaceInfo::SurfaceInfo(SurfaceType const& type, unsigned const quality, 
    double const isovalue, QColor const& positive, QColor const& negative, bool isSigned,
-   bool simplifyMesh, double const opacity) : m_surfaceType(type), m_quality(quality),
-   m_isovalue(isovalue),  m_positiveColor(positive), m_negativeColor(negative), 
-   m_isSigned(isSigned), m_simplifyMesh(simplifyMesh), m_opacity(opacity)
+   bool simplifyMesh, double const opacity, bool const isovalueIsPercent) 
+ : m_surfaceType(type), m_quality(quality), m_isovalue(isovalue),  
+   m_positiveColor(positive), m_negativeColor(negative), 
+   m_isSigned(isSigned), m_simplifyMesh(simplifyMesh), m_opacity(opacity), 
+   m_isovalueIsPercent(isovalueIsPercent)
 {
 }
 
