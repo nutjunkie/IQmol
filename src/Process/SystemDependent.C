@@ -47,7 +47,7 @@ QStringList RunCommand(QString const& command, QStringList const& arguments,
    QFileInfo cmd(command);
 
    if (cmd.exists()) {
-      qDebug() << "Executing command" << command << "with args:" << arguments;
+      qDebug() << "Executing local command" << command << "with args:" << arguments;
                
       QProcess process;
       process.setWorkingDirectory(cmd.absolutePath());
