@@ -416,6 +416,8 @@ bool Server::parseSubmitMessage(Job* job, QString const& message)
       case ServerConfiguration::Basic: {
          qDebug() << "Need to correctly parse submit message for server type "
                   << ServerConfiguration::toString(m_configuration.queueSystem());
+         QLOG_DEBUG() << "Submit message:" << message;
+
          // A successful submission returns a string like:
          //   [1] 9876 $QC/exe/qcprog.exe .aaaa.inp.9876.qcin.1 $QCSCRATCH/local/qchem9876
          // ...or on Windows we parse for the following 
