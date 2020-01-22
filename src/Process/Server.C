@@ -28,6 +28,7 @@
 #include "SshConnection.h"
 #include "HttpConnection.h"
 #include "WriteToTemporaryFile.h"
+#include "SystemDependent.h"
 #include "TextStream.h"
 #include "JobMonitor.h"
 #include "Preferences.h"
@@ -314,6 +315,11 @@ void Server::queueJob()
 
       QString workingDirectory(job->jobInfo().get(QChemJobInfo::RemoteWorkingDirectory));
 
+      if (isLocal()) {
+         // Cache a list of currently running qchem jobs so we can identify the new one
+         m_qcprocs = System::GetMatchingProcessIds("qcprog.exe");
+      }
+
       // Note that the execute takes a working directory which is changed into before
       // executing the command.  If the Working Directory path is relative, and if
       // cd ${JOB_DIR} is in the submit command, this results in the change of directory
@@ -414,6 +420,37 @@ bool Server::parseSubmitMessage(Job* job, QString const& message)
       } break;
 
       case ServerConfiguration::Basic: {
+         if (isLocal()) {
+            QList<unsigned> qcprocs = System::GetMatchingProcessIds("qcprog.exe");
+/*
+            qDebug() << "Original list of PIDS:";
+            qDebug() << m_qcprocs; 
+            qDebug() << "New list of PIDS:";
+            qDebug() << qcprocs; 
+*/
+            QList<unsigned>::iterator iter;
+            unsigned jobid(0);
+            for (iter = qcprocs.begin(); iter != qcprocs.end(); ++iter) {
+                if (!m_qcprocs.contains(*iter)) {
+                   qDebug() << "Setting job id to:" << QString::number(*iter);
+                   jobid = *iter;
+                   break;
+                }
+            }
+            job->setJobId(QString::number(jobid));
+            ok = true;
+
+         }else {
+            QStringList tokens(message.split(QRegExp("\\s+"), QString::SkipEmptyParts));
+            if (tokens.size() == 1) {  // bash returns only the pid
+               int id(tokens[0].toInt(&ok));
+               if (ok) job->setJobId(QString::number(id));
+            }else if (tokens.size() >= 2) { // skip csh initial [1] 
+               int id(tokens[1].toInt(&ok));
+               if (ok) job->setJobId(QString::number(id));
+            }
+         }
+/*
          qDebug() << "Need to correctly parse submit message for server type "
                   << ServerConfiguration::toString(m_configuration.queueSystem());
          // A successful submission returns a string like:
@@ -432,15 +469,8 @@ bool Server::parseSubmitMessage(Job* job, QString const& message)
                ok = true;
             }
          }else {
-            QStringList tokens(message.split(QRegExp("\\s+"), QString::SkipEmptyParts));
-            if (tokens.size() == 1) {  // bash returns only the pid
-               int id(tokens[0].toInt(&ok));
-               if (ok) job->setJobId(QString::number(id));
-            }else if (tokens.size() >= 2) { // skip csh initial [1] 
-               int id(tokens[1].toInt(&ok));
-               if (ok) job->setJobId(QString::number(id));
-            }
          }
+*/
       } break;
 
       default:

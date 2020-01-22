@@ -119,6 +119,7 @@ namespace Process {
          // The Server class watches jobs, but is not responsible for them.
          QList<Job*> m_watchedJobs;
          QMap<Network::Reply*, Job*> m_activeRequests;
+         QList<unsigned> m_qcprocs;
 
          QTimer m_updateTimer;
    };
