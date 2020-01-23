@@ -173,30 +173,8 @@ QString TemplateForRunFile(bool const local)
             "set QC=C:\\QChem\\5.2.2\n"
             ":: <-- End user configuration -->\n"
             "\n"
-            "set QCEXE=qcprog.exe\n"
-            "\n"
-            "setlocal enabledelayedexpansion\n"
-            "\n"
-            "set QCproc=:\n"
-            "for /F \"tokens=2 delims= \" %%A IN ('tasklist /fi ^\"imagename eq %QCEXE%^\" /nh') do set QCproc=!QCproc!%%A:\n"
-            "\n"
-            "start \"\" /b %QC%\\bin\\qchem ${JOB_NAME}.inp  ${JOB_NAME}.out  2> ${JOB_NAME}.err\n"
-            "\n"
-            "timeout /t 1 >nul\n"
-            "tasklist /v /fo csv >nul\n"
-            "\n"
-            "set ProcessId=\n"
-            "for /F \"tokens=2 delims= \" %%A IN ('tasklist /fi ^\"imagename eq %QCEXE%^\" /nh') do (call :findpid %%A)\n"
-            "echo ProcessId = %ProcessId% =\n"
-            "\n"
-            "endlocal\n"
-            "exit \n"
-            "\n"
-            ":findpid\n"
-            "if not [%1] == [] (\n"
-            "   echo.\"%QCProc%\" | findstr /C:^:%1^: 1>nul\n"
-            "   if errorlevel 1 ( set ProcessId=%1 )\n"
-            ")\n";
+            "start /b %QC%\\qcenv ${JOB_NAME}.inp  ${JOB_NAME}.out  2> ${JOB_NAME}.err\n"
+            "exit \n";
 #endif
    }
    return cmd;
