@@ -182,11 +182,13 @@ in_addr_t HostLookup(QString const& hostname)
    }else {
       struct hostent* host;
       host = gethostbyname(hostname.toLatin1().data());
-      if (host->h_addrtype == AF_INET6) {
-         QLOG_ERROR() << "IPv6 addresses are not supported";
-         address = INADDR_NONE;
-      }else if (host) {
-         address = *(in_addr_t*)host->h_addr;
+      if (host) {
+         if (host->h_addrtype == AF_INET6) {
+            QLOG_ERROR() << "IPv6 addresses are not supported";
+            address = INADDR_NONE;
+         }else {
+            address = *(in_addr_t*)host->h_addr;
+         }
       }
    }
 

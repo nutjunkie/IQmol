@@ -114,7 +114,6 @@ bool Server::open()
    }
 
    if (m_connection->status() == Network::Connection::Closed) {
-      QLOG_TRACE() << "Opening connection to server" << name();
       m_connection->open();
    }
 
@@ -144,6 +143,7 @@ bool Server::open()
 
    if (m_connection->status() == Network::Connection::Error) {
       QLOG_ERROR() << "Failed to connect to server " + name();
+      m_message += m_connection->message();
       delete m_connection;
       m_connection = 0;
    }
@@ -317,7 +317,8 @@ void Server::queueJob()
 
       if (isLocal()) {
          // Cache a list of currently running qchem jobs so we can identify the new one
-         m_qcprocs = System::GetMatchingProcessIds("qcprog.exe");
+         m_qcprogs = System::GetMatchingProcessIds("qcprog.exe");
+         m_cmds    = System::GetMatchingProcessIds("cmd.exe");
       }
 
       // Note that the execute takes a working directory which is changed into before
@@ -421,17 +422,26 @@ bool Server::parseSubmitMessage(Job* job, QString const& message)
 
       case ServerConfiguration::Basic: {
          if (isLocal()) {
-            QList<unsigned> qcprocs = System::GetMatchingProcessIds("qcprog.exe");
-/*
-            qDebug() << "Original list of PIDS:";
-            qDebug() << m_qcprocs; 
-            qDebug() << "New list of PIDS:";
-            qDebug() << qcprocs; 
-*/
+            int count(0);
+
+            QList<unsigned> qcprogs = System::GetMatchingProcessIds("qcprog.exe");
+
+            while (count <= 4 && qcprogs.size() <= m_qcprogs.size()) {
+               qDebug() << "searching" <<  count << qcprogs.size() << m_qcprogs.size();
+               QThread::msleep(500) ;
+               qcprogs = System::GetMatchingProcessIds("qcprog.exe");
+               count++;
+            }
+
+            QLOG_DEBUG() << "Original list of PIDS:";
+            QLOG_DEBUG() << m_qcprogs; 
+            QLOG_DEBUG() << "New list of PIDS:";
+            QLOG_DEBUG() << qcprogs; 
+  
             QList<unsigned>::iterator iter;
-            unsigned jobid(0);
-            for (iter = qcprocs.begin(); iter != qcprocs.end(); ++iter) {
-                if (!m_qcprocs.contains(*iter)) {
+            int jobid(-1);
+            for (iter = qcprogs.begin(); iter != qcprogs.end(); ++iter) {
+                if (!m_qcprogs.contains(*iter)) {
                    qDebug() << "Setting job id to:" << QString::number(*iter);
                    jobid = *iter;
                    break;
@@ -661,6 +671,8 @@ bool Server::parseQueryMessage(Job* job, QString const& message)
          if (message.isEmpty()) {
             status = Job::Finished;
          }else if (message.contains("No tasks are running")) { // Windows
+            status = Job::Finished;
+         }else if (message.contains("ERROR")) { // Windows
             status = Job::Finished;
          }else if (message.contains(Preferences::ServerQueryJobFinished())) { // Windows
             status = Job::Finished;

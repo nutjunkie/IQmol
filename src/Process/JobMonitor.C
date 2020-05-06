@@ -290,7 +290,9 @@ void JobMonitor::submitJob(QChemJobInfo& qchemJobInfo)
       BlockServerUpdates bs(server);
       postUpdateMessage("Connecting to server...");
       if (!server->open()) {
-         QMsgBox::warning(this, "IQmol", "Failed to connnect to server");
+         QString msg("Failed to connnect to server\n");
+         msg += server->message();
+         QMsgBox::warning(this, "IQmol", msg);
          postUpdateMessage("");
          return;
       }

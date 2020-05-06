@@ -77,6 +77,8 @@ namespace Process {
          // Unthreaded command to get queue information
          QString queueInfo();
 
+         QString const& message() const { return m_message; }
+
          void submit(Job*);
          void query(Job*);
          void kill(Job*);
@@ -119,7 +121,9 @@ namespace Process {
          // The Server class watches jobs, but is not responsible for them.
          QList<Job*> m_watchedJobs;
          QMap<Network::Reply*, Job*> m_activeRequests;
-         QList<unsigned> m_qcprocs;
+         QList<unsigned> m_qcprogs;
+         QList<unsigned> m_cmds;
+         QString m_message;
 
          QTimer m_updateTimer;
    };
