@@ -315,9 +315,10 @@ void Server::queueJob()
 
       QString workingDirectory(job->jobInfo().get(QChemJobInfo::RemoteWorkingDirectory));
 
-      if (isLocal()) {
+      if (isBasic()) {
          // Cache a list of currently running qchem jobs so we can identify the new one
-         m_qcprogs = System::GetMatchingProcessIds("qcprog.exe");
+         QString exeName(m_configuration.value(ServerConfiguration::QueueInfo));
+         m_qcprogs = System::GetMatchingProcessIds(exeName);
          m_cmds    = System::GetMatchingProcessIds("cmd.exe");
       }
 
@@ -424,12 +425,14 @@ bool Server::parseSubmitMessage(Job* job, QString const& message)
          if (isLocal()) {
             int count(0);
 
-            QList<unsigned> qcprogs = System::GetMatchingProcessIds("qcprog.exe");
+            QString exeName(m_configuration.value(ServerConfiguration::QueueInfo));
+
+            QList<unsigned> qcprogs = System::GetMatchingProcessIds(exeName);
 
             while (count <= 4 && qcprogs.size() <= m_qcprogs.size()) {
                qDebug() << "searching" <<  count << qcprogs.size() << m_qcprogs.size();
                QThread::msleep(500) ;
-               qcprogs = System::GetMatchingProcessIds("qcprog.exe");
+               qcprogs = System::GetMatchingProcessIds(exeName);
                count++;
             }
 

@@ -54,6 +54,10 @@ namespace Process {
             return m_configuration.isLocal();
          }
 
+         bool isBasic() const { 
+            return m_configuration.isBasic();
+         }
+
          bool isWebBased() const { 
             return m_configuration.isWebBased();
          }
