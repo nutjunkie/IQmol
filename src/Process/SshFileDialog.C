@@ -22,26 +22,47 @@
 
 #include "SshFileDialog.h"
 #include "Preferences.h"
+#include "ServerConfiguration.h"
 
 
 namespace IQmol {
+namespace Process {
 
-SshFileDialog::SshFileDialog(QWidget* parent) : QDialog(parent)
+SshFileDialog::SshFileDialog(ServerConfiguration* configuration, QWidget* parent) 
+ : QDialog(parent), m_configuration(configuration)
 {
    m_dialog.setupUi(this);
-   m_dialog.knownHosts->setText(Preferences::SSHKnownHostsFile());
-   m_dialog.publicKey->setText(Preferences::SSHPublicIdentityFile());
-   m_dialog.privateKey->setText(Preferences::SSHPrivateIdentityFile());
+
+   QString publicKeyFile  = m_configuration->value(ServerConfiguration::PublicKeyFile);
+   QString privateKeyFile = m_configuration->value(ServerConfiguration::PrivateKeyFile);
+   QString knownHostsFile = m_configuration->value(ServerConfiguration::KnownHostsFile);
+
+   if (publicKeyFile.isEmpty())  publicKeyFile  = Preferences::SSHPublicIdentityFile();
+   if (privateKeyFile.isEmpty()) privateKeyFile = Preferences::SSHPrivateIdentityFile();
+   if (knownHostsFile.isEmpty()) knownHostsFile = Preferences::SSHKnownHostsFile();
+
+   m_dialog.publicKey->setText(publicKeyFile);
+   m_dialog.privateKey->setText(privateKeyFile);
+   m_dialog.knownHosts->setText(knownHostsFile);
+
    connect(this, SIGNAL(accepted()), this, SLOT(updatePreferences()));
 }
 
 
 void SshFileDialog::updatePreferences()
 {
-    Preferences::SSHKnownHostsFile(m_dialog.knownHosts->text());
-    Preferences::SSHPublicIdentityFile(m_dialog.publicKey->text());
-    Preferences::SSHPrivateIdentityFile(m_dialog.privateKey->text());
+   QString publicKeyFile(m_dialog.publicKey->text());
+   QString privateKeyFile(m_dialog.privateKey->text());
+   QString knownHostsFile(m_dialog.knownHosts->text());
+
+    m_configuration->setValue(ServerConfiguration::PublicKeyFile, publicKeyFile);
+    m_configuration->setValue(ServerConfiguration::PrivateKeyFile, privateKeyFile);
+    m_configuration->setValue(ServerConfiguration::KnownHostsFile, knownHostsFile);
+
+    Preferences::SSHPublicIdentityFile(publicKeyFile);
+    Preferences::SSHPrivateIdentityFile(privateKeyFile);
+    Preferences::SSHKnownHostsFile(knownHostsFile);
 }
 
 
-} // end namespace IQmol
+}} // end namespace IQmol::Process

@@ -45,6 +45,9 @@ libraries.  The compilation of the code itself is relatively straightforward.
 
    - Shared and static libraries located in src/.libs
 
+   - with cmake:
+cmake -DOPENSSL_ROOT_DIR=$DEV/openssl-1.1.1f/ -DOPENSSL_INCLUDE_DIR=$DEV/openssl-1.1.1f/include/ -DOPENSSL_CRYPTO_LIBRARY=$DEV/openssl-1.1.1f/libcrypto.a -DOPENSSL_SSL_LIBRARY=$DEV/Development/openssl-1.1.1f/libssl.a ../
+
 
  o Boost:
    - Download: http://sourceforge.net/projects/boost/files/boost/1.56.0/

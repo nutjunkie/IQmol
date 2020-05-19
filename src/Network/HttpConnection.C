@@ -91,7 +91,7 @@ QString HttpConnection::obtainCookie()
 
    if (reply->status() == Reply::Finished) {
       QString msg(reply->message());
-      QRegExp rx("Qchemserv-Cookie::([0-9a-zA-Z\\-_]+)");
+      QRegExp rx("Qchemserv-Cookie::([0-9a-zA-Z\\-\\._]+)");
       if (msg.contains("Qchemserv-Status::OK") && rx.indexIn(msg,0) != -1) {
          cookie = rx.cap(1);
       }

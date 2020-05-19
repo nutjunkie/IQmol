@@ -84,6 +84,7 @@ void Server::closeConnection()
 
 bool Server::open()
 {
+   bool ok(true);
    // Short circuit the open if we have already been authenticated.
    if (m_connection && m_connection->status() == Network::Connection::Authenticated) return true;
 
@@ -92,6 +93,10 @@ bool Server::open()
                    << m_configuration.value(ServerConfiguration::Connection);
 
       QVariant address(m_configuration.value(ServerConfiguration::HostAddress));
+      QVariant publicKeyFile(m_configuration.value(ServerConfiguration::PublicKeyFile));
+      QVariant privateKeyFile(m_configuration.value(ServerConfiguration::PrivateKeyFile));
+      QVariant knownHostsFile(m_configuration.value(ServerConfiguration::KnownHostsFile));
+
       int port(m_configuration.port());
 
       switch (m_configuration.connection()) {
@@ -99,10 +104,10 @@ bool Server::open()
             m_connection = new Network::LocalConnection();
             break;
          case ServerConfiguration::SSH:
-            m_connection = new Network::SshConnection(address.toString(), port);
-            break;
          case ServerConfiguration::SFTP:
-            m_connection = new Network::SshConnection(address.toString(), port, true);
+            m_connection = new Network::SshConnection(address.toString(), port, 
+               publicKeyFile.toString(), privateKeyFile.toString(), 
+               knownHostsFile.toString(), true);
             break;
          case ServerConfiguration::HTTP:
             m_connection = new Network::HttpConnection(address.toString(), port);
@@ -114,7 +119,6 @@ bool Server::open()
    }
 
    if (m_connection->status() == Network::Connection::Closed) {
-      QLOG_TRACE() << "Opening connection to server" << name();
       m_connection->open();
    }
 
@@ -139,16 +143,14 @@ bool Server::open()
          queryAllJobs();
          startUpdates();
       }
-      return true;
-   }
-
-   if (m_connection->status() == Network::Connection::Error) {
-      QLOG_ERROR() << "Failed to connect to server " + name();
+   }else {
+      m_message = m_connection->message();
       delete m_connection;
       m_connection = 0;
+      ok = false;
    }
 
-   return false;
+   return ok;
 }
 
 
@@ -596,6 +598,7 @@ bool Server::parseQueryMessage(Job* job, QString const& message)
             if (rv == "DONE")    status = Job::Finished;
             if (rv == "RUNNING") status = Job::Running;
             if (rv == "QUEUED")  status = Job::Queued;
+            if (rv == "NEW")     status = Job::Queued;
             if (rv == "ERROR")   status = Job::Error;
             ok = true;
           }

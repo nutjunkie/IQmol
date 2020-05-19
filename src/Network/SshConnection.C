@@ -25,7 +25,6 @@
 #include "QsLog.h"
 #include "Network.h"
 #include "NetworkException.h"
-#include "Preferences.h"
 #include <QInputDialog>
 #include <QFileInfo>
 #include <QEventLoop>
@@ -48,6 +47,8 @@
 #endif
 
 #include <stdio.h>
+#include "openssl/sha.h"
+#include "openssl/md5.h"
 
 
 namespace IQmol {
@@ -58,8 +59,12 @@ namespace Network {
 unsigned SshConnection::s_numberOfConnections = 0;
 
 
-SshConnection::SshConnection(QString const& hostname, int const port, bool const useSftp) : 
-   Connection(hostname, port), m_session(0), m_socket(0), m_agent(0), m_useSftp(useSftp)
+SshConnection::SshConnection(QString const& hostname, int const port, 
+   QString const& publicKeyFile, QString const& privateKeyFile, 
+   QString const& knownHostsFile, bool const useSftp) : 
+   Connection(hostname, port), m_session(0), m_socket(0), m_agent(0), 
+   m_publicKeyFile(publicKeyFile), m_privateKeyFile(privateKeyFile),
+   m_knownHostsFile(knownHostsFile), m_useSftp(useSftp)
 {
 }
 
@@ -67,7 +72,7 @@ SshConnection::SshConnection(QString const& hostname, int const port, bool const
 
 void SshConnection::open()
 {
-   QLOG_TRACE() << "Opening connection to" << m_hostname;
+   QLOG_TRACE() << "Opening SSH connection to" << m_hostname;
    try {
       if (s_numberOfConnections == 0) init();
 
@@ -217,16 +222,17 @@ bool SshConnection::openSocket(unsigned const timeout)
             QLOG_ERROR() << m_message;
             return false;
 
-         }else if (rc > 0) {
+         }else if (rc > 0 && errno != EINTR) {
             // Socket selected for write 
             socklen_t lon(sizeof(int));
             int errorStatus;
             
 #ifdef WIN32
-            if (getsockopt(m_socket, SOL_SOCKET, SO_ERROR, (char*)(&errorStatus), &lon) < 0) {
+            if (getsockopt(m_socket, SOL_SOCKET, SO_ERROR, (char*)(&errorStatus), &lon) < 0)
 #else
-            if (getsockopt(m_socket, SOL_SOCKET, SO_ERROR, (void*)(&errorStatus), &lon) < 0) {
+            if (getsockopt(m_socket, SOL_SOCKET, SO_ERROR, (void*)(&errorStatus), &lon) < 0) 
 #endif
+            {
                QString msg(": ");
                m_message = "Error check on socket: " + m_hostname + " " + lastError();
                m_status = Error;
@@ -253,6 +259,82 @@ bool SshConnection::openSocket(unsigned const timeout)
    }
 
    return true;
+}
+
+
+bool SshConnection::checkHost()
+{
+   bool ok(true);
+
+   LIBSSH2_KNOWNHOSTS* knownHosts = libssh2_knownhost_init(m_session);
+   if (!knownHosts) {
+      m_message = "Unable to initialize SSH known hosts"; 
+      return false;
+   }
+
+   libssh2_knownhost_readfile(knownHosts, getKnownHostsFile().toLatin1().data(),  
+      LIBSSH2_KNOWNHOST_FILE_OPENSSH);
+
+   size_t length;
+   int    type, check;
+   const char* fingerprint = libssh2_session_hostkey(m_session, &length, &type);
+
+   if (!fingerprint) {
+      m_message = "Failed to obtain host key fingerprint";
+      ok = false;
+      goto cleanup;
+   }
+
+   struct libssh2_knownhost *host;
+
+   check = libssh2_knownhost_checkp(knownHosts, m_hostname.toLatin1().data(), 
+       m_port, fingerprint, length, LIBSSH2_KNOWNHOST_TYPE_PLAIN | 
+       LIBSSH2_KNOWNHOST_KEYENC_RAW, &host);
+
+   switch (check) {
+      case LIBSSH2_KNOWNHOST_CHECK_FAILURE:
+         m_message = "Failed SSH known host check";
+         ok = false;
+         goto cleanup;
+         break;
+      case LIBSSH2_KNOWNHOST_CHECK_NOTFOUND:
+         m_message = "SSH host key not found in " + getKnownHostsFile();
+         ok = false;
+         goto cleanup;
+         break;
+      case LIBSSH2_KNOWNHOST_CHECK_MATCH:
+         m_message = "Host key found";
+         ok = true;
+         break;
+      case LIBSSH2_KNOWNHOST_CHECK_MISMATCH:
+         m_message = "SSH keys do not match with host found in " + getKnownHostsFile();
+         ok = false;
+         goto cleanup;
+         break;
+   }
+
+
+   if (host && false) {
+      printf("Host check: %d, key: %s\n", check,
+         (check <= LIBSSH2_KNOWNHOST_CHECK_MISMATCH) ? host->key : "<none>");
+
+      unsigned char hash[MD5_DIGEST_LENGTH];
+      unsigned char* key = reinterpret_cast<unsigned char*>(host->key); 
+      unsigned len(strlen(host->key));
+      fprintf(stderr, "key length: %d\n",len);
+      MD5(key, len-1, hash);
+
+      for (int i = 0; i < 20; ++i) {
+         fprintf(stderr, "%02X:", hash[i]);
+     }
+
+     fprintf(stderr, "\n");
+   }
+                
+   cleanup:
+      QLOG_TRACE() << m_message;
+      libssh2_knownhost_free(knownHosts);
+      return ok;
 }
 
 
@@ -291,18 +373,36 @@ void SshConnection::authenticate(AuthenticationT const authentication, QString& 
       return;
 
    }
-
-/* Can't get this working at the moment
-   const char* fingerprint(libssh2_hostkey_hash(m_session, LIBSSH2_HOSTKEY_HASH_MD5));
-   fprintf(stderr, "SSH Fingerprint: ");
-
-   for (int i = 0; i < 20; ++i) {
-       fprintf(stderr, "%02X ", (unsigned char)fingerprint[i]);
+  
+   if (!checkHost()) {
+      m_status = Error;
+      return;
    }
-   fprintf(stderr, "\n");
-*/
 
-//!!!
+   if (false) {
+      const char* fingerprint_MD5(libssh2_hostkey_hash(m_session, LIBSSH2_HOSTKEY_HASH_MD5));
+      fprintf(stderr, "SSH Fingerprint (MD5):    ");
+      for (int i = 0; i < 16; ++i) {
+          fprintf(stderr, "%02X ", (unsigned char)fingerprint_MD5[i]);
+      }
+      fprintf(stderr, "\n");
+
+      const char* fingerprint_SHA1(libssh2_hostkey_hash(m_session, LIBSSH2_HOSTKEY_HASH_SHA1));
+      fprintf(stderr, "SSH Fingerprint (SHA1):   ");
+      for (int i = 0; i < 20; ++i) {
+          fprintf(stderr, "%02X ", (unsigned char)fingerprint_SHA1[i]);
+      }
+      fprintf(stderr, "\n");
+
+      const char* fingerprint_SHA256(
+         libssh2_hostkey_hash(m_session, LIBSSH2_HOSTKEY_HASH_SHA256));
+      fprintf(stderr, "SSH Fingerprint (SHA256): ");
+      for (int i = 0; i < 32; ++i) {
+          fprintf(stderr, "%02X ", (unsigned char)fingerprint_SHA256[i]);
+      }
+      fprintf(stderr, "\n");
+   }
+
 
    // Check what authentication methods are available
    char* authenticationMethods =
@@ -375,13 +475,14 @@ void SshConnection::authenticate(AuthenticationT const authentication, QString& 
 
       case LIBSSH2_ERROR_AUTHENTICATION_CANCELLED:
          m_message  = "Authentication cancelled";
-         QLOG_ERROR() << m_message;
+         QLOG_WARN() << m_message;
          break;
 
       default:
          m_message = "Authentication failed:\n" + lastSessionError();
-         m_status   = Error;
+         m_status  = Error;
          QLOG_ERROR() << m_message;
+         QLOG_ERROR() << "rc code: " << rc;
          break;
    }
 }
@@ -527,39 +628,52 @@ int SshConnection::connectPublicKey()
    QLOG_TRACE() << "SshConnection::connectPublicKey";
    QString privateKey(getPrivateKeyFile());
    QString publicKey(getPublicKeyFile());
-   QLOG_WARN() << "WARNING connectHostBased() not wired correctly";
-   QString passphrase;
+   QString msg("Enter passphrase for key ");
+   msg += privateKey;
 
-   int rc;
-   while ((rc = libssh2_userauth_publickey_fromfile(m_session, m_username.toLatin1().data(),
-      publicKey.toLatin1().data(), privateKey.toLatin1().data(), 
-      passphrase.toLatin1().data())) == LIBSSH2_ERROR_EAGAIN);
+   int rc(LIBSSH2_ERROR_AUTHENTICATION_FAILED);
 
-   if (rc == LIBSSH2_ERROR_AUTHENTICATION_FAILED) rc = LIBSSH2_ERROR_PUBLICKEY_NOT_FOUND;
+   for (int count = 0; count < 3; ++count) {
+      QString passphrase(getPasswordFromUser(msg));
+
+      while ((rc = libssh2_userauth_publickey_fromfile(m_session, m_username.toLatin1().data(),
+         publicKey.toLatin1().data(), privateKey.toLatin1().data(), 
+         passphrase.toLatin1().data())) == LIBSSH2_ERROR_EAGAIN);
+
+      if (rc != LIBSSH2_ERROR_AUTHENTICATION_FAILED) break;
+   }
 
    return rc;
 }
 
 
-QString SshConnection::getPublicKeyFile()
+QString SshConnection::getPublicKeyFile() const
 {
-   QString fileName(Preferences::SSHPublicIdentityFile());
-   QFileInfo info(fileName);
+   QFileInfo info(m_publicKeyFile);
    if (!info.exists()) {
-      QLOG_ERROR() << "Failed to find SSH public identity file:\n" + fileName;
+      QLOG_ERROR() << "Failed to find SSH public identity file:\n" + m_publicKeyFile;
    }
-   return fileName;
+   return m_publicKeyFile;
 }
 
 
-QString SshConnection::getPrivateKeyFile()
+QString SshConnection::getPrivateKeyFile() const
 {
-   QString fileName(Preferences::SSHPrivateIdentityFile());
-   QFileInfo info(fileName);
+   QFileInfo info(m_privateKeyFile);
    if (!info.exists()) {
-      QLOG_ERROR() << "Failed to find SSH private identity file:\n" + fileName;
+      QLOG_ERROR() << "Failed to find SSH private identity file:\n" + m_privateKeyFile;
    }
-   return fileName;
+   return m_privateKeyFile;
+}
+
+
+QString SshConnection::getKnownHostsFile() const
+{
+   QFileInfo info(m_knownHostsFile);
+   if (!info.exists()) {
+      QLOG_ERROR() << "Failed to find SSH private identity file:\n" + m_knownHostsFile;
+   }
+   return m_knownHostsFile;
 }
 
 

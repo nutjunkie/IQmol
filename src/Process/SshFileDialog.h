@@ -26,6 +26,9 @@
 
 
 namespace IQmol {
+namespace Process {
+
+   class ServerConfiguration;
 
    /// A simple dialog that allows the user to customize the locations of the
    /// SSH configuration files.
@@ -34,16 +37,17 @@ namespace IQmol {
       Q_OBJECT
 
       public: 
-         SshFileDialog(QWidget* parent = 0);
+         SshFileDialog(ServerConfiguration*, QWidget* parent = 0);
 
       private Q_SLOTS:
          void updatePreferences();
 
       private:
          Ui::SshFileDialog m_dialog;
+         ServerConfiguration* m_configuration;
    };
 
-} // end namespace IQmol
+}} // end namespace IQmol::Process
 
 
 #endif

@@ -46,8 +46,10 @@ namespace Network {
       friend class SftpGetFile;
 
       public:
-         SshConnection(QString const& hostname, int const port = 22,
-             bool const useSftp = false);
+         SshConnection(QString const& hostname, int const port,
+             QString const& publicKeyFile, QString const& privateKeyFile,
+             QString const& knownHostsFile, bool const useSftp = false);
+             
          ~SshConnection() { close(); }
 
          void open();
@@ -90,9 +92,13 @@ namespace Network {
          int m_socket;
          LIBSSH2_AGENT* m_agent;
          QString m_username;
+         QString m_publicKeyFile;
+         QString m_privateKeyFile;
+         QString m_knownHostsFile;
          bool m_useSftp;
 
          void init();
+         bool checkHost();
          bool openSocket(unsigned const timeout);
          bool setNonBlocking();
          bool setBlocking();
@@ -106,8 +112,9 @@ namespace Network {
 
          QString getPasswordFromUser(QString const& message);
          QString lastError();
-         QString getPrivateKeyFile();
-         QString getPublicKeyFile();
+         QString getPublicKeyFile()  const;
+         QString getPrivateKeyFile() const;
+         QString getKnownHostsFile() const;
    };
 
 } } // end namespace IQmol::Network

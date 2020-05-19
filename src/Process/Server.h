@@ -86,6 +86,8 @@ namespace Process {
          void stopUpdates()  { m_updateTimer.stop(); }
          void startUpdates() { m_updateTimer.start(); }
 
+         QString const& message() const { return m_message; }
+
       public Q_SLOTS:
          void watchJob(Job*);
          void unwatchJob(Job*);
@@ -112,6 +114,7 @@ namespace Process {
          bool parseSubmitMessage(Job* job, QString const& message);
          bool parseQueryMessage(Job* job, QString const& message);
          QStringList parseListMessage(Job* job, QString const& message); 
+         QString m_message;
 
          ServerConfiguration  m_configuration;
          Network::Connection* m_connection;

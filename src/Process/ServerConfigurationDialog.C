@@ -198,7 +198,7 @@ void ServerConfigurationDialog::on_httpsRadioButton_toggled(bool tf)
 
 void ServerConfigurationDialog::on_configureConnectionButton_clicked(bool)
 {
-   SshFileDialog dialog(this); 
+   SshFileDialog dialog(&m_currentConfiguration, this); 
    dialog.exec();
 }
 
@@ -373,9 +373,14 @@ bool ServerConfigurationDialog::testSshConnection(ServerConfiguration const& con
       QString userName(configuration.value(ServerConfiguration::UserName));
       Network::Connection::AuthenticationT authentication(configuration.authentication());
 
+      QString publicKeyFile(configuration.value(ServerConfiguration::KnownHostsFile));
+      QString privateKeyFile(configuration.value(ServerConfiguration::PrivateKeyFile));
+      QString knownHostsFile(configuration.value(ServerConfiguration::PublicKeyFile));
+
       int port(configuration.port());
 
-      Network::SshConnection ssh(hostAddress, port);
+      Network::SshConnection ssh(hostAddress, port, publicKeyFile, privateKeyFile, 
+         knownHostsFile);
       ssh.open();
       ssh.authenticate(authentication, userName);
       QLOG_TRACE() << "Authentication successful";

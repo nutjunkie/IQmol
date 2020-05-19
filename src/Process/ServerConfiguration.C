@@ -31,8 +31,7 @@ namespace Process {
 
 void ServerConfiguration::dump() const 
 {
-   qDebug() << " ==> Server Configuration";
-
+   qDebug() << " ==> Server Configuration <== ";
    for (int i = 0; i < MaxFieldT; ++i) {
        FieldT field(static_cast<FieldT>(i));
        QString name(toString(field));
@@ -44,25 +43,28 @@ QString ServerConfiguration::toString(FieldT const field)
 {
    QString s;
    switch (field) {
-      case ServerName:        s = "Server Name";        break;
-      case Connection:        s = "Connection";         break;
-      case QueueSystem:       s = "Queue System";       break;
-      case HostAddress:       s = "Host Address";       break;
-      case UserName:          s = "User Name";          break;
-      case Port:              s = "Port";               break;
-      case Authentication:    s = "Authentication";     break;
-      case WorkingDirectory:  s = "Working Directory";  break;
-      case Submit:            s = "Submit";             break;
-      case Query:             s = "Query";              break;
-      case QueueInfo:         s = "Queue Info";         break;
-      case Kill:              s = "Kill";               break;
-      case UpdateInterval:    s = "Update Interval";    break;
-      case JobLimit:          s = "Job Limit";          break;
-      case RunFileTemplate:   s = "Run File Template";  break;
-      case Cookie:            s = "Cookie";             break;
-      case QueueResources:    s = "Queue Resources";    break;
-      case JobFileList:       s = "Job File List";      break;
-      case MaxFieldT:         s = "";                   break;
+      case ServerName:        s = "Server Name";          break;
+      case Connection:        s = "Connection";           break;
+      case QueueSystem:       s = "Queue System";         break;
+      case HostAddress:       s = "Host Address";         break;
+      case UserName:          s = "User Name";            break;
+      case Port:              s = "Port";                 break;
+      case Authentication:    s = "Authentication";       break;
+      case WorkingDirectory:  s = "Working Directory";    break;
+      case Submit:            s = "Submit";               break;
+      case Query:             s = "Query";                break;
+      case QueueInfo:         s = "Queue Info";           break;
+      case Kill:              s = "Kill";                 break;
+      case UpdateInterval:    s = "Update Interval";      break;
+      case JobLimit:          s = "Job Limit";            break;
+      case RunFileTemplate:   s = "Run File Template";    break;
+      case Cookie:            s = "Cookie";               break;
+      case QueueResources:    s = "Queue Resources";      break;
+      case JobFileList:       s = "Job File List";        break;
+      case PrivateKeyFile:    s = "SSH Private Key File"; break;
+      case PublicKeyFile:     s = "SSH Public Key File";  break;
+      case KnownHostsFile:    s = "SSH Known Hosts File"; break;
+      case MaxFieldT:         s = "";                     break;
    }
    return s;
 }
@@ -117,6 +119,9 @@ ServerConfiguration::FieldT ServerConfiguration::toFieldT(QString const& field)
    if (field.contains("resources",  Qt::CaseInsensitive))  return QueueResources;
    if (field.contains("list",       Qt::CaseInsensitive))  return JobFileList;
    if (field.contains("cookie",     Qt::CaseInsensitive))  return Cookie;
+   if (field.contains("publickey",  Qt::CaseInsensitive))  return PublicKeyFile;
+   if (field.contains("privatekey", Qt::CaseInsensitive))  return PrivateKeyFile;
+   if (field.contains("knownhosts", Qt::CaseInsensitive))  return KnownHostsFile;
 
    return MaxFieldT;
 }

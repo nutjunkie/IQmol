@@ -42,7 +42,9 @@ namespace Process {
                        Authentication, UserName, WorkingDirectory,
                        Submit, Query, QueueInfo, Kill,
                        UpdateInterval, JobLimit, RunFileTemplate, Cookie, 
-                       QueueResources, JobFileList, MaxFieldT };
+                       QueueResources, JobFileList, 
+                       PublicKeyFile, PrivateKeyFile, KnownHostsFile, 
+                       MaxFieldT };
                        
          enum ConnectionT { Local, SSH, SFTP, HTTP, HTTPS };
 

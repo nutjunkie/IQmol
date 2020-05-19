@@ -13,13 +13,13 @@ contains(CONFIG, DEPLOY) {
    LIBS        += $${BOOST}/stage/lib/libboost_exception.a
 
    # libssl/libcrypto
-   INCLUDEPATH += $(DEV)/openssl/include
-   LIBS        += $(DEV)/openssl/libssl.a
-   LIBS        += $(DEV)/openssl/libcrypto.a
+   INCLUDEPATH += $(DEV)/openssl-1.1.1f/include
+   LIBS        += $(DEV)/openssl-1.1.1f/libssl.a
+   LIBS        += $(DEV)/openssl-1.1.1f/libcrypto.a
 
    # SSH2
-   INCLUDEPATH += $(DEV)/libssh2-1.8.0/include
-   LIBS        += $(DEV)/libssh2-1.8.0/build/src/libssh2.a
+   INCLUDEPATH += $(DEV)/libssh2-1.9.0/include
+   LIBS        += $(DEV)/libssh2-1.9.0/build/src/libssh2.a
 
    # OpenBabel
    OPENBABEL    = $(DEV)/openbabel-2.4.1
