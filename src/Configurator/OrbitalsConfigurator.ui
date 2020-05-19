@@ -159,6 +159,16 @@ QToolButton:pressed {
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QCheckBox" name="simplifyMeshCheckBox">
+         <property name="text">
+          <string>Simplify Mesh</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
      <item row="3" column="0">
@@ -401,7 +411,7 @@ QToolButton:pressed {
           <double>0.000100000000000</double>
          </property>
          <property name="maximum">
-          <double>99.999900000000000</double>
+          <double>99.999899999999997</double>
          </property>
          <property name="singleStep">
           <double>0.001000000000000</double>
@@ -412,12 +422,9 @@ QToolButton:pressed {
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="simplifyMeshCheckBox">
+        <widget class="QCheckBox" name="atomicUnits">
          <property name="text">
-          <string>Simplify Mesh</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
+          <string>Atomic Units</string>
          </property>
         </widget>
        </item>

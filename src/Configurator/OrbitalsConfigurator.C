@@ -26,6 +26,7 @@
 #include "Preferences.h"
 #include "MoleculeLayer.h"
 #include "CustomPlot.h"
+#include "Constants.h"
 #include "QsLog.h"
 #include <QColorDialog>
 #include <QMouseEvent>
@@ -70,6 +71,8 @@ Orbitals::Orbitals(Layer::Orbitals& orbitals)
       m_configurator.surfaceType->addItem("Alpha Orbital",  Data::SurfaceType::AlphaOrbital);
       m_configurator.surfaceType->addItem("Beta Orbital",   Data::SurfaceType::BetaOrbital);
    }
+
+   setIsovalueUnits(m_configurator.atomicUnits->isChecked());
 
    setPositiveColor(Preferences::PositiveSurfaceColor());
    setNegativeColor(Preferences::NegativeSurfaceColor());
@@ -421,13 +424,30 @@ void Orbitals::on_surfaceType_currentIndexChanged(int index)
 }
 
 
+void Orbitals::setIsovalueUnits(bool atomicUnits) 
+{
+   if (atomicUnits) {
+      m_configurator.isovalue->setSuffix(" a\u2080\u207B\u00B3");
+   }else {
+      m_configurator.isovalue->setSuffix(" \u212B\u207B\u00B3");
+   }
+}
+
+
+void Orbitals::on_atomicUnits_clicked(bool tf)
+{
+    setIsovalueUnits(tf);
+}
+
+
 void Orbitals::on_isovalueRadio_clicked(bool)
 {
    m_configurator.isovalue->setDecimals(4);
    m_configurator.isovalue->setRange(0.0001, 99.9999);
    m_configurator.isovalue->setSingleStep(0.0001);
    m_configurator.isovalue->setValue(0.0200);
-   m_configurator.isovalue->setSuffix("");
+   m_configurator.atomicUnits->setEnabled(true);
+   setIsovalueUnits(m_configurator.atomicUnits->isChecked());
 }
 
 
@@ -438,6 +458,7 @@ void Orbitals::on_percentageRadio_clicked(bool)
    m_configurator.isovalue->setSingleStep(1.0);
    m_configurator.isovalue->setValue(90.0);
    m_configurator.isovalue->setSuffix(" %  ");
+   m_configurator.atomicUnits->setEnabled(false);
 }
 
 
@@ -533,27 +554,34 @@ void Orbitals::on_calculateButton_clicked(bool)
 
 void Orbitals::on_addToQueueButton_clicked(bool) 
 {
-   int quality(m_configurator.quality->value());
-
-   double isovalue(m_configurator.isovalue->value());
-
-   QColor positive(Preferences::PositiveSurfaceColor());
-   QColor negative(Preferences::NegativeSurfaceColor());
-   bool simplifyMesh(m_configurator.simplifyMeshCheckBox->isChecked());
-
-   int index(m_configurator.surfaceType->currentIndex());
-   QVariant qvar(m_configurator.surfaceType->itemData(index));
-   bool isSigned(true);
-
-   int op(m_configurator.opacity->value());
+   int    quality(m_configurator.quality->value());
+   bool   simplifyMesh(m_configurator.simplifyMeshCheckBox->isChecked());
+   int    index(m_configurator.surfaceType->currentIndex());
+   bool   isSigned(true);
+   int    op(m_configurator.opacity->value());
    double opacity = op == 100 ? 0.999 : double(op)/100.0;
+   double isovalue(m_configurator.isovalue->value());
+   bool   isovalueIsPercent(m_configurator.percentageRadio->isChecked());
 
-   bool isovalueIsPercent(m_configurator.percentageRadio->isChecked());
+   QColor   positive(Preferences::PositiveSurfaceColor());
+   QColor   negative(Preferences::NegativeSurfaceColor());
+   QVariant qvar(m_configurator.surfaceType->itemData(index));
+
+   Data::SurfaceType type(qvar.toInt());
+
+   if (!isovalueIsPercent && m_configurator.atomicUnits->isChecked()) {
+      // convert from bohr to angstrom, densities are cubic length, but
+      // orbitals are rooted.
+      double conv = std::pow(Constants::AngstromToBohr,1.5);
+      if (type.units() == Data::SurfaceType::Volume) conv *= conv;
+      isovalue *= conv;
+      qDebug() << "Unit conversion = " << conv;
+   }
 
    Data::SurfaceInfo info(Data::SurfaceType::Custom, quality, isovalue, 
      positive, negative, isSigned, simplifyMesh, opacity, isovalueIsPercent);
 
-   switch (qvar.toUInt()) {
+   switch (type.kind()) {
 
       case Data::SurfaceType::BasisFunction: {
          info.type().setKind(Data::SurfaceType::BasisFunction);

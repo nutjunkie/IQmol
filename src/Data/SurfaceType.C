@@ -27,6 +27,61 @@
 namespace IQmol {
 namespace Data {
 
+
+SurfaceType::SurfaceType(int const kind)
+{
+   switch (kind) {  
+      case Custom:                  m_kind = Custom;                  break;
+      case AlphaOrbital:            m_kind = AlphaOrbital;            break;
+      case BetaOrbital:             m_kind = BetaOrbital;             break;
+      case TotalDensity:            m_kind = TotalDensity;            break;
+      case SpinDensity:             m_kind = SpinDensity;             break;
+      case AlphaDensity:            m_kind = AlphaDensity;            break;
+      case BetaDensity:             m_kind = BetaDensity;             break;
+      case DensityCombo:            m_kind = DensityCombo;            break;
+      case CubeData:                m_kind = CubeData;                break;
+      case VanDerWaals:             m_kind = VanDerWaals;             break;
+      case Promolecule:             m_kind = Promolecule;             break;
+      case SolventExcluded:         m_kind = SolventExcluded;         break;
+      case SID:                     m_kind = SID;                     break;
+      case ElectrostaticPotential:  m_kind = ElectrostaticPotential;  break;
+      case Geminal:                 m_kind = Geminal;                 break;
+      case Correlation:             m_kind = Correlation;             break;
+      case CustomDensity:           m_kind = CustomDensity;           break;
+      case BasisFunction:           m_kind = BasisFunction;           break;
+      case DysonLeft:               m_kind = DysonLeft;               break;
+      case DysonRight:              m_kind = DysonRight;              break;
+      case MullikenAtomic:          m_kind = MullikenAtomic;          break;
+      case MullikenDiatomic:        m_kind = MullikenDiatomic;        break;
+      case GenericOrbital:          m_kind = GenericOrbital;          break;
+      default:
+         qDebug() << "Unknown surface type" << kind;
+         m_kind = Custom;
+         
+   }
+}
+
+
+
+SurfaceType::Units SurfaceType::units() const
+{
+   Units units(Orbital);
+
+   if (isDensity() || 
+       m_kind == SID || 
+       m_kind == Promolecule ||
+       m_kind == SolventExcluded || 
+       m_kind == ElectrostaticPotential || 
+       m_kind == VanDerWaals) {
+       units = Volume;
+   }
+
+   return units;
+}
+
+
+
+
 QString SurfaceType::toString() const 
 {
    QString label;
@@ -99,7 +154,8 @@ bool SurfaceType::isDensity() const
    return (m_kind == AlphaDensity)   || (m_kind == BetaDensity)      ||
           (m_kind == TotalDensity)   || (m_kind == SpinDensity)      ||
           (m_kind == MullikenAtomic) || (m_kind == MullikenDiatomic) ||
-          (m_kind == DensityCombo)   || (m_kind == Correlation);
+          (m_kind == DensityCombo)   || (m_kind == Correlation)      ||
+          (m_kind == CustomDensity);
 }
 
 

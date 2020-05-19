@@ -70,6 +70,7 @@ namespace Configurator {
          void setMullikenDecompositions(Matrix const&);
          void on_isovalueRadio_clicked(bool);
          void on_percentageRadio_clicked(bool);
+         void on_atomicUnits_clicked(bool);
 
          void on_densityMatrixButton_clicked(bool);
 
@@ -81,6 +82,7 @@ namespace Configurator {
          void updateBasisRange();
          void setPositiveColor(QColor const& color);
          void setNegativeColor(QColor const& color);
+         void setIsovalueUnits(bool atomicUnits);
          void initPlot();
 
          Layer::Orbitals& m_orbitals;

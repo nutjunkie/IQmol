@@ -38,12 +38,19 @@ namespace Data {
             VanDerWaals, Promolecule, SolventExcluded, SID, ElectrostaticPotential,
             Geminal, Correlation, CustomDensity, BasisFunction, DysonLeft, DysonRight,
             MullikenAtomic, MullikenDiatomic, GenericOrbital
+
 // TODO
 //            AlphaHole Density, BetaHole Density,
 //            AlphaExcitationDensity, BetaExcitationDensity,
 //            AlphaAttachmentDensity, BetaAttachmentDensity,
 //            AlphaDetachmentDensity, BetaDetachmentDensity
          };
+
+		 // Not really units, but indicates how any unit conversion should be
+		 // handled.
+         enum Units { Orbital, Volume };
+
+         SurfaceType(int const kind);
 
          SurfaceType(Kind const kind = Custom, unsigned index = 0) 
           : m_kind(kind), m_index(index) { }
@@ -52,6 +59,8 @@ namespace Data {
 
          Kind const& kind() const { return m_kind; }
          void setKind(Kind const kind) { m_kind = kind; }
+
+         Units units() const;
 
          // used for custom surfaces
          QString const& label() const { return m_label; }
