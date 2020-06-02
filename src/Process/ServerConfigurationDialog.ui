@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>607</width>
-    <height>401</height>
+    <height>422</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -90,6 +90,18 @@ QToolButton:checked {
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="QComboBox" name="queueSystem">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="toolTip">
           <string>Basic simply runs the qchem command on the server.  
 
@@ -98,6 +110,9 @@ You will be prompted for additional resource limits when
 submitting a job.
 
 Use Web for HTTP/HTTPS servers</string>
+         </property>
+         <property name="sizeAdjustPolicy">
+          <enum>QComboBox::AdjustToContents</enum>
          </property>
          <item>
           <property name="text">
@@ -124,6 +139,18 @@ Use Web for HTTP/HTTPS servers</string>
            <string>Web</string>
           </property>
          </item>
+         <item>
+          <property name="text">
+           <string>Web - Anonymous</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="configureQueueButton">
+         <property name="text">
+          <string>Configure</string>
+         </property>
         </widget>
        </item>
        <item>
@@ -138,13 +165,6 @@ Use Web for HTTP/HTTPS servers</string>
           </size>
          </property>
         </spacer>
-       </item>
-       <item>
-        <widget class="QPushButton" name="configureQueueButton">
-         <property name="text">
-          <string>Configure</string>
-         </property>
-        </widget>
        </item>
       </layout>
      </item>
@@ -209,7 +229,10 @@ Use Web for HTTP/HTTPS servers</string>
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="configureConnectionButton">
+        <widget class="QPushButton" name="configureSshButton">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
           <string>Configure SSH</string>
          </property>
@@ -255,7 +278,7 @@ Use Web for HTTP/HTTPS servers</string>
          </widget>
         </item>
         <item row="2" column="0">
-         <widget class="QLabel" name="userLabel">
+         <widget class="QLabel" name="userNameLabel">
           <property name="text">
            <string>User Name</string>
           </property>
@@ -310,8 +333,17 @@ Use Web for HTTP/HTTPS servers</string>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
            <widget class="QComboBox" name="authentication">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="currentIndex">
              <number>0</number>
+            </property>
+            <property name="sizeAdjustPolicy">
+             <enum>QComboBox::AdjustToContents</enum>
             </property>
             <item>
              <property name="text">
@@ -352,6 +384,23 @@ Use Web for HTTP/HTTPS servers</string>
              </size>
             </property>
            </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="authenticationPortLabel">
+            <property name="text">
+             <string>Port</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="authenticationPort">
+            <property name="maximum">
+             <number>65535</number>
+            </property>
+            <property name="value">
+             <number>8882</number>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -447,10 +496,9 @@ Use Web for HTTP/HTTPS servers</string>
   <tabstop>sshRadioButton</tabstop>
   <tabstop>httpRadioButton</tabstop>
   <tabstop>httpsRadioButton</tabstop>
-  <tabstop>configureConnectionButton</tabstop>
+  <tabstop>configureSshButton</tabstop>
   <tabstop>serverName</tabstop>
   <tabstop>queueSystem</tabstop>
-  <tabstop>configureQueueButton</tabstop>
   <tabstop>hostAddress</tabstop>
   <tabstop>port</tabstop>
   <tabstop>authentication</tabstop>
