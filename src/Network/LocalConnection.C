@@ -38,19 +38,19 @@ LocalConnection::LocalConnection() : Connection("localhost", 0)
 
 void LocalConnection::open()
 {
-   m_status = Connection::Opened;
+   m_status = Opened;
 }
 
 
 void LocalConnection::close()
 {
-   m_status = Connection::Closed;
+   m_status = Closed;
 }
 
 
 void LocalConnection::authenticate(AuthenticationT const, QString& /*username*/)
 {
-   m_status = Connection::Authenticated;
+   m_status = Authenticated;
 }
 
 

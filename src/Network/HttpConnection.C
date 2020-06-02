@@ -34,9 +34,15 @@
 namespace IQmol {
 namespace Network {
 
-HttpConnection::HttpConnection(QString const& hostname, int const port, bool const https) :
-   Connection(hostname, port), m_networkAccessManager(0), m_secure(https)
+HttpConnection::HttpConnection(QString const& hostname, int const port, bool const https)
+ : Connection(hostname, port), m_networkAccessManager(0), m_secure(https)
 {
+}
+
+
+ConnectionT HttpConnection::type() const
+{
+    return m_secure ? HTTPS : HTTP;
 }
 
 
@@ -65,14 +71,63 @@ void HttpConnection::close()
 }
 
 
-void HttpConnection::authenticate(AuthenticationT const, QString& cookie)
+void HttpConnection::authenticate(AuthenticationT const auth, QString& cookie)
 {
-  if ( cookie.isEmpty()) cookie = obtainCookie();
+  if (auth == Network::Password) {
+     // cookie is actually username in this case
+     cookie = getJwt(cookie);
+  }else {
+     if ( cookie.isEmpty()) cookie = getCookie();
+  }
+
   if (!cookie.isEmpty()) m_status = Authenticated;
 }
 
 
-QString HttpConnection::obtainCookie()
+QString HttpConnection::getJwt(QString const& userName)
+{
+   QString jwt;
+   QLOG_TRACE() << "Attempting to obtain JWT from server" << userName << "@" <<  m_hostname;;
+
+   QString msg("Password for ");
+   msg += userName + "@" + m_hostname;
+
+   QString password = getPasswordFromUser(msg);
+   if (password.isEmpty()) return jwt;
+
+   QStringMap headers;
+   headers["Qcloud-Client-User"] = userName;
+   headers["Qcloud-Client-Password"] = password;
+
+   Reply* reply(execute("token", headers));
+
+   QEventLoop loop;
+   connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+   reply->start();
+   loop.exec();
+
+   // This is not getting caught (no thread saftey)
+   if (reply->status() == Reply::TimedOut) {
+      m_message = "Connection timeout to " + m_hostname;
+      m_status = Error;
+      QLOG_DEBUG() << m_message;
+   }
+
+   if (reply->status() == Reply::Finished) {
+      QString msg(reply->message());
+   qDebug() << "Messsage received: " << msg;
+      QRegExp rx("Qcloud-Token::([0-9a-zA-Z\\-\\._]+)");
+      if (msg.contains("Qcloud-Server-Status::OK") && rx.indexIn(msg,0) != -1) {
+         jwt = rx.cap(1);
+      }
+      QLOG_DEBUG() << "Returning JWT:" << jwt;
+   }
+
+   return jwt;
+}
+
+
+QString HttpConnection::getCookie()
 {
    QString cookie;
    qDebug() << "Obtaining cookie from HTTP server";
@@ -108,6 +163,25 @@ Reply* HttpConnection::execute(QString const& query)
    HttpGet* reply(new HttpGet(this, query));
    return reply;
 }
+
+
+Reply* HttpConnection::execute(QString const& query, QString const&)
+{
+   return execute(query);
+}
+
+
+Reply* HttpConnection::execute(QString const& query, QStringMap const& headers)
+{
+   QStringMap::const_iterator iter;
+   HttpGet* reply(new HttpGet(this, query));
+   for (iter = headers.begin(); iter != headers.end(); ++iter) {
+       reply->setHeader(iter.key(), iter.value());
+   }
+
+   return reply;
+}
+
 
 
 Reply* HttpConnection::putFile(QString const& sourcePath, QString const& destinationPath)

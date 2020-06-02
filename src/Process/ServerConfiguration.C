@@ -43,42 +43,29 @@ QString ServerConfiguration::toString(FieldT const field)
 {
    QString s;
    switch (field) {
-      case ServerName:        s = "Server Name";          break;
-      case Connection:        s = "Connection";           break;
-      case QueueSystem:       s = "Queue System";         break;
-      case HostAddress:       s = "Host Address";         break;
-      case UserName:          s = "User Name";            break;
-      case Port:              s = "Port";                 break;
-      case Authentication:    s = "Authentication";       break;
-      case WorkingDirectory:  s = "Working Directory";    break;
-      case Submit:            s = "Submit";               break;
-      case Query:             s = "Query";                break;
-      case QueueInfo:         s = "Queue Info";           break;
-      case Kill:              s = "Kill";                 break;
-      case UpdateInterval:    s = "Update Interval";      break;
-      case JobLimit:          s = "Job Limit";            break;
-      case RunFileTemplate:   s = "Run File Template";    break;
-      case Cookie:            s = "Cookie";               break;
-      case QueueResources:    s = "Queue Resources";      break;
-      case JobFileList:       s = "Job File List";        break;
-      case PrivateKeyFile:    s = "SSH Private Key File"; break;
-      case PublicKeyFile:     s = "SSH Public Key File";  break;
-      case KnownHostsFile:    s = "SSH Known Hosts File"; break;
-      case MaxFieldT:         s = "";                     break;
-   }
-   return s;
-}
-
-
-QString ServerConfiguration::toString(ConnectionT const connection)
-{
-   QString s;
-   switch (connection) {
-      case Local:  s = "Local";  break;
-      case SSH:    s = "SSH";    break;
-      case SFTP:   s = "SFTP";   break;
-      case HTTP:   s = "HTTP";   break;
-      case HTTPS:  s = "HTTPS";  break;
+      case ServerName:          s = "Server Name";          break;
+      case Connection:          s = "Connection";           break;
+      case QueueSystem:         s = "Queue System";         break;
+      case HostAddress:         s = "Host Address";         break;
+      case UserName:            s = "User Name";            break;
+      case Port:                s = "Port";                 break;
+      case Authentication:      s = "Authentication";       break;
+      case WorkingDirectory:    s = "Working Directory";    break;
+      case Submit:              s = "Submit";               break;
+      case Query:               s = "Query";                break;
+      case QueueInfo:           s = "Queue Info";           break;
+      case Kill:                s = "Kill";                 break;
+      case UpdateInterval:      s = "Update Interval";      break;
+      case JobLimit:            s = "Job Limit";            break;
+      case RunFileTemplate:     s = "Run File Template";    break;
+      case Cookie:              s = "Cookie";               break;
+      case QueueResources:      s = "Queue Resources";      break;
+      case JobFileList:         s = "Job File List";        break;
+      case PrivateKeyFile:      s = "SSH Private Key File"; break;
+      case PublicKeyFile:       s = "SSH Public Key File";  break;
+      case KnownHostsFile:      s = "SSH Known Hosts File"; break;
+      case AuthenticationPort:  s = "Authentication Port";  break;
+      case MaxFieldT:           s = "";                     break;
    }
    return s;
 }
@@ -88,11 +75,11 @@ QString ServerConfiguration::toString(QueueSystemT const queue)
 {
    QString s;
    switch (queue) {
-      case Basic:  s = "Basic";  break;
-      case PBS:    s = "PBS";    break;
-      case SGE:    s = "SGE";    break;
-      case Web:    s = "Web";    break;
-      case SLURM:  s = "SLURM";  break;
+      case Basic:   s = "Basic";  break;
+      case PBS:     s = "PBS";    break;
+      case SGE:     s = "SGE";    break;
+      case SLURM:   s = "SLURM";  break;
+      case Web:     s = "Web";    break;
    }
    return s;
 }
@@ -100,41 +87,31 @@ QString ServerConfiguration::toString(QueueSystemT const queue)
 
 ServerConfiguration::FieldT ServerConfiguration::toFieldT(QString const& field)
 { 
-   if (field.contains("server",     Qt::CaseInsensitive))  return ServerName;
-   if (field.contains("connection", Qt::CaseInsensitive))  return Connection;
-   if (field.contains("info",       Qt::CaseInsensitive))  return QueueInfo;
-   if (field.contains("queue",      Qt::CaseInsensitive))  return QueueSystem;
-   if (field.contains("host",       Qt::CaseInsensitive))  return HostAddress;
-   if (field.contains("address",    Qt::CaseInsensitive))  return HostAddress;
-   if (field.contains("user",       Qt::CaseInsensitive))  return UserName;
-   if (field.contains("port",       Qt::CaseInsensitive))  return Port;
-   if (field.contains("auth",       Qt::CaseInsensitive))  return Authentication;
-   if (field.contains("dir",        Qt::CaseInsensitive))  return WorkingDirectory;
-   if (field.contains("submit",     Qt::CaseInsensitive))  return Submit;
-   if (field.contains("query",      Qt::CaseInsensitive))  return Query;
-   if (field.contains("kill",       Qt::CaseInsensitive))  return Kill;
-   if (field.contains("interval",   Qt::CaseInsensitive))  return UpdateInterval;
-   if (field.contains("limit",      Qt::CaseInsensitive))  return JobLimit;
-   if (field.contains("template",   Qt::CaseInsensitive))  return RunFileTemplate;
-   if (field.contains("resources",  Qt::CaseInsensitive))  return QueueResources;
-   if (field.contains("list",       Qt::CaseInsensitive))  return JobFileList;
-   if (field.contains("cookie",     Qt::CaseInsensitive))  return Cookie;
-   if (field.contains("publickey",  Qt::CaseInsensitive))  return PublicKeyFile;
-   if (field.contains("privatekey", Qt::CaseInsensitive))  return PrivateKeyFile;
-   if (field.contains("knownhosts", Qt::CaseInsensitive))  return KnownHostsFile;
+   if (field.contains("server",              Qt::CaseInsensitive))  return ServerName;
+   if (field.contains("connection",          Qt::CaseInsensitive))  return Connection;
+   if (field.contains("info",                Qt::CaseInsensitive))  return QueueInfo;
+   if (field.contains("queue",               Qt::CaseInsensitive))  return QueueSystem;
+   if (field.contains("host",                Qt::CaseInsensitive))  return HostAddress;
+   if (field.contains("address",             Qt::CaseInsensitive))  return HostAddress;
+   if (field.contains("user",                Qt::CaseInsensitive))  return UserName;
+   if (field.contains("authentication port", Qt::CaseInsensitive))  return AuthenticationPort;
+   if (field.contains("port",                Qt::CaseInsensitive))  return Port;
+   if (field.contains("auth",                Qt::CaseInsensitive))  return Authentication;
+   if (field.contains("dir",                 Qt::CaseInsensitive))  return WorkingDirectory;
+   if (field.contains("submit",              Qt::CaseInsensitive))  return Submit;
+   if (field.contains("query",               Qt::CaseInsensitive))  return Query;
+   if (field.contains("kill",                Qt::CaseInsensitive))  return Kill;
+   if (field.contains("interval",            Qt::CaseInsensitive))  return UpdateInterval;
+   if (field.contains("limit",               Qt::CaseInsensitive))  return JobLimit;
+   if (field.contains("template",            Qt::CaseInsensitive))  return RunFileTemplate;
+   if (field.contains("resources",           Qt::CaseInsensitive))  return QueueResources;
+   if (field.contains("list",                Qt::CaseInsensitive))  return JobFileList;
+   if (field.contains("cookie",              Qt::CaseInsensitive))  return Cookie;
+   if (field.contains("publickey",           Qt::CaseInsensitive))  return PublicKeyFile;
+   if (field.contains("privatekey",          Qt::CaseInsensitive))  return PrivateKeyFile;
+   if (field.contains("knownhosts",          Qt::CaseInsensitive))  return KnownHostsFile;
 
    return MaxFieldT;
-}
-
-
-ServerConfiguration::ConnectionT ServerConfiguration::toConnectionT(QString const& connection)
-{
-   if (connection.contains("ssh",   Qt::CaseInsensitive))  return SSH;
-   if (connection.contains("sftp",  Qt::CaseInsensitive))  return SFTP;
-   if (connection.contains("https", Qt::CaseInsensitive))  return HTTPS;
-   if (connection.contains("http",  Qt::CaseInsensitive))  return HTTP;
-
-   return Local;
 }
 
 
@@ -150,30 +127,14 @@ ServerConfiguration::QueueSystemT ServerConfiguration::toQueueSystemT(
 }
 
 
-ServerConfiguration::AuthenticationT ServerConfiguration::toAuthenticationT(
-   QString const& authentication)
-{
-   if (authentication.contains("agent",       Qt::CaseInsensitive))  
-      return Network::Connection::Agent;
-   if (authentication.contains("public",      Qt::CaseInsensitive))  
-      return Network::Connection::PublicKey;
-   if (authentication.contains("host",        Qt::CaseInsensitive))  
-      return Network::Connection::HostBased;
-   if (authentication.contains("interactive", Qt::CaseInsensitive))  
-      return Network::Connection::KeyboardInteractive;
-
-   return Network::Connection::Password; // default
-}
-
-
 ServerConfiguration::ServerConfiguration()
 {
 #ifdef Q_OS_WIN32
    // Set the default to HTTP on Windows for now as HTTPS seems to require
    // additional libraries.
-   setDefaults(HTTP);
+   setDefaults(Network::HTTP);
 #else
-   setDefaults(HTTPS);
+   setDefaults(Network::HTTPS);
 #endif
    setDefaults(Web);
    //setDefaults(Local);
@@ -224,7 +185,7 @@ QString ServerConfiguration::value(FieldT const field) const
    switch (field) {
       
       case Authentication:
-         s = Network::Connection::toString(authentication());
+         s = Network::ToString(authentication());
          break;
 
       case QueueSystem:
@@ -232,11 +193,15 @@ QString ServerConfiguration::value(FieldT const field) const
          break;
 
       case Connection:
-         s = toString(connection());
+         s = Network::ToString(connection());
          break;
 
       case Port:
          s = QString::number(port());
+         break;
+
+      case AuthenticationPort:
+         s = QString::number(authenticationPort());
          break;
 
       case UpdateInterval:
@@ -258,9 +223,9 @@ void ServerConfiguration::setValue(FieldT const field, QVariant const& value)
 }
 
 
-ServerConfiguration::ConnectionT ServerConfiguration::connection() const
+Network::ConnectionT ServerConfiguration::connection() const
 {
-   return static_cast<ConnectionT>(m_configuration.value(Connection).toInt());
+   return static_cast<Network::ConnectionT>(m_configuration.value(Connection).toInt());
 }
 
 
@@ -270,9 +235,15 @@ ServerConfiguration::QueueSystemT ServerConfiguration::queueSystem() const
 }
 
 
-ServerConfiguration::AuthenticationT ServerConfiguration::authentication() const
+Network::AuthenticationT ServerConfiguration::authentication() const
 {
-   return static_cast<AuthenticationT>(m_configuration.value(Authentication).toInt());
+   return static_cast<Network::AuthenticationT>(m_configuration.value(Authentication).toInt());
+}
+
+
+int ServerConfiguration::authenticationPort() const
+{
+   return m_configuration.value(AuthenticationPort).toInt();
 }
 
 
@@ -293,55 +264,55 @@ QVariantList ServerConfiguration::queueResourcesList() const
 }
 
 
-void ServerConfiguration::setDefaults(ConnectionT const connection)
+void ServerConfiguration::setDefaults(Network::ConnectionT const connection)
 {
-   //qDebug() << "Setting defaults for " << toString(connection);
+   qDebug() << "Setting defaults for: " << Network::ToString(connection);
    m_configuration.insert(Connection, (int)connection);
 
    switch (connection) {
 
-      case Local:
+      case Network::Local:
          m_configuration.insert(ServerName, "Local");
          m_configuration.insert(Port, 0);
          m_configuration.insert(HostAddress, "localhost");
-         m_configuration.insert(Authentication, Network::Connection::None);
+         m_configuration.insert(Authentication, Network::Anonymous);
          m_configuration.insert(UserName, QString(qgetenv("USER")));
          m_configuration.insert(WorkingDirectory, QDir::homePath());
          m_configuration.insert(WorkingDirectory, "(unused)");
          break;
 
-      case SSH:
+      case Network::SSH:
          m_configuration.insert(ServerName, "Server");
          m_configuration.insert(Port, 22);
-         m_configuration.insert(Authentication, Network::Connection::Password);
+         m_configuration.insert(Authentication, Network::Password);
          m_configuration.insert(UserName, QString(qgetenv("USER")));
          m_configuration.insert(WorkingDirectory, "");
          break;
 
-      case SFTP:
+      case Network::SFTP:
          m_configuration.insert(ServerName, "Server");
          m_configuration.insert(Port, 22);
-         m_configuration.insert(Authentication, Network::Connection::Password);
+         m_configuration.insert(Authentication, Network::Password);
          m_configuration.insert(UserName, QString(qgetenv("USER")));
          m_configuration.insert(WorkingDirectory, "");
          break;
 
-      case HTTP:
+      case Network::HTTP:
          m_configuration.insert(ServerName, "Q-Chem");
          m_configuration.insert(Port, 80);
          m_configuration.insert(HostAddress, "iqmol.q-chem.com");
          m_configuration.insert(UserName, "guest");
          m_configuration.insert(WorkingDirectory, "(unused)");
-         m_configuration.insert(Authentication, Network::Connection::None);
+         m_configuration.insert(Authentication, Network::Anonymous);
          break;
 
-      case HTTPS:
+      case Network::HTTPS:
          m_configuration.insert(ServerName, "Q-Chem");
          m_configuration.insert(Port, 443);
          m_configuration.insert(HostAddress, "iqmol.q-chem.com");
          m_configuration.insert(UserName, "guest");
          m_configuration.insert(WorkingDirectory, "(unused)");
-         m_configuration.insert(Authentication, Network::Connection::None);
+         m_configuration.insert(Authentication, Network::Anonymous);
          break;
    }
 }
@@ -349,14 +320,14 @@ void ServerConfiguration::setDefaults(ConnectionT const connection)
 
 void ServerConfiguration::setDefaults(QueueSystemT const queueSystem)
 {
-qDebug() << "Setting defaults for " << toString(queueSystem);
+   qDebug() << "Setting defaults for: " << toString(queueSystem);
    m_configuration.insert(UpdateInterval, 20);
    m_configuration.insert(QueueSystem, queueSystem);
 
    switch (queueSystem) {
 
       case Basic: {
-         bool local(connection() == Local);
+         bool local(connection() == Network::Local);
          if (local) m_configuration.insert(UpdateInterval, 10);
          m_configuration.insert(Submit, System::SubmitCommand(local));
          m_configuration.insert(Query,  System::QueryCommand(local));
@@ -460,8 +431,6 @@ qDebug() << "Setting defaults for " << toString(queueSystem);
 
       } break;
 
-
-
       case Web: {
          m_configuration.insert(Kill,      "GET  /delete?cookie=${COOKIE}&jobid=${JOB_ID}");
          m_configuration.insert(Query,     "GET  /status?cookie=${COOKIE}&jobid=${JOB_ID}");
@@ -530,13 +499,13 @@ qDebug() << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
 
        switch (iter.key()) {
           case Authentication:
-             value = Network::Connection::toString(authentication()).toStdString();
+             value = Network::ToString(authentication()).toStdString();
              break;
           case QueueSystem:
              value = toString(queueSystem()).toStdString();
              break;
           case Connection:
-             value = toString(connection()).toStdString();
+             value = Network::ToString(connection()).toStdString();
              break;
           default:
              value = iter.value().toString().toStdString();
@@ -563,10 +532,10 @@ void ServerConfiguration::fromYamlNode(YAML::Node const& node)
 
        switch (field) {
           case Connection:
-             m_configuration.insert(field, (int)toConnectionT(QString::fromStdString(s)));
+             m_configuration.insert(field, (int)Network::ToConnectionT(QString::fromStdString(s)));
              break;
           case Authentication:
-             m_configuration.insert(field, (int)toAuthenticationT(QString::fromStdString(s)));
+             m_configuration.insert(field, (int)Network::ToAuthenticationT(QString::fromStdString(s)));
              break;
           case QueueSystem:
              m_configuration.insert(field, (int)toQueueSystemT(QString::fromStdString(s)));
@@ -595,11 +564,11 @@ void ServerConfiguration::fromQVariantMapLegacy(QVariantMap const& map)
       // old enum Host { Local = 0, Remote, Web };          
       int host(map.value("Host").toInt(&ok));
       if (ok) {
-         ConnectionT connection(Local);
+         Network::ConnectionT connection(Network::Local);
          switch (host) {
-            case 0:  connection = Local;  break;
-            case 1:  connection = SSH;    break;
-            case 2:  connection = HTTP;   break;
+            case 0:  connection = Network::Local;  break;
+            case 1:  connection = Network::SSH;    break;
+            case 2:  connection = Network::HTTP;   break;
          }
          setDefaults(connection);    
       }
@@ -623,21 +592,21 @@ void ServerConfiguration::fromQVariantMapLegacy(QVariantMap const& map)
    if (map.contains("Authentication")) {
       // old  Authentication { None = 0, Agent, PublicKey, HostBased, KeyboardInteractive, 
       //                       Vault, Prompt   };
-      int auth(map.value("Authentication").toInt(&ok));
+      int a(map.value("Authentication").toInt(&ok));
       if (ok) { 
-         AuthenticationT authentication(Network::Connection::Password);
+         Network::AuthenticationT auth(Network::Password);
 
-         switch (auth) { 
+         switch (a) { 
             // Note None, and Vault are no longer supported, so we default to Password
-            case 0:  authentication = Network::Connection::Password;             break; 
-            case 1:  authentication = Network::Connection::Agent;                break;
-            case 2:  authentication = Network::Connection::PublicKey;            break;
-            case 3:  authentication = Network::Connection::HostBased;            break;
-            case 4:  authentication = Network::Connection::KeyboardInteractive;  break;
-            case 5:  authentication = Network::Connection::Password;             break;
-            case 6:  authentication = Network::Connection::Password;             break;
+            case 0:  auth = Network::Password;             break; 
+            case 1:  auth = Network::Agent;                break;
+            case 2:  auth = Network::PublicKey;            break;
+            case 3:  auth = Network::HostBased;            break;
+            case 4:  auth = Network::KeyboardInteractive;  break;
+            case 5:  auth = Network::Password;             break;
+            case 6:  auth = Network::Password;             break;
          }
-         m_configuration.insert(Authentication, authentication);
+         m_configuration.insert(Authentication, auth);
       }                
    }                   
                        

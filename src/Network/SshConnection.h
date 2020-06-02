@@ -52,6 +52,8 @@ namespace Network {
              
          ~SshConnection() { close(); }
 
+         ConnectionT type() const { return SSH; }  // Need to check SFTP
+
          void open();
          void close();
          void authenticate(AuthenticationT const, QString& username);
@@ -110,7 +112,6 @@ namespace Network {
          int connectPublicKey();
          int connectPassword();
 
-         QString getPasswordFromUser(QString const& message);
          QString lastError();
          QString getPublicKeyFile()  const;
          QString getPrivateKeyFile() const;

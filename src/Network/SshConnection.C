@@ -25,9 +25,9 @@
 #include "QsLog.h"
 #include "Network.h"
 #include "NetworkException.h"
-#include <QInputDialog>
 #include <QFileInfo>
 #include <QEventLoop>
+#include <QInputDialog>
 
 #ifdef WIN32
 #include <winsock2.h>
@@ -78,7 +78,7 @@ void SshConnection::open()
 
       if (openSocket(m_timeout)) {
          ++s_numberOfConnections;
-         m_status = Connection::Opened;
+         m_status = Opened;
       }else {
       }
    }catch (...)  {
@@ -90,7 +90,7 @@ void SshConnection::open()
 void SshConnection::close()
 {
    // No logging as the Logger may not exist on shutdown
-   if (m_status == Connection::Closed) return;
+   if (m_status == Closed) return;
 
    //QLOG_TRACE() << "Closing connection to" << m_hostname;
    killAgent();
@@ -119,7 +119,7 @@ void SshConnection::close()
 #endif
    }
 
-   m_status = Connection::Closed;
+   m_status = Closed;
 }
 
 
@@ -415,7 +415,7 @@ void SshConnection::authenticate(AuthenticationT const authentication, QString& 
 
    switch (authentication) {
 
-      case None:
+      case Anonymous:
          break;
 
       case Agent:
@@ -449,7 +449,7 @@ void SshConnection::authenticate(AuthenticationT const authentication, QString& 
 
    switch (rc) {
       case LIBSSH2_ERROR_NONE:
-         m_status = Connection::Authenticated;
+         m_status = Authenticated;
          QLOG_INFO() << "SSH Connection established";
          break;
 
@@ -466,7 +466,7 @@ void SshConnection::authenticate(AuthenticationT const authentication, QString& 
          break;
 
       case LIBSSH2_ERROR_METHOD_NOT_SUPPORTED:
-         m_message  = toString(authentication) + " authentication not supported\n\n";
+         m_message  = ToString(authentication) + " authentication not supported\n\n";
          m_message += "Supported methods: ";
          m_message += QString(authenticationMethods).replace(",",", ");
          m_status   = Error;
@@ -586,17 +586,6 @@ int SshConnection::connectKeyboardInteractive()
    }
 
    return rc;
-}
-
-
-QString SshConnection::getPasswordFromUser(QString const& message)
-{
-   bool okPushed(true);
-   QString password(QInputDialog::getText(0, "IQmol", message, QLineEdit::Password, 
-       QString(), &okPushed));
-
-   if (!okPushed) password.clear();
-   return password; 
 }
 
 

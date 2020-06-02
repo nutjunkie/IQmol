@@ -25,6 +25,8 @@
 #include <QObject>
 #include <QThread>
 
+#include "Network.h"
+
 #define TIMEOUT 10000
 
 namespace IQmol {
@@ -44,18 +46,12 @@ namespace Network {
      Q_OBJECT
 
       public:
-         enum Status { Closed, Opened, Authenticated, Error };
-
-         enum AuthenticationT { None, Agent, HostBased, KeyboardInteractive, Password,
-            PublicKey };
-
-         static QString toString(Status const);
-         static QString toString(AuthenticationT const);
-
          Connection(QString const& hostname, int const port) : QObject(), m_hostname(hostname),
             m_port(port), m_status(Closed), m_timeout(10000) { }  // 10s default
          
          virtual ~Connection();
+
+         virtual ConnectionT type() const = 0;
 
          virtual void open() = 0;
          virtual void close() = 0;
@@ -80,6 +76,7 @@ namespace Network {
          unsigned timeout() const { return m_timeout; }
 
          Status status() const { return m_status; }
+         void setStatus(Status status) { m_status = status; }
          QString const& message() const { return m_message; }
          QString const& hostname() const { return m_hostname; }
          int port() const { return m_port; }
@@ -97,14 +94,13 @@ namespace Network {
          QString  m_message;
 
          void     thread(Reply*);
+         QString  getPasswordFromUser(QString const& message);
 
       private:
          void     killThread();
          explicit Connection(Connection const&) : QObject() { }
          QThread  m_thread;
    };
-
-
 
 } } // end namespace IQmol::Network
 

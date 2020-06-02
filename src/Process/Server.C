@@ -86,59 +86,76 @@ bool Server::open()
 {
    bool ok(true);
    // Short circuit the open if we have already been authenticated.
-   if (m_connection && m_connection->status() == Network::Connection::Authenticated) return true;
+   if (m_connection && m_connection->status() == Network::Authenticated) return true;
+
+   QString address(m_configuration.value(ServerConfiguration::HostAddress));
+   QString publicKeyFile(m_configuration.value(ServerConfiguration::PublicKeyFile));
+   QString privateKeyFile(m_configuration.value(ServerConfiguration::PrivateKeyFile));
+   QString knownHostsFile(m_configuration.value(ServerConfiguration::KnownHostsFile));
 
    if (!m_connection) {
       QLOG_TRACE() << "Creating connection" 
                    << m_configuration.value(ServerConfiguration::Connection);
 
-      QVariant address(m_configuration.value(ServerConfiguration::HostAddress));
-      QVariant publicKeyFile(m_configuration.value(ServerConfiguration::PublicKeyFile));
-      QVariant privateKeyFile(m_configuration.value(ServerConfiguration::PrivateKeyFile));
-      QVariant knownHostsFile(m_configuration.value(ServerConfiguration::KnownHostsFile));
-
       int port(m_configuration.port());
 
       switch (m_configuration.connection()) {
-         case ServerConfiguration::Local:
+         case Network::Local:
             m_connection = new Network::LocalConnection();
             break;
-         case ServerConfiguration::SSH:
-         case ServerConfiguration::SFTP:
-            m_connection = new Network::SshConnection(address.toString(), port, 
-               publicKeyFile.toString(), privateKeyFile.toString(), 
-               knownHostsFile.toString(), true);
+         case Network::SSH:
+         case Network::SFTP:
+            m_connection = new Network::SshConnection(address, port, 
+               publicKeyFile, privateKeyFile, knownHostsFile, true);
             break;
-         case ServerConfiguration::HTTP:
-            m_connection = new Network::HttpConnection(address.toString(), port);
+         case Network::HTTP:
+            m_connection = new Network::HttpConnection(address, port);
             break;
-         case ServerConfiguration::HTTPS:
-            m_connection = new Network::HttpConnection(address.toString(), port, true);
+         case Network::HTTPS:
+            m_connection = new Network::HttpConnection(address, port, true);
             break;
       }
    }
 
-   if (m_connection->status() == Network::Connection::Closed) {
+   if (m_connection->status() == Network::Closed) {
       m_connection->open();
    }
 
-   if (m_connection->status() == Network::Connection::Opened) {
+   if (m_connection->status() == Network::Opened) {
       QLOG_TRACE() << "Authenticating connection";
-      Network::Connection::AuthenticationT 
+      Network::AuthenticationT 
          authentication(m_configuration.authentication());
 
       if (m_configuration.isWebBased()) {
          QString cookie(m_configuration.value(ServerConfiguration::Cookie));
-         m_connection->authenticate(authentication, cookie);
+
+         if (authentication == Network::Password) {
+            // Update our JWT through the authentication server.
+            int authenticationPort(m_configuration.authenticationPort());
+            QString userName(m_configuration.value(ServerConfiguration::UserName));
+            QString jwt(userName);
+
+            Network::HttpConnection conn(address, authenticationPort);
+            conn.open();
+            conn.authenticate(authentication, jwt);
+            if (conn.status() == Network::Authenticated) {
+               cookie = jwt;
+               m_connection->setStatus(Network::Authenticated);
+            }
+         }else {
+            m_connection->authenticate(authentication, cookie);
+         }
+
          m_configuration.setValue(ServerConfiguration::Cookie, cookie);
          ServerRegistry::save();
+
       }else {
          QString userName(m_configuration.value(ServerConfiguration::UserName));
          m_connection->authenticate(authentication, userName);
       }
    }
 
-   if (m_connection->status() == Network::Connection::Authenticated) {
+   if (m_connection->status() == Network::Authenticated) {
       if (!m_watchedJobs.isEmpty()) {
          queryAllJobs();
          startUpdates();

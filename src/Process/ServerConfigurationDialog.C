@@ -34,19 +34,18 @@
 #include <QFileDialog>
 
 
+
 namespace IQmol {
 namespace Process {
 
 ServerConfigurationDialog::ServerConfigurationDialog(ServerConfiguration& configuration, 
-   QWidget* parent) : QDialog(parent), m_tested(false), m_blockUpdate(false),
+   QWidget* parent) : QDialog(parent), m_tested(false), m_setDefaults(false),
    m_originalConfiguration(configuration)
 {
    m_dialog.setupUi(this);
-   init();
    m_currentConfiguration = m_originalConfiguration;
-   blockUpdate(true);
+
    copyFrom(m_originalConfiguration);
-   blockUpdate(false);
 
    // Hide this temporarily as it causes the server to not appear in the list
    m_dialog.testConnectionButton->hide();
@@ -55,54 +54,81 @@ ServerConfigurationDialog::ServerConfigurationDialog(ServerConfiguration& config
 }
 
 
-ServerConfigurationDialog::~ServerConfigurationDialog()
+
+void ServerConfigurationDialog::updateQueueSystemsCombo(
+   Network::ConnectionT const connection)
 {
-}
+   QComboBox* qs(m_dialog.queueSystem);
+   QString currentText(qs->currentText());
+   qs->clear();
 
-
-void ServerConfigurationDialog::init()
-{
-   m_dialog.authentication->clear(); 
-
-   // Not pretty, the ordering of these is linked to the enum in Network/Connection.h
-   m_dialog.authentication->addItem(
-      Network::Connection::toString(Network::Connection::None)); 
-   m_dialog.authentication->addItem(
-      Network::Connection::toString(Network::Connection::Agent)); 
-   m_dialog.authentication->addItem(
-      Network::Connection::toString(Network::Connection::HostBased)); 
-   m_dialog.authentication->addItem(
-      Network::Connection::toString(Network::Connection::KeyboardInteractive)); 
-   m_dialog.authentication->addItem(
-      Network::Connection::toString(Network::Connection::Password)); 
-   m_dialog.authentication->addItem(
-      Network::Connection::toString(Network::Connection::PublicKey)); 
-}
-
-
-void ServerConfigurationDialog::updateAllowedQueueSystems(bool httpOnly)
-{
-   bool currentHttpOnly(m_dialog.queueSystem->itemText(0) ==
-         ServerConfiguration::toString(ServerConfiguration::Web));
-
-   if (currentHttpOnly == httpOnly) return;
-
-   m_dialog.queueSystem->clear();
-
-   if (httpOnly) {
-      m_dialog.queueSystem->addItem(
-         ServerConfiguration::toString(ServerConfiguration::Web));
-   }else {
-      m_dialog.queueSystem->addItem(
-         ServerConfiguration::toString(ServerConfiguration::Basic));
-      m_dialog.queueSystem->addItem(
-         ServerConfiguration::toString(ServerConfiguration::PBS));
-      m_dialog.queueSystem->addItem(
-         ServerConfiguration::toString(ServerConfiguration::SGE));
-      m_dialog.queueSystem->addItem(
-         ServerConfiguration::toString(ServerConfiguration::SLURM));
+   switch (connection) {
+      case Network::HTTP:
+      case Network::HTTPS:
+         qs->addItem(ServerConfiguration::toString(ServerConfiguration::Web));
+         break;
+      case Network::Local:
+      case Network::SSH:
+      case Network::SFTP:
+         qs->addItem(ServerConfiguration::toString(ServerConfiguration::Basic));
+         qs->addItem(ServerConfiguration::toString(ServerConfiguration::PBS));
+         qs->addItem(ServerConfiguration::toString(ServerConfiguration::SGE));
+         qs->addItem(ServerConfiguration::toString(ServerConfiguration::SLURM));
+         break;
    }
-   m_tested = false;
+
+   int index(0);
+   for (int i = 0; i < qs->count(); ++i) {
+       if (qs->itemText(i) == currentText) {
+          index = i;  break;
+       }
+   }
+   qDebug()<< "setting current index to " << index;
+   qs->setCurrentIndex(index);
+   qDebug()<< "current text now" << qs->currentText();
+}
+
+
+
+void ServerConfigurationDialog::updateAuthenticationCombo(
+   Network::ConnectionT const connection)
+{
+   QComboBox* auth(m_dialog.authentication);
+   QString currentText(auth->currentText());
+   auth->clear();
+
+   switch (connection) {
+
+      case Network::Local:
+      case Network::HTTP:
+         auth->addItem(Network::ToString(Network::Anonymous)); 
+         // This is insecure and only here for testing
+         auth->addItem(Network::ToString(Network::Password)); 
+         break;
+
+      case Network::HTTPS:
+         auth->addItem(Network::ToString(Network::Anonymous)); 
+         auth->addItem(Network::ToString(Network::Password)); 
+         break;
+
+      case Network::SSH:
+      case Network::SFTP:
+         auth->addItem(Network::ToString(Network::Anonymous)); 
+         auth->addItem(Network::ToString(Network::Agent)); 
+         auth->addItem(Network::ToString(Network::HostBased)); 
+         auth->addItem(Network::ToString(Network::KeyboardInteractive));
+         auth->addItem(Network::ToString(Network::Password)); 
+         auth->addItem(Network::ToString(Network::PublicKey)); 
+   }
+    
+   int index(0);
+   for (int i = 0; i < auth->count(); ++i) {
+       if (auth->itemText(i) == currentText) {
+          index = i;  break;
+       }
+   }
+
+   auth->setCurrentIndex(index);
 }
 
 
@@ -112,15 +138,16 @@ void ServerConfigurationDialog::on_localRadioButton_toggled(bool tf)
    if (!tf) return;
 
    m_dialog.remoteHostGroupBox->setEnabled(false);
-   m_dialog.configureConnectionButton->setEnabled(false);
-   updateAllowedQueueSystems(false);
+   m_dialog.configureSshButton->setEnabled(false);
 
-   if (blockUpdate()) return;
+   updateQueueSystemsCombo(Network::Local);
+   updateAuthenticationCombo(Network::Local);
 
-   m_currentConfiguration.setDefaults(ServerConfiguration::Local);
-   on_queueSystem_currentIndexChanged(m_dialog.queueSystem->currentText());
-
-   copyFrom(m_currentConfiguration);
+   if (setDefaults()) {
+      qDebug() << "Setting defaults for Local";
+      m_currentConfiguration.setDefaults(Network::Local);
+      copyFrom(m_currentConfiguration);
+   }
 }
 
 
@@ -129,16 +156,20 @@ void ServerConfigurationDialog::on_sshRadioButton_toggled(bool tf)
    if (!tf) return;
 
    m_dialog.remoteHostGroupBox->setEnabled(true);
-   m_dialog.configureConnectionButton->setEnabled(true);
+   m_dialog.configureSshButton->setEnabled(true);
    m_dialog.authentication->setEnabled(true);
    m_dialog.userName->setEnabled(true);
    m_dialog.workingDirectory->setEnabled(true);
-   updateAllowedQueueSystems(false);
+   m_dialog.workingDirectoryLabel->setEnabled(true);
 
-   if (blockUpdate()) return;
+   updateQueueSystemsCombo(Network::SSH);
+   updateAuthenticationCombo(Network::SSH);
 
-   m_currentConfiguration.setDefaults(ServerConfiguration::SSH);
-   copyFrom(m_currentConfiguration);
+   if (setDefaults()) {
+      qDebug() << "Setting defaults for SSH";
+      m_currentConfiguration.setDefaults(Network::SSH);
+      copyFrom(m_currentConfiguration);
+   }
 }
 
 
@@ -147,16 +178,20 @@ void ServerConfigurationDialog::on_sftpRadioButton_toggled(bool tf)
    if (!tf) return;
 
    m_dialog.remoteHostGroupBox->setEnabled(true);
-   m_dialog.configureConnectionButton->setEnabled(true);
+   m_dialog.configureSshButton->setEnabled(true);
    m_dialog.authentication->setEnabled(true);
    m_dialog.userName->setEnabled(true);
    m_dialog.workingDirectory->setEnabled(true);
-   updateAllowedQueueSystems(false);
+   m_dialog.workingDirectoryLabel->setEnabled(true);
 
-   if (blockUpdate()) return;
+   updateQueueSystemsCombo(Network::SFTP);
+   updateAuthenticationCombo(Network::SFTP);
 
-   m_currentConfiguration.setDefaults(ServerConfiguration::SFTP);
-   copyFrom(m_currentConfiguration);
+   if (setDefaults()) {
+      qDebug() << "Setting defaults for SFTP";
+      m_currentConfiguration.setDefaults(Network::SFTP);
+      copyFrom(m_currentConfiguration);
+   }
 }
 
 
@@ -165,16 +200,20 @@ void ServerConfigurationDialog::on_httpRadioButton_toggled(bool tf)
    if (!tf) return;
 
    m_dialog.remoteHostGroupBox->setEnabled(true);
-   m_dialog.configureConnectionButton->setEnabled(false);
-   m_dialog.authentication->setEnabled(false);
+   m_dialog.configureSshButton->setEnabled(false);
+   m_dialog.authentication->setEnabled(true);
    m_dialog.userName->setEnabled(false);
    m_dialog.workingDirectory->setEnabled(false);
-   updateAllowedQueueSystems(true);
+   m_dialog.workingDirectoryLabel->setEnabled(false);
 
-   if (blockUpdate()) return;
+   updateQueueSystemsCombo(Network::HTTP);
+   updateAuthenticationCombo(Network::HTTP);
 
-   m_currentConfiguration.setDefaults(ServerConfiguration::HTTP);
-   copyFrom(m_currentConfiguration);
+   if (setDefaults()) {
+      qDebug() << "Setting defaults for HTTP";
+      m_currentConfiguration.setDefaults(Network::HTTP);
+      copyFrom(m_currentConfiguration);
+   }
 }
 
 
@@ -183,20 +222,25 @@ void ServerConfigurationDialog::on_httpsRadioButton_toggled(bool tf)
    if (!tf) return;
 
    m_dialog.remoteHostGroupBox->setEnabled(true);
-   m_dialog.configureConnectionButton->setEnabled(false);
-   m_dialog.authentication->setEnabled(false);
-   m_dialog.userName->setEnabled(false);
+   m_dialog.configureSshButton->setEnabled(false);
+   m_dialog.authentication->setEnabled(true);
+   m_dialog.userName->setEnabled(true);
    m_dialog.workingDirectory->setEnabled(false);
-   updateAllowedQueueSystems(true);
+   m_dialog.workingDirectoryLabel->setEnabled(false);
 
-   if (blockUpdate()) return;
+   updateQueueSystemsCombo(Network::HTTPS);
+   updateAuthenticationCombo(Network::HTTPS);
 
-   m_currentConfiguration.setDefaults(ServerConfiguration::HTTPS);
-   copyFrom(m_currentConfiguration);
+   if (setDefaults()) {
+      qDebug() << "Setting defaults for HTTPS";
+      m_currentConfiguration.setDefaults(Network::HTTPS);
+      copyFrom(m_currentConfiguration);
+   }
 }
 
 
-void ServerConfigurationDialog::on_configureConnectionButton_clicked(bool)
+
+void ServerConfigurationDialog::on_configureSshButton_clicked(bool)
 {
    SshFileDialog dialog(&m_currentConfiguration, this); 
    dialog.exec();
@@ -213,76 +257,95 @@ void ServerConfigurationDialog::on_configureQueueButton_clicked(bool)
 
 void ServerConfigurationDialog::on_queueSystem_currentIndexChanged(QString const& queue)
 {
-  if (blockUpdate()) return;
-  ServerConfiguration::QueueSystemT queueT(ServerConfiguration::toQueueSystemT(queue));
-  //if (m_currentConfiguration.queueSystem() == queueT) return;
-  m_currentConfiguration.setDefaults(queueT);
+   if (setDefaults()) {
+      ServerConfiguration::QueueSystemT queueT(ServerConfiguration::toQueueSystemT(queue));
+      m_currentConfiguration.setDefaults(queueT);
+   }
 }
+
+
+void ServerConfigurationDialog::on_authentication_currentIndexChanged(QString const& auth)
+{
+   if (m_dialog.queueSystem->currentText() == 
+      ServerConfiguration::toString(ServerConfiguration::Web)) {
+      bool pw(auth == Network::ToString(Network::Password));
+      m_dialog.authenticationPort->setEnabled(pw);
+      m_dialog.authenticationPortLabel->setEnabled(pw);
+      m_dialog.userName->setEnabled(pw);
+      m_dialog.userNameLabel->setEnabled(pw);
+   }else {
+      m_dialog.authenticationPort->setEnabled(false);
+      m_dialog.authenticationPortLabel->setEnabled(false);
+   }
+}
+
 
 
 void ServerConfigurationDialog::copyFrom(ServerConfiguration const& config)
 {
+   setDefaults(false);
    switch (config.connection()) {
-      case ServerConfiguration::Local:
-         m_dialog.localRadioButton->setChecked(true);
-         m_dialog.queueSystem->setCurrentIndex(config.queueSystem());
-         break;
-      case ServerConfiguration::SSH:
-         m_dialog.sshRadioButton->setChecked(true);
-         m_dialog.queueSystem->setCurrentIndex(config.queueSystem());
-         break;
-      case ServerConfiguration::SFTP:
-         m_dialog.sftpRadioButton->setChecked(true);
-         m_dialog.queueSystem->setCurrentIndex(config.queueSystem());
-         break;
-      case ServerConfiguration::HTTP:
-         m_dialog.httpRadioButton->setChecked(true);
-         break;
-      case ServerConfiguration::HTTPS:
-         m_dialog.httpsRadioButton->setChecked(true);
-         break;
+      case Network::Local:  m_dialog.localRadioButton->setChecked(true);  break;
+      case Network::SSH:    m_dialog.sshRadioButton->setChecked(true);    break;
+      case Network::SFTP:   m_dialog.sftpRadioButton->setChecked(true);   break;
+      case Network::HTTP:   m_dialog.httpRadioButton->setChecked(true);   break;
+      case Network::HTTPS:  m_dialog.httpsRadioButton->setChecked(true);  break;
    }
+
+   m_dialog.queueSystem->setCurrentText(
+      ServerConfiguration::toString(config.queueSystem()));
 
    m_dialog.serverName->setText(config.value(ServerConfiguration::ServerName));
    m_dialog.hostAddress->setText(config.value(ServerConfiguration::HostAddress));
    m_dialog.port->setValue(config.port());
-   m_dialog.authentication->setCurrentIndex(config.authentication());
+
+   m_dialog.authentication->setCurrentText(
+      Network::ToString(config.authentication()));
+   m_dialog.authenticationPort->setValue(config.authenticationPort());
+
    m_dialog.userName->setText(config.value(ServerConfiguration::UserName));
 
    m_dialog.workingDirectory->setText(
       config.value(ServerConfiguration::WorkingDirectory));
 
+   setDefaults(true);
    m_tested = false;
 }
 
 
 bool ServerConfigurationDialog::copyTo(ServerConfiguration* config)
 {
+   Network::AuthenticationT authentication = 
+      Network::ToAuthenticationT(m_dialog.authentication->currentText());
+
+   Network::ConnectionT connection(Network::Local);
+
+   if (m_dialog.sshRadioButton->isChecked()) {
+      connection = Network::SSH;
+   }else if (m_dialog.sftpRadioButton->isChecked()) {
+      connection = Network::SFTP;
+   }else if (m_dialog.httpRadioButton->isChecked()) {
+      connection = Network::HTTP;
+   }else if (m_dialog.httpsRadioButton->isChecked()) {
+      connection = Network::HTTPS;
+   }
+
    // Sanity checks
    if (m_dialog.serverName->text().trimmed().isEmpty()) {
       QMsgBox::warning(this, "IQmol", "Server name not set");
       return false;
    }
 
-   ServerConfiguration::ConnectionT connection(ServerConfiguration::Local);
-   if (m_dialog.sshRadioButton->isChecked()) {
-      connection = ServerConfiguration::SSH;
-   }else if (m_dialog.sftpRadioButton->isChecked()) {
-      connection = ServerConfiguration::SFTP;
-   }else if (m_dialog.httpRadioButton->isChecked()) {
-      connection = ServerConfiguration::HTTP;
-   }else if (m_dialog.httpsRadioButton->isChecked()) {
-      connection = ServerConfiguration::HTTPS;
-   }
-
-   if (connection != ServerConfiguration::Local) {
+   if (connection != Network::Local) {
       if (m_dialog.hostAddress->text().trimmed().isEmpty()) {
          QMsgBox::warning(this, "IQmol", "Host address not set");
          return false;
       }
    }
 
-   if (connection == ServerConfiguration::SSH || connection == ServerConfiguration::SFTP) {
+   if (connection == Network::SSH || connection == Network::SFTP || 
+       authentication == Network::Password) {
+ 
       if (m_dialog.userName->text().trimmed().isEmpty()) {
          QMsgBox::warning(this, "IQmol", "User name must be set");
          return false;
@@ -305,7 +368,7 @@ bool ServerConfigurationDialog::copyTo(ServerConfiguration* config)
       ServerConfiguration::toQueueSystemT(queue));
    config->setValue(ServerConfiguration::HostAddress, "localhost");
 
-   if (connection == ServerConfiguration::Local) return true;
+   if (connection == Network::Local) return true;
 
    config->setValue(ServerConfiguration::HostAddress, 
       m_dialog.hostAddress->text());
@@ -314,7 +377,10 @@ bool ServerConfigurationDialog::copyTo(ServerConfiguration* config)
       m_dialog.port->value());
 
    config->setValue(ServerConfiguration::Authentication, 
-      ServerConfiguration::toAuthenticationT(m_dialog.authentication->currentText()));
+      Network::ToAuthenticationT(m_dialog.authentication->currentText()));
+
+   config->setValue(ServerConfiguration::AuthenticationPort, 
+      m_dialog.authenticationPort->value());
 
    config->setValue(ServerConfiguration::UserName, 
       m_dialog.userName->text());
@@ -342,15 +408,15 @@ bool ServerConfigurationDialog::testConnection()
    if (!copyTo(&m_currentConfiguration)) return okay;
 
    switch (m_currentConfiguration.connection()) {
-      case ServerConfiguration::Local:
+      case Network::Local:
          QMsgBox::information(this, "IQmol", "Local connection just fine");
          break;
-      case ServerConfiguration::SSH:
-      case ServerConfiguration::SFTP:
+      case Network::SSH:
+      case Network::SFTP:
          okay = testSshConnection(m_currentConfiguration);
          break;
-      case ServerConfiguration::HTTP:
-      case ServerConfiguration::HTTPS:
+      case Network::HTTP:
+      case Network::HTTPS:
          okay = testHttpConnection(m_currentConfiguration);
          break;
    }
@@ -371,7 +437,7 @@ bool ServerConfigurationDialog::testSshConnection(ServerConfiguration const& con
    try {
       QString hostAddress(configuration.value(ServerConfiguration::HostAddress));
       QString userName(configuration.value(ServerConfiguration::UserName));
-      Network::Connection::AuthenticationT authentication(configuration.authentication());
+      Network::AuthenticationT authentication(configuration.authentication());
 
       QString publicKeyFile(configuration.value(ServerConfiguration::KnownHostsFile));
       QString privateKeyFile(configuration.value(ServerConfiguration::PrivateKeyFile));
@@ -517,9 +583,9 @@ void ServerConfigurationDialog::on_loadButton_clicked(bool)
       if (yaml.first()) {
          yaml.first()->dump();
          m_currentConfiguration = ServerConfiguration(*(yaml.first()));
-         blockUpdate(true);
+         setDefaults(false);
          copyFrom(m_currentConfiguration);
-         blockUpdate(false);
+         setDefaults(true);
       }
 
    } catch (YAML::Exception& err) {
@@ -547,15 +613,15 @@ void ServerConfigurationDialog::on_exportButton_clicked(bool)
 }
 
 
-void ServerConfigurationDialog::blockUpdate(bool const tf)
+void ServerConfigurationDialog::setDefaults(bool const tf)
 {
-   m_blockUpdate = tf;
+   m_setDefaults = tf;
 }
 
 
-bool ServerConfigurationDialog::blockUpdate() const
+bool ServerConfigurationDialog::setDefaults() const
 {
-   return m_blockUpdate;
+   return m_setDefaults;
 }
 
 } } // end namespace IQmol::Process

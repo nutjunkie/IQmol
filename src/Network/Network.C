@@ -45,6 +45,111 @@ namespace IQmol {
 namespace Network {
 
 
+QString ToString(Status const status)
+{
+   QString s;
+
+   switch (status) {
+      case Closed:         s = "Closed";         break;
+      case Opened:         s = "Opened";         break;
+      case Authenticated:  s = "Authenticated";  break;
+      case Error:          s = "Error";          break;
+   }
+
+   return s;
+}
+
+
+QString ToString(ConnectionT const type)
+{
+   QString s;
+
+   switch (type) {
+      case Local:  s = "Local";  break;
+      case SSH:    s = "SSH";    break;
+      case SFTP:   s = "SFTP";   break;
+      case HTTP:   s = "HTTP";   break;
+      case HTTPS:  s = "HTTPS";  break;
+   }
+
+   return s;
+}
+
+
+QString ToString(AuthenticationT const authentication)
+{
+   QString s;
+
+   switch (authentication) {
+      case Anonymous:            s = "Anonymous";             break;
+      case Agent:                s = "Agent";                 break;
+      case HostBased:            s = "Host Based";            break;
+      case KeyboardInteractive:  s = "Keyboard Interactive";  break;
+      case Password:             s = "Password";              break;
+      case PublicKey:            s = "Public Key";            break;
+   }
+
+   return s;
+}
+
+
+Status ToStatus(QString const& s)
+{
+   Status status(Error);
+
+   if (s.contains(ToString(Closed), Qt::CaseInsensitive)) {
+      status = Closed;
+   }else if (s.contains(ToString(Opened), Qt::CaseInsensitive)) {
+      status = Opened;
+   }else if (s.contains(ToString(Authenticated), Qt::CaseInsensitive)) {
+      status = Authenticated;
+   }
+
+   return status;
+}
+
+
+ConnectionT ToConnectionT(QString const& s)
+{
+   ConnectionT conn(Local);
+
+   if (s.contains(ToString(SSH), Qt::CaseInsensitive)) {
+      conn = SSH;
+   }else if (s.contains(ToString(SFTP), Qt::CaseInsensitive)) {
+      conn = SFTP;
+   }else if (s.contains(ToString(HTTPS), Qt::CaseInsensitive)) {
+      conn = HTTPS;
+   }else if (s.contains(ToString(HTTP), Qt::CaseInsensitive)) {
+      conn = HTTP;
+   }
+
+   return conn;
+}
+
+
+AuthenticationT ToAuthenticationT(QString const& s)
+{
+   AuthenticationT auth(Anonymous);
+
+   if (s.contains(ToString(Agent), Qt::CaseInsensitive)) {
+      auth = Agent;
+   }else if (s.contains(ToString(HostBased), Qt::CaseInsensitive)) {
+      auth = HostBased;
+   }else if (s.contains(ToString(KeyboardInteractive), Qt::CaseInsensitive)) {
+      auth = KeyboardInteractive;
+   }else if (s.contains(ToString(Password), Qt::CaseInsensitive)) {
+      auth = Password;
+   }else if (s.contains(ToString(PublicKey), Qt::CaseInsensitive)) {
+      auth = PublicKey;
+   }
+
+   return auth;
+}
+
+
+
+
+
    //Network::HttpConnection* http = new Network::HttpConnection("cactus.nci.nih.gov");
    //if (http->openConnection()) {
    //   http->request("chemical/structure/Benzene/smiles");
@@ -71,7 +176,7 @@ bool TestNetworkConnection()
             << "He"
             << "$end"
 
-            << "$rem"
+            << "$rem
             << "  exchange  hf"
             << "  gui       2"
             << "  basis     6-31G"

@@ -35,7 +35,7 @@ namespace Process {
 
       public:
          ServerConfigurationDialog(ServerConfiguration& config, QWidget* parent = 0);
-         ~ServerConfigurationDialog();
+         ~ServerConfigurationDialog() { }
 
       private Q_SLOTS:
          void on_localRadioButton_toggled(bool);
@@ -44,11 +44,13 @@ namespace Process {
          void on_httpRadioButton_toggled(bool);
          void on_httpsRadioButton_toggled(bool);
 
-         void on_configureConnectionButton_clicked(bool);
+         void on_configureSshButton_clicked(bool);
          void on_configureQueueButton_clicked(bool);
          void on_queueSystem_currentIndexChanged(QString const& queue);
+         void on_authentication_currentIndexChanged(QString const& queue);
 
          void on_testConnectionButton_clicked(bool);
+
          void on_loadButton_clicked(bool);
          void on_exportButton_clicked(bool);
 
@@ -58,18 +60,17 @@ namespace Process {
          bool testConnection();
          bool testSshConnection(ServerConfiguration const&);
          bool testHttpConnection(ServerConfiguration const&);
+         bool m_tested;
 
          void copyFrom(ServerConfiguration const&);
          bool copyTo(ServerConfiguration*);
 
-         void init();
-         void updateAllowedQueueSystems(bool httpOnly);
+         void updateAuthenticationCombo(Network::ConnectionT const);
+         void updateQueueSystemsCombo(Network::ConnectionT const);
 
-         bool m_tested;
-
-         bool blockUpdate() const;
-         void blockUpdate(bool const tf);
-         bool m_blockUpdate;
+         bool setDefaults() const;
+         void setDefaults(bool const tf);
+         bool m_setDefaults;
 
          Ui::ServerConfigurationDialog m_dialog;
 

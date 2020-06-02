@@ -32,6 +32,8 @@
 class QNetworkReply;
 class QFile;
 
+typedef QMap<QString, QString> QStringMap;
+
 namespace IQmol {
 namespace Network {
 
@@ -44,6 +46,7 @@ namespace Network {
          virtual ~HttpReply();
 
          QString headerValue(QString const& headerName);
+         void setHeader(QString const& header, QString const& value);
 
       public Q_SLOTS:
          void interrupt();
@@ -55,12 +58,14 @@ namespace Network {
          HttpConnection* m_connection;
          unsigned m_timeout;
          QNetworkReply* m_networkReply;  // We take ownership of this
+         QStringMap m_headers;
          QTimer m_timer;
          bool m_https;
+         QUrl m_url;
+
          // This takes care of all the http:// crap
          void setUrl(QString const& path = QString()); 
-         QUrl m_url;
-       
+ 
       protected Q_SLOTS:
          void readToString();
          void finishedSlot();

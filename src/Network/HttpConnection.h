@@ -24,11 +24,15 @@
 
 #include "Connection.h"
 
+typedef QMap<QString, QString> QStringMap;
+
 
 class QNetworkAccessManager;
 
 namespace IQmol {
 namespace Network {
+
+   
 
    class HttpReply;
    class HttpGet;
@@ -43,8 +47,10 @@ namespace Network {
 
       public:
          HttpConnection(QString const& hostAddress, int const port = 80, 
-            bool const https = false);
+             bool const https = false);
          ~HttpConnection() { close(); }
+
+         ConnectionT type() const;
 
          bool isSecure() const { return m_secure; }
 
@@ -59,7 +65,8 @@ namespace Network {
 
 
          Reply* execute(QString const& query);
-         Reply* execute(QString const& query, QString const& /*workingDirectory*/) { return execute(query); }
+         Reply* execute(QString const& query, QString const& /*workingDirectory*/);
+         Reply* execute(QString const& query, QStringMap const& headers);
          Reply* putFile(QString const& sourcePath, QString const& destinationPath);
          Reply* getFile(QString const& sourcePath, QString const& destinationPath);
          Reply* getFiles(QStringList const& fileList, QString const& destinationPath);
@@ -72,7 +79,8 @@ namespace Network {
          bool m_secure; 
 
       private:
-         QString obtainCookie();
+         QString getJwt(QString const& userName);
+         QString getCookie();
    };
 
 } } // end namespace IQmol::Network

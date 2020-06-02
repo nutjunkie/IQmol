@@ -37,6 +37,8 @@ namespace Network {
          LocalConnection();
          ~LocalConnection() { close(); }
 
+         ConnectionT type() const { return Local; }
+
          void open();
          void close();
          void authenticate(AuthenticationT const, QString& username);

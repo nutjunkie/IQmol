@@ -28,8 +28,8 @@
 namespace IQmol {
 namespace Network {
 
-HttpReply::HttpReply(HttpConnection* connection) : m_connection(connection), m_networkReply(0),
-   m_https(connection->isSecure())
+HttpReply::HttpReply(HttpConnection* connection) 
+ : m_connection(connection), m_networkReply(0), m_https(connection->isSecure())
 { 
    m_timeout = m_connection->timeout();
    m_timer.setInterval(m_timeout);
@@ -52,8 +52,9 @@ void HttpReply::finishedSlot()
    QLOG_DEBUG() << "HttpReply finished, HEADER:\n" << headerAsString();
 
    QString status(headerValue("Qchemserv-Status"));
+   QString cloud(headerValue("Qcloud-Server-Status"));
 
-   if (status.contains("OK")) {
+   if (status.contains("OK") || cloud.contains("OK")) {
       if (m_status != Error) m_status = m_interrupt ? Interrupted : Finished;
       if (m_message.isEmpty()) {
          m_message = headerAsString(); 
@@ -61,13 +62,19 @@ void HttpReply::finishedSlot()
    }else if (status.contains("ERROR")) {
       m_status  = Error;
       m_message = headerValue("Qchemserv-Error");
-   }else  {
+   }else {
+      QString msg(headerValue("Qcloud-Server-Message"));
       m_status  = Error;
-      m_message = "QChem server temporarily unavailable";
+      if (msg.isEmpty()) {
+         m_message = "QChem server temporarily unavailable";
+      }else {
+      m_message = msg;
+      }
    }
 
    finished();
 }
+
 
 
 void HttpReply::errorSlot(QNetworkReply::NetworkError /*error*/)
@@ -128,6 +135,12 @@ void HttpReply::setUrl(QString const& path)
 }
 
 
+void HttpReply::setHeader(QString const& header, QString const& value)
+{
+   m_headers[header] = value;
+}
+
+
 QString HttpReply::headerValue(QString const& headerName)
 {
    QByteArray data(headerName.toLatin1());
@@ -135,8 +148,6 @@ QString HttpReply::headerValue(QString const& headerName)
    
    if (m_networkReply->hasRawHeader(data)) {
        header = QString(m_networkReply->rawHeader(data));
-   }else {
-      QLOG_DEBUG() << "Header not found:" << data;
    }
 
    return header;
@@ -212,6 +223,11 @@ void HttpGet::run()
    QNetworkRequest request;
    request.setUrl(m_url);
    QLOG_DEBUG() << "Retrieving:" << m_url;
+
+   QStringMap::iterator iter;
+   for (iter = m_headers.begin(); iter != m_headers.end(); ++iter) {
+       request.setRawHeader(iter.key().toLatin1(), iter.value().toLatin1());
+   }
 
    m_networkReply = m_connection->m_networkAccessManager->get(request);
 
@@ -324,6 +340,10 @@ void HttpPost::run()
    request.setUrl(m_url);
    request.setHeader(QNetworkRequest::ContentTypeHeader, "text/plain; charset=UTF-8");
 
+   QStringMap::iterator it;
+   for (it = m_headers.begin(); it != m_headers.end(); ++it) {
+       request.setRawHeader(it.key().toLatin1(), it.value().toLatin1());
+   }
    QByteArray data(m_postData.toLatin1());
 
 
