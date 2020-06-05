@@ -105,7 +105,9 @@ QStringList QChemOutput::parseForErrors(TextStream& textStream)
          if (error.isEmpty()) error = "Fatal error occured at end of output file";
 
       }else if (line.contains("Time limit has been exceeded")) {
-         error = "Time limit has been exceeded";
+         error = "Time limit on Q-Chem public server has been exceeded.\n"
+                 "Please consider installing your own copy of Q-Chem to \n"
+                 "remove this limitation.";
 
       }else if (line.contains("Welcome to Q-Chem")) {
          if (!error.isEmpty()) {
