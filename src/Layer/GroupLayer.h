@@ -35,7 +35,7 @@ namespace Layer {
       Q_OBJECT
 
       public:
-         Group(QString const& label = QString());
+         explicit Group(QString const& label = QString());
          Group(PrimitiveList const&, QString const& label = QString());
          ~Group();
 

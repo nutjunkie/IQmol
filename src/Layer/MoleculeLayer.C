@@ -1396,7 +1396,7 @@ void Molecule::groupSelection()
    }
 
    takePrimitives(selected);
-   appendPrimitive(new Layer::Group(selected));
+   appendPrimitive(new Layer::Group(selected, ""));
 
    //postCommand(new Command::GroupPrimitives(this, selected));
    m_modified = true;
