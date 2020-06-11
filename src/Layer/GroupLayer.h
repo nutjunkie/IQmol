@@ -35,7 +35,8 @@ namespace Layer {
       Q_OBJECT
 
       public:
-         Group(QString const& label = QString());
+         explicit Group(QString const& label = QString());
+         Group(PrimitiveList const&, QString const& label = QString());
          ~Group();
 
          void loadFromFile(QString const& filePath);
@@ -60,6 +61,7 @@ namespace Layer {
          void dump() const;
 
       protected:
+         void addPrimitives(PrimitiveList const&);
          void addAtoms(AtomList const&);
          void addBonds(BondList const&);
 
