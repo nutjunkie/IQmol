@@ -41,6 +41,7 @@ namespace Constants {
    double const HartreeToKJmol      = 2625.49962;
    double const HartreeToKCalmol    = HartreeToKJmol/JoulesPerCalorie;
 
+   enum Units { Hartree, ElectronVolt, Wavenumber, KJoulePerMol, KCalPerlMol, MegaHertz };
 
 } } // end namespace IQmol::Constants
 

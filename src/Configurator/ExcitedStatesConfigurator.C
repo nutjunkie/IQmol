@@ -25,6 +25,7 @@
 #include "ElectronicTransition.h"
 #include "ExcitedStates.h"
 #include "CustomPlot.h"
+#include "Constants.h"
 #include <cmath>
 
 
@@ -35,7 +36,11 @@ ExcitedStates::ExcitedStates(Layer::ExcitedStates& excitedStates) :
   m_excitedStates(excitedStates), m_moPlot(0), m_spectrum(0)
 {
    m_configurator.setupUi(this);
-   m_configurator.energyTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+   QString label(m_excitedStates.stateData().typeLabel());
+   label += " Excited States";
+   setWindowTitle(label);
+
    m_configurator.widthSlider->setEnabled(false);
    m_configurator.widthLabel->setEnabled(false);
 
@@ -48,8 +53,15 @@ ExcitedStates::ExcitedStates(Layer::ExcitedStates& excitedStates) :
    m_selectedPen.setWidth(3);
 
    initSpectrum();
+   initTable();
    initMoPlot();
+
+   m_configurator.unitsCombo->clear();
+   m_configurator.unitsCombo->addItem("eV", Constants::ElectronVolt);
+   m_configurator.unitsCombo->addItem("Wavenumber", Constants::Wavenumber);
+   m_configurator.unitsCombo->setCurrentIndex(0);
 }
+
 
 
 ExcitedStates::~ExcitedStates()
@@ -58,6 +70,7 @@ ExcitedStates::~ExcitedStates()
    if (m_moPlot) delete m_moPlot;
    if (m_spectrum) delete m_spectrum;
 }
+
 
 
 void ExcitedStates::initSpectrum()
@@ -82,20 +95,123 @@ void ExcitedStates::initSpectrum()
 }
 
 
-void ExcitedStates::load(Data::ExcitedStates const& states)
+void ExcitedStates::initMoPlot()
 {
-   Data::ElectronicTransitionList const& transitions(states.transitions());
+   m_moPlot = new CustomPlot(); 
+   m_moPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+   m_moPlot->axisRect()->setRangeDrag(Qt::Vertical);
+   m_moPlot->axisRect()->setRangeZoom(Qt::Vertical);
+   m_moPlot->xAxis->setSelectableParts(QCPAxis::spNone);
+   
+   QFrame* frame(m_configurator.moFrame);
+   QVBoxLayout* layout(new QVBoxLayout());
+   frame->setLayout(layout);
+   layout->addWidget(m_moPlot);
 
-   QString label(states.typeLabel());
-   label += " Excited States";
-   setWindowTitle(label);
+   m_moPlot->yAxis->setLabel("Energy/Hartree");
+   QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
+   m_moPlot->xAxis->setTicker(textTicker);
+   m_moPlot->xAxis->setRange(0,3.25);
+   textTicker->addTick(0.75, "Alpha");
+   textTicker->addTick(2.5, "Beta");
 
-   QTableWidget* table(m_configurator.energyTable); 
+   Data::OrbitalSymmetries const& orbitals(m_excitedStates.stateData().orbitalSymmetries());
+
+   unsigned nOrbs(orbitals.nOrbitals());
+   unsigned nAlpha(orbitals.nAlpha());
+   unsigned nBeta(orbitals.nBeta());
+   QVector<double>  xAlpha(nOrbs), yAlpha(nOrbs), xBeta(nOrbs), yBeta(nOrbs); 
+   QVector<double> a(1), b(1), y(1);
+   QCPGraph* graph(0);
+
+
+   Data::Spin spin(Data::Alpha);
+   unsigned nElectrons(nAlpha);
+   unsigned i(0), g(0);
+
+   while (i < nOrbs) {
+       y[0] = orbitals.energy(spin, i);
+
+       g = 1; // degeneracy
+       while (i+g < nOrbs && 
+              std::abs(y[0]-orbitals.energy(spin, i+g)) < 0.001) { ++g; }
+
+       for (unsigned k = i; k < i+g; ++k) {
+           a[0]  = 0.75 - 0.25*(g-1) + (k-i)*0.50;
+           graph = m_moPlot->addGraph();
+           graph->setData(a, y);
+           graph->setName(QString::number(k));
+           graph->selectionDecorator()->setPen(m_selectedPen);
+           graph->setScatterStyle(k < nElectrons ? QCPScatterStyle::ssOccupied 
+                                                 : QCPScatterStyle::ssVirtual);
+           connect(graph, SIGNAL(selectionChanged(bool)), this, SLOT(moSelectionChanged(bool)));
+       }
+
+       i += g;
+   }
+
+   i    = 0;
+   spin = Data::Beta;
+   nElectrons = nBeta;
+
+   while (i < nOrbs) {
+       y[0] = orbitals.energy(spin, i);
+
+       g = 1; // degeneracy
+       while (i+g < nOrbs && 
+              std::abs(y[0]-orbitals.energy(spin, i+g)) < 0.001) { ++g; }
+
+       for (unsigned k = i; k < i+g; ++k) {
+           a[0]  = 2.50 - 0.25*(g-1) + (k-i)*0.50;
+           graph = m_moPlot->addGraph();
+           graph->setData(a, y);
+           graph->setName(QString::number(k+nOrbs));
+           graph->selectionDecorator()->setPen(m_selectedPen);
+           graph->setScatterStyle(k < nElectrons ? QCPScatterStyle::ssOccupied 
+                                                 : QCPScatterStyle::ssVirtual);
+           connect(graph, SIGNAL(selectionChanged(bool)), this, SLOT(moSelectionChanged(bool)));
+       }
+
+       i += g;
+   }
+
+   // Set the scale to show 5 occupied and virtual orbitals to start with
+   int nShow(5);
+
+   // Use the beta energies if there are more of them
+   if (nBeta > nAlpha) {
+      spin = Data::Beta;
+      nElectrons = nBeta;
+   }else {
+      spin = Data::Alpha;
+      nElectrons = nAlpha;
+   }
+
+   unsigned index(std::max(0, (int)nElectrons-nShow));
+   double   yMin(orbitals.energy(spin, index));
+   index =  std::min((int)nElectrons+nShow, (int)nOrbs);
+   double   yMax(orbitals.energy(spin, index));
+   
+   // enlarge the range by 5% for asthetics
+   double dy(0.05*std::abs(yMax-yMin));
+   m_moPlot->yAxis->setRange(yMin-dy,yMax+dy);
+}
+
+
+
+void ExcitedStates::initTable()
+{
+   Data::ElectronicTransitionList const& transitions(m_excitedStates.stateData().transitions());
+
+   QTableWidget* table(m_configurator.energyTable);
+   table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
    table->setRowCount(transitions.size());
+
    QTableWidgetItem* item;
 
    m_maxValues.first  = 0;
    m_maxValues.second = 0;
+   m_rawData.clear();
 
    int row(0);
    Data::ElectronicTransitionList::const_iterator iter;
@@ -126,7 +242,62 @@ void ExcitedStates::load(Data::ExcitedStates const& states)
        item->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
        item->setData(Qt::UserRole, row);
        table->setItem(row, 2, item);
- 
+
+       ++row;
+   }
+
+   updateSpectrum();
+}
+
+
+
+void ExcitedStates::updateEnergyUnits()
+{
+   Data::ElectronicTransitionList const& transitions(m_excitedStates.stateData().transitions());
+   QTableWidget* table(m_configurator.energyTable); 
+   QTableWidgetItem* item;
+   
+   int units(m_configurator.unitsCombo->currentData().toInt());
+   double conversion(1.0);
+   QString label;
+
+   m_maxValues.first = 0;
+   m_rawData.clear();
+
+   switch (units) {
+      case Constants::ElectronVolt:
+         // Default energies are in eV
+         conversion = 1.0;
+         label = "Energy/eV";
+         break;
+      case Constants::Wavenumber:
+         conversion = Constants::HartreeToWavenumber/Constants::HartreeToEv;
+         label = "Energy/cm⁻¹";
+         break;
+   }
+
+   table->horizontalHeaderItem(0)->setText(label);
+   if (m_spectrum) m_spectrum->xAxis->setLabel(label);
+
+   int row(0);
+   Data::ElectronicTransitionList::const_iterator iter;
+   for (iter = transitions.begin(); iter != transitions.end(); ++iter) {
+       double energy((*iter)->energy() * conversion);
+       double strength((*iter)->strength());
+       QString text;
+
+       switch (units) {
+          case Constants::ElectronVolt:
+             text = QString::number(energy, 'f', 3);
+             break;
+          case Constants::Wavenumber:
+             text = QString::number(energy, 'f', 3);
+             break;
+       }
+
+       m_maxValues.first = std::max(m_maxValues.first, energy);
+       m_rawData.append(qMakePair(energy, strength));
+       table->item(row, 0)->setText(text + "     ");
        ++row;
    }
 
@@ -137,7 +308,7 @@ void ExcitedStates::load(Data::ExcitedStates const& states)
 
 void ExcitedStates::updateSpectrum()
 {
-   m_spectrum->xAxis->setLabel("Energy/eV");
+   //m_spectrum->xAxis->setLabel("Energy/eV");
    m_spectrum->clearGraphs();
    double width(m_configurator.widthSlider->value());
 
@@ -308,9 +479,17 @@ void ExcitedStates::on_energyTable_itemSelectionChanged()
 
    m_spectrum->replot();
 }
+
+
 void ExcitedStates::on_resetZoomButton_clicked(bool)
 {
    updateSpectrum();
+}
+
+
+void ExcitedStates::on_unitsCombo_currentIndexChanged(int)
+{
+   updateEnergyUnits();
 }
 
 
@@ -381,108 +560,6 @@ void ExcitedStates::updateMoPlot(int const index)
    m_moPlot->replot();
 }
 
-
-void ExcitedStates::initMoPlot()
-{
-   m_moPlot = new CustomPlot(); 
-   m_moPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-   m_moPlot->axisRect()->setRangeDrag(Qt::Vertical);
-   m_moPlot->axisRect()->setRangeZoom(Qt::Vertical);
-   m_moPlot->xAxis->setSelectableParts(QCPAxis::spNone);
-   
-   QFrame* frame(m_configurator.moFrame);
-   QVBoxLayout* layout(new QVBoxLayout());
-   frame->setLayout(layout);
-   layout->addWidget(m_moPlot);
-
-   m_moPlot->yAxis->setLabel("Energy/Hartree");
-   QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
-   m_moPlot->xAxis->setTicker(textTicker);
-   m_moPlot->xAxis->setRange(0,3.25);
-   textTicker->addTick(0.75, "Alpha");
-   textTicker->addTick(2.5, "Beta");
-
-   Data::OrbitalSymmetries const& orbitals(m_excitedStates.stateData().orbitalSymmetries());
-
-   unsigned nOrbs(orbitals.nOrbitals());
-   unsigned nAlpha(orbitals.nAlpha());
-   unsigned nBeta(orbitals.nBeta());
-   QVector<double>  xAlpha(nOrbs), yAlpha(nOrbs), xBeta(nOrbs), yBeta(nOrbs); 
-   QVector<double> a(1), b(1), y(1);
-   QCPGraph* graph(0);
-
-
-   Data::Spin spin(Data::Alpha);
-   unsigned nElectrons(nAlpha);
-   unsigned i(0), g(0);
-
-   while (i < nOrbs) {
-       y[0] = orbitals.energy(spin, i);
-
-       g = 1; // degeneracy
-       while (i+g < nOrbs && 
-              std::abs(y[0]-orbitals.energy(spin, i+g)) < 0.001) { ++g; }
-
-       for (unsigned k = i; k < i+g; ++k) {
-           a[0]  = 0.75 - 0.25*(g-1) + (k-i)*0.50;
-           graph = m_moPlot->addGraph();
-           graph->setData(a, y);
-           graph->setName(QString::number(k));
-           graph->selectionDecorator()->setPen(m_selectedPen);
-           graph->setScatterStyle(k < nElectrons ? QCPScatterStyle::ssOccupied 
-                                                 : QCPScatterStyle::ssVirtual);
-           connect(graph, SIGNAL(selectionChanged(bool)), this, SLOT(moSelectionChanged(bool)));
-       }
-
-       i += g;
-   }
-
-   i    = 0;
-   spin = Data::Beta;
-   nElectrons = nBeta;
-
-   while (i < nOrbs) {
-       y[0] = orbitals.energy(spin, i);
-
-       g = 1; // degeneracy
-       while (i+g < nOrbs && 
-              std::abs(y[0]-orbitals.energy(spin, i+g)) < 0.001) { ++g; }
-
-       for (unsigned k = i; k < i+g; ++k) {
-           a[0]  = 2.50 - 0.25*(g-1) + (k-i)*0.50;
-           graph = m_moPlot->addGraph();
-           graph->setData(a, y);
-           graph->setName(QString::number(k+nOrbs));
-           graph->selectionDecorator()->setPen(m_selectedPen);
-           graph->setScatterStyle(k < nElectrons ? QCPScatterStyle::ssOccupied 
-                                                 : QCPScatterStyle::ssVirtual);
-           connect(graph, SIGNAL(selectionChanged(bool)), this, SLOT(moSelectionChanged(bool)));
-       }
-
-       i += g;
-   }
-
-   // Set the scale to show 5 occupied and virtual orbitals to start with
-   int nShow(5);
-
-   // Use the beta energies if there are more of them
-   if (nBeta > nAlpha) {
-      spin = Data::Beta;
-      nElectrons = nBeta;
-   }else {
-      spin = Data::Alpha;
-      nElectrons = nAlpha;
-   }
-
-   unsigned index(std::max(0, (int)nElectrons-nShow));
-   double   yMin(orbitals.energy(spin, index));
-   index =  std::min((int)nElectrons+nShow, (int)nOrbs);
-   double   yMax(orbitals.energy(spin, index));
-   
-   // enlarge the range by 5% for asthetics
-   double dy(0.05*std::abs(yMax-yMin));
-   m_moPlot->yAxis->setRange(yMin-dy,yMax+dy);
-}
 
 
 

@@ -45,6 +45,9 @@ namespace Parser {
    ///   - voxel axes must be aligned with the cartesian axes
    ///   - data loops in the order x, y, z, so the z data varies fastest
    ///   - all data is separated by whitespace
+   /// 
+   /// https://h5cube-spec.readthedocs.io/en/latest/cubeformat.html
+
    class Cube : public Base {
 
       public:

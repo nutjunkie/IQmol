@@ -35,22 +35,18 @@ ExcitedStates::ExcitedStates(Data::ExcitedStates const& states) : Base("Excited 
 }
 
 
+
 ExcitedStates::~ExcitedStates()
 {
    if (m_configurator) delete m_configurator;
 }
 
 
+
 void ExcitedStates::configure()
 {
-   if (!m_configurator) {
-      m_configurator = new Configurator::ExcitedStates(*this);
-      if (!m_configurator) return;
-      m_configurator->load(m_excitedStates);
-   }
-
+   if (!m_configurator) m_configurator = new Configurator::ExcitedStates(*this);
    if (m_configurator) m_configurator->display();
 }
-
 
 } } // end namespace IQmol::Layer

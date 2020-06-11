@@ -39,10 +39,34 @@ QToolButton:pressed {
 }
 </string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,1,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="2,3">
-     <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="1">
+      <widget class="QFrame" name="moFrame">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <zorder>energyTable</zorder>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="orbitalLabel">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
       <widget class="QTableWidget" name="energyTable">
        <property name="editTriggers">
         <set>QAbstractItemView::NoEditTriggers</set>
@@ -73,30 +97,30 @@ QToolButton:pressed {
        </column>
       </widget>
      </item>
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
+     <item row="1" column="0">
+      <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QFrame" name="moFrame">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Units</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="orbitalLabel">
-         <property name="text">
-          <string/>
+        <widget class="QComboBox" name="unitsCombo"/>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
          </property>
-        </widget>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </item>

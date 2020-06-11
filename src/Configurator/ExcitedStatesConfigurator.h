@@ -53,11 +53,10 @@ namespace Configurator {
          explicit ExcitedStates(Layer::ExcitedStates&);
          ~ExcitedStates();
 
-          void load(Data::ExcitedStates const&);
-
       private Q_SLOTS:
-         void plotSelectionChanged(bool);
          void moSelectionChanged(bool);
+         void plotSelectionChanged(bool);
+         void setSelectionRectMode(QMouseEvent* e);
 
          void on_impulseButton_clicked(bool);
          void on_gaussianButton_clicked(bool);
@@ -65,15 +64,19 @@ namespace Configurator {
          void on_widthSlider_valueChanged(int);
          void on_energyTable_itemSelectionChanged();
          void on_resetZoomButton_clicked(bool);
-         void setSelectionRectMode(QMouseEvent* e);
+         void on_unitsCombo_currentIndexChanged(int);
 
       private:
          enum Profile { Gaussian, Lorentzian };
 
+         void initTable();
          void initMoPlot();
          void initSpectrum();
+
          void updateSpectrum();
+         void updateEnergyUnits();
          void updateMoPlot(int const index);
+
          void plotImpulse();
          void plotSpectrum(Profile const, double const width);
          void clearTransitionLines();
