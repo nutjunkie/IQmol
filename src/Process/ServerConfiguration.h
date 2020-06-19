@@ -83,6 +83,10 @@ namespace Process {
             return connection() == Network::Local;
          }
 
+         bool isBasic() const {
+            return queueSystem() == Basic;
+         }
+
          bool needsResourceLimits() const {
             return (queueSystem() == PBS || queueSystem() == SGE || queueSystem() == SLURM);
          }

@@ -59,6 +59,10 @@ QueueOptionsDialog::QueueOptionsDialog(ServerConfiguration* configuration, QWidg
    if (queue == ServerConfiguration::Web) {
       m_dialog.queueInfoLabel->setText("Download");
       m_dialog.runFileGroupBox->setEnabled(false);
+   }else if (queue == ServerConfiguration::Basic) {
+      // Repurpose the QueueInfo field (which would otherwise be unused)
+      // for specifying the qchem executable, which changed over time.
+      m_dialog.queueInfoLabel->setText("Executable");
    }
 
    if (queue == ServerConfiguration::Basic) {

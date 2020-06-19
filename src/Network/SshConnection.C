@@ -87,6 +87,7 @@ void SshConnection::open()
 }
 
 
+
 void SshConnection::close()
 {
    // No logging as the Logger may not exist on shutdown
@@ -123,6 +124,7 @@ void SshConnection::close()
 }
 
 
+
 void SshConnection::killAgent()
 {
    if (m_agent) {
@@ -131,6 +133,7 @@ void SshConnection::killAgent()
       m_agent = 0;
    }
 }
+
 
 
 void SshConnection::init()
@@ -148,6 +151,7 @@ void SshConnection::init()
    int rc(libssh2_init(0));
    if (rc != 0) throw Exception("Failed to initialize libssh2 connection");
 }
+
 
 
 bool SshConnection::openSocket(unsigned const timeout)

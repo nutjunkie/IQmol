@@ -332,7 +332,7 @@ void ServerConfiguration::setDefaults(QueueSystemT const queueSystem)
          m_configuration.insert(Submit, System::SubmitCommand(local));
          m_configuration.insert(Query,  System::QueryCommand(local));
          m_configuration.insert(Kill,   System::KillCommand(local));
-         m_configuration.insert(QueueInfo,   "(unused)");
+         m_configuration.insert(QueueInfo,   "qcprog.exe");
          m_configuration.insert(RunFileTemplate, System::TemplateForRunFile(local));
          m_configuration.insert(JobLimit, 1024);
          m_configuration.insert(JobFileList, System::JobFileListCommand(local));

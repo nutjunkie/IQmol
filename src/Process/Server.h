@@ -54,6 +54,10 @@ namespace Process {
             return m_configuration.isLocal();
          }
 
+         bool isBasic() const { 
+            return m_configuration.isBasic();
+         }
+
          bool isWebBased() const { 
             return m_configuration.isWebBased();
          }
@@ -77,6 +81,8 @@ namespace Process {
          // Unthreaded command to get queue information
          QString queueInfo();
 
+         QString const& message() const { return m_message; }
+
          void submit(Job*);
          void query(Job*);
          void kill(Job*);
@@ -85,8 +91,6 @@ namespace Process {
          void setUpdateInterval(int const seconds);
          void stopUpdates()  { m_updateTimer.stop(); }
          void startUpdates() { m_updateTimer.start(); }
-
-         QString const& message() const { return m_message; }
 
       public Q_SLOTS:
          void watchJob(Job*);
@@ -114,7 +118,6 @@ namespace Process {
          bool parseSubmitMessage(Job* job, QString const& message);
          bool parseQueryMessage(Job* job, QString const& message);
          QStringList parseListMessage(Job* job, QString const& message); 
-         QString m_message;
 
          ServerConfiguration  m_configuration;
          Network::Connection* m_connection;
@@ -122,7 +125,9 @@ namespace Process {
          // The Server class watches jobs, but is not responsible for them.
          QList<Job*> m_watchedJobs;
          QMap<Network::Reply*, Job*> m_activeRequests;
-         QList<unsigned> m_qcprocs;
+         QList<unsigned> m_qcprogs;
+         QList<unsigned> m_cmds;
+         QString m_message;
 
          QTimer m_updateTimer;
    };
