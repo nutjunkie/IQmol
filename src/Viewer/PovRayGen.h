@@ -37,14 +37,12 @@ namespace Layer {
    class PovRayGen {
 
       public:
-         PovRayGen(QString const& filename, QVariantMap const& settings, 
-            QMap<QString, QString> const& textures);
+         PovRayGen(QString const& filename, QVariantMap const& settings);
          ~PovRayGen();
 
          void setCamera(qglviewer::Camera*);
          void setBackground(QColor const&);
          void setClippingPlane(Layer::ClippingPlane const&);
-         void setShaderSettings(QVariantMap const& settings);
 
          void writeAtom(qglviewer::Vec const& pos, QColor const&, double const radius);
 
@@ -59,20 +57,31 @@ namespace Layer {
          void writeMesh(QList<qglviewer::Vec> const& edges, QColor const&, bool clip);
 
       private:
+         void writeLight(qglviewer::Vec const& position, QColor const& color, 
+            QString const& comment);
+
          void writeHeader();
-         void writeLight(qglviewer::Vec const& position, QColor const& color = Qt::white);
          void writeAtomMacro();
          void writeBondMacro();
          void writeSurfaceMacro();
          void writeAxes();
          void writeSky();
          void writeAreaLight(double const size);
-         void writeTexture(QString const& name);
 
-         bool m_lightFront;
-         bool m_lightHighlight;
-         bool m_lightLeft;
-         bool m_lightLower;
+         void writeTextureMacros();
+         void writeTextureNone();
+         void writeTextureChrome();
+         void writeTextureCrumpled();
+         void writeTextureRippled();
+         void writeTextureRough();
+         void writeTextureMarble();
+         void writeTextureBlackMarble();
+         void writeTextureSkin();
+         void writeTextureSwirl();
+         void writeTextureBubble();
+         void writeTextureShattered();
+         void writeTextureMesh();
+
 
          QFile m_file;
          QTextStream m_stream;

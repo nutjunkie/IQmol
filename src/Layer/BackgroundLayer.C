@@ -47,8 +47,15 @@ void Background::draw()
 //      glClearColor(m_backgroundColor.redF(), m_backgroundColor.greenF(), 
 //         m_backgroundColor.blueF(), m_backgroundColor.alphaF());
    } else {
-      glClearColor(1.0f, 1.0f, 1.0f, 0.0f); 
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      glDepthMask(false);
+
       backgroundColorChanged(QColor(255,255,255,0));
+      glClearColor(1.0f, 1.0f, 1.0f, 0.0f); 
+      glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+      glDepthMask(true);
    }
 
  //  glClear(GL_COLOR_BUFFER_BIT);

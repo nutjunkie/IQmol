@@ -31,21 +31,22 @@ using namespace qglviewer;
 
 namespace IQmol {
 
-PovRayGen::PovRayGen(QString const& fileName, QVariantMap const& settings, 
-   QMap<QString, QString> const& textures) :  m_lightFront(true), m_lightHighlight(true),  
-   m_lightLeft(true), m_lightLower(false),  m_meshCount(0), m_settings(settings), 
-   m_textures(textures)
+PovRayGen::PovRayGen(QString const& fileName, QVariantMap const& settings) :
+   m_meshCount(0), m_settings(settings)
 {
-   qDebug() << "Generating PovRay file";
+   qDebug() << "Generating PovRay file " << fileName;
+   qDebug() << settings;
    m_file.setFileName(fileName);
 
    if (m_file.open(QIODevice::WriteOnly | QIODevice::Text)) {
       m_stream.setDevice(&m_file);
       writeHeader();
-      //writeAxes();
+      writeTextureMacros();
       writeAtomMacro();
       writeBondMacro();
       writeSurfaceMacro();
+      //writeAxes();
+      // Actual contents of the scene get written by Viewer.C
    }else {
       QLOG_WARN() << "Unable to open PovRay file" << fileName;
    }
@@ -71,54 +72,22 @@ void PovRayGen::writeHeader()
    m_stream << "//------------------------------------------\n";
    m_stream << "\n\n";
 
-   bool ok(false);
-   double gamma(m_settings.value("gamma").toDouble(&ok));
-   if (!ok || gamma < 0.1) gamma = 1.0;
    m_stream << "global_settings {\n";
-   m_stream << "   assumed_gamma " << gamma << "\n";
-   m_stream << "}\n\n";
-}
-
-
-void PovRayGen::setShaderSettings(QVariantMap const& settings)
-{
-   bool ok(true);
-
-   float ambient(settings.value("user_Ambient").toFloat(&ok));
-   if (!ok) ambient = 0.6;
-
-   float diffuse(settings.value("user_Diffuse").toFloat(&ok));
-   if (!ok) diffuse = 0.75;
-
-   float specular(settings.value("user_Highlights").toFloat(&ok));
-   if (!ok) specular = 0.56;
-
-   float phong(settings.value("user_Shininess").toFloat(&ok));
-   if (!ok) phong = 0.75;
-
-   m_lightFront     = settings.value("user_light_Front").toBool();
-   m_lightHighlight = settings.value("user_light_Highlight").toBool();
-   m_lightLeft      = settings.value("user_light_Left").toBool();
-   m_lightLower     = settings.value("user_light_Lower").toBool();
-
-   m_stream << "#default {\n";
-   m_stream << "   finish {\n";
-   m_stream << "      phong      " << 0.75     << "\n";
-   m_stream << "      ambient    " << ambient  << "\n";
-   m_stream << "      diffuse    " << diffuse  << "\n";
-   m_stream << "      specular   " << specular << "\n";
-   m_stream << "      reflection " << phong    << "\n";
-   m_stream << "   }   \n";
+   m_stream << "   assumed_gamma 2.5\n";
    m_stream << "}\n\n";
 }
 
 
 void PovRayGen::writeAtomMacro()
 {
+   QString texture("Structure_");
+   texture += m_settings.value("atomTexture").toString();
+   texture += "()";
+
    m_stream << "#macro Atom(pos, col, rad)\n";
    m_stream << "sphere {\n";
    m_stream << "   pos, rad \n";
-   writeTexture(m_settings.value("atomTexture").toString());
+   m_stream << "   " << texture << "\n";   
    m_stream << "}\n";
    m_stream << "#end\n\n";
 }
@@ -126,10 +95,14 @@ void PovRayGen::writeAtomMacro()
 
 void PovRayGen::writeBondMacro()
 {
+   QString texture("Structure_");
+   texture += m_settings.value("bondTexture").toString();
+   texture += "()";
+
    m_stream << "#macro Bond(beginAtom, endAtom, col, rad)\n";
    m_stream << "cylinder {\n";
    m_stream << "   beginAtom, endAtom, rad\n";
-   writeTexture(m_settings.value("bondTexture").toString());
+   m_stream << "   " << texture << "\n";   
    m_stream << "}\n";
    m_stream << "#end\n\n";
 }
@@ -137,20 +110,421 @@ void PovRayGen::writeBondMacro()
 
 void PovRayGen::writeSurfaceMacro()
 {
+   QString texture("Surface_");
+   texture += m_settings.value("surfaceTexture").toString();
+   texture += "()";
+
    m_stream << "#macro Surface(id, col)\n";
    m_stream << "object {\n";
    m_stream << "   id\n";
-   writeTexture(m_settings.value("surfaceTexture").toString());
+   m_stream << "   " << texture << "\n";   
    m_stream << "}\n";
    m_stream << "#end\n\n";
 
    m_stream << "#macro ClippedSurface(id, col)\n";
    m_stream << "object {\n";
    m_stream << "   id\n";
-   writeTexture(m_settings.value("surfaceTexture").toString());
+   m_stream << "   " << texture << "\n";   
    m_stream << "   clipped_by { Clipping_Plane }\n";
    m_stream << "}\n";
    m_stream << "#end\n\n";
+}
+
+
+void PovRayGen::writeTextureChrome()
+{
+   m_stream << "#macro Structure_Chrome()\n";
+   m_stream << "texture {\n";
+   m_stream << "   Chrome_Metal\n";
+   m_stream << "   pigment { color rgbt col}\n";
+   m_stream << "   finish {\n";
+   m_stream << "      phong       0.9\n";
+   m_stream << "      specular    0.4\n";
+   m_stream << "      diffuse     1.2\n";
+   m_stream << "      ambient     0.4\n";
+   m_stream << "      reflection  0.1\n";
+   m_stream << "   }\n";
+   m_stream << "}\n";
+   m_stream << "#end\n\n";
+
+   m_stream << "#macro Surface_Chrome()\n";
+   m_stream << "texture {\n";
+   m_stream << "   Chrome_Metal\n";
+   m_stream << "   pigment { color rgbt col}\n";
+   m_stream << "   finish {\n";
+   m_stream << "      phong       0.9\n";
+   m_stream << "      specular    0.5\n";
+   m_stream << "      diffuse     1.2\n";
+   m_stream << "      ambient     0.1\n";
+   m_stream << "      reflection  0.1\n";
+   m_stream << "   }\n";
+   m_stream << "}\n";
+   m_stream << "#end\n\n";
+}
+
+
+void PovRayGen::writeTextureCrumpled()
+{
+   m_stream << "#macro Structure_Crumpled()\n";
+   m_stream << "texture {\n";
+   m_stream << "   pigment { color rgbt col }\n";
+   m_stream << "   normal  { agate 1.0 scale 0.5 }\n";
+   m_stream << "   finish {\n";
+   m_stream << "      phong       0.9\n";
+   m_stream << "      specular    0.3\n";
+   m_stream << "      diffuse     0.9\n";
+   m_stream << "      ambient     0.1\n";
+   m_stream << "      reflection  0.1\n";
+   m_stream << "   }\n";
+   m_stream << "}\n";
+   m_stream << "#end\n\n";
+
+   m_stream << "#macro Surface_Crumpled()\n";
+   m_stream << "texture {\n";
+   m_stream << "   pigment { color rgbt col }\n";
+   m_stream << "   normal  { agate 1.0 scale 0.5 }\n";
+   m_stream << "   finish {\n";
+   m_stream << "      phong       0.9\n";
+   m_stream << "      specular    0.3\n";
+   m_stream << "      diffuse     0.9\n";
+   m_stream << "      ambient     0.1\n";
+   m_stream << "      reflection  0.1\n";
+   m_stream << "   }\n";
+   m_stream << "}\n";
+   m_stream << "#end\n\n";
+
+}
+
+
+void PovRayGen::writeTextureRippled()
+{
+   m_stream << "#macro Structure_Rippled()\n";
+   m_stream << "texture {\n";
+   m_stream << "   pigment { color rgbt col }\n";
+   m_stream << "   normal  { spotted 2.0 scale 0.02 }\n";
+   m_stream << "   finish {\n";
+   m_stream << "      phong       0.9\n";
+   m_stream << "      specular    0.3\n";
+   m_stream << "      diffuse     0.7\n";
+   m_stream << "      ambient     0.8\n";
+   m_stream << "      reflection  0.1\n";
+   m_stream << "   }\n";
+   m_stream << "}\n";
+   m_stream << "#end\n\n";
+
+   m_stream << "#macro Surface_Rippled()\n";
+   m_stream << "texture {\n";
+   m_stream << "   pigment { color rgbt col }\n";
+   m_stream << "   normal  { spotted 1.0 scale 0.05 }\n";
+   m_stream << "   finish {\n";
+   m_stream << "      phong       0.9\n";
+   m_stream << "      specular    0.3\n";
+   m_stream << "      diffuse     0.7\n";
+   m_stream << "      ambient     0.8\n";
+   m_stream << "      reflection  0.1\n";
+   m_stream << "   }\n";
+   m_stream << "}\n";
+   m_stream << "#end\n\n";
+}
+
+
+void PovRayGen::writeTextureNone()
+{
+   m_stream << "#macro Structure_None()\n";
+   m_stream << "texture {\n";
+   m_stream << "   pigment { color rgbt col}\n";
+   m_stream << "   finish {\n";
+   m_stream << "      phong       1.0\n";
+   m_stream << "      specular    0.2\n";
+   m_stream << "      diffuse     0.9\n";
+   m_stream << "      ambient     0.1\n";
+   m_stream << "      reflection  0.0\n";
+   m_stream << "   }\n";
+   m_stream << "}\n";
+   m_stream << "#end\n\n";
+
+   m_stream << "#macro Surface_None()\n";
+   m_stream << "texture {\n";
+   m_stream << "   pigment { color rgbt col}\n";
+   m_stream << "   finish {\n";
+   m_stream << "      phong       1.0\n";
+   m_stream << "      specular    0.2\n";
+   m_stream << "      diffuse     0.9\n";
+   m_stream << "      ambient     0.1\n";
+   m_stream << "      reflection  0.0\n";
+   m_stream << "   }\n";
+   m_stream << "}\n";
+   m_stream << "#end\n\n";
+}
+
+
+void PovRayGen::writeTextureRough()
+{
+   m_stream << "#macro Structure_Rough()\n";
+   m_stream << "texture {\n";
+   m_stream << "   pigment { color rgbt col }\n";
+   m_stream << "   normal  { dents 10.0 scale 0.01 }\n";
+   m_stream << "   finish {\n";
+   m_stream << "      phong       0.2\n";
+   m_stream << "      specular    0.1\n";
+   m_stream << "      diffuse     0.9\n";
+   m_stream << "      ambient     0.1\n";
+   m_stream << "      reflection  0.1\n";
+   m_stream << "   }\n";
+   m_stream << "}\n";
+   m_stream << "#end\n\n";
+
+   m_stream << "#macro Surface_Rough()\n";
+   m_stream << "texture {\n";
+   m_stream << "   pigment { color rgbt col }\n";
+   m_stream << "   normal  { dents 10.0 scale 0.01 }\n";
+   m_stream << "   finish {\n";
+   m_stream << "      phong       0.2\n";
+   m_stream << "      specular    0.1\n";
+   m_stream << "      diffuse     0.7\n";
+   m_stream << "      ambient     0.1\n";
+   m_stream << "      reflection  0.1\n";
+   m_stream << "   }\n";
+   m_stream << "}\n";
+   m_stream << "#end\n\n";
+
+}
+
+
+void PovRayGen::writeTextureMarble()
+{
+   m_stream << "#macro Structure_Marble()\n";
+   m_stream << "texture {\n";
+   m_stream << "   pigment { \n";
+   m_stream << "      bozo turbulence 1.96\n";
+   m_stream << "      color_map { [0.5 rgbt col]\n";
+   m_stream << "          [0.6 rgbt White] \n";
+   m_stream << "          [1.0 rgbt <0.5,0.5,0.5,0.0>]\n";
+   m_stream << "      }\n";
+   m_stream << "      scale 0.05\n";
+   m_stream << "   }\n";
+   m_stream << "   finish {\n";
+   m_stream << "      phong       0.2\n";
+   m_stream << "      specular    0.0\n";
+   m_stream << "      diffuse     1.0\n";
+   m_stream << "      ambient     0.2\n";
+   m_stream << "      reflection  0.0\n";
+   m_stream << "   }\n";
+   m_stream << "}\n";
+   m_stream << "#end\n\n";
+
+   m_stream << "#macro Surface_Marble()\n";
+   m_stream << "texture {\n";
+   m_stream << "   pigment { \n";
+   m_stream << "      bozo turbulence 1.96\n";
+   m_stream << "      color_map { [0.5 rgbt col]\n";
+   m_stream << "          [0.6 rgbt White] \n";
+   m_stream << "          [1.0 rgbt <0.5,0.5,0.5,0.0>]\n";
+   m_stream << "      }\n";
+   m_stream << "      scale 0.08\n";
+   m_stream << "   }\n";
+   m_stream << "   finish {\n";
+   m_stream << "      phong       0.5\n";
+   m_stream << "      specular    0.0\n";
+   m_stream << "      diffuse     1.0\n";
+   m_stream << "      ambient     0.1\n";
+   m_stream << "      reflection  0.0\n";
+   m_stream << "   }\n";
+   m_stream << "}\n";
+   m_stream << "#end\n\n";
+
+}
+
+
+void PovRayGen::writeTextureBlackMarble()
+{
+   m_stream << "#macro Structure_BlackMarble()\n";
+   m_stream << "texture {\n";
+   m_stream << "   pigment { \n";
+   m_stream << "      bozo turbulence 1.96\n";
+   m_stream << "      color_map { [0.5 rgbt col]\n";
+   m_stream << "          [0.6 rgbt Black] \n";
+   m_stream << "          [1.0 rgbt <0.5,0.5,0.5,0.0>]\n";
+   m_stream << "      }\n";
+   m_stream << "      scale 0.05\n";
+   m_stream << "   }\n";
+   m_stream << "   finish {\n";
+   m_stream << "      phong       0.2\n";
+   m_stream << "      specular    0.0\n";
+   m_stream << "      diffuse     1.0\n";
+   m_stream << "      ambient     0.2\n";
+   m_stream << "      reflection  0.0\n";
+   m_stream << "   }\n";
+   m_stream << "}\n";
+   m_stream << "#end\n\n";
+
+
+   m_stream << "#macro Surface_BlackMarble()\n";
+   m_stream << "texture {\n";
+   m_stream << "   pigment { \n";
+   m_stream << "      bozo turbulence 1.96\n";
+   m_stream << "      color_map { [0.5 rgbt col]\n";
+   m_stream << "          [0.6 rgbt Black] \n";
+   m_stream << "          [1.0 rgbt <0.5,0.5,0.5,0.0>]\n";
+   m_stream << "      }\n";
+   m_stream << "      scale 0.08\n";
+   m_stream << "   }\n";
+   m_stream << "   finish {\n";
+   m_stream << "      phong       0.5\n";
+   m_stream << "      specular    0.0\n";
+   m_stream << "      diffuse     1.0\n";
+   m_stream << "      ambient     0.1\n";
+   m_stream << "      reflection  0.0\n";
+   m_stream << "   }\n";
+   m_stream << "}\n";
+   m_stream << "#end\n\n";
+
+}
+
+
+void PovRayGen::writeTextureSkin()
+{
+   // Only available as a surface texture
+   m_stream << "#macro Surface_Skin()\n";
+   m_stream << "texture {\n";
+   m_stream << "   pigment{ color rgbt col };\n";
+   m_stream << "   normal {\n";
+   m_stream << "      pigment_pattern {\n";
+   m_stream << "         crackle turbulence 0.2\n";
+   m_stream << "         colour_map { [ 0.00, rgb 0 ]\n";
+   m_stream << "                      [ 0.25, rgb 1 ]\n";
+   m_stream << "                      [ 0.95, rgb 1 ]\n";
+   m_stream << "                      [ 1.00, rgb 0 ]\n";
+   m_stream << "         }\n";
+   m_stream << "         scale 0.4\n";
+   m_stream << "      }\n";
+   m_stream << "   }\n";
+   m_stream << "   finish {\n";
+   m_stream << "      phong       0.5\n";
+   m_stream << "      specular    0.1\n";
+   m_stream << "      diffuse     1.0\n";
+   m_stream << "      ambient     0.1\n";
+   m_stream << "      reflection  0.1\n";
+   m_stream << "   }\n";
+   m_stream << "}\n";
+   m_stream << "#end\n\n";
+}
+
+
+void PovRayGen::writeTextureSwirl()
+{
+   // Only available as a surface texture
+   m_stream << "#macro Surface_Swirl()\n";
+   m_stream << "texture {\n";
+   m_stream << "   pigment {\n";
+   m_stream << "      gradient y\n";
+   m_stream << "      turbulence 5\n";
+   m_stream << "      octaves 2\n";
+   m_stream << "      color_map {\n";
+   m_stream << "         [0.0, 0.8  color Clear    color Clear]\n";
+   m_stream << "         [0.8, 1.0  color rgbt col color  rgbt col ]\n";
+   m_stream << "      }    \n";
+   m_stream << "      scale 0.5\n";
+   m_stream << "   }\n";
+   m_stream << "   finish {\n";
+   m_stream << "      phong       0.5\n";
+   m_stream << "      specular    0.0\n";
+   m_stream << "      diffuse     0.9\n";
+   m_stream << "      ambient     0.3\n";
+   m_stream << "      reflection  0.0\n";
+   m_stream << "   }\n";
+   m_stream << "}\n";
+   m_stream << "#end\n\n";
+}
+
+
+void PovRayGen::writeTextureBubble()
+{
+   // Only available as a surface texture
+   m_stream << "#macro Surface_Bubble()\n";
+   m_stream << "texture {\n";
+   m_stream << "   pigment { rgbf <1,1,1,0.85>  }\n";
+   m_stream << "   finish {\n";
+   m_stream << "       Shiny\n";
+   m_stream << "       diffuse    0.9\n";
+   m_stream << "       ambient    0.0\n";
+   m_stream << "       reflection 0.05\n";
+   m_stream << "       irid { 0.8 thickness 1 turbulence 0.1}\n";
+   m_stream << "    }\n";
+   m_stream << "}\n";
+   m_stream << "#end\n\n";
+}
+
+
+void PovRayGen::writeTextureShattered()
+{
+   m_stream << "#macro Surface_Shattered()\n";
+   m_stream << "texture {\n";
+   m_stream << "   pigment {\n";
+   m_stream << "      crackle scale 0.5 \n";
+   m_stream << "      turbulence 0.4\n";
+   m_stream << "      color_map{ [ 0.04 color Black   ]\n";
+   m_stream << "                 [ 0.09 color Black   ]\n";
+   m_stream << "                 [ 0.12 color rgbt col]\n";
+   m_stream << "                 [ 1.00 color rgbt col]\n";
+   m_stream << "      }\n";
+   m_stream << "      scale 0.15\n";
+   m_stream << "   } \n";
+   m_stream << "   normal { bumps 0.75 scale 0.02 }\n";
+   m_stream << "   translate<0.01, 0.04, 0.00>\n";
+   m_stream << "   finish {\n";
+   m_stream << "      phong       0.5\n";
+   m_stream << "      specular    0.0\n";
+   m_stream << "      diffuse     0.9\n";
+   m_stream << "      ambient     0.3\n";
+   m_stream << "      reflection  0.0\n";
+   m_stream << "   }\n";
+   m_stream << "}\n";
+   m_stream << "#end\n\n";
+}
+
+
+void PovRayGen::writeTextureMesh()
+{
+   // Only available as a surface texture
+   m_stream << "#macro Texture_Mesh()\n";
+   m_stream << "texture {\n";
+   m_stream << "   pigment {\n";
+   m_stream << "      crackle scale 0.8 turbulence 0.5\n";
+   m_stream << "      color_map{ [ 0.04 color rgbt col ]\n";
+   m_stream << "                 [ 0.09 color rgbt col ]\n";
+   m_stream << "                 [ 0.12 color Clear    ]\n";
+   m_stream << "                 [ 1.00 color Clear    ]\n";
+   m_stream << "      }\n";
+   m_stream << "      scale 0.10\n";
+   m_stream << "   }\n";
+   m_stream << "   translate<0.01, 0.04, 0.00>\n";
+   m_stream << "   finish {\n";
+   m_stream << "      phong       0.5\n";
+   m_stream << "      specular    0.0\n";
+   m_stream << "      diffuse     0.9\n";
+   m_stream << "      ambient     0.2\n";
+   m_stream << "      reflection  0.0\n";
+   m_stream << "   }\n";
+   m_stream << "}\n";
+   m_stream << "#end\n\n";
+}
+
+
+void PovRayGen::writeTextureMacros()
+{
+   writeTextureNone();
+   writeTextureChrome();
+   writeTextureCrumpled();
+   writeTextureRough();
+   writeTextureRippled();
+   writeTextureMarble();
+   writeTextureBlackMarble();
+   writeTextureSkin();
+   writeTextureSwirl();
+   writeTextureBubble();
+   writeTextureShattered();
+   writeTextureMesh();
 }
 
 
@@ -188,13 +562,12 @@ void PovRayGen::writeAxes()
 
 void PovRayGen::setCamera(qglviewer::Camera* camera)
 {
-   Vec pos(camera->position());
    double angle(camera->fieldOfView());
    angle *= 180/M_PI;
-   
-   //angle += 15;  // The angle seem to come out different for POVRay
+   angle += 15;  // The angle seem to come out different for POV-Ray
 
    // The camera coordinate system
+   Vec pos(camera->position());
    Vec x(camera->rightVector());
    Vec y(camera->upVector());
    //Vec z(camera->viewDirection());
@@ -221,48 +594,45 @@ void PovRayGen::setCamera(qglviewer::Camera* camera)
 
    // Light directions are taken from the phong.vert shader
    Vec light;
+   QString comment;
 
-   if (m_lightFront) {
-      //const vec4 lightDirection0 = vec4( 0.4,  0.0,  1.0);  
-      light = 0.4*x + 0.0*y + 1.0*pos;
-      light = r * light.unit();
-      m_stream << "// Light: front\n";
-      writeLight(light, Qt::lightGray);
-   }
+   comment = m_settings.value("lightFront").toBool() ? "" : "//";
+   //const vec4 lightDirection0 = vec4( 0.4,  0.0,  1.0);  
+   light = 0.4*x + 0.0*y + 1.0*pos;
+   light = r * light.unit();
+   m_stream << "// Light: front\n";
+   writeLight(light, Qt::lightGray, comment);
 
-   if (m_lightHighlight) {
-      //const vec4 lightDirection1 = vec4( 0.3,  0.8, -0.5);  // highlight
-      light = 0.3*x + 0.8*y - 0.5*pos;
-      light = r * light.unit();
-      m_stream << "// Light: highlight\n";
-      writeLight(light, Qt::lightGray);
-   }
+   comment = m_settings.value("lightHighlight").toBool() ? "" : "//";
+   //const vec4 lightDirection1 = vec4( 0.3,  0.8, -0.5);  // highlight
+   light = 0.3*x + 0.8*y - 0.5*pos;
+   light = r * light.unit();
+   m_stream << "// Light: highlight\n";
+   writeLight(light, Qt::lightGray, comment);
 
-   if (m_lightLeft) {
-      //const vec4 lightDirection2 = vec4(-0.5,  0.0,  0.0);  // left
-      light = -0.5*x + 0.0*y + 0.0*pos;
-      light = r * light.unit();
-      m_stream << "// Light: left\n";
-      writeLight(light, Qt::lightGray);
-   }
+   comment = m_settings.value("lightLeft").toBool() ? "" : "//";
+   //const vec4 lightDirection2 = vec4(-0.5,  0.0,  0.0);  // left
+   light = -0.5*x + 0.0*y + 0.0*pos;
+   light = r * light.unit();
+   m_stream << "// Light: left\n";
+   writeLight(light, Qt::lightGray, comment);
 
-   if (m_lightLower) {
-      //const vec4 lightDirection3 = vec4( 0.0, -1.0,  0.2);  // lower
-      light = 0.0*x - 1.0*y + 0.2*pos;
-      light = r * light.unit();
-      m_stream << "// Light: lower\n";
-      writeLight(light, Qt::lightGray);
-   }
+   comment = m_settings.value("lightLower").toBool() ? "" : "//";
+   //const vec4 lightDirection3 = vec4( 0.0, -1.0,  0.2);  // lower
+   light = 0.0*x - 1.0*y + 0.2*pos;
+   light = r * light.unit();
+   m_stream << "// Light: lower\n";
+   writeLight(light, Qt::lightGray, comment);
 }
 
 
-void PovRayGen::writeLight(Vec const& pos, QColor const& col)
+void PovRayGen::writeLight(Vec const& pos, QColor const& col, QString const& comment)
 {
-   m_stream << "light_source {\n";
-   m_stream << "   <" << pos.x << ", " << pos.y << ", " << pos.z << ">\n";
-   m_stream << "   color   rgb<" <<  col.redF()  << ", " <<  col.greenF() << ", " 
+   m_stream << comment << "light_source {\n";
+   m_stream << comment << "   <" << pos.x << ", " << pos.y << ", " << pos.z << ">\n";
+   m_stream << comment << "   color   rgb<" <<  col.redF()  << ", " <<  col.greenF() << ", " 
             <<  col.blueF() << ">\n";
-   m_stream << "}\n\n";
+   m_stream << comment << "}\n\n";
 }
 
 
@@ -486,22 +856,5 @@ void PovRayGen::writeMesh(QList<qglviewer::Vec> const& vertices,
    }
             
 }
-
-
-// Note that these are assumed to be inside a #declare statement which defines
-// col and if required col_aux
-void PovRayGen::writeTexture(QString const& name)
-{
-    QString texture(m_textures.value(name));
-
-    if (texture.isEmpty()) {
-       m_stream << "   texture {\n";
-       m_stream << "      pigment { color rgbt col }\n";
-       m_stream << "   }\n";
-    }else {
-       m_stream << texture << "\n";
-    }
-}
-
 
 } // end namespace IQmol

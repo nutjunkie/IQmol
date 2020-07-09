@@ -26,6 +26,7 @@
 #include "QMsgBox.h"
 
 #include <QDebug>
+#include <QDir>
 
 
 namespace IQmol {
@@ -41,7 +42,7 @@ ShaderDialog::ShaderDialog(ShaderLibrary& library, QWidget* parent) : QDialog(pa
       m_dialog.shaderFilterTabWidget->removeTab(1);
    }else {
       // setupEffectsTab();
-      m_dialog.shaderFilterTabWidget->removeTab(1); // disable anyway for the moment
+      m_dialog.shaderFilterTabWidget->removeTab(1); // disable for the moment
    }
 
    setupPovRayTab();
@@ -128,94 +129,7 @@ void ShaderDialog::setupEffectsTab()
 }
 
 
-void ShaderDialog::setupPovRayTab()
-{
-   QStringList textures(m_shaderLibrary.povrayTextureNames());
 
-   m_dialog.atomTexture->clear();
-   m_dialog.atomTexture->addItem("None");
-   m_dialog.atomTexture->addItems(textures);
-
-   m_dialog.bondTexture->clear();
-   m_dialog.bondTexture->addItem("None");
-   m_dialog.bondTexture->addItems(textures);
-
-   m_dialog.surfaceTexture->clear();
-   m_dialog.surfaceTexture->addItem("None");
-   m_dialog.surfaceTexture->addItems(textures);
-
-
-   connect(m_dialog.height, SIGNAL(valueChanged(int)), 
-      this, SLOT(setPovRayParameter(int)));
-   connect(m_dialog.width, SIGNAL(valueChanged(int)), 
-      this, SLOT(setPovRayParameter(int)));
-   connect(m_dialog.gamma, SIGNAL(valueChanged(double)), 
-      this, SLOT(setPovRayParameter(double)));
-   connect(m_dialog.background, SIGNAL(currentIndexChanged(int)), 
-      this, SLOT(setPovRayParameter(int)));
-   connect(m_dialog.atomTexture, SIGNAL(currentIndexChanged(int)), 
-      this, SLOT(setPovRayParameter(int)));
-   connect(m_dialog.bondTexture, SIGNAL(currentIndexChanged(int)), 
-      this, SLOT(setPovRayParameter(int)));
-   connect(m_dialog.surfaceTexture, SIGNAL(currentIndexChanged(int)), 
-      this, SLOT(setPovRayParameter(int)));
-
-   copyPovRayParametersToDialog(Preferences::DefaultPovRayParameters());
-}
-
-
-void ShaderDialog::setPovRayParameter(double)
-{
-   m_shaderLibrary.setPovRayVariables(getPovRayParametersFromDialog());
-   updated();
-}
-
-
-void ShaderDialog::setPovRayParameter(int)
-{
-   m_shaderLibrary.setPovRayVariables(getPovRayParametersFromDialog());
-   updated();
-}
-
-
-QVariantMap ShaderDialog::getPovRayParametersFromDialog()
-{
-   QVariantMap map;
-
-   map.insert("height",         QVariant(m_dialog.height->value()));
-   map.insert("width",          QVariant(m_dialog.width->value()));
-   map.insert("gamma",          QVariant(m_dialog.gamma->value()));
-   map.insert("background",     QVariant(m_dialog.background->currentText()));
-   map.insert("atomTexture",    QVariant(m_dialog.atomTexture->currentText()));
-   map.insert("bondTexture",    QVariant(m_dialog.bondTexture->currentText()));
-   map.insert("surfaceTexture", QVariant(m_dialog.surfaceTexture->currentText()));
-
-   return map;
-}
-
-
-void ShaderDialog::copyPovRayParametersToDialog(QVariantMap const& map)
-{
-   int     dim;
-   double  value;
-   QString name;
-   
-   dim = map.contains("height") ? map.value("height").toInt() : 480;
-   m_dialog.height->setValue(dim);
-   dim = map.contains("width") ? map.value("width").toInt() : 640;
-   m_dialog.width->setValue(dim);
-   value = map.contains("gamma") ? map.value("gamma").toDouble() : 2.2;
-   m_dialog.gamma->setValue(dim);
-   name = map.contains("background") ? map.value("background").toString() : "Black";
-   m_dialog.background->setCurrentText(name);
-
-   name = map.contains("atomTexture") ? map.value("atomTexture").toString() : "None";
-   m_dialog.atomTexture->setCurrentText(name);
-   name = map.contains("bondTexture") ? map.value("bondTexture").toString() : "None";
-   m_dialog.bondTexture->setCurrentText(name);
-   name = map.contains("surfaceTexture") ? map.value("surfaceTexture").toString() : "None";
-   m_dialog.surfaceTexture->setCurrentText(name);
-}
 
 
 void ShaderDialog::on_shaderCombo_currentIndexChanged(int)
@@ -424,6 +338,144 @@ void ShaderDialog::installFilterParameters()
 {
    m_shaderLibrary.setFilterVariables(getFilterParametersFromDialog());
    updated();
+}
+
+
+// POV-Ray tab
+
+void ShaderDialog::setupPovRayTab()
+{
+   QStringList textures;
+   textures << "None"
+            << "Chrome"
+            << "Crumpled"
+            << "Rippled"
+            << "Rough"
+            << "Marble"
+            << "BlackMarble";
+
+   m_dialog.atomTexture->clear();
+   m_dialog.atomTexture->addItems(textures);
+   m_dialog.bondTexture->clear();
+   m_dialog.bondTexture->addItems(textures);
+
+   textures << "Skin"
+            << "Swirl"
+            << "Bubble"
+            << "Shattered"
+            << "Mesh";
+
+   m_dialog.surfaceTexture->clear();
+   m_dialog.surfaceTexture->addItems(textures);
+
+   loadPovRayImages();
+
+   on_atomTexture_currentIndexChanged(0);
+   on_surfaceTexture_currentIndexChanged(0);
+   connect(m_dialog.generatePovRay, SIGNAL(clicked(bool)), 
+          this, SLOT(generatePovRay(bool)));
+}
+
+
+void ShaderDialog::on_background_currentIndexChanged(int index)
+{
+   QPalette pal;
+   QString label(m_dialog.background->currentText());
+
+   if (label.contains("None")) {
+      pal.setColor(QPalette::Background, Qt::lightGray);
+   }else if (label.contains("Default")) {
+      pal.setColor(QPalette::Background, Preferences::BackgroundColor());
+   }else if (label.contains("White")) {
+      pal.setColor(QPalette::Background, Qt::white);
+   }else if (label.contains("Black")) {
+      pal.setColor(QPalette::Background, Qt::black);
+   }
+
+   m_dialog.atomSampleFrame->setAutoFillBackground(true);
+   m_dialog.atomSampleFrame->setPalette(pal);
+   m_dialog.surfaceSampleFrame->setAutoFillBackground(true);
+   m_dialog.surfaceSampleFrame->setPalette(pal);
+}
+
+
+void ShaderDialog::on_atomTexture_currentIndexChanged(int index)
+{
+   QString label(m_dialog.atomTexture->currentText());
+   label += "-structure";
+   QString style("background-image: url(");
+   style += m_povRayImages[label] + ");";
+   m_dialog.atomSampleFrame->setStyleSheet(style);
+   on_background_currentIndexChanged(0);
+}
+
+
+void ShaderDialog::on_surfaceTexture_currentIndexChanged(int index)
+{
+   QString label(m_dialog.surfaceTexture->currentText());
+   label += "-surface";
+   QString style("background-image: url(");
+   style += m_povRayImages[label] + ");";
+   m_dialog.surfaceSampleFrame->setStyleSheet(style);
+   on_background_currentIndexChanged(0);
+}
+
+
+void ShaderDialog::loadPovRayImages()
+{
+   QDir dir(Preferences::ShaderDirectory());
+
+   dir.cd("images");
+   QDir::Filters filters(QDir::Files | QDir::Readable);
+   QStringList contents(dir.entryList(filters));
+
+   QStringList::iterator iter;
+   for (iter = contents.begin(); iter != contents.end(); ++iter) {
+       QString fname(*iter);
+       QFileInfo info(dir, fname);
+       fname = fname.replace(".png","",Qt::CaseInsensitive);
+       qDebug() << "setting path " << fname << "->" << info.filePath(); 
+       m_povRayImages[fname] = info.filePath();
+   }
+
+}
+   
+
+
+void ShaderDialog::generatePovRay(bool)
+{
+   m_shaderLibrary.setPovRayVariables(getPovRayParametersFromDialog());
+   generatePovRay();
+}
+
+
+void ShaderDialog::povRayTextureChanged(int)
+{
+   // This is where we need to load image files based on the selections
+   QString atomTexture(m_dialog.atomTexture->currentText());
+   QString bondTexture(m_dialog.bondTexture->currentText());
+   QString surfaceTexture(m_dialog.surfaceTexture->currentText());
+
+   qDebug() << "POV-Ray texture change" << atomTexture << " " 
+            << bondTexture << " " << surfaceTexture;
+}
+
+
+QVariantMap ShaderDialog::getPovRayParametersFromDialog()
+{
+   QVariantMap map;
+
+   map.insert("background",     QVariant(m_dialog.background->currentText()));
+   map.insert("atomTexture",    QVariant(m_dialog.atomTexture->currentText()));
+   map.insert("bondTexture",    QVariant(m_dialog.bondTexture->currentText()));
+   map.insert("surfaceTexture", QVariant(m_dialog.surfaceTexture->currentText()));
+
+   map.insert("lightFront",     QVariant(m_dialog.povLightFront->isChecked()));
+   map.insert("lightHighlight", QVariant(m_dialog.povLightHighlight->isChecked()));
+   map.insert("lightLeft",      QVariant(m_dialog.povLightLeft->isChecked()));
+   map.insert("lightLower",     QVariant(m_dialog.povLightLower->isChecked()));
+
+   return map;
 }
 
 } // end namespace IQmol
