@@ -37,6 +37,7 @@
 #include <QtDebug>
 #include <QUrl>
 #include <QGLFramebufferObject>
+#include <QFileDialog>
 #include <QMimeData>
 #include <cmath>
 
@@ -105,6 +106,13 @@ Viewer::Viewer(QGLContext* context, ViewerModel& model, QWidget* parent) :
    setActiveViewerMode(BuildAtom);  // this should get overwritten by the MainWindow class
 
    m_recordTimer.setInterval(30);  // ~15 frames per second
+
+   QSurfaceFormat format;
+   format.setDepthBufferSize(24);
+   format.setAlphaBufferSize(8);
+   format.setStencilBufferSize(8);
+   format.setProfile(QSurfaceFormat::CoreProfile);
+   QSurfaceFormat::setDefaultFormat(format);
 }
 
 
@@ -174,6 +182,7 @@ void Viewer::editShaders()
    if (!m_shaderDialog) {
       m_shaderDialog = new ShaderDialog(*m_shaderLibrary, this);
       connect(m_shaderDialog, SIGNAL(updated()), this, SLOT(updateGL()));
+      connect(m_shaderDialog, SIGNAL(generatePovRay()), this, SLOT(generatePovRay()));
    }
    m_shaderDialog->show();
    m_shaderDialog->raise();
@@ -214,14 +223,42 @@ void Viewer::resizeGL(int width, int height)
    m_shaderLibrary->resizeScreenBuffers(QSize(width, height), m);
 }
 
+void Viewer::generatePovRay()
+{
+   QFileInfo info(Preferences::LastFileAccessed());
+   info.setFile(info.dir(), info.completeBaseName() + ".pov");
+
+   while (1) {
+      QString filter(tr("POV") + " (*.pov)");
+      QStringList extensions;
+      extensions << filter;
+
+      QString fileName(QFileDialog::getSaveFileName(this, tr("Save File"), 
+         info.filePath(), extensions.join(";;"), &filter));
+
+      if (fileName.isEmpty()) {
+         // This will occur if the user cancels the action.
+         return;
+      }else {
+         QRegExp rx("\\*(\\..+)\\)");
+         if (rx.indexIn(filter) > 0) { 
+            filter = rx.cap(1);
+            if (!fileName.endsWith(filter, Qt::CaseInsensitive)) {
+               fileName += filter;
+            }    
+         }    
+         Preferences::LastFileAccessed(fileName);
+         generatePovRay(fileName);
+         break;
+      }    
+   } 
+}
 
 
 void Viewer::generatePovRay(QString const& filename)
 {
    // The ordering of these calls is important
-   PovRayGen povRayGen(filename, m_shaderLibrary->povrayVariables(),
-                       m_shaderLibrary->povrayTextures());
-   povRayGen.setShaderSettings(m_shaderLibrary->uniformUserVariableList("Phong"));
+   PovRayGen povRayGen(filename, m_shaderLibrary->povrayVariables());
    povRayGen.setCamera(camera());
    povRayGen.setBackground(m_viewerModel.backgroundColor());
    povRayGen.setClippingPlane(m_viewerModel.clippingPlane());

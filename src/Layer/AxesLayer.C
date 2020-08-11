@@ -50,6 +50,8 @@ void Axes::draw()
    
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  
 
+   // The colors of the axes are correct w.r.t. the world frame, and the labels
+   // in the ui file, but they may look a little off here.
    if (m_xAxisOn) {
       color[0] = blend;  color[1] = blend;  color[2] = 1.0f;  color[3] = 1.0f;
       glColor4fv(color);

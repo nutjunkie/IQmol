@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>480</width>
-    <height>749</height>
+    <width>516</width>
+    <height>607</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -293,17 +293,17 @@ QToolButton:pressed {
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QCheckBox" name="lightBox4">
-            <property name="text">
-             <string>Center</string>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="2">
            <widget class="QCheckBox" name="lightBox5">
             <property name="text">
              <string>Right</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QCheckBox" name="lightBox4">
+            <property name="text">
+             <string>Center</string>
             </property>
            </widget>
           </item>
@@ -430,61 +430,55 @@ QToolButton:pressed {
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_5">
        <item>
-        <widget class="QLabel" name="label_4">
-         <property name="text">
-          <string>Phong shader settings are used for lighting</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox">
+        <widget class="QGroupBox" name="groupBox_2">
          <property name="title">
-          <string>Global</string>
+          <string>Textures</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_6">
-          <item row="0" column="1">
-           <layout class="QHBoxLayout" name="horizontalLayout_4">
-            <item>
-             <widget class="QLabel" name="label_6">
-              <property name="text">
-               <string>Width</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="width">
-              <property name="minimum">
-               <number>100</number>
-              </property>
-              <property name="maximum">
-               <number>9999</number>
-              </property>
-             </widget>
-            </item>
-           </layout>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_9">
+            <property name="text">
+             <string>Bond</string>
+            </property>
+           </widget>
           </item>
-          <item row="0" column="0">
-           <layout class="QHBoxLayout" name="horizontalLayout_3">
-            <item>
-             <widget class="QLabel" name="label_5">
-              <property name="text">
-               <string>Height</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="height">
-              <property name="minimum">
-               <number>100</number>
-              </property>
-              <property name="maximum">
-               <number>9999</number>
-              </property>
-             </widget>
-            </item>
-           </layout>
+          <item row="2" column="1">
+           <widget class="QComboBox" name="bondTexture"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_8">
+            <property name="text">
+             <string>Atom</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_13">
+            <property name="text">
+             <string>Surface</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QComboBox" name="surfaceTexture"/>
+          </item>
+          <item row="1" column="2">
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>52</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
           <item row="1" column="1">
+           <widget class="QComboBox" name="atomTexture"/>
+          </item>
+          <item row="0" column="1">
            <widget class="QComboBox" name="background">
             <item>
              <property name="text">
@@ -508,51 +502,36 @@ QToolButton:pressed {
             </item>
            </widget>
           </item>
-          <item row="1" column="0">
+          <item row="0" column="0">
            <widget class="QLabel" name="label_7">
             <property name="text">
              <string>Background</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
-           <layout class="QHBoxLayout" name="horizontalLayout">
-            <item>
-             <widget class="QLabel" name="label_11">
-              <property name="text">
-               <string>Gamma</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QDoubleSpinBox" name="gamma">
-              <property name="decimals">
-               <number>1</number>
-              </property>
-              <property name="maximum">
-               <double>9.900000000000000</double>
-              </property>
-              <property name="singleStep">
-               <double>0.100000000000000</double>
-              </property>
-              <property name="value">
-               <double>2.200000000000000</double>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
          </layout>
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupBox_2">
+        <widget class="QGroupBox" name="groupBox_3">
          <property name="title">
-          <string>Textures</string>
+          <string>Sample</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_3">
-          <item row="3" column="0" colspan="3">
-           <widget class="QFrame" name="texturePreview">
+         <layout class="QGridLayout" name="gridLayout_7">
+          <item row="0" column="2">
+           <widget class="QFrame" name="atomSampleFrame">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>1</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>200</width>
+              <height>150</height>
+             </size>
+            </property>
             <property name="frameShape">
              <enum>QFrame::StyledPanel</enum>
             </property>
@@ -561,46 +540,25 @@ QToolButton:pressed {
             </property>
            </widget>
           </item>
-          <item row="0" column="2">
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+          <item row="0" column="3">
+           <widget class="QFrame" name="surfaceSampleFrame">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
             </property>
-            <property name="sizeHint" stdset="0">
+            <property name="minimumSize">
              <size>
-              <width>52</width>
-              <height>20</height>
+              <width>200</width>
+              <height>150</height>
              </size>
             </property>
-           </spacer>
-          </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="atomTexture"/>
-          </item>
-          <item row="2" column="1">
-           <widget class="QComboBox" name="surfaceTexture"/>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_13">
-            <property name="text">
-             <string>Surface</string>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
             </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_8">
-            <property name="text">
-             <string>Atom</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QComboBox" name="bondTexture"/>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_9">
-            <property name="text">
-             <string>Bond</string>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
             </property>
            </widget>
           </item>
@@ -608,23 +566,73 @@ QToolButton:pressed {
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+        <widget class="QGroupBox" name="lightBox_2">
+         <property name="title">
+          <string>Lights</string>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
+         <layout class="QGridLayout" name="gridLayout_6">
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="povLightFront">
+            <property name="text">
+             <string>Front</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QCheckBox" name="povLightHighlight">
+            <property name="text">
+             <string>Highlight</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QCheckBox" name="povLightLeft">
+            <property name="text">
+             <string>Left</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="povLightLower">
+            <property name="text">
+             <string>Lower</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="generatePovRay">
+           <property name="text">
+            <string>Generate POV-Ray File</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
-      <zorder>groupBox_2</zorder>
-      <zorder>label_4</zorder>
-      <zorder>groupBox</zorder>
-      <zorder>verticalSpacer_3</zorder>
      </widget>
     </widget>
    </item>
@@ -682,9 +690,6 @@ QToolButton:pressed {
   <tabstop>lightBox3</tabstop>
   <tabstop>lightBox4</tabstop>
   <tabstop>lightBox5</tabstop>
-  <tabstop>height</tabstop>
-  <tabstop>width</tabstop>
-  <tabstop>background</tabstop>
   <tabstop>saveAsDefault</tabstop>
   <tabstop>okButton</tabstop>
   <tabstop>aoRadius</tabstop>

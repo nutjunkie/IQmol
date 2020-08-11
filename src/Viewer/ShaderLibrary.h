@@ -51,10 +51,6 @@ class mat4x4;
 
 namespace IQmol {
 
-namespace Data {
-   class PovRay;
-}
-
    enum  Texture_t { NormalBuffer, FilterBuffer, RotationTexture };
 
    struct Texture {
@@ -108,9 +104,6 @@ namespace Data {
             m_povrayVariables = map;
          }
          QVariantMap const& povrayVariables() const { return m_povrayVariables; }
-
-         QStringList povrayTextureNames() const;
-         QMap<QString,QString> povrayTextures() const;
 
          bool filtersAvailable() { return m_filtersAvailable; };
          bool filtersActive() { return m_filtersActive; };
@@ -180,7 +173,6 @@ namespace Data {
          void init();
          void loadPreferences();
          void loadShaders();
-         void loadPovRay();
          unsigned createProgram(QString const& vertexPath, QString const& fragmentPath);
          unsigned loadShader(QString const& path, unsigned const mode);
 
@@ -202,8 +194,6 @@ namespace Data {
 
          QGLFunctions* m_glFunctions;
          QVariantMap m_povrayVariables;
-
-         Data::PovRay* m_povray;
    };
 
 

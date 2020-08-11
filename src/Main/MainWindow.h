@@ -108,8 +108,7 @@ namespace IQmol {
          void configureAppearance();
          void configureCamera();
          void clearRecentFilesMenu();
-
-         void generatePovRay();
+         void generatePovRay() { m_viewer->generatePovRay(); }
 
       private:
          void createMenus();

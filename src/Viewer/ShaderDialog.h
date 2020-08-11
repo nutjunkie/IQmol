@@ -38,6 +38,7 @@ namespace IQmol {
 
       Q_SIGNALS:
          void updated();  // to trigger a redraw
+         void generatePovRay();
 
       private Q_SLOTS:
          void on_shaderCombo_currentIndexChanged(int index);
@@ -49,15 +50,19 @@ namespace IQmol {
          void installFilterParameters(bool) { installFilterParameters(); }
          void installFilterParameters(int)  { installFilterParameters(); }
 
-         void setPovRayParameter(int);
-         void setPovRayParameter(double);
+         void povRayTextureChanged(int);
+         void generatePovRay(bool);
+
+         void on_background_currentIndexChanged(int index);
+         void on_atomTexture_currentIndexChanged(int index);
+         void on_surfaceTexture_currentIndexChanged(int index);
 
       private:
          void hideOptionControls();
-
          void setupShaderTab();
          void setupEffectsTab();
          void setupPovRayTab();
+         void loadPovRayImages();
 
          void copyParametersToDialog(QVariantMap const& parameters);
          QVariantMap getParametersFromDialog();
@@ -65,7 +70,6 @@ namespace IQmol {
          void copyFilterParametersToDialog(QVariantMap const& parameters);
          QVariantMap getFilterParametersFromDialog();
 
-         void copyPovRayParametersToDialog(QVariantMap const& parameters);
          QVariantMap getPovRayParametersFromDialog();
 
          static const int s_maxSliders = 6;
@@ -78,6 +82,8 @@ namespace IQmol {
          QCheckBox* m_lightBoxes[s_maxLightBoxes];
          Ui::ShaderDialog m_dialog;
          ShaderLibrary& m_shaderLibrary;
+
+         QMap<QString, QString> m_povRayImages;
    };
 
 
