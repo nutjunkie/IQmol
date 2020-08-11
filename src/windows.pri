@@ -27,7 +27,7 @@ contains(CONFIG, DEVELOP) {
    INCLUDEPATH += $${OPENBABEL}\build\include
    LIBS        += $${OPENBABEL}\build\src\libopenbabel.a
 
-   # SSH2
+   # SSH2 / OpenSSL
    INCLUDEPATH += C:\MinGW\msys\1.0\local\include
    LIBS        += C:\MinGW\msys\1.0\local\lib\libssh2.a
    LIBS        += C:\MinGW\msys\1.0\local\lib\libssl.a
@@ -85,10 +85,13 @@ contains(CONFIG, DEPLOY) {
    LIBS        += $${OPENMESH}\build\Build\lib\libOpenMeshToolsd.a
 
    # SSH2
+   INCLUDEPATH += $${DEV}\openssl-1.1.1f\include
    INCLUDEPATH += C:\MinGW\msys\1.0\local\include
    LIBS        += C:\MinGW\msys\1.0\local\lib\libssh2.a
    LIBS        += C:\MinGW\msys\1.0\local\lib\libssl.a
    LIBS        += C:\MinGW\msys\1.0\local\lib\libcrypto.a
+   #LIBS        += $${DEV}\openssl-1.1.1f\lib\libssl.a
+   #LIBS        += $${DEV}\openssl-1.1.1f\lib\libcrypto.a
    LIBS        += C:\MinGW\lib\libgdi32.a
    
    #LIBS += -lws2_32 -lOpenGL32 

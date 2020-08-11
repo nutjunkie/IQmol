@@ -25,6 +25,7 @@
 #include <QString>
 
 #ifdef WIN32
+#include <winsock2.h>
 #define in_addr_t u_long
 #else
 #include <netinet/in.h>
