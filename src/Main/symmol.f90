@@ -171,7 +171,7 @@
       CALl work(Coordinates, pointGroup)
 
 
-      WRITE(*,10) Tolerance
+!     WRITE(*,10) Tolerance
    10 FORMAT ('Symmetrized Orthogonal Coordinates Tol = ', F6.3)
 !     DO i = 1,nAtoms
 !        WRITE(*,'(i2, 3(f16.10))') atomicNumbers(i), (Coordinates(k,I),k=1,3)
@@ -244,7 +244,7 @@
          CALL prodmm(A,B,B,i,1,1)
       ENDDO
 
-      write(*,*)'INPUT PARAMETER DCM probably too HIGH. Reduce it!'
+!     write(*,*)'INPUT PARAMETER DCM probably too HIGH. Reduce it!'
       stop
 
 1000  IF (m.lt.6.or.msign.eq.1) RETURN
@@ -399,10 +399,10 @@
  2610 NMS = NMS+1
       IF (NMS.LE.NMG) GOTO 2630
 
-      WRITE(6,2)
+!     WRITE(6,2)
     2 FORMAT(' ERROR: TOO MANY MATRICES FOUND')
 
-      WRITE(6,'(3(3F10.5,/),/)') (((SIM(I,J,K),J=1,3),I=1,3),K=1,NMS)
+!     WRITE(6,'(3(3F10.5,/),/)') (((SIM(I,J,K),J=1,3),I=1,3),K=1,NMS)
 
 !     ritorno per errore
       RETURN 1
@@ -1901,7 +1901,7 @@
           go to 1100
         endif
 ! asse improprio m>2
-        write(Sn,'(i2)') m
+!       write(Sn,'(i2)') m
         if(msign.eq.-1)S1='S'
  1100   tot=S1//Sn//S2
         call compatta(tot,4,k)
@@ -1933,17 +1933,17 @@
       S1 = 'C'
 
 !     Cn e S2n dove n=maxasp
-      write(Sn,'(I2)')maxasp
+!     write(Sn,'(I2)')maxasp
       if(MOD(NMS,2).eq.0.and.maxasi.eq.NMS)then
         S1='S'
-        write(Sn,'(I2)')maxasi
+!       write(Sn,'(I2)')maxasi
         if(NMS.ne.6)go to 5000
         pointGroup = 'C3i'
         go to 5100
       endif
       if(NMS.eq.maxasp)go to 5000
       if(NMS.lt.maxasi)then
-        write(Sn,'(I2)')maxasi
+!       write(Sn,'(I2)')maxasi
         S1='S'
         go to 5000
       endif
@@ -1966,7 +1966,8 @@
 
  5100 CONTINUE
 
- 5200 WRITE(*,1) pointGroup, CSMT, RMST
+!5200 WRITE(*,1) pointGroup, CSMT, RMST
+ 5200 CONTINUE
 
     1 FORMAT('Schoenflies symbol = ',a7,'  CSM =',f8.4,5x, & 
          'Molecular RMS =',f8.4)
@@ -2230,7 +2231,7 @@
       porig = PESO(1)
 
       IF (N .le. 2) THEN
-         WRITE(*,*)' GROUP WITH LESS THAN THREE ATOMS'
+!        WRITE(*,*)' GROUP WITH LESS THAN THREE ATOMS'
       DEALLOCATE (MK, MN, IEQAT, MD, ISU, IASU)
       DEALLOCATE (XO, XS, D, CO, delta, PESO)
          RETURN
@@ -2360,7 +2361,7 @@
 ! RICERCA DELLA ROTAZIONE PER PORTARE EVENTUALI ELEMENTI DI SIMMETRIA
 ! A COINCIDERE CON GLI ASSI DI RIFERIMENTO
  1300 IF (N.le.1) THEN
-         WRITE(*,*)'Single atom, not a molecule'
+!        WRITE(*,*)'Single atom, not a molecule'
          DEALLOCATE (MK, MN, IEQAT, MD, ISU, IASU)
          DEALLOCATE (XO, XS, D, CO, delta, PESO)
          RETURN
@@ -2507,7 +2508,7 @@
       if(NMS.ge.5)then
         MDEG=1
         call vrload(AA,0.d0,9)
-        write(*,'(i3,3f9.5)')(I,(XO(k,I),k=1,3),i=1,N)
+!       write(*,'(i3,3f9.5)')(I,(XO(k,I),k=1,3),i=1,N)
         AA(1,1)= 1
         AA(2,2)= 1
         AA(3,3)=-1
@@ -2601,7 +2602,7 @@
  2180 CONTINUE
  2190 CONTINUE
  2200 CONTINUE
-      write(*,2)
+!     write(*,2)
     2 format('********************** WARNING **********************',//, &
       '       INCREASING THE TOLERANCE COULD BE USEFUL',//, &
       '*****************************************************')
@@ -2618,7 +2619,7 @@
 ! che la pseudodegenerazione sia completa (MDEG=0) o che ci sia una
 ! asse 4,-4,5,-5,7,-7,8,-8
 ! 
-        write(*,*)'Weights are changed'
+!       write(*,*)'Weights are changed'
         do k=1,N
           PESO(K)=PESO(K)*(D(k)/DM)**4
         enddo
@@ -2726,7 +2727,7 @@
       IU=3
       IB=2
       IC=1
-      write(*,5)
+!     write(*,5)
     5 format( &
       '***********************************************************',/, &
       'WARNING: the degeneration degree is 3 but no cubic',/,  &
@@ -2746,7 +2747,7 @@
       call verify(XO,CO,MK,MN,MV,N)
       IF (NMS.NE.1) GOTO 2520
 
-      WRITE(*,3)
+!     WRITE(*,3)
       DEALLOCATE (MK, MN, IEQAT, MD, ISU, IASU)
       DEALLOCATE (XO, XS, D, CO, delta, PESO)
       RETURN 

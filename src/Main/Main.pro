@@ -41,7 +41,7 @@ INCLUDEPATH += $$BUILD_DIR/Qui   # Required for the ui_QuiMainWindow.h header
 #QMAKE_EXTRA_TARGETS += version
 
 symmol.target = $$BUILD_DIR/symmol.o
-symmol.commands = gfortran -c $$PWD/symmol.f90 -o $$BUILD_DIR/symmol.o
+symmol.commands = gfortran -g -c $$PWD/symmol.f90 -o $$BUILD_DIR/symmol.o
 OBJECTS += $$BUILD_DIR/symmol.o
 QMAKE_EXTRA_TARGETS += symmol
 
