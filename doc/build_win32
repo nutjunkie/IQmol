@@ -30,6 +30,7 @@ libraries.  The compilation of the code should be relatively straightforward.
  o I followed the instructions on http://gaia-gis.it/gaia-sins/mingw_how_to.html
    to install libz, libxml2 and openssl.  The relevant libraries should be installed
    in C:\MinGW\msys\1.0\local\lib
+   https://bintray.com/vszakats/generic/openssl/1.1.1f
 
  o LibSSH2:
    - Download: http://www.libssh2.org  (version 1.6.0)
