@@ -134,7 +134,7 @@ ServerConfiguration::ServerConfiguration()
    // additional libraries.
    setDefaults(Network::HTTP);
 #else
-   setDefaults(Network::HTTPS);
+   setDefaults(Network::HTTP);
 #endif
    setDefaults(Web);
    //setDefaults(Local);
