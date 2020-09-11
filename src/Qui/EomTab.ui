@@ -122,7 +122,13 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
+     <item row="3" column="2">
+      <widget class="QCheckBox" name="state_analysis">
+       <property name="text">
+        <string>State analysis (libwfa)</string>
+       </property>
+      </widget>
+     </item>     <item row="2" column="0">
       <widget class="QLabel" name="label_cc_state_to_opt">
        <property name="text">
         <string>State to optimize</string>
