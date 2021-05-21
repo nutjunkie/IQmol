@@ -32,6 +32,7 @@
 
 #include "IQmolApplication.h"
 #include "Preferences.h"
+#include "ServerConfiguration.h"
 #include "Exception.h"
 #include <QStringList>
 #include <QDir>
@@ -52,6 +53,8 @@ int LogFileDescriptor(-1);
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
+
+
 
 const char* signalText(const int& signal)
 {
@@ -133,8 +136,37 @@ void signalHandler(int signal)
 //****************************************************************************
 
 
+int addServers(int argc, char* argv[])
+{
+    
+    QVariantList list(IQmol::Preferences::ServerConfigurationList());
+    QVariantList::iterator iter;
+
+    for (int i = 2; i < argc; ++i) {
+        IQmol::Process::ServerConfiguration config;
+        if (config.loadFromFile(argv[i])) {
+           std::cout << "\nServer configuration loaded from " << argv[i] <<  std::endl;
+           list.prepend(config.toQVariant());      
+        }else {
+           std::cout << "Failed to load server configuration from " << argv[i] <<  std::endl;
+        }
+    }
+
+    for (iter = list.begin(); iter != list.end(); ++iter) {
+        //qDebug() << *iter;
+    }
+
+    IQmol::Preferences::ServerConfigurationList(list);
+
+    return 0;
+}
+
+
 int main(int argc, char *argv[]) 
 {
+    if (argc >= 3 && QString(argv[1]) == "--add-server") {
+       return addServers(argc, argv);
+    }
     // Install our signal handler for all the signals we care about
     signal( 4, signalHandler);   // Illegal Instruction
     signal( 8, signalHandler);   // Floating point exception

@@ -142,14 +142,17 @@ void SshConnection::init()
    WSADATA wsadata;
    int res(WSAStartup(MAKEWORD(2,0), &wsadata));
    if (res != NO_ERROR) {
-      QString msg("WSAStartup failed to initialize: error ");
-      throw Exception(msg + QString::number(res));
-   }   
+      m_message = "WSAStartup failed to initialize: error ";
+      m_message += QString::number(res);
+      m_status = Error;
 #endif
 
    QLOG_TRACE() << "Calling libssh2_init()";
    int rc(libssh2_init(0));
-   if (rc != 0) throw Exception("Failed to initialize libssh2 connection");
+   if (rc != 0) {
+      m_message = "Failed to initialize libssh2 connection";
+      m_status = Error;
+   }
 }
 
 
@@ -342,8 +345,6 @@ bool SshConnection::checkHost()
 }
 
 
-// Returns true if the username and password are valid, false otherwise.
-// throws on any other error.
 void SshConnection::authenticate(AuthenticationT const authentication, QString& username)
 {
    m_username = username;
@@ -479,6 +480,11 @@ void SshConnection::authenticate(AuthenticationT const authentication, QString& 
 
       case LIBSSH2_ERROR_AUTHENTICATION_CANCELLED:
          m_message  = "Authentication cancelled";
+         QLOG_WARN() << m_message;
+         break;
+
+      case LIBSSH2_ERROR_SOCKET_RECV:
+         m_message = "Connection interrupted, try again.\n" + lastSessionError();
          QLOG_WARN() << m_message;
          break;
 
@@ -765,7 +771,10 @@ bool SshConnection::waitSocket()
 
    int rc(select(m_socket+1, readfd, writefd, 0, &tv));
 
-   if (rc == -1) throw Exception("Error in select()");
+   if (rc == -1) {
+      QLOG_ERROR() << "Error in SshConnection::waitSocket()";
+      rc = 0;
+   }
 
    bool timedout(rc == 0);
    if (timedout) { QLOG_TRACE() << "  waitsocket timeout"; }

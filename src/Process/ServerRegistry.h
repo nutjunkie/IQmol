@@ -83,7 +83,6 @@ namespace Process {
          static int  indexOf(QString const& serverName);
          static void loadFromPreferences();
          static void saveToPreferences();
-         static bool loadFromFile(QString const& filePath, ServerConfiguration& serverConfig);
 
          // Hide these to prevent multiple instances
          ServerRegistry() { }

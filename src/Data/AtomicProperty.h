@@ -184,6 +184,12 @@ namespace Data {
    };
 
 
+   class NaturalCharge : public AtomicCharge {
+      public:
+         Type::ID typeID() const { return Type::NaturalCharge; }
+   };
+
+
    class NmrShielding : public ScalarProperty {
       public:
          Type::ID typeID() const { return Type::NmrShielding; }

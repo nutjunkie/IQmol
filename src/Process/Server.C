@@ -387,6 +387,7 @@ void Server::submitFinished()
 }
 
 
+
 // This should be delegated
 bool Server::parseSubmitMessage(Job* job, QString const& message)
 {
@@ -442,35 +443,52 @@ bool Server::parseSubmitMessage(Job* job, QString const& message)
 
       case ServerConfiguration::Basic: {
          if (isLocal()) {
-            int count(0);
 
-            QString exeName(m_configuration.value(ServerConfiguration::QueueInfo));
-
-            QList<unsigned> qcprogs = System::GetMatchingProcessIds(exeName);
-
-            while (count <= 4 && qcprogs.size() <= m_qcprogs.size()) {
-               qDebug() << "searching" <<  count << qcprogs.size() << m_qcprogs.size();
-               QThread::msleep(500) ;
-               qcprogs = System::GetMatchingProcessIds(exeName);
-               count++;
+            // First see if we can capture the PID from the return from the 
+            //  submission script
+            QRegExp rx("JobId:\\s+([0-9]+)");
+            if (rx.indexIn(message,0) != -1) {
+               job->setJobId(rx.cap(1));
+               ok = true;
+               QLOG_DEBUG() << "PID captured from return message" << rx.cap(1);
             }
 
-            QLOG_DEBUG() << "Original list of PIDS:";
-            QLOG_DEBUG() << m_qcprogs; 
-            QLOG_DEBUG() << "New list of PIDS:";
-            QLOG_DEBUG() << qcprogs; 
+            // No dice, so we search through the qchem processes:
+            if (!ok) {
+               int count(0);
+
+               QString exeName(m_configuration.value(ServerConfiguration::QueueInfo));
+
+               QList<unsigned> qcprogs = System::GetMatchingProcessIds(exeName);
+
+               while (count <= 4 && qcprogs.size() <= m_qcprogs.size()) {
+                  qDebug() << "searching" <<  count << qcprogs.size() << m_qcprogs.size();
+                  QThread::msleep(500) ;
+                  qcprogs = System::GetMatchingProcessIds(exeName);
+                  count++;
+               }
+
+               QLOG_DEBUG() << "Original list of PIDS matching:" << exeName;
+               QLOG_DEBUG() << m_qcprogs; 
+               QLOG_DEBUG() << "New list of PIDS:";
+               QLOG_DEBUG() << qcprogs; 
   
-            QList<unsigned>::iterator iter;
-            int jobid(-1);
-            for (iter = qcprogs.begin(); iter != qcprogs.end(); ++iter) {
-                if (!m_qcprogs.contains(*iter)) {
-                   qDebug() << "Setting job id to:" << QString::number(*iter);
-                   jobid = *iter;
-                   break;
-                }
+               QList<unsigned>::iterator iter;
+#ifdef WIN32
+               int jobid(-1);
+#else
+               int jobid(0);
+#endif
+               for (iter = qcprogs.begin(); iter != qcprogs.end(); ++iter) {
+                   if (!m_qcprogs.contains(*iter)) {
+                      qDebug() << "Setting job id to:" << QString::number(*iter);
+                      jobid = *iter;
+                      break;
+                   }
+               }
+               job->setJobId(QString::number(jobid));
+               ok = true;
             }
-            job->setJobId(QString::number(jobid));
-            ok = true;
 
          }else {
             QStringList tokens(message.split(QRegExp("\\s+"), QString::SkipEmptyParts));
@@ -515,6 +533,7 @@ bool Server::parseSubmitMessage(Job* job, QString const& message)
 
    return ok;
 }
+
 
 
 // ---------- Query ----------

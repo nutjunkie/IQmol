@@ -173,11 +173,10 @@ void ServerRegistry::loadFromPreferences()
           s_servers.append(new Server(ServerConfiguration(*iter)));
       }
 
-
       // Look for default servers in the share directory
       if (s_servers.isEmpty()) {
          QDir dir(Preferences::ServerDirectory());
-         qDebug() << "Server Directory set to: " << dir.absolutePath();
+         QLOG_TRACE() << "Server Directory set to: " << dir.absolutePath();
          if (dir.exists()) {
             QStringList filters;
             filters << "*.cfg";
@@ -186,9 +185,9 @@ void ServerRegistry::loadFromPreferences()
             QStringList::iterator iter;
             for (iter = listing.begin(); iter != listing.end(); ++iter) {
                 QFileInfo info(dir, *iter);
-                qDebug() << "Reading server configutation from: " << info.absoluteFilePath();
+                QLOG_TRACE() << "Reading server configutation from: " << info.absoluteFilePath();
                 ServerConfiguration serverConfiguration;
-                if (loadFromFile(info.absoluteFilePath(), serverConfiguration)) {
+                if (serverConfiguration.loadFromFile(info.absoluteFilePath())) {
                    addServer(serverConfiguration);
                    //s_servers.append(new Server(serverConfiguration));
                 }
@@ -218,37 +217,6 @@ void ServerRegistry::saveToPreferences()
        list.append((*iter)->configuration().toQVariant());
    }
    Preferences::ServerConfigurationList(list);
-}
-
-
-bool ServerRegistry::loadFromFile(QString const& filePath, ServerConfiguration& serverConfig)
-{
-   bool ok(false);
-
-   QFile file(filePath);
-   if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-      QLOG_ERROR() << "Server configuraiton file does not exist" << filePath;
-      return ok;
-   }   
-
-   Parser::ParseFile parser(filePath);
-   parser.start();
-   parser.wait();
-
-   QStringList errors(parser.errors());
-   if (!errors.isEmpty()) {
-      QLOG_ERROR() << errors.join("\n");
-   }   
-
-   Data::Bank& bank(parser.data());
-   QList<Data::YamlNode*> yaml(bank.findData<Data::YamlNode>());
-   if (yaml.first()) {
-      yaml.first()->dump();
-      serverConfig = ServerConfiguration(*(yaml.first()));
-      ok = true;
-   }   
-
-   return ok;
 }
 
 

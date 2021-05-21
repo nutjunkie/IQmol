@@ -2286,6 +2286,9 @@ QList<double> Molecule::atomicCharges(Data::Type::ID type)
       case Data::Type::HirshfeldCharge:
          charges = atomicCharges<Data::HirshfeldCharge>();
          break;
+      case Data::Type::NaturalCharge:
+         charges = atomicCharges<Data::NaturalCharge>();
+         break;
       case Data::Type::AtomicNumber:
          charges = atomicCharges<Data::AtomicNumber>();
          break;
@@ -2598,6 +2601,19 @@ void Molecule::initProperties()
       m_properties 
         << new PointChargePotential(Data::Type::LowdinCharge, "ESP (Lowdin)", this);
    }
+
+   // Natural
+   if (m_currentGeometry->hasProperty<Data::NaturalCharge>()) {
+      action = menu->addAction("Natural");
+      action->setCheckable(true);
+      action->setData(Data::Type::NaturalCharge);
+      chargeTypes->addAction(action);
+      connect(action, SIGNAL(triggered()), this, SLOT(updateAtomicCharges()));
+      m_properties 
+        << new PointChargePotential(Data::Type::LowdinCharge, "ESP (Natural)", this);
+   }
+
+
 
    if (m_currentGeometry->hasProperty<Data::MultipoleExpansionList>()) {
       Data::MultipoleExpansionList& dma(

@@ -102,7 +102,9 @@ void SshExecute::runDelegate()
 
    if (channel == 0) {
       QString msg("Failed to open execution channel:\n");
-      throw Exception(msg + m_connection->lastSessionError());
+      msg += m_connection->lastSessionError();
+      QLOG_ERROR() << msg;
+      throw Exception(msg);
    }
 
    int rc(0);
@@ -163,7 +165,10 @@ void SshExecute::runDelegate()
       }
 
       libssh2_channel_free(channel);
-      if (!m_interrupt && !error.isEmpty()) throw Exception(error);
+      if (!m_interrupt && !error.isEmpty()) {
+         QLOG_ERROR() << error;
+         throw Exception(error);
+      }
 }
 
 

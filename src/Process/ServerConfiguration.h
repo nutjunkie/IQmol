@@ -98,6 +98,8 @@ namespace Process {
 
          ServerConfiguration& operator=(ServerConfiguration const& that);
 
+         bool loadFromFile(QString const& filePath);
+
       protected:
          void setDefaults(Network::ConnectionT const);
          void setDefaults(QueueSystemT const);

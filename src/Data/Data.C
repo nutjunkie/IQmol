@@ -85,6 +85,7 @@ QString toString(ID const id)
       case LowdinCharge:               s = "Data::LowdinCharge";              break;
       case ChelpgCharge:               s = "Data::ChelpgCharge";              break;
       case HirshfeldCharge:            s = "Data::HirshfeldCharge";           break;
+      case NaturalCharge:              s = "Data::NaturalCharge";             break;
 
       case SpinDensity:                s = "Data::SpinDensity";               break;
       case VdwRadius:                  s = "Data::VdwRadius";                 break;

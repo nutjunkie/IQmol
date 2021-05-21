@@ -418,6 +418,11 @@ bool QChemOutput::parse(TextStream& textStream)
          if (currentGeometry) 
             readCharges(textStream, *currentGeometry, Data::Type::LowdinCharge);
 
+      }else if (line.contains("Summary of Natural Population Analysis")) {
+         textStream.skipLine(5);
+         if (currentGeometry) 
+            readNBO(textStream, *currentGeometry, Data::Type::NaturalCharge);
+
       }else if (line.contains("Orbital Energies (a.u.) and Symmetries")) {
          textStream.skipLine(2);
          bool readSymmetries(true);
@@ -1558,6 +1563,55 @@ void QChemOutput::readNmrCouplings(TextStream& textStream, Data::Geometry& geome
    }
 
    delete couplings;
+}
+
+
+void QChemOutput::readNBO(TextStream& textStream, Data::Geometry& geometry, 
+   Data::Type::ID type)
+{
+   QStringList tokens;
+
+   QList<double> charges;
+   QList<double> spins;
+   QStringList atomicSymbols;
+
+   int n;
+   bool done(false), allOk(true), ok;
+
+   while (!textStream.atEnd() && !done && allOk) {
+      tokens = textStream.nextLineAsTokens();
+      n = tokens.size();
+
+      if (n >=3) {
+         charges.append(tokens[2].toDouble(&ok)); 
+         allOk = allOk && ok;
+         atomicSymbols.append(tokens[0]);
+      }else {
+         done = true;
+      }
+   }
+
+   if (!allOk) {
+      QString msg("Problem parsing charges, line number: ");
+      m_errors.append(msg + QString::number(textStream.lineNumber()));
+      return;
+   }
+
+   if (!geometry.sameAtoms(atomicSymbols)) {
+      QString msg("Atom list mismatch around line number: ");
+      m_errors.append(msg + QString::number(textStream.lineNumber()));
+      return;
+   }
+
+   allOk = geometry.setAtomicProperty<Data::NaturalCharge>(charges);
+
+   if (allOk) {
+      double q(0.0);
+      for (int i = 0; i < charges.size(); ++i) q += charges[i];
+      geometry.setCharge(Util::round(q));
+   }else {
+      m_errors.append("Problem setting atomic charges");
+   }
 }
 
 

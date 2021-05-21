@@ -23,6 +23,7 @@
 #include "ServerConfiguration.h"
 #include "QsLog.h"
 #include "SystemDependent.h"
+#include "ParseFile.h"
 #include <QDir>
 
 
@@ -627,6 +628,37 @@ void ServerConfiguration::fromQVariantMapLegacy(QVariantMap const& map)
    //if (map.contains("DelegateDefaults")) {
    //   m_delegateDefaults = map.value("DelegateDefaults").toMap();
    //}
+}
+
+
+bool ServerConfiguration::loadFromFile(QString const& filePath)
+{
+   bool ok(false);
+
+   QFile file(filePath);
+   if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      QLOG_ERROR() << "Server configuraiton file does not exist" << filePath;
+      return ok;
+   }   
+
+   Parser::ParseFile parser(filePath);
+   parser.start();
+   parser.wait();
+
+   QStringList errors(parser.errors());
+   if (!errors.isEmpty()) {
+      QLOG_ERROR() << errors.join("\n");
+   }   
+
+   Data::Bank& bank(parser.data());
+   QList<Data::YamlNode*> yaml(bank.findData<Data::YamlNode>());
+   if (yaml.first()) {
+      yaml.first()->dump();
+      *this = ServerConfiguration(*(yaml.first()));
+      ok = true;
+   }   
+
+   return ok;
 }
 
 } } // end namespace IQmol::Process

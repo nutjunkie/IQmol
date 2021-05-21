@@ -51,6 +51,7 @@ namespace Parser {
       private:
          void readStandardCoordinates(TextStream&, Data::Geometry&);
          void readCharges(TextStream&, Data::Geometry&, Data::Type::ID);
+         void readNBO(TextStream&, Data::Geometry&, Data::Type::ID);
          void readNmrShifts(TextStream&, Data::Geometry&, Data::Nmr&);
          void readNmrReference(TextStream&, Data::Nmr&);
          void readNmrCouplings(TextStream&, Data::Geometry&, Data::Nmr&);
