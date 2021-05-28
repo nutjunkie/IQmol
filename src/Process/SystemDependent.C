@@ -81,14 +81,16 @@ QString QueryCommand(bool const local)
    if (local) {
       // The command only changes for Windows boxes 
 #ifdef Q_OS_WIN32
-      QFileInfo tasklist("/Windows/System32/tasklist.exe");
+      QFileInfo tasklist("C:/Windows/System32/tasklist.exe");
       if (tasklist.exists()) {
          QString spid("\"PID eq ${JOB_ID}\"");
          QStringList args;
          args << "/v" << "/fo list" << "/fi " + spid;
          cmd = tasklist.filePath() + " " + args.join(" ");
       }else {
-         return QString("Error: tasklist.exe not found");
+         QString err("Error: ");
+         err += tasklist.filePath() + " not found";
+         return err;
       }
 #endif
 
@@ -107,14 +109,14 @@ QString KillCommand(bool const local)
    QString cmd("/bin/kill -TERM -${JOB_ID}");
    if (local) {
 #ifdef Q_OS_WIN32
-      QFileInfo taskkill("/Windows/System32/taskkill.exe");
-      QFileInfo tskill("/Windows/System32/tskill.exe");
+      QFileInfo taskkill("C:/Windows/System32/taskkill.exe");
+      QFileInfo tskill("C:/Windows/System32/tskill.exe");
       if (taskkill.exists()) {       // Vista
          cmd = taskkill.filePath() + " /f /pid ${JOB_ID}";
       }else if (tskill.exists()) {   // XP
          cmd = tskill.filePath() + " ${JOB_ID}";
       }else {
-         cmd = "Error: taskkill.exe or tskill.exe not found";
+         cmd = "Error: taskkill.exe or tskill.exe could not be found";
       }
 #endif
    }
@@ -170,7 +172,7 @@ QString TemplateForRunFile(bool const local)
             ":: The values below are examples only, you should set your own values.\n"
             "\n"
             ":: <-- Start user configuration -->\n"
-            "set QC=C:\\QChem\\5.2.2\n"
+            "set QC=C:\\QChem\\5.4.0\n"
             ":: <-- End user configuration -->\n"
             "\n"
             "start /b %QC%\\qcenv ${JOB_NAME}.inp  ${JOB_NAME}.out  2> ${JOB_NAME}.err\n"
@@ -186,7 +188,7 @@ QString ExecutableName(bool const local)
    QString cmd("qchem.exe");
    if (local) {
 #ifdef Q_OS_WIN32
-      cmd = "qchem_s.exe";
+      //cmd = "qchem_s.exe";
 #endif
    }
    return cmd;
@@ -258,12 +260,13 @@ QList<unsigned int> GetMatchingProcessIds(QString const& pattern)
    QStringList args;
 
 #ifdef Q_OS_WIN32
-   QString cmd("/Windows/System32/tasklist.exe");
+   QFileInfo cmdInfo("C:/Windows/System32/tasklist.exe");
 #else
-   QString cmd("/bin/ps");
+   QFileInfo cmdInfo("/bin/ps");
    // The command,pid ordering is chosen to match the output of tasklist
    args << "-x" << "-c" << "-o" << "command,pid";
 #endif
+   QString cmd(cmdInfo.absoluteFilePath());
 
    QStringList processes(RunCommand(cmd, args));
    QStringList tokens;
