@@ -145,6 +145,7 @@ void SshConnection::init()
       m_message = "WSAStartup failed to initialize: error ";
       m_message += QString::number(res);
       m_status = Error;
+   }
 #endif
 
    QLOG_TRACE() << "Calling libssh2_init()";
