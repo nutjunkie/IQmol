@@ -168,9 +168,16 @@ void ServerRegistry::loadFromPreferences()
    QVariantList list(Preferences::ServerConfigurationList());
    QVariantList::iterator iter;
 
+   bool qchemServerFound(false);
+
    try {
       for (iter = list.begin(); iter != list.end(); ++iter) {
-          s_servers.append(new Server(ServerConfiguration(*iter)));
+          ServerConfiguration config(*iter);
+          s_servers.append(new Server(config));
+          if (config.isWebBased() && 
+             config.value(ServerConfiguration::HostAddress) == "iqmol.q-chem.com") {
+             qchemServerFound = true;
+          }
       }
 
       // Look for default servers in the share directory
@@ -189,15 +196,16 @@ void ServerRegistry::loadFromPreferences()
                 ServerConfiguration serverConfiguration;
                 if (serverConfiguration.loadFromFile(info.absoluteFilePath())) {
                    addServer(serverConfiguration);
-                   //s_servers.append(new Server(serverConfiguration));
                 }
             }
          }
       }
 
-      // Finally, if there are no servers, add the eefault iqmol.q-chem.com server
-      if (s_servers.isEmpty()) {
-         qDebug() << "Appending Q-Chem server";
+      // Finally, if the qchem server does not exist, add it to the end
+      if (qchemServerFound) {
+         QLOG_DEBUG() << "Found existing Q-Chem server configuration";
+      }else {
+         QLOG_DEBUG() << "Appending Q-Chem server";
          s_servers.append(new Server(ServerConfiguration()));
       }
 
