@@ -17,7 +17,7 @@ apt-get install libopenbabel-dev
 git clone https://github.com/nutjunkie/IQmol.git
 
 cd IQmol/src
-qmake IQmol
+qmake IQmol.pro
 make
 
 
