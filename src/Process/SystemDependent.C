@@ -175,7 +175,7 @@ QString TemplateForRunFile(bool const local)
             "set QC=C:\\QChem\\5.4.0\n"
             ":: <-- End user configuration -->\n"
             "\n"
-            "start /b %QC%\\qcenv ${JOB_NAME}.inp  ${JOB_NAME}.out  2> ${JOB_NAME}.err\n"
+            "start /b %QC%\\qcenv ${JOB_NAME}.inp ${JOB_NAME}.out 1> ${JOB_NAME}.err 2>&1\n"
             "exit \n";
 #endif
    }

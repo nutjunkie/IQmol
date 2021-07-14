@@ -119,7 +119,7 @@ void SshExecute::runDelegate()
       error = "Command execution failed: " + m_command;
       goto cleanup;
    }
-
+     
    for ( ; ; ) { // loop until we block
        int bc;
        char buffer[0x400];
@@ -129,7 +129,6 @@ void SshExecute::runDelegate()
               output.append(buffer, bc);
               bytecount += bc;
           }
-          //qDebug() <<" sleeping 2"; sleep(2);
        } while( bc > 0 && !m_interrupt);
 
        if (m_interrupt) goto cleanup;
@@ -141,8 +140,10 @@ void SshExecute::runDelegate()
        }else {
           break;
        }
+       // This assumes everything was captured in the channel_read
+       // If we don't, this for loop gets trapped in the waitSocket call
+       if (bytecount > 0)  break;
    }
-
 
    if (m_interrupt) {
       QLOG_TRACE() << "---------- SshExecute Interrupted -----------";
@@ -328,7 +329,9 @@ void SftpPutFile::runDelegate()
 
    } while (rc > 0 && !m_interrupt);
 
-   if (total == fileInfo.st_size) QLOG_TRACE() << "Transfer complete";
+   if (total == fileInfo.st_size) {
+      QLOG_TRACE() << "Transfer complete";
+   }
 
    fclose(localFileHandle);
    libssh2_sftp_close(sftp_handle);
@@ -432,8 +435,6 @@ void SshGetFile::runDelegate(bool& getFilesInterrupt)
        //copyProgress();
        double frac(double(got)/double(fileSize));
        copyProgress(frac);
-       // qDebug() << "CopyProgress" << m_interrupt << frac;
-       // qDebug() << "sleeping 1"; sleep(1);
    }
 
    cleanup:
@@ -546,7 +547,7 @@ void SftpGetFile::runDelegate(bool& getFilesInterrupt)
       }
    }
 
-   cleanup:
+   //cleanup:
       QLOG_TRACE() <<  "Closing sftp read transfer";
       fclose(localFileHandle);
       libssh2_sftp_shutdown(sftp_session);

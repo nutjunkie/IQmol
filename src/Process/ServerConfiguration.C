@@ -362,7 +362,7 @@ void ServerConfiguration::setDefaults(QueueSystemT const queueSystem)
                  << "setenv QCSCRATCH $PBS_JOBFS"
                  << "if (-e $QC/bin/qchem.setup) source $QC/bin/qchem.setup"
                  << ""
-                 << "qchem -seq ${JOB_NAME}.inp ${JOB_NAME}.out";
+                 << "qchem -nt ${NCPUS} ${JOB_NAME}.inp ${JOB_NAME}.out";
     
          m_configuration.insert(RunFileTemplate, runFile.join("\n"));
 
@@ -392,7 +392,7 @@ void ServerConfiguration::setDefaults(QueueSystemT const queueSystem)
                  << "setenv QCSCRATCH $TMPDIR"
                  << "if (-e $QC/bin/qchem.setup) source $QC/bin/qchem.setup"
                  << ""
-                 << "qchem -seq ${JOB_NAME}.inp ${JOB_NAME}.out";
+                 << "qchem -nt ${NCPUS} ${JOB_NAME}.inp ${JOB_NAME}.out";
 
          m_configuration.insert(RunFileTemplate, runFile.join("\n"));
 
@@ -426,7 +426,7 @@ void ServerConfiguration::setDefaults(QueueSystemT const queueSystem)
                  << ""
                  << "if (-e $QC/bin/qchem.setup) source $QC/bin/qchem.setup"
                  << ""
-                 << "qchem -seq ${JOB_NAME}.inp ${JOB_NAME}.out";
+                 << "qchem -nt ${NCPUS} ${JOB_NAME}.inp ${JOB_NAME}.out";
  
          m_configuration.insert(RunFileTemplate, runFile.join("\n"));
 
