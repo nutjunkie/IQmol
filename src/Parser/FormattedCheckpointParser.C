@@ -81,6 +81,10 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
    boysData.orbitalType = Data::Orbitals::Localized;
    boysData.label = "Localized MOs (Boys)";
 
+   OrbitalData osloData;
+   osloData.orbitalType = Data::Orbitals::Localized;
+   osloData.label = "Localized MOs (OSLO)";
+
    OrbitalData virtLocData;
    virtLocData.orbitalType = Data::Orbitals::Localized;
    virtLocData.label = "Localized MOs (VirtLoc)";
@@ -314,6 +318,14 @@ bool FormattedCheckpoint::parse(TextStream& textStream)
          if (!toInt(n, list, 2)) goto error;
          boysData.betaCoefficients = readDoubleArray(textStream, n);
 
+      }else if (key == "Localized Alpha MO Coefficients (OSLO)") {
+         if (!toInt(n, list, 2)) goto error;
+         osloData.alphaCoefficients = readDoubleArray(textStream, n);
+
+      }else if (key == "Localized Beta  MO Coefficients (OSLO)") {
+         if (!toInt(n, list, 2)) goto error;
+         osloData.betaCoefficients = readDoubleArray(textStream, n);
+
       }else if (key == "Localized Alpha MO Coefficients (VirtLoc)") {
          if (!toInt(n, list, 2)) goto error;
          virtLocData.alphaCoefficients = readDoubleArray(textStream, n);
@@ -486,6 +498,9 @@ qDebug() << "Density matrix is square?" << square;
       if (orbitals) orbitalsList->append(orbitals);
 
       orbitals = makeOrbitals(nAlpha, nBeta, boysData, shellData, *geometry); 
+      if (orbitals) orbitalsList->append(orbitals);
+
+      orbitals = makeOrbitals(nAlpha, nBeta, osloData, shellData, *geometry); 
       if (orbitals) orbitalsList->append(orbitals);
 
       orbitals = makeOrbitals(nAlpha, nBeta, virtLocData, shellData, *geometry); 
