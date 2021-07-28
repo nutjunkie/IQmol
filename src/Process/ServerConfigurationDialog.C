@@ -85,6 +85,7 @@ void ServerConfigurationDialog::updateQueueSystemsCombo(
    }
    qDebug()<< "setting current index to " << index;
    qs->setCurrentIndex(index);
+   on_queueSystem_currentIndexChanged(qs->currentText());
    qDebug()<< "current text now" << qs->currentText();
 }
 
@@ -147,7 +148,7 @@ void ServerConfigurationDialog::on_localRadioButton_toggled(bool tf)
       qDebug() << "Setting defaults for Local";
       m_currentConfiguration.setDefaults(Network::Local);
       copyFrom(m_currentConfiguration);
-   }
+  }
 }
 
 

@@ -206,7 +206,8 @@ void ServerRegistry::loadFromPreferences()
          QLOG_DEBUG() << "Found existing Q-Chem server configuration";
       }else {
          QLOG_DEBUG() << "Appending Q-Chem server";
-         s_servers.append(new Server(ServerConfiguration()));
+         ServerConfiguration config;
+         addServer(config);
       }
 
    } catch (Exception& ex) {
