@@ -48,8 +48,9 @@ Orbitals::Orbitals(Layer::Orbitals& orbitals)
 {
    m_configurator.setupUi(this);
 
-   connect(m_configurator.orbitalRangeMin, SIGNAL(currentIndexChanged(int)),
-      m_configurator.orbitalRangeMax, SLOT(setCurrentIndex(int)));
+   // Why is this here, it seems annoying.
+   //connect(m_configurator.orbitalRangeMin, SIGNAL(currentIndexChanged(int)),
+   //   m_configurator.orbitalRangeMax, SLOT(setCurrentIndex(int)));
 
    m_configurator.surfaceType->clear();
    // Watch the ordering of these affects the index selection below
