@@ -62,7 +62,7 @@ namespace Layer {
       public Q_SLOTS:
          void setCharge(int const charge);
          void setMultiplicity(unsigned const multiplicity);
-         void setEnergy(double const energy, Info::EnergyUnit unit);
+         void setEnergy(double const energy, Info::EnergyUnit unit, QString const& label);
          void setDipole(qglviewer::Vec const& dipole, bool const estimated = false);
          void setPointGroup(Data::PointGroup const&);
 
@@ -82,6 +82,7 @@ namespace Layer {
          unsigned m_multiplicity;
 
          EnergyUnit m_energyUnit;
+         QString m_energyText;
          QMap<QString, int> m_formula;
          Data::PointGroup m_pointGroup;
 
