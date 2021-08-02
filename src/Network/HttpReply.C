@@ -64,11 +64,15 @@ void HttpReply::finishedSlot()
       m_message = headerValue("Qchemserv-Error");
    }else {
       QString msg(headerValue("Qcloud-Server-Message"));
+      if (msg.contains("JWT signature expired") && m_connection->status() == Authenticated) {
+         // We are no longer authenticated
+         m_connection->setStatus(Opened);
+      }
       m_status  = Error;
       if (msg.isEmpty()) {
          m_message = "QChem server temporarily unavailable";
       }else {
-      m_message = msg;
+         m_message = msg;
       }
    }
 

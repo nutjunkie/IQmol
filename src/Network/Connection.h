@@ -77,6 +77,7 @@ namespace Network {
 
          Status status() const { return m_status; }
          void setStatus(Status status) { m_status = status; }
+         void setMessage(QString const& message) { m_message = message; }
          QString const& message() const { return m_message; }
          QString const& hostname() const { return m_hostname; }
          int port() const { return m_port; }

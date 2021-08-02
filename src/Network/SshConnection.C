@@ -285,11 +285,12 @@ bool SshConnection::checkHost()
    int rc = libssh2_knownhost_readfile(knownHosts, getKnownHostsFile().toLatin1().data(), 
       LIBSSH2_KNOWNHOST_FILE_OPENSSH);
 
-   if (rc < 0) {
-      m_message = "Unable to read file\n" + getKnownHostsFile() + "\nError (" 
+   bool fileExists(rc == 0);
+   if (!fileExists) {
+      // Most likely the file is not there, so we note this but keep going
+      m_message = "Unable to read file\n" + getKnownHostsFile() + "\n(" 
         + QString::number(rc) + ") " + lastSessionError();
-                       
-      return false;
+      QLOG_WARN() << m_message;
    }
       
    size_t length;
@@ -310,9 +311,13 @@ bool SshConnection::checkHost()
 
    struct libssh2_knownhost *host;
 
-   check = libssh2_knownhost_checkp(knownHosts, m_hostname.toLatin1().data(), 
-       m_port, fingerprint, length, LIBSSH2_KNOWNHOST_TYPE_PLAIN | 
-       LIBSSH2_KNOWNHOST_KEYENC_RAW, &host);
+   if (fileExists) {
+      check = libssh2_knownhost_checkp(knownHosts, m_hostname.toLatin1().data(), 
+          m_port, fingerprint, length, LIBSSH2_KNOWNHOST_TYPE_PLAIN | 
+          LIBSSH2_KNOWNHOST_KEYENC_RAW, &host);
+   }else {
+      check = LIBSSH2_KNOWNHOST_CHECK_NOTFOUND;
+   }
 
    switch (check) {
       case LIBSSH2_KNOWNHOST_CHECK_MATCH:
@@ -347,7 +352,6 @@ bool SshConnection::checkHost()
                break;
             }
 
-            //rc = libssh2_knownhost_writefile(knownHosts, "/tmp/known_hosts", LIBSSH2_KNOWNHOST_FILE_OPENSSH);
             rc = libssh2_knownhost_writefile(knownHosts, getKnownHostsFile().toLatin1().data(), 
                LIBSSH2_KNOWNHOST_FILE_OPENSSH);
 
