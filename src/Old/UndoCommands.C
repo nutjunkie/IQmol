@@ -98,6 +98,7 @@ void AddHydrogens::redo()
    }
    m_molecule->appendPrimitives(m_primitives);
    m_molecule->pushAnimators(m_animatorList); 
+   m_molecule->updated();
 }
 
 
@@ -125,6 +126,7 @@ void EditPrimitives::redo()
    m_deleteRemoved = true;
    m_molecule->takePrimitives(m_removed);
    m_molecule->appendPrimitives(m_added);
+   m_molecule->updated();
 }
 
 
@@ -207,6 +209,7 @@ void MoveObjects::redo()
       if (m_invalidateSymmetry) m_molecule->invalidateSymmetry();
       m_molecule->autoDetectSymmetry();
       m_molecule->postMessage(m_msg);
+      m_molecule->updated();
    }
 }
 
@@ -218,6 +221,7 @@ void MoveObjects::undo()
       m_molecule->postMessage("");
       if (m_invalidateSymmetry) m_molecule->invalidateSymmetry();
       m_molecule->autoDetectSymmetry();
+      m_molecule->updated();
    }
 }
 
@@ -302,6 +306,7 @@ void ChangeAtomType::redo()
       m_molecule->updateInfo();
       m_molecule->softUpdate();
       m_molecule->reindexAtomsAndBonds();
+      m_molecule->updated();
    }
 }
 
@@ -313,6 +318,7 @@ void ChangeAtomType::undo()
       m_molecule->updateInfo();
       m_molecule->softUpdate();
       m_molecule->reindexAtomsAndBonds();
+      m_molecule->updated();
    }
 }
 
