@@ -71,6 +71,7 @@ void Info::sync()
    }
 
    m_infoConfigurator.energyLabel->setText(s);
+   m_infoConfigurator.energyText->setText(m_info.m_energyText);
 
    s = QString::number(m_info.m_dipoleValue, 'f', 3) + " D";
    if (m_info.m_dipoleEstimated) s+= " (est.)";

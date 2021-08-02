@@ -423,6 +423,10 @@ void ViewerModel::connectMolecule(Layer::Molecule* molecule)
 {
    connect(molecule, SIGNAL(updated()), 
       this, SLOT(updateVisibleObjects()));
+
+   connect(molecule, SIGNAL(updated()), 
+      this, SLOT(computeEnergy()));
+
    connect(molecule, SIGNAL(softUpdate()), 
      this, SIGNAL(updated()));
    connect(molecule, SIGNAL(postMessage(QString const&)), 
@@ -854,6 +858,12 @@ void ViewerModel::reperceiveBonds()
 void ViewerModel::reperceiveBondsForAnimation()
 {
    forAllMolecules(boost::bind(&Layer::Molecule::reperceiveBondsForAnimation, _1));
+}
+
+
+void ViewerModel::computeEnergy()
+{
+   forAllMolecules(boost::bind(&Layer::Molecule::computeEnergy, _1, m_forceField));
 }
 
 

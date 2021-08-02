@@ -693,7 +693,10 @@ void Viewer::displayGeometricParameter(GLObjectList const& selection)
    // We cannot use displayMessage here as it triggers an update
    //displayMessage(""); 
 
-   if (message_.isEmpty()) drawText(10, height()-10, msg);
+   QString space(" ");
+   drawText(10, height()-10, space.repeated(message_.length()));
+   drawText(10, height()-10, msg);
+   //if (message_.isEmpty()) drawText(10, height()-10, msg);
 }
 
 

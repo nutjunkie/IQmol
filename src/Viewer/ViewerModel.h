@@ -95,6 +95,7 @@ namespace IQmol {
          void setIsotopes();
          void translateToCenter();
          void minimizeEnergy();
+         void computeEnergy();
          void insertMoleculeById(QString identifier);
 
          void cutSelection();
