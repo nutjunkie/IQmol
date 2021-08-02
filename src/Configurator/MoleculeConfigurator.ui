@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>285</width>
-    <height>340</height>
+    <height>361</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -76,22 +76,10 @@
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="0" column="1">
-         <widget class="QSlider" name="atomRadiusScale">
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="maximum">
-           <number>20</number>
-          </property>
-          <property name="pageStep">
-           <number>1</number>
-          </property>
-          <property name="value">
-           <number>10</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+        <item row="3" column="0" colspan="2">
+         <widget class="QCheckBox" name="smallerHydrogens">
+          <property name="text">
+           <string>Smaller Hydrogen Atoms</string>
           </property>
          </widget>
         </item>
@@ -111,6 +99,39 @@
           </property>
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QSlider" name="atomRadiusScale">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>20</number>
+          </property>
+          <property name="pageStep">
+           <number>1</number>
+          </property>
+          <property name="value">
+           <number>10</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>Atoms</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_13">
+          <property name="text">
+           <string>Bonds</string>
           </property>
          </widget>
         </item>
@@ -140,24 +161,13 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_13">
+        <item row="4" column="0" colspan="2">
+         <widget class="QCheckBox" name="hideHydrogens">
           <property name="text">
-           <string>Bonds</string>
+           <string>Hide Hydrogen Atoms</string>
           </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_12">
-          <property name="text">
-           <string>Atoms</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0" colspan="2">
-         <widget class="QCheckBox" name="smallerHydrogens">
-          <property name="text">
-           <string>Smaller Hydrogen Atoms</string>
+          <property name="checked">
+           <bool>false</bool>
           </property>
          </widget>
         </item>

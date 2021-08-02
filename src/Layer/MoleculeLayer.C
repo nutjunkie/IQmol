@@ -1540,13 +1540,13 @@ void Molecule::setGeometry(IQmol::Data::Geometry& geometry)
       Data::Energy::Units units(energy.units());
       switch (units) {
          case Data::Energy::Hartree: 
-            energyAvailable(energy.value(), Info::Hartree); 
+            energyAvailable(energy.value(), Info::Hartree, "Energy:"); 
             break;
          case Data::Energy::KJMol: 
-            energyAvailable(energy.value(), Info::KJMol); 
+            energyAvailable(energy.value(), Info::KJMol, "Energy:"); 
             break;
          case Data::Energy::KCalMol: 
-            energyAvailable(energy.value(), Info::KCalMol); 
+            energyAvailable(energy.value(), Info::KCalMol, "Energy:"); 
             break;
          default:
             break;
@@ -1830,6 +1830,64 @@ void Molecule::addHydrogens()
 }
 
 
+void Molecule::computeEnergy(QString const& forceFieldName)
+{
+   QLOG_DEBUG() << "Computing energy with forcefield" << forceFieldName;
+   OBPlugin::List("forcefields");
+   QByteArray ff(forceFieldName.toLatin1());
+   const char* obff(ff.data());
+
+   OBForceField* forceField = OBForceField::FindForceField(obff);
+   if (!forceField)  {
+      QString msg("Failed to load force field: ");
+      msg += forceFieldName + "\nUnable to compute energy\n";
+      msg += "BABEL_DATADIR environment variable may not be set correctly.";
+      QMsgBox::warning(0, "IQmol", msg);
+      return;
+   }
+
+   forceField->SetLogFile(&std::cout);
+   forceField->SetLogLevel(OBFF_LOGLVL_LOW);
+
+   AtomMap atomMap;
+   BondMap bondMap;
+   GroupMap groupMap;
+   OBMol* obMol(toOBMol(&atomMap, &bondMap, &groupMap));
+   if (atomMap.size() == 0) return;
+
+   if (!forceField->Setup(*obMol)) {
+      QString msg("Failed to setup force field for molecule.  ");
+      msg += text() + "\n";
+      msg += "Try using a different force field\n";
+      msg += "\nUnable to compute energy.";
+      QMsgBox::warning(0, "IQmol", msg);
+      return;
+   }
+
+   forceField->SetConformers(*obMol);
+   double energy(forceField->Energy());
+   qDebug() << "Energy computed as" << energy;
+
+   delete obMol;
+
+   QString unit(QString::fromStdString(forceField->GetUnit()));
+   QString mesg(forceFieldName + " energy: ");
+   if (unit.contains("kJ/mol")) { 
+      energyAvailable(energy, Info::KJMol, mesg);
+   }else {
+      energyAvailable(energy, Info::KCalMol, mesg);
+   }
+
+   // The following need to be posted after the command otherwise the 
+   // molecule gets updated to the final geometry before the animators
+   // have done their work
+   centerOfNuclearChargeAvailable(centerOfNuclearCharge());
+   setAtomicCharges(Data::Type::GasteigerCharge);
+   bool estimated(true);
+   dipoleAvailable(dipoleFromPointCharges(), estimated);
+}
+
+
 void Molecule::minimizeEnergy(QString const& forceFieldName)
 {
    QLOG_DEBUG() << "Minimizing energy with forcefield" << forceFieldName;
@@ -1904,12 +1962,13 @@ void Molecule::minimizeEnergy(QString const& forceFieldName)
 
    QString unit(QString::fromStdString(forceField->GetUnit()));
    double energy(forceField->Energy());
+   qDebug() << "Energy minimized as" << energy;
    QString mesg(forceFieldName + " energy: ");
    cmd->setMessage(mesg + QString::number(energy, 'f', 4));
    if (unit.contains("kJ/mol")) { 
-      energyAvailable(energy, Info::KJMol);
+      energyAvailable(energy, Info::KJMol, mesg);
    }else {
-      energyAvailable(energy, Info::KCalMol);
+      energyAvailable(energy, Info::KCalMol, mesg);
    }
 
    m_modified = true;
@@ -2038,7 +2097,7 @@ void Molecule::symmetrize(double tolerance, bool updateCoordinates)
       setAtomicCharges(Data::Type::GasteigerCharge);
       bool estimated(true);
       dipoleAvailable(dipoleFromPointCharges(), estimated); 
-      energyAvailable(0.0, Info::KJMol);  // invalidate the energy
+      energyAvailable(0.0, Info::KJMol, "Energy:");  // invalidate the energy
    }else {
       delete cmd;
    }
@@ -2469,10 +2528,18 @@ void Molecule::updateAtomScale(double const scale)
    update<Atom>(boost::bind(&Atom::setScale, _1, m_atomScale));
 }
 
+
 void Molecule::updateSmallerHydrogens(bool smallerHydrogens)
 {
    m_smallerHydrogens = smallerHydrogens;
    update<Atom>(boost::bind(&Atom::setSmallerHydrogens, _1, m_smallerHydrogens));
+}
+
+
+void Molecule::updateHideHydrogens(bool hideHydrogens)
+{
+   m_hideHydrogens = hideHydrogens;
+   update<Atom>(boost::bind(&Atom::setHideHydrogens, _1, m_hideHydrogens));
 }
 
 

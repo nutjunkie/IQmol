@@ -155,6 +155,7 @@ namespace IQmol {
             void symmetrize(double tolerance, bool updateCoordinates = true);
 
             void minimizeEnergy(QString const& forcefield);
+            void computeEnergy(QString const& forcefield);
 
             void translateToCenter(GLObjectList const& selection);
             static void toggleAutoDetectSymmetry() { 
@@ -282,7 +283,7 @@ namespace IQmol {
             void multiplicityAvailable(unsigned);
             void chargeAvailable(int);
             void pointGroupAvailable(Data::PointGroup const&);
-            void energyAvailable(double const, Info::EnergyUnit);
+            void energyAvailable(double const, Info::EnergyUnit, QString const&);
             void dipoleAvailable(qglviewer::Vec const& dipole, bool const estimated);
             void radiusAvailable(double const radius);
             void centerOfNuclearChargeAvailable(qglviewer::Vec const&);
@@ -293,6 +294,7 @@ namespace IQmol {
          protected:
             void updateAtomScale(double const scale);
             void updateSmallerHydrogens(bool smallerHydrogens);
+            void updateHideHydrogens(bool hideHydrogens);
             void updateBondScale(double const scale);
             void updateChargeScale(double const scale);
             void updateDrawMode(Primitive::DrawMode const);
@@ -401,6 +403,7 @@ namespace IQmol {
    
             /// Determines if the hydrogen atoms are drawn smaller in the CPK model
             bool m_smallerHydrogens;
+            bool m_hideHydrogens;
 
             bool m_modified;
             bool m_reperceiveBondsForAnimation;
