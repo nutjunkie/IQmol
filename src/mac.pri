@@ -1,37 +1,36 @@
 CONFIG += DEPLOY
 
-
 contains(CONFIG, DEPLOY) {
    #CONFIG += debug
    CONFIG += release
 
    # Boost
-   BOOST        = $(DEV)/boost_1_64_0
-   INCLUDEPATH += $${BOOST}
-   LIBS        += $${BOOST}/stage/lib/libboost_iostreams.a
-   LIBS        += $${BOOST}/stage/lib/libboost_serialization.a
-   LIBS        += $${BOOST}/stage/lib/libboost_exception.a
+   BOOST        = /usr/local/Cellar/boost/1.76.0/
+   INCLUDEPATH += $${BOOST}/include
+   LIBS        += $${BOOST}/lib/libboost_iostreams.a
+   LIBS        += $${BOOST}/lib/libboost_serialization.a
+   LIBS        += $${BOOST}/lib/libboost_exception.a
 
    # libssl/libcrypto
-   INCLUDEPATH += $(DEV)/openssl-1.1.1f/include
-   LIBS        += $(DEV)/openssl-1.1.1f/libssl.a
-   LIBS        += $(DEV)/openssl-1.1.1f/libcrypto.a
+   INCLUDEPATH += /usr/local/Cellar/openssl\@1.1/1.1.1k/include/
+   LIBS        += /usr/local/Cellar/openssl@1.1/1.1.1k/lib/libssl.a
+   LIBS        += /usr/local/Cellar/openssl@1.1/1.1.1k/lib/libcrypto.a
 
    # SSH2
-   INCLUDEPATH += $(DEV)/libssh2-1.9.0/include
-   LIBS        += $(DEV)/libssh2-1.9.0/build/src/libssh2.a
+   INCLUDEPATH += /opt/anaconda3/envs/iqmol-dev/include
+   LIBS        += /opt/anaconda3/envs/iqmol-dev/lib/libssh2.dylib
 
    # OpenBabel
-   OPENBABEL    = $(DEV)/openbabel-2.4.1
-   INCLUDEPATH += $${OPENBABEL}/include
-   INCLUDEPATH += $${OPENBABEL}/build/include
-   LIBS        += $${OPENBABEL}/build/src/libopenbabel.a
-   LIBS        += $${OPENBABEL}/build/src/formats/libinchi/libinchi.a
+   OPENBABEL    = /opt/anaconda3/envs/iqmol-dev/include/openbabel-2.0/
+   INCLUDEPATH += /opt/anaconda3/envs/iqmol-dev/include/openbabel-2.0/
+   LIBS        += /opt/anaconda3/envs/iqmol-dev/lib/libopenbabel.dylib
+   LIBS        += /opt/anaconda3/envs/iqmol-dev/lib/libopenbabel.5.dylib
+   LIBS        += /opt/anaconda3/envs/iqmol-dev/lib/libinchi.dylib
 
    # gfortran
-   LIBS        += /usr/local/gfortran/lib/libgfortran.a
-   LIBS        += /usr/local/gfortran/lib/libquadmath.a
-   LIBS        += -L/usr/local/gfortran/lib -lgcc_ext.10.5
+   LIBS        += /usr/local/Cellar/gcc/11.2.0/lib/gcc/11/libgfortran.a
+   LIBS        += /usr/local/Cellar/gcc/11.2.0/lib/gcc/11/libquadmath.a
+   LIBS        += -L/usr/local/Cellar/gcc/11.2.0/lib/gcc/11/ -lgcc_ext.10.5
 
    # Misc
    LIBS        += -L/usr/X11/lib  
