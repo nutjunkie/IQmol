@@ -95,9 +95,3 @@ Possible Issues
    /path/to/conda/env/share/openbabel/2.4.1. This allows the user to use 
    the "Geometry Optimisation" function of IQmol.
 
- o If there are compile issues involving yaml-cpp/node/node.h, add the
-   following include statment to Yaml/yaml-cpp/node/node.h. This issue
-   should be fixed in a future PR.
-      #include <string>
-
-
