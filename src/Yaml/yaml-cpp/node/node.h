@@ -12,6 +12,7 @@
 #include "yaml-cpp/node/detail/iterator_fwd.h"
 #include "yaml-cpp/node/detail/bool_type.h"
 #include <stdexcept>
+#include <string>
 
 namespace YAML
 {

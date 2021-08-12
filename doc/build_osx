@@ -32,15 +32,15 @@ libraries.  The compilation of the code itself is relatively straightforward.
         ./Configure darwin64-x86_64-cc
         make
 
-   - Static libraries appear in top directory and may need to be moved to the lib
-     subdirectory for the libssh2 compilation.
+   - Static libraries (libssl.a & libcrypto.a) appear in top directory and may need to be moved to the lib
+     subdirectory (which may need to be created) for the libssh2 compilation.
 
 
  o LibSSH2:
-   - Download: http://www.libssh2.org  (version 1.8.0 tested)
+   - Download: http://www.libssh2.org  (version 1.9.0 tested)
    - Compile (making sure the correct path for libssl is specified): 
 
-        ./configure --with-openssl --with-libssl-prefix=/path/to/openssl-1.0.1p --with-libz
+        ./configure --with-crypto=openssl --with-libssl-prefix=/path/to/openssl-1.0.1q --with-libz
         make
 
    - Shared and static libraries located in src/.libs
@@ -50,31 +50,19 @@ cmake -DOPENSSL_ROOT_DIR=$DEV/openssl-1.1.1f/ -DOPENSSL_INCLUDE_DIR=$DEV/openssl
 
 
  o Boost:
-   - Download: http://sourceforge.net/projects/boost/files/boost/1.56.0/
-     Later versions of boost seem to have removed the load_collection function which
-     is part of the serialization routines.
-   - Compile: needs the -stdlib=libstdc++ setting to be compatible with Qt.
-     Further details at: http://stackoverflow.com/questions/20108407/
+   - Download: http://sourceforge.net/projects/boost/files/boost/1.76.0/
 
-        ./bootstrap.sh --prefix= toolset=clang
-        ./b2 toolset=clang --without-mpi cxxflags="-arch x86_64 -fvisibility=hidden \
-             -fvisibility-inlines-hidden -stdlib=libstdc++ -ftemplate-depth=512" \
-             linkflags="-stdlib=libstdc++" stage
+        ./bootstrap.sh --prefix= -with-toolset=clang
+        ./b2 
 
-   - Static libraries are in stage/lib.  If they do not appear you may need to
-     add "link=static runtime-link=static" to the b2 arguments
+   - Static libraries are in stage/lib.
 
 
  o OpenBabel:
-   - Download: http://openbabel.org/wiki/Get_Open_Babel (2.4.1)
-     Use the installer which puts things in the following locations:
-     Headers: /usr/local/include/openbabel-2.0
-     PlugIns: /usr/local/lib/openbable/2.4.1
-     Libs:    /usr/local/lib
+   - Download: https://sourceforge.net/projects/openbabel/files/openbabel/ (2.4.1)
+   - Source can be downloaded and compiled with (in the build directory):
 
-   - Alternatively, the source can be downloaded and compiled with (in the build directory):
-
-        cmake -DBUILD_SHARED=OFF -DWITH_STATIC_INCHI=ON -DWITH_STATIC_LIBXML=ON ..
+        cmake -DBUILD_SHARED=OFF -DWITH_STATIC_INCHI=ON -DWITH_STATIC_LIBXML=ON -DLIBXML2_LIBRARIES=/path/to/libxml2/2.9.12/lib/ -DLIBXML2_INCLUDE_DIR=/path/to/libxml2/2.9.12/include -DZLIB_LIBRARY=/path/to/zlib/1.2.11/lib/ -DZLIB_INCLUDE_DIR=/path/to/zlib/1.2.11/include/ ..
         make
 
 	 The static libopenbabel.a will be in the build/src directory. This 
@@ -85,13 +73,18 @@ cmake -DOPENSSL_ROOT_DIR=$DEV/openssl-1.1.1f/ -DOPENSSL_INCLUDE_DIR=$DEV/openssl
 Compilation
 ~~~~~~~~~~~
 
- o Compile the SymMol object file in src/Main
+ o Compile the SymMol object file in src/Main and copy symmol.o to ../../build
       gfortran -c symmol.f90
 
  o Edit the common.pri file to reflect the locations of the various libraries
    required.  I keep all these in a common directory set in the $DEV environment
    variable.
 
- o Compile the remaining IQmol source
+ o Compile the remaining IQmol source. The application will be built in
+   IQmol.app/Contents/MacOS/
       qmake IQmol.pro
       make
+
+ o If the previous step is successful, copy share/ to IQmol.app/Contents. This
+   enables the use of shaders, molecule fragments, and the QUI interface.
+
