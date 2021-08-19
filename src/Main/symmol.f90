@@ -171,7 +171,8 @@
       CALl work(Coordinates, pointGroup)
 
 
-!     WRITE(*,10) Tolerance
+      WRITE(*,*) 'Point group = ', pointGroup
+      WRITE(6,10) Tolerance
    10 FORMAT ('Symmetrized Orthogonal Coordinates Tol = ', F6.3)
 !     DO i = 1,nAtoms
 !        WRITE(*,'(i2, 3(f16.10))') atomicNumbers(i), (Coordinates(k,I),k=1,3)
@@ -1901,7 +1902,7 @@
           go to 1100
         endif
 ! asse improprio m>2
-!       write(Sn,'(i2)') m
+        write(Sn,'(i2)') m
         if(msign.eq.-1)S1='S'
  1100   tot=S1//Sn//S2
         call compatta(tot,4,k)
@@ -1933,17 +1934,17 @@
       S1 = 'C'
 
 !     Cn e S2n dove n=maxasp
-!     write(Sn,'(I2)')maxasp
+      write(Sn,'(I2)')maxasp
       if(MOD(NMS,2).eq.0.and.maxasi.eq.NMS)then
         S1='S'
-!       write(Sn,'(I2)')maxasi
+        write(Sn,'(I2)')maxasi
         if(NMS.ne.6)go to 5000
         pointGroup = 'C3i'
         go to 5100
       endif
       if(NMS.eq.maxasp)go to 5000
       if(NMS.lt.maxasi)then
-!       write(Sn,'(I2)')maxasi
+        write(Sn,'(I2)')maxasi
         S1='S'
         go to 5000
       endif
@@ -1966,7 +1967,7 @@
 
  5100 CONTINUE
 
-!5200 WRITE(*,1) pointGroup, CSMT, RMST
+ 5150 WRITE(*,1) pointGroup, CSMT, RMST
  5200 CONTINUE
 
     1 FORMAT('Schoenflies symbol = ',a7,'  CSM =',f8.4,5x, & 
