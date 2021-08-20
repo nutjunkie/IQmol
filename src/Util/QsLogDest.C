@@ -56,7 +56,7 @@ FileDestination::FileDestination(const QString& filePath)
 
 void FileDestination::write(const QString& message, Level)
 {
-    mOutputStream << message << endl;
+    mOutputStream << message <<  '\n';
     mOutputStream.flush();
 }
 
