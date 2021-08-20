@@ -300,25 +300,36 @@ double Atom::getRadius(bool const selected)
 void Atom::drawLabel(Viewer& viewer, LabelType const type, QFontMetrics& fontMetrics) 
 {
    Vec pos(getPosition());
+qDebug() << "Atom coordinates: " << pos[0] << pos[1] << pos[2];
+   Vec cam(viewer.camera()->position());
    Vec shift = viewer.camera()->position() - pos;
+qDebug() << "Camera coords:    " << cam[0] << cam[1] << cam[2];
+qDebug() << "    Shift vector: " << shift[0] << shift[1] << shift[2];
    shift.normalize();
    QString label(getLabel(type));
 
    pos = pos + 1.05 * shift * getRadius(true);
+qDebug() << "Shifted coords:   " << pos[0] << pos[1] << pos[2] << " r =" << getRadius(true);;
+
    pos = viewer.camera()->projectedCoordinatesOf(pos);
    pos.x -= fontMetrics.width(label)/2.0;
    pos.y += fontMetrics.height()/4.0;
    pos = viewer.camera()->unprojectedCoordinatesOf(pos);
 
+        glPushMatrix();
    glColor3f(0.1, 0.1, 0.1);
-   viewer.renderText(pos[0], pos[1], pos[2], label, viewer.labelFont());
+   viewer.renderText(pos.x, pos.y, pos.z, label, viewer.labelFont());
+        glPopMatrix();
 
-/*
-QString t(getLabel(Index));
-Vec p(getPosition());
-qDebug() << "Rendering text at: " << pos[0] << pos[1] << pos[2] << "    location" <<t << p[0] << p[1] << p[2];
-*/
+qDebug() << "Rendering text:   " << pos[0] << pos[1] << pos[2] << label;
+qDebug() << "";
 
+      glDisable(GL_LIGHTING);
+      glPointSize(3);
+      glBegin(GL_POINTS);
+         glVertex3f(pos.x, pos.y, pos.z);
+      glEnd();
+      glEnable(GL_LIGHTING);
 }
 
 
