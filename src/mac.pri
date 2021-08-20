@@ -29,6 +29,12 @@ contains(CONFIG, DEPLOY) {
    LIBS        += $${OPENBABEL}/build/src/formats/libinchi/libinchi.a
 
    # gfortran
+#  LIBS        += /usr/local/Cellar/gcc/10.2.0_4/lib/gcc/10/libquadmath.a 
+#  LIBS        += /usr/local/Cellar/gcc/10.2.0_4/lib/gcc/10/libgfortran.a
+#  #LIBS        += -L/usr/local/gfortran/lib -lgcc_ext.10.5
+#  LIBS        += -L/usr/local/Cellar/gcc/10.2.0_4/lib/gcc/10 -lgcc_ext.10.5
+
+   # /usr/local/gfortran/bin/gfortran  -c Main/symmol.f90 -o ../build/symmol.o
    LIBS        += /usr/local/gfortran/lib/libgfortran.a
    LIBS        += /usr/local/gfortran/lib/libquadmath.a
    LIBS        += -L/usr/local/gfortran/lib -lgcc_ext.10.5
