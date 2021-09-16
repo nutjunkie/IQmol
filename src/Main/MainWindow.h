@@ -40,6 +40,7 @@
 #include <QSplitter>
 #include <QProgressBar>
 #include <QList>
+//#include <QOpenGLContext>
 
 
 namespace Qui {
@@ -141,6 +142,7 @@ namespace IQmol {
          QSplitter* m_sideSplitter;
          Qui::InputDialog* m_quiInputDialog;
 
+         //QOpenGLContext* m_context;
          QGLContext* m_context;
    };
 

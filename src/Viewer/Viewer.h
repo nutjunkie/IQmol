@@ -84,6 +84,7 @@ namespace IQmol {
             BuildAtom, BuildFunctionalGroup, BuildEfp, BuildMolecule };
 
          Viewer(QGLContext* context, ViewerModel& model, QWidget* parent);
+         //Viewer(ViewerModel& model, QWidget* parent);
          ~Viewer();
 
          void init();

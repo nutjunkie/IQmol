@@ -52,6 +52,7 @@ namespace Configurator {
          void on_wireFrame_clicked(bool);
          void on_plastic_clicked(bool);
          void on_smallerHydrogens_clicked(bool);
+         void on_hideHydrogens_clicked(bool);
          void on_atomRadiusScale_valueChanged(int);
          void on_bondRadiusScale_valueChanged(int);
          void on_chargeRadiusScale_valueChanged(int);

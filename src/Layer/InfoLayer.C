@@ -33,8 +33,8 @@ using namespace qglviewer;
 namespace IQmol {
 namespace Layer {
 
-Info::Info(Molecule* molecule) : m_dipoleValue(0), m_dipoleEstimated(true), m_configurator(*this),
-   m_symmetry(m_pointGroup)
+Info::Info(Molecule* molecule) : m_dipoleValue(0), m_dipoleEstimated(true), 
+   m_configurator(*this), m_symmetry(m_pointGroup), m_energyText("Energy:")
 {
    clear();
    setText("Info");
@@ -53,8 +53,9 @@ void Info::setMolecule(Molecule* molecule)
       connect(m_molecule, SIGNAL(pointGroupAvailable(Data::PointGroup const&)), 
          this, SLOT(setPointGroup(Data::PointGroup const&)));
 
-      connect(m_molecule, SIGNAL(energyAvailable(double const, Info::EnergyUnit)), 
-         this, SLOT(setEnergy(double const, Info::EnergyUnit)));
+      connect(m_molecule, 
+         SIGNAL(energyAvailable(double const, Info::EnergyUnit, QString const&)), 
+         this, SLOT(setEnergy(double const, Info::EnergyUnit, QString const&)));
 
       connect(m_molecule, SIGNAL(dipoleAvailable(qglviewer::Vec const&, bool const)), 
          this, SLOT(setDipole(qglviewer::Vec const&, bool const)));
@@ -247,10 +248,12 @@ unsigned Info::numberOfBetaElectrons() const
 }
 
 
-void Info::setEnergy(double const energy, EnergyUnit unit) 
+void Info::setEnergy(double const energy, EnergyUnit unit, QString const& label) 
 {
+   qDebug() << "Layer::Info Energy set to: " << energy;
    m_energy = energy; 
    m_energyUnit = unit;
+   m_energyText = label;
    updated();
 }
 

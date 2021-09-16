@@ -50,7 +50,9 @@ ShaderLibrary::ShaderLibrary(QGLContext* context) : m_normalBuffer(0), m_filterB
    m_filtersAvailable(false), m_filtersActive(false), m_shadersInitialized(false), 
    m_currentMaterial(QVariantMap())
 {
-   m_glFunctions = new  QGLFunctions(context);
+   m_glFunctions = new QGLFunctions(context);
+   //context->makeCurrent();
+   //m_glFunctions->initializeGLFunctions(context);
    init();
    loadShaders();
    loadPreferences();
@@ -70,6 +72,11 @@ void ShaderLibrary::init()
 
    const GLubyte* shading  = glGetString(GL_SHADING_LANGUAGE_VERSION);
    QLOG_INFO() << "GLSL     " << QString((char*)shading);
+   //Check source framebuffer status 
+   GLenum fbStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+   if (fbStatus != GL_FRAMEBUFFER_COMPLETE) {
+      QLOG_INFO() << "FrametestFramebufferBlitLayered srcFBO Status:" << fbStatus;
+	}
 }
 
 
@@ -648,7 +655,7 @@ void ShaderLibrary::initializeTextures()
    setUniformVariable("Filters", "SamplingVectors", array);
 */
 
-   delete angles;
+   delete [] angles;
 
 
    // generate a 64 x 64 rotation texture for rotating the sampling vectors

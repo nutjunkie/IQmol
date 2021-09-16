@@ -114,6 +114,12 @@ void Molecule::on_smallerHydrogens_clicked(bool tf)
 }
 
 
+void Molecule::on_hideHydrogens_clicked(bool tf)
+{
+   m_molecule.updateHideHydrogens(tf);
+}
+
+
 void Molecule::on_atomRadiusScale_valueChanged(int value)
 {
    if (m_drawMode == Layer::Primitive::Tubes || 

@@ -80,6 +80,7 @@ void Bond::drawSelected()
 void Bond::drawPrivate(bool selected) 
 {
    updateOrientation(); // This should only need calling if an atom is moving
+   if (m_begin->hideHydrogens() || m_end->hideHydrogens()) return;
    switch (m_drawMode) {
       case Primitive::BallsAndSticks:
          drawBallsAndSticks(selected);
@@ -234,8 +235,8 @@ void Bond::drawPlastic(bool selected)
    GLfloat offset(0.09);   // height of the cap
    GLfloat bondRadius(0.10);
    GLfloat capRadius(2*bondRadius);
-   GLfloat aRadius = m_begin->smallHydrogen() ? 0.28 : 0.40;
-   GLfloat bRadius = m_end->smallHydrogen()   ? 0.28 : 0.40;
+   GLfloat aRadius = m_begin->smallerHydrogens() ? 0.28 : 0.40;
+   GLfloat bRadius = m_end->smallerHydrogens()   ? 0.28 : 0.40;
    GLfloat aShift  = aRadius + offset - capRadius;
    GLfloat bShift  = bRadius + offset - capRadius;
 
@@ -634,8 +635,8 @@ void Bond::povrayPlastic(PovRayGen& povray)
    double offset(0.09);   // height of the cap
    double bondRadius(0.10);
    double capRadius(2*bondRadius);
-   double aRadius(m_begin->smallHydrogen() ? 0.28 : 0.40);
-   double bRadius(m_end  ->smallHydrogen() ? 0.28 : 0.40);
+   double aRadius(m_begin->smallerHydrogens() ? 0.28 : 0.40);
+   double bRadius(m_end  ->smallerHydrogens() ? 0.28 : 0.40);
    double aShift(aRadius + offset - capRadius);
    double bShift(bRadius + offset - capRadius);
 

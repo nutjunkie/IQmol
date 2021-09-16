@@ -64,7 +64,9 @@ QFontMetrics Viewer::s_labelFontMetrics(Viewer::s_labelFont);
 
 //! Window set up is done here
 Viewer::Viewer(QGLContext* context, ViewerModel& model, QWidget* parent) : 
+//Viewer::Viewer(ViewerModel& model, QWidget* parent) : 
    QGLViewer(context, parent), 
+//   QGLViewer(parent), 
    m_viewerModel(model), 
    m_selectionHighlighting(true),
    m_labelType(Layer::Atom::None),
@@ -125,10 +127,15 @@ Viewer::~Viewer()
 
 
 //! The OpenGL context is not available in the constructor, so all GL setup
-//! must be done here.
+//! must be done here. This is called from the initializeGL funciton in QGLViewer
 void Viewer::init()
 {
+   qDebug() << "GLContext isValid()" << isValid();
+   //m_glContext = context();
+   //context()->create();
    makeCurrent();
+
+   initShaders();
 
    setManipulatedFrame(new ManipulatedFrame());
    manipulatedFrame()->setConstraint(new ManipulatedFrameSetConstraint());
@@ -157,6 +164,7 @@ void Viewer::init()
    //glLightf( GL_LIGHT1, GL_CONSTANT_ATTENUATION,  0.1f);
    //glLightf( GL_LIGHT1, GL_LINEAR_ATTENUATION,    0.3f);
    //glLightf( GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.3f);
+
 }
 
 
@@ -164,6 +172,7 @@ void Viewer::initShaders()
 {
    makeCurrent();
    m_shaderLibrary = new ShaderLibrary(m_glContext);
+   //m_shaderLibrary = new ShaderLibrary(context());
 
    if (QGLFramebufferObject::hasOpenGLFramebufferObjects()) {
       QLOG_INFO() << "OpenGL framebuffers are active";
@@ -317,7 +326,10 @@ void Viewer::draw()
    m_shaderLibrary->releaseTextures();
    m_shaderLibrary->clearFrameBuffers();
 
-   if (m_labelType != Layer::Atom::None) drawLabels(m_objects);
+   if (m_labelType != Layer::Atom::None) {
+       glEnable(GL_DEPTH_TEST);
+       drawLabels(m_objects);
+   }
    if (m_currentHandler->selectionMode() != Handler::None) {
       drawSelectionRectangle(m_selectHandler.region());
    }
@@ -579,7 +591,6 @@ void Viewer::drawLabels(GLObjectList const& objects)
        }
    }
 
-   
    qglColor(foregroundColor());
 
    QString msg = selectedOnly ? "Selection " : "Total ";
@@ -693,7 +704,10 @@ void Viewer::displayGeometricParameter(GLObjectList const& selection)
    // We cannot use displayMessage here as it triggers an update
    //displayMessage(""); 
 
-   if (message_.isEmpty()) drawText(10, height()-10, msg);
+   QString space(" ");
+   drawText(10, height()-10, space.repeated(message_.length()));
+   drawText(10, height()-10, msg);
+   //if (message_.isEmpty()) drawText(10, height()-10, msg);
 }
 
 
@@ -796,6 +810,7 @@ void Viewer::popAnimator(Animator::Base* base)
       QLOG_DEBUG() << "Stoping animation";
       stopAnimation();
       m_viewerModel.determineSymmetry();
+      m_viewerModel.computeEnergy();
    }
 }
 

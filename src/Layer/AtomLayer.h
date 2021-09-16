@@ -85,6 +85,7 @@ namespace Layer {
 
          void setAtomicNumber(unsigned int const Z);
          void setSmallerHydrogens(bool const tf) { m_smallerHydrogens = tf; }
+         void setHideHydrogens(bool const tf) { m_hideHydrogens = tf; }
          void setCharge(double const charge) {m_charge = charge; }
          void setSpinDensity(double const spin) {m_spin = spin; }
          void setIndex(int const index);
@@ -105,7 +106,8 @@ namespace Layer {
          int getReorderIndex() const { return m_reorderIndex; }
          double getRadius(bool const selected);
          double getVdwRadius() { return m_vdwRadius; }
-         bool smallHydrogen() const { return (m_atomicNumber == 1 && m_smallerHydrogens); }
+         bool smallerHydrogens() const { return (m_atomicNumber == 1 && m_smallerHydrogens); }
+         bool hideHydrogens() const { return (m_atomicNumber == 1 && m_hideHydrogens); }
 
          void resetMass();
          void setMass(double const mass) { m_mass = mass; }
@@ -159,6 +161,7 @@ namespace Layer {
          GLfloat m_vdwRadius;
          QString m_symbol;
          bool    m_smallerHydrogens;
+         bool    m_hideHydrogens;
          bool    m_haveNmrShift;
          int     m_reorderIndex;
          int     m_valency;

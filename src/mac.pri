@@ -28,9 +28,21 @@ contains(CONFIG, DEPLOY) {
    LIBS        += /opt/anaconda3/envs/iqmol-dev/lib/libinchi.dylib
 
    # gfortran
+<<<<<<< HEAD
    LIBS        += /usr/local/Cellar/gcc/11.2.0/lib/gcc/11/libgfortran.a
    LIBS        += /usr/local/Cellar/gcc/11.2.0/lib/gcc/11/libquadmath.a
    LIBS        += -L/usr/local/Cellar/gcc/11.2.0/lib/gcc/11/ -lgcc_ext.10.5
+=======
+#  LIBS        += /usr/local/Cellar/gcc/10.2.0_4/lib/gcc/10/libquadmath.a 
+#  LIBS        += /usr/local/Cellar/gcc/10.2.0_4/lib/gcc/10/libgfortran.a
+#  #LIBS        += -L/usr/local/gfortran/lib -lgcc_ext.10.5
+#  LIBS        += -L/usr/local/Cellar/gcc/10.2.0_4/lib/gcc/10 -lgcc_ext.10.5
+
+   # /usr/local/gfortran/bin/gfortran  -c Main/symmol.f90 -o ../build/symmol.o
+   LIBS        += /usr/local/gfortran/lib/libgfortran.a
+   LIBS        += /usr/local/gfortran/lib/libquadmath.a
+   LIBS        += -L/usr/local/gfortran/lib -lgcc_ext.10.5
+>>>>>>> 2fa130e4968a24548db349ba4998e3387e98ec53
 
    # Misc
    LIBS        += -L/usr/X11/lib  

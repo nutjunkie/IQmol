@@ -5,7 +5,7 @@ include(../common.pri)
 SOURCES = \
    $$PWD/Align.C \
    $$PWD/ColorGradient.C \
-   $$PWD/ColorGradientdialog.C \
+   $$PWD/ColorGradientDialog.C \
    $$PWD/EulerAngles.C \
    $$PWD/Function.C \
    $$PWD/GLShape.C \
@@ -24,7 +24,7 @@ HEADERS = \
    $$PWD/Align.h \
    $$PWD/Axes.h \
    $$PWD/ColorGradient.h \
-   $$PWD/ColorGradientdialog.h \
+   $$PWD/ColorGradientDialog.h \
    $$PWD/Constants.h \
    $$PWD/EulerAngles.h \
    $$PWD/Exception.h \

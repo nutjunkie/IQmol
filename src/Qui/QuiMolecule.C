@@ -173,6 +173,8 @@ QString Molecule::formatForQui(Coordinates::ID const& coords) {
    QString buffer;
    QTextStream mol(&buffer);
 
+   mol.setNumberFlags(mol.numberFlags()|QTextStream::ForcePoint);
+
    switch (coords) {
 
       case Coordinates::Cartesian: {
@@ -181,7 +183,7 @@ QString Molecule::formatForQui(Coordinates::ID const& coords) {
          FOR_ATOMS_OF_MOL(atom, this) {
             mol << qSetFieldWidth(3) << right 
                 << QString(etab.GetSymbol(atom->GetAtomicNum()))
-                << qSetFieldWidth(12) << qSetRealNumberPrecision(6) << forcepoint
+                << qSetFieldWidth(12) << qSetRealNumberPrecision(6)
                 << fixed << right << atom->GetX() << atom->GetY() << atom->GetZ()
                 << qSetFieldWidth(0) << "\n";
          }
@@ -233,6 +235,7 @@ QString Molecule::formatForQui(Coordinates::ID const& coords) {
 
       mol << "\n";
 
+
       FOR_ATOMS_OF_MOL(atom, this) {
          r = vic[atom->GetIdx()]->_dst;
          w = vic[atom->GetIdx()]->_ang;
@@ -243,19 +246,19 @@ QString Molecule::formatForQui(Coordinates::ID const& coords) {
           
          if (atom->GetIdx() > 1) {
             mol << "   r" << atom->GetIdx() << " = " << qSetFieldWidth(12)
-                << qSetRealNumberPrecision(5) << forcepoint << fixed << right
+                << qSetRealNumberPrecision(5) << fixed << right
                 << r << qSetFieldWidth(0) << "\n";
          }
 
          if (atom->GetIdx() > 2) {
             mol << "   a" << atom->GetIdx() << " = " << qSetFieldWidth(12)
-                << qSetRealNumberPrecision(5) << forcepoint << fixed << right
+                << qSetRealNumberPrecision(5) << fixed << right
                 << w << qSetFieldWidth(0) << "\n";
          }
 
          if (atom->GetIdx() > 3) {
              mol << "   d" << atom->GetIdx() << " = " << qSetFieldWidth(12)
-                 << qSetRealNumberPrecision(5) << forcepoint << fixed << right
+                 << qSetRealNumberPrecision(5) << fixed << right
                  << t << qSetFieldWidth(0) << "\n";
          }
       }
@@ -297,21 +300,21 @@ QString Molecule::formatForQui(Coordinates::ID const& coords) {
             mol << qSetFieldWidth(6) << right
                 << QString(etab.GetSymbol(a->GetAtomicNum())
                         + QString::number(a->GetIdx())) << qSetFieldWidth(12)
-                << qSetRealNumberPrecision(5) << forcepoint << fixed << right << r;
+                << qSetRealNumberPrecision(5) << fixed << right << r;
          }
 
          if (atom->GetIdx() > 2) {
             mol << qSetFieldWidth(6) << right
                 << QString(etab.GetSymbol(b->GetAtomicNum())
                     + QString::number(b->GetIdx())) << qSetFieldWidth(12)
-                << qSetRealNumberPrecision(5) << forcepoint << fixed << right << w;
+                << qSetRealNumberPrecision(5) << fixed << right << w;
          }
 
          if (atom->GetIdx() > 3) {
             mol << qSetFieldWidth(6) << right
                 << QString(etab.GetSymbol(c->GetAtomicNum())
                     + QString::number(c->GetIdx())) << qSetFieldWidth(12)
-                << qSetRealNumberPrecision(5) << forcepoint << fixed << right << t;
+                << qSetRealNumberPrecision(5) << fixed << right << t;
          }
 
          mol << qSetFieldWidth(0) << "\n";

@@ -3,7 +3,7 @@
 QT     += xml opengl gui network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
-QMAKE_CXXFLAGS += -O2 -g -ggdb
+QMAKE_CXXFLAGS += -O2 -g -ggdb -w #added -fcompare
 
 # Set the $DEV environment variable to the top directory used to compile all
 # the packages.  To simplify distribution, we use static libraries wherever

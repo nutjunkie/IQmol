@@ -87,6 +87,7 @@ bool Server::open()
    bool ok(true);
    // Short circuit the open if we have already been authenticated.
    if (m_connection && m_connection->status() == Network::Authenticated) return true;
+   stopUpdates();
 
    QString address(m_configuration.value(ServerConfiguration::HostAddress));
    QString publicKeyFile(m_configuration.value(ServerConfiguration::PublicKeyFile));
@@ -135,12 +136,16 @@ bool Server::open()
             QString userName(m_configuration.value(ServerConfiguration::UserName));
             QString jwt(userName);
 
+            // Spawn a separate connection as the authentication server may
+            // be on a different machine.
             Network::HttpConnection conn(address, authenticationPort);
             conn.open();
             conn.authenticate(authentication, jwt);
             if (conn.status() == Network::Authenticated) {
                cookie = jwt;
                m_connection->setStatus(Network::Authenticated);
+            }else {
+               m_connection->setMessage(conn.message());
             }
          }else {
             m_connection->authenticate(authentication, cookie);
@@ -162,6 +167,7 @@ bool Server::open()
       }
    }else {
       m_message = m_connection->message();
+      qDebug() << "Setting Server message" << m_message;
       delete m_connection;
       m_connection = 0;
       ok = false;
@@ -853,6 +859,8 @@ void Server::listFinished()
       }
 
       QStringList fileList(parseListMessage(job, reply->message()));
+      // Remove unwanted files
+      fileList.removeAll("batch");
       QString destination(job->jobInfo().get(QChemJobInfo::LocalWorkingDirectory));
       //reply->deleteLater();
 

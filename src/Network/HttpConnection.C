@@ -74,10 +74,9 @@ void HttpConnection::close()
 void HttpConnection::authenticate(AuthenticationT const auth, QString& cookie)
 {
   if (auth == Network::Password) {
-     // cookie is actually username in this case
-     cookie = getJwt(cookie);
+     cookie = getJwt(cookie); // cookie is actually username in this case
   }else {
-     if ( cookie.isEmpty()) cookie = getCookie();
+     if (cookie.isEmpty()) cookie = getCookie();
   }
 
   if (!cookie.isEmpty()) m_status = Authenticated;
@@ -115,12 +114,13 @@ QString HttpConnection::getJwt(QString const& userName)
 
    if (reply->status() == Reply::Finished) {
       QString msg(reply->message());
-   qDebug() << "Messsage received: " << msg;
       QRegExp rx("Qcloud-Token::([0-9a-zA-Z\\-\\._]+)");
       if (msg.contains("Qcloud-Server-Status::OK") && rx.indexIn(msg,0) != -1) {
          jwt = rx.cap(1);
       }
       QLOG_DEBUG() << "Returning JWT:" << jwt;
+   }else {
+      m_message = reply->message();
    }
 
    return jwt;

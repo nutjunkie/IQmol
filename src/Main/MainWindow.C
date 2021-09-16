@@ -70,8 +70,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent),
    //format.setProfile(QGLFormat::CoreProfile);
 
    m_context = new QGLContext(format);
+   //m_context = new QOpenGLContext(format);
+   //m_context->create();
+   //m_context->makeCurrent();
    m_viewer  = new Viewer(m_context, m_viewerModel, this);
-   m_viewer->initShaders();
 
    setStatusBar(0);
    setWindowTitle("IQmol");
