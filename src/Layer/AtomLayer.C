@@ -27,6 +27,7 @@
 #include "GLShape.h"
 #include <openbabel/mol.h>
 #include <openbabel/data.h>
+#include <openbabel/elements.h>
 #include <QColor>
 #include <QMenu>
 #include <vector>
@@ -147,20 +148,21 @@ void Atom::updateHybridization()
 
 void Atom::resetMass()
 {
-   m_mass = OpenBabel::etab.GetMass(m_atomicNumber);
+   m_mass = OpenBabel::OBElements::GetMass(m_atomicNumber);
 }
 
 
 void Atom::setAtomicNumber(unsigned int const Z) 
 {
    m_atomicNumber = Z;
-   m_vdwRadius = OpenBabel::etab.GetVdwRad(Z);
-   m_mass      = OpenBabel::etab.GetMass(Z);
-   m_symbol    = QString(OpenBabel::etab.GetSymbol(Z));
-   m_valency   = OpenBabel::etab.GetMaxBonds(Z);
+   m_vdwRadius = OpenBabel::OBElements::GetVdwRad(Z);
+   m_mass      = OpenBabel::OBElements::GetMass(Z);
+   m_symbol    = QString(OpenBabel::OBElements::GetSymbol(Z));
+   m_valency   = OpenBabel::OBElements::GetMaxBonds(Z);
    setText(m_symbol);
 
-   std::vector<double> rgb(OpenBabel::etab.GetRGB(Z));
+   std::vector<double> rgb(3);
+   OpenBabel::OBElements::GetRGB(Z,&rgb[0],&rgb[1],&rgb[2]);
    m_color[0] = rgb[0];
    m_color[1] = rgb[1];
    m_color[2] = rgb[2];

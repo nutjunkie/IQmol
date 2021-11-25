@@ -51,7 +51,7 @@ void PeriodicTable::connectSignals() {
        name.remove(QRegExp("element_"));
        atomicNumber = name.toUInt(&ok);
        if (ok) {
-          name = QString(OpenBabel::etab.GetName(atomicNumber).c_str());
+          name = QString(OpenBabel::OBElements::GetName(atomicNumber));
           (*iter)->setToolTip(QString::number(atomicNumber) + " " + name);
        }
    }
@@ -75,7 +75,7 @@ void PeriodicTable::buttonPushed() {
    int atomicNumber = name.toUInt(&ok);
    if (ok) {
       elementSelected(atomicNumber);
-      elementSelected(QString(OpenBabel::etab.GetSymbol(atomicNumber)));
+      elementSelected(QString(OpenBabel::OBElements::GetSymbol(atomicNumber)));
    }
 }
 

@@ -44,7 +44,7 @@
 #include "openbabel/forcefield.h"
 #include "openbabel/griddata.h"
 #include "openbabel/math/vector3.h"
-
+#include "openbabel/obiter.h"
 
 
 namespace IQmol {

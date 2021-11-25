@@ -11,7 +11,7 @@ contains(CONFIG, DEVELOP){
    LIBS        += -lboost_iostreams -lboost_serialization
    
    # OpenBabel
-   INCLUDEPATH += /usr/include/openbabel-2.0
+   INCLUDEPATH += /usr/include/openbabel3
    LIBS        += -lopenbabel
 
    # SSH2/libssl/crypto
@@ -41,7 +41,7 @@ contains(CONFIG, DISTRIB) {
    LIBS        += /usr/lib/x86_64-linux-gnu/libboost_iostreams.a
    
    # OpenBabel
-   INCLUDEPATH += /usr/include/openbabel-2.0
+   INCLUDEPATH += /usr/include/openbabel3
    LIBS        += -lopenbabel
 
    # libssl/crypto
@@ -75,7 +75,7 @@ contains(CONFIG, DEPLOY) {
    LIBS        += /usr/lib/x86_64-linux-gnu/libboost_iostreams.a
    
    # OpenBabel
-   OPENBABEL    = $(DEV)/openbabel-2.4.1
+   OPENBABEL    = $(DEV)/openbabel3
    INCLUDEPATH += $${OPENBABEL}/include
    LIBS        += $${OPENBABEL}/build/src/libopenbabel.a
 

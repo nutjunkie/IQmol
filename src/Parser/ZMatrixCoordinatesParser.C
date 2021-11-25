@@ -25,6 +25,8 @@
 #include "openbabel/obconversion.h"
 #include "openbabel/format.h"
 #include "openbabel/mol.h"
+#include "openbabel/obiter.h"
+#include "openbabel/atom.h"
 
 #include <QDebug>
 

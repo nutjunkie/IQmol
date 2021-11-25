@@ -23,6 +23,7 @@
 #include "IsotopesConfigurator.h"
 #include "IsotopesLayer.h"
 #include "openbabel/data.h"
+#include "openbabel/elements.h"
 #include "AtomLayer.h"
 #include <QComboBox>
 #include <QSpinBox>
@@ -75,14 +76,13 @@ void Isotopes::loadTable(QList<Layer::Atom*> const& atoms)
    QTableWidgetItem* index;
    QComboBox* combo;
 
-   OpenBabel::OBElementTable pt;
    unsigned n(atomicNumbers.size());
    table->setRowCount(n);
 
    for (unsigned i = 0; i < n; ++i) {
        unsigned Z(atomicNumbers[i]);
        combo = new QComboBox(table);
-       name  = new QTableWidgetItem(QString::fromStdString(pt.GetName(Z)));
+       name  = new QTableWidgetItem(QString::fromStdString(OpenBabel::OBElements::GetName(Z)));
        index = new QTableWidgetItem(indices[Z]);
        table->setItem(      i, 0, name);
        table->setCellWidget(i, 1, combo);
@@ -94,12 +94,8 @@ void Isotopes::loadTable(QList<Layer::Atom*> const& atoms)
 
 void Isotopes::loadMasses(unsigned Z, QComboBox* combo)
 {
-   OpenBabel::OBElementTable pt;
-   OpenBabel::OBIsotopeTable it;
-
-
    QList<unsigned> isotopes;
-   QString symbol(pt.GetSymbol(Z));
+   QString symbol(OpenBabel::OBElements::GetSymbol(Z));
 
    // The isotopes are ordered by abundance
    switch(Z) {
@@ -150,12 +146,12 @@ void Isotopes::loadMasses(unsigned Z, QComboBox* combo)
    }
 
    combo->clear();
-   double m(pt.GetMass(Z));
+   double m(OpenBabel::OBElements::GetMass(Z));
    combo->addItem(symbol + "(std)", m);
 
    for (int i = 0; i < isotopes.size(); ++i) {
        QString label(symbol + "(" + QString::number(isotopes[i]) + ")");
-       double m(it.GetExactMass(Z,isotopes[i]));
+       double m(OpenBabel::OBElements::GetExactMass(Z,isotopes[i]));
        combo->addItem(label, m);
    }
 }

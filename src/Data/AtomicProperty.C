@@ -22,6 +22,7 @@
 
 #include "AtomicProperty.h"
 #include <openbabel/mol.h>
+#include <openbabel/elements.h>
 #include <vector>
 #include <QDebug>
 
@@ -32,7 +33,7 @@ namespace Data {
 //  ---------- AtomicSymbol ----------
 void AtomicSymbol::setDefault(int const Z)
 {
-   if (Z > 0) m_symbol = QString(OpenBabel::etab.GetSymbol(Z));
+   if (Z > 0) m_symbol = QString(OpenBabel::OBElements::GetSymbol(Z));
 }
 
 
@@ -54,7 +55,7 @@ void ScalarProperty::dump() const
 //  ---------- Mass ----------
 void Mass::setDefault(int const Z)
 {
-   if (Z > 0) m_value = OpenBabel::etab.GetMass(Z);
+   if (Z > 0) m_value = OpenBabel::OBElements::GetMass(Z);
 }
 
 
@@ -62,7 +63,7 @@ void Mass::setDefault(int const Z)
 //  ---------- VdwRadius ----------
 void VdwRadius::setDefault(int const Z)
 {
-   if (Z > 0) m_value = OpenBabel::etab.GetVdwRad(Z);
+   if (Z > 0) m_value = OpenBabel::OBElements::GetVdwRad(Z);
 }
 
 
@@ -71,10 +72,7 @@ void VdwRadius::setDefault(int const Z)
 void AtomColor::setDefault(int const Z)
 {
    if (Z > 0) {
-      std::vector<double> rgb(OpenBabel::etab.GetRGB(Z));
-      m_color[0] = rgb[0];
-      m_color[1] = rgb[1];
-      m_color[2] = rgb[2];
+      OpenBabel::OBElements::GetRGB(Z, &m_color[0], &m_color[1], &m_color[2]);
       m_color[3] = 1.0;
    }
 }
