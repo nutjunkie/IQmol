@@ -1,3 +1,6 @@
+This is an old repository that will be deprecated.  Please use the IQmol3
+repo.
+
 This is IQmol, a molecular builder and visualization package written by Andrew
 Gilbert.  IQmol is able to build molecules, set up and submit input for Q-Chem
 calculations, and analyse the output.  Analyses include display of molecular
