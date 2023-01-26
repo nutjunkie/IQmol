@@ -21,6 +21,9 @@
 #include "openbabel/format.h"
 #include "openbabel/obconversion.h"
 #include "openbabel/forcefield.h"
+#include "openbabel/elements.h"
+#include "openbabel/obiter.h"
+#include "openbabel/internalcoord.h"
 
 #include "QuiMolecule.h"
 
@@ -182,7 +185,7 @@ QString Molecule::formatForQui(Coordinates::ID const& coords) {
              << GetTotalCharge() << GetTotalSpinMultiplicity() << "\n";
          FOR_ATOMS_OF_MOL(atom, this) {
             mol << qSetFieldWidth(3) << right 
-                << QString(etab.GetSymbol(atom->GetAtomicNum()))
+                << QString(OBElements::GetSymbol(atom->GetAtomicNum()))
                 << qSetFieldWidth(12) << qSetRealNumberPrecision(6)
                 << fixed << right << atom->GetX() << atom->GetY() << atom->GetZ()
                 << qSetFieldWidth(0) << "\n";
@@ -209,24 +212,24 @@ QString Molecule::formatForQui(Coordinates::ID const& coords) {
          c = vic[atom->GetIdx()]->_c;
 
          mol << qSetFieldWidth(4) << right
-             << QString(etab.GetSymbol(atom->GetAtomicNum())
+             << QString(OBElements::GetSymbol(atom->GetAtomicNum())
                       + QString::number(atom->GetIdx()))
              << qSetFieldWidth(0);
  
          if (atom->GetIdx() > 1) {
-            mol << " "  << QString(etab.GetSymbol(a->GetAtomicNum())
+            mol << " "  << QString(OBElements::GetSymbol(a->GetAtomicNum())
                            + QString::number(a->GetIdx()))
                 << " r" << atom->GetIdx();
          }
 
          if (atom->GetIdx() > 2) {
-            mol << " "  << QString(etab.GetSymbol(b->GetAtomicNum())
+            mol << " "  << QString(OBElements::GetSymbol(b->GetAtomicNum())
                          + QString::number(b->GetIdx()))
                 << " a" << atom->GetIdx();
          }
 
          if (atom->GetIdx() > 3) {
-            mol << " " << QString(etab.GetSymbol(c->GetAtomicNum())
+            mol << " " << QString(OBElements::GetSymbol(c->GetAtomicNum())
                           + QString::number(c->GetIdx()))
                 << " d" << atom->GetIdx();
          }
@@ -293,26 +296,26 @@ QString Molecule::formatForQui(Coordinates::ID const& coords) {
          if (t < 0.0) t += 360.0;
 
          mol << qSetFieldWidth(4) << right
-             << QString(etab.GetSymbol(atom->GetAtomicNum())
+             << QString(OBElements::GetSymbol(atom->GetAtomicNum())
                  + QString::number(atom->GetIdx()));
 
          if (atom->GetIdx() > 1) {
             mol << qSetFieldWidth(6) << right
-                << QString(etab.GetSymbol(a->GetAtomicNum())
+                << QString(OBElements::GetSymbol(a->GetAtomicNum())
                         + QString::number(a->GetIdx())) << qSetFieldWidth(12)
                 << qSetRealNumberPrecision(5) << fixed << right << r;
          }
 
          if (atom->GetIdx() > 2) {
             mol << qSetFieldWidth(6) << right
-                << QString(etab.GetSymbol(b->GetAtomicNum())
+                << QString(OBElements::GetSymbol(b->GetAtomicNum())
                     + QString::number(b->GetIdx())) << qSetFieldWidth(12)
                 << qSetRealNumberPrecision(5) << fixed << right << w;
          }
 
          if (atom->GetIdx() > 3) {
             mol << qSetFieldWidth(6) << right
-                << QString(etab.GetSymbol(c->GetAtomicNum())
+                << QString(OBElements::GetSymbol(c->GetAtomicNum())
                     + QString::number(c->GetIdx())) << qSetFieldWidth(12)
                 << qSetRealNumberPrecision(5) << fixed << right << t;
          }

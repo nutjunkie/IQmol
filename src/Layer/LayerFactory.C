@@ -59,6 +59,9 @@
 #include "RemLayer.h"
 #include "QsLog.h"
 #include "openbabel/mol.h"
+#include "openbabel/atom.h"
+#include "openbabel/bond.h"
+#include "openbabel/obiter.h"
 
 #include <typeinfo>   // for std::bad_cast
 

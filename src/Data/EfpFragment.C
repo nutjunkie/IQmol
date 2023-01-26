@@ -25,6 +25,7 @@
 #include "EulerAngles.h"
 #include "Align.h"
 #include "openbabel/mol.h"
+#include "openbabel/elements.h"
 #include <QDebug>
 
 
@@ -58,7 +59,7 @@ bool EfpFragment::align(QList<Vec> const& coordinates)
    
    QList<double> weights;
    for (unsigned i = 0; i < geometry.nAtoms(); ++i) {
-       weights.append(OpenBabel::etab.GetMass(geometry.atomicNumber(i))); 
+       weights.append(OpenBabel::OBElements::GetMass(geometry.atomicNumber(i))); 
    }
 
    Util::Align align(geometry.coordinates(), coordinates, weights);

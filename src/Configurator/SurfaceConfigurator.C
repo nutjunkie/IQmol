@@ -24,7 +24,8 @@
 #include "SurfaceConfigurator.h"
 #include "SurfaceLayer.h"
 #include "MoleculeLayer.h"
-#include <openbabel/mol.h>  // for etab
+#include <openbabel/mol.h>
+#include <openbabel/elements.h>
 #include <QColorDialog>
 
 
@@ -228,7 +229,8 @@ ColorGradient::ColorList Surface::atomColorGradient(unsigned const maxAtomicNumb
    ColorGradient::ColorList atomColors;
    QColor color;
    for (unsigned int Z = 1; Z <= maxAtomicNumber; ++Z) {
-       std::vector<double> rgb(OpenBabel::etab.GetRGB(Z));
+       std::vector<double> rgb(3);
+       OpenBabel::OBElements::GetRGB(Z,&rgb[0],&rgb[1],&rgb[2]);
        color.setRgbF(rgb[0],rgb[1],rgb[2],1.0);
        atomColors.append(color);
    }

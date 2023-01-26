@@ -25,6 +25,8 @@
 #include "Geometry.h"
 #include "openbabel/obiter.h"
 #include "openbabel/mol.h"
+#include "openbabel/atom.h"
+#include "openbabel/bond.h"
 
 #define _USE_MATH_DEFINES
 #include <cmath>

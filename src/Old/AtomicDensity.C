@@ -23,7 +23,7 @@
 #include "Constants.h"
 #include "AtomicDensity.h"
 #include "AtomicDensityData.h"
-#include <openbabel/mol.h>  // for OpenBabel::etab
+#include <openbabel/elements.h>
 #include <cmath>
 
 
@@ -168,7 +168,7 @@ unsigned VanDerWaals::s_indices[20][3] = {
 VanDerWaals::VanDerWaals(unsigned atomicNumber, Vec const& center, double const scale,
    double const solventRadius) : Base(atomicNumber), m_center(center)
 {
-   m_radius = scale*OpenBabel::etab.GetVdwRad(atomicNumber)+solventRadius;
+   m_radius = scale*OpenBabel::OBElements::GetVdwRad(atomicNumber)+solventRadius;
 }
 
 

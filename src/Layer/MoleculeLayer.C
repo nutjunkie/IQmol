@@ -63,11 +63,15 @@
 #include "IQmolParser.h"
 
 #include "openbabel/mol.h"
+#include "openbabel/atom.h"
+#include "openbabel/bond.h"
+#include "openbabel/typer.h"
 #include "openbabel/format.h"
 #include "openbabel/obconversion.h"
 #include "openbabel/generic.h"
 #include "openbabel/forcefield.h"
 #include "openbabel/plugin.h"
+#include "openbabel/obiter.h"
 
 #include <QFileDialog>
 #include <QDropEvent>
@@ -516,7 +520,7 @@ OBMol* Molecule::toOBMol(AtomMap* atomMap, BondMap* bondMap, GroupMap* groupMap)
    AtomList::iterator atomIter;
 
    obMol->BeginModify();
-   obMol->SetImplicitValencePerceived();
+   //obMol->SetImplicitValencePerceived(); // FIXME: this function doesn't appear to exist in OpenBabel3?
    obMol->SetHybridizationPerceived();
 
    for (atomIter = atoms.begin(); atomIter != atoms.end(); ++atomIter) {
@@ -1803,14 +1807,14 @@ void Molecule::addHydrogens()
    // We now type the atoms and overwrite the valency/hybridization info
    // if it has been changed by the user.
    OBAtomTyper atomTyper;
-   atomTyper.AssignImplicitValence(*obMol);
+   // atomTyper.AssignImplicitValence(*obMol); // FIXME: this function doesn't appear to exist in OpenBabel3?
    atomTyper.AssignHyb(*obMol);
 
    AtomMap::iterator iter;
    for (iter = atomMap.begin(); iter != atomMap.end(); ++iter) {
        int hybrid(iter.value()->getHybridization());
        if (hybrid > 0) {
-          iter.key()->SetImplicitValence(iter.value()->getValency());
+	  // iter.key()->SetImplicitValence(iter.value()->getValency()); // FIXME: this function doesn't appear to exist in OpenBabel3?
           iter.key()->SetHyb(hybrid);
        }
    }

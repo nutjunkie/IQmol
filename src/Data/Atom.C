@@ -23,6 +23,7 @@
 #include "Atom.h"
 #include "AtomicProperty.h"
 #include <openbabel/mol.h>
+#include <openbabel/elements.h>
 #include <QDebug>
 
 
@@ -34,7 +35,7 @@ template<> const Type::ID AtomList::TypeID = Type::AtomList;
 
 unsigned Atom::atomicNumber(QString const& symbol) 
 {
-   unsigned z(OpenBabel::etab.GetAtomicNum(symbol.toLatin1().data()));
+   unsigned z(OpenBabel::OBElements::GetAtomicNum(symbol.toLatin1().data()));
    return z;
 }
 

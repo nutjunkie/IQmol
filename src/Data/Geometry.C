@@ -26,6 +26,8 @@
 #include "QsLog.h"
 #include <QDebug>
 #include "openbabel/mol.h"
+#include "openbabel/atom.h"
+#include "openbabel/obiter.h"
 
 
 namespace IQmol {
@@ -258,7 +260,7 @@ return;
     OpenBabel::OBMol obMol;
 
     obMol.BeginModify();
-    obMol.UnsetPartialChargesPerceived();
+    obMol.SetPartialChargesPerceived(false);
     for (int i = 0; i < m_atoms.size(); ++i) {
         obAtom = obMol.NewAtom();
         obAtom->SetAtomicNum(m_atoms[i]->atomicNumber());
